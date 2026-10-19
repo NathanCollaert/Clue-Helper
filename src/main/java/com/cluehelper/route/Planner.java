@@ -33,6 +33,10 @@ public final class Planner
 	private static final int REGION_SIZE = 64;
 	/** Alternatives are shown only within Best's rank plus this, or plus Best's own rank if that is more. */
 	static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
+	/** Landings this close count as the same place: catalog landings spread 0–2 tiles (B09). */
+	private static final int SAME_LANDING_TILES = 2;
+	/** Rejected repeats and round trips each cost a search; past this many the plan shows what it has. */
+	static final int MOST_ALTERNATIVE_SEARCHES = 12;
 
 	private Planner()
 	{
@@ -45,7 +49,7 @@ public final class Planner
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
 			return Plan.builder().stepKey(step == null ? null : step.getKey()).alternatives(List.of()).candidates(List.of())
-				.probeTicks(Map.of()).note(step == null ? "no step" : "no target tile for this step yet").build();
+				.probeTicks(Map.of()).why(List.of()).note(step == null ? "no step" : "no target tile for this step yet").build();
 		}
 		PlanContext ctx = new PlanContext(in);
 		List<List<int[]>> orders = legOrders(ctx, step);
@@ -64,6 +68,7 @@ public final class Planner
 			.candidates(picks.candidates);
 		plan.probeTicks(probes ? probeTicks(ctx, first) : Map.of());
 		plan.alternatives(probes || orders.size() > 1 ? List.of() : alternatives(in, searches, orders, picks));
+		plan.why(probes ? List.of() : WhyList.of(ctx, orders.get(0).get(0)));
 		plan.note(picks.best == null ? noRouteNote(ctx, orders) : ctx.targetInWilderness ? "Wilderness target" : null);
 		return plan.searchNanos(System.nanoTime() - started).contextNanos(contextNanos).labels(searches.labels)
 			.searches(searches.count).build();
@@ -128,10 +133,12 @@ public final class Planner
 		List<Route> alternatives = new ArrayList<>();
 		Set<String> excluded = new HashSet<>();
 		Set<String> identities = new HashSet<>();
+		List<Route> shown = new ArrayList<>();
 		Stream.of(picks.best, picks.direct, picks.sameBook).filter(Objects::nonNull).forEach(route ->
 		{
 			excluded.add(route.getFirstTransportKey());
 			identities.add(route.getIdentity());
+			shown.add(route);
 		});
 		if (excluded.isEmpty())
 		{
@@ -139,7 +146,7 @@ public final class Planner
 		}
 		int limit = picks.best == null ? Integer.MAX_VALUE
 			: picks.best.getRankHalfTicks() + Math.max(picks.best.getRankHalfTicks(), ALTERNATIVE_SLACK_HALF_TICKS);
-		while (alternatives.size() < in.getSettings().getRouteCount() - 1)
+		for (int tries = 0; alternatives.size() < in.getSettings().getRouteCount() - 1 && tries < MOST_ALTERNATIVE_SEARCHES; tries++)
 		{
 			LabelSearch search = searches.bestOrder(orders, Set.copyOf(excluded), limit);
 			Route next = new Picks(searches.ctx, search).best;
@@ -147,12 +154,63 @@ public final class Planner
 			{
 				break;
 			}
-			if (identities.add(next.getIdentity()))
+			if (!repeats(next, shown) && !loops(next) && identities.add(next.getIdentity()))
 			{
 				alternatives.add(next);
+				shown.add(next);
 			}
 		}
 		return alternatives;
+	}
+
+	/**
+	 * Comes back to where it already was: leaving the shown routes' transports out can leave a round trip as the
+	 * cheapest route with a transport ("walk to ring BIP, ring to DIP, ring back to BIP, walk 35").
+	 */
+	static boolean loops(Route route)
+	{
+		List<WorldPoint> places = new ArrayList<>();
+		for (Leg leg : route.getLegs())
+		{
+			WorldPoint from = leg.getFrom();
+			WorldPoint to = leg.getTo();
+			if (from == null || to == null || to.equals(from))
+			{
+				continue;
+			}
+			if (places.isEmpty())
+			{
+				places.add(from);
+			}
+			List<WorldPoint> before = places.subList(0, places.size() - 1);
+			if (before.stream().anyMatch(seen -> seen.getPlane() == to.getPlane() && seen.distanceTo2D(to) <= SAME_LANDING_TILES))
+			{
+				return true;
+			}
+			places.add(to);
+		}
+		return false;
+	}
+
+	/** Where the route's first transport lands; null for a walk. */
+	private static WorldPoint firstLanding(Route route)
+	{
+		return route.getLegs().stream().filter(Leg::isTransport).findFirst().map(Leg::getTo).orElse(null);
+	}
+
+	/**
+	 * Lands beside a shown route and saves nothing it spends: Fishing cape and Max cape to Otto's Grotto are one
+	 * alternative, while a free home teleport beside a paid spell stays.
+	 */
+	private static boolean repeats(Route route, List<Route> shown)
+	{
+		WorldPoint landing = firstLanding(route);
+		return landing != null && shown.stream().anyMatch(other ->
+		{
+			WorldPoint at = firstLanding(other);
+			return at != null && at.getPlane() == landing.getPlane() && at.distanceTo2D(landing) <= SAME_LANDING_TILES
+				&& route.getSpent().keySet().containsAll(other.getSpent().keySet());
+		});
 	}
 
 	private static Map<WorldPoint, Integer> probeTicks(PlanContext ctx, LabelSearch search)

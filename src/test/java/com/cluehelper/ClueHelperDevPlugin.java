@@ -2,6 +2,7 @@ package com.cluehelper;
 
 import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
+import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.player.Position;
 import com.cluehelper.route.Plan;
@@ -71,6 +72,10 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final String LANDING_TAG = "[CH-LAND]";
 	private static final File ROUTE_FRAMES = new File("build/routes");
 	private static final File SCENES = new File("build/scenes");
+	private static final File GUIDE_FRAMES = new File("build/guide");
+	/** While a route is followed, a game frame this often (about 5 s), to see highlights between sub-step changes. */
+	private static final int LIVE_FRAME_TICKS = 8;
+	private static final int MOST_LIVE_FRAMES = 200;
 	/** Scenes recorded per run for the scene BFS check: one per new plan that starts with a scene walk. */
 	private static final int MOST_SCENES = 12;
 	/** Farther than a run tick can carry you: a teleport, a ladder or a boat. */
@@ -121,6 +126,9 @@ public class ClueHelperDevPlugin extends Plugin
 	private int lastAvailableCount = -1;
 	private int landingFrameCount;
 	private int routeFrameCount;
+	private int guideFrameCount;
+	private String lastGuideText;
+	private int liveFrameCount;
 	private String lastPlannedStep;
 	private boolean sampled;
 	private final Set<String> recordedScenes = new HashSet<>();
@@ -135,10 +143,12 @@ public class ClueHelperDevPlugin extends Plugin
 		clearOldPngs(PLAYER_FRAMES);
 		clearOldPngs(LANDING_FRAMES);
 		clearOldPngs(ROUTE_FRAMES);
+		clearOldPngs(GUIDE_FRAMES);
 		SCENES.mkdirs();
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getRoutes().addListener(this::onPlanned));
+		unregister.add(clueHelper.getGuide().addListener(this::saveGuideFrames));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
@@ -161,6 +171,7 @@ public class ClueHelperDevPlugin extends Plugin
 	public void onGameTick(GameTick tick)
 	{
 		checkLanding();
+		saveLiveFrame();
 		if (!autoRunPending || client.getGameState() != GameState.LOGGED_IN || ++loggedInTicks < AUTO_RUN_AFTER_TICKS)
 		{
 			return;
@@ -469,17 +480,25 @@ public class ClueHelperDevPlugin extends Plugin
 
 	private void snapshot(ClueHelperPanel panel, String name)
 	{
+		snapshotTo(panel, new File(SNAPSHOTS, String.format("%02d-%s.png", ++snapshotCount, name)));
+	}
+
+	private void snapshotTo(ClueHelperPanel panel, File file)
+	{
+		if (panel == null)
+		{
+			return;
+		}
 		Component target = panel.getParent() != null ? panel.getParent() : panel;
 		if (target.getWidth() <= 0 || target.getHeight() <= 0)
 		{
-			log.info("{} NOTE snapshot {} skipped: the panel has no size (sidebar collapsed?)", TAG, name);
+			log.info("{} NOTE snapshot {} skipped: the panel has no size (sidebar collapsed?)", TAG, file.getName());
 			return;
 		}
 		BufferedImage image = new BufferedImage(target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = image.createGraphics();
 		target.paint(g);
 		g.dispose();
-		File file = new File(SNAPSHOTS, String.format("%02d-%s.png", ++snapshotCount, name));
 		try
 		{
 			ImageIO.write(image, "png", file);
@@ -487,7 +506,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		catch (Exception e)
 		{
-			log.warn("{} snapshot {} failed", TAG, name, e);
+			log.warn("{} snapshot {} failed", TAG, file, e);
 		}
 	}
 
@@ -541,6 +560,33 @@ public class ClueHelperDevPlugin extends Plugin
 		String key = plan.getStepKey().replaceAll("[^a-zA-Z0-9]+", "-");
 		String name = String.format("%03d-%s.png", ++routeFrameCount, key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
 		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(ROUTE_FRAMES, name))));
+	}
+
+	private void saveLiveFrame()
+	{
+		SubStep current = clueHelper.getGuide().getCurrent();
+		if (current == null || client.getTickCount() % LIVE_FRAME_TICKS != 0 || liveFrameCount >= MOST_LIVE_FRAMES)
+		{
+			return;
+		}
+		String name = String.format("live-%03d-t%d-%s-game.png", ++liveFrameCount, client.getTickCount(),
+			current.getKind().name().toLowerCase(Locale.ROOT));
+		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name))));
+	}
+
+	/** A game frame and a sidebar snapshot per new sub-step, for reading a live run's guidance afterwards. */
+	private void saveGuideFrames()
+	{
+		SubStep current = clueHelper.getGuide().getCurrent();
+		String text = current == null ? null : current.getKind() + " " + current.getText();
+		if (text == null || text.equals(lastGuideText))
+		{
+			return;
+		}
+		lastGuideText = text;
+		String name = String.format("%03d-%s", ++guideFrameCount, current.getKind().name().toLowerCase(Locale.ROOT));
+		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
+		SwingUtilities.invokeLater(() -> snapshotTo(clueHelper.getPanel(), new File(GUIDE_FRAMES, name + "-panel.png")));
 	}
 
 	/** Once per run on the first plan, and on {@code ::ch-sample}. */

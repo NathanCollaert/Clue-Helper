@@ -2,6 +2,8 @@ package com.cluehelper.ui;
 
 public enum PanelState
 {
+	DORMANT("Off on this world",
+		"Clue Helper stays off on seasonal, Deadman, beta and other special worlds."),
 	CORE_OFF("Turn the Clue Scroll plugin back on",
 		"Clue Helper works alongside RuneLite's Clue Scroll plugin. Turn it back on to continue."),
 	READ_CLUE("Read the clue to start",
@@ -37,9 +39,13 @@ public enum PanelState
 		return this == WORKING || this == ROUTES;
 	}
 
-	/** Core being off overrides everything: nothing else runs then. */
-	public static PanelState of(boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean planning)
+	/** A special world or core being off overrides everything: nothing else runs then. */
+	public static PanelState of(boolean dormant, boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean planning)
 	{
+		if (dormant)
+		{
+			return DORMANT;
+		}
 		if (!coreActive)
 		{
 			return CORE_OFF;

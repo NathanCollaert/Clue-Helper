@@ -2,6 +2,7 @@ package com.cluehelper.route;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ public final class SceneBfs
 	private static final int BUCKETS = 1024;
 	private static final int BORDER_LOW = 1;
 	private static final int BORDER_HIGH = 5;
+	/** How far beside a blocked waypoint the path line may end. */
+	private static final int BESIDE_TILES = 2;
 
 	/** One top-level, non-instanced scene's collision flags, copied on the client thread. */
 	@Value
@@ -105,6 +108,84 @@ public final class SceneBfs
 		public Scene getScene()
 		{
 			return scene;
+		}
+
+		/**
+		 * The tiles from the start to {@code waypoint}, traced back one step at a time. A waypoint on a blocked tile (a
+		 * fairy ring, an altar) is reached at the reachable tile closest to it. A door or stairs row breaks the trace, so the
+		 * path then begins past it; empty when nothing near the waypoint is reached.
+		 */
+		public List<WorldPoint> pathTo(WorldPoint waypoint)
+		{
+			List<WorldPoint> path = new ArrayList<>();
+			WorldPoint goal = nearestReached(waypoint);
+			int c = cost(goal);
+			if (c == UNREACHED)
+			{
+				return path;
+			}
+			int plane = goal.getPlane();
+			int x = goal.getX() - scene.getBaseX();
+			int y = goal.getY() - scene.getBaseY();
+			int[][] flags = scene.getFlags()[plane];
+			path.add(goal);
+			while (c > 0)
+			{
+				int step = previous(flags, x, y, plane, c);
+				if (step < 0)
+				{
+					break;
+				}
+				x -= DX[step];
+				y -= DY[step];
+				c--;
+				path.add(new WorldPoint(scene.getBaseX() + x, scene.getBaseY() + y, plane));
+			}
+			Collections.reverse(path);
+			return path;
+		}
+
+		private WorldPoint nearestReached(WorldPoint waypoint)
+		{
+			if (cost(waypoint) != UNREACHED)
+			{
+				return waypoint;
+			}
+			WorldPoint best = waypoint;
+			int bestCost = UNREACHED;
+			int bestDistance = Integer.MAX_VALUE;
+			for (int dx = -BESIDE_TILES; dx <= BESIDE_TILES; dx++)
+			{
+				for (int dy = -BESIDE_TILES; dy <= BESIDE_TILES; dy++)
+				{
+					WorldPoint tile = waypoint.dx(dx).dy(dy);
+					int c = cost(tile);
+					int distance = Math.max(Math.abs(dx), Math.abs(dy));
+					if (c != UNREACHED && (distance < bestDistance || distance == bestDistance && c < bestCost))
+					{
+						best = tile;
+						bestCost = c;
+						bestDistance = distance;
+					}
+				}
+			}
+			return best;
+		}
+
+		/** The direction that reached (x, y) from a tile one cheaper, or -1. */
+		private int previous(int[][] flags, int x, int y, int plane, int c)
+		{
+			for (int d = 0; d < DX.length; d++)
+			{
+				int px = x - DX[d];
+				int py = y - DY[d];
+				if (px >= 0 && py >= 0 && px < scene.getSizeX() && py < scene.getSizeY()
+					&& cost[index(scene, px, py, plane)] == c - 1 && canMove(flags, px, py, d))
+				{
+					return d;
+				}
+			}
+			return -1;
 		}
 
 		public int reachedTiles()

@@ -1,16 +1,25 @@
 package com.cluehelper;
 
 import com.cluehelper.dev.DevHarness;
+import com.cluehelper.guide.StepGuide;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.MemoryStore;
+import com.cluehelper.player.Book;
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.Icons;
+import com.cluehelper.ui.ItemHighlightOverlay;
+import com.cluehelper.ui.MinimapMarkerOverlay;
+import com.cluehelper.ui.PanelModel;
 import com.cluehelper.ui.PanelState;
+import com.cluehelper.ui.WidgetHighlightOverlay;
+import com.cluehelper.ui.WaypointOverlay;
+import com.cluehelper.ui.WorldMapMarkers;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,14 +27,17 @@ import javax.swing.SwingUtilities;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.PluginChanged;
 import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.plugins.Plugin;
@@ -34,6 +46,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(
@@ -74,6 +88,31 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
+	private StepGuide guide;
+
+	@Inject
+	private ClientThread clientThread;
+
+	@Inject
+	private OverlayManager overlayManager;
+
+	@Inject
+	private ItemHighlightOverlay itemOverlay;
+
+	@Inject
+	private WidgetHighlightOverlay widgetOverlay;
+
+	@Inject
+	private WaypointOverlay waypointOverlay;
+
+	@Inject
+	private MinimapMarkerOverlay minimapOverlay;
+
+	@Inject
+	private WorldMapMarkers mapMarkers;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
 	private DevHarness devHarness;
 
 	@Inject
@@ -84,6 +123,7 @@ public class ClueHelperPlugin extends Plugin
 	private ClueHelperPanel panel;
 	private NavigationButton navigationButton;
 	private Runnable unregisterRoutes;
+	private Runnable unregisterGuide;
 	private boolean shownWorking;
 
 	@Provides
@@ -108,8 +148,14 @@ public class ClueHelperPlugin extends Plugin
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
+		guide.start();
 		unregisterRoutes = routes.addListener(plan -> showPanelState());
-		showPanelState();
+		unregisterGuide = guide.addListener(this::onGuideChanged);
+		for (Overlay overlay : overlays())
+		{
+			overlayManager.add(overlay);
+		}
+		clientThread.invokeLater(this::showPanelState);
 		if (developerMode)
 		{
 			devHarness.start(this::shownPanelState, this::panelState);
@@ -120,7 +166,14 @@ public class ClueHelperPlugin extends Plugin
 	protected void shutDown()
 	{
 		devHarness.stop();
+		for (Overlay overlay : overlays())
+		{
+			overlayManager.remove(overlay);
+		}
+		unregisterGuide.run();
 		unregisterRoutes.run();
+		guide.stop();
+		clientThread.invokeLater(mapMarkers::clear);
 		routes.stop();
 		planner.cancelAll();
 		availability.stop();
@@ -136,7 +189,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		if (clueLink.onPluginChanged(event))
 		{
-			showPanelState();
+			clientThread.invokeLater(this::showPanelState);
 		}
 	}
 
@@ -151,6 +204,7 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
+		guide.onGameTick();
 		if (planner.isWorking() != shownWorking)
 		{
 			shownWorking = planner.isWorking();
@@ -184,6 +238,21 @@ public class ClueHelperPlugin extends Plugin
 	}
 
 	@Subscribe
+	public void onChatMessage(ChatMessage event)
+	{
+		guide.onChatMessage(event);
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (ClueHelperConfig.GROUP.equals(event.getGroup()))
+		{
+			clientThread.invokeLater(mapMarkers::refresh);
+		}
+	}
+
+	@Subscribe
 	public void onRuneScapeProfileChanged(RuneScapeProfileChanged event)
 	{
 		memory.reload();
@@ -203,16 +272,48 @@ public class ClueHelperPlugin extends Plugin
 
 	PanelState panelState()
 	{
-		return PanelState.of(clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
+		return PanelState.of(dormantReason() != null, clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
 	}
 
+	private Overlay[] overlays()
+	{
+		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, minimapOverlay};
+	}
+
+	private void onGuideChanged()
+	{
+		mapMarkers.refresh();
+		showPanelState();
+	}
+
+	private String dormantReason()
+	{
+		PlayerSnapshot snapshot = playerModel.getSnapshot();
+		return snapshot == null ? null : snapshot.getDormantReason();
+	}
+
+	/** Client thread: the guide's state is read here, then handed to Swing. */
 	private void showPanelState()
 	{
-		PanelState state = panelState();
 		ClueHelperPanel target = panel;
-		if (target != null)
+		if (target == null)
 		{
-			SwingUtilities.invokeLater(() -> target.display(state));
+			return;
 		}
+		PanelModel model = PanelModel.of(panelState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
+			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p());
+		SwingUtilities.invokeLater(() -> target.show(model));
+	}
+
+	/** Members keep their book on an F2P world, where no book can be changed and only Standard has teleports. */
+	private Book stuckBookOnF2p()
+	{
+		PlayerSnapshot snapshot = playerModel.getSnapshot();
+		if (snapshot == null || snapshot.isMembersWorld() || snapshot.getSpellbook() == null)
+		{
+			return null;
+		}
+		Book book = snapshot.getSpellbook().getBook();
+		return book == null || book == Book.STANDARD ? null : book;
 	}
 }

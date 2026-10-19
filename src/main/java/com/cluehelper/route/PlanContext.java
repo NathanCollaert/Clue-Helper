@@ -306,7 +306,7 @@ final class PlanContext
 			teleports.addAll(longestVariant.values());
 			for (SpellbookChange change : in.getCatalog().getSpellbookChanges())
 			{
-				if (change.isInHouse())
+				if (change.isInHouse() || in.getRefusedChanges().contains(change.getName()))
 				{
 					continue;
 				}

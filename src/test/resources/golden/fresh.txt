@@ -4,8 +4,8 @@ anagram:12055
   alt       419t: Burthorpe Games Room Minigame Teleport → walk 392 {cooldown:888=1}
 anagram:12568
   best      464t: Clan Wars Minigame Teleport → walk 437 {cooldown:888=1}
-  alt       464t: Last Man Standing Minigame Teleport → walk 437 {cooldown:888=1}
   alt       504t: Lumbridge Home Teleport → walk 479 {cooldown:892=1}
+  alt       560t: Giant's Foundry Minigame Teleport → walk 533 {cooldown:888=1}
 anagram:19758
   best      none
   note      no route from what you have
@@ -22,7 +22,7 @@ anagram:duo plug
 map:w346
   best      121t: Lumbridge Home Teleport → walk 96 {cooldown:892=1}
   alt       172t: Clan Wars Minigame Teleport → walk 145 {cooldown:888=1}
-  alt       172t: Last Man Standing Minigame Teleport → walk 145 {cooldown:888=1}
+  alt       194t: Giant's Foundry Minigame Teleport → walk 167 {cooldown:888=1}
 map:w347
   best      117t: Lumbridge Home Teleport → walk 92 {cooldown:892=1}
   alt       174t: Giant's Foundry Minigame Teleport → walk 147 {cooldown:888=1}
@@ -60,7 +60,6 @@ coordinate:12033
   alt       272t: Clan Wars Minigame Teleport → walk 245 {cooldown:888=1}
 coordinate:12101
   best      189t: Clan Wars Minigame Teleport → walk 162 {cooldown:888=1}
-  alt       189t: Last Man Standing Minigame Teleport → walk 162 {cooldown:888=1}
   alt       374t: Burthorpe Games Room Minigame Teleport → walk 347 {cooldown:888=1}
   note      Wilderness target
 coordinate:19844
@@ -68,20 +67,19 @@ coordinate:19844
   note      no route from what you have
 coordinate:2725
   best      216t: Clan Wars Minigame Teleport → walk 189 {cooldown:888=1}
-  alt       216t: Last Man Standing Minigame Teleport → walk 189 {cooldown:888=1}
   alt       369t: Burthorpe Games Room Minigame Teleport → walk 342 {cooldown:888=1}
+  alt       429t: Lumbridge Home Teleport → walk 404 {cooldown:892=1}
   note      Wilderness target
 coordinate:28909
   best      none
   note      no route from what you have
 coordinate:3556
   best      104t: Clan Wars Minigame Teleport → walk 77 {cooldown:888=1}
-  alt       104t: Last Man Standing Minigame Teleport → walk 77 {cooldown:888=1}
   note      Wilderness target
 cryptic:'a bag belt only?', he asked his balding brothers.
   best      111t: Clan Wars Minigame Teleport → walk 84 {cooldown:888=1}
-  alt       111t: Last Man Standing Minigame Teleport → walk 84 {cooldown:888=1}
   alt       162t: Burthorpe Games Room Minigame Teleport → walk 135 {cooldown:888=1}
+  alt       197t: Lumbridge Home Teleport → walk 172 {cooldown:892=1}
 cryptic:elvish onions.
   best      none
   note      no route from what you have
@@ -99,7 +97,7 @@ cryptic:search the wheelbarrow in rimmington mine.
 cryptic:talk to the cook in the blue moon inn in varrock.
   best      146t: Lumbridge Home Teleport → walk 113 {cooldown:892=1}
   alt       176t: Clan Wars Minigame Teleport → walk 141 {cooldown:888=1}
-  alt       176t: Last Man Standing Minigame Teleport → walk 141 {cooldown:888=1}
+  alt       218t: Giant's Foundry Minigame Teleport → walk 183 {cooldown:888=1}
 emote:10180
   best      72t: Lumbridge Home Teleport → walk 47 {cooldown:892=1}
 emote:10222
@@ -111,12 +109,12 @@ emote:10264
   note      no route from what you have
 emote:12080
   best      332t: Clan Wars Minigame Teleport → walk 305 {cooldown:888=1}
-  alt       332t: Last Man Standing Minigame Teleport → walk 305 {cooldown:888=1}
   alt       373t: Lumbridge Home Teleport → walk 348 {cooldown:892=1}
+  alt       428t: Giant's Foundry Minigame Teleport → walk 401 {cooldown:888=1}
 emote:19833
   best      149t: Lumbridge Home Teleport → walk 124 {cooldown:892=1}
   alt       167t: Clan Wars Minigame Teleport → walk 140 {cooldown:888=1}
-  alt       167t: Last Man Standing Minigame Teleport → walk 140 {cooldown:888=1}
+  alt       218t: Giant's Foundry Minigame Teleport → walk 191 {cooldown:888=1}
 emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
   best      none
   note      walk too long
@@ -176,14 +174,14 @@ spot:KANDARIN_GRAND_TREE
 spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      115t: Lumbridge Home Teleport → walk 90 {cooldown:892=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Giant's Foundry Minigame Teleport → walk 159 {cooldown:888=1}
 spot:VARLAMORE_LOCUS_OASIS
   best      none
   note      no route from what you have
 spot:WILDERNESS_54
   best      213t: Clan Wars Minigame Teleport → walk 186 {cooldown:888=1}
-  alt       213t: Last Man Standing Minigame Teleport → walk 186 {cooldown:888=1}
   alt       366t: Burthorpe Games Room Minigame Teleport → walk 339 {cooldown:888=1}
+  alt       426t: Lumbridge Home Teleport → walk 401 {cooldown:892=1}
   note      Wilderness target
 map:12130
   best      95t: Castle Wars Minigame Teleport → walk 68 {cooldown:888=1}
@@ -206,31 +204,31 @@ map:7241
 music:23138
   best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Lumbridge Home Teleport → walk 161 {cooldown:892=1}
 music:23142
   best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Lumbridge Home Teleport → walk 161 {cooldown:892=1}
 music:23157
   best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Lumbridge Home Teleport → walk 161 {cooldown:892=1}
 music:23174
   best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Lumbridge Home Teleport → walk 161 {cooldown:892=1}
 music:23178
   best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Lumbridge Home Teleport → walk 161 {cooldown:892=1}
 music:24773
   best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
   alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
-  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       186t: Lumbridge Home Teleport → walk 161 {cooldown:892=1}
 skill:CHARLIE:i need to give charlie a cooked pike.
   best      126t: Lumbridge Home Teleport → walk 101 {cooldown:892=1}
   alt       167t: Clan Wars Minigame Teleport → walk 140 {cooldown:888=1}
-  alt       167t: Last Man Standing Minigame Teleport → walk 140 {cooldown:888=1}
+  alt       199t: Giant's Foundry Minigame Teleport → walk 172 {cooldown:888=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
   best      193t: Nightmare Zone Minigame Teleport → walk 166 {cooldown:888=1}
   alt       245t: Burthorpe Games Room Minigame Teleport → walk 218 {cooldown:888=1}
@@ -264,11 +262,11 @@ cryptic:search through some drawers in the upstairs of a house in rimmington.
 anagram:12566
   best      167t: Burthorpe Games Room Minigame Teleport → walk 140 {cooldown:888=1}
   alt       183t: Clan Wars Minigame Teleport → walk 156 {cooldown:888=1}
-  alt       183t: Last Man Standing Minigame Teleport → walk 156 {cooldown:888=1}
+  alt       191t: Lumbridge Home Teleport → walk 166 {cooldown:892=1}
 cryptic:search the crates in a bank in varrock.
   best      155t: Clan Wars Minigame Teleport → walk 128 {cooldown:888=1}
-  alt       155t: Last Man Standing Minigame Teleport → walk 128 {cooldown:888=1}
   alt       157t: Lumbridge Home Teleport → walk 132 {cooldown:892=1}
+  alt       218t: Burthorpe Games Room Minigame Teleport → walk 191 {cooldown:888=1}
 emote:12021
   best      88t: Lumbridge Home Teleport → walk 63 {cooldown:892=1}
 coordinate:2840,3423,0

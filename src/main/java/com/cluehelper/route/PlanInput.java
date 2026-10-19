@@ -4,6 +4,7 @@ import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Value;
 
@@ -29,4 +30,7 @@ public class PlanInput
 	/** Ticks left of a pending Spellbook Swap's free cast; {@link #NO_REVERT_WINDOW} when none or unknown. */
 	@Builder.Default
 	int revertTicksLeft = NO_REVERT_WINDOW;
+	/** Spellbook changes the game refused this session (PLAN §5.4 Consumption); never offered. */
+	@Builder.Default
+	Set<String> refusedChanges = Set.of();
 }

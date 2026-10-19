@@ -12,7 +12,7 @@ import net.runelite.api.coords.WorldPoint;
 public class Plan
 {
 	public static final Plan NONE = Plan.builder().alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-		.note("no step").build();
+		.why(List.of()).note("no step").build();
 
 	String stepKey;
 	/** The bottom-up margin rule's pick. */
@@ -29,6 +29,8 @@ public class Plan
 	List<Candidate> candidates;
 	/** PROBES only: per target tile, the Best rule's ticks. */
 	Map<WorldPoint, Integer> probeTicks;
+	/** "Show why": every transport usable from the current book, with teleport plus table walk, fastest first. */
+	List<Option> why;
 	/** Why there is no route, or a warning ("walk too long", "Wilderness target"). */
 	String note;
 	/** The whole plan: judging the catalog, then every search. */
@@ -37,6 +39,15 @@ public class Plan
 	long contextNanos;
 	int labels;
 	int searches;
+
+	@Value
+	public static class Option
+	{
+		String name;
+		int ticks;
+		/** A fairy ring landing: the walk to the nearest ring comes on top. */
+		boolean fairyRing;
+	}
 
 	@Value
 	public static class Candidate

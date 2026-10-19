@@ -2,6 +2,7 @@ package com.cluehelper.ui;
 
 import static org.junit.Assert.assertTrue;
 
+import com.cluehelper.route.Plan;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics2D;
@@ -30,6 +31,8 @@ public class PanelRenderTest
 {
 	private static final int WIDTH = PluginPanel.PANEL_WIDTH;
 	private static final int HEIGHT = 300;
+	private static final int ROUTES_HEIGHT = 560;
+	private static final int WHY_HEIGHT = 1000;
 	private static final File OUT = new File("build/panel");
 
 	@Test
@@ -43,32 +46,66 @@ public class PanelRenderTest
 			{
 				ClueHelperPanel panel = new ClueHelperPanel();
 				panel.display(state);
-				panel.setSize(WIDTH, HEIGHT);
-				for (int pass = 0; pass < 3; pass++)
-				{
-					layout(panel);
-				}
-				for (JComponent text : texts(panel))
-				{
-					Rectangle r = SwingUtilities.convertRectangle(text.getParent(), text.getBounds(), panel);
-					assertTrue(state + ": text inside the content column: " + describe(text) + " " + r,
-						r.x >= Theme.SIDE && r.x + r.width <= WIDTH - Theme.SIDE);
-					assertTrue(state + ": text has a height: " + describe(text), r.height > 0);
-					if (text instanceof TextBlock)
-					{
-						TextBlock block = (TextBlock) text;
-						for (String line : block.getLines())
-						{
-							assertTrue(state + ": line fits its block: '" + line + "'",
-								block.getFontMetrics(block.getFont()).stringWidth(line) <= r.width);
-						}
-						assertTrue(state + ": text block shows its full height", r.height >= block.getPreferredSize().height);
-					}
-				}
-				render(panel, state.name().toLowerCase(Locale.ROOT));
+				check(panel, state.name().toLowerCase(Locale.ROOT), HEIGHT);
 			}
+			ClueHelperPanel routes = new ClueHelperPanel();
+			routes.show(threeRoutes());
+			check(routes, "routes-3", ROUTES_HEIGHT);
+			routes.toggleWhy();
+			check(routes, "routes-why", WHY_HEIGHT);
 		});
 		writeLogo();
+	}
+
+	/** Long names everywhere: a followed route, two more with savings, notes, and more transports than "Show why" lists. */
+	private static PanelModel threeRoutes()
+	{
+		List<Plan.Option> why = new ArrayList<>();
+		for (int i = 0; i < ClueHelperPanel.WHY_ROWS + 5; i++)
+		{
+			why.add(new Plan.Option(i % 3 == 0 ? "Fairy ring DIP: Other Realms: Abyssal Area" : "Achievement diary cape: 6. Pirate Jackie the Fruit",
+				40 + 7 * i, i % 3 == 0));
+		}
+		return PanelModel.builder()
+			.state(PanelState.ROUTES)
+			.now("Use Max cape: Fishing Teleports: Otto's Grotto")
+			.nowDetail("Right-click the cape: Spellbook")
+			.next("Walk to the clue")
+			.notes(List.of("Wilderness target", "You're on Arceuus; F2P worlds can't change book"))
+			.routes(List.of(
+				new PanelModel.RouteCard("Best", 133, "Max cape → Ancient → Spellbook Swap → Annakarl Teleport → Fairy ring DIP: Other Realms: Abyssal Area → walk 41",
+					"leaves you on Ancient · charges unknown · Wilderness", true),
+				new PanelModel.RouteCard("Under the margin · -3", 130, "Clan Wars Minigame Teleport → walk south 21 → walk 162", "", false),
+				new PanelModel.RouteCard("Also · +29", 162, "Last Man Standing Minigame Teleport → walk 162", "not everything read yet", false)))
+			.why(why)
+			.build();
+	}
+
+	private static void check(ClueHelperPanel panel, String name, int height)
+	{
+		panel.setSize(WIDTH, height);
+		for (int pass = 0; pass < 3; pass++)
+		{
+			layout(panel);
+		}
+		for (JComponent text : texts(panel))
+		{
+			Rectangle r = SwingUtilities.convertRectangle(text.getParent(), text.getBounds(), panel);
+			assertTrue(name + ": text inside the content column: " + describe(text) + " " + r,
+				r.x >= Theme.SIDE && r.x + r.width <= WIDTH - Theme.SIDE);
+			assertTrue(name + ": text has a height: " + describe(text), r.height > 0);
+			if (text instanceof TextBlock)
+			{
+				TextBlock block = (TextBlock) text;
+				for (String line : block.getLines())
+				{
+					assertTrue(name + ": line fits its block: '" + line + "'",
+						block.getFontMetrics(block.getFont()).stringWidth(line) <= r.width);
+				}
+				assertTrue(name + ": text block shows its full height", r.height >= block.getPreferredSize().height);
+			}
+		}
+		render(panel, name);
 	}
 
 	private static void render(Component panel, String name)
@@ -106,8 +143,10 @@ public class PanelRenderTest
 		ImageIO.write(big, "png", new File(OUT, "logo-4x.png"));
 	}
 
+	/** Offscreen containers have no peer, so revalidate never clears BoxLayout's cached sizes: invalidate by hand. */
 	private static void layout(Component c)
 	{
+		c.invalidate();
 		if (c instanceof Container)
 		{
 			((Container) c).doLayout();

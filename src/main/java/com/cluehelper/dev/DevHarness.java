@@ -1,5 +1,7 @@
 package com.cluehelper.dev;
 
+import com.cluehelper.guide.StepGuide;
+import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.player.PlayerModel;
@@ -29,6 +31,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class DevHarness
 {
 	private static final int STEP_LOG_LINES = 5;
+	private static final String GUIDE_TAG = "[CH-GUIDE]";
 
 	private final Client client;
 	private final ClientThread clientThread;
@@ -41,6 +44,8 @@ public class DevHarness
 	private final AvailabilityService availability;
 	private final RoutePlanner routes;
 	private final RouteDump routeDump;
+	private final StepGuide guide;
+	private String lastGuideLine;
 	private final RouteOverlay routeOverlay;
 	private final OverlayManager overlayManager;
 	private final List<Runnable> unregister = new ArrayList<>();
@@ -50,7 +55,7 @@ public class DevHarness
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, SelfTestRunner selfTests, StepLogger stepLogger,
 		BuiltInSelfTests builtInSelfTests, ClueLink clueLink, Gson gson, PlayerModel player,
-		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager)
+		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager, StepGuide guide)
 	{
 		this.client = client;
 		this.clientThread = clientThread;
@@ -65,6 +70,7 @@ public class DevHarness
 		this.routeDump = new RouteDump(routes);
 		this.routeOverlay = new RouteOverlay(client, routes, walkData);
 		this.overlayManager = overlayManager;
+		this.guide = guide;
 	}
 
 	/**
@@ -81,6 +87,7 @@ public class DevHarness
 			playerDump.describe(this::reply, line -> log.info("{}   {}", PlayerDump.TAG, line)));
 		c.register("routes", "show the current step's routes; every candidate goes to the log", args ->
 			routeDump.describe(this::reply, line -> log.info("{}   {}", RouteDump.TAG, line)));
+		c.register("guide", "show the followed route's sub-steps and what is highlighted", args -> dumpGuide());
 		c.register("overlay", "toggle the route graph overlay: walk-table nodes, scene BFS walks, origin class", args -> toggleOverlay());
 		for (SelfTest test : builtInSelfTests.create(shown, expected))
 		{
@@ -90,6 +97,7 @@ public class DevHarness
 		unregister.add(clueLink.addListener(this::onStepChange));
 		unregister.add(availability.addListener(playerDump::onJudged));
 		unregister.add(routes.addListener(this::onPlanned));
+		unregister.add(guide.addListener(this::onGuideChanged));
 		commands = c;
 		log.info("developer mode: ::ch-help lists the dev commands");
 	}
@@ -143,6 +151,43 @@ public class DevHarness
 	{
 		log.info("{} {}", RouteDump.TAG, routeDump.header(plan));
 		routeDump.summary(plan).forEach(line -> log.info("{}   {}", RouteDump.TAG, line));
+	}
+
+	/** One line per change of sub-step or highlight, so a live run can be followed in the log. */
+	private void onGuideChanged()
+	{
+		String line = guideLine();
+		if (!line.equals(lastGuideLine))
+		{
+			lastGuideLine = line;
+			log.info("{} t{} {}", GUIDE_TAG, client.getTickCount(), line);
+		}
+	}
+
+	private String guideLine()
+	{
+		SubStep current = guide.getCurrent();
+		if (current == null)
+		{
+			return "no route";
+		}
+		return String.format("%d/%d %s %s | waypoint %s | items %s | widgets %s | route %s",
+			guide.getSteps().indexOf(current) + 1, guide.getSteps().size(), current.getKind(), current.getText(),
+			current.getWaypoint(), guide.getHighlightItems(), guide.getHighlightSpellWidget() + "/" + guide.getHighlightMenuWidget(),
+			guide.getRoute() == null ? "-" : guide.getRoute().describe());
+	}
+
+	private void dumpGuide()
+	{
+		reply("Guide: " + guideLine());
+		List<SubStep> steps = guide.getSteps();
+		for (int i = 0; i < steps.size(); i++)
+		{
+			SubStep step = steps.get(i);
+			reply(String.format("  %s%d %s: %s%s", step == guide.getCurrent() ? "> " : "", i + 1, step.getKind(), step.getText(),
+				step.getDetail() == null ? "" : " (" + step.getDetail() + ")"));
+		}
+		guide.getMapWaypoints().forEach((tile, label) -> log.info("{}   map {} {}", GUIDE_TAG, tile, label));
 	}
 
 	private void toggleOverlay()

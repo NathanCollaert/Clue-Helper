@@ -17,8 +17,10 @@ import com.cluehelper.transport.CatalogData;
 import com.cluehelper.transport.Requirements;
 import com.cluehelper.transport.VarCheck;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,7 +31,10 @@ import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.VarbitID;
 
 /**
  * Keeps the current step's plan (PLAN §5.4 Re-planning and commitment). On the client thread each tick it
@@ -45,6 +50,11 @@ public class RoutePlanner
 	static final int COMMIT_MARGIN_TICKS = 5;
 	/** Ticks a Spellbook Swap's free cast stays pending after 3617 turns 1 (B04). */
 	static final int SWAP_WINDOW_TICKS = 200;
+	private static final int NOT_REFUSED = -1;
+	/** Walking in the scene re-plans when the walk to a target in it changes by this much: the commit margin. */
+	static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
+	private static final int NO_TARGET_IN_SCENE = -1;
+	private static final long NO_SCENE = Long.MIN_VALUE;
 
 	private final Client client;
 	private final ClueLink clueLink;
@@ -62,12 +72,16 @@ public class RoutePlanner
 	private long gatesVersion = -1;
 	private boolean[] rowOpen;
 	private WorldPoint lastTile;
+	/** After a teleport the scene loads a tick after the tile moves: a BFS over the old scene must be redone. */
+	private long lastSceneBase = NO_SCENE;
 	@Getter
 	private volatile PlanStart start;
 	@Getter
 	private volatile int nearestNode = WalkTable.NO_NODE;
 	@Getter
 	private volatile long lastBfsNanos;
+	/** The scene walk to the nearest target, in buckets of {@link #TARGET_WALK_BUCKET_TILES}. */
+	private int targetWalkBucket = NO_TARGET_IN_SCENE;
 	private Trigger lastTrigger;
 	@Getter
 	private volatile Plan plan = Plan.NONE;
@@ -75,6 +89,10 @@ public class RoutePlanner
 	@Getter
 	private volatile Route committed;
 	private String committedStep;
+	/** 4816 when the game last refused a cape change: uses left count as 0 until it moves (PLAN §5.4 Consumption). */
+	private int capeRefusedAt = NOT_REFUSED;
+	/** Spellbook changes the game refused this session. */
+	private final Set<String> refusedChanges = new HashSet<>();
 
 	@Inject
 	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
@@ -129,20 +147,26 @@ public class RoutePlanner
 		RuneModel runes = player.getRuneModel();
 		WalkData.Loaded data = walk;
 		Catalog loadedCatalog = catalog;
-		if (step == null || snapshot == null || runes == null || data == null || loadedCatalog == null)
+		boolean dormant = snapshot != null && snapshot.getDormantReason() != null;
+		if (step == null || snapshot == null || runes == null || data == null || loadedCatalog == null || dormant)
 		{
-			if (step == null && plan != Plan.NONE)
+			if ((step == null || dormant) && plan != Plan.NONE)
 			{
 				stop();
 				listeners.forEach(listener -> listener.accept(Plan.NONE));
 			}
 			return;
 		}
+		if (client.getGameState() != GameState.LOGGED_IN)
+		{
+			return;
+		}
+		snapshot = withRefusals(snapshot);
 		updateStart(data, snapshot, runes, step);
 		PlannerSettings settings = PlannerSettings.from(config, snapshot.getAccountType());
 		AvailabilitySet carried = availability.getCarried();
 		Trigger trigger = new Trigger(step, snapshot.getVersion(), carried.getSnapshotVersion(), carried.getValidUntilMinute(),
-			nearestNode, start.getKind(), snapshot.getSpellbook(), settings);
+			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), settings, Set.copyOf(refusedChanges));
 		if (trigger.equals(lastTrigger))
 		{
 			return;
@@ -159,8 +183,50 @@ public class RoutePlanner
 			.start(start)
 			.settings(settings)
 			.revertTicksLeft(revertTicksLeft())
+			.refusedChanges(Set.copyOf(refusedChanges))
 			.build();
 		runner.submit(() -> Planner.plan(input), this::onPlanned);
+	}
+
+	/** Client thread: the game refused a cape change for today's limit, whatever 4816 says. */
+	public void onCapeChangesRefused()
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		Integer used = snapshot == null ? null : snapshot.varbit(VarbitID.SB_SWAP_CHECK);
+		capeRefusedAt = used == null ? 0 : used;
+		lastTrigger = null;
+		log.debug("cape change refused at 4816 = {}", capeRefusedAt);
+	}
+
+	/** Client thread: the game refused this spellbook change; it isn't offered again this session. */
+	public void onChangeRefused(String change)
+	{
+		if (refusedChanges.add(change))
+		{
+			lastTrigger = null;
+			log.debug("spellbook change refused: {}", change);
+		}
+	}
+
+	/** After a cape refusal, no cape uses are left until 4816 moves. */
+	private PlayerSnapshot withRefusals(PlayerSnapshot snapshot)
+	{
+		if (capeRefusedAt == NOT_REFUSED)
+		{
+			return snapshot;
+		}
+		Integer used = snapshot.varbit(VarbitID.SB_SWAP_CHECK);
+		if (used != null && used != capeRefusedAt)
+		{
+			capeRefusedAt = NOT_REFUSED;
+			return snapshot;
+		}
+		Map<Integer, Integer> varbits = new HashMap<>(snapshot.getVarbits());
+		varbits.put(VarbitID.SB_SWAP_CHECK, SpellbookState.CAPE_CHANGES_PER_DAY);
+		SpellbookState book = snapshot.getSpellbook();
+		SpellbookState noCapeUses = book == null ? null : new SpellbookState(book.getBook(), book.isPendingRevert(), 0,
+			book.isArceuusUnlocked(), book.isAncientAccess(), book.isLunarAccess(), book.isSwapAccess());
+		return snapshot.toBuilder().varbits(varbits).spellbook(noCapeUses).build();
 	}
 
 	/** The start of the next plan: the POH node, a scene BFS on the surface, else teleports only. */
@@ -182,11 +248,15 @@ public class RoutePlanner
 			lastTile = null;
 			return;
 		}
-		if (position.getTile().equals(lastTile) && start != null)
+		WorldView view = client.getTopLevelWorldView();
+		long sceneBase = view == null ? NO_SCENE : (long) view.getBaseX() << 32 | view.getBaseY() & 0xFFFFFFFFL;
+		boolean sceneReloaded = sceneBase != lastSceneBase;
+		if (position.getTile().equals(lastTile) && start != null && !sceneReloaded)
 		{
 			return;
 		}
 		lastTile = position.getTile();
+		lastSceneBase = sceneBase;
 		if (gatesVersion != snapshot.getVersion())
 		{
 			gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
@@ -194,11 +264,21 @@ public class RoutePlanner
 			gatesVersion = snapshot.getVersion();
 		}
 		long started = System.nanoTime();
-		SceneBfs.Scene scene = SceneBfs.Scene.capture(client.getTopLevelWorldView());
+		SceneBfs.Scene scene = SceneBfs.Scene.capture(view);
 		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, position.getTile(), table, rowOpen);
 		lastBfsNanos = System.nanoTime() - started;
+		// A scene whose base has moved but whose collision flags are still loading walls the player in: the BFS then
+		// reaches only their own tile. Keep the last start and try again next tick.
+		if (sceneReloaded && bfs != null && bfs.reachedTiles() <= 1 && start != null)
+		{
+			lastTile = null;
+			lastSceneBase = NO_SCENE;
+			return;
+		}
 		nearestNode = bfs == null ? WalkTable.NO_NODE : nearest(table, bfs);
-		boolean targetInScene = bfs != null && step.getTargets().stream().anyMatch(t -> bfs.cost(t) != SceneBfs.UNREACHED);
+		int targetWalk = bfs == null ? SceneBfs.UNREACHED : step.getTargets().stream().mapToInt(bfs::cost).min().orElse(SceneBfs.UNREACHED);
+		boolean targetInScene = targetWalk != SceneBfs.UNREACHED;
+		targetWalkBucket = targetInScene ? targetWalk / TARGET_WALK_BUCKET_TILES : NO_TARGET_IN_SCENE;
 		start = nearestNode != WalkTable.NO_NODE || targetInScene ? PlanStart.scene(position.getTile(), bfs)
 			: PlanStart.teleportOnly(position.getTile());
 	}
@@ -292,7 +372,7 @@ public class RoutePlanner
 		player.watch(varbits, varps);
 	}
 
-	/** What a re-plan depends on; walking alone changes none of it unless the nearest node changes. */
+	/** What a re-plan depends on; walking changes it only through the nearest node or the walk to a target in the scene. */
 	@Value
 	private static class Trigger
 	{
@@ -302,8 +382,10 @@ public class RoutePlanner
 		long carriedVersion;
 		long carriedValidUntil;
 		int nearestNode;
+		int targetWalkBucket;
 		PlanStart.Kind startKind;
 		SpellbookState spellbook;
 		PlannerSettings settings;
+		Set<String> refusedChanges;
 	}
 }
