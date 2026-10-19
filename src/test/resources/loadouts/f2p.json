@@ -1,0 +1,21 @@
+{
+  "name": "f2p",
+  "description": "Free-to-play account with 37 Magic and runes for the three F2P city teleports. Beginner clues only, since every other tier is members-only.",
+  "members": false,
+  "bank": true,
+  "walkTier": "open",
+  "skills": { "default": 30, "Magic": 37 },
+  "maxTotal": false,
+  "quests": [],
+  "vars": { "default": "fail", "values": { "4070": 0, "4560": 0 } },
+  "book": "standard",
+  "runes": true,
+  "spellWhitelist": ["Varrock Teleport", "Lumbridge Teleport", "Falador Teleport", "Lumbridge Home Teleport"],
+  "fixedTransportItems": false,
+  "carried": [],
+  "banked": [],
+  "poh": "none",
+  "types": ["TELEPORTATION_SPELL_HOME"],
+  "avoidWilderness": false,
+  "tiers": ["beginner"]
+}

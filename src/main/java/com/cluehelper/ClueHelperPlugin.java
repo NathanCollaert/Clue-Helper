@@ -3,7 +3,9 @@ package com.cluehelper;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.MemoryStore;
+import com.cluehelper.player.PlayerModel;
 import com.cluehelper.route.PlannerRunner;
+import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.Icons;
 import com.cluehelper.ui.PanelState;
@@ -15,8 +17,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.CommandExecuted;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.PluginChanged;
@@ -46,6 +51,13 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private MemoryStore memory;
+
+	@Inject
+	private PlayerModel playerModel;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private AvailabilityService availability;
 
 	@Inject
 	private PlannerRunner planner;
@@ -80,6 +92,8 @@ public class ClueHelperPlugin extends Plugin
 			.build();
 		clientToolbar.addNavigation(navigationButton);
 		clueLink.start();
+		playerModel.start();
+		availability.start();
 		showPanelState();
 		if (developerMode)
 		{
@@ -92,6 +106,8 @@ public class ClueHelperPlugin extends Plugin
 	{
 		devHarness.stop();
 		planner.cancelAll();
+		availability.stop();
+		playerModel.stop();
 		clueLink.stop();
 		clientToolbar.removeNavigation(navigationButton);
 		navigationButton = null;
@@ -115,12 +131,33 @@ public class ClueHelperPlugin extends Plugin
 		{
 			showPanelState();
 		}
+		playerModel.onGameTick();
+		availability.onGameTick();
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
 		clueLink.onItemContainerChanged(event);
+		playerModel.onItemContainerChanged(event);
+	}
+
+	@Subscribe
+	public void onVarbitChanged(VarbitChanged event)
+	{
+		playerModel.onVarbitChanged(event);
+	}
+
+	@Subscribe
+	public void onStatChanged(StatChanged event)
+	{
+		playerModel.onStatChanged();
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged event)
+	{
+		playerModel.onGameStateChanged(event);
 	}
 
 	@Subscribe

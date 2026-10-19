@@ -1,0 +1,20 @@
+{
+  "name": "fresh",
+  "description": "Fresh members account straight off Tutorial Island: level 1 stats, no quests, no items, no runes. Home teleport, free boats and walking only.",
+  "members": true,
+  "bank": true,
+  "walkTier": "open",
+  "skills": { "default": 1, "Hitpoints": 10 },
+  "maxTotal": false,
+  "quests": [],
+  "vars": { "default": "fail", "values": { "4070": 0, "4560": 0 } },
+  "book": "standard",
+  "runes": false,
+  "fixedTransportItems": false,
+  "carried": [],
+  "banked": [],
+  "poh": "none",
+  "types": ["BOAT", "SHIP", "TELEPORTATION_LEVER", "TELEPORTATION_PORTAL", "WILDERNESS_OBELISK", "TELEPORTATION_SPELL_HOME", "TELEPORTATION_MINIGAME"],
+  "avoidWilderness": false,
+  "tiers": "*"
+}

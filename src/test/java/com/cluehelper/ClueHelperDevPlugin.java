@@ -4,6 +4,8 @@ import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.step.Step;
+import com.cluehelper.transport.AvailabilitySet;
+import com.cluehelper.transport.SampleCatalog;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.PanelState;
 import com.cluehelper.ui.TextBlock;
@@ -54,6 +56,7 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final String TAG = "[CH-TEST]";
 	private static final File SNAPSHOTS = new File("build/selftest");
 	private static final File STEP_FRAMES = new File("build/steps");
+	private static final File PLAYER_FRAMES = new File("build/player");
 	private static final int FRAME_NAME_KEY_CHARS = 50;
 	private static final int STATE_DELAY_MS = 400;
 	private static final int PLUGIN_DELAY_MS = 2000;
@@ -89,6 +92,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private int loggedInTicks;
 	private int snapshotCount;
 	private int stepFrameCount;
+	private int playerFrameCount;
+	private int lastAvailableCount = -1;
 
 	@Override
 	protected void startUp()
@@ -96,7 +101,10 @@ public class ClueHelperDevPlugin extends Plugin
 		clueHelper = find(ClueHelperPlugin.class);
 		clearOldPngs(SNAPSHOTS);
 		clearOldPngs(STEP_FRAMES);
+		clearOldPngs(PLAYER_FRAMES);
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
+		clueHelper.getAvailability().setCatalog(SampleCatalog.load());
+		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
@@ -433,6 +441,19 @@ public class ClueHelperDevPlugin extends Plugin
 		String name = String.format("%03d-%s-%s.png", ++stepFrameCount, change.name().toLowerCase(Locale.ROOT),
 			key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
 		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
+	}
+
+	/** A frame whenever the number of available sample rows changes: banking the pouch, casting, wielding. */
+	private void savePlayerFrame(AvailabilitySet carried)
+	{
+		int available = carried.available().size();
+		if (available == lastAvailableCount)
+		{
+			return;
+		}
+		lastAvailableCount = available;
+		String name = String.format("%03d-v%d-available-%d.png", ++playerFrameCount, carried.getSnapshotVersion(), available);
+		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(PLAYER_FRAMES, name))));
 	}
 
 	private static void writeFrame(Image frame, File file)

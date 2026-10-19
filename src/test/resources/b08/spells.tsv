@@ -1,0 +1,189 @@
+book	name	level	members	quest	runes	runeIds	obj	widget	spriteOn	spriteOff
+Standard	Lumbridge Home Teleport	0	0				9712	14286854	356	406
+Standard	Minigame Teleport	0	0				33138	14286855	7479	7504
+Standard	Wind Strike	1	0		1 Mind rune + 1 Air rune	558x1;556x1	3273	14286859	15	65
+Standard	Confuse	3	0		1 Body rune + 3 Water rune + 2 Earth rune	559x1;555x3;557x2	3274	14286860	16	66
+Standard	Crossbow Bolt Enchantments	4	1				5000	14286861	358	408
+Standard	Water Strike	5	0		1 Mind rune + 1 Water rune + 1 Air rune	558x1;555x1;556x1	3275	14286862	17	67
+Standard	Jewellery Enchantments	7	0				27089	14286863	366	416
+Standard	Earth Strike	9	0		1 Mind rune + 2 Earth rune + 1 Air rune	558x1;557x2;556x1	3277	14286865	19	69
+Standard	Weaken	11	0		1 Body rune + 3 Water rune + 2 Earth rune	559x1;555x3;557x2	3278	14286866	20	70
+Standard	Fire Strike	13	0		1 Mind rune + 3 Fire rune + 2 Air rune	558x1;554x3;556x2	3279	14286867	21	71
+Standard	Bones to Bananas	15	0		1 Nature rune + 2 Water rune + 2 Earth rune	561x1;555x2;557x2	3280	14286868	22	72
+Standard	Wind Bolt	17	0		1 Chaos rune + 2 Air rune	562x1;556x2	3281	14286869	23	73
+Standard	Curse	19	0		1 Body rune + 2 Water rune + 3 Earth rune	559x1;555x2;557x3	3282	14286870	24	74
+Standard	Bind	20	0		2 Nature rune + 3 Water rune + 3 Earth rune	561x2;555x3;557x3	3283	14286871	319	369
+Standard	Low Level Alchemy	21	0		1 Nature rune + 3 Fire rune	561x1;554x3	3284	14286872	25	75
+Standard	Water Bolt	23	0		1 Chaos rune + 2 Water rune + 2 Air rune	562x1;555x2;556x2	3285	14286873	26	76
+Standard	Varrock Teleport	25	0		1 Law rune + 3 Air rune + 1 Fire rune	563x1;556x3;554x1	3286	14286874	27	77
+Standard	Earth Bolt	29	0		1 Chaos rune + 3 Earth rune + 2 Air rune	562x1;557x3;556x2	3288	14286876	29	79
+Standard	Lumbridge Teleport	31	0		1 Law rune + 3 Air rune + 1 Earth rune	563x1;556x3;557x1	3289	14286877	30	80
+Standard	Telekinetic Grab	33	0		1 Law rune + 1 Air rune	563x1;556x1	3290	14286878	31	81
+Standard	Fire Bolt	35	0		1 Chaos rune + 4 Fire rune + 3 Air rune	562x1;554x4;556x3	3291	14286879	32	82
+Standard	Falador Teleport	37	0		1 Law rune + 3 Air rune + 1 Water rune	563x1;556x3;555x1	3292	14286880	33	83
+Standard	Crumble Undead	39	0		1 Chaos rune + 2 Earth rune + 2 Air rune	562x1;557x2;556x2	3293	14286881	34	84
+Standard	Wind Blast	41	0		1 Death rune + 3 Air rune	560x1;556x3	3294	14286883	35	85
+Standard	Monster Inspect	42	0		2 Body rune + 2 Mind rune	559x2;558x2	28180	14287046	368	418
+Standard	Superheat Item	43	0		1 Nature rune + 4 Fire rune	561x1;554x4	3295	14286884	36	86
+Standard	Camelot Teleport	45	1		1 Law rune + 5 Air rune	563x1;556x5	3296	14286885	37	87
+Standard	Water Blast	47	0		1 Death rune + 3 Water rune + 3 Air rune	560x1;555x3;556x3	3297	14286886	38	88
+Standard	Iban Blast	50	1	154	1 Iban's staff + 1 Death rune + 5 Fire rune	1409x1;560x1;554x5	3299	14286889	53	103
+Standard	Snare	50	0		3 Nature rune + 4 Water rune + 4 Earth rune	561x3;555x4;557x4	3300	14286890	320	370
+Standard	Magic Dart	50	1		1 Slayer's staff + 1 Death rune + 4 Mind rune	4170x1;560x1;558x4	4176	14286891	324	374
+Standard	Ardougne Teleport	51	1	109	2 Law rune + 2 Water rune	563x2;555x2	3301	14286892	54	104
+Standard	Earth Blast	53	0		1 Death rune + 4 Earth rune + 3 Air rune	560x1;557x4;556x3	3302	14286893	40	90
+Standard	High Level Alchemy	55	0		1 Nature rune + 5 Fire rune	561x1;554x5	3303	14286895	41	91
+Standard	Charge Water Orb	56	1		3 Cosmic rune + 30 Water rune + 1 Unpowered orb	564x3;555x30;567x1	3304	14286896	42	92
+Standard	Summon Boat	56	1	7103	2 Law rune + 1 Earth rune + 1 Water rune	563x2;557x1;555x1	31714	14286930	6923	6948
+Standard	Watchtower Teleport	58	1	157	2 Law rune + 2 Earth rune	563x2;557x2	3306	14286898	55	105
+Standard	Fire Blast	59	0		1 Death rune + 5 Fire rune + 4 Air rune	560x1;554x5;556x4	3307	14286899	44	94
+Standard	Charge Earth Orb	60	1		3 Cosmic rune + 30 Earth rune + 1 Unpowered orb	564x3;557x30;567x1	3308	14286900	45	95
+Standard	Bones to Peaches	60	1		2 Nature rune + 4 Water rune + 4 Earth rune	561x2;555x4;557x4	6884	14286901	354	404
+Standard	Saradomin Strike	60	1	89	1 Saradomin staff + 2 Blood rune + 4 Air rune	2415x1;565x2;556x4	3311	14286902	61	111
+Standard	Claws of Guthix	60	1	89	1 null + 2 Blood rune + 4 Air rune	8843x1;565x2;556x4	3309	14286903	60	110
+Standard	Flames of Zamorak	60	1	89	1 Zamorak staff + 2 Blood rune + 1 Air rune	2417x1;565x2;556x1	3310	14286904	59	109
+Standard	Trollheim Teleport	61	1	36	2 Law rune + 2 Fire rune	563x2;554x2	3312	14286905	323	373
+Standard	Wind Wave	62	1		1 Blood rune + 5 Air rune	565x1;556x5	3313	14286906	46	96
+Standard	Charge Fire Orb	63	1		3 Cosmic rune + 30 Fire rune + 1 Unpowered orb	564x3;554x30;567x1	3314	14286907	47	97
+Standard	Ape Atoll Teleport	64	1		2 Law rune + 2 Water rune + 2 Fire rune	563x2;555x2;554x2	7619	14286908	357	407
+Standard	Water Wave	65	1		1 Blood rune + 7 Water rune + 5 Air rune	565x1;555x7;556x5	3315	14286909	48	98
+Standard	Charge Air Orb	66	1		3 Cosmic rune + 30 Air rune + 1 Unpowered orb	564x3;556x30;567x1	3316	14286910	49	99
+Standard	Vulnerability	66	1		1 Soul rune + 5 Water rune + 5 Earth rune	566x1;555x5;557x5	3317	14286911	56	106
+Standard	Teleport to House	40	1		1 Law rune + 1 Air rune + 1 Earth rune	563x1;556x1;557x1	8828	14286882	355	405
+Standard	Teleport to Boat	67	1	7103	2 Law rune + 2 Earth rune + 2 Water rune	563x2;557x2;555x2	31715	14286931	6922	6947
+Standard	Kourend Castle Teleport	48	1	13	2 Law rune + 1 Water rune + 1 Fire rune	563x2;555x1;554x1	21836	14286887	360	410
+Standard	Earth Wave	70	1		1 Blood rune + 7 Earth rune + 5 Air rune	565x1;557x7;556x5	3319	14286913	51	101
+Standard	Enfeeble	73	1		1 Soul rune + 8 Water rune + 8 Earth rune	566x1;555x8;557x8	3320	14286914	57	107
+Standard	Teleother Lumbridge	74	1		1 Law rune + 1 Soul rune + 1 Earth rune	563x1;566x1;557x1	4553	14286915	349	399
+Standard	Fire Wave	75	1		1 Blood rune + 7 Fire rune + 5 Air rune	565x1;554x7;556x5	3321	14286916	52	102
+Standard	Entangle	79	1		4 Nature rune + 5 Water rune + 5 Earth rune	561x4;555x5;557x5	3322	14286917	321	371
+Standard	Stun	80	1		1 Soul rune + 12 Water rune + 12 Earth rune	566x1;555x12;557x12	3324	14286918	58	108
+Standard	Charge	80	1	89	3 Blood rune + 3 Air rune + 3 Fire rune	565x3;556x3;554x3	3323	14286919	322	372
+Standard	Wind Surge	81	1		1 Wrath rune + 7 Air rune	21880x1;556x7	21876	14286920	362	412
+Standard	Teleother Falador	82	1		1 Law rune + 1 Soul rune + 1 Water rune	563x1;566x1;555x1	4554	14286921	350	400
+Standard	Water Surge	85	1		1 Wrath rune + 10 Water rune + 7 Air rune	21880x1;555x10;556x7	21877	14286922	363	413
+Standard	Tele Block	85	0		1 Law rune + 1 Death rune + 1 Chaos rune	563x1;560x1;562x1	4555	14286923	352	402
+Standard	Teleport to Target	85	1		1 Law rune + 1 Death rune + 1 Chaos rune	563x1;560x1;562x1	17152	14286924	359	409
+Standard	Teleother Camelot	90	1		1 Law rune + 2 Soul rune	563x1;566x2	4556	14286926	351	401
+Standard	Earth Surge	90	1		1 Wrath rune + 10 Earth rune + 7 Air rune	21880x1;557x10;556x7	21878	14286927	364	414
+Standard	Fire Surge	95	1		1 Wrath rune + 10 Fire rune + 7 Air rune	21880x1;554x10;556x7	21879	14286929	365	415
+Standard	Civitas illa Fortis Teleport	54	1	3512	2 Law rune + 1 Earth rune + 1 Fire rune	563x2;557x1;554x1	24612	14286894	367	417
+Ancient	Edgeville Home Teleport	0	0				11142	14286956	356	406
+Ancient	Minigame Teleport	0	0				33139	14286856	7479	7504
+Ancient	Smoke Rush	50	1	27	2 Death rune + 2 Chaos rune + 1 Air rune	560x2;562x2;556x1	4629	14286940	329	379
+Ancient	Shadow Rush	52	1	27	2 Death rune + 2 Chaos rune + 1 Soul rune	560x2;562x2;566x1	4630	14286944	337	387
+Ancient	Paddewwa Teleport	54	1	27	2 Law rune + 1 Air rune + 1 Fire rune	563x2;556x1;554x1	4631	14286948	341	391
+Ancient	Blood Rush	56	1	27	2 Death rune + 2 Chaos rune + 1 Blood rune	560x2;562x2;565x1	4632	14286936	333	383
+Ancient	Ice Rush	58	1	27	2 Death rune + 2 Chaos rune + 2 Water rune	560x2;562x2;555x2	4633	14286932	325	375
+Ancient	Senntisten Teleport	60	1	27	2 Law rune + 1 Soul rune	563x2;566x1	4634	14286949	342	392
+Ancient	Smoke Burst	62	1	27	2 Death rune + 4 Chaos rune + 2 Air rune	560x2;562x4;556x2	4635	14286942	330	380
+Ancient	Shadow Burst	64	1	27	2 Death rune + 4 Chaos rune + 2 Soul rune	560x2;562x4;566x2	4636	14286946	338	388
+Ancient	Kharyrll Teleport	66	1	27	2 Law rune + 1 Blood rune	563x2;565x1	4637	14286950	343	393
+Ancient	Blood Burst	68	1	27	2 Death rune + 4 Chaos rune + 2 Blood rune	560x2;562x4;565x2	4638	14286938	334	384
+Ancient	Ice Burst	70	1	27	2 Death rune + 4 Chaos rune + 4 Water rune	560x2;562x4;555x4	4639	14286934	326	376
+Ancient	Lassar Teleport	72	1	27	2 Law rune + 4 Water rune	563x2;555x4	4640	14286951	344	394
+Ancient	Smoke Blitz	74	1	27	2 Death rune + 2 Blood rune + 2 Air rune	560x2;565x2;556x2	4641	14286941	331	381
+Ancient	Shadow Blitz	76	1	27	2 Death rune + 2 Blood rune + 2 Soul rune	560x2;565x2;566x2	4642	14286945	339	389
+Ancient	Dareeyak Teleport	78	1	27	2 Law rune + 2 Air rune + 3 Fire rune	563x2;556x2;554x3	4643	14286952	345	395
+Ancient	Blood Blitz	80	1	27	2 Death rune + 4 Blood rune	560x2;565x4	4644	14286937	335	385
+Ancient	Ice Blitz	82	1	27	2 Death rune + 2 Blood rune + 3 Water rune	560x2;565x2;555x3	4645	14286933	327	377
+Ancient	Carrallanger Teleport	84	1	27	2 Law rune + 2 Soul rune	563x2;566x2	4646	14286953	346	396
+Ancient	Teleport to Target	85	1		1 Law rune + 1 Death rune + 1 Chaos rune	563x1;560x1;562x1	17152	14286924	359	409
+Ancient	Smoke Barrage	86	1	27	4 Death rune + 2 Blood rune + 4 Air rune	560x4;565x2;556x4	4647	14286943	332	382
+Ancient	Shadow Barrage	88	1	27	4 Death rune + 2 Blood rune + 3 Soul rune	560x4;565x2;566x3	4648	14286947	340	390
+Ancient	Annakarl Teleport	90	1	27	2 Law rune + 2 Blood rune	563x2;565x2	4649	14286954	347	397
+Ancient	Blood Barrage	92	1	27	4 Death rune + 4 Blood rune + 1 Soul rune	560x4;565x4;566x1	4650	14286939	336	386
+Ancient	Ice Barrage	94	1	27	4 Death rune + 2 Blood rune + 6 Water rune	560x4;565x2;555x6	4651	14286935	328	378
+Ancient	Ghorrock Teleport	96	1	27	2 Law rune + 8 Water rune	563x2;555x8	4652	14286955	348	398
+Lunar	Lunar Home Teleport	0	1				11143	14286957	356	406
+Lunar	Minigame Teleport	0	0				33141	14286858	7479	7504
+Lunar	Bake Pie	65	1	88	1 Astral rune + 4 Water rune + 5 Fire rune	9075x1;555x4;554x5	9107	14286958	543	593
+Lunar	Cure Plant	66	1	88	1 Astral rune + 8 Earth rune	9075x1;557x8	9108	14286959	567	617
+Lunar	Astral Contact	67	1	88	1 Astral rune + 1 Cosmic rune + 2 Air rune	9075x1;564x1;556x2	9109	14286961	568	618
+Lunar	Cure Other	68	1	88	1 Astral rune + 1 Law rune + 10 Earth rune	9075x1;563x1;557x10	9110	14286962	559	609
+Lunar	Moonclan Teleport	69	1	88	1 Law rune + 2 Astral rune + 2 Earth rune	563x1;9075x2;557x2	9111	14286964	544	594
+Lunar	Tele Group Moonclan	70	1	88	1 Law rune + 2 Astral rune + 4 Earth rune	563x1;9075x2;557x4	9112	14286965	569	619
+Lunar	Cure Me	71	1	88	2 Astral rune + 2 Cosmic rune + 1 Law rune	9075x2;564x2;563x1	9113	14286966	562	612
+Lunar	Waterbirth Teleport	72	1	88	1 Law rune + 2 Astral rune + 1 Water rune	563x1;9075x2;555x1	9114	14286968	545	595
+Lunar	Tele Group Waterbirth	73	1	88	1 Law rune + 2 Astral rune + 5 Water rune	563x1;9075x2;555x5	9115	14286969	570	620
+Lunar	Cure Group	74	1	88	2 Astral rune + 2 Cosmic rune + 2 Law rune	9075x2;564x2;563x2	9116	14286970	565	615
+Lunar	Stat Spy	75	1	33	2 Astral rune + 2 Cosmic rune + 5 Body rune	9075x2;564x2;559x5	11147	14286971	576	626
+Lunar	Barbarian Teleport	75	1	88	2 Law rune + 2 Astral rune + 3 Fire rune	563x2;9075x2;554x3	9117	14286972	547	597
+Lunar	Tele Group Barbarian	76	1	88	2 Law rune + 2 Astral rune + 6 Fire rune	563x2;9075x2;554x6	9118	14286973	571	621
+Lunar	Spin Flax	76	1	88	1 Astral rune + 2 Nature rune + 5 Air rune	9075x1;561x2;556x5	20589	14286999	585	635
+Lunar	Superglass Make	77	1	88	2 Astral rune + 6 Fire rune + 10 Air rune	9075x2;554x6;556x10	9119	14286974	548	598
+Lunar	Tan Leather	78	1		2 Astral rune + 1 Nature rune + 5 Fire rune	9075x2;561x1;554x5	1741	14286975	583	633
+Lunar	Khazard Teleport	78	1	88	2 Law rune + 2 Astral rune + 4 Water rune	563x2;9075x2;555x4	9120	14286976	549	599
+Lunar	Tele Group Khazard	79	1	88	2 Law rune + 2 Astral rune + 8 Water rune	563x2;9075x2;555x8	9121	14286977	572	622
+Lunar	String Jewellery	80	1	88	2 Astral rune + 5 Water rune + 10 Earth rune	9075x2;555x5;557x10	9122	14286979	550	600
+Lunar	Stat Restore Pot Share	81	1	88	2 Astral rune + 10 Water rune + 10 Earth rune	9075x2;555x10;557x10	9123	14286980	554	604
+Lunar	Magic Imbue	82	1	88	2 Astral rune + 7 Water rune + 7 Fire rune	9075x2;555x7;554x7	9124	14286981	552	602
+Lunar	Fertile Soil	83	1	88	3 Astral rune + 2 Nature rune + 15 Earth rune	9075x3;561x2;557x15	9125	14286982	553	603
+Lunar	Boost Potion Share	84	1	88	3 Astral rune + 10 Water rune + 12 Earth rune	9075x3;555x10;557x12	9126	14286983	551	601
+Lunar	Fishing Guild Teleport	85	1	88	3 Law rune + 3 Astral rune + 10 Water rune	563x3;9075x3;555x10	9127	14286984	555	605
+Lunar	Tele Group Fishing Guild	86	1	88	3 Law rune + 3 Astral rune + 14 Water rune	563x3;9075x3;555x14	9128	14286985	573	623
+Lunar	Catherby Teleport	87	1	88	3 Law rune + 3 Astral rune + 10 Water rune	563x3;9075x3;555x10	9129	14286987	556	606
+Lunar	Tele Group Catherby	88	1	88	3 Law rune + 3 Astral rune + 15 Water rune	563x3;9075x3;555x15	9130	14286988	574	624
+Lunar	Recharge Dragonstone	89	1	88	1 Astral rune + 1 Soul rune + 4 Water rune	9075x1;566x1;555x4	2529	14286989	584	634
+Lunar	Ice Plateau Teleport	89	1	88	3 Law rune + 3 Astral rune + 8 Water rune	563x3;9075x3;555x8	9131	14286990	557	607
+Lunar	Tele Group Ice Plateau	90	1	88	3 Law rune + 3 Astral rune + 16 Water rune	563x3;9075x3;555x16	9132	14286991	575	625
+Lunar	Energy Transfer	91	1	88	3 Astral rune + 2 Law rune + 1 Nature rune	9075x3;563x2;561x1	9133	14286992	558	608
+Lunar	Heal Other	92	1	88	3 Astral rune + 3 Law rune + 1 Blood rune	9075x3;563x3;565x1	9134	14286993	560	610
+Lunar	Vengeance Other	93	1	88	3 Astral rune + 2 Death rune + 10 Earth rune	9075x3;560x2;557x10	9135	14286994	561	611
+Lunar	Vengeance	94	1	88	4 Astral rune + 2 Death rune + 10 Earth rune	9075x4;560x2;557x10	9136	14286995	564	614
+Lunar	Heal Group	95	1	88	4 Astral rune + 6 Law rune + 3 Blood rune	9075x4;563x6;565x3	9137	14286996	566	616
+Lunar	Monster Examine	66	1	33	1 Astral rune + 1 Cosmic rune + 1 Mind rune	9075x1;564x1;558x1	11144	14286960	577	627
+Lunar	Humidify	68	1	33	1 Astral rune + 3 Water rune + 1 Fire rune	9075x1;555x3;554x1	11145	14286963	578	628
+Lunar	Ourania Teleport	71	1	88	1 Law rune + 2 Astral rune + 6 Earth rune	563x1;9075x2;557x6	20759	14287000	586	636
+Lunar	Hunter Kit	71	1	33	2 Astral rune + 2 Earth rune	9075x2;557x2	11146	14286967	579	629
+Lunar	Dream	79	1	33	2 Astral rune + 1 Cosmic rune + 5 Body rune	9075x2;564x1;559x5	11148	14286978	580	630
+Lunar	Plank Make	86	1	33	2 Astral rune + 1 Nature rune + 15 Earth rune	9075x2;561x1;557x15	11149	14286986	581	631
+Lunar	Spellbook Swap	96	1	33	3 Astral rune + 2 Cosmic rune + 1 Law rune	9075x3;564x2;563x1	11150	14286997	582	632
+Lunar	Geomancy	65	1	88	3 Astral rune + 3 Nature rune + 8 Earth rune	9075x3;561x3;557x8	6797	14286998	563	613
+Lunar	Teleport to Target	85	1		1 Law rune + 1 Death rune + 1 Chaos rune	563x1;560x1;562x1	17152	14286924	359	409
+Arceuus	Arceuus Home Teleport	0	1				21835	14287001	1251	1276
+Arceuus	Minigame Teleport	0	0				33140	14286857	7479	7504
+Arceuus	Basic Reanimation	16	1		4 Body rune + 2 Nature rune	559x4;561x2	11997	14287002	1247	1272
+Arceuus	Adept Reanimation	41	1		4 Body rune + 3 Nature rune + 1 Soul rune	559x4;561x3;566x1	2885	14287004	1248	1273
+Arceuus	Expert Reanimation	72	1		1 Blood rune + 3 Nature rune + 2 Soul rune	565x1;561x3;566x2	6208	14287005	1249	1274
+Arceuus	Master Reanimation	90	1		2 Blood rune + 4 Nature rune + 4 Soul rune	565x2;561x4;566x4	6888	14287006	1250	1275
+Arceuus	Arceuus Library Teleport	6	1		1 Law rune + 2 Earth rune	563x1;557x2	20409	14287003	1252	1277
+Arceuus	Draynor Manor Teleport	17	1		1 Law rune + 1 Water rune + 1 Earth rune	563x1;555x1;557x1	20410	14287007	1253	1278
+Arceuus	Mind Altar Teleport	28	1		1 Law rune + 2 Mind rune	563x1;558x2	20411	14287009	1256	1281
+Arceuus	Salve Graveyard Teleport	40	1		1 Law rune + 2 Soul rune	563x1;566x2	20412	14287011	1258	1283
+Arceuus	Fenkenstrain's Castle Teleport	48	1		1 Law rune + 1 Soul rune + 1 Earth rune	563x1;566x1;557x1	20413	14287012	1259	1284
+Arceuus	West Ardougne Teleport	61	1	9	2 Law rune + 2 Soul rune	563x2;566x2	20414	14287013	1260	1285
+Arceuus	Harmony Island Teleport	65	1	67	1 Law rune + 1 Soul rune + 1 Nature rune	563x1;566x1;561x1	20419	14287014	1261	1286
+Arceuus	Cemetery Teleport	71	1		1 Law rune + 1 Soul rune + 1 Blood rune	563x1;566x1;565x1	20420	14287015	1264	1289
+Arceuus	Barrows Teleport	83	1		2 Law rune + 2 Soul rune + 1 Blood rune	563x2;566x2;565x1	20404	14287017	1262	1287
+Arceuus	Ape Atoll Teleport	90	1		2 Law rune + 2 Soul rune + 2 Blood rune	563x2;566x2;565x2	20427	14287018	1263	1288
+Arceuus	Respawn Teleport	34	1		1 Law rune + 1 Soul rune	563x1;566x1	8092	14287010	1257	1282
+Arceuus	Resurrect Crops	78	1		8 Soul rune + 12 Nature rune + 8 Blood rune	566x8;561x12;565x8	20391	14287016	1266	1291
+Arceuus	Battlefront Teleport	23	1		1 Law rune + 1 Earth rune + 1 Fire rune	563x1;557x1;554x1	22779	14287019	1255	1280
+Arceuus	Inferior Demonbane	44	1		1 Chaos rune + 3 Fire rune	562x1;554x3	20398	14287020	1302	1321
+Arceuus	Superior Demonbane	62	1	81	1 Soul rune + 5 Fire rune	566x1;554x5	20399	14287021	1303	1322
+Arceuus	Dark Demonbane	82	1	81	2 Soul rune + 7 Fire rune	566x2;554x7	20400	14287022	1304	1323
+Arceuus	Mark of Darkness	59	1	81	1 Soul rune + 1 Cosmic rune	566x1;564x1	20392	14287023	1305	1324
+Arceuus	Ghostly Grasp	35	1		1 Chaos rune + 4 Air rune	562x1;556x4	21826	14287024	1267	1292
+Arceuus	Skeletal Grasp	56	1	81	1 Death rune + 8 Earth rune	560x1;557x8	21829	14287025	1268	1293
+Arceuus	Undead Grasp	79	1	81	1 Blood rune + 12 Fire rune	565x1;554x12	21832	14287026	1269	1294
+Arceuus	Ward of Arceuus	73	1	81	4 Soul rune + 2 Nature rune + 1 Cosmic rune	566x4;561x2;564x1	20763	14287027	1306	1325
+Arceuus	Lesser Corruption	64	1	81	1 Death rune + 2 Soul rune	560x1;566x2	10511	14287028	1307	1326
+Arceuus	Greater Corruption	85	1	81	1 Blood rune + 3 Soul rune	565x1;566x3	20762	14287029	1308	1327
+Arceuus	Demonic Offering	84	1	81	1 Soul rune + 1 Wrath rune	566x1;21880x1	15346	14287030	1311	1330
+Arceuus	Sinister Offering	92	1	81	1 Blood rune + 1 Wrath rune	565x1;21880x1	8796	14287031	1312	1331
+Arceuus	Degrime	70	1	81	4 Earth rune + 2 Nature rune	557x4;561x2	15345	14287032	1318	1337
+Arceuus	Shadow Veil	47	1	81	5 Earth rune + 5 Fire rune + 5 Cosmic rune	557x5;554x5;564x5	15344	14287033	1315	1334
+Arceuus	Vile Vigour	66	1	81	1 Soul rune + 3 Air rune	566x1;556x3	15304	14287034	1317	1336
+Arceuus	Dark Lure	50	1	81	1 Death rune + 1 Nature rune	560x1;561x1	15303	14287035	1316	1335
+Arceuus	Death Charge	80	1	81	1 Death rune + 1 Blood rune + 1 Soul rune	560x1;565x1;566x1	15309	14287036	1310	1329
+Arceuus	Resurrect Lesser Ghost	38	1	81	5 Mind rune + 10 Air rune + 1 Cosmic rune	558x5;556x10;564x1	25511	14287037	1270	1295
+Arceuus	Resurrect Lesser Skeleton	38	1	81	5 Mind rune + 10 Air rune + 1 Cosmic rune	558x5;556x10;564x1	25509	14287038	1271	1296
+Arceuus	Resurrect Lesser Zombie	38	1	81	5 Mind rune + 10 Air rune + 1 Cosmic rune	558x5;556x10;564x1	25508	14287039	1300	1319
+Arceuus	Resurrect Superior Ghost	57	1	81	5 Death rune + 10 Earth rune + 1 Cosmic rune	560x5;557x10;564x1	25506	14287040	2979	2985
+Arceuus	Resurrect Superior Skeleton	57	1	81	5 Death rune + 10 Earth rune + 1 Cosmic rune	560x5;557x10;564x1	25512	14287041	2981	2987
+Arceuus	Resurrect Superior Zombie	57	1	81	5 Death rune + 10 Earth rune + 1 Cosmic rune	560x5;557x10;564x1	25513	14287042	2983	2989
+Arceuus	Resurrect Greater Ghost	76	1	81	5 Blood rune + 10 Fire rune + 1 Cosmic rune	565x5;554x10;564x1	25507	14287043	2980	2986
+Arceuus	Resurrect Greater Skeleton	76	1	81	5 Blood rune + 10 Fire rune + 1 Cosmic rune	565x5;554x10;564x1	25510	14287044	2982	2988
+Arceuus	Resurrect Greater Zombie	76	1	81	5 Blood rune + 10 Fire rune + 1 Cosmic rune	565x5;554x10;564x1	25514	14287045	2984	2990
+Arceuus	Teleport to Target	85	1		1 Law rune + 1 Death rune + 1 Chaos rune	563x1;560x1;562x1	17152	14286924	359	409

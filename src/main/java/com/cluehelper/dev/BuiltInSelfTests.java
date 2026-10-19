@@ -4,6 +4,9 @@ import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.MemorySlot;
 import com.cluehelper.memory.MemoryStore;
+import com.cluehelper.player.PlayerModel;
+import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.RuneModel;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.step.ClueFacts;
 import com.cluehelper.step.CoreClueReader;
@@ -28,6 +31,8 @@ import net.runelite.client.plugins.PluginManager;
 class BuiltInSelfTests
 {
 	private static final String ROUND_TRIP_KEY = "devSelfTest";
+	/** Aether, the newest rune in enum 982 (B04). */
+	private static final int LAST_POUCH_TYPE = 23;
 
 	private final Client client;
 	private final ClientThread clientThread;
@@ -37,11 +42,13 @@ class BuiltInSelfTests
 	private final ClueLink core;
 	private final MemoryStore memory;
 	private final MemorySlot<String> roundTrip;
+	private final PlayerModel player;
 
 	@Inject
 	BuiltInSelfTests(Client client, ClientThread clientThread, ScheduledExecutorService executor,
-		PluginManager pluginManager, ClueHelperConfig config, ClueLink core, MemoryStore memory)
+		PluginManager pluginManager, ClueHelperConfig config, ClueLink core, MemoryStore memory, PlayerModel player)
 	{
+		this.player = player;
 		this.client = client;
 		this.clientThread = clientThread;
 		this.executor = executor;
@@ -65,6 +72,7 @@ class BuiltInSelfTests
 			SelfTest.of("panel state", run ->
 				run.check(shown.get() == expected.get(), "panel shows " + shown.get() + ", signals say " + expected.get())),
 			SelfTest.of("memory store", this::checkMemoryRoundTrip),
+			SelfTest.of("player snapshot", this::checkPlayerSnapshot),
 			new PlannerRunnerTest());
 	}
 
@@ -126,6 +134,23 @@ class BuiltInSelfTests
 		roundTrip.clear();
 		memory.reload();
 		run.check(roundTrip.get() == null, "value gone from the profile after clear");
+	}
+
+	private void checkPlayerSnapshot(SelfTestRun run)
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		RuneModel runes = player.getRuneModel();
+		if (snapshot == null || runes == null)
+		{
+			run.skip("no snapshot yet: log in first");
+			return;
+		}
+		run.check(runes.getSpells().size() > 150, runes.getSpells().size() + " spells read from the cache");
+		run.check(runes.pouchRune(LAST_POUCH_TYPE) > 0, "pouch type " + LAST_POUCH_TYPE + " is rune " + runes.pouchRune(LAST_POUCH_TYPE));
+		run.check(snapshot.getSpellbook().getBook() != null, "book " + snapshot.getSpellbook().getBook());
+		run.check(snapshot.isQuestsRead(), snapshot.getQuests().size() + " quest states read");
+		run.check(snapshot.getPosition().getTile() != null, "position " + snapshot.getPosition());
+		run.check(!snapshot.getBoostedLevels().isEmpty(), "levels read");
 	}
 
 	/** A runner of its own, so the test never supersedes a real planner job. */

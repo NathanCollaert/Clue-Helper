@@ -1,0 +1,27 @@
+{
+  "name": "maxed-main",
+  "description": "Maxed main (Nathan's profile): every quest, diary and unlock, standard book with runes, a clue carry, everything banked, full POH in Hosidius.",
+  "members": true,
+  "bank": true,
+  "walkTier": "full",
+  "skills": { "default": 99 },
+  "maxTotal": true,
+  "quests": "all",
+  "vars": { "default": "pass", "values": { "4070": 0, "2187": 8, "4744": 0, "4560": 0 } },
+  "book": "standard",
+  "runes": true,
+  "fixedTransportItems": true,
+  "carried": [
+    "Amulet of glory", "Ring of dueling", "Games necklace", "Skills necklace", "Xeric's talisman",
+    "Digsite pendant", "Ardougne cloak", "Fremennik sea boots", "Morytania legs", "Desert amulet 4",
+    "Kandarin headgear 4", "Karamja gloves 4", "Royal seed pod", "Ectophial", "Max cape",
+    "Construction cape", "Eternal teleport crystal", "Pharaoh's sceptre", "Drakan's medallion",
+    "Master scroll book", "Ring of wealth", "Slayer ring", "Necklace of passage", "Pendant of ates",
+    "Book of the dead", "Fishing cape", "Crafting cape", "Teleport to House tablet"
+  ],
+  "banked": "*",
+  "poh": "full",
+  "types": "*",
+  "avoidWilderness": false,
+  "tiers": "*"
+}
