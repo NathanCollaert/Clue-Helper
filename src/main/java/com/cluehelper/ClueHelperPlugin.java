@@ -1,0 +1,147 @@
+package com.cluehelper;
+
+import com.cluehelper.dev.DevHarness;
+import com.cluehelper.link.CorePluginState;
+import com.cluehelper.memory.MemoryStore;
+import com.cluehelper.route.PlannerRunner;
+import com.cluehelper.ui.ClueHelperPanel;
+import com.cluehelper.ui.Icons;
+import com.cluehelper.ui.PanelState;
+import com.google.inject.Provides;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.SwingUtilities;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.events.CommandExecuted;
+import net.runelite.api.events.GameTick;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.PluginChanged;
+import net.runelite.client.events.RuneScapeProfileChanged;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+
+@Slf4j
+@PluginDescriptor(
+	name = "Clue Helper",
+	description = "Fastest clue routes from what you own, alongside the Clue Scroll plugin",
+	tags = {"clue", "clues", "treasure", "trails", "teleport", "route"}
+)
+public class ClueHelperPlugin extends Plugin
+{
+	@Inject
+	private ClientToolbar clientToolbar;
+
+	@Inject
+	private CorePluginState core;
+
+	@Inject
+	private MemoryStore memory;
+
+	@Inject
+	private PlannerRunner planner;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private DevHarness devHarness;
+
+	@Inject
+	@Named("developerMode")
+	private boolean developerMode;
+
+	@Getter(AccessLevel.PACKAGE)
+	private ClueHelperPanel panel;
+	private NavigationButton navigationButton;
+
+	@Provides
+	ClueHelperConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(ClueHelperConfig.class);
+	}
+
+	@Override
+	protected void startUp()
+	{
+		panel = new ClueHelperPanel();
+		navigationButton = NavigationButton.builder()
+			.tooltip("Clue Helper")
+			.icon(Icons.logo())
+			.priority(7)
+			.panel(panel)
+			.build();
+		clientToolbar.addNavigation(navigationButton);
+		core.start();
+		showPanelState();
+		if (developerMode)
+		{
+			devHarness.start(this::shownPanelState, this::panelState);
+		}
+	}
+
+	@Override
+	protected void shutDown()
+	{
+		devHarness.stop();
+		planner.cancelAll();
+		core.stop();
+		clientToolbar.removeNavigation(navigationButton);
+		navigationButton = null;
+		panel = null;
+	}
+
+	@Subscribe
+	public void onPluginChanged(PluginChanged event)
+	{
+		if (core.onPluginChanged(event))
+		{
+			showPanelState();
+		}
+	}
+
+	/** Priority -1: core updates its clue in its own priority-0 handlers, which must run first. */
+	@Subscribe(priority = -1)
+	public void onGameTick(GameTick tick)
+	{
+		if (core.recheck())
+		{
+			showPanelState();
+		}
+	}
+
+	@Subscribe
+	public void onRuneScapeProfileChanged(RuneScapeProfileChanged event)
+	{
+		memory.reload();
+	}
+
+	@Subscribe
+	public void onCommandExecuted(CommandExecuted event)
+	{
+		devHarness.onCommandExecuted(event);
+	}
+
+	private PanelState shownPanelState()
+	{
+		ClueHelperPanel shown = panel;
+		return shown == null ? null : shown.getShownState();
+	}
+
+	PanelState panelState()
+	{
+		return PanelState.of(core.isActive(), false, false, planner.isWorking());
+	}
+
+	private void showPanelState()
+	{
+		PanelState state = panelState();
+		ClueHelperPanel target = panel;
+		if (target != null)
+		{
+			SwingUtilities.invokeLater(() -> target.display(state));
+		}
+	}
+}
