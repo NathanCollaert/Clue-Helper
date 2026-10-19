@@ -3,6 +3,9 @@ package com.cluehelper.dev;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.route.Plan;
+import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.route.WalkData;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.ui.PanelState;
@@ -18,6 +21,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 /** Everything the plugin adds in developer mode, and nothing outside it. */
 @Slf4j
@@ -35,13 +39,18 @@ public class DevHarness
 	private final StepDump stepDump;
 	private final PlayerDump playerDump;
 	private final AvailabilityService availability;
+	private final RoutePlanner routes;
+	private final RouteDump routeDump;
+	private final RouteOverlay routeOverlay;
+	private final OverlayManager overlayManager;
 	private final List<Runnable> unregister = new ArrayList<>();
+	private boolean overlayShown;
 	private volatile DevCommands commands;
 
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, SelfTestRunner selfTests, StepLogger stepLogger,
 		BuiltInSelfTests builtInSelfTests, ClueLink clueLink, Gson gson, PlayerModel player,
-		AvailabilityService availability)
+		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager)
 	{
 		this.client = client;
 		this.clientThread = clientThread;
@@ -52,6 +61,10 @@ public class DevHarness
 		this.stepDump = new StepDump(clueLink, gson);
 		this.playerDump = new PlayerDump(client, player, availability);
 		this.availability = availability;
+		this.routes = routes;
+		this.routeDump = new RouteDump(routes);
+		this.routeOverlay = new RouteOverlay(client, routes, walkData);
+		this.overlayManager = overlayManager;
 	}
 
 	/**
@@ -66,6 +79,9 @@ public class DevHarness
 		c.register("step", "show the current step and log it as a replay fixture line", args -> dumpStep());
 		c.register("player", "show the player snapshot, castable spells and A_carried", args ->
 			playerDump.describe(this::reply, line -> log.info("{}   {}", PlayerDump.TAG, line)));
+		c.register("routes", "show the current step's routes; every candidate goes to the log", args ->
+			routeDump.describe(this::reply, line -> log.info("{}   {}", RouteDump.TAG, line)));
+		c.register("overlay", "toggle the route graph overlay: walk-table nodes, scene BFS walks, origin class", args -> toggleOverlay());
 		for (SelfTest test : builtInSelfTests.create(shown, expected))
 		{
 			unregister.add(selfTests.register(test));
@@ -73,6 +89,7 @@ public class DevHarness
 		stepLogger.setEnabled(true);
 		unregister.add(clueLink.addListener(this::onStepChange));
 		unregister.add(availability.addListener(playerDump::onJudged));
+		unregister.add(routes.addListener(this::onPlanned));
 		commands = c;
 		log.info("developer mode: ::ch-help lists the dev commands");
 	}
@@ -80,6 +97,10 @@ public class DevHarness
 	public void stop()
 	{
 		commands = null;
+		if (overlayShown)
+		{
+			toggleOverlay();
+		}
 		stepLogger.setEnabled(false);
 		unregister.forEach(Runnable::run);
 		unregister.clear();
@@ -115,6 +136,25 @@ public class DevHarness
 		if (change == StepChange.NEW)
 		{
 			stepLogger.record(step.getTier(), step.getType(), step.getKey());
+		}
+	}
+
+	private void onPlanned(Plan plan)
+	{
+		log.info("{} {}", RouteDump.TAG, routeDump.header(plan));
+		routeDump.summary(plan).forEach(line -> log.info("{}   {}", RouteDump.TAG, line));
+	}
+
+	private void toggleOverlay()
+	{
+		overlayShown = !overlayShown;
+		if (overlayShown)
+		{
+			overlayManager.add(routeOverlay);
+		}
+		else
+		{
+			overlayManager.remove(routeOverlay);
 		}
 	}
 

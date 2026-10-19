@@ -1,0 +1,281 @@
+anagram:12055
+  best      274t: Nightmare Zone Minigame Teleport → walk 247 {cooldown:888=1}
+  alt       318t: Castle Wars Minigame Teleport → walk 291 {cooldown:888=1}
+  alt       419t: Burthorpe Games Room Minigame Teleport → walk 392 {cooldown:888=1}
+anagram:12568
+  best      464t: Clan Wars Minigame Teleport → walk 437 {cooldown:888=1}
+  alt       464t: Last Man Standing Minigame Teleport → walk 437 {cooldown:888=1}
+  alt       504t: Lumbridge Home Teleport → walk 479 {cooldown:892=1}
+anagram:19758
+  best      none
+  note      no route from what you have
+anagram:25784
+  best      none
+  note      no route from what you have
+anagram:7268
+  best      272t: Nightmare Zone Minigame Teleport → walk 245 {cooldown:888=1}
+  alt       309t: Castle Wars Minigame Teleport → walk 282 {cooldown:888=1}
+  alt       429t: Clan Wars Minigame Teleport → walk 402 {cooldown:888=1}
+anagram:duo plug
+  best      none
+  note      no route from what you have
+map:w346
+  best      121t: Lumbridge Home Teleport → walk 96 {cooldown:892=1}
+  alt       172t: Clan Wars Minigame Teleport → walk 145 {cooldown:888=1}
+  alt       172t: Last Man Standing Minigame Teleport → walk 145 {cooldown:888=1}
+map:w347
+  best      117t: Lumbridge Home Teleport → walk 92 {cooldown:892=1}
+  alt       174t: Giant's Foundry Minigame Teleport → walk 147 {cooldown:888=1}
+  alt       175t: Clan Wars Minigame Teleport → walk 148 {cooldown:888=1}
+map:w348
+  best      95t: Lumbridge Home Teleport → walk 70 {cooldown:892=1}
+map:w351
+  best      140t: Burthorpe Games Room Minigame Teleport → walk 113 {cooldown:888=1}
+  alt       171t: Lumbridge Home Teleport → walk 146 {cooldown:892=1}
+  alt       174t: Clan Wars Minigame Teleport → walk 147 {cooldown:888=1}
+map:w356
+  best      115t: Lumbridge Home Teleport → walk 90 {cooldown:892=1}
+  alt       217t: Giant's Foundry Minigame Teleport → walk 190 {cooldown:888=1}
+cipher:19762
+  best      none
+  note      no route from what you have
+cipher:19768
+  best      none
+  note      no route from what you have
+cipher:19898
+  best      none
+  note      no route from what you have
+cipher:19904
+  best      none
+  note      no route from what you have
+cipher:19910
+  best      none
+  note      no route from what you have
+cipher:23172
+  best      none
+  note      no route from what you have
+coordinate:12033
+  best      151t: Castle Wars Minigame Teleport → walk 124 {cooldown:888=1}
+  alt       154t: Nightmare Zone Minigame Teleport → walk 127 {cooldown:888=1}
+  alt       272t: Clan Wars Minigame Teleport → walk 245 {cooldown:888=1}
+coordinate:12101
+  best      189t: Clan Wars Minigame Teleport → walk 162 {cooldown:888=1}
+  alt       189t: Last Man Standing Minigame Teleport → walk 162 {cooldown:888=1}
+  alt       374t: Burthorpe Games Room Minigame Teleport → walk 347 {cooldown:888=1}
+  note      Wilderness target
+coordinate:19844
+  best      none
+  note      no route from what you have
+coordinate:2725
+  best      216t: Clan Wars Minigame Teleport → walk 189 {cooldown:888=1}
+  alt       216t: Last Man Standing Minigame Teleport → walk 189 {cooldown:888=1}
+  alt       369t: Burthorpe Games Room Minigame Teleport → walk 342 {cooldown:888=1}
+  note      Wilderness target
+coordinate:28909
+  best      none
+  note      no route from what you have
+coordinate:3556
+  best      104t: Clan Wars Minigame Teleport → walk 77 {cooldown:888=1}
+  alt       104t: Last Man Standing Minigame Teleport → walk 77 {cooldown:888=1}
+  note      Wilderness target
+cryptic:'a bag belt only?', he asked his balding brothers.
+  best      111t: Clan Wars Minigame Teleport → walk 84 {cooldown:888=1}
+  alt       111t: Last Man Standing Minigame Teleport → walk 84 {cooldown:888=1}
+  alt       162t: Burthorpe Games Room Minigame Teleport → walk 135 {cooldown:888=1}
+cryptic:elvish onions.
+  best      none
+  note      no route from what you have
+cryptic:leader of the yak city.
+  best      none
+  note      no route from what you have
+cryptic:search the chest in the left-hand tower of camelot castle.
+  best      254t: Nightmare Zone Minigame Teleport → walk 227 {cooldown:888=1}
+  alt       263t: Burthorpe Games Room Minigame Teleport → walk 236 {cooldown:888=1}
+  alt       322t: Castle Wars Minigame Teleport → walk 295 {cooldown:888=1}
+cryptic:search the wheelbarrow in rimmington mine.
+  best      161t: Lumbridge Home Teleport → walk 136 {cooldown:892=1}
+  alt       190t: Burthorpe Games Room Minigame Teleport → walk 163 {cooldown:888=1}
+  alt       256t: Clan Wars Minigame Teleport → walk 229 {cooldown:888=1}
+cryptic:talk to the cook in the blue moon inn in varrock.
+  best      146t: Lumbridge Home Teleport → walk 113 {cooldown:892=1}
+  alt       176t: Clan Wars Minigame Teleport → walk 141 {cooldown:888=1}
+  alt       176t: Last Man Standing Minigame Teleport → walk 141 {cooldown:888=1}
+emote:10180
+  best      72t: Lumbridge Home Teleport → walk 47 {cooldown:892=1}
+emote:10222
+  best      191t: Nightmare Zone Minigame Teleport → walk 164 {cooldown:888=1}
+  alt       241t: Burthorpe Games Room Minigame Teleport → walk 214 {cooldown:888=1}
+  alt       276t: Castle Wars Minigame Teleport → walk 249 {cooldown:888=1}
+emote:10264
+  best      none
+  note      no route from what you have
+emote:12080
+  best      332t: Clan Wars Minigame Teleport → walk 305 {cooldown:888=1}
+  alt       332t: Last Man Standing Minigame Teleport → walk 305 {cooldown:888=1}
+  alt       373t: Lumbridge Home Teleport → walk 348 {cooldown:892=1}
+emote:19833
+  best      149t: Lumbridge Home Teleport → walk 124 {cooldown:892=1}
+  alt       167t: Clan Wars Minigame Teleport → walk 140 {cooldown:888=1}
+  alt       167t: Last Man Standing Minigame Teleport → walk 140 {cooldown:888=1}
+emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
+  best      none
+  note      walk too long
+fairyring:a i q 0 4 4 0
+  best      207t: Lumbridge Home Teleport → walk 182 {cooldown:892=1}
+  alt       255t: Burthorpe Games Room Minigame Teleport → walk 228 {cooldown:888=1}
+  alt       307t: Clan Wars Minigame Teleport → walk 280 {cooldown:888=1}
+fairyring:a i r 2 3 3 1
+  best      none
+  note      no route from what you have
+fairyring:a l p 1 1 4 0
+  best      317t: Nightmare Zone Minigame Teleport → walk 290 {cooldown:888=1}
+  alt       361t: Castle Wars Minigame Teleport → walk 334 {cooldown:888=1}
+  alt       400t: Burthorpe Games Room Minigame Teleport → walk 373 {cooldown:888=1}
+fairyring:b j r 1 1 2 3
+  best      none
+  note      no route from what you have
+fairyring:c i s 0 0 0 9
+  best      none
+  note      no route from what you have
+fairyring:d i p 8 5 1 1
+  best      none
+  note      no route from what you have
+falo:a blood red weapon, a strong curved sword, found on the island of primate lords.
+  best      253t: Nightmare Zone Minigame Teleport → walk 226 {cooldown:888=1}
+  alt       293t: Burthorpe Games Room Minigame Teleport → walk 266 {cooldown:888=1}
+  alt       306t: Castle Wars Minigame Teleport → walk 279 {cooldown:888=1}
+falo:a fiery axe of great inferno, when you use it, you'll wonder where the logs go.
+  best      253t: Nightmare Zone Minigame Teleport → walk 226 {cooldown:888=1}
+  alt       293t: Burthorpe Games Room Minigame Teleport → walk 266 {cooldown:888=1}
+  alt       306t: Castle Wars Minigame Teleport → walk 279 {cooldown:888=1}
+falo:a shiny helmet of flight, to obtain this with melee, struggle you might.
+  best      253t: Nightmare Zone Minigame Teleport → walk 226 {cooldown:888=1}
+  alt       293t: Burthorpe Games Room Minigame Teleport → walk 266 {cooldown:888=1}
+  alt       306t: Castle Wars Minigame Teleport → walk 279 {cooldown:888=1}
+falo:it can hold down a boat or crush a goat, this object, you see, is quite heavy.
+  best      253t: Nightmare Zone Minigame Teleport → walk 226 {cooldown:888=1}
+  alt       293t: Burthorpe Games Room Minigame Teleport → walk 266 {cooldown:888=1}
+  alt       306t: Castle Wars Minigame Teleport → walk 279 {cooldown:888=1}
+falo:penance healers runners and more, obtaining this body often gives much deplore.
+  best      253t: Nightmare Zone Minigame Teleport → walk 226 {cooldown:888=1}
+  alt       293t: Burthorpe Games Room Minigame Teleport → walk 266 {cooldown:888=1}
+  alt       306t: Castle Wars Minigame Teleport → walk 279 {cooldown:888=1}
+falo:they come from some time ago, from a land unto the east. fossilised they have become, this small and gentle beast.
+  best      253t: Nightmare Zone Minigame Teleport → walk 226 {cooldown:888=1}
+  alt       293t: Burthorpe Games Room Minigame Teleport → walk 266 {cooldown:888=1}
+  alt       306t: Castle Wars Minigame Teleport → walk 279 {cooldown:888=1}
+spot:ASGARNIA_WARRIORS
+  best      49t: Burthorpe Games Room Minigame Teleport → walk 22 {cooldown:888=1}
+spot:FELDIP_HILLS_GNOME_GLITER
+  best      115t: Nightmare Zone Minigame Teleport → walk 88 {cooldown:888=1}
+  alt       127t: Castle Wars Minigame Teleport → walk 100 {cooldown:888=1}
+spot:KANDARIN_GRAND_TREE
+  best      265t: Nightmare Zone Minigame Teleport → walk 238 {cooldown:888=1}
+  alt       301t: Castle Wars Minigame Teleport → walk 274 {cooldown:888=1}
+  alt       422t: Clan Wars Minigame Teleport → walk 395 {cooldown:888=1}
+spot:MISTHALIN_VARROCK_STONE_CIRCLE
+  best      115t: Lumbridge Home Teleport → walk 90 {cooldown:892=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+spot:VARLAMORE_LOCUS_OASIS
+  best      none
+  note      no route from what you have
+spot:WILDERNESS_54
+  best      213t: Clan Wars Minigame Teleport → walk 186 {cooldown:888=1}
+  alt       213t: Last Man Standing Minigame Teleport → walk 186 {cooldown:888=1}
+  alt       366t: Burthorpe Games Room Minigame Teleport → walk 339 {cooldown:888=1}
+  note      Wilderness target
+map:12130
+  best      95t: Castle Wars Minigame Teleport → walk 68 {cooldown:888=1}
+  alt       122t: Nightmare Zone Minigame Teleport → walk 95 {cooldown:888=1}
+map:19785
+  best      none
+  note      no route from what you have
+map:2719
+  best      141t: Burthorpe Games Room Minigame Teleport → walk 114 {cooldown:888=1}
+  alt       171t: Lumbridge Home Teleport → walk 146 {cooldown:892=1}
+  alt       174t: Clan Wars Minigame Teleport → walk 147 {cooldown:888=1}
+map:3520
+  best      47t: Nightmare Zone Minigame Teleport → walk 20 {cooldown:888=1}
+map:3599
+  best      87t: Nightmare Zone Minigame Teleport → walk 60 {cooldown:888=1}
+map:7241
+  best      155t: Nightmare Zone Minigame Teleport → walk 128 {cooldown:888=1}
+  alt       241t: Castle Wars Minigame Teleport → walk 214 {cooldown:888=1}
+  alt       276t: Burthorpe Games Room Minigame Teleport → walk 249 {cooldown:888=1}
+music:23138
+  best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+music:23142
+  best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+music:23157
+  best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+music:23174
+  best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+music:23178
+  best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+music:24773
+  best      129t: Burthorpe Games Room Minigame Teleport → walk 102 {cooldown:888=1}
+  alt       185t: Clan Wars Minigame Teleport → walk 158 {cooldown:888=1}
+  alt       185t: Last Man Standing Minigame Teleport → walk 158 {cooldown:888=1}
+skill:CHARLIE:i need to give charlie a cooked pike.
+  best      126t: Lumbridge Home Teleport → walk 101 {cooldown:892=1}
+  alt       167t: Clan Wars Minigame Teleport → walk 140 {cooldown:888=1}
+  alt       167t: Last Man Standing Minigame Teleport → walk 140 {cooldown:888=1}
+skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
+  best      193t: Nightmare Zone Minigame Teleport → walk 166 {cooldown:888=1}
+  alt       245t: Burthorpe Games Room Minigame Teleport → walk 218 {cooldown:888=1}
+  alt       277t: Castle Wars Minigame Teleport → walk 250 {cooldown:888=1}
+skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
+  best      193t: Nightmare Zone Minigame Teleport → walk 166 {cooldown:888=1}
+  alt       245t: Burthorpe Games Room Minigame Teleport → walk 218 {cooldown:888=1}
+  alt       277t: Castle Wars Minigame Teleport → walk 250 {cooldown:888=1}
+skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
+  best      193t: Nightmare Zone Minigame Teleport → walk 166 {cooldown:888=1}
+  alt       245t: Burthorpe Games Room Minigame Teleport → walk 218 {cooldown:888=1}
+  alt       277t: Castle Wars Minigame Teleport → walk 250 {cooldown:888=1}
+skill:SHERLOCK:kill a lizardman shaman.
+  best      193t: Nightmare Zone Minigame Teleport → walk 166 {cooldown:888=1}
+  alt       245t: Burthorpe Games Room Minigame Teleport → walk 218 {cooldown:888=1}
+  alt       277t: Castle Wars Minigame Teleport → walk 250 {cooldown:888=1}
+skill:SHERLOCK:score a goal in skullball.
+  best      193t: Nightmare Zone Minigame Teleport → walk 166 {cooldown:888=1}
+  alt       245t: Burthorpe Games Room Minigame Teleport → walk 218 {cooldown:888=1}
+  alt       277t: Castle Wars Minigame Teleport → walk 250 {cooldown:888=1}
+cryptic:search through chests found in the upstairs of houses in eastern falador.
+  best      160t: Burthorpe Games Room Minigame Teleport → walk 133 {cooldown:888=1}
+  alt       187t: Lumbridge Home Teleport → walk 162 {cooldown:892=1}
+  alt       204t: Clan Wars Minigame Teleport → walk 177 {cooldown:888=1}
+cryptic:you will need to under-cook to solve this one.
+  best      47t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}
+cryptic:search through some drawers in the upstairs of a house in rimmington.
+  best      173t: Lumbridge Home Teleport → walk 148 {cooldown:892=1}
+  alt       206t: Burthorpe Games Room Minigame Teleport → walk 179 {cooldown:888=1}
+  alt       269t: Clan Wars Minigame Teleport → walk 242 {cooldown:888=1}
+anagram:12566
+  best      167t: Burthorpe Games Room Minigame Teleport → walk 140 {cooldown:888=1}
+  alt       183t: Clan Wars Minigame Teleport → walk 156 {cooldown:888=1}
+  alt       183t: Last Man Standing Minigame Teleport → walk 156 {cooldown:888=1}
+cryptic:search the crates in a bank in varrock.
+  best      155t: Clan Wars Minigame Teleport → walk 128 {cooldown:888=1}
+  alt       155t: Last Man Standing Minigame Teleport → walk 128 {cooldown:888=1}
+  alt       157t: Lumbridge Home Teleport → walk 132 {cooldown:892=1}
+emote:12021
+  best      88t: Lumbridge Home Teleport → walk 63 {cooldown:892=1}
+coordinate:2840,3423,0
+  best      none
+  note      no route from what you have
+coordinate:2303,3328,0
+  best      none
+  note      no route from what you have
+emote:19791
+  best      56t: Nightmare Zone Minigame Teleport → walk 29 {cooldown:888=1}

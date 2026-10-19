@@ -4,6 +4,12 @@ import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.player.Position;
+import com.cluehelper.route.Plan;
+import com.cluehelper.route.WalkData;
+import com.cluehelper.transport.CatalogData;
+import com.cluehelper.route.PlanStart;
+import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.SceneFiles;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.CatalogRow;
@@ -21,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -62,6 +69,10 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File PLAYER_FRAMES = new File("build/player");
 	private static final File LANDING_FRAMES = new File("build/landings");
 	private static final String LANDING_TAG = "[CH-LAND]";
+	private static final File ROUTE_FRAMES = new File("build/routes");
+	private static final File SCENES = new File("build/scenes");
+	/** Scenes recorded per run for the scene BFS check: one per new plan that starts with a scene walk. */
+	private static final int MOST_SCENES = 12;
 	/** Farther than a run tick can carry you: a teleport, a ladder or a boat. */
 	private static final int LANDING_JUMP_TILES = 4;
 	private static final int LANDING_CANDIDATES = 2;
@@ -90,6 +101,12 @@ public class ClueHelperDevPlugin extends Plugin
 	@Inject
 	private DrawManager drawManager;
 
+	@Inject
+	private CatalogData catalogData;
+
+	@Inject
+	private WalkData walkData;
+
 	/** For the blocking config save, which must not run on the Swing thread. */
 	@Inject
 	private ScheduledExecutorService executor;
@@ -103,6 +120,10 @@ public class ClueHelperDevPlugin extends Plugin
 	private int playerFrameCount;
 	private int lastAvailableCount = -1;
 	private int landingFrameCount;
+	private int routeFrameCount;
+	private String lastPlannedStep;
+	private boolean sampled;
+	private final Set<String> recordedScenes = new HashSet<>();
 	private WorldPoint lastTile;
 
 	@Override
@@ -113,8 +134,11 @@ public class ClueHelperDevPlugin extends Plugin
 		clearOldPngs(STEP_FRAMES);
 		clearOldPngs(PLAYER_FRAMES);
 		clearOldPngs(LANDING_FRAMES);
+		clearOldPngs(ROUTE_FRAMES);
+		SCENES.mkdirs();
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
+		unregister.add(clueHelper.getRoutes().addListener(this::onPlanned));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
@@ -490,6 +514,50 @@ public class ClueHelperDevPlugin extends Plugin
 	}
 
 	/** A frame whenever the number of available sample rows changes: banking the pouch, casting, wielding. */
+	/** A frame per step's first plan, and the scene it started from (test resources for the scene BFS check). */
+	private void onPlanned(Plan plan)
+	{
+		PlanStart start = clueHelper.getRoutes().getStart();
+		if (start != null && start.getKind() == PlanStart.Kind.SCENE && recordedScenes.size() < MOST_SCENES)
+		{
+			SceneBfs.Scene scene = start.getScene().getScene();
+			String name = scene.getBaseX() + "_" + scene.getBaseY() + "_" + start.getTile().getPlane();
+			if (recordedScenes.add(name))
+			{
+				SceneFiles.write(new File(SCENES, name + ".scene.gz"), scene, start.getTile());
+				log.info("{} scene {} recorded at {}", TAG, name, text(start.getTile()));
+			}
+		}
+		if (!sampled)
+		{
+			sampled = true;
+			sample();
+		}
+		if (plan.getStepKey() == null || plan.getStepKey().equals(lastPlannedStep))
+		{
+			return;
+		}
+		lastPlannedStep = plan.getStepKey();
+		String key = plan.getStepKey().replaceAll("[^a-zA-Z0-9]+", "-");
+		String name = String.format("%03d-%s.png", ++routeFrameCount, key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
+		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(ROUTE_FRAMES, name))));
+	}
+
+	/** Once per run on the first plan, and on {@code ::ch-sample}. */
+	private void sample()
+	{
+		new RouteSampler(client, clueHelper, catalogData.get().getNow(null), walkData.get().getNow(null), executor).run();
+	}
+
+	@Subscribe
+	public void onCommandExecuted(CommandExecuted event)
+	{
+		if (event.getCommand().equalsIgnoreCase("ch-sample"))
+		{
+			sample();
+		}
+	}
+
 	private void savePlayerFrame(AvailabilitySet carried)
 	{
 		int available = carried.available().size();

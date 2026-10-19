@@ -64,6 +64,10 @@ public final class Loadouts
 		Map.entry("Varrock tablet", ItemID.POH_TABLET_VARROCKTELEPORT),
 		Map.entry("Watchtower tablet", ItemID.POH_TABLET_WATCHTOWERTELEPORT),
 		Map.entry("Xeric's talisman", ItemID.XERIC_TALISMAN));
+	/** Charges of the families whose id encodes them (Charge.Source.ITEM_ID live); the rest stay unknown. */
+	private static final Map<String, Integer> CHARGES = Map.of("Amulet of glory", 4, "Burning amulet", 5, "Combat bracelet", 6,
+		"Digsite pendant", 5, "Games necklace", 8, "Necklace of passage", 5, "Ring of dueling", 8, "Ring of wealth", 5,
+		"Skills necklace", 6, "Slayer ring", 8);
 	/** "runes": true carries this many of every standard-book rune. */
 	private static final int RUNE_STACK = 1000;
 	private static final List<Integer> RUNES = List.of(ItemID.AIRRUNE, ItemID.WATERRUNE, ItemID.EARTHRUNE, ItemID.FIRERUNE,
@@ -91,9 +95,16 @@ public final class Loadouts
 	{
 		JsonObject f = read(name);
 		Map<Integer, Integer> inventory = new HashMap<>();
+		Map<Integer, Charge> charges = new HashMap<>();
 		for (JsonElement item : array(f, "carried"))
 		{
-			inventory.merge(itemId(item.getAsString()), 1, Integer::sum);
+			int id = itemId(item.getAsString());
+			inventory.merge(id, 1, Integer::sum);
+			Integer known = CHARGES.get(item.getAsString());
+			if (known != null)
+			{
+				charges.put(id, new Charge(known, Charge.Source.ITEM_ID));
+			}
 		}
 		if (f.get("runes").getAsBoolean())
 		{
@@ -126,6 +137,7 @@ public final class Loadouts
 			.varbits(values)
 			.varps(values)
 			.unknownVars(varsPass ? PlayerSnapshot.UnknownVars.PASS : PlayerSnapshot.UnknownVars.FAIL)
+			.charges(charges)
 			.spellbook(new SpellbookState(Book.valueOf(f.get("book").getAsString().toUpperCase()), false,
 				SpellbookState.CAPE_CHANGES_PER_DAY, varsPass || values.getOrDefault(VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, 0) == 1,
 				quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED, quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED,
@@ -134,7 +146,14 @@ public final class Loadouts
 		return new Loadout(name, snapshot, List.copyOf(banked), f);
 	}
 
-	private static int itemId(String family)
+	/** The rune model from B01's cache slice, as the live client would build it. */
+	public static RuneModel runeModel()
+	{
+		return RuneModel.load(new RuneModelTest.SliceCacheView("/b08/cache-runes.json"));
+	}
+
+	/** A fixture family's fully charged item id. */
+	public static int itemId(String family)
 	{
 		Integer id = ITEMS.get(family);
 		if (id == null)

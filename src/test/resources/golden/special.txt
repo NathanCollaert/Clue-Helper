@@ -1,0 +1,76 @@
+consumption: glory(1) carried, bank on with glory(1), to Draynor
+  best      21t: Amulet of glory: Draynor Village → walk 15 {charge:1706=1}
+consumption: minigame teleports only, bank on, to Varrock bank crates
+  best      62t: Soul Wars Minigame Teleport → walk 2 → bank → Varrock tablet → walk 23 {cooldown:888=1, item:8007=1}
+  direct    147t: Clan Wars Minigame Teleport → walk 120 {cooldown:888=1}
+  alt       63t: Fishing Trawler Minigame Teleport → walk 3 → bank → Varrock tablet → walk 23 {cooldown:888=1, item:8007=1}
+  alt       65t: Castle Wars Minigame Teleport → walk 5 → bank → Varrock tablet → walk 23 {cooldown:888=1, item:8007=1}
+Lunar, swap runes and Max cape carried, to Varrock: Spellbook Swap, not the cape
+  best      33t: Spellbook Swap · Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  same book 35t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
+  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  alt       41t: Spellbook Swap · Varrock Teleport: Grand Exchange → walk 30 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+Lunar, swap runes and Max cape, Spellbook Swap only
+  best      33t: Spellbook Swap · Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  same book 35t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
+  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  alt       41t: Spellbook Swap · Varrock Teleport: Grand Exchange → walk 30 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+pending revert to Lunar on Standard, 150 ticks left: Standard teleport at +0
+  best      28t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       35t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
+  alt       36t: Varrock Teleport: Grand Exchange → walk 30 {item:556=3, item:554=1, item:563=1}
+pending revert, window unknown: plans from Lunar
+  best      33t: Spellbook Swap · Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  same book 35t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
+  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  alt       41t: Spellbook Swap · Varrock Teleport: Grand Exchange → walk 30 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+pending revert on Standard, Ancient target: the cape from a pending revert
+  best      34t (rank 42): Max cape: Spellbook → ANCIENT → Senntisten Teleport → walk 26 {cape=1, item:563=2, item:566=1} leaves you on ANCIENT
+  same book 44t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
+  alt       51t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
+  alt       45t (rank 53): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 38 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+99 Magic, no cape uses left today, Ancient target
+  best      44t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
+  alt       51t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
+  alt       60t: Digsite pendant: Digsite → walk 54 {charge:11194=1}
+Lunar, swap runes only in the bank (bank on)
+  best      35t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
+  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  alt       30t (rank 38): Max cape: Spellbook → STANDARD → Varrock Teleport → walk 23 {cape=1, item:556=3, item:554=1, item:563=1} leaves you on STANDARD
+Wilderness start at level 26 (3100,3720), to Varrock
+  best      34t: Slayer ring: Stronghold → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       34t: Slayer ring: Slayer Tower → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       34t: Slayer ring: Fremennik → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+Wilderness start at level 36 (3100,3800), to Varrock
+  best      55t: walk south 21 → Slayer ring: Stronghold → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       55t: walk south 21 → Slayer ring: Slayer Tower → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       55t: walk south 21 → Slayer ring: Fremennik → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+member on an F2P world on Ancient: Edgeville Home Teleport
+  best      33t: Edgeville Home Teleport → walk 8 {cooldown:892=1}
+avoidWilderness with a Wilderness target
+  best      64t: Games necklace: Corporeal Beast → walk 58 {charge:3853=1}
+  alt       88t: Ring of dueling: Ferox Enclave → walk 82 {charge:2552=1}
+  alt       109t: Clan Wars Minigame Teleport → walk 82 {cooldown:888=1}
+  note      Wilderness target
+avoidWilderness, target outside: no Wilderness landing
+  best      52t: Necklace of passage: Wizards' Tower → walk 46 {charge:21146=1}
+  alt       54t: Amulet of glory: Draynor Village → walk 48 {charge:1712=1}
+  alt       68t: Lumbridge Teleport → walk 63 {item:556=3, item:557=1, item:563=1}
+bank tipping point: mid-ironman, bank on, to Varrock bank crates
+  best      28t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  alt       43t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 23 {charge:2552=1, item:8007=1}
+start on a node: standing at the Varrock Teleport landing, to Varrock bank crates
+  best      23t: walk 23
+  alt       28t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+AREA: cryptic:anger those who adhere to saradomin's edicts to prevent travel.
+  best      50t: Rat Pits Minigame Teleport: 4. Port Sarim → walk 15 {cooldown:888=1}
+  alt       53t: Amulet of glory: Draynor Village → walk 39 {charge:1712=1}
+  alt       59t: Construction cape: Rimmington → walk 45
+SEQUENCE skill: skill:CHARLIE:i need to give charlie a cooked pike.
+  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  alt       50t: Skills necklace: Cooking Guild → walk 44 {charge:11968=1}
+SEQUENCE three-step (6 orders)
+  best      89t: Skills necklace: Mining Guild → walk 28 → Lumbridge Teleport → walk 22 → Varrock Teleport → walk 23 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
+PROBES (hot/cold spots): {2860,3562,0=28, 2915,3425,0=60, 2917,3295,0=14, 2972,3486,0=59, 2976,3239,0=40, 3030,3364,0=30, 3031,3304,0=59, 3033,3438,0=52}

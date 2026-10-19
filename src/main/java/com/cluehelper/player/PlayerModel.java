@@ -62,6 +62,8 @@ public class PlayerModel
 		WorldType.BETA_WORLD, WorldType.TOURNAMENT_WORLD, WorldType.QUEST_SPEEDRUNNING, WorldType.LAST_MAN_STANDING,
 		WorldType.PVP_ARENA, WorldType.NOSAVE_MODE);
 
+	public static final int UNKNOWN_TICK = -1;
+
 	private final Client client;
 	private final ChargeReader chargeReader;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
@@ -82,6 +84,8 @@ public class PlayerModel
 	private volatile RuneModel runeModel;
 	private volatile PlayerSnapshot snapshot;
 	private volatile Position position = Position.NONE;
+	/** The tick varbit 3617 was first seen at 1, or {@link #UNKNOWN_TICK} (none, or already 1 at login). */
+	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	@Inject
 	PlayerModel(Client client, ChargeReader chargeReader)
@@ -125,6 +129,15 @@ public class PlayerModel
 	public Position getPosition()
 	{
 		return position;
+	}
+
+	/**
+	 * The tick a pending Spellbook Swap began (3617 turned 1), so the planner knows how much of its 200 ticks
+	 * is left; {@link #UNKNOWN_TICK} when there is none, or it was already pending when first seen.
+	 */
+	public int getPendingRevertSinceTick()
+	{
+		return pendingRevertSinceTick;
 	}
 
 	/** Null until the first tick after login, when it is read from the cache. */
@@ -232,9 +245,24 @@ public class PlayerModel
 			dirty = false;
 			long started = System.nanoTime();
 			PlayerSnapshot built = build(now);
+			trackPendingRevert(last, built);
 			stats.record(dirtyBecause, System.nanoTime() - started, client.getTickCount());
 			snapshot = built;
 			listeners.forEach(listener -> listener.accept(built));
+		}
+	}
+
+	private void trackPendingRevert(PlayerSnapshot last, PlayerSnapshot built)
+	{
+		boolean pending = built.getSpellbook() != null && built.getSpellbook().isPendingRevert();
+		boolean wasPending = last != null && last.getSpellbook() != null && last.getSpellbook().isPendingRevert();
+		if (!pending)
+		{
+			pendingRevertSinceTick = UNKNOWN_TICK;
+		}
+		else if (!wasPending)
+		{
+			pendingRevertSinceTick = last == null ? UNKNOWN_TICK : client.getTickCount();
 		}
 	}
 

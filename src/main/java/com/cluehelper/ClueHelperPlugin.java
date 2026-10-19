@@ -5,6 +5,7 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.route.PlannerRunner;
+import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.ClueHelperPanel;
@@ -69,6 +70,10 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
+	private RoutePlanner routes;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
 	private DevHarness devHarness;
 
 	@Inject
@@ -78,6 +83,8 @@ public class ClueHelperPlugin extends Plugin
 	@Getter(AccessLevel.PACKAGE)
 	private ClueHelperPanel panel;
 	private NavigationButton navigationButton;
+	private Runnable unregisterRoutes;
+	private boolean shownWorking;
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -100,6 +107,8 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.start();
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
+		routes.start();
+		unregisterRoutes = routes.addListener(plan -> showPanelState());
 		showPanelState();
 		if (developerMode)
 		{
@@ -111,6 +120,8 @@ public class ClueHelperPlugin extends Plugin
 	protected void shutDown()
 	{
 		devHarness.stop();
+		unregisterRoutes.run();
+		routes.stop();
 		planner.cancelAll();
 		availability.stop();
 		playerModel.stop();
@@ -139,6 +150,12 @@ public class ClueHelperPlugin extends Plugin
 		}
 		playerModel.onGameTick();
 		availability.onGameTick();
+		routes.onGameTick();
+		if (planner.isWorking() != shownWorking)
+		{
+			shownWorking = planner.isWorking();
+			showPanelState();
+		}
 	}
 
 	@Subscribe
