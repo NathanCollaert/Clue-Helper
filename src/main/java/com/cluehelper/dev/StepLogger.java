@@ -5,7 +5,6 @@ import com.cluehelper.memory.MemoryStore;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.LongSupplier;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -22,21 +21,12 @@ public class StepLogger
 	static final int MAX_ENTRIES = 5000;
 
 	private final MemorySlot<StepLog> slot;
-	private final LongSupplier epochSeconds;
-	private final int maxEntries;
 	private volatile boolean enabled;
 
 	@Inject
 	StepLogger(MemoryStore memory)
 	{
-		this(memory, () -> Instant.now().getEpochSecond(), MAX_ENTRIES);
-	}
-
-	StepLogger(MemoryStore memory, LongSupplier epochSeconds, int maxEntries)
-	{
 		this.slot = memory.slot(KEY, StepLog.class, StepLog::new);
-		this.epochSeconds = epochSeconds;
-		this.maxEntries = maxEntries;
 	}
 
 	public void setEnabled(boolean enabled)
@@ -51,7 +41,7 @@ public class StepLogger
 			return;
 		}
 		StepLog log = slot.get();
-		log.append(new StepLog.Entry(tier, type, key, epochSeconds.getAsLong()), maxEntries);
+		log.append(new StepLog.Entry(tier, type, key, Instant.now().getEpochSecond()), MAX_ENTRIES);
 		slot.set(log);
 	}
 

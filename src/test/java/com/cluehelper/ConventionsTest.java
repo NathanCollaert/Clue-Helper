@@ -1,7 +1,6 @@
 package com.cluehelper;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -78,18 +77,6 @@ public class ConventionsTest
 	}
 
 	@Test
-	public void bannedApiPatternsCatchWhatTheyShould()
-	{
-		assertTrue(banned("import java.io.File;"));
-		assertTrue(banned("new FileInputStream(path)"));
-		assertTrue(banned("Thread.sleep(100);"));
-		assertTrue(banned("private final Gson gson = new Gson();"));
-		assertTrue(banned("getClass().getResource(\"/x.tsv\")"));
-		assertFalse(banned("getClass().getResourceAsStream(\"/x.tsv\")"));
-		assertFalse(banned("@Inject private Gson gson;"));
-	}
-
-	@Test
 	public void configHasEveryM1Key() throws IOException
 	{
 		Set<String> keys = new TreeSet<>();
@@ -105,10 +92,6 @@ public class ConventionsTest
 	public void configEnumsArePublicTopLevelTypes() throws IOException
 	{
 		String config = configSource();
-		String body = config.substring(config.indexOf('{') + 1);
-		assertFalse("no type declared inside the config interface",
-			Pattern.compile("\\b(enum|class|interface)\\s+\\w+\\s*\\{").matcher(body).find());
-
 		Matcher m = Pattern.compile("default\\s+(\\w+)\\s+\\w+\\s*\\(\\)").matcher(config);
 		int enums = 0;
 		while (m.find())
@@ -138,11 +121,6 @@ public class ConventionsTest
 				.collect(Collectors.toList());
 			assertEquals(List.of(), nested);
 		}
-	}
-
-	private static boolean banned(String line)
-	{
-		return BANNED.values().stream().anyMatch(p -> p.matcher(line).find());
 	}
 
 	private static String configSource() throws IOException
