@@ -1,0 +1,69 @@
+# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	Gameval
+spell	Varrock Teleport		3213 3424 0			AIR_RUNE=3&FIRE_RUNE=1&LAW_RUNE=1	25 Magic				20	4	0	F	runes	Standard	N	
+spell	Varrock Teleport: Grand Exchange		3165 3479 0			AIR_RUNE=3&FIRE_RUNE=1&LAW_RUNE=1	25 Magic		4480=1		20	4	1	F	runes	Standard	N	varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE
+spell	Lumbridge Teleport		3221 3218 0			AIR_RUNE=3&EARTH_RUNE=1&LAW_RUNE=1	31 Magic				20	4	0	F	runes	Standard	N	
+spell	Falador Teleport		2964 3378 0			AIR_RUNE=3&WATER_RUNE=1&LAW_RUNE=1	37 Magic				20	4	0	F	runes	Standard	N	
+spell	Teleport to House		1858 7051 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		4744=0		20	4	0	F	runes	Standard	Y	varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Inside)		1858 7051 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		4744=1		20	4	1	F	runes	Standard	Y	varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		2953 3224 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=1;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		2953 3224 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=1;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		2893 3465 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=2;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		2893 3465 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=2;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		3340 3003 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=3;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		3340 3003 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=3;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		2670 3631 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=4;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		2670 3631 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=4;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		2757 3178 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=5;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		2757 3178 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=5;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		2544 3096 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=6;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		2544 3096 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=6;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		1743 3517 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=8;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		1743 3517 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=8;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		3239 6076 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=9;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		3239 6076 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=9;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House		1422 2963 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=13;4744=1		20	4	0	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Teleport to House (Outside)		1422 2963 0			AIR_RUNE=1&EARTH_RUNE=1&LAW_RUNE=1	40 Magic		2187=13;4744=0		20	4	1	F	runes	Standard	Y	varbit:2187=POH_HOUSE_LOCATION varbit:4744=POH_TELE_TOGGLE
+spell	Camelot Teleport		2757 3479 0			AIR_RUNE=5&LAW_RUNE=1	45 Magic				20	4	0	F	runes	Standard	Y	
+spell	Camelot Teleport: Seers'		2726 3487 0			AIR_RUNE=5&LAW_RUNE=1	45 Magic		4477=1		20	4	1	F	runes	Standard	Y	varbit:4477=KANDARIN_DIARY_HARD_COMPLETE
+spell	Kourend Castle Teleport		1641 3673 0			FIRE_RUNE=1&WATER_RUNE=1&LAW_RUNE=2	48 Magic	Client of Kourend			20	4	0	F	runes	Standard	Y	
+spell	Ardougne Teleport		2662 3305 0			WATER_RUNE=2&LAW_RUNE=2	51 Magic	Plague City		165=30	20	4	0	F	runes	Standard	Y	varp:165=ELENAQUEST
+spell	Civitas illa Fortis Teleport		1681 3136 0			EARTH_RUNE=1&FIRE_RUNE=1&LAW_RUNE=2	54 Magic	Twilight's Promise			20	4	0	F	runes	Standard	Y	
+spell	Watchtower Teleport		2546 3112 0			EARTH_RUNE=2&LAW_RUNE=2	58 Magic	Watchtower		212=14	20	4	0	F	runes	Standard	Y	varp:212=ITWATCHTOWER
+spell	Watchtower Teleport: Yanille		2584 3097 0			EARTH_RUNE=2&LAW_RUNE=2	58 Magic	Watchtower	4460=1	212=14	20	4	1	F	runes	Standard	Y	varbit:4460=ARDOUGNE_DIARY_HARD_COMPLETE varp:212=ITWATCHTOWER
+spell	Trollheim Teleport		2890 3679 0			FIRE_RUNE=2&LAW_RUNE=2	61 Magic	Eadgar's Ruse			20	4	0	F	runes	Standard	Y	
+spell	Ape Atoll Teleport		2797 2798 1			FIRE_RUNE=2&WATER_RUNE=2&LAW_RUNE=2&1963=1	64 Magic	Recipe for Disaster - King Awowogei			20	4	0	F	runes;item	Standard	Y	item:1963=BANANA
+spell	Paddewwa Teleport		3097 9881 0			AIR_RUNE=1&FIRE_RUNE=1&LAW_RUNE=2	54 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Senntisten Teleport		3320 3337 0			LAW_RUNE=2&SOUL_RUNE=1	60 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Kharyrll Teleport		3494 3473 0			LAW_RUNE=2&BLOOD_RUNE=1	66 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Lassar Teleport		3004 3470 0			LAW_RUNE=2&WATER_RUNE=4	72 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Dareeyak Teleport		2968 3696 0			AIR_RUNE=2&FIRE_RUNE=3&LAW_RUNE=2	78 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Carrallanger Teleport		3158 3666 0			LAW_RUNE=2&SOUL_RUNE=2	84 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Annakarl Teleport		3288 3888 0			LAW_RUNE=2&BLOOD_RUNE=2	90 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Ghorrock Teleport		2976 3875 0			LAW_RUNE=2&WATER_RUNE=8	96 Magic	Desert Treasure I			20	5	0	F	runes	Ancient	Y	
+spell	Moonclan Teleport		2113 3915 0			EARTH_RUNE=2&ASTRAL_RUNE=2&LAW_RUNE=1	69 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Ourania Teleport		2468 3246 0			EARTH_RUNE=6&ASTRAL_RUNE=2&LAW_RUNE=1	71 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Waterbirth Teleport		2546 3755 0			WATER_RUNE=1&ASTRAL_RUNE=2&LAW_RUNE=1	72 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Barbarian Teleport		2543 3569 0			FIRE_RUNE=3&ASTRAL_RUNE=2&LAW_RUNE=2	75 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Khazard Teleport		2636 3167 0			WATER_RUNE=4&ASTRAL_RUNE=2&LAW_RUNE=2	78 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Fishing Guild Teleport		2613 3391 0			WATER_RUNE=10&ASTRAL_RUNE=3&LAW_RUNE=3	85 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Catherby Teleport		2801 3449 0			WATER_RUNE=10&ASTRAL_RUNE=3&LAW_RUNE=3	87 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Ice Plateau Teleport		2975 3938 0			WATER_RUNE=8&ASTRAL_RUNE=3&LAW_RUNE=3	89 Magic	Lunar Diplomacy			20	4	0	F	runes	Lunar	Y	
+spell	Arceuus Library Teleport		1632 3837 0			EARTH_RUNE=2&LAW_RUNE=1	6 Magic				20	4	0	F	runes	Arceuus	Y	
+spell	Draynor Manor Teleport		3109 3351 0			EARTH_RUNE=1&WATER_RUNE=1&LAW_RUNE=1	17 Magic				20	4	0	F	runes	Arceuus	Y	
+spell	Battlefront Teleport		1347 3740 0			EARTH_RUNE=1&FIRE_RUNE=1&LAW_RUNE=1	23 Magic				20	4	0	F	runes	Arceuus	Y	
+spell	Mind Altar Teleport		2979 3510 0			LAW_RUNE=1&MIND_RUNE=2	28 Magic				20	4	0	F	runes	Arceuus	Y	
+spell	Respawn Teleport		3221 3218 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		668=0;3910=0;621=0;10528=0;12310=0;9805=0		20	4	0	F	runes	Arceuus	Y	varbit:668=FALADOR_SPAWN varbit:3910=CAMELOT_SPAWN varbit:621=EDGEVILLE_SPAWN varbit:10528=WILDERNESS_SPAWN varbit:12310=KOUREND_SPAWN varbit:9805=CIVITAS_SPAWN
+spell	Respawn Teleport		2964 3378 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		668=1		20	4	0	F	runes	Arceuus	Y	varbit:668=FALADOR_SPAWN
+spell	Respawn Teleport		2757 3479 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		3910=1		20	4	0	F	runes	Arceuus	Y	varbit:3910=CAMELOT_SPAWN
+spell	Respawn Teleport		3095 3469 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		621=1		20	4	0	F	runes	Arceuus	Y	varbit:621=EDGEVILLE_SPAWN
+spell	Respawn Teleport		3151 3636 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		10528=1		20	4	0	F	runes	Arceuus	Y	varbit:10528=WILDERNESS_SPAWN
+spell	Respawn Teleport		1630 3674 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		12310=1		20	4	0	F	runes	Arceuus	Y	varbit:12310=KOUREND_SPAWN
+spell	Respawn Teleport		1682 3135 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		9805=1		20	4	0	F	runes	Arceuus	Y	varbit:9805=CIVITAS_SPAWN
+spell	Salve Graveyard Teleport		3433 3459 0			LAW_RUNE=1&SOUL_RUNE=2	40 Magic	Priest in Peril			20	4	0	F	runes	Arceuus	Y	
+spell	Fenkenstrain's Castle Teleport		3548 3529 0			EARTH_RUNE=1&LAW_RUNE=1&SOUL_RUNE=1	48 Magic	Priest in Peril			20	4	0	F	runes	Arceuus	Y	
+spell	West Ardougne Teleport		2500 3290 0			LAW_RUNE=2&SOUL_RUNE=2	61 Magic	Biohazard			20	4	0	F	runes	Arceuus	Y	
+spell	Harmony Island Teleport		3797 2866 0			LAW_RUNE=1&NATURE_RUNE=1&SOUL_RUNE=1	65 Magic	The Great Brain Robbery			20	4	0	F	runes	Arceuus	Y	
+spell	Cemetery Teleport		2981 3762 0			BLOOD_RUNE=1&LAW_RUNE=1&SOUL_RUNE=1	71 Magic				20	4	0	F	runes	Arceuus	Y	
+spell	Barrows Teleport		3564 3315 0			BLOOD_RUNE=1&LAW_RUNE=2&SOUL_RUNE=2	83 Magic				20	4	0	F	runes	Arceuus	Y	
+spell	Ape Atoll Teleport		2771 9102 0			BLOOD_RUNE=2&LAW_RUNE=2&SOUL_RUNE=2	90 Magic	Monkey Madness I			20	4	0	F	runes	Arceuus	Y	

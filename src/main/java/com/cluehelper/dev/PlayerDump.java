@@ -11,8 +11,10 @@ import com.cluehelper.player.Spell;
 import com.cluehelper.player.SpellbookState;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.AvailabilitySet;
+import com.cluehelper.transport.Category;
 import com.cluehelper.transport.RowAvailability;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +54,7 @@ final class PlayerDump
 		this.availability = availability;
 	}
 
-	/** @param chat lines for the chat box and log; {@code logOnly} gets the unavailable catalog rows */
+	/** @param chat lines for the chat box and log; {@code logOnly} gets every catalog row */
 	void describe(Consumer<String> chat, Consumer<String> logOnly)
 	{
 		PlayerSnapshot s = model.getSnapshot();
@@ -71,11 +73,16 @@ final class PlayerDump
 		chat.accept(String.format("A_carried: %d of %d rows (v%d, judged in %.2f ms); A_banked: empty until B15",
 			carried.available().size(), carried.getRows().size(), carried.getSnapshotVersion(),
 			availability.getLastJudgeNanos() / NANOS_PER_MS));
-		for (RowAvailability row : carried.getRows())
-		{
-			(row.isAvailable() ? chat : logOnly).accept(rowLine(row));
-		}
+		chat.accept("Available by category: " + availableByCategory(carried) + " (every row is in the log)");
+		carried.getRows().forEach(row -> logOnly.accept(rowLine(row)));
 		chat.accept("Rebuilds: " + model.getStats().summary());
+	}
+
+	private static String availableByCategory(AvailabilitySet carried)
+	{
+		Map<Category, Long> counts = carried.available().stream()
+			.collect(Collectors.groupingBy(row -> row.getRow().getCategory(), () -> new EnumMap<>(Category.class), Collectors.counting()));
+		return counts.entrySet().stream().map(e -> e.getKey() + " " + e.getValue()).collect(Collectors.joining(", "));
 	}
 
 	/** Logs what changed in {@code A_carried} since the last judgement. */

@@ -1,0 +1,50 @@
+# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	Gameval
+home	Lumbridge Home Teleport		3221 3218 0							4560=0;892@30	20	24	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&1;892@30	20	24	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&2;892@30	20	21	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&4;892@30	20	19	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&8;892@30	20	24	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&16;892@30	20	24	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&32;892@30	20	25	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&64;892@30	20	20	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&128;892@30	20	21	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&256;892@30	20	21	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&512;892@30	20	19	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lumbridge Home Teleport		3221 3218 0							4560&1024;892@30	20	23	0	F	cooldown:892	Standard	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560=0;892@30	20	24	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&1;892@30	20	24	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&2;892@30	20	21	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&4;892@30	20	19	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&8;892@30	20	24	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&16;892@30	20	24	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&32;892@30	20	25	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&64;892@30	20	20	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&128;892@30	20	21	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&256;892@30	20	21	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&512;892@30	20	19	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Edgeville Home Teleport		3087 3504 0					Desert Treasure I		4560&1024;892@30	20	23	0	F	cooldown:892	Ancient	N	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560=0;892@30	20	24	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&1;892@30	20	24	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&2;892@30	20	21	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&4;892@30	20	19	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&8;892@30	20	24	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&16;892@30	20	24	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&32;892@30	20	25	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&64;892@30	20	20	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&128;892@30	20	21	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&256;892@30	20	21	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&512;892@30	20	19	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Lunar Home Teleport		2113 3915 0					Lunar Diplomacy		4560&1024;892@30	20	23	0	F	cooldown:892	Lunar	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560=0;892@30	20	24	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&1;892@30	20	24	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&2;892@30	20	21	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&4;892@30	20	19	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&8;892@30	20	24	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&16;892@30	20	24	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&32;892@30	20	25	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&64;892@30	20	20	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&128;892@30	20	21	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&256;892@30	20	21	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&512;892@30	20	19	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
+home	Arceuus Home Teleport		1700 3882 0							4560&1024;892@30	20	23	0	F	cooldown:892	Arceuus	Y	varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER

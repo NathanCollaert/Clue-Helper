@@ -3,9 +3,10 @@ package com.cluehelper;
 import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.player.Position;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilitySet;
-import com.cluehelper.transport.SampleCatalog;
+import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.PanelState;
 import com.cluehelper.ui.TextBlock;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.imageio.ImageIO;
@@ -29,6 +31,7 @@ import javax.swing.Timer;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
@@ -57,6 +60,11 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File SNAPSHOTS = new File("build/selftest");
 	private static final File STEP_FRAMES = new File("build/steps");
 	private static final File PLAYER_FRAMES = new File("build/player");
+	private static final File LANDING_FRAMES = new File("build/landings");
+	private static final String LANDING_TAG = "[CH-LAND]";
+	/** Farther than a run tick can carry you: a teleport, a ladder or a boat. */
+	private static final int LANDING_JUMP_TILES = 4;
+	private static final int LANDING_CANDIDATES = 2;
 	private static final int FRAME_NAME_KEY_CHARS = 50;
 	private static final int STATE_DELAY_MS = 400;
 	private static final int PLUGIN_DELAY_MS = 2000;
@@ -94,6 +102,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private int stepFrameCount;
 	private int playerFrameCount;
 	private int lastAvailableCount = -1;
+	private int landingFrameCount;
+	private WorldPoint lastTile;
 
 	@Override
 	protected void startUp()
@@ -102,8 +112,8 @@ public class ClueHelperDevPlugin extends Plugin
 		clearOldPngs(SNAPSHOTS);
 		clearOldPngs(STEP_FRAMES);
 		clearOldPngs(PLAYER_FRAMES);
+		clearOldPngs(LANDING_FRAMES);
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
-		clueHelper.getAvailability().setCatalog(SampleCatalog.load());
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
@@ -122,15 +132,51 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.clear();
 	}
 
-	@Subscribe
+	/** Priority -2: after the plugin's -1 handler has read the position. */
+	@Subscribe(priority = -2)
 	public void onGameTick(GameTick tick)
 	{
+		checkLanding();
 		if (!autoRunPending || client.getGameState() != GameState.LOGGED_IN || ++loggedInTicks < AUTO_RUN_AFTER_TICKS)
 		{
 			return;
 		}
 		autoRunPending = false;
 		postSelfTest();
+	}
+
+	/** Logs every jump with the catalog landings nearest to it. */
+	private void checkLanding()
+	{
+		Position position = clueHelper.getPlayerModel().getPosition();
+		WorldPoint tile = position.getTile();
+		if (tile != null && lastTile != null
+			&& (tile.getPlane() != lastTile.getPlane() || tile.distanceTo2D(lastTile) > LANDING_JUMP_TILES))
+		{
+			logLanding(lastTile, tile, position.getKind());
+		}
+		lastTile = tile;
+	}
+
+	private void logLanding(WorldPoint from, WorldPoint to, Position.Kind kind)
+	{
+		StringBuilder line = new StringBuilder(LANDING_TAG).append(" t").append(client.getTickCount()).append(' ')
+			.append(text(from)).append(" -> ").append(text(to)).append(" (").append(kind).append(')');
+		clueHelper.getAvailability().getCatalog().stream()
+			.filter(row -> row.getDestination() != null && row.getDestination().getPlane() == to.getPlane())
+			.sorted(Comparator.comparingInt((CatalogRow row) -> row.getDestination().distanceTo2D(to)))
+			.map(row -> row.getName() + " [" + row.getCategory() + "] " + text(row.getDestination()) + " d=" + row.getDestination().distanceTo2D(to))
+			.distinct()
+			.limit(LANDING_CANDIDATES)
+			.forEach(candidate -> line.append(" | ").append(candidate));
+		log.info(line.toString());
+		String name = String.format("%03d-%d-%d-%d.png", ++landingFrameCount, to.getX(), to.getY(), to.getPlane());
+		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(LANDING_FRAMES, name))));
+	}
+
+	private static String text(WorldPoint tile)
+	{
+		return tile.getX() + " " + tile.getY() + " " + tile.getPlane();
 	}
 
 	private void postSelfTest()

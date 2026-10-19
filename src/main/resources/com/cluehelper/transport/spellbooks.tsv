@@ -1,0 +1,16 @@
+# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+Display info	Kind	Where	From	To	Items	Skills	Quests	Varbits	Duration	Menu ticks	Spends	Members	Milestone	Note	Gameval
+Spellbook Swap	temporary	anywhere	Lunar	any	ASTRAL_RUNE=3&COSMIC_RUNE=2&LAW_RUNE=1	96 Magic	Dream Mentor		4	1	runes	Y	M1	right-click the book; the left-click Cast opens a chooser (2 clicks)	
+Magic cape: Spellbook	persistent	anywhere	any	any	9762=1|9763=1	99 Magic		4816<5	1	1	cape-use	Y	M1	per-book sub-menu; shares the daily counter with the Max cape (B04)	item:9762=SKILLCAPE_MAGIC item:9763=SKILLCAPE_MAGIC_TRIMMED varbit:4816=SB_SWAP_CHECK
+Max cape: Spellbook	persistent	anywhere	any	any	13280=1	Max Total		4816<5	1	1	cape-use	Y	M1	inventory sub-menu	item:13280=SKILLCAPE_MAX varbit:4816=SB_SWAP_CHECK
+Max cape (worn): Spellbook	persistent	anywhere	any	any	13342=1	Max Total		4816<5	1	1	cape-use	Y	M1	the op is on the equipment slot, not the item	item:13342=SKILLCAPE_MAX_WORN varbit:4816=SB_SWAP_CHECK
+Astral altar: Pray	persistent	2158 3864 0 object:34771	any	toggle Lunar			Lunar Diplomacy		1	1	none	Y	M1	Pray is op 2, a right-click	object:34771=ASTRAL_ALTAR
+Ancient Pyramid altar: Pray-at	persistent	3233 9311 0 object:6552	any	toggle Ancient			Desert Treasure I		1	0	none	Y	M1	drains prayer; reached by the tunnel at 3233 2887 0	object:6552=DT_ZAROS_ALTAR
+Tyss: Spellbook	persistent	1714 3883 0 npc:7050	any	toggle Arceuus					1	1	none	Y	M1	Spellbook is op 3, a right-click; talking to Tyss unlocks Arceuus, so no gate	npc:7050=ARCEUUS_DARKGUARDIAN
+Occult altar	persistent	poh object:29150	any	any					1	1	none	Y	M2	multiloc on 4070, children 31858-31861; plus the POH walk	object:29150=POH_ALTAR_OCCULT
+POH Ancient altar: Venerate	persistent	poh object:29147	any	toggle Ancient			Desert Treasure I		1	0	none	Y	M2	unmeasured: by analogy with the pyramid altar	object:29147=POH_ALTAR_ANCIENT
+POH Lunar altar: Venerate	persistent	poh object:29148	any	toggle Lunar			Lunar Diplomacy		1	0	none	Y	M2	unmeasured: by analogy with the pyramid altar	object:29148=POH_ALTAR_LUNAR
+POH Dark altar: Venerate	persistent	poh object:29149	any	toggle Arceuus				9631=1	1	0	none	Y	M2	unmeasured: by analogy with the pyramid altar; not ARCHEUS_ALTAR_DARK 27979 (Arceuus runecrafting)	varbit:9631=ARCEUUS_SPELLBOOK_UNLOCKED object:29149=POH_ALTAR_DARK
+Mounted Magic cape: Spellbook	persistent	poh object:29206	any	any				4816<5	1	2	cape-use	Y	M2	unmeasured: by analogy with the mounted Max cape; owner only	varbit:4816=SB_SWAP_CHECK object:29206=POH_MOUNTED_MAGIC_CAPE
+Mounted Magic cape (t): Spellbook	persistent	poh object:29207	any	any				4816<5	1	2	cape-use	Y	M2	unmeasured: by analogy with the mounted Max cape; owner only	varbit:4816=SB_SWAP_CHECK object:29207=POH_MOUNTED_MAGIC_CAPE_TRIM
+Mounted Max cape: Perks	persistent	poh object:29170	any	any				4816<5	1	3	cape-use	Y	M2	Perks -> Spellbook Swap -> book (B04)	varbit:4816=SB_SWAP_CHECK object:29170=POH_MOUNTED_MAX_CAPE

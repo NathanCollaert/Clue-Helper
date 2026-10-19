@@ -6,6 +6,7 @@ import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.transport.AvailabilityService;
+import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.Icons;
 import com.cluehelper.ui.PanelState;
@@ -53,11 +54,15 @@ public class ClueHelperPlugin extends Plugin
 	private MemoryStore memory;
 
 	@Inject
+	@Getter(AccessLevel.PACKAGE)
 	private PlayerModel playerModel;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private AvailabilityService availability;
+
+	@Inject
+	private CatalogData catalog;
 
 	@Inject
 	private PlannerRunner planner;
@@ -94,6 +99,7 @@ public class ClueHelperPlugin extends Plugin
 		clueLink.start();
 		playerModel.start();
 		availability.start();
+		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		showPanelState();
 		if (developerMode)
 		{
