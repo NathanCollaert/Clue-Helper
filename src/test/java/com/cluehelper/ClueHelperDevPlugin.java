@@ -2,12 +2,15 @@ package com.cluehelper;
 
 import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
+import com.cluehelper.link.StepChange;
+import com.cluehelper.step.Step;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.PanelState;
 import com.cluehelper.ui.TextBlock;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -35,11 +38,12 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.ui.DrawManager;
 import net.runelite.client.util.Text;
 
 /**
  * Dev launcher only: the self-tests that need files or drive other plugins, which the plugin jar
- * must not do. Snapshots go to build/selftest/. With -Dcluehelper.selftest=true (gradlew dev
+ * must not do. Snapshots go to build/selftest/, and a game frame per step change to build/steps/. With -Dcluehelper.selftest=true (gradlew dev
  * -Pselftest) it runs ::ch-selftest once the UI has settled, and again a few ticks after the
  * first login.
  */
@@ -49,6 +53,8 @@ public class ClueHelperDevPlugin extends Plugin
 {
 	private static final String TAG = "[CH-TEST]";
 	private static final File SNAPSHOTS = new File("build/selftest");
+	private static final File STEP_FRAMES = new File("build/steps");
+	private static final int FRAME_NAME_KEY_CHARS = 50;
 	private static final int STATE_DELAY_MS = 400;
 	private static final int PLUGIN_DELAY_MS = 2000;
 	private static final int AUTO_RUN_AFTER_TICKS = 5;
@@ -70,6 +76,9 @@ public class ClueHelperDevPlugin extends Plugin
 	@Inject
 	private EventBus eventBus;
 
+	@Inject
+	private DrawManager drawManager;
+
 	/** For the blocking config save, which must not run on the Swing thread. */
 	@Inject
 	private ScheduledExecutorService executor;
@@ -79,12 +88,15 @@ public class ClueHelperDevPlugin extends Plugin
 	private boolean autoRunPending = Boolean.getBoolean("cluehelper.selftest");
 	private int loggedInTicks;
 	private int snapshotCount;
+	private int stepFrameCount;
 
 	@Override
 	protected void startUp()
 	{
 		clueHelper = find(ClueHelperPlugin.class);
-		clearOldSnapshots();
+		clearOldPngs(SNAPSHOTS);
+		clearOldPngs(STEP_FRAMES);
+		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
@@ -401,16 +413,42 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 	}
 
-	private static void clearOldSnapshots()
+	private static void clearOldPngs(File dir)
 	{
-		SNAPSHOTS.mkdirs();
-		File[] old = SNAPSHOTS.listFiles((dir, name) -> name.endsWith(".png"));
+		dir.mkdirs();
+		File[] old = dir.listFiles((parent, name) -> name.endsWith(".png"));
 		if (old != null)
 		{
 			for (File f : old)
 			{
 				f.delete();
 			}
+		}
+	}
+
+	/** The next game frame after a step change, so a run's reads can be checked against core's overlay. */
+	private void saveStepFrame(StepChange change, Step step)
+	{
+		String key = step == null ? "none" : step.getKey().replaceAll("[^a-zA-Z0-9]+", "-");
+		String name = String.format("%03d-%s-%s.png", ++stepFrameCount, change.name().toLowerCase(Locale.ROOT),
+			key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
+		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
+	}
+
+	private static void writeFrame(Image frame, File file)
+	{
+		BufferedImage image = new BufferedImage(frame.getWidth(null), frame.getHeight(null), BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = image.createGraphics();
+		g.drawImage(frame, 0, 0, null);
+		g.dispose();
+		try
+		{
+			ImageIO.write(image, "png", file);
+			log.info("{} step frame {}", TAG, file.getAbsolutePath());
+		}
+		catch (Exception e)
+		{
+			log.warn("{} step frame {} failed", TAG, file, e);
 		}
 	}
 

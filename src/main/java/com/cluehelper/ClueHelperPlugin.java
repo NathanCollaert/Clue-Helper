@@ -1,7 +1,7 @@
 package com.cluehelper;
 
 import com.cluehelper.dev.DevHarness;
-import com.cluehelper.link.CorePluginState;
+import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.ui.ClueHelperPanel;
@@ -16,12 +16,15 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.PluginChanged;
 import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 
@@ -31,13 +34,15 @@ import net.runelite.client.ui.NavigationButton;
 	description = "Fastest clue routes from what you own, alongside the Clue Scroll plugin",
 	tags = {"clue", "clues", "treasure", "trails", "teleport", "route"}
 )
+@PluginDependency(ClueScrollPlugin.class)
 public class ClueHelperPlugin extends Plugin
 {
 	@Inject
 	private ClientToolbar clientToolbar;
 
 	@Inject
-	private CorePluginState core;
+	@Getter(AccessLevel.PACKAGE)
+	private ClueLink clueLink;
 
 	@Inject
 	private MemoryStore memory;
@@ -74,7 +79,7 @@ public class ClueHelperPlugin extends Plugin
 			.panel(panel)
 			.build();
 		clientToolbar.addNavigation(navigationButton);
-		core.start();
+		clueLink.start();
 		showPanelState();
 		if (developerMode)
 		{
@@ -87,7 +92,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		devHarness.stop();
 		planner.cancelAll();
-		core.stop();
+		clueLink.stop();
 		clientToolbar.removeNavigation(navigationButton);
 		navigationButton = null;
 		panel = null;
@@ -96,7 +101,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onPluginChanged(PluginChanged event)
 	{
-		if (core.onPluginChanged(event))
+		if (clueLink.onPluginChanged(event))
 		{
 			showPanelState();
 		}
@@ -106,10 +111,16 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe(priority = -1)
 	public void onGameTick(GameTick tick)
 	{
-		if (core.recheck())
+		if (clueLink.onGameTick())
 		{
 			showPanelState();
 		}
+	}
+
+	@Subscribe
+	public void onItemContainerChanged(ItemContainerChanged event)
+	{
+		clueLink.onItemContainerChanged(event);
 	}
 
 	@Subscribe
@@ -132,7 +143,7 @@ public class ClueHelperPlugin extends Plugin
 
 	PanelState panelState()
 	{
-		return PanelState.of(core.isActive(), false, false, planner.isWorking());
+		return PanelState.of(clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
 	}
 
 	private void showPanelState()

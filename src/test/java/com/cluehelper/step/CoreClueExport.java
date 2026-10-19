@@ -10,7 +10,6 @@ import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,56 +21,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * B01 offline tool: writes core's clue data (the package-private CLUES lists of the client jar
- * this project builds against) to JSON for tools/cache/c1_match.py. Provider lambdas are
- * evaluated against a fake client under every var state in {@link #VAR_STATES}, so each
+ * Offline tool (B01, B07): writes core's clue data (the package-private CLUES lists of the client jar
+ * this project builds against) to JSON for tools/cache/c1_match.py and c5_step_index.py, with
+ * each entry's runtime step key. Provider lambdas are evaluated against a fake client under
+ * every var state in {@link CoreClues#VAR_STATES}, so each
  * varbit- or quest-dependent entry lists all its branches.
  *
  * Run: gradlew coreClues (writes tools/cache/out/core-clues.json).
  */
 public class CoreClueExport
 {
-	private static final String CLUES_PACKAGE = "net.runelite.client.plugins.cluescrolls.clues.";
-	private static final int[] VAR_STATES = {0, 1, 2, 3, 4, 5, 10, 100};
-	private static final String[][] SOURCES = {
-		{"CrypticClue", "CLUES"},
-		{"AnagramClue", "CLUES"},
-		{"CipherClue", "CLUES"},
-		{"CoordinateClue", "CLUES"},
-		{"EmoteClue", "CLUES"},
-		{"MapClue", "CLUES"},
-		{"BeginnerMapClue", "CLUES"},
-		{"FairyRingClue", "CLUES"},
-		{"MusicClue", "CLUES"},
-		{"FaloTheBardClue", "CLUES"},
-		{"SkillChallengeClue", "CLUES"},
-	};
+	private static final String CLUES_PACKAGE = CoreClues.CLUES_PACKAGE;
 
-	private static int varState;
 	private static ClueScrollPlugin fakePlugin;
 
 	public static void main(String[] args) throws Exception
 	{
 		Path out = Paths.get(args.length > 0 ? args[0] : "tools/cache/out/core-clues.json");
-		fakePlugin = pluginWithFakeClient();
+		fakePlugin = CoreClues.plugin();
 
 		JsonObject root = new JsonObject();
-		for (String[] source : SOURCES)
+		for (String type : CoreClues.LIST_TYPES)
 		{
-			Object clues = staticField(CLUES_PACKAGE + source[0], source[1]);
-			Collection<?> entries = clues instanceof Map ? ((Map<?, ?>) clues).values() : (Collection<?>) clues;
 			JsonArray array = new JsonArray();
-			for (Object clue : entries)
+			for (Object clue : CoreClues.entries(type))
 			{
-				array.add(describe(clue, 0));
+				array.add(withStepKey(describe(clue, 0).getAsJsonObject(), (ClueScroll) clue));
 			}
-			root.add(source[0], array);
-			System.out.println(source[0] + ": " + array.size());
+			root.add(type, array);
+			System.out.println(type + ": " + array.size());
 		}
 		root.add("HotColdLocation", enumValues(CLUES_PACKAGE + "hotcold.HotColdLocation"));
 		root.add("STASHUnit", enumValues(CLUES_PACKAGE + "emote.STASHUnit"));
@@ -83,50 +66,6 @@ public class CoreClueExport
 			new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().create().toJson(root, writer);
 		}
 		System.out.println("wrote " + out.toAbsolutePath());
-	}
-
-	private static ClueScrollPlugin pluginWithFakeClient() throws Exception
-	{
-		Client client = (Client) Proxy.newProxyInstance(Client.class.getClassLoader(), new Class<?>[]{Client.class},
-			(proxy, method, methodArgs) ->
-			{
-				switch (method.getName())
-				{
-					case "getVarbitValue":
-					case "getVarpValue":
-						return varState;
-					case "getIntStack":
-						return new int[]{varState, varState, varState};
-					case "toString":
-						return "FakeClient";
-					case "hashCode":
-						return 0;
-					case "equals":
-						return proxy == methodArgs[0];
-				}
-				Class<?> type = method.getReturnType();
-				if (type == boolean.class)
-				{
-					return false;
-				}
-				if (type.isPrimitive() && type != void.class)
-				{
-					return type == long.class ? 0L : type == float.class ? 0f : type == double.class ? 0d : 0;
-				}
-				return null;
-			});
-		ClueScrollPlugin plugin = new ClueScrollPlugin();
-		Field clientField = ClueScrollPlugin.class.getDeclaredField("client");
-		clientField.setAccessible(true);
-		clientField.set(plugin, client);
-		return plugin;
-	}
-
-	private static Object staticField(String className, String fieldName) throws Exception
-	{
-		Field field = Class.forName(className).getDeclaredField(fieldName);
-		field.setAccessible(true);
-		return field.get(null);
 	}
 
 	private static JsonArray enumValues(String className) throws Exception
@@ -144,13 +83,21 @@ public class CoreClueExport
 	private static JsonArray hotColdClues() throws Exception
 	{
 		JsonArray array = new JsonArray();
-		for (String name : new String[]{"BEGINNER_CLUE", "MASTER_CLUE", "LEAGUE_TUTOR_BEGINNER_CLUE", "LEAGUE_TUTOR_MASTER_CLUE"})
+		for (String name : CoreClues.HOT_COLD_CLUES)
 		{
-			JsonObject described = describe(staticField(CLUES_PACKAGE + "HotColdClue", name), 0).getAsJsonObject();
+			Object clue = CoreClues.staticField(CLUES_PACKAGE + "HotColdClue", name);
+			JsonObject described = withStepKey(describe(clue, 0).getAsJsonObject(), (ClueScroll) clue);
 			described.addProperty("name", name);
 			array.add(described);
 		}
 		return array;
+	}
+
+	/** The runtime step key under var state 0, which the step index generator joins on. */
+	private static JsonObject withStepKey(JsonObject described, ClueScroll clue)
+	{
+		described.addProperty("stepKey", StepKey.of(CoreClueReader.facts(clue, fakePlugin)));
+		return described;
 	}
 
 	private static JsonElement describe(Object value, int depth)
@@ -261,9 +208,9 @@ public class CoreClueExport
 	{
 		Set<String> seen = new LinkedHashSet<>();
 		List<JsonElement> branches = new ArrayList<>();
-		for (int state : VAR_STATES)
+		for (int state : CoreClues.VAR_STATES)
 		{
-			varState = state;
+			CoreClues.setVarState(state);
 			JsonElement result;
 			try
 			{
@@ -278,7 +225,7 @@ public class CoreClueExport
 				branches.add(result);
 			}
 		}
-		varState = 0;
+		CoreClues.setVarState(0);
 		JsonObject object = new JsonObject();
 		JsonArray array = new JsonArray();
 		branches.forEach(array::add);

@@ -76,6 +76,33 @@ public class ConventionsTest
 		assertEquals("banned APIs in src/main:\n" + String.join("\n", hits), 0, hits.size());
 	}
 
+	/** These change core's shared state, which every overlay of core reads (B07). Safe only offline. */
+	private static final Pattern MUTATING_CORE_CALL = Pattern.compile(
+		"\\.(forText|forChatboxText|update|reset|resetClue|setChallengeCompleted|makeOverlayHint|makeWorldOverlayHint|makeSTASHOverlay)\\s*\\(");
+	private static final String CORE_CLUE_PACKAGE = "import net.runelite.client.plugins.cluescrolls";
+
+	@Test
+	public void mainSourcesNeverCallMutatingCoreClueMethods() throws IOException
+	{
+		List<String> hits = new ArrayList<>();
+		for (Path file : javaFiles(MAIN_SOURCES))
+		{
+			List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+			if (lines.stream().noneMatch(line -> line.startsWith(CORE_CLUE_PACKAGE)))
+			{
+				continue;
+			}
+			for (int i = 0; i < lines.size(); i++)
+			{
+				if (MUTATING_CORE_CALL.matcher(lines.get(i)).find())
+				{
+					hits.add(MAIN_SOURCES.relativize(file) + ":" + (i + 1) + ": " + lines.get(i).trim());
+				}
+			}
+		}
+		assertEquals("calls that change the Clue Scroll plugin's state:\n" + String.join("\n", hits), 0, hits.size());
+	}
+
 	@Test
 	public void configHasEveryM1Key() throws IOException
 	{

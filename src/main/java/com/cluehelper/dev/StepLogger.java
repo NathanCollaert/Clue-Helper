@@ -41,6 +41,10 @@ public class StepLogger
 			return;
 		}
 		StepLog log = slot.get();
+		if (log.endsWith(key))
+		{
+			return;
+		}
 		log.append(new StepLog.Entry(tier, type, key, Instant.now().getEpochSecond()), MAX_ENTRIES);
 		slot.set(log);
 	}

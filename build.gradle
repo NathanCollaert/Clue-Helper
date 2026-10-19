@@ -10,7 +10,7 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = 'latest.release'
+def runeLiteVersion = project.findProperty('runeliteVersion') ?: 'latest.release'
 
 dependencies {
 	compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
@@ -44,7 +44,9 @@ tasks.register('dev', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'com.cluehelper.ClueHelperPluginTest'
 	// RuneLite refuses to load a builtin plugin without assertions on.
-	jvmArgs '-ea', '-Xmx1g'
+	// Core's GPU plugin trips its own assert in ModelUploader.uploadSortedModel (1.13.2, seen drawing
+	// the bank), which stops the client; assertions stay on everywhere else.
+	jvmArgs '-ea', '-da:net.runelite.client.plugins.gpu...', '-Xmx1g'
 	if (project.hasProperty('selftest')) {
 		// ClueHelperDevPlugin runs ::ch-selftest a few ticks after the first login.
 		systemProperty 'cluehelper.selftest', 'true'

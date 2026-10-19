@@ -17,6 +17,16 @@ public final class StepLog
 		return entries;
 	}
 
+	/**
+	 * Whether the newest entry has this key. ClueLink reports a re-read, a pick-up or a core
+	 * re-enable as a new step (B03), but for step frequencies it is the same step again.
+	 */
+	boolean endsWith(String key)
+	{
+		List<Entry> list = entries();
+		return !list.isEmpty() && list.get(list.size() - 1).getKey().equals(key);
+	}
+
 	/** Appends, dropping the oldest entries beyond {@code max}. */
 	void append(Entry entry, int max)
 	{

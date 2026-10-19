@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.cluehelper.step.ClueFacts;
+import com.cluehelper.step.StepKey;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
@@ -18,8 +20,9 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 /**
- * B03: pins the key rule and the observed core behaviour against the recorded live logs in
- * src/test/resources/b03/. B07 replays the same fixtures through ClueLink.
+ * B03's recorded live logs (src/test/resources/b03/) replayed through the production key rule
+ * and ClueLink's rules ({@link LinkState}), tick by tick. Fixtures of more clue types can be cut
+ * from the dev log's "[CH-STEP] fixture" lines, which use the same "clue" event format.
  */
 public class CoreLinkFixtureTest
 {
@@ -30,65 +33,81 @@ public class CoreLinkFixtureTest
 	@Test
 	public void keyRuleRebuildsEveryRecordedKey() throws IOException
 	{
-		List<JsonObject> clues = clueEvents(RUN1);
 		int checked = 0;
-		for (JsonObject e : clues)
+		for (JsonObject e : events(RUN1, "clue"))
 		{
-			if (!e.has("fields"))
+			if (e.has("fields"))
 			{
-				continue;
+				ClueFacts facts = GSON.fromJson(e.get("fields"), ClueFacts.class);
+				assertEquals("tick " + e.get("t"), e.get("key").getAsString(), StepKey.of(facts));
+				checked++;
 			}
-			ClueFields fields = GSON.fromJson(e.get("fields"), ClueFields.class);
-			assertEquals("tick " + e.get("t"), e.get("key").getAsString(), ClueFields.key(fields));
-			checked++;
 		}
 		assertEquals(15, checked);
 	}
 
 	@Test
-	public void stepSequenceIsKeyChangesSeparatedByNullGaps() throws IOException
+	public void replayGivesOneChangePerRecordedTransition() throws IOException
 	{
-		List<String> sequence = clueEvents(RUN1).stream()
-			.map(e -> e.has("key") ? e.get("key").getAsString() : "-")
-			.collect(Collectors.toList());
+		List<String> changes = replay(RUN1).changes;
 		List<String> expectedPrefixes = Arrays.asList(
-			"threestep:the doorman of the warriors' gui",
-			"coordinate:12101",
-			"emote:panic at al kharid mine.",
-			"-",
-			"cryptic:talk to charlie the tramp in varro",
-			"skill:CHARLIE:i need to give charlie som",
-			"-",
-			"cryptic:in the place duke horacio calls ho",
-			"-",
-			"coordinate:12101",
-			"-",
-			"anagram:an earl",
-			"-",
-			"cryptic:in a village of barbarians, i am t",
-			"-",
-			"anagram:carpet ahoy",
-			"-",
-			"map:w348",
-			"-",
-			"cryptic:talk to charlie the tramp in varro",
-			"skill:CHARLIE:i need to give charlie a c",
-			"-",
-			"cryptic:near the open desert i reside, to ",
-			"-",
-			"coordinate:12101",
-			"-");
-		assertEquals(expectedPrefixes.size(), sequence.size());
-		for (int i = 0; i < sequence.size(); i++)
+			"NEW threestep:the doorman of the warriors' gui",
+			"NEW coordinate:12101",
+			"NEW emote:panic at al kharid mine.",
+			"CLEARED",
+			"NEW cryptic:talk to charlie the tramp in varro",
+			"NEW skill:CHARLIE:i need to give charlie som",
+			"CLEARED",
+			"NEW cryptic:in the place duke horacio calls ho",
+			"CLEARED",
+			"NEW coordinate:12101",
+			"CLEARED",
+			"NEW anagram:an earl",
+			"CLEARED",
+			"NEW cryptic:in a village of barbarians, i am t",
+			"CLEARED",
+			"NEW anagram:carpet ahoy",
+			"CLEARED",
+			"NEW map:w348",
+			"CLEARED",
+			"NEW cryptic:talk to charlie the tramp in varro",
+			"NEW skill:CHARLIE:i need to give charlie a c",
+			"CLEARED",
+			"NEW cryptic:near the open desert i reside, to ",
+			"CLEARED",
+			"NEW coordinate:12101",
+			"CLEARED");
+		assertEquals(changes.toString(), expectedPrefixes.size(), changes.size());
+		for (int i = 0; i < changes.size(); i++)
 		{
-			assertTrue(i + ": " + sequence.get(i), sequence.get(i).startsWith(expectedPrefixes.get(i)));
+			assertTrue(i + ": " + changes.get(i), changes.get(i).startsWith(expectedPrefixes.get(i)));
 		}
+	}
+
+	/** The flag follows isPluginActive and PluginChanged: never the config key, which flips first. */
+	@Test
+	public void replayKeepsTheActiveFlagOnCoresRealState() throws IOException
+	{
+		for (String run : List.of(RUN1, RUN2))
+		{
+			Replay replay = replay(run);
+			assertEquals(run + ": active flag vs the recorded isPluginActive", List.of(), replay.activeMismatches);
+		}
+	}
+
+	@Test
+	public void replayAsksForAReadWheneverCoreIsOnWithoutAClueButOneIsHeld() throws IOException
+	{
+		assertEquals("run 1: client start; each beginner step done or casket opened while the unread elite is held;"
+				+ " elite picked up; withdrawn; withdrawn again after core's re-enable",
+			List.of(0, 294, 495, 566, 636, 672, 773, 841, 883, 909, 1019, 1037, 2234), replay(RUN1).readPromptStarts);
+		assertEquals("run 2: only once core is turned on at t31, and again after the Gauntlet", List.of(31, 465), replay(RUN2).readPromptStarts);
 	}
 
 	@Test
 	public void coreHandsOutStaticEntriesSoIdentityRepeatsAcrossSteps() throws IOException
 	{
-		List<JsonObject> clues = clueEvents(RUN1);
+		List<JsonObject> clues = events(RUN1, "clue");
 		assertEquals("elite coordinate read at t83, re-read at t649 and t2240",
 			identityAt(clues, 83), identityAt(clues, 649));
 		assertEquals(identityAt(clues, 83), identityAt(clues, 2240));
@@ -100,7 +119,7 @@ public class CoreLinkFixtureTest
 	@Test
 	public void coreResetsInItsOwnTickOnStepCompletion() throws IOException
 	{
-		for (JsonObject e : clueEvents(RUN1))
+		for (JsonObject e : events(RUN1, "clue"))
 		{
 			int t = e.get("t").getAsInt();
 			if (t == 294 || t == 495 || t == 773 || t == 841 || t == 909 || t == 1019)
@@ -125,42 +144,85 @@ public class CoreLinkFixtureTest
 		}
 	}
 
-	@Test
-	public void configKeyFlipsBeforeThePluginActuallyStopsOrStarts() throws IOException
+	private static final class Replay
 	{
-		List<JsonObject> toggles = new ArrayList<>();
-		for (JsonObject e : allEvents(RUN1))
-		{
-			String kind = e.get("event").getAsString();
-			if (kind.equals("configChanged") || (kind.equals("pluginChanged") && e.get("plugin").getAsString().equals("ClueScrollPlugin")))
-			{
-				toggles.add(e);
-			}
-		}
-		assertEquals(6, toggles.size());
-		for (int i = 0; i < toggles.size(); i += 2)
-		{
-			JsonObject config = toggles.get(i);
-			JsonObject plugin = toggles.get(i + 1);
-			assertEquals("configChanged", config.get("event").getAsString());
-			assertEquals("pluginChanged", plugin.get("event").getAsString());
-			boolean enabling = plugin.get("loaded").getAsBoolean();
-			assertTrue("active still the old value when the config event arrives",
-				config.get("coreState").getAsString().startsWith("active=" + !enabling));
-			assertTrue(plugin.get("coreState").getAsString().startsWith("active=" + enabling));
-			assertEquals("AWT-EventQueue-0", plugin.get("thread").getAsString());
-		}
+		final List<String> changes = new ArrayList<>();
+		final List<String> activeMismatches = new ArrayList<>();
+		final List<Integer> readPromptStarts = new ArrayList<>();
 	}
 
-	@Test
-	public void startingWithCoreDisabledStillLoadsAndPostsNoCoreEvent() throws IOException
+	/**
+	 * Feeds a recorded run into LinkState the way ClueLink does: the probe's events of a tick
+	 * first (it logged clue reads at GameTick -1 and only on a change), then one tick read.
+	 */
+	private static Replay replay(String resource) throws IOException
 	{
-		JsonObject start = events(RUN2, "start").get(0);
-		assertTrue(start.get("coreFound").getAsBoolean());
-		assertEquals("active=false enabled=false cfg=false", start.get("coreState").getAsString());
-		assertEquals("none", start.get("serviceClue").getAsString());
-		assertEquals("only the re-enable posts a core PluginChanged", 1, events(RUN2, "pluginChanged").stream()
-			.filter(e -> e.get("plugin").getAsString().equals("ClueScrollPlugin")).count());
+		List<JsonObject> all = allEvents(resource);
+		Replay replay = new Replay();
+		LinkState state = new LinkState();
+		boolean coreActive = false;
+		String key = null;
+		Object targets = null;
+		boolean holdsClue = false;
+		boolean neededRead = false;
+		int lastTick = all.get(all.size() - 1).get("t").getAsInt();
+		int next = 0;
+		for (int tick = 0; tick <= lastTick; tick++)
+		{
+			for (; next < all.size() && all.get(next).get("t").getAsInt() == tick; next++)
+			{
+				JsonObject e = all.get(next);
+				switch (e.get("event").getAsString())
+				{
+					case "start":
+						coreActive = recordedActive(e.get("coreState").getAsString());
+						state.start(coreActive);
+						break;
+					case "pluginChanged":
+						if (e.get("plugin").getAsString().equals("ClueScrollPlugin"))
+						{
+							state.onPluginChanged(e.get("loaded").getAsBoolean());
+						}
+						break;
+					case "coreState":
+						coreActive = recordedActive(e.get("to").getAsString());
+						break;
+					case "inventory":
+						holdsClue = !e.get("clueItems").getAsString().isEmpty();
+						break;
+					case "clue":
+						key = e.has("key") ? e.get("key").getAsString() : null;
+						targets = e.has("fields") ? e.getAsJsonObject("fields").get("targets") : null;
+						break;
+					default:
+						break;
+				}
+				if (e.has("coreState") && state.isActive() != recordedActive(e.get("coreState").getAsString()))
+				{
+					replay.activeMismatches.add("t" + tick + " " + e.get("event").getAsString() + ": " + state.isActive());
+				}
+			}
+			StepChange change = state.tick(coreActive, key, targets, holdsClue);
+			if (change == StepChange.NEW)
+			{
+				replay.changes.add("NEW " + key);
+			}
+			else if (change != StepChange.UNCHANGED)
+			{
+				replay.changes.add(change.name());
+			}
+			if (state.needsRead() && !neededRead)
+			{
+				replay.readPromptStarts.add(tick);
+			}
+			neededRead = state.needsRead();
+		}
+		return replay;
+	}
+
+	private static boolean recordedActive(String coreState)
+	{
+		return coreState.startsWith("active=true");
 	}
 
 	private static int identityAt(List<JsonObject> clues, int tick)
@@ -168,11 +230,6 @@ public class CoreLinkFixtureTest
 		return clues.stream().filter(e -> e.get("t").getAsInt() == tick).findFirst()
 			.orElseThrow(() -> new AssertionError("no clue event at t" + tick))
 			.get("identity").getAsInt();
-	}
-
-	private static List<JsonObject> clueEvents(String resource) throws IOException
-	{
-		return events(resource, "clue");
 	}
 
 	private static List<JsonObject> events(String resource, String kind) throws IOException
