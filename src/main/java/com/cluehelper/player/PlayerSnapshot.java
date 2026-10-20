@@ -58,6 +58,8 @@ public final class PlayerSnapshot
 	private final Map<Integer, Integer> bank;
 	/** GIM group storage, remembered like the bank; empty except in a banked snapshot. */
 	private final Map<Integer, Integer> groupStorage;
+	/** The player's own house (B16); {@link HouseState#NONE} when nothing is known. */
+	private final HouseState house;
 
 	@Builder(toBuilder = true)
 	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
@@ -66,7 +68,7 @@ public final class PlayerSnapshot
 		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
 		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
-		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage)
+		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house)
 	{
 		this.version = version;
 		this.tick = tick;
@@ -96,6 +98,7 @@ public final class PlayerSnapshot
 		this.freeInventorySlots = freeInventorySlots;
 		this.bank = copy(bank);
 		this.groupStorage = copy(groupStorage);
+		this.house = house == null ? HouseState.NONE : house;
 	}
 
 	public int boosted(Skill skill)

@@ -1,6 +1,7 @@
 package com.cluehelper;
 
 import com.cluehelper.dev.DevHarness;
+import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
@@ -8,7 +9,9 @@ import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.CheckLines;
+import com.cluehelper.player.HouseState;
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.poh.PohService;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
@@ -16,7 +19,9 @@ import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.Icons;
+import com.cluehelper.ui.FurnitureOverlay;
 import com.cluehelper.ui.ItemHighlightOverlay;
+import com.cluehelper.ui.MenuLineOverlay;
 import com.cluehelper.ui.MinimapMarkerOverlay;
 import com.cluehelper.ui.PanelModel;
 import com.cluehelper.ui.PanelState;
@@ -37,6 +42,10 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.MenuOpened;
+import net.runelite.api.events.PostMenuSort;
+import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetClosed;
@@ -66,6 +75,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class ClueHelperPlugin extends Plugin
 {
 	private static final int ULTIMATE_IRONMAN = 2;
+	private static final String FORGET_HOUSE_KEY = "pohForget";
+	private static final String HOUSE_KEY_PREFIX = "poh";
 
 	@Inject
 	private ClientToolbar clientToolbar;
@@ -86,6 +97,13 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private CheckLines checkLines;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private PohService poh;
+
+	@Inject
+	private ConfigManager configManager;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -126,6 +144,16 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private WidgetHighlightOverlay widgetOverlay;
+
+	@Inject
+	private MenuLineOverlay menuLineOverlay;
+
+	@Inject
+	private FurnitureOverlay furnitureOverlay;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private MenuLines menuLines;
 
 	@Inject
 	private WaypointOverlay waypointOverlay;
@@ -170,6 +198,7 @@ public class ClueHelperPlugin extends Plugin
 		clientToolbar.addNavigation(navigationButton);
 		clueLink.start();
 		playerModel.start();
+		poh.start();
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
@@ -202,6 +231,7 @@ public class ClueHelperPlugin extends Plugin
 		routes.stop();
 		planner.cancelAll();
 		availability.stop();
+		poh.stop();
 		playerModel.stop();
 		clueLink.stop();
 		clientToolbar.removeNavigation(navigationButton);
@@ -226,6 +256,8 @@ public class ClueHelperPlugin extends Plugin
 		{
 			showPanelState();
 		}
+		bankMemory.onGameTick();
+		poh.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
@@ -255,12 +287,44 @@ public class ClueHelperPlugin extends Plugin
 	public void onWidgetClosed(WidgetClosed event)
 	{
 		bankMemory.onWidgetClosed(event);
+		menuLines.onWidgetClosed(event);
+	}
+
+	@Subscribe
+	public void onClientTick(ClientTick tick)
+	{
+		menuLines.colourLines(guide.getMenuTarget(), config.highlightMenus());
+	}
+
+	/** After Menu Entry Swapper's swaps: the hover menu's top entry is the left click. */
+	@Subscribe(priority = -1)
+	public void onPostMenuSort(PostMenuSort event)
+	{
+		guide.onPostMenuSort();
+	}
+
+	/** After other plugins have built the menu: our option is coloured, nothing is added, removed or reordered. */
+	@Subscribe(priority = -1)
+	public void onMenuOpened(MenuOpened event)
+	{
+		menuLines.colourMenu(guide.getMenuTarget(), config.highlightMenus());
+	}
+
+	/** Priority 2: the menu scripts' arguments are read before better-teleport-menu (priority 1) rewrites them (B12). */
+	@Subscribe(priority = 2)
+	public void onScriptPreFired(ScriptPreFired event)
+	{
+		menuLines.onScriptPreFired(event);
+		poh.onScriptPreFired(event);
 	}
 
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		stashMemory.onMenuOptionClicked(event);
+		bankMemory.onMenuOptionClicked(event);
+		poh.onMenuOptionClicked(event);
+		guide.onMenuOptionClicked(event);
 		checkLines.onMenuOptionClicked(event);
 	}
 
@@ -268,6 +332,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onVarbitChanged(VarbitChanged event)
 	{
 		playerModel.onVarbitChanged(event);
+		poh.onVarbitChanged(event);
 	}
 
 	@Subscribe
@@ -281,6 +346,8 @@ public class ClueHelperPlugin extends Plugin
 	{
 		playerModel.onGameStateChanged(event);
 		bankMemory.onGameStateChanged(event);
+		poh.onGameStateChanged(event);
+		guide.onGameStateChanged(event);
 	}
 
 	@Subscribe
@@ -297,9 +364,19 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (ClueHelperConfig.GROUP.equals(event.getGroup()))
+		if (!ClueHelperConfig.GROUP.equals(event.getGroup()))
 		{
-			clientThread.invokeLater(mapMarkers::refresh);
+			return;
+		}
+		clientThread.invokeLater(mapMarkers::refresh);
+		if (FORGET_HOUSE_KEY.equals(event.getKey()) && config.pohForget())
+		{
+			configManager.setConfiguration(ClueHelperConfig.GROUP, FORGET_HOUSE_KEY, false);
+			clientThread.invokeLater(poh::forget);
+		}
+		else if (event.getKey().startsWith(HOUSE_KEY_PREFIX))
+		{
+			clientThread.invokeLater(poh::onConfigChanged);
 		}
 	}
 
@@ -308,6 +385,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		memory.reload();
 		bankMemory.onProfileChanged();
+		poh.onProfileChanged();
 	}
 
 	@Subscribe
@@ -329,7 +407,7 @@ public class ClueHelperPlugin extends Plugin
 
 	private Overlay[] overlays()
 	{
-		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, minimapOverlay};
+		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, minimapOverlay, menuLineOverlay, furnitureOverlay};
 	}
 
 	private void onGuideChanged()
@@ -353,7 +431,8 @@ public class ClueHelperPlugin extends Plugin
 			return;
 		}
 		PanelModel model = PanelModel.of(panelState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
-			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p(), bankInfo(), System.currentTimeMillis());
+			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p(), bankInfo(), houseInfo(), guide.getMenuHint(),
+			System.currentTimeMillis());
 		SwingUtilities.invokeLater(() -> target.show(model));
 	}
 
@@ -365,6 +444,15 @@ public class ClueHelperPlugin extends Plugin
 		boolean bankCounts = config.useBank() && snapshot != null && snapshot.getAccountType() != ULTIMATE_IRONMAN;
 		return new PanelModel.BankInfo(bank == null ? 0 : bank.seenAt, bank == null && bankCounts,
 			id -> client.getItemDefinition(id).getName());
+	}
+
+	/** "Visit your house once" while only the nexus varbits are known (B16). */
+	private PanelModel.HouseInfo houseInfo()
+	{
+		HouseState house = poh.getHouse();
+		boolean known = !house.getNexusKeys().isEmpty() || !house.getFurniture().isEmpty();
+		return new PanelModel.HouseInfo(house.getScannedAt(), known && house.getSource() == HouseState.Source.VARBITS,
+			house.getSource() == HouseState.Source.MANUAL);
 	}
 
 	/** Members keep their book on an F2P world, where no book can be changed and only Standard has teleports. */

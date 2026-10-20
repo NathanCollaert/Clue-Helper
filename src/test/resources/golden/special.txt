@@ -24,21 +24,21 @@ pending revert, window unknown: plans from Lunar
   alt       40t: Spellbook Swap · Varrock Teleport: Grand Exchange → walk 30 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
 pending revert on Standard, Ancient target: the cape from a pending revert
   best      40t: Varrock Teleport → Spellbook Swap · Senntisten Teleport → walk 26 {item:556=3, item:554=1, item:563=4, item:566=1, item:9075=3, item:564=2}
-  same book 43t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
+  same book 42t: Teleport to House → Portal nexus: Senntisten → walk 26 {item:556=1, item:557=1, item:563=1}
   alt       40t: Lumbridge Teleport → Spellbook Swap · Senntisten Teleport → walk 26 {item:556=3, item:557=1, item:563=4, item:566=1, item:9075=3, item:564=2}
   alt       40t: Falador Teleport → Spellbook Swap · Senntisten Teleport → walk 26 {item:556=3, item:555=1, item:563=4, item:566=1, item:9075=3, item:564=2}
 99 Magic, no cape uses left today, Ancient target
-  best      43t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
+  best      42t: Teleport to House → Portal nexus: Senntisten → walk 26 {item:556=1, item:557=1, item:563=1}
+  alt       43t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
   alt       50t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
-  alt       59t: Digsite pendant: Digsite → walk 54 {charge:11194=1}
 Lunar, swap runes only in the bank (bank on)
   best      34t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
   alt       37t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
   alt       29t (rank 37): Max cape: Spellbook → STANDARD → Varrock Teleport → walk 23 {cape=1, item:556=3, item:554=1, item:563=1} leaves you on STANDARD
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
-  best      50t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
-  alt       53t: Crafting cape: Teleport → walk 4 → bank → Spellbook Swap · Senntisten Teleport → walk 26 {item:563=3, item:566=1, item:9075=3, item:564=2} withdraw [9075, 564] deposit first
-  alt       59t: Digsite pendant: Digsite → walk 54 {charge:11194=1}
+  best      43t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 26
+  alt       50t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
+  alt       55t: Construction cape: Tele to POH → Portal nexus: Respawn (Civitas illa Fortis) → walk 38
 Wilderness start at level 26 (3100,3720), to Varrock
   best      32t: Slayer ring: Stronghold → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
   alt       32t: Slayer ring: Slayer Tower → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
@@ -64,7 +64,7 @@ bank tipping point: mid-ironman, bank on, to Varrock bank crates
   alt       42t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 23 {charge:2552=1, item:8007=1} withdraw [8007]
 Nathan's case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked
   best      25t: Camelot Teleport: Seers' → walk 3 → bank → Wilderness sword 4: Teleport → walk 6 {item:556=5, item:563=1} withdraw [13111] deposit first
-  direct    128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  direct    67t: Teleport to House → House obelisk: Level 50 Wilderness → walk 52 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 bank tipping point: mid-ironman, coordinate:3556
   best      58t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 39 {charge:2552=1, charge:21166=1} withdraw [21166]
@@ -117,10 +117,44 @@ emote item in the bank, STASH unknown
   alt       67t: Amulet of glory: Edgeville → walk 5 → bank → Amulet of glory: Draynor Village → walk 48 {charge:1712=2} withdraw [1155]
   alt       85t: Games necklace: Barbarian Outpost → walk 8 → bank → Lumbridge Teleport → walk 63 {charge:3853=1, item:556=3, item:557=1, item:563=1} withdraw [1155]
   needs     STASH unknown — search it once. If it's filled, skip the bank
+Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley shop boxes
+  best      20t: (at the open bank) Max cape: POH Portals: Taverley → walk 12 withdraw [13280] deposit first
 at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required
   best      29t: (at the open bank) Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1} withdraw [952]
   alt       32t: (at the open bank) Varrock tablet → walk 23 {item:8007=1} withdraw [8007, 952]
   alt       37t: (at the open bank) walk 35 withdraw [952]
+house: Burthorpe castle steps (Eohric), no games necklace, Nathan's house
+  best      23t: Teleport to House → Jewellery box: Burthorpe → walk 6 {item:556=1, item:557=1, item:563=1}
+  alt       31t: Max cape: Warriors' Guild → walk 26
+  alt       32t: Burthorpe Games Room Minigame Teleport → walk 6 {cooldown:888=1}
+house: Burthorpe castle steps (Eohric), no games necklace, no house
+  best      31t: Max cape: Warriors' Guild → walk 26
+  alt       32t: Burthorpe Games Room Minigame Teleport → walk 6 {cooldown:888=1}
+  alt       57t: Construction cape: Taverley → walk 52
+house: Fountain of Rune 12101 on Arceuus, no cape uses left, Nathan's house
+  best      68t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 52
+  alt       72t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 55
+  alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  note      Wilderness target
+house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus (B10's case)
+  best      72t (rank 102): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 55 {item:563=2, item:565=2} leaves you on ANCIENT
+  same book 128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  alt       132t: Max cape: Other Teleports: Black chinchompa → walk 127 {daily:4819=1}
+  alt       140t: Master scroll book: Revenant cave teleport → walk 135 {charge:21389=1}
+  note      Wilderness target
+house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
+  best      72t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 55
+  alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  alt       132t: Max cape: Other Teleports: Black chinchompa → walk 127 {daily:4819=1}
+  note      Wilderness target
+house: standing in the own house, Burthorpe castle steps
+  best      11t: Games necklace: Burthorpe → walk 6 {charge:3853=1}
+  alt       18t: Jewellery box: Burthorpe → walk 6
+  alt       29t: Jewellery box: Warriors' Guild → walk 17
+house: standing in a stranger's house, Burthorpe castle steps
+  best      11t: Games necklace: Burthorpe → walk 6 {charge:3853=1}
+  alt       23t: Teleport to House → Jewellery box: Burthorpe → walk 6 {item:556=1, item:557=1, item:563=1}
+  alt       31t: Max cape: Warriors' Guild → walk 26
 start on a node: standing at the Varrock Teleport landing, to Varrock bank crates
   best      23t: walk 23
   alt       27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
@@ -131,7 +165,8 @@ AREA: cryptic:anger those who adhere to saradomin's edicts to prevent travel.
   alt       58t: Construction cape: Rimmington → walk 45
 SEQUENCE skill: skill:CHARLIE:i need to give charlie a cooked pike.
   best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
-  alt       49t: Skills necklace: Cooking Guild → walk 44 {charge:11968=1}
+  alt       32t: Teleport to House → Portal nexus: Varrock → walk 16 {item:556=1, item:557=1, item:563=1}
+  alt       32t: Teleport to House → Jewellery box: Champions' Guild → walk 15 {item:556=1, item:557=1, item:563=1}
 SEQUENCE three-step (6 orders)
   best      86t: Skills necklace: Mining Guild → walk 28 → Lumbridge Teleport → walk 22 → Varrock Teleport → walk 23 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
 PROBES (hot/cold spots): {2860,3562,0=27, 2915,3425,0=59, 2917,3295,0=13, 2972,3486,0=58, 2976,3239,0=39, 3030,3364,0=29, 3031,3304,0=58, 3033,3438,0=51}

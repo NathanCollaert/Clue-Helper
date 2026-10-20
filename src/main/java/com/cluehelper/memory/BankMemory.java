@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Item;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
@@ -34,12 +36,15 @@ public class BankMemory
 	static final String PIN_KEY = "bankPin";
 	private static final Set<Integer> GROUP_IRONMAN = Set.of(4, 5, 6);
 	private static final int NO_PLACEHOLDER = -1;
+	private static final int NO_NOTE = -1;
+	private static final String DEPOSIT = "Deposit";
 
 	private final Client client;
 	private final MemorySlot<Seen> storedBank;
 	private final MemorySlot<Seen> storedGroup;
 	private final MemorySlot<Pin> pin;
 	private final Map<Integer, Boolean> placeholders = new HashMap<>();
+	private final LateDeposits lateDeposits = new LateDeposits();
 
 	private volatile Seen liveBank;
 	private volatile Seen liveGroup;
@@ -92,8 +97,13 @@ public class BankMemory
 
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (event.getContainerId() == InventoryID.BANK)
+		if (event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN)
 		{
+			lateDeposits.onCarried(carried(), client.getTickCount());
+		}
+		else if (event.getContainerId() == InventoryID.BANK)
+		{
+			lateDeposits.onBankSeen(client.getTickCount());
 			liveBank = seen(event.getItemContainer());
 			pinDoneThisSession = true;
 			unsaved = true;
@@ -120,7 +130,40 @@ public class BankMemory
 		else if (event.getGroupId() == InterfaceID.BANKMAIN)
 		{
 			bankOpen = true;
+			lateDeposits.onCarried(carried(), client.getTickCount());
 		}
+	}
+
+	public void onMenuOptionClicked(MenuOptionClicked event)
+	{
+		String option = event.getMenuOption();
+		if (bankOpen && option != null && option.regionMatches(true, 0, DEPOSIT, 0, DEPOSIT.length()))
+		{
+			lateDeposits.onDepositClicked(client.getTickCount());
+		}
+	}
+
+	/** Before the planner's tick: deposits the bank never confirmed are added to it (B16). */
+	public void onGameTick()
+	{
+		Map<Integer, Integer> deposited = lateDeposits.onTick();
+		Seen bank = getBank();
+		if (deposited.isEmpty() || bank == null)
+		{
+			return;
+		}
+		Seen updated = new Seen();
+		updated.seenAt = bank.seenAt;
+		updated.items = new HashMap<>(bank.items);
+		deposited.forEach((id, quantity) -> updated.items.merge(id, quantity, Integer::sum));
+		liveBank = updated;
+		unsaved = true;
+		version++;
+		if (!bankOpen)
+		{
+			save();
+		}
+		log.debug("deposits without a bank update: {}", deposited);
 	}
 
 	public void onWidgetClosed(WidgetClosed event)
@@ -203,6 +246,34 @@ public class BankMemory
 			}
 		}
 		return seen;
+	}
+
+	/** The inventory and equipment together, notes as the items they stand for: what a deposit puts in the bank. */
+	private Map<Integer, Integer> carried()
+	{
+		Map<Integer, Integer> carried = new HashMap<>();
+		for (int containerId : new int[]{InventoryID.INV, InventoryID.WORN})
+		{
+			ItemContainer container = client.getItemContainer(containerId);
+			if (container == null)
+			{
+				continue;
+			}
+			for (Item item : container.getItems())
+			{
+				if (item.getId() > 0 && item.getQuantity() > 0)
+				{
+					carried.merge(unnoted(item.getId()), item.getQuantity(), Integer::sum);
+				}
+			}
+		}
+		return carried;
+	}
+
+	private int unnoted(int id)
+	{
+		ItemComposition item = client.getItemDefinition(id);
+		return item.getNote() != NO_NOTE ? item.getLinkedNoteId() : id;
 	}
 
 	private boolean isPlaceholder(int id)

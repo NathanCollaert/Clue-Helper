@@ -11,8 +11,12 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import net.runelite.client.util.ImageUtil;
 
-/** Outlines the item the current sub-step uses, in the inventory and the equipment tab, and what to withdraw in the bank. */
+/**
+ * Outlines the item the current sub-step uses, in the inventory and the equipment tab, and what to withdraw in the bank;
+ * fills it too when its left click teleports straight there.
+ */
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
 
@@ -40,6 +44,11 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 			return;
 		}
 		Rectangle bounds = item.getCanvasBounds();
+		if (!inBank && guide.getFillItems().contains(itemId))
+		{
+			BufferedImage image = itemManager.getImage(itemId, item.getQuantity(), false);
+			graphics.drawImage(ImageUtil.fillImage(image, Markers.ONE_CLICK_FILL), bounds.x, bounds.y, null);
+		}
 		BufferedImage outline = itemManager.getItemOutline(itemId, item.getQuantity(), Markers.COLOUR);
 		graphics.drawImage(outline, bounds.x, bounds.y, null);
 	}

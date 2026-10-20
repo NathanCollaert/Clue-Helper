@@ -51,7 +51,9 @@ public class ConventionsTest
 		"highlightItems", "highlightSpells", "highlightMenus",
 		"pathLine", "minimapMarker", "worldMapMarker",
 		"spellbookChanges", "capeUsePenalty", "strandPenalty",
-		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks"));
+		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks",
+		"pohSource", "pohJewelleryBox", "pohMountedGlory", "pohGarden", "pohObelisk", "pohAltar", "pohMountedCape",
+		"pohMythicalCape", "pohPortals", "pohForget", "stashBuiltIsFilled"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 
@@ -133,7 +135,7 @@ public class ConventionsTest
 			assertTrue(type + " is declared 'public enum'", Files.readString(source).contains("public enum " + type));
 			enums++;
 		}
-		assertEquals("avoidWilderness, spellbookChanges, diggingDog", 3, enums);
+		assertEquals("avoidWilderness, spellbookChanges, diggingDog and five house settings", 8, enums);
 	}
 
 	@Test

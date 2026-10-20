@@ -146,6 +146,7 @@ public class ClueHelperDevPlugin extends Plugin
 		clearOldPngs(LANDING_FRAMES);
 		clearOldPngs(ROUTE_FRAMES);
 		clearOldPngs(GUIDE_FRAMES);
+		clearOldPngs(PohTrace.FRAMES);
 		SCENES.mkdirs();
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
@@ -158,6 +159,14 @@ public class ClueHelperDevPlugin extends Plugin
 			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
 		eventBus.register(bankTrace);
 		unregister.add(() -> eventBus.unregister(bankTrace));
+		PohTrace pohTrace = new PohTrace(client, clueHelper.getPoh(), clueHelper.getGuide(), clueHelper.getMenuLines(),
+			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+		eventBus.register(pohTrace);
+		unregister.add(() ->
+		{
+			eventBus.unregister(pohTrace);
+			pohTrace.stop();
+		});
 		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
 		if (autoRunPending)
 		{

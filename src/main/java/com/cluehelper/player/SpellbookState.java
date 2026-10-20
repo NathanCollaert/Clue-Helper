@@ -1,5 +1,7 @@
 package com.cluehelper.player;
 
+import java.util.EnumSet;
+import java.util.Set;
 import lombok.Value;
 
 /** The spellbook vars B04 confirmed live. */
@@ -22,4 +24,23 @@ public class SpellbookState
 	boolean lunarAccess;
 	/** Dream Mentor. */
 	boolean swapAccess;
+
+	/** Standard and every book the player has access to: where the cape or the occult altar can go. */
+	public Set<Book> usableBooks()
+	{
+		Set<Book> books = EnumSet.of(Book.STANDARD);
+		if (ancientAccess)
+		{
+			books.add(Book.ANCIENT);
+		}
+		if (lunarAccess)
+		{
+			books.add(Book.LUNAR);
+		}
+		if (arceuusUnlocked)
+		{
+			books.add(Book.ARCEUUS);
+		}
+		return books;
+	}
 }

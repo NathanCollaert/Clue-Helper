@@ -4,12 +4,16 @@ import com.cluehelper.guide.StepGuide;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.memory.StashMemory;
+import com.cluehelper.player.HouseState;
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.poh.PohService;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
+import com.cluehelper.ui.PanelModel;
 import com.cluehelper.ui.PanelState;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -45,6 +49,8 @@ public class DevHarness
 	private final RoutePlanner routes;
 	private final RouteDump routeDump;
 	private final StepGuide guide;
+	private final PohService poh;
+	private final StashMemory stash;
 	private String lastGuideLine;
 	private final RouteOverlay routeOverlay;
 	private final OverlayManager overlayManager;
@@ -55,8 +61,11 @@ public class DevHarness
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, SelfTestRunner selfTests, StepLogger stepLogger,
 		BuiltInSelfTests builtInSelfTests, ClueLink clueLink, Gson gson, PlayerModel player,
-		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager, StepGuide guide)
+		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager, StepGuide guide,
+		PohService poh, StashMemory stash)
 	{
+		this.poh = poh;
+		this.stash = stash;
 		this.client = client;
 		this.clientThread = clientThread;
 		this.selfTests = selfTests;
@@ -88,6 +97,9 @@ public class DevHarness
 		c.register("routes", "show the current step's routes; every candidate goes to the log", args ->
 			routeDump.describe(this::reply, line -> log.info("{}   {}", RouteDump.TAG, line)));
 		c.register("guide", "show the followed route's sub-steps and what is highlighted", args -> dumpGuide());
+		c.register("poh", "[forget] show what is known about your house, or forget it", this::house);
+		c.register("stash", "compare every STASH unit's built varbit, the core check (script 1479) and what we remember",
+			args -> clientThread.invokeLater(this::stashes));
 		c.register("overlay", "toggle the route graph overlay: walk-table nodes, scene BFS walks, origin class", args -> toggleOverlay());
 		for (SelfTest test : builtInSelfTests.create(shown, expected))
 		{
@@ -237,6 +249,35 @@ public class DevHarness
 		{
 			reply("  " + entry);
 		}
+	}
+
+	private void stashes()
+	{
+		int built = 0;
+		int core = 0;
+		for (int unit : StashMemory.unitObjects())
+		{
+			boolean isBuilt = stash.built(unit);
+			int check = stash.coreCheck(unit);
+			built += isBuilt ? 1 : 0;
+			core += check == 1 ? 1 : 0;
+			log.info("[CH-STASH] unit {} built {} script1479 {} remembered {}", unit, isBuilt, check, stash.state(unit));
+		}
+		reply(StashMemory.unitObjects().size() + " units: " + built + " built, " + core + " ticked by script 1479 (details in the log)");
+	}
+
+	private void house(String[] args)
+	{
+		if (args.length > 0 && args[0].equalsIgnoreCase("forget"))
+		{
+			poh.forget();
+		}
+		HouseState house = poh.getHouse();
+		reply("house: " + house.getSource() + (house.getScannedAt() == 0 ? ", never scanned" : ", scanned " + PanelModel.age(System.currentTimeMillis() - house.getScannedAt()))
+			+ "; in a house: " + poh.isInHouse() + " (" + poh.getOwnership() + ")");
+		reply("furniture " + house.getFurniture() + "; walks " + house.getWalkTicks());
+		reply(house.getNexusKeys().size() + " nexus destinations; left-click Xeric " + house.getXericLeftClick() + ", digsite "
+			+ house.getDigsiteLeftClick() + ", box line " + house.getBoxLeftClick());
 	}
 
 	private void reply(String message)

@@ -34,6 +34,8 @@ public class Requirements
 	Book book;
 	/** The row spends item charges (Shortest Path's Consumable = T), so unknown charges lower its confidence. */
 	boolean spendsCharges;
+	/** The house piece a POH row needs; null for rows outside the house (B16). */
+	HouseNeed house;
 	@Builder.Default
 	List<String> errors = List.of();
 }

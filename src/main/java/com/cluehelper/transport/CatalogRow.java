@@ -28,6 +28,12 @@ public class CatalogRow
 	@Builder.Default
 	List<Spend> spends = List.of();
 	Requirements requirements;
+	/**
+	 * How to find the row's line in the menu it opens (catalog Menu column, POH rows): {@code nexus 466 Wilderness}
+	 * (struct id, map region), {@code box 10} (script 1688's index), {@code list Xeric's Inferno} (a 187 line),
+	 * {@code op Karamja} (the object's own option); null otherwise.
+	 */
+	String menu;
 
 	/** Usable from anywhere: neither a fairy-ring entry nor a fairy-ring landing. */
 	public boolean isGlobal()

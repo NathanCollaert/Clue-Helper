@@ -36,7 +36,9 @@ public class PlanInput
 	/** Ticks left of a pending Spellbook Swap's free cast; {@link #NO_REVERT_WINDOW} when none or unknown. */
 	@Builder.Default
 	int revertTicksLeft = NO_REVERT_WINDOW;
-	/** Spellbook changes the game refused this session (PLAN §5.4 Consumption); never offered. */
+	/** Spellbook changes and teleports (by row name) the game refused this session (PLAN §5.4 Consumption); never offered. */
 	@Builder.Default
 	Set<String> refusedChanges = Set.of();
+	/** The plan starts inside a house that isn't the player's: its furniture is not theirs (B16). */
+	boolean foreignHouseStart;
 }

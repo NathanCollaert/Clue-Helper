@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
+import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Route;
@@ -10,11 +11,14 @@ import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.CatalogRow;
+import com.cluehelper.transport.Category;
 import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
@@ -29,6 +33,8 @@ public final class SubSteps
 	static final int AREA_ARRIVE_TILES = 15;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
+	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
+	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
 	private static final Map<String, String> CHANGE_WARNINGS = Map.of(
 		"Ancient Pyramid altar", "Drains your Prayer, and the way in crosses desert heat",
 		"Astral altar", "Aggressive suqahs nearby",
@@ -40,6 +46,12 @@ public final class SubSteps
 
 	/** @param itemNames item names for the withdraw list; client thread */
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames)
+	{
+		return of(route, step, itemNames, HouseState.NONE);
+	}
+
+	/** @param house for the nexus hotkeys, which follow the player's own slot order */
+	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house)
 	{
 		List<SubStep> steps = new ArrayList<>();
 		List<Leg> legs = route.getLegs();
@@ -62,10 +74,10 @@ public final class SubSteps
 					break;
 				case SWAP_TELEPORT:
 					steps.add(swap(leg));
-					steps.add(teleport(leg));
+					steps.add(teleport(leg, house));
 					break;
 				case TELEPORT:
-					steps.add(teleport(leg));
+					steps.add(teleport(leg, house));
 					break;
 				case FAIRY_RING:
 					steps.add(fairyRing(leg));
@@ -85,8 +97,8 @@ public final class SubSteps
 	}
 
 	/**
-	 * The withdraw list. Items core's *clue* tag already shows are only counted, never listed or outlined again
-	 * (they would duplicate core).
+	 * The withdraw list. Items core's *clue* tag already shows are only counted in the text, but outlined in the bank like
+	 * the rest (Nathan, B16: the spade must be easy to find).
 	 */
 	static SubStep withdraw(Route route, IntFunction<String> itemNames)
 	{
@@ -106,7 +118,7 @@ public final class SubSteps
 		String text = route.getWithdraw().isEmpty() ? "Close the bank" : "Withdraw " + String.join(", ", lines);
 		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text(text)
 			.detail(route.getWithdraw().isEmpty() ? null : "Then close the bank")
-			.bankItems(ours.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
+			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
 	private static SubStep walk(Leg leg, Leg next, Step step)
@@ -149,23 +161,27 @@ public final class SubSteps
 			.detail("Right-click Spellbook Swap, then pick the book").book(book).change(leg.getChange()).build();
 	}
 
-	private static SubStep teleport(Leg leg)
+	private static SubStep teleport(Leg leg, HouseState house)
 	{
 		CatalogRow row = leg.getRow();
-		return SubStep.builder().kind(SubStep.Kind.TELEPORT).text(teleportText(row)).detail(teleportDetail(row))
+		return SubStep.builder().kind(SubStep.Kind.TELEPORT).text(teleportText(row)).detail(withHotkey(teleportDetail(row), hotkey(row, house)))
 			.goal(leg.getTo()).radius(LANDING_TILES).row(row).build();
 	}
 
 	static String teleportText(CatalogRow row)
 	{
 		String name = row.getName();
+		if (row.getCategory().isHouse())
+		{
+			return houseText(row);
+		}
 		switch (row.getCategory())
 		{
 			case SPELL:
 			case HOME:
 				return "Cast " + name;
 			case MINIGAME:
-				return "Minigame teleport: " + name.replace(MINIGAME_SUFFIX, "");
+				return "Minigame teleport: " + minigameName(row);
 			case TABLET:
 				return "Break the " + name;
 			case SCROLL:
@@ -177,16 +193,105 @@ public final class SubSteps
 
 	private static String teleportDetail(CatalogRow row)
 	{
+		if (row.getCategory().isHouse())
+		{
+			return houseDetail(row);
+		}
 		switch (row.getCategory())
 		{
 			case SPELL:
 			case HOME:
 				return "Magic tab";
 			case MINIGAME:
-				return "Grouping tab: Teleport";
+				return "Magic tab: Minigame Teleport";
 			default:
 				return null;
 		}
+	}
+
+	/** "Castle Wars Minigame Teleport" → "Castle Wars", as the Grouping dropdown lists it. */
+	static String minigameName(CatalogRow row)
+	{
+		return row.getName().replace(MINIGAME_SUFFIX, "");
+	}
+
+	/**
+	 * The key that picks the row's line in the list it opens (Nathan, B16): the nexus slot's, the jewellery box line's, a
+	 * 187 list line's ("5: Feldip Hills"), or the number a catalog name gives ("Achievement diary cape: 7. Kaleb Paramaya");
+	 * 0 when there is none.
+	 */
+	static char hotkey(CatalogRow row, HouseState house)
+	{
+		String menu = row.getMenu();
+		if (menu != null && menu.startsWith("nexus "))
+		{
+			int struct = Integer.parseInt(menu.split(" ")[1]);
+			Integer line = house.getNexusLines().get(struct);
+			return line == null || line < 1 || line > MenuLines.HOTKEYS.length() ? 0 : MenuLines.HOTKEYS.charAt(line - 1);
+		}
+		if (menu != null && menu.startsWith("box "))
+		{
+			int line = Integer.parseInt(menu.substring("box ".length()));
+			return line < MenuLines.HOTKEYS.length() ? MenuLines.HOTKEYS.charAt(line) : 0;
+		}
+		String label = menu != null && menu.startsWith("list ") ? menu.substring("list ".length())
+			: row.getName().substring(row.getName().lastIndexOf(": ") + 2);
+		Matcher key = LIST_HOTKEY.matcher(label);
+		return key.find() ? key.group(1).charAt(0) : 0;
+	}
+
+	private static String withHotkey(String detail, char key)
+	{
+		if (key == 0)
+		{
+			return detail;
+		}
+		String press = "press " + key;
+		return detail == null ? "In the list, " + press : detail + ", then " + press;
+	}
+
+	/** "Portal nexus → Annakarl": the piece, then the place, without the left/right-click note of the catalog name. */
+	static String houseText(CatalogRow row)
+	{
+		String name = CLICK_NOTE.matcher(row.getName()).replaceFirst("");
+		int colon = name.indexOf(": ");
+		if (row.getCategory() == Category.PORTAL)
+		{
+			return "Enter the " + name.substring(colon + 2) + " portal";
+		}
+		return colon < 0 ? "Use the " + name.toLowerCase() : name.substring(0, colon) + " → " + name.substring(colon + 2);
+	}
+
+	/** How to pick it: the nexus map region first, the box's teleport menu, or the object's own option. */
+	private static String houseDetail(CatalogRow row)
+	{
+		String menu = row.getMenu();
+		if (menu == null)
+		{
+			return null;
+		}
+		String[] parts = menu.split(" ", 2);
+		switch (parts[0])
+		{
+			case "nexus":
+				return "Teleport Menu (map: " + parts[1].split(" ", 2)[1] + ")";
+			case "box":
+				return "Teleport Menu";
+			case "op":
+				return row.getMenuTicks() == 0 ? "Left-click" : "Right-click: " + parts[1];
+			case "list":
+				return "Right-click: Teleport menu";
+			default:
+				return null;
+		}
+	}
+
+	/** The nexus destination as the cache names it: "Portal nexus: Respawn (Camelot)" → "Respawn". */
+	static String nexusPlace(String rowName)
+	{
+		String place = rowName.substring(rowName.indexOf(": ") + 2);
+		int bracket = place.indexOf(" (");
+		return bracket < 0 ? place : place.substring(0, bracket);
 	}
 
 	private static SubStep fairyRing(Leg leg)

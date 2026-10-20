@@ -138,6 +138,14 @@ public class CatalogSchemaTest
 		{
 			refs.add("object:" + menu.substring(menu.lastIndexOf(' ') + 1));
 		}
+		String house = line.get(RequirementParser.HOUSE);
+		if (house.startsWith("object:"))
+		{
+			for (String id : house.substring("object:".length()).split("\\|"))
+			{
+				refs.add("object:" + id);
+			}
+		}
 		Matcher where = WHERE_ID.matcher(line.get(CatalogLoader.WHERE));
 		while (where.find())
 		{

@@ -15,6 +15,8 @@ final class Markers
 {
 	static final Color COLOUR = new Color(64, 208, 255);
 	static final Color FILL = new Color(64, 208, 255, 40);
+	/** An item or object whose left click teleports straight there. */
+	static final Color ONE_CLICK_FILL = new Color(64, 208, 255, 90);
 	static final Color OUTLINE = new Color(0, 0, 0, 200);
 	private static final int DIAMOND = 14;
 	private static final int ARROW_WIDTH = 18;

@@ -1,5 +1,6 @@
 package com.cluehelper.memory;
 
+import com.cluehelper.ClueHelperConfig;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,9 @@ import net.runelite.client.util.Text;
 
 /**
  * What the player's STASH units hold (PLAN §5.2, B13). Built state is each unit's own varbit, read live; filled
- * state has no var, so it is learned from the two Search chat lines and remembered per unit with the date. A
- * unit never seen is unknown, which never counts as filled. Client thread.
+ * state has no var (the Clue Scroll plugin's tick, script 1479, is built state too: B16 emptied a unit and it stayed
+ * 1), so it is learned from the two Search chat lines and remembered per unit with the date. A unit never seen counts
+ * as filled while {@code stashBuiltIsFilled} is on (Nathan, B16), else as unknown. Client thread.
  */
 @Singleton
 public class StashMemory
@@ -34,21 +36,24 @@ public class StashMemory
 	/** A Search line lands 0–3 ticks after the click, or 8 when the first Search of a session asks for the PIN (B13). */
 	static final int SEARCH_LINE_TICKS = 8;
 	private static final String SEARCH = "Search";
+	private static final int CORE_STASH_SCRIPT = 1479;
 	private static final int BUILT = 1;
 	private static final int NOT_SEEN = -1;
 	private static final Set<Integer> UNIT_OBJECTS = Arrays.stream(STASHUnit.values()).map(STASHUnit::getObjectId)
 		.collect(Collectors.toUnmodifiableSet());
 
 	private final Client client;
+	private final ClueHelperConfig config;
 	private final MemorySlot<Units> remembered;
 	private final Map<Integer, Integer> builtVarbits = new HashMap<>();
 	private int lastSearchObject = NOT_SEEN;
 	private int lastSearchTick;
 
 	@Inject
-	StashMemory(Client client, MemoryStore memory)
+	StashMemory(Client client, MemoryStore memory, ClueHelperConfig config)
 	{
 		this.client = client;
+		this.config = config;
 		this.remembered = memory.slot(KEY, Units.class, Units::new);
 	}
 
@@ -60,7 +65,34 @@ public class StashMemory
 			return State.NOT_BUILT;
 		}
 		Seen seen = remembered.get().units.get(objectId);
-		return seen == null ? State.UNKNOWN : seen.filled ? State.FILLED : State.EMPTY;
+		if (seen == null)
+		{
+			return config.stashBuiltIsFilled() ? State.FILLED : State.UNKNOWN;
+		}
+		return seen.filled ? State.FILLED : State.EMPTY;
+	}
+
+	/**
+	 * The Clue Scroll plugin's STASH tick: game script 1479 with the unit's object id leaves 1 or 0 on the int stack.
+	 * B16 checks live whether it means built or filled. Client thread, outside any script: scripts don't nest (a call
+	 * from a chat command's handler trips the client's assertion).
+	 */
+	public int coreCheck(int objectId)
+	{
+		client.runScript(CORE_STASH_SCRIPT, objectId, 0, 0, 0);
+		return client.getIntStack()[0];
+	}
+
+	/** Every unit's object id, for the dev probe. */
+	public static Set<Integer> unitObjects()
+	{
+		return UNIT_OBJECTS;
+	}
+
+	/** Whether the unit is built (its varbit), for the dev probe. */
+	public boolean built(int objectId)
+	{
+		return isBuilt(objectId);
 	}
 
 	/** When the unit's state was last seen (epoch millis), or 0. */

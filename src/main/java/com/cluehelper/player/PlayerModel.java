@@ -81,6 +81,7 @@ public class PlayerModel
 	private boolean questsRead;
 	private volatile boolean questsDirty;
 	private volatile boolean dirty;
+	private HouseState house = HouseState.NONE;
 	private String dirtyBecause;
 	private long version;
 
@@ -214,6 +215,13 @@ public class PlayerModel
 	public void onStatChanged()
 	{
 		markDirty("stats");
+	}
+
+	/** The house state changed (PohService, B16). Client thread. */
+	public void setHouse(HouseState next)
+	{
+		house = next;
+		markDirty("house");
 	}
 
 	/** A Check line taught a charge count. */
@@ -411,6 +419,7 @@ public class PlayerModel
 			.spellbook(spellbook())
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
+			.house(house)
 			.build();
 	}
 

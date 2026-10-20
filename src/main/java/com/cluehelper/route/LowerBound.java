@@ -1,6 +1,7 @@
 package com.cluehelper.route;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -28,6 +29,13 @@ final class LowerBound
 			for (PlanContext.Teleport tele : options.teleports)
 			{
 				cheapest = Math.min(cheapest, tele.halfTicks + walk[tele.node]);
+			}
+			for (List<PlanContext.Teleport> here : options.located.values())
+			{
+				for (PlanContext.Teleport tele : here)
+				{
+					cheapest = Math.min(cheapest, tele.halfTicks + walk[tele.node]);
+				}
 			}
 			int fairy = options.fairyEntries.values().stream().mapToInt(e -> e.halfTicks).min().orElse(UNREACHABLE);
 			for (PlanContext.Teleport landing : options.fairyLandings)

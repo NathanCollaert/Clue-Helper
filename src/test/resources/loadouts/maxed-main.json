@@ -7,7 +7,7 @@
   "skills": { "default": 99 },
   "maxTotal": true,
   "quests": "all",
-  "vars": { "default": "pass", "values": { "4070": 0, "2187": 8, "4744": 0, "4560": 0 } },
+  "vars": { "default": "pass", "values": { "4070": 0, "2187": 8, "4744": 0, "4560": 0, "2308": 20, "6617": 3, "6651": 2 } },
   "book": "standard",
   "runes": true,
   "fixedTransportItems": true,

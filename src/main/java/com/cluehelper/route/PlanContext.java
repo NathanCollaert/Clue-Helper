@@ -4,11 +4,15 @@ import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Charge;
 import com.cluehelper.player.Container;
+import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.player.SpellbookState;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
+import com.cluehelper.transport.HouseNeed;
+import com.cluehelper.transport.Requirements;
 import com.cluehelper.transport.RowAvailability;
 import com.cluehelper.transport.SpellbookChange;
 import com.cluehelper.transport.Spend;
@@ -44,6 +48,8 @@ final class PlanContext
 	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
 	static final int SWAP_DURATION_TICKS = 4;
 	static final int SWAP_MENU_TICKS = 1;
+	/** Entering the house: the scene loads about a tick after the transport's own landing (B14). */
+	static final int HOUSE_LOAD_HALF_TICKS = 2;
 	private static final OriginClass[] ABSTRACT_CLASSES = {OriginClass.WILD0, OriginClass.WILD20, OriginClass.WILD30, OriginClass.POH};
 
 	final PlanInput in;
@@ -51,6 +57,8 @@ final class PlanContext
 	final WalkGates gates;
 	final int start;
 	final int goal;
+	/** The walk table's POH node, or {@link WalkTable#NO_NODE}. */
+	final int pohNode;
 	private final int abstractBase;
 	private final List<WorldPoint> extraTiles = new ArrayList<>();
 	private final Map<WorldPoint, Integer> extraNodes = new HashMap<>();
@@ -74,6 +82,7 @@ final class PlanContext
 	final int[] requiredWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
+	private Map<Integer, Integer> rowsPerItem;
 
 	PlanContext(PlanInput in)
 	{
@@ -84,6 +93,7 @@ final class PlanContext
 		start = t;
 		abstractBase = t + 1;
 		goal = abstractBase + ABSTRACT_CLASSES.length;
+		pohNode = table.node(PositionRules.POH_NODE);
 		SpellbookState book = in.getPlayer().getSpellbook();
 		boolean pending = book != null && book.isPendingRevert() && in.getRevertTicksLeft() > 0 && book.getBook() != Book.LUNAR;
 		startPending = pending;
@@ -123,7 +133,7 @@ final class PlanContext
 			bankItemUses = new boolean[nodeCount()];
 			banked.fairyEntries.forEach((at, entry) -> bankItemUses[at] |= entry.withdraw.length > 0
 				|| banked.fairyLandings.stream().anyMatch(landing -> landing.withdraw.length > 0));
-			banked.located.forEach((at, change) -> bankItemUses[at] |= change.withdraw.length > 0);
+			banked.changes.forEach((at, changes) -> changes.forEach(change -> bankItemUses[at] |= change.withdraw.length > 0));
 		}
 		return node < bankItemUses.length && bankItemUses[node];
 	}
@@ -238,6 +248,15 @@ final class PlanContext
 		return origin.allowsTeleports();
 	}
 
+	/**
+	 * The house furniture at this node can be used: not while the route is still in someone else's house (a start
+	 * there, before any transport), since the furniture judged is the player's own (B16).
+	 */
+	boolean houseUsable(int node, int hasTransport)
+	{
+		return node != pohNode || hasTransport == 1 || !in.isForeignHouseStart();
+	}
+
 	/** Ranking cost of finishing on {@code book}: the cheapest way back, else the strand penalty (PLAN §5.4). */
 	int strandHalfTicks(Book book, int bankState, int capeUsesSpent)
 	{
@@ -278,24 +297,22 @@ final class PlanContext
 			}
 			if (o.cape != null && state != null)
 			{
-				reachable.add(Book.STANDARD);
-				if (state.isAncientAccess())
-				{
-					reachable.add(Book.ANCIENT);
-				}
-				if (state.isLunarAccess())
-				{
-					reachable.add(Book.LUNAR);
-				}
-				if (state.isArceuusUnlocked())
-				{
-					reachable.add(Book.ARCEUUS);
-				}
+				reachable.addAll(state.usableBooks());
 			}
-			for (Change located : o.located.values())
+			for (List<Change> changes : o.changes.values())
 			{
-				reachable.add(located.change.getToggles());
-				reachable.add(Book.STANDARD);
+				for (Change located : changes)
+				{
+					if (located.change.getToggles() != null)
+					{
+						reachable.add(located.change.getToggles());
+					}
+					else if (state != null)
+					{
+						reachable.addAll(state.usableBooks());
+					}
+					reachable.add(Book.STANDARD);
+				}
 			}
 		}
 		for (Book book : reachable)
@@ -345,7 +362,10 @@ final class PlanContext
 		final List<Teleport> teleports = new ArrayList<>();
 		final Map<Integer, Teleport> fairyEntries = new HashMap<>();
 		final List<Teleport> fairyLandings = new ArrayList<>();
-		final Map<Integer, Change> located = new HashMap<>();
+		/** Transports that start at a node: the house furniture at the POH node (B16). */
+		final Map<Integer, List<Teleport>> located = new HashMap<>();
+		/** Altars, Tyss and the house's altars and mounted capes, by the node they are used at. */
+		final Map<Integer, List<Change>> changes = new HashMap<>();
 		Change cape;
 		Change swap;
 
@@ -355,16 +375,26 @@ final class PlanContext
 			Map<String, Teleport> longestVariant = new LinkedHashMap<>();
 			for (CatalogRow row : in.getCatalog().getTeleports())
 			{
+				if (in.getRefusedChanges().contains(row.getName()))
+				{
+					continue;
+				}
 				RowAvailability judged = in.getEngine().judge(row, judgedAt, in.getNowMinutes());
 				if (!judged.isAvailable())
 				{
 					continue;
 				}
 				Teleport tele = teleport(judged, player, bankState);
-				if (row.getOrigin() != null)
+				if (row.getOrigin() != null && row.getCategory() == Category.FAIRY_RING)
 				{
 					tele.node = nodeAt(row.getOrigin());
+					tele.halfTicks += houseWalkHalfTicks(row.getRequirements(), player);
 					fairyEntries.merge(tele.node, tele, (a, b) -> a.halfTicks <= b.halfTicks ? a : b);
+				}
+				else if (row.getOrigin() != null)
+				{
+					tele.halfTicks += houseWalkHalfTicks(row.getRequirements(), player);
+					located.computeIfAbsent(nodeAt(row.getOrigin()), k -> new ArrayList<>()).add(tele);
 				}
 				else if (row.getCode() != null)
 				{
@@ -376,9 +406,10 @@ final class PlanContext
 				}
 			}
 			teleports.addAll(longestVariant.values());
+			keepMostVersatileWithdraws(teleports);
 			for (SpellbookChange change : in.getCatalog().getSpellbookChanges())
 			{
-				if (change.isInHouse() || in.getRefusedChanges().contains(change.getName()))
+				if (change.isInHouse() && pohNode == WalkTable.NO_NODE || in.getRefusedChanges().contains(change.getName()))
 				{
 					continue;
 				}
@@ -399,10 +430,29 @@ final class PlanContext
 				}
 				else
 				{
-					c.node = nodeAt(change.getTile());
-					located.put(c.node, c);
+					c.node = change.isInHouse() ? pohNode : nodeAt(change.getTile());
+					c.halfTicks += houseWalkHalfTicks(change.getRequirements(), player);
+					changes.computeIfAbsent(c.node, k -> new ArrayList<>()).add(c);
 				}
 			}
+		}
+
+		/**
+		 * Two banked items that give the same teleport for the same ticks: only the one with more teleports of its own is
+		 * withdrawn (Nathan, B16: the Construction cape was taken out where the Max cape does the same and more).
+		 */
+		private void keepMostVersatileWithdraws(List<Teleport> all)
+		{
+			Map<String, Teleport> kept = new HashMap<>();
+			for (Teleport tele : all)
+			{
+				if (tele.withdraw.length > 0)
+				{
+					kept.merge(tele.node + "|" + tele.halfTicks + "|" + tele.book, tele,
+						(a, b) -> versatility(b.withdraw) > versatility(a.withdraw) ? b : a);
+				}
+			}
+			all.removeIf(tele -> tele.withdraw.length > 0 && kept.get(tele.node + "|" + tele.halfTicks + "|" + tele.book) != tele);
 		}
 
 		/** Home and minigame rows come once per animation override; with several on, the game picks one, so the longest counts. */
@@ -417,7 +467,8 @@ final class PlanContext
 			Teleport tele = new Teleport();
 			tele.row = row;
 			tele.node = row.getDestination() == null ? WalkTable.NO_NODE : nodeAt(row.getDestination());
-			tele.halfTicks = 2 * (row.getDuration() + row.getMenuTicks() + LEG_OVERHEAD_TICKS);
+			tele.halfTicks = 2 * (row.getDuration() + row.getMenuTicks() + LEG_OVERHEAD_TICKS)
+				+ (tele.node != WalkTable.NO_NODE && tele.node == pohNode ? HOUSE_LOAD_HALF_TICKS : 0);
 			tele.book = row.getRequirements().getBook();
 			tele.confidence = judged.getConfidence();
 			tele.minigame = row.getCategory() == Category.MINIGAME;
@@ -445,6 +496,38 @@ final class PlanContext
 			c.withdraw = ids(c.withdrawUses);
 			return c;
 		}
+	}
+
+	/** The walk inside the house to the piece a row needs: learned by the scan, else 4 ticks (PLAN §5.4 Cost). */
+	private static int houseWalkHalfTicks(Requirements requirements, PlayerSnapshot player)
+	{
+		HouseNeed need = requirements.getHouse();
+		if (need == null)
+		{
+			return 0;
+		}
+		HouseState house = player.getHouse();
+		return 2 * house.walkTicks(need.getKind() == HouseNeed.Kind.NEXUS ? HouseState.NEXUS_OBJECTS : need.getIds());
+	}
+
+	/** How many catalog rows these items unlock between them. */
+	private int versatility(int[] itemIds)
+	{
+		if (rowsPerItem == null)
+		{
+			rowsPerItem = new HashMap<>();
+			for (CatalogRow row : in.getCatalog().getTeleports())
+			{
+				row.getRequirements().getItems().forEach(clause -> clause.getBranches().forEach(branch ->
+					branch.getIds().forEach(id -> rowsPerItem.merge(id, 1, Integer::sum))));
+			}
+		}
+		int rows = 0;
+		for (int id : itemIds)
+		{
+			rows += rowsPerItem.getOrDefault(id, 0);
+		}
+		return rows;
 	}
 
 	private static List<ItemUse> withdrawUses(List<ItemUse> witness)

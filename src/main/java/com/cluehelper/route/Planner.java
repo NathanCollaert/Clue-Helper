@@ -209,7 +209,8 @@ public final class Planner
 	/** Where the route's first transport lands; null for a walk. */
 	private static WorldPoint firstLanding(Route route)
 	{
-		return route.getLegs().stream().filter(Leg::isTransport).findFirst().map(Leg::getTo).orElse(null);
+		Leg first = route.getFirstTransport();
+		return first == null ? null : first.getTo();
 	}
 
 	/**

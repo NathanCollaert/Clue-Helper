@@ -6,8 +6,10 @@ import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Charge;
 import com.cluehelper.player.Container;
+import com.cluehelper.player.HouseState;
 import com.cluehelper.player.Loadouts;
 import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.player.RuneModel;
 import com.cluehelper.player.SpellbookState;
 import com.cluehelper.step.ClueTypes;
@@ -31,10 +33,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 import org.junit.BeforeClass;
@@ -179,6 +183,7 @@ public class GoldenRoutesTest
 		lines.add(line("bank tipping point: mid-ironman, bank on, to Varrock bank crates",
 			checked(input(mid, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(midBank).build())));
 		bankCases(lines, maxed, mid, midBank, bankOn);
+		houseCases(lines, maxed, plain);
 		lines.add(line("start on a node: standing at the Varrock Teleport landing, to Varrock bank crates",
 			checked(input(mid, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3213, 3424, 0))), plain).build())));
 
@@ -233,10 +238,51 @@ public class GoldenRoutesTest
 					.banked(emoteItemBanked).build())));
 		}
 
+		Set<Integer> capes = Set.of(ItemID.SKILLCAPE_MAX, ItemID.SKILLCAPE_MAX_WORN, ItemID.SKILLCAPE_CONSTRUCTION,
+			ItemID.SKILLCAPE_CONSTRUCTION_TRIMMED);
+		PlayerSnapshot capesBanked = withoutAll(maxed, capes);
+		Map<Integer, Integer> capesBank = merged(merged(capesBanked.getBank(), ItemID.SKILLCAPE_MAX), ItemID.SKILLCAPE_CONSTRUCTION_TRIMMED);
+		int craftingGuildBank = table.node(new WorldPoint(2935, 3280, 0));
+		lines.add(line("Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley shop boxes",
+			checked(input(capesBanked, step("cryptic:search the boxes in a shop in taverley."), PlanStart.atNode(table, craftingGuildBank), bankOn)
+				.atOpenBank(true).banked(capesBanked.toBuilder().bank(capesBank).build()).build())));
+
 		int geBank = table.node(new WorldPoint(3162, 3489, 0));
 		lines.add(line("at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required",
 			checked(input(mid, step("cryptic:search the crates in a bank in varrock."), PlanStart.atNode(table, geBank), bankOn)
 				.atOpenBank(true).required(spade).banked(midBank.toBuilder().bank(merged(midBank.getBank(), ItemID.SPADE)).build()).build())));
+	}
+
+	/**
+	 * B16: Nathan's house. Burthorpe castle steps (box vs Max cape: Warriors' Guild); his Fountain of Rune case through
+	 * the nexus, and through the occult altar when the house has no nexus; a profile known only from varbits; starting
+	 * inside the own house, and inside a stranger's (its furniture isn't the player's).
+	 */
+	private static void houseCases(List<String> lines, PlayerSnapshot maxed, PlannerSettings plain)
+	{
+		Step burthorpe = step("anagram:12071");
+		Step fountain = step("coordinate:12101");
+		HouseState full = Loadouts.nathansHouse();
+		PlayerSnapshot noNecklace = without(maxed, Loadouts.itemId("Games necklace"));
+		lines.add(line("house: Burthorpe castle steps (Eohric), no games necklace, Nathan's house",
+			checked(input(noNecklace, burthorpe, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("house: Burthorpe castle steps (Eohric), no games necklace, no house",
+			checked(input(noNecklace.toBuilder().house(HouseState.NONE).build(), burthorpe, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		PlayerSnapshot arceuus = capeUsesLeft(onBook(maxed, Book.ARCEUUS, false), 0);
+		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, Nathan's house",
+			checked(input(arceuus, fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus (B10's case)",
+			checked(input(arceuus.toBuilder().house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_ALTAR_OCCULT)).build()).build(),
+				fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		HouseState varbitsOnly = full.toBuilder().furniture(Set.of(ObjectID.POH_AMULET_XERIC_INFERNO, ObjectID.POH_AMULET_DIG_FOSSIL,
+			ObjectID.POH_JEWELLERY_BOX_3)).source(HouseState.Source.VARBITS).scannedAt(0).build();
+		lines.add(line("house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)",
+			checked(input(arceuus.toBuilder().house(varbitsOnly).build(), fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		PlanStart inside = PlanStart.atNode(table, table.node(PositionRules.POH_NODE));
+		lines.add(line("house: standing in the own house, Burthorpe castle steps",
+			checked(input(maxed, burthorpe, inside, plain).build())));
+		lines.add(line("house: standing in a stranger's house, Burthorpe castle steps",
+			checked(input(maxed, burthorpe, inside, plain).foreignHouseStart(true).build())));
 	}
 
 	private static RequiredItems.Need need(String name, ItemRequirement requirement, boolean stepItem)
@@ -255,6 +301,17 @@ public class GoldenRoutesTest
 		Map<Integer, Integer> inventory = new HashMap<>(player.getInventory());
 		inventory.put(itemId, 1);
 		return player.toBuilder().inventory(inventory).build();
+	}
+
+	private static PlayerSnapshot withoutAll(PlayerSnapshot player, Set<Integer> itemIds)
+	{
+		Map<Integer, Integer> inventory = new HashMap<>(player.getInventory());
+		Map<Integer, Integer> worn = new HashMap<>(player.getWorn());
+		Map<Integer, Integer> bank = new HashMap<>(player.getBank());
+		inventory.keySet().removeAll(itemIds);
+		worn.keySet().removeAll(itemIds);
+		bank.keySet().removeAll(itemIds);
+		return player.toBuilder().inventory(inventory).worn(worn).bank(bank).build();
 	}
 
 	private static Map<Integer, Integer> merged(Map<Integer, Integer> bank, int itemId)
@@ -460,6 +517,13 @@ public class GoldenRoutesTest
 		varbits.put(4070, book.ordinal());
 		return player.toBuilder().varbits(varbits).spellbook(new SpellbookState(book, pending, s.getCapeChangesLeft(),
 			s.isArceuusUnlocked(), s.isAncientAccess(), s.isLunarAccess(), s.isSwapAccess())).build();
+	}
+
+	private static PlayerSnapshot without(PlayerSnapshot player, int itemId)
+	{
+		Map<Integer, Integer> inventory = new HashMap<>(player.getInventory());
+		inventory.remove(itemId);
+		return player.toBuilder().inventory(inventory).build();
 	}
 
 	private static PlayerSnapshot capeUsesLeft(PlayerSnapshot player, int left)

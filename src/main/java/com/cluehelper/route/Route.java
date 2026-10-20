@@ -2,6 +2,7 @@ package com.cluehelper.route;
 
 import com.cluehelper.player.Book;
 import com.cluehelper.player.ItemUse;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.RowAvailability;
 import java.util.List;
@@ -79,10 +80,27 @@ public class Route
 		return changes.isEmpty() ? id.toString() : id + " | " + changes;
 	}
 
-	/** The first transport with its destination, or "walk". Alternatives are searched without it. */
+	/**
+	 * The first transport with its destination, or "walk". Alternatives are searched without it. A way into the house
+	 * followed by the house's own transport counts as that transport: otherwise one house route would hide all others.
+	 */
 	public String getFirstTransportKey()
 	{
-		return legs.stream().filter(Leg::isTransport).findFirst().map(Route::transportKey).orElse(WALK);
+		Leg first = getFirstTransport();
+		return first == null ? WALK : transportKey(first);
+	}
+
+	/** The first transport, past a way into the house that the house's own transport follows; null for a walk. */
+	public Leg getFirstTransport()
+	{
+		List<Leg> transports = legs.stream().filter(Leg::isTransport).collect(Collectors.toList());
+		if (transports.isEmpty())
+		{
+			return null;
+		}
+		Leg first = transports.get(0);
+		boolean intoHouse = PositionRules.POH_NODE.equals(first.getTo()) && transports.size() > 1;
+		return intoHouse ? transports.get(1) : first;
 	}
 
 	/**

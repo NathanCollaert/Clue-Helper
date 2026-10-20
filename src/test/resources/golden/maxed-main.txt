@@ -2,47 +2,47 @@ anagram:12055
   best      10t: Fishing cape: Otto's Grotto → walk 5
 anagram:12568
   best      20t (rank 28): Max cape: Spellbook → ARCEUUS → Barrows Teleport → walk 14 {cape=1, item:565=1, item:563=2, item:566=2} leaves you on ARCEUUS
-  same book 43t: Master scroll book: Mort'ton teleport → walk 38 {charge:21389=1}
+  same book 30t: Teleport to House → Portal nexus: Barrows → walk 14 {item:556=1, item:557=1, item:563=1}
+  alt       43t: Master scroll book: Mort'ton teleport → walk 38 {charge:21389=1}
 anagram:19758
   best      60t: Amulet of glory: Edgeville → walk 55 {charge:1712=1}
+  alt       68t: Teleport to House → House obelisk: Level 13 Wilderness → walk 53 {item:556=1, item:557=1, item:563=1}
   alt       68t: Ring of dueling: Ferox Enclave → walk 63 {charge:2552=1}
-  alt       75t: Varrock Teleport: Grand Exchange → walk 70 {item:556=3, item:554=1, item:563=1}
 anagram:25784
   best      28t: Xeric's talisman: 1. Xeric's Lookout → walk 23 {charge:13393=1}
+  alt       39t: Teleport to House → Mounted Xeric's talisman: Lookout → walk 23 {item:556=1, item:557=1, item:563=1}
   alt       54t: Book of the dead: History and Hearsay → walk 49 {charge:25818=1}
-  alt       57t: Master scroll book: Watson teleport → walk 52 {charge:21389=1}
 anagram:7268
   best      51t: Slayer ring: Stronghold → walk 46 {charge:11866=1}
   alt       65t: Royal seed pod → walk 54
-  alt       95t: Necklace of passage: The Outpost → walk 90 {charge:21146=1}
+  alt       69t: Teleport to House → Spirit tree: Gnome Stronghold → walk 53 {item:556=1, item:557=1, item:563=1}
 anagram:duo plug
-  best      92t (rank 100): Max cape: Spellbook → ARCEUUS → Ape Atoll Teleport → walk 86 {cape=1, item:565=2, item:563=2, item:566=2} leaves you on ARCEUUS
+  best      45t: Teleport to House → Portal nexus: Marim → walk 29 {item:556=1, item:557=1, item:563=1}
 map:w346
-  best      32t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 13 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
-  direct    45t: Skills necklace: Cooking Guild → walk 40 {charge:11968=1}
-  alt       48t: Varrock Teleport → walk 44 {item:556=3, item:554=1, item:563=1}
-  alt       54t (rank 62): Max cape: Spellbook → ARCEUUS → Draynor Manor Teleport → walk 48 {cape=1, item:557=1, item:555=1, item:563=1} leaves you on ARCEUUS
+  best      30t: Teleport to House → Jewellery box: Champions' Guild → walk 13 {item:556=1, item:557=1, item:563=1}
+  alt       32t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 13 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
+  alt       45t: Skills necklace: Cooking Guild → walk 40 {charge:11968=1}
 map:w347
   best      33t (rank 41): Max cape: Spellbook → ANCIENT → Senntisten Teleport → walk 26 {cape=1, item:563=2, item:566=1} leaves you on ANCIENT
-  same book 43t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
+  same book 42t: Teleport to House → Portal nexus: Senntisten → walk 26 {item:556=1, item:557=1, item:563=1}
+  alt       43t: Civitas illa Fortis Teleport → walk 39 {item:557=1, item:554=1, item:563=2}
   alt       50t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
-  alt       44t (rank 52): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 38 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
 map:w348
   best      20t: Amulet of glory: Draynor Village → walk 15 {charge:1712=1}
+  alt       29t: Teleport to House → Mounted glory: Draynor Village → walk 15 {item:556=1, item:557=1, item:563=1}
   alt       33t: Necklace of passage: Wizards' Tower → walk 28 {charge:21146=1}
 map:w351
   best      51t: Skills necklace: Mining Guild → walk 46 {charge:11968=1}
   alt       53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
   alt       54t: Ring of wealth: Falador Park → walk 49 {charge:11980=1}
 map:w356
-  best      21t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
-  alt       28t: Slayer ring: Fremennik → walk 12 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11866=1}
-  alt       28t: Ring of wealth: Miscellania → walk 13 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11980=1}
+  best      20t: Teleport to House → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {item:556=1, item:557=1, item:563=1}
+  alt       21t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
 cipher:19762
   best      25t (rank 33): Max cape: Spellbook → ARCEUUS → Arceuus Library Teleport → walk 19 {cape=1, item:557=2, item:563=1} leaves you on ARCEUUS
-  same book 38t: Book of the dead: A Dark Disposition → walk 33 {charge:25818=1}
+  same book 35t: Teleport to House → Portal nexus: Arceuus Library → walk 19 {item:556=1, item:557=1, item:563=1}
+  alt       38t: Book of the dead: A Dark Disposition → walk 33 {charge:25818=1}
   alt       51t: Book of the dead: Jewelry of Jubilation → walk 46 {charge:25818=1}
-  alt       61t: Slayer ring: Fremennik → walk 12 → Fairy ring CIS: Great Kourend: Arceuus Library → walk 36 {charge:11866=1}
 cipher:19768
   best      26t: Construction cape: Pollnivneach → walk 21
   alt       42t: Master scroll book: Nardah teleport → walk 37 {charge:21389=1}
@@ -50,22 +50,23 @@ cipher:19768
 cipher:19898
   best      57t: Eternal teleport crystal: Lletya → walk 52
 cipher:19904
-  best      47t: Slayer ring: Fremennik → walk 12 → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 22 {charge:11866=1}
-  alt       48t: Ring of wealth: Miscellania → walk 13 → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 22 {charge:11980=1}
-  alt       52t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 22 {charge:21389=1}
+  best      39t: Teleport to House → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 22 {item:556=1, item:557=1, item:563=1}
+  alt       57t: Desert amulet 4: Kalphite cave → walk 52
+  alt       65t: Lumbridge Teleport → walk 61 {item:556=3, item:557=1, item:563=1}
 cipher:19910
-  best      53t: Slayer ring: Fremennik → walk 12 → Fairy ring AIR-DLR-DJQ-AJS → walk 15 {charge:11866=1}
-  alt       53t: Ring of wealth: Miscellania → walk 13 → Fairy ring AIR-DLR-DJQ-AJS → walk 15 {charge:11980=1}
-  alt       57t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring AIR-DLR-DJQ-AJS → walk 15 {charge:21389=1}
+  best      41t: Teleport to House → Fairy ring AIR-DLR-DJQ-AJS → walk 15 {item:556=1, item:557=1, item:563=1}
 cipher:23172
   best      24t (rank 32): Max cape: Spellbook → LUNAR → Barbarian Teleport → walk 18 {cape=1, item:554=3, item:9075=2, item:563=2} leaves you on LUNAR
-  same book 38t: Games necklace: Barbarian Outpost → walk 33 {charge:3853=1}
+  same book 34t: Teleport to House → Portal nexus: Barbarian Outpost → walk 18 {item:556=1, item:557=1, item:563=1}
+  alt       38t: Games necklace: Barbarian Outpost → walk 33 {charge:3853=1}
+  alt       50t: Teleport to House → Jewellery box: Barbarian Outpost → walk 33 {item:556=1, item:557=1, item:563=1}
 coordinate:12033
   best      24t: Max cape: Other Teleports: Feldip Hills → walk 19 {daily:4819=1}
   alt       33t: Master scroll book: Feldip hills teleport → walk 28 {charge:21389=1}
+  alt       47t: Teleport to House → Fairy ring AKS: Feldip Hills: Jungle Hunter area → walk 30 {item:556=1, item:557=1, item:563=1}
 coordinate:12101
   best      25t: Camelot Teleport: Seers' → walk 3 → bank → Wilderness sword 4: Teleport → walk 6 {item:556=5, item:563=1} withdraw [13111] deposit first
-  direct    62t (rank 70): Max cape: Spellbook → ANCIENT → Annakarl Teleport → walk 55 {cape=1, item:563=2, item:565=2} leaves you on ANCIENT
+  direct    67t: Teleport to House → House obelisk: Level 50 Wilderness → walk 52 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 coordinate:19844
   best      49t: Morytania legs: Burgh de Rott → walk 44
@@ -73,21 +74,24 @@ coordinate:19844
   alt       46t (rank 54): Max cape: Spellbook → ARCEUUS → Barrows Teleport → walk 40 {cape=1, item:565=1, item:563=2, item:566=2} leaves you on ARCEUUS
 coordinate:2725
   best      19t (rank 27): Max cape: Spellbook → LUNAR → Ice Plateau Teleport → walk 13 {cape=1, item:555=8, item:9075=3, item:563=3} leaves you on LUNAR
+  same book 29t: Teleport to House → Portal nexus: Ice Plateau → walk 13 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 coordinate:28909
   best      22t: Civitas illa Fortis Teleport → walk 18 {item:557=1, item:554=1, item:563=2}
   alt       24t (rank 32): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 18 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       33t: Teleport to House → Portal nexus: Civitas illa Fortis → walk 17 {item:556=1, item:557=1, item:563=1}
 coordinate:3556
-  best      30t: Max cape: Other Teleports: Black chinchompa → walk 25 {daily:4819=1}
+  best      30t: Teleport to House → House obelisk: Level 35 Wilderness → walk 15 {item:556=1, item:557=1, item:563=1}
+  alt       30t: Max cape: Other Teleports: Black chinchompa → walk 25 {daily:4819=1}
   alt       39t: Master scroll book: Revenant cave teleport → walk 34 {charge:21389=1}
-  alt       58t: Camelot Teleport: Seers' → walk 3 → bank → Burning amulet: Lava Maze → walk 39 {item:556=5, item:563=1, charge:21166=1} withdraw [21166] deposit first
   note      Wilderness target
 cryptic:'a bag belt only?', he asked his balding brothers.
-  best      24t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Monastery → walk 5 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
-  direct    42t: Amulet of glory: Edgeville → walk 37 {charge:1712=1}
-  alt       44t (rank 52): Max cape: Spellbook → ANCIENT → Lassar Teleport → walk 37 {cape=1, item:563=2, item:555=4} leaves you on ANCIENT
+  best      22t: Teleport to House → Jewellery box: Monastery → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       24t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Monastery → walk 5 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
+  alt       42t: Amulet of glory: Edgeville → walk 37 {charge:1712=1}
 cryptic:elvish onions.
   best      33t: Eternal teleport crystal: Prifddinas → walk 28
+  alt       41t: Teleport to House → Spirit tree: Prifddinas → walk 25 {item:556=1, item:557=1, item:563=1}
   alt       43t: Construction cape: Prifddinas → walk 38
 cryptic:leader of the yak city.
   best      none
@@ -102,103 +106,96 @@ cryptic:search the wheelbarrow in rimmington mine.
   alt       42t: Crafting cape: Teleport → walk 37
 cryptic:talk to the cook in the blue moon inn in varrock.
   best      35t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
-  alt       53t: Rat Pits Minigame Teleport: 2. Varrock → walk 19 {cooldown:888=1}
-  alt       50t: Camelot Teleport: Seers' → walk 3 → bank → Varrock tablet → walk 23 {item:556=5, item:563=1, item:8007=1} withdraw [8007] deposit first
+  alt       47t: Teleport to House → Portal nexus: Varrock → walk 23 {item:556=1, item:557=1, item:563=1}
+  alt       51t: Teleport to House → Jewellery box: Champions' Guild → walk 26 {item:556=1, item:557=1, item:563=1}
 emote:10180
   best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
+  alt       56t: Teleport to House → Fairy ring: Zanaris → walk 39 {item:556=1, item:557=1, item:563=1}
   alt       58t: Amulet of glory: Al Kharid → walk 53 {charge:1712=1}
-  alt       53t (rank 61): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 47 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
 emote:10222
   best      19t: Kandarin headgear 4: Teleport → walk 14
   alt       45t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
-  alt       48t: Camelot Teleport: Seers' → walk 43 {item:556=5, item:563=1}
+  alt       45t: Teleport to House → Fairy ring BLR: Kandarin: Legends' Guild → walk 28 {item:556=1, item:557=1, item:563=1}
 emote:10264
   best      18t (rank 26): Max cape: Spellbook → LUNAR → Barbarian Teleport → walk 12 {cape=1, item:554=3, item:9075=2, item:563=2} leaves you on LUNAR
-  same book 32t: Games necklace: Barbarian Outpost → walk 27 {charge:3853=1}
+  same book 28t: Teleport to House → Portal nexus: Barbarian Outpost → walk 12 {item:556=1, item:557=1, item:563=1}
+  alt       32t: Games necklace: Barbarian Outpost → walk 27 {charge:3853=1}
+  alt       44t: Teleport to House → Jewellery box: Barbarian Outpost → walk 27 {item:556=1, item:557=1, item:563=1}
 emote:12080
   best      24t: Slayer ring: Slayer Tower → walk 19 {charge:11866=1}
 emote:19833
   best      30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
   alt       33t: Rat Pits Minigame Teleport: 2. Varrock → walk 7 {cooldown:888=1}
-  alt       47t: Civitas illa Fortis Teleport → walk 43 {item:557=1, item:554=1, item:563=2}
+  alt       42t: Teleport to House → Portal nexus: Varrock → walk 26 {item:556=1, item:557=1, item:563=1}
 emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
   best      none
   note      walk too long
 fairyring:a i q 0 4 4 0
-  best      28t: Slayer ring: Fremennik → walk 12 → Fairy ring AIQ: Asgarnia: Mudskipper Point → walk 3 {charge:11866=1}
-  alt       28t: Ring of wealth: Miscellania → walk 13 → Fairy ring AIQ: Asgarnia: Mudskipper Point → walk 3 {charge:11980=1}
-  alt       32t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring AIQ: Asgarnia: Mudskipper Point → walk 3 {charge:21389=1}
+  best      20t: Teleport to House → Fairy ring AIQ: Asgarnia: Mudskipper Point → walk 3 {item:556=1, item:557=1, item:563=1}
 fairyring:a i r 2 3 3 1
-  best      27t: Slayer ring: Fremennik → walk 12 → Fairy ring AIR: Islands: South-east of Ardougne → walk 2 {charge:11866=1}
-  alt       27t: Ring of wealth: Miscellania → walk 13 → Fairy ring AIR: Islands: South-east of Ardougne → walk 2 {charge:11980=1}
-  alt       31t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring AIR: Islands: South-east of Ardougne → walk 2 {charge:21389=1}
+  best      19t: Teleport to House → Fairy ring AIR: Islands: South-east of Ardougne → walk 2 {item:556=1, item:557=1, item:563=1}
 fairyring:a l p 1 1 4 0
-  best      27t: Slayer ring: Fremennik → walk 12 → Fairy ring ALP: Fremennik Province: Lighthouse → walk 2 {charge:11866=1}
-  alt       27t: Ring of wealth: Miscellania → walk 13 → Fairy ring ALP: Fremennik Province: Lighthouse → walk 2 {charge:11980=1}
-  alt       31t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring ALP: Fremennik Province: Lighthouse → walk 2 {charge:21389=1}
+  best      19t: Teleport to House → Fairy ring ALP: Fremennik Province: Lighthouse → walk 2 {item:556=1, item:557=1, item:563=1}
 fairyring:b j r 1 1 2 3
-  best      26t: Slayer ring: Fremennik → walk 12 → Fairy ring BJR: Other Realms: Fisher King → walk 1 {charge:11866=1}
-  alt       26t: Ring of wealth: Miscellania → walk 13 → Fairy ring BJR: Other Realms: Fisher King → walk 1 {charge:11980=1}
-  alt       30t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring BJR: Other Realms: Fisher King → walk 1 {charge:21389=1}
+  best      18t: Teleport to House → Fairy ring BJR: Other Realms: Fisher King → walk 1 {item:556=1, item:557=1, item:563=1}
 fairyring:c i s 0 0 0 9
-  best      30t: Slayer ring: Fremennik → walk 12 → Fairy ring CIS: Great Kourend: Arceuus Library → walk 5 {charge:11866=1}
+  best      22t: Teleport to House → Fairy ring CIS: Great Kourend: Arceuus Library → walk 5 {item:556=1, item:557=1, item:563=1}
   alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Arceuus Library Teleport → walk 16 {cape=1, item:557=2, item:563=1} leaves you on ARCEUUS
-  alt       30t: Ring of wealth: Miscellania → walk 13 → Fairy ring CIS: Great Kourend: Arceuus Library → walk 5 {charge:11980=1}
+  alt       32t: Teleport to House → Portal nexus: Arceuus Library → walk 16 {item:556=1, item:557=1, item:563=1}
 fairyring:d i p 8 5 1 1
-  best      29t: Slayer ring: Fremennik → walk 12 → Fairy ring DIP: Other Realms: Abyssal Nexus → walk 4 {charge:11866=1}
-  alt       29t: Ring of wealth: Miscellania → walk 13 → Fairy ring DIP: Other Realms: Abyssal Nexus → walk 4 {charge:11980=1}
-  alt       33t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring DIP: Other Realms: Abyssal Nexus → walk 4 {charge:21389=1}
+  best      21t: Teleport to House → Fairy ring DIP: Other Realms: Abyssal Nexus → walk 4 {item:556=1, item:557=1, item:563=1}
 falo:a blood red weapon, a strong curved sword, found on the island of primate lords.
   best      45t: Camelot Teleport: Seers' → walk 40 {item:556=5, item:563=1}
+  alt       51t: Teleport to House → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {item:556=1, item:557=1, item:563=1}
   alt       54t: Construction cape: Rellekka → walk 49
-  alt       59t: Slayer ring: Fremennik → walk 12 → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {charge:11866=1}
 falo:a fiery axe of great inferno, when you use it, you'll wonder where the logs go.
   best      45t: Camelot Teleport: Seers' → walk 40 {item:556=5, item:563=1}
+  alt       51t: Teleport to House → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {item:556=1, item:557=1, item:563=1}
   alt       54t: Construction cape: Rellekka → walk 49
-  alt       59t: Slayer ring: Fremennik → walk 12 → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {charge:11866=1}
 falo:a shiny helmet of flight, to obtain this with melee, struggle you might.
   best      45t: Camelot Teleport: Seers' → walk 40 {item:556=5, item:563=1}
+  alt       51t: Teleport to House → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {item:556=1, item:557=1, item:563=1}
   alt       54t: Construction cape: Rellekka → walk 49
-  alt       59t: Slayer ring: Fremennik → walk 12 → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {charge:11866=1}
 falo:it can hold down a boat or crush a goat, this object, you see, is quite heavy.
   best      45t: Camelot Teleport: Seers' → walk 40 {item:556=5, item:563=1}
+  alt       51t: Teleport to House → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {item:556=1, item:557=1, item:563=1}
   alt       54t: Construction cape: Rellekka → walk 49
-  alt       59t: Slayer ring: Fremennik → walk 12 → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {charge:11866=1}
 falo:penance healers runners and more, obtaining this body often gives much deplore.
   best      45t: Camelot Teleport: Seers' → walk 40 {item:556=5, item:563=1}
+  alt       51t: Teleport to House → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {item:556=1, item:557=1, item:563=1}
   alt       54t: Construction cape: Rellekka → walk 49
-  alt       59t: Slayer ring: Fremennik → walk 12 → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {charge:11866=1}
 falo:they come from some time ago, from a land unto the east. fossilised they have become, this small and gentle beast.
   best      45t: Camelot Teleport: Seers' → walk 40 {item:556=5, item:563=1}
+  alt       51t: Teleport to House → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {item:556=1, item:557=1, item:563=1}
   alt       54t: Construction cape: Rellekka → walk 49
-  alt       59t: Slayer ring: Fremennik → walk 12 → Fairy ring CJR: Kandarin: Sinclair Mansion → walk 34 {charge:11866=1}
 spot:ASGARNIA_WARRIORS
   best      24t: Max cape: Warriors' Guild → walk 19
   alt       27t: Games necklace: Burthorpe → walk 22 {charge:3853=1}
-  alt       32t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Warriors' Guild → walk 13 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
+  alt       30t: Teleport to House → Jewellery box: Warriors' Guild → walk 13 {item:556=1, item:557=1, item:563=1}
 spot:FELDIP_HILLS_GNOME_GLITER
-  best      33t: Max cape: Other Teleports: Feldip Hills → walk 28 {daily:4819=1}
+  best      28t: Teleport to House → Fairy ring AKS: Feldip Hills: Jungle Hunter area → walk 11 {item:556=1, item:557=1, item:563=1}
+  alt       33t: Max cape: Other Teleports: Feldip Hills → walk 28 {daily:4819=1}
   alt       36t: Master scroll book: Feldip hills teleport → walk 31 {charge:21389=1}
-  alt       36t: Slayer ring: Fremennik → walk 12 → Fairy ring AKS: Feldip Hills: Jungle Hunter area → walk 11 {charge:11866=1}
 spot:KANDARIN_GRAND_TREE
   best      23t: Royal seed pod → walk 12
   alt       48t: Slayer ring: Stronghold → walk 43 {charge:11866=1}
+  alt       48t: Teleport to House → Spirit tree: Gnome Stronghold → walk 32 {item:556=1, item:557=1, item:563=1}
 spot:MISTHALIN_VARROCK_STONE_CIRCLE
-  best      38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
-  faster, under the margin 37t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 18 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
+  best      35t: Teleport to House → Jewellery box: Champions' Guild → walk 18 {item:556=1, item:557=1, item:563=1}
+  alt       38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
   alt       37t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 18 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
-  alt       59t: Skills necklace: Cooking Guild → walk 54 {charge:11968=1}
 spot:VARLAMORE_LOCUS_OASIS
-  best      51t: Slayer ring: Fremennik → walk 12 → Fairy ring AJP: Varlamore: Avium Savannah → walk 26 {charge:11866=1}
-  alt       52t: Ring of wealth: Miscellania → walk 13 → Fairy ring AJP: Varlamore: Avium Savannah → walk 26 {charge:11980=1}
-  alt       56t: Master scroll book: Piscatoris teleport → walk 17 → Fairy ring AJP: Varlamore: Avium Savannah → walk 26 {charge:21389=1}
+  best      43t: Teleport to House → Fairy ring AJP: Varlamore: Avium Savannah → walk 26 {item:556=1, item:557=1, item:563=1}
+  alt       77t: Civitas illa Fortis Teleport → walk 73 {item:557=1, item:554=1, item:563=2}
+  alt       77t: Max cape: Other Teleports: Hunter Guild → walk 72
 spot:WILDERNESS_54
   best      10t (rank 18): Max cape: Spellbook → LUNAR → Ice Plateau Teleport → walk 4 {cape=1, item:555=8, item:9075=3, item:563=3} leaves you on LUNAR
+  same book 20t: Teleport to House → Portal nexus: Ice Plateau → walk 4 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 map:12130
-  best      59t: Construction cape: Yanille → walk 54
-  alt       65t: Slayer ring: Fremennik → walk 12 → Fairy ring CIQ: Kandarin: North-west of Yanille → walk 40 {charge:11866=1}
-  alt       66t: Ring of wealth: Miscellania → walk 13 → Fairy ring CIQ: Kandarin: North-west of Yanille → walk 40 {charge:11980=1}
+  best      57t: Teleport to House → Fairy ring CIQ: Kandarin: North-west of Yanille → walk 40 {item:556=1, item:557=1, item:563=1}
+  alt       59t: Construction cape: Yanille → walk 54
+  alt       74t: Ring of dueling: Castle Wars → walk 69 {charge:2552=1}
 map:19785
   best      33t: Morytania legs: Burgh de Rott → walk 28
   alt       56t: Master scroll book: Mort'ton teleport → walk 51 {charge:21389=1}
@@ -211,41 +208,41 @@ map:3520
   alt       43t: Watchtower Teleport → walk 39 {item:557=2, item:563=2}
   alt       43t: Construction cape: Yanille → walk 38
 map:3599
-  best      27t: Ardougne cloak: Kandarin Monastery → walk 22
-  alt       29t: Slayer ring: Fremennik → walk 12 → Fairy ring DJP: Kandarin: Tower of Life → walk 4 {charge:11866=1}
-  alt       30t: Ring of wealth: Miscellania → walk 13 → Fairy ring DJP: Kandarin: Tower of Life → walk 4 {charge:11980=1}
+  best      21t: Teleport to House → Fairy ring DJP: Kandarin: Tower of Life → walk 4 {item:556=1, item:557=1, item:563=1}
+  alt       27t: Ardougne cloak: Kandarin Monastery → walk 22
+  alt       48t: Ardougne Teleport → walk 44 {item:555=2, item:563=2}
 map:7241
-  best      35t: Slayer ring: Fremennik → walk 12 → Fairy ring BLR: Kandarin: Legends' Guild → walk 10 {charge:11866=1}
-  alt       35t: Ring of wealth: Miscellania → walk 13 → Fairy ring BLR: Kandarin: Legends' Guild → walk 10 {charge:11980=1}
+  best      27t: Teleport to House → Fairy ring BLR: Kandarin: Legends' Guild → walk 10 {item:556=1, item:557=1, item:563=1}
   alt       38t: Ardougne Teleport → walk 34 {item:555=2, item:563=2}
+  alt       39t: Ardougne cloak: Ardougne Farm → walk 34
 music:23138
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 16 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23142
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 16 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23157
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 16 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23174
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 16 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23178
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 16 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:24773
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t (rank 30): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 16 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 skill:CHARLIE:i need to give charlie a cooked pike.
   best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
-  alt       34t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 15 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
-  alt       36t: Crafting cape: Teleport → walk 4 → bank → Varrock tablet → walk 16 {item:8007=1} withdraw [8007] deposit first
+  alt       32t: Teleport to House → Portal nexus: Varrock → walk 16 {item:556=1, item:557=1, item:563=1}
+  alt       32t: Teleport to House → Jewellery box: Champions' Guild → walk 15 {item:556=1, item:557=1, item:563=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
   best      8t: Kandarin headgear 4: Teleport → walk 3
   alt       38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
@@ -264,7 +261,7 @@ skill:SHERLOCK:score a goal in skullball.
 cryptic:search through chests found in the upstairs of houses in eastern falador.
   best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
   alt       36t: Ring of wealth: Falador Park → walk 31 {charge:11980=1}
-  alt       47t: Falador Teleport → walk 43 {item:556=3, item:555=1, item:563=1}
+  alt       45t: Teleport to House → Jewellery box: Mining Guild → walk 28 {item:556=1, item:557=1, item:563=1}
 cryptic:you will need to under-cook to solve this one.
   best      26t: Lumbridge Teleport → walk 22 {item:556=3, item:557=1, item:563=1}
   alt       28t (rank 36): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 22 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
@@ -273,6 +270,7 @@ cryptic:search through some drawers in the upstairs of a house in rimmington.
   best      14t: Construction cape: Rimmington → walk 9
 anagram:12566
   best      13t: Skills necklace: Mining Guild → walk 8 {charge:11968=1}
+  alt       25t: Teleport to House → Jewellery box: Mining Guild → walk 8 {item:556=1, item:557=1, item:563=1}
 cryptic:search the crates in a bank in varrock.
   best      27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       34t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}
@@ -280,12 +278,13 @@ cryptic:search the crates in a bank in varrock.
 emote:12021
   best      51t: Necklace of passage: Wizards' Tower → walk 46 {charge:21146=1}
   alt       53t: Amulet of glory: Draynor Village → walk 48 {charge:1712=1}
-  alt       67t: Lumbridge Teleport → walk 63 {item:556=3, item:557=1, item:563=1}
+  alt       62t: Teleport to House → Mounted glory: Draynor Village → walk 48 {item:556=1, item:557=1, item:563=1}
 coordinate:2840,3423,0
   best      38t: Master scroll book: Key master teleport → walk 33 {charge:21389=1}
 coordinate:2303,3328,0
   best      43t: Eternal teleport crystal: Prifddinas → walk 38
   alt       53t: Construction cape: Prifddinas → walk 48
+  alt       57t: Teleport to House → Spirit tree: Prifddinas → walk 41 {item:556=1, item:557=1, item:563=1}
 emote:19791
   best      30t: Watchtower Teleport → walk 26 {item:557=2, item:563=2}
   alt       34t: Watchtower Teleport: Yanille → walk 29 {item:557=2, item:563=2}

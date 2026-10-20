@@ -62,6 +62,20 @@ public class PanelModel
 		IntFunction<String> itemNames;
 	}
 
+	/** What the panel says about the player's house (PLAN §5.2 POH, B16). */
+	@Value
+	public static class HouseInfo
+	{
+		public static final HouseInfo NONE = new HouseInfo(0, false, false);
+
+		/** When an own-house scan last ran (epoch millis); 0 for never. */
+		long scannedAt;
+		/** The house is known only from the nexus varbits: say "Visit your house once". */
+		boolean promptVisit;
+		/** The furniture comes from the config's overrides. */
+		boolean manual;
+	}
+
 	/**
 	 * @param state     from {@link PanelState#of}
 	 * @param nowItemWorn the current sub-step's item is worn, so its option is in the equipment tab
@@ -70,11 +84,13 @@ public class PanelModel
 	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
 		boolean nowItemWorn, Book f2pBook)
 	{
-		return of(state, dormantReason, plan, committed, now, next, nowItemWorn, f2pBook, BankInfo.NONE, System.currentTimeMillis());
+		return of(state, dormantReason, plan, committed, now, next, nowItemWorn, f2pBook, BankInfo.NONE, HouseInfo.NONE, null,
+			System.currentTimeMillis());
 	}
 
+	/** @param menuHint replaces the sub-step's hint: the hotkey when another plugin hides the list line (B16) */
 	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
-		boolean nowItemWorn, Book f2pBook, BankInfo bank, long nowMillis)
+		boolean nowItemWorn, Book f2pBook, BankInfo bank, HouseInfo house, String menuHint, long nowMillis)
 	{
 		PanelModelBuilder model = PanelModel.builder().state(state);
 		if (state == PanelState.DORMANT)
@@ -87,7 +103,8 @@ public class PanelModel
 		}
 		if (now != null)
 		{
-			String detail = now.getDetail() == null && nowItemWorn ? "Worn: right-click it in the equipment tab" : now.getDetail();
+			String detail = menuHint != null ? menuHint
+				: now.getDetail() == null && nowItemWorn ? "Worn: right-click it in the equipment tab" : now.getDetail();
 			model.now(now.getText()).nowDetail(detail).next(next == null ? null : next.getText());
 		}
 		List<String> notes = new ArrayList<>();
@@ -104,7 +121,11 @@ public class PanelModel
 		{
 			notes.add("Open your bank once so banked teleports count");
 		}
-		List<RouteCard> cards = cards(plan, committed, bank, nowMillis);
+		if (house.isPromptVisit())
+		{
+			notes.add("Visit your house once so its furniture counts");
+		}
+		List<RouteCard> cards = cards(plan, committed, bank, houseFlags(house, nowMillis), nowMillis);
 		if (cards.isEmpty() && notes.isEmpty())
 		{
 			notes.add(plan == Plan.NONE ? "Waiting for the first plan" : "No route from what you have");
@@ -115,10 +136,10 @@ public class PanelModel
 	/** The followed route first, then Best, Direct, Same book, the faster one under the margin and the alternatives. */
 	static List<RouteCard> cards(Plan plan, Route committed)
 	{
-		return cards(plan, committed, BankInfo.NONE, 0);
+		return cards(plan, committed, BankInfo.NONE, "", 0);
 	}
 
-	static List<RouteCard> cards(Plan plan, Route committed, BankInfo bank, long nowMillis)
+	static List<RouteCard> cards(Plan plan, Route committed, BankInfo bank, String houseFlags, long nowMillis)
 	{
 		List<RouteCard> cards = new ArrayList<>();
 		Set<String> shown = new HashSet<>();
@@ -130,20 +151,20 @@ public class PanelModel
 		}
 		boolean followingBest = best == null || best.getIdentity().equals(first.getIdentity());
 		String bankFlags = bankFlags(bank, nowMillis);
-		add(cards, shown, followingBest ? "Best" : "Following", first, null, true, bankFlags, bank.getItemNames());
-		add(cards, shown, "Best", best, first, false, bankFlags, bank.getItemNames());
-		add(cards, shown, "Direct", plan.getDirect(), first, false, bankFlags, bank.getItemNames());
-		add(cards, shown, "Same book", plan.getSameBook(), first, false, bankFlags, bank.getItemNames());
-		add(cards, shown, "Under the margin", plan.getFasterUnqualified(), first, false, bankFlags, bank.getItemNames());
+		add(cards, shown, followingBest ? "Best" : "Following", first, null, true, bankFlags, houseFlags, bank.getItemNames());
+		add(cards, shown, "Best", best, first, false, bankFlags, houseFlags, bank.getItemNames());
+		add(cards, shown, "Direct", plan.getDirect(), first, false, bankFlags, houseFlags, bank.getItemNames());
+		add(cards, shown, "Same book", plan.getSameBook(), first, false, bankFlags, houseFlags, bank.getItemNames());
+		add(cards, shown, "Under the margin", plan.getFasterUnqualified(), first, false, bankFlags, houseFlags, bank.getItemNames());
 		for (Route alternative : plan.getAlternatives())
 		{
-			add(cards, shown, "Also", alternative, first, false, bankFlags, bank.getItemNames());
+			add(cards, shown, "Also", alternative, first, false, bankFlags, houseFlags, bank.getItemNames());
 		}
 		return cards;
 	}
 
 	private static void add(List<RouteCard> cards, Set<String> shown, String label, Route route, Route reference, boolean followed,
-		String bankFlags, IntFunction<String> itemNames)
+		String bankFlags, String houseFlags, IntFunction<String> itemNames)
 	{
 		if (route == null || !shown.add(route.getIdentity()))
 		{
@@ -155,6 +176,10 @@ public class PanelModel
 		{
 			flags = flags.isEmpty() ? bankFlags : bankFlags + " · " + flags;
 		}
+		if (!houseFlags.isEmpty() && usesHouse(route))
+		{
+			flags = flags.isEmpty() ? houseFlags : houseFlags + " · " + flags;
+		}
 		cards.add(new RouteCard(label + saving, route.getTicks(), legs(route, itemNames), flags, followed));
 	}
 
@@ -164,7 +189,24 @@ public class PanelModel
 		return bank.getSeenAt() == 0 ? "" : "in bank, seen " + age(nowMillis - bank.getSeenAt());
 	}
 
-	static String age(long millis)
+	/** "house seen 3 days ago": how old the furniture is, on every route that uses the house. */
+	static String houseFlags(HouseInfo house, long nowMillis)
+	{
+		if (house.isManual())
+		{
+			return "house set by hand";
+		}
+		return house.getScannedAt() == 0 ? "" : "house seen " + age(nowMillis - house.getScannedAt());
+	}
+
+	static boolean usesHouse(Route route)
+	{
+		return route.getLegs().stream().anyMatch(leg -> leg.getRow() != null && leg.getRow().getCategory().isHouse()
+			|| leg.getChange() != null && leg.getChange().isInHouse()
+			|| leg.getRow() != null && leg.getRow().getRequirements().getHouse() != null);
+	}
+
+	public static String age(long millis)
 	{
 		long minutes = millis / 60_000;
 		if (minutes < 1)

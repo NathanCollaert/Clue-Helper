@@ -40,6 +40,13 @@ public interface ClueHelperConfig extends Config
 	)
 	String unlocksSection = "unlocks";
 
+	@ConfigSection(
+		name = "House",
+		description = "Your player-owned house. Auto learns it from the portal nexus and from a visit to your own house",
+		position = 4
+	)
+	String houseSection = "house";
+
 	@Range(min = 1, max = 5)
 	@ConfigItem(
 		keyName = "routeCount",
@@ -103,6 +110,18 @@ public interface ClueHelperConfig extends Config
 	default int bankStopExtraTicks()
 	{
 		return 0;
+	}
+
+	@ConfigItem(
+		keyName = "stashBuiltIsFilled",
+		name = "Built STASH units are filled",
+		description = "Count a built STASH unit as holding its items, as the Clue Scroll plugin's tick suggests, unless a Search showed it empty",
+		section = routesSection,
+		position = 5
+	)
+	default boolean stashBuiltIsFilled()
+	{
+		return true;
 	}
 
 	@ConfigItem(
@@ -237,6 +256,126 @@ public interface ClueHelperConfig extends Config
 		position = 1
 	)
 	default boolean xericsHonourUnlocked()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "pohSource",
+		name = "Source",
+		description = "Auto: the nexus and mounted amulets from the game, the rest from a visit to your own house. Manual: the fields below",
+		section = houseSection,
+		position = 0
+	)
+	default PohSource pohSource()
+	{
+		return PohSource.AUTO;
+	}
+
+	@ConfigItem(
+		keyName = "pohJewelleryBox",
+		name = "Jewellery box",
+		description = "Manual only",
+		section = houseSection,
+		position = 1
+	)
+	default PohJewelleryBox pohJewelleryBox()
+	{
+		return PohJewelleryBox.NONE;
+	}
+
+	@ConfigItem(
+		keyName = "pohMountedGlory",
+		name = "Mounted glory",
+		description = "Manual only",
+		section = houseSection,
+		position = 2
+	)
+	default boolean pohMountedGlory()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "pohGarden",
+		name = "Garden",
+		description = "Spirit tree, fairy ring or spiritual fairy tree. Manual only",
+		section = houseSection,
+		position = 3
+	)
+	default PohGarden pohGarden()
+	{
+		return PohGarden.NONE;
+	}
+
+	@ConfigItem(
+		keyName = "pohObelisk",
+		name = "Wilderness obelisk",
+		description = "Manual only",
+		section = houseSection,
+		position = 4
+	)
+	default boolean pohObelisk()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "pohAltar",
+		name = "Altar",
+		description = "Occult or a single spellbook altar. Manual only",
+		section = houseSection,
+		position = 5
+	)
+	default PohAltar pohAltar()
+	{
+		return PohAltar.NONE;
+	}
+
+	@ConfigItem(
+		keyName = "pohMountedCape",
+		name = "Mounted cape",
+		description = "Magic or Max cape on the cape hanger (spellbook changes). Manual only",
+		section = houseSection,
+		position = 6
+	)
+	default PohMountedCape pohMountedCape()
+	{
+		return PohMountedCape.NONE;
+	}
+
+	@ConfigItem(
+		keyName = "pohMythicalCape",
+		name = "Mounted mythical cape",
+		description = "Manual only",
+		section = houseSection,
+		position = 7
+	)
+	default boolean pohMythicalCape()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "pohPortals",
+		name = "Portal chamber",
+		description = "Portal chamber destinations, comma-separated, such as Annakarl, Kharyrll. Manual only",
+		section = houseSection,
+		position = 8
+	)
+	default String pohPortals()
+	{
+		return "";
+	}
+
+	@ConfigItem(
+		keyName = "pohForget",
+		name = "Forget learned house",
+		description = "Tick to forget what was learned from your house; it is learned again on your next visit",
+		section = houseSection,
+		position = 9
+	)
+	default boolean pohForget()
 	{
 		return false;
 	}

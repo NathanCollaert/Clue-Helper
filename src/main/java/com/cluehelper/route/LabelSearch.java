@@ -191,9 +191,30 @@ final class LabelSearch
 			offer(from, ctx.abstractNode(origin), from.b, from.c, k, from.t, from.leg, 0, 0, null, null, null, from.spent);
 		}
 		expandExits(from, k);
-		expandFairyRing(from, k);
-		expandLocatedChange(from, origin, k);
+		if (ctx.houseUsable(from.node, from.t))
+		{
+			expandLocatedTeleports(from, k);
+			expandFairyRing(from, k);
+			expandLocatedChanges(from, origin, k);
+		}
 		expandBank(from, k);
+	}
+
+	/** Transports that start here: the house furniture at the POH node (B16). */
+	private void expandLocatedTeleports(Label from, int k)
+	{
+		List<PlanContext.Teleport> here = ctx.options[from.b].located.get(from.node);
+		if (here == null)
+		{
+			return;
+		}
+		for (PlanContext.Teleport tele : here)
+		{
+			if (tele.node != from.node && !ctx.forbidden(tele.node) && !excluded.contains(Route.teleportKey(tele.row)))
+			{
+				transport(from, tele.node, from.c, k, tele.halfTicks, Leg.Kind.TELEPORT, tele, null);
+			}
+		}
 	}
 
 	private void arrive(Label from, int k)
@@ -377,20 +398,28 @@ final class LabelSearch
 		}
 	}
 
-	/** An altar or Tyss at this node: toggles its book, or back to Standard when already on it. */
-	private void expandLocatedChange(Label from, OriginClass origin, int k)
+	/**
+	 * Altars, Tyss and the house's altars and mounted capes at this node. A single altar or Tyss toggles its book, or
+	 * goes back to Standard when already on it; the occult altar and a mounted cape go to any expanded book.
+	 */
+	private void expandLocatedChanges(Label from, OriginClass origin, int k)
 	{
-		PlanContext.Change change = ctx.options[from.b].located.get(from.node);
-		if (change == null || ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.ALL || !ctx.changesAllowed(origin))
+		List<PlanContext.Change> here = ctx.options[from.b].changes.get(from.node);
+		if (here == null || ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.ALL || !ctx.changesAllowed(origin))
 		{
 			return;
 		}
-		Book toggles = change.change.getToggles();
 		Book current = bookOf(k);
-		Book next = current == toggles ? Book.STANDARD : toggles;
-		if (ctx.expanded.contains(next) && (k >= FIRST_PENDING || next != current))
+		for (PlanContext.Change change : here)
 		{
-			change(from, from.node, WALKED, next.ordinal(), change);
+			Book toggles = change.change.getToggles();
+			for (Book next : toggles == null ? ctx.expanded : Set.of(current == toggles ? Book.STANDARD : toggles))
+			{
+				if (ctx.expanded.contains(next) && (k >= FIRST_PENDING || next != current))
+				{
+					change(from, from.node, WALKED, next.ordinal(), change);
+				}
+			}
 		}
 	}
 

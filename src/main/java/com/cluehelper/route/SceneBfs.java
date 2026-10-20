@@ -145,6 +145,38 @@ public final class SceneBfs
 			return path;
 		}
 
+		/**
+		 * The cheapest reached tile straight beside an object's footprint (corners don't count): where the game walks to
+		 * use it. Null when no side is reached.
+		 */
+		public WorldPoint cheapestBeside(WorldPoint southWest, int sizeX, int sizeY)
+		{
+			WorldPoint best = null;
+			int bestCost = UNREACHED;
+			for (int x = -1; x <= sizeX; x++)
+			{
+				for (int y = -1; y <= sizeY; y++)
+				{
+					boolean outsideX = x == -1 || x == sizeX;
+					boolean outsideY = y == -1 || y == sizeY;
+					WorldPoint tile = southWest.dx(x).dy(y);
+					int c = outsideX != outsideY ? cost(tile) : UNREACHED;
+					if (c < bestCost)
+					{
+						best = tile;
+						bestCost = c;
+					}
+				}
+			}
+			return best;
+		}
+
+		/** Tiles to {@code tile}, or to the closest reached tile beside it when it is blocked (furniture, an altar). */
+		public int costNear(WorldPoint tile)
+		{
+			return cost(nearestReached(tile));
+		}
+
 		private WorldPoint nearestReached(WorldPoint waypoint)
 		{
 			if (cost(waypoint) != UNREACHED)
@@ -322,6 +354,10 @@ public final class SceneBfs
 	private static Map<Integer, List<int[]>> sceneRows(Scene scene, WalkTable table, boolean[] rowOpen)
 	{
 		Map<Integer, List<int[]>> rows = new HashMap<>();
+		if (table == null)
+		{
+			return rows;
+		}
 		for (int r = 0; r < table.rowCount(); r++)
 		{
 			if (!rowOpen[r])

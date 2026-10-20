@@ -41,12 +41,14 @@ public final class RequirementParser
 	public static final String BOOK = "Book";
 	public static final String MEMBERS = "Members";
 	public static final String CONSUMABLE = "Consumable";
+	public static final String HOUSE = "House";
 
 	private static final int MAX_SKILL_LEVEL = 99;
 	private static final int MAX_COMBAT_LEVEL = 126;
 	private static final String MAX = "Max";
 	private static final String UNLOCK_PREFIX = "UNLOCK_";
 	private static final Pattern VAR_CLAUSE = Pattern.compile("(\\d+)\\s*([=<>&@])\\s*(-?\\d+)");
+	private static final Pattern HOUSE_NEED = Pattern.compile("(object|nexus):(\\d+(?:\\|\\d+)*)");
 	private static final Pattern ITEM_BRANCH = Pattern.compile("([A-Z0-9_]+)=(\\d+)");
 	private static final Map<String, Integer> RUNE_NAMES = runeNames();
 	private static final Map<String, Quest> QUESTS_BY_NAME = questsByName();
@@ -74,6 +76,7 @@ public final class RequirementParser
 		Book varBook = parseVars(cell(cells, VARBITS), VarCheck.Kind.VARBIT, out);
 		parseVars(cell(cells, VARPS), VarCheck.Kind.VARP, out);
 		parseWilderness(cell(cells, WILDERNESS), out);
+		HouseNeed house = parseHouse(cell(cells, HOUSE), out);
 		Book columnBook = parseBook(cell(cells, BOOK), out);
 		if (varBook != null && columnBook != null && varBook != columnBook)
 		{
@@ -88,8 +91,35 @@ public final class RequirementParser
 			.book(columnBook != null ? columnBook : varBook)
 			.members(isTrue(cell(cells, MEMBERS)))
 			.spendsCharges(isTrue(cell(cells, CONSUMABLE)))
+			.house(house)
 			.errors(List.copyOf(out.errors))
 			.build();
+	}
+
+	private static HouseNeed parseHouse(String cell, Parsed out)
+	{
+		if (cell.isEmpty())
+		{
+			return null;
+		}
+		Matcher m = HOUSE_NEED.matcher(cell.trim());
+		if (!m.matches())
+		{
+			out.errors.add("House: can't read '" + cell + "'");
+			return null;
+		}
+		List<Integer> ids = new ArrayList<>();
+		for (String id : m.group(2).split("\\|"))
+		{
+			ids.add(Integer.parseInt(id));
+		}
+		HouseNeed.Kind kind = m.group(1).equals("nexus") ? HouseNeed.Kind.NEXUS : HouseNeed.Kind.FURNITURE;
+		if (kind == HouseNeed.Kind.NEXUS && ids.size() != 1)
+		{
+			out.errors.add("House: one nexus destination per row, not '" + cell + "'");
+			return null;
+		}
+		return new HouseNeed(kind, List.copyOf(ids));
 	}
 
 	private void parseItems(String cell, Parsed out)

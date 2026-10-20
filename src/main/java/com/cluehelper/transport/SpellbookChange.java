@@ -8,7 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 
 /** One way to change spellbook ({@code spellbooks.tsv}, PLAN §4 Data), with B04's measured costs. */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class SpellbookChange
 {
 	public static final int NO_ID = -1;

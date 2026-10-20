@@ -12,7 +12,8 @@ public final class PositionRules
 	public static final WorldPoint POH_NODE = new WorldPoint(1858, 7051, 0);
 
 	private static final int POH_MIN_X = 1856;
-	private static final int POH_MAX_X = 2047;
+	/** Template region 8302 (x 2048–2111) holds houses too (Estate-Agent B05), beyond Shortest Path's box (B12). */
+	private static final int POH_MAX_X = 2111;
 	private static final int POH_MIN_Y = 7040;
 	private static final int POH_MAX_Y = 7111;
 

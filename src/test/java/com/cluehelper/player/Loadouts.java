@@ -9,13 +9,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Value;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
 /**
@@ -153,6 +156,7 @@ public final class Loadouts
 			.varps(values)
 			.unknownVars(varsPass ? PlayerSnapshot.UnknownVars.PASS : PlayerSnapshot.UnknownVars.FAIL)
 			.charges(charges)
+			.house("full".equals(f.get("poh").getAsString()) ? nathansHouse() : HouseState.NONE)
 			.spellbook(new SpellbookState(Book.valueOf(f.get("book").getAsString().toUpperCase()), false,
 				SpellbookState.CAPE_CHANGES_PER_DAY, varsPass || values.getOrDefault(VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, 0) == 1,
 				quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED, quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED,
@@ -182,6 +186,31 @@ public final class Loadouts
 		}
 		boolean group = carried.getAccountType() == GROUP_IRONMAN;
 		return carried.toBuilder().bank(group ? Map.of() : stored).groupStorage(group ? stored : Map.of()).charges(charges).build();
+	}
+
+	/**
+	 * Nathan's house as B12 scanned it: every nexus slot (keys 1–41 in his order), the ornate jewellery box, mounted
+	 * glory, Xeric's talisman (Inferno) and digsite pendant (Fossil Island), occult altar, mounted Max cape, obelisk and a
+	 * spiritual fairy tree. Walks are the unlearned 4 ticks.
+	 */
+	public static HouseState nathansHouse()
+	{
+		Set<Integer> keys = new HashSet<>();
+		for (int key = 1; key <= 41; key++)
+		{
+			keys.add(key);
+		}
+		return HouseState.builder()
+			.nexusKeys(keys)
+			.furniture(Set.of(ObjectID.POH_NEXUS_PORTAL_3, ObjectID.POH_JEWELLERY_BOX_3, ObjectID.POH_TROPHY_AMULETOFGLORY_4,
+				ObjectID.POH_AMULET_XERIC_INFERNO, ObjectID.POH_AMULET_DIG_FOSSIL, ObjectID.POH_ALTAR_OCCULT,
+				ObjectID.POH_MOUNTED_MAX_CAPE, ObjectID.POH_WILDERNESS_OBELISK, ObjectID.POH_SPIRIT_RING))
+			.xericLeftClick(3)
+			.digsiteLeftClick(2)
+			.boxLeftClick(20)
+			.source(HouseState.Source.SCAN)
+			.scannedAt(1)
+			.build();
 	}
 
 	/** The rune model from B01's cache slice, as the live client would build it. */

@@ -2,6 +2,7 @@ package com.cluehelper.transport;
 
 import com.cluehelper.player.Charge;
 import com.cluehelper.player.Container;
+import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.RuneModel;
@@ -63,6 +64,7 @@ public final class AvailabilityEngine
 		req.getLevels().forEach(need -> checkLevel(need, player, v));
 		req.getQuests().forEach(quest -> checkQuest(quest, player, v));
 		req.getVars().forEach(check -> checkVar(check, player, nowMinutes, v));
+		checkHouse(req.getHouse(), player, v);
 		req.getItems().forEach(clause -> checkClause(clause, req.isSpendsCharges(), player, nowMinutes, v));
 		return v.result(row);
 	}
@@ -101,6 +103,21 @@ public final class AvailabilityEngine
 		else if (!player.finished(quest))
 		{
 			v.no(quest.getName() + " not finished");
+		}
+	}
+
+	private static void checkHouse(HouseNeed need, PlayerSnapshot player, Verdict v)
+	{
+		if (need == null)
+		{
+			return;
+		}
+		HouseState house = player.getHouse();
+		boolean built = need.getKind() == HouseNeed.Kind.NEXUS ? house.getNexusKeys().contains(need.getIds().get(0))
+			: house.hasAny(need.getIds());
+		if (!built)
+		{
+			v.no(need.describe() + " not known in your house");
 		}
 	}
 

@@ -9,6 +9,8 @@ import com.cluehelper.player.Position;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.player.RuneModel;
 import com.cluehelper.player.SpellbookState;
+import com.cluehelper.poh.HouseOwnership;
+import com.cluehelper.poh.PohService;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.AvailabilityService;
@@ -67,6 +69,7 @@ public class RoutePlanner
 	private final ClueHelperConfig config;
 	private final BankMemory bankMemory;
 	private final StepNeeds stepNeeds;
+	private final PohService poh;
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile WalkData.Loaded walk;
@@ -99,8 +102,9 @@ public class RoutePlanner
 
 	@Inject
 	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
-		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds)
+		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds, PohService poh)
 	{
+		this.poh = poh;
 		this.bankMemory = bankMemory;
 		this.stepNeeds = stepNeeds;
 		this.client = client;
@@ -173,9 +177,10 @@ public class RoutePlanner
 		PlayerSnapshot banked = availability.getBankedSnapshot();
 		RequiredItems required = stepNeeds.of(step);
 		boolean atOpenBank = bankMemory.isBankOpen();
+		boolean foreignHouse = poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
 		Trigger trigger = new Trigger(step, snapshot.getVersion(), carried.getSnapshotVersion(), carried.getValidUntilMinute(),
 			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), settings, Set.copyOf(refusedChanges),
-			bankMemory.getVersion(), atOpenBank, required);
+			bankMemory.getVersion(), atOpenBank, required, foreignHouse);
 		if (trigger.equals(lastTrigger))
 		{
 			return;
@@ -197,6 +202,7 @@ public class RoutePlanner
 			.settings(settings)
 			.revertTicksLeft(revertTicksLeft())
 			.refusedChanges(Set.copyOf(refusedChanges))
+			.foreignHouseStart(foreignHouse)
 			.build();
 		runner.submit(() -> Planner.plan(input), this::onPlanned);
 	}
@@ -209,6 +215,15 @@ public class RoutePlanner
 		capeRefusedAt = used == null ? 0 : used;
 		lastTrigger = null;
 		log.debug("cape change refused at 4816 = {}", capeRefusedAt);
+	}
+
+	/**
+	 * Client thread: the game refused this teleport (the Music cape's "untrimmed cape" rule, B16): no var says so, so it
+	 * isn't offered again this session.
+	 */
+	public void onTeleportRefused(String row)
+	{
+		onChangeRefused(row);
 	}
 
 	/** Client thread: the game refused this spellbook change; it isn't offered again this session. */
@@ -404,5 +419,6 @@ public class RoutePlanner
 		long bankVersion;
 		boolean atOpenBank;
 		RequiredItems required;
+		boolean foreignHouse;
 	}
 }

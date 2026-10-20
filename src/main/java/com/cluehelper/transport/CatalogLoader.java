@@ -19,7 +19,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class CatalogLoader
 {
 	static final List<String> TELEPORT_FILES = List.of("spells.tsv", "home_teleports.tsv", "minigames.tsv", "items.tsv",
-		"fairy_rings.tsv");
+		"fairy_rings.tsv", "poh.tsv");
 	static final String SPELLBOOK_FILE = "spellbooks.tsv";
 
 	static final String CATEGORY = "Category";
@@ -34,6 +34,7 @@ public final class CatalogLoader
 	static final String WHERE = "Where";
 	static final String FROM = "From";
 	static final String TO = "To";
+	static final String MENU = "Menu";
 
 	private static final String ANY = "any";
 	private static final String ANYWHERE = "anywhere";
@@ -84,6 +85,7 @@ public final class CatalogLoader
 	private static CatalogRow teleport(TsvTable.Line line, RequirementParser parser)
 	{
 		String code = line.get(CODE);
+		String menu = line.get(MENU);
 		return CatalogRow.builder()
 			.name(line.get(NAME))
 			.category(Category.of(line.get(CATEGORY)))
@@ -94,6 +96,7 @@ public final class CatalogLoader
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))
 			.spends(Spend.parse(line.get(SPENDS)))
 			.requirements(CatalogRules.fairyRingStaff(parser.parse(line.getCells())))
+			.menu(menu.isEmpty() ? null : menu)
 			.build();
 	}
 
@@ -127,7 +130,13 @@ public final class CatalogLoader
 				change.npcId(id);
 			}
 		}
-		return change.build();
+		SpellbookChange built = change.build();
+		if (built.isInHouse() && built.getObjectId() != SpellbookChange.NO_ID)
+		{
+			HouseNeed piece = new HouseNeed(HouseNeed.Kind.FURNITURE, List.of(built.getObjectId()));
+			return built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
+		}
+		return built;
 	}
 
 	private static Book book(String cell)
