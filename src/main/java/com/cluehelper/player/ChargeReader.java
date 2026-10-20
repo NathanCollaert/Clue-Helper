@@ -5,6 +5,7 @@ import com.cluehelper.memory.MemoryStore;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -15,9 +16,10 @@ import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 
 /**
- * Charges of held items, in PLAN §4 item 4's order: the item id, the charge varbit while held, the
- * last value seen while held (remembered per profile), then RuneLite's Item Charges plugin (read
- * only). An item none of them knows has no entry: its charges are unknown. Client thread only.
+ * Charges of held items, in PLAN §4 item 4's order: the item id, the memoirs' charge varbit while
+ * held, the last value seen while held (remembered per profile), then RuneLite's Item Charges plugin
+ * (read only). An item none of them knows has no entry: its charges are unknown. Client thread only.
+ * The {@code CHARGES_*_QUANTITY} varbits are never a source: they always read 0 (B13).
  */
 @Singleton
 public class ChargeReader
@@ -28,11 +30,11 @@ public class ChargeReader
 	private static final int NOT_IN_NAME = -1;
 
 	private static final Map<Integer, Integer> CHARGE_VARBITS = Map.of(
-		ItemID.XERIC_TALISMAN, VarbitID.CHARGES_XERICS_TALISMAN_QUANTITY,
-		ItemID.RING_OF_SHADOWS, VarbitID.CHARGES_RING_OF_SHADOWS_QUANTITY,
 		ItemID.VEOS_KHAREDSTS_MEMOIRS, VarbitID.VEOS_MEMOIR_CHARGES,
-		ItemID.BOOK_OF_THE_DEAD, VarbitID.VEOS_MEMOIR_CHARGES,
-		ItemID.CAMULET, VarbitID.ENAKH_CAMULET_CHARGE);
+		ItemID.BOOK_OF_THE_DEAD, VarbitID.VEOS_MEMOIR_CHARGES);
+	/** Profiles may still hold values that M1 read from varbits that are not counts; they are ignored and dropped. */
+	private static final Set<Integer> UNTRUSTED_REMEMBERED = Set.of(
+		ItemID.XERIC_TALISMAN, ItemID.RING_OF_SHADOWS, ItemID.CAMULET);
 	private static final Map<Integer, String> ITEM_CHARGES_KEYS = Map.of(ItemID.CHRONICLE, "chronicle");
 
 	private final Client client;
@@ -113,7 +115,13 @@ public class ChargeReader
 	private Map<Integer, Integer> seen()
 	{
 		Map<Integer, Integer> charges = remembered.get().charges;
-		return charges == null ? Map.of() : charges;
+		if (charges == null)
+		{
+			return Map.of();
+		}
+		Map<Integer, Integer> trusted = new HashMap<>(charges);
+		trusted.keySet().removeAll(UNTRUSTED_REMEMBERED);
+		return trusted;
 	}
 
 	/** The stored form: item id → the last charge count seen while held. */
