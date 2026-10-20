@@ -33,6 +33,9 @@ public class Plan
 	List<Option> why;
 	/** Why there is no route, or a warning ("walk too long", "Wilderness target"). */
 	String note;
+	/** The step's required items: what isn't found on you or in your bank, and STASH or leprechaun hints. */
+	@Builder.Default
+	List<String> requirementNotes = List.of();
 	/** The whole plan: judging the catalog, then every search. */
 	long searchNanos;
 	/** Judging the catalog and gates for this plan, before any search. */

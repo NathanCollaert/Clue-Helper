@@ -63,6 +63,7 @@ public final class Loadouts
 		Map.entry("Teleport to House tablet", ItemID.POH_TABLET_TELEPORTTOHOUSE),
 		Map.entry("Varrock tablet", ItemID.POH_TABLET_VARROCKTELEPORT),
 		Map.entry("Watchtower tablet", ItemID.POH_TABLET_WATCHTOWERTELEPORT),
+		Map.entry("Wilderness sword 4", ItemID.WILDERNESS_SWORD_ELITE),
 		Map.entry("Xeric's talisman", ItemID.XERIC_TALISMAN));
 	/** Charges of the families whose id encodes them (Charge.Source.ITEM_ID live); the rest stay unknown. */
 	private static final Map<String, Integer> CHARGES = Map.of("Amulet of glory", 4, "Burning amulet", 5, "Combat bracelet", 6,
@@ -75,6 +76,10 @@ public final class Loadouts
 		ItemID.DEATHRUNE, ItemID.ASTRALRUNE, ItemID.BLOODRUNE, ItemID.SOULRUNE, ItemID.WRATHRUNE);
 	private static final Map<String, Integer> ACCOUNT_TYPES = Map.of("mid-ironman", 1, "uim", 2, "hcim", 3, "gim", 4);
 	private static final int MAX_QUEST_POINTS = 300;
+	/** Runes are taken to sit in a rune pouch, so only the carried items fill slots. */
+	private static final int INVENTORY_SLOTS = 28;
+	private static final int BANKED_TABLETS = 5;
+	private static final int GROUP_IRONMAN = 4;
 
 	private Loadouts()
 	{
@@ -85,8 +90,10 @@ public final class Loadouts
 	{
 		String name;
 		PlayerSnapshot carried;
-		/** Item ids the fixture banks ("*" in the fixture means everything: empty here, B15 decides). */
+		/** Item ids the fixture banks; "*" in the fixture means every fixture item it doesn't carry. */
 		List<Integer> banked;
+		/** The carried snapshot with the bank added (a GIM's in group storage), as A_banked sees it; null without a bank. */
+		PlayerSnapshot bankedSnapshot;
 		/** The fixture as written, for the planner settings it carries (types, tiers, avoidWilderness, poh). */
 		JsonObject fixture;
 	}
@@ -110,8 +117,15 @@ public final class Loadouts
 		{
 			RUNES.forEach(rune -> inventory.put(rune, RUNE_STACK));
 		}
+		List<String> bankedFamilies = new ArrayList<>();
+		array(f, "banked").forEach(item -> bankedFamilies.add(item.getAsString()));
+		if (f.get("banked").isJsonPrimitive() && "*".equals(f.get("banked").getAsString()))
+		{
+			ITEMS.keySet().stream().filter(family -> !inventory.containsKey(ITEMS.get(family))).sorted().forEach(bankedFamilies::add);
+		}
 		List<Integer> banked = new ArrayList<>();
-		array(f, "banked").forEach(item -> banked.add(itemId(item.getAsString())));
+		bankedFamilies.forEach(family -> banked.add(itemId(family)));
+		int carriedItems = f.getAsJsonArray("carried").size();
 
 		Map<Skill, Integer> levels = levels(f.getAsJsonObject("skills"));
 		Map<Quest, QuestState> quests = quests(f.get("quests"));
@@ -125,6 +139,7 @@ public final class Loadouts
 			.membersWorld(f.get("members").getAsBoolean())
 			.accountType(ACCOUNT_TYPES.getOrDefault(name, 0))
 			.inventory(inventory)
+			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - carriedItems))
 			.weapon(-1)
 			.boostedLevels(levels)
 			.realLevels(levels)
@@ -143,7 +158,30 @@ public final class Loadouts
 				quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED, quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED,
 				quests.get(Quest.DREAM_MENTOR) == QuestState.FINISHED))
 			.build();
-		return new Loadout(name, snapshot, List.copyOf(banked), f);
+		return new Loadout(name, snapshot, List.copyOf(banked), bankedSnapshot(snapshot, bankedFamilies), f);
+	}
+
+	/** Tablets come five to a stack; ids that encode charges carry them, like the carried ones. */
+	private static PlayerSnapshot bankedSnapshot(PlayerSnapshot carried, List<String> families)
+	{
+		if (families.isEmpty())
+		{
+			return null;
+		}
+		Map<Integer, Integer> stored = new HashMap<>();
+		Map<Integer, Charge> charges = new HashMap<>(carried.getCharges());
+		for (String family : families)
+		{
+			int id = itemId(family);
+			stored.merge(id, family.endsWith("tablet") ? BANKED_TABLETS : 1, Integer::sum);
+			Integer known = CHARGES.get(family);
+			if (known != null)
+			{
+				charges.put(id, new Charge(known, Charge.Source.ITEM_ID));
+			}
+		}
+		boolean group = carried.getAccountType() == GROUP_IRONMAN;
+		return carried.toBuilder().bank(group ? Map.of() : stored).groupStorage(group ? stored : Map.of()).charges(charges).build();
 	}
 
 	/** The rune model from B01's cache slice, as the live client would build it. */

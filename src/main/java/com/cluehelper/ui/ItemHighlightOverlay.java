@@ -6,13 +6,16 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
-/** Outlines the item the current sub-step uses, in the inventory and the equipment tab. */
+/** Outlines the item the current sub-step uses, in the inventory and the equipment tab, and what to withdraw in the bank. */
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
+
 	private final StepGuide guide;
 	private final ItemManager itemManager;
 	private final ClueHelperConfig config;
@@ -25,12 +28,14 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 		this.config = config;
 		showOnInventory();
 		showOnEquipment();
+		showOnBank();
 	}
 
 	@Override
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem item)
 	{
-		if (!config.highlightItems() || !guide.getHighlightItems().contains(itemId))
+		boolean inBank = item.getWidget() != null && WidgetUtil.componentToInterface(item.getWidget().getId()) == InterfaceID.BANKMAIN;
+		if (!config.highlightItems() || !(inBank ? guide.getBankHighlightItems() : guide.getHighlightItems()).contains(itemId))
 		{
 			return;
 		}

@@ -1,6 +1,8 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.player.Book;
+import com.cluehelper.player.Container;
+import com.cluehelper.player.ItemUse;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Route;
 import com.cluehelper.step.ClueTypes;
@@ -12,6 +14,8 @@ import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
 /** Turns a committed route and its step into the sub-steps StepGuide walks through (PLAN §5.5). */
@@ -34,10 +38,15 @@ public final class SubSteps
 	{
 	}
 
-	public static List<SubStep> of(Route route, Step step)
+	/** @param itemNames item names for the withdraw list; client thread */
+	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames)
 	{
 		List<SubStep> steps = new ArrayList<>();
 		List<Leg> legs = route.getLegs();
+		if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
+		{
+			steps.add(withdraw(route, itemNames));
+		}
 		for (int i = 0; i < legs.size(); i++)
 		{
 			Leg leg = legs.get(i);
@@ -65,12 +74,39 @@ public final class SubSteps
 					steps.add(change(leg));
 					break;
 				default:
-					steps.add(SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank").waypoint(leg.getTo()).build());
+					steps.add(SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank")
+						.detail(route.isPinIncluded() ? "Your PIN comes first" : null).waypoint(leg.getTo()).build());
+					steps.add(withdraw(route, itemNames));
 					break;
 			}
 		}
 		steps.add(act(step));
 		return steps;
+	}
+
+	/**
+	 * The withdraw list. Items core's *clue* tag already shows are only counted, never listed or outlined again
+	 * (they would duplicate core).
+	 */
+	static SubStep withdraw(Route route, IntFunction<String> itemNames)
+	{
+		List<ItemUse> ours = route.getWithdraw().stream().filter(use -> !route.getWithdrawInCoreTag().contains(use.getItemId()))
+			.collect(Collectors.toList());
+		int fromCoreTag = route.getWithdraw().size() - ours.size();
+		List<String> lines = new ArrayList<>();
+		ours.forEach(use -> lines.add(itemNames.apply(use.getItemId()) + (use.getContainer() == Container.GROUP_STORAGE ? " (group storage)" : "")));
+		if (fromCoreTag > 0)
+		{
+			lines.add(fromCoreTag + " from the Clue Scroll plugin's clue tag");
+		}
+		if (route.isDepositFirst())
+		{
+			lines.add(0, "Deposit first: not enough free slots");
+		}
+		String text = route.getWithdraw().isEmpty() ? "Close the bank" : "Withdraw " + String.join(", ", lines);
+		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text(text)
+			.detail(route.getWithdraw().isEmpty() ? null : "Then close the bank")
+			.bankItems(ours.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
 	private static SubStep walk(Leg leg, Leg next, Step step)

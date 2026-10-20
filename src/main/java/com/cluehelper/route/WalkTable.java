@@ -55,6 +55,7 @@ public final class WalkTable
 	private int[] entryFrom = new int[0];
 	private int[][] gateSets = new int[0][];
 	private List<Requirements> gates = List.of();
+	private Map<Integer, List<Bank>> banks = Map.of();
 
 	private int[] rowOrigin = new int[0];
 	private int[] rowDest = new int[0];
@@ -65,7 +66,7 @@ public final class WalkTable
 	{
 	}
 
-	/** Reads the four bundled files. Throws when one is missing or unreadable. */
+	/** Reads the five bundled files. Throws when one is missing or unreadable. */
 	public static WalkTable load() throws IOException
 	{
 		WalkTable table = new WalkTable();
@@ -73,6 +74,7 @@ public final class WalkTable
 		table.readGates(lines("gates.tsv"));
 		table.readTable(new Varints(bytes("table.bin")));
 		table.readRows(new Varints(bytes("rows.bin")));
+		table.readBanks(lines("banks.tsv"));
 		table.indexReverse();
 		return table;
 	}
@@ -152,6 +154,12 @@ public final class WalkTable
 	public List<Requirements> getGates()
 	{
 		return gates;
+	}
+
+	/** The banks at a bank node, each with its own gates; empty for other nodes. */
+	public List<Bank> banks(int node)
+	{
+		return banks.getOrDefault(node, List.of());
 	}
 
 	public int rowCount()
@@ -269,6 +277,30 @@ public final class WalkTable
 			parsed.add(parser.parse(cells));
 		}
 		gates = List.copyOf(parsed);
+	}
+
+	private void readBanks(List<String[]> rows)
+	{
+		RequirementParser parser = new RequirementParser();
+		Map<Integer, List<Bank>> byNode = new HashMap<>();
+		for (String[] c : rows)
+		{
+			String[] xyz = c[0].split(" ");
+			int node = node(new WorldPoint(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2])));
+			if (node == NO_NODE)
+			{
+				throw new IllegalStateException("banks.tsv: no node at " + c[0]);
+			}
+			Map<String, String> cells = new HashMap<>();
+			cells.put(RequirementParser.MEMBERS, cell(c, 3));
+			cells.put(RequirementParser.SKILLS, cell(c, 4));
+			cells.put(RequirementParser.QUESTS, cell(c, 5));
+			cells.put(RequirementParser.VARBITS, cell(c, 6));
+			cells.put(RequirementParser.VARPS, cell(c, 7));
+			Bank bank = new Bank(c[1], c[2], parser.parse(cells), "Y".equals(cell(c, 8)));
+			byNode.computeIfAbsent(node, n -> new ArrayList<>()).add(bank);
+		}
+		banks = byNode;
 	}
 
 	private void readTable(Varints in)

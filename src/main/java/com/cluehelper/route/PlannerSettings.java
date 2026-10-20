@@ -11,8 +11,6 @@ import lombok.Value;
 @Builder(toBuilder = true)
 public class PlannerSettings
 {
-	/** Off until B15 remembers the bank: the bank-stop edge is built but never offered live. */
-	public static final boolean BANK_EDGE_LIVE = false;
 	private static final int HARDCORE_IRONMAN = 3;
 	private static final int HARDCORE_GROUP_IRONMAN = 5;
 
@@ -26,8 +24,11 @@ public class PlannerSettings
 	int capeUsePenalty = 3;
 	@Builder.Default
 	int strandPenalty = 30;
+	/** The bank-stop edge is offered whenever {@code PlanInput.banked} is set (useBank on, a bank seen, not UIM). */
 	@Builder.Default
-	boolean bankEdge = BANK_EDGE_LIVE;
+	boolean bankEdge = true;
+	/** Ticks on top of B14's bank stop (3 + 2 per item stack + 4 for the PIN). */
+	int bankStopExtraTicks;
 
 	public static PlannerSettings from(ClueHelperConfig config, int accountType)
 	{
@@ -41,6 +42,8 @@ public class PlannerSettings
 			.consumablePenalty(config.consumablePenalty())
 			.capeUsePenalty(config.capeUsePenalty())
 			.strandPenalty(config.strandPenalty())
+			.bankEdge(config.useBank())
+			.bankStopExtraTicks(config.bankStopExtraTicks())
 			.build();
 	}
 }

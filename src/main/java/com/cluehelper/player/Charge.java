@@ -15,6 +15,8 @@ public class Charge
 		VARBIT,
 		/** The last value seen while held, remembered per profile. */
 		REMEMBERED,
+		/** The item's own "Check" line, remembered per profile with its date (B13). */
+		CHECK_LINE,
 		/** RuneLite's Item Charges plugin, read only. */
 		ITEM_CHARGES_PLUGIN
 	}

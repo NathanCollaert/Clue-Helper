@@ -51,7 +51,7 @@ public class ConventionsTest
 		"highlightItems", "highlightSpells", "highlightMenus",
 		"pathLine", "minimapMarker", "worldMapMarker",
 		"spellbookChanges", "capeUsePenalty", "strandPenalty",
-		"diggingDog", "xericsHonourUnlocked"));
+		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 

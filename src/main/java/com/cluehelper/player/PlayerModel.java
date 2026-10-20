@@ -1,6 +1,7 @@
 package com.cluehelper.player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -63,9 +64,11 @@ public class PlayerModel
 		WorldType.PVP_ARENA, WorldType.NOSAVE_MODE);
 
 	public static final int UNKNOWN_TICK = -1;
+	private static final int INVENTORY_SLOTS = 28;
 
 	private final Client client;
 	private final ChargeReader chargeReader;
+	private final CheckLines checkLines;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
 	private final Queue<int[]> pendingWatches = new ConcurrentLinkedQueue<>();
 	private final RebuildStats stats = new RebuildStats();
@@ -88,10 +91,11 @@ public class PlayerModel
 	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	@Inject
-	PlayerModel(Client client, ChargeReader chargeReader)
+	PlayerModel(Client client, ChargeReader chargeReader, CheckLines checkLines)
 	{
 		this.client = client;
 		this.chargeReader = chargeReader;
+		this.checkLines = checkLines;
 	}
 
 	public void start()
@@ -210,6 +214,30 @@ public class PlayerModel
 	public void onStatChanged()
 	{
 		markDirty("stats");
+	}
+
+	/** A Check line taught a charge count. */
+	public void onChargesLearned()
+	{
+		markDirty("charges");
+	}
+
+	/**
+	 * What is known about these items' charges, in PLAN §4 item 4's order, for items that aren't held (the remembered
+	 * bank). Client thread.
+	 */
+	public Map<Integer, Charge> charges(Collection<Integer> itemIds)
+	{
+		Map<Integer, Charge> charges = new HashMap<>(chargeReader.read(itemIds));
+		for (int id : itemIds)
+		{
+			CheckLines.Checked checked = checkLines.charges().get(id);
+			if (checked != null)
+			{
+				charges.putIfAbsent(id, new Charge(checked.charges, Charge.Source.CHECK_LINE));
+			}
+		}
+		return charges;
 	}
 
 	/** From the plugin's GameTick handler. */
@@ -337,6 +365,9 @@ public class PlayerModel
 	private PlayerSnapshot build(Position now)
 	{
 		Map<Integer, Integer> inventory = contents(InventoryID.INV);
+		ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INV);
+		int usedSlots = inventoryContainer == null ? 0 : (int) Arrays.stream(inventoryContainer.getItems())
+			.filter(item -> item.getId() > 0 && item.getQuantity() > 0).count();
 		Map<Integer, Integer> worn = contents(InventoryID.WORN);
 		boolean pouchHeld = inventory.keySet().stream().anyMatch(RUNE_POUCHES::contains);
 		Map<Integer, Integer> varbits = new HashMap<>();
@@ -378,7 +409,8 @@ public class PlayerModel
 			.varps(varps)
 			.unknownVars(PlayerSnapshot.UnknownVars.UNREAD)
 			.spellbook(spellbook())
-			.charges(chargeReader.read(held))
+			.charges(charges(held))
+			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.build();
 	}
 

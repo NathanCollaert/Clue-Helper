@@ -2,6 +2,7 @@ package com.cluehelper.route;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.link.ClueLink;
+import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.Position;
@@ -64,6 +65,8 @@ public class RoutePlanner
 	private final WalkData walkData;
 	private final PlannerRunner runner;
 	private final ClueHelperConfig config;
+	private final BankMemory bankMemory;
+	private final StepNeeds stepNeeds;
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile WalkData.Loaded walk;
@@ -96,8 +99,10 @@ public class RoutePlanner
 
 	@Inject
 	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
-		WalkData walkData, PlannerRunner runner, ClueHelperConfig config)
+		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds)
 	{
+		this.bankMemory = bankMemory;
+		this.stepNeeds = stepNeeds;
 		this.client = client;
 		this.clueLink = clueLink;
 		this.player = player;
@@ -165,8 +170,12 @@ public class RoutePlanner
 		updateStart(data, snapshot, runes, step);
 		PlannerSettings settings = PlannerSettings.from(config, snapshot.getAccountType());
 		AvailabilitySet carried = availability.getCarried();
+		PlayerSnapshot banked = availability.getBankedSnapshot();
+		RequiredItems required = stepNeeds.of(step);
+		boolean atOpenBank = bankMemory.isBankOpen();
 		Trigger trigger = new Trigger(step, snapshot.getVersion(), carried.getSnapshotVersion(), carried.getValidUntilMinute(),
-			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), settings, Set.copyOf(refusedChanges));
+			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), settings, Set.copyOf(refusedChanges),
+			bankMemory.getVersion(), atOpenBank, required);
 		if (trigger.equals(lastTrigger))
 		{
 			return;
@@ -175,6 +184,10 @@ public class RoutePlanner
 		PlanInput input = PlanInput.builder()
 			.step(step)
 			.player(snapshot)
+			.banked(banked == null ? null : withRefusals(banked))
+			.pinPending(bankMemory.isPinPending())
+			.atOpenBank(atOpenBank)
+			.required(required)
 			.engine(new AvailabilityEngine(runes, id -> "item " + id))
 			.nowMinutes(AvailabilityService.nowMinutes())
 			.catalog(loadedCatalog)
@@ -387,5 +400,9 @@ public class RoutePlanner
 		SpellbookState spellbook;
 		PlannerSettings settings;
 		Set<String> refusedChanges;
+		/** The remembered bank or the PIN state changed; while the bank is open, every withdraw. */
+		long bankVersion;
+		boolean atOpenBank;
+		RequiredItems required;
 	}
 }

@@ -79,6 +79,13 @@ final class SpendCheck
 		}
 	}
 
+	/** Carried, and after a bank stop the bank and group storage too. */
+	private static int stored(PlayerSnapshot player, int id)
+	{
+		return player.count(Container.INVENTORY, id) + player.count(Container.WORN, id) + player.count(Container.BANK, id)
+			+ player.count(Container.GROUP_STORAGE, id);
+	}
+
 	private static int available(String key, PlayerSnapshot player)
 	{
 		String[] parts = key.split(":");
@@ -86,11 +93,11 @@ final class SpendCheck
 		{
 			case "item":
 				int id = Integer.parseInt(parts[1]);
-				return player.count(Container.INVENTORY, id) + player.count(Container.WORN, id) + player.count(Container.RUNE_POUCH, id);
+				return stored(player, id) + player.count(Container.RUNE_POUCH, id);
 			case "charge":
 				int item = Integer.parseInt(parts[1]);
 				Charge charge = player.getCharges().get(item);
-				int held = player.count(Container.INVENTORY, item) + player.count(Container.WORN, item);
+				int held = stored(player, item);
 				return Math.max(1, held) * (charge == null ? 1 : charge.getCharges());
 			case "once":
 				return 1;

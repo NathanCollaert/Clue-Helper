@@ -70,8 +70,13 @@ final class PlayerDump
 			spellLines(s, runes).forEach(chat);
 		}
 		AvailabilitySet carried = availability.getCarried();
-		chat.accept(String.format("A_carried: %d of %d rows (v%d, judged in %.2f ms); A_banked: empty until B15",
+		AvailabilitySet banked = availability.getBanked();
+		PlayerSnapshot bankedSnapshot = availability.getBankedSnapshot();
+		chat.accept(String.format("A_carried: %d of %d rows (v%d); A_banked: %s (both judged in %.2f ms)",
 			carried.available().size(), carried.getRows().size(), carried.getSnapshotVersion(),
+			bankedSnapshot == null ? "none (no bank seen, useBank off or UIM)"
+				: banked.available().size() + " rows, bank " + bankedSnapshot.getBank().size() + " items, group storage "
+				+ bankedSnapshot.getGroupStorage().size(),
 			availability.getLastJudgeNanos() / NANOS_PER_MS));
 		chat.accept("Available by category: " + availableByCategory(carried) + " (every row is in the log)");
 		carried.getRows().forEach(row -> logOnly.accept(rowLine(row)));

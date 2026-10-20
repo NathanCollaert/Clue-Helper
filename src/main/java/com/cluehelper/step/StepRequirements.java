@@ -15,14 +15,23 @@ public final class StepRequirements
 	private final int firePitVarbitId;
 	private final int lightSourceVarbitId;
 	private final List<ItemRequirement> items;
+	private final int stashObjectId;
 
-	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items)
+	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
+		int stashObjectId)
 	{
 		this.spade = spade;
 		this.light = light;
 		this.firePitVarbitId = firePitVarbitId;
 		this.lightSourceVarbitId = lightSourceVarbitId;
 		this.items = List.copyOf(items);
+		this.stashObjectId = stashObjectId;
+	}
+
+	/** The emote step's STASH unit object (core's {@code STASHUnit}), or -1. */
+	public int getStashObjectId()
+	{
+		return stashObjectId;
 	}
 
 	public SpadeNeed getSpade()

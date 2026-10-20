@@ -1,10 +1,12 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.Book;
+import com.cluehelper.player.ItemUse;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.RowAvailability;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Value;
@@ -34,6 +36,18 @@ public class Route
 	RowAvailability.Confidence confidence;
 	/** The route lands in or walks through the Wilderness. */
 	boolean wilderness;
+	/** What to take from the bank or group storage: route items and the step's required items (PLAN §5.4). */
+	@Builder.Default
+	List<ItemUse> withdraw = List.of();
+	/** Withdraw-list items core's *clue* bank tag already shows: our bank highlights leave them out. */
+	@Builder.Default
+	Set<Integer> withdrawInCoreTag = Set.of();
+	/** The withdraw list needs more inventory slots than are free: deposit first (1 tick, counted). */
+	boolean depositFirst;
+	/** The bank stop's ticks include the PIN. */
+	boolean pinIncluded;
+	/** Planned at an open bank: the route starts with the withdraw list, no bank leg. */
+	boolean openBankStart;
 
 	public int getTicks()
 	{
@@ -69,6 +83,27 @@ public class Route
 	public String getFirstTransportKey()
 	{
 		return legs.stream().filter(Leg::isTransport).findFirst().map(Route::transportKey).orElse(WALK);
+	}
+
+	/**
+	 * The first transport after the bank stop, or null without one. Alternatives leave it out too: otherwise every way
+	 * to reach a bank comes back as an alternative with the same teleport after it.
+	 */
+	public String getAfterBankTransportKey()
+	{
+		boolean afterBank = false;
+		for (Leg leg : legs)
+		{
+			if (leg.getKind() == Leg.Kind.BANK)
+			{
+				afterBank = true;
+			}
+			else if (afterBank && leg.isTransport())
+			{
+				return transportKey(leg);
+			}
+		}
+		return null;
 	}
 
 	static String transportKey(Leg leg)

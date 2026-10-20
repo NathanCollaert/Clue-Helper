@@ -17,8 +17,14 @@ public class PlanInput
 
 	Step step;
 	PlayerSnapshot player;
-	/** What the player has with the bank added (A_banked); null until B15 remembers the bank. */
+	/** What the player has with the remembered bank added (A_banked); null when no bank counts (UIM, useBank off, never seen). */
 	PlayerSnapshot banked;
+	/** The next bank open asks for the PIN (B14: 4 ticks). */
+	boolean pinPending;
+	/** The bank interface is open: the plan starts banked, with no stop cost (PLAN §5.4 At an open bank). */
+	boolean atOpenBank;
+	@Builder.Default
+	RequiredItems required = RequiredItems.NONE;
 	AvailabilityEngine engine;
 	long nowMinutes;
 	Catalog catalog;

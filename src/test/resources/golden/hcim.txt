@@ -1,84 +1,87 @@
 anagram:12055
-  best      51t: Games necklace: Barbarian Outpost → walk 45 {charge:3853=1}
+  best      50t: Games necklace: Barbarian Outpost → walk 45 {charge:3853=1}
 anagram:12568
-  best      398t: Varrock Teleport → walk 393 {item:556=3, item:554=1, item:563=1}
-  faster, under the margin 341t (rank 371): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Salve Graveyard Teleport → walk 227 {item:554=1, item:555=1, item:563=3, item:566=2} leaves you on ARCEUUS
-  alt       341t (rank 371): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Salve Graveyard Teleport → walk 227 {item:554=1, item:555=1, item:563=3, item:566=2} leaves you on ARCEUUS
-  alt       434t: Skills necklace: Cooking Guild → walk 428 {charge:11968=1}
+  best      354t: Ring of dueling: Castle Wars → walk 4 → bank → Digsite pendant: Digsite → walk 335 {charge:2552=1, charge:11194=1} withdraw [11194]
+  direct    397t: Varrock Teleport → walk 393 {item:556=3, item:554=1, item:563=1}
+  alt       358t: Amulet of glory: Edgeville → walk 5 → bank → Ectophial → walk 337 {charge:1712=1} withdraw [4251]
+  alt       339t (rank 369): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Salve Graveyard Teleport → walk 227 {item:554=1, item:555=1, item:563=3, item:566=2} leaves you on ARCEUUS
 anagram:19758
-  best      181t: Kourend Castle Teleport → walk 176 {item:554=1, item:555=1, item:563=2}
-  alt       275t: Skills necklace: Woodcutting Guild → walk 269 {charge:11968=1}
-  alt       337t: Skills necklace: Farming Guild → walk 331 {charge:11968=1}
+  best      180t: Kourend Castle Teleport → walk 176 {item:554=1, item:555=1, item:563=2}
+  alt       196t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 4. Xeric's Heart → walk 177 {charge:2552=1, charge:13393=1} withdraw [13393]
+  alt       207t: Amulet of glory: Edgeville → walk 5 → bank → Xeric's talisman: 3. Xeric's Inferno → walk 188 {charge:1712=1, charge:13393=1} withdraw [13393]
 anagram:25784
-  best      78t: Kourend Castle Teleport → walk 73 {item:554=1, item:555=1, item:563=2}
-  alt       82t: Skills necklace: Woodcutting Guild → walk 76 {charge:11968=1}
+  best      42t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 1. Xeric's Lookout → walk 23 {charge:2552=1, charge:13393=1} withdraw [13393]
+  direct    77t: Kourend Castle Teleport → walk 73 {item:554=1, item:555=1, item:563=2}
+  alt       81t: Skills necklace: Woodcutting Guild → walk 76 {charge:11968=1}
 anagram:7268
-  best      96t: Necklace of passage: The Outpost → walk 90 {charge:21146=1}
-  alt       150t: Skills necklace: Fishing Guild → walk 144 {charge:11968=1}
+  best      95t: Necklace of passage: The Outpost → walk 90 {charge:21146=1}
+  alt       149t: Skills necklace: Fishing Guild → walk 144 {charge:11968=1}
 anagram:duo plug
   best      none
   note      no route from what you have
 map:w346
-  best      46t: Skills necklace: Cooking Guild → walk 40 {charge:11968=1}
-  alt       49t: Varrock Teleport → walk 44 {item:556=3, item:554=1, item:563=1}
-  alt       75t: Amulet of glory: Draynor Village → walk 69 {charge:1712=1}
+  best      31t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 13 {charge:2552=1, charge:11972=1} withdraw [11972]
+  direct    45t: Skills necklace: Cooking Guild → walk 40 {charge:11968=1}
+  alt       48t: Varrock Teleport → walk 44 {item:556=3, item:554=1, item:563=1}
 map:w347
-  best      63t: Varrock Teleport → walk 58 {item:556=3, item:554=1, item:563=1}
-  alt       78t: Ring of dueling: Emir's Arena → walk 72 {charge:2552=1}
-  alt       91t: Skills necklace: Cooking Guild → walk 85 {charge:11968=1}
+  best      62t: Varrock Teleport → walk 58 {item:556=3, item:554=1, item:563=1}
+  alt       68t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 49 {charge:2552=1, charge:11972=1} withdraw [11972]
+  alt       77t: Ring of dueling: Emir's Arena → walk 72 {charge:2552=1}
 map:w348
-  best      21t: Amulet of glory: Draynor Village → walk 15 {charge:1712=1}
-  alt       34t: Necklace of passage: Wizards' Tower → walk 28 {charge:21146=1}
+  best      20t: Amulet of glory: Draynor Village → walk 15 {charge:1712=1}
+  alt       33t: Necklace of passage: Wizards' Tower → walk 28 {charge:21146=1}
 map:w351
-  best      54t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
-  alt       72t: Skills necklace: Cooking Guild → walk 66 {charge:11968=1}
-  alt       77t: Amulet of glory: Edgeville → walk 71 {charge:1712=1}
+  best      53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
+  alt       71t: Skills necklace: Cooking Guild → walk 66 {charge:11968=1}
+  alt       67t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 49 {charge:2552=1, item:8009=1} withdraw [8009]
 map:w356
-  best      22t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
+  best      21t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
 cipher:19762
-  best      73t: Kourend Castle Teleport → walk 68 {item:554=1, item:555=1, item:563=2}
+  best      72t: Kourend Castle Teleport → walk 68 {item:554=1, item:555=1, item:563=2}
+  alt       87t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 4. Xeric's Heart → walk 69 {charge:2552=1, charge:13393=1} withdraw [13393]
+  alt       92t: Amulet of glory: Edgeville → walk 5 → bank → Xeric's talisman: 3. Xeric's Inferno → walk 72 {charge:1712=1, charge:13393=1} withdraw [13393]
 cipher:19768
-  best      106t: Necklace of passage: Eagle's Eyrie → walk 100 {charge:21146=1}
+  best      105t: Necklace of passage: Eagle's Eyrie → walk 100 {charge:21146=1}
 cipher:19898
   best      none
   note      no route from what you have
 cipher:19904
-  best      122t: Necklace of passage: Eagle's Eyrie → walk 116 {charge:21146=1}
+  best      121t: Necklace of passage: Eagle's Eyrie → walk 116 {charge:21146=1}
 cipher:19910
   best      none
   note      no route from what you have
 cipher:23172
-  best      39t: Games necklace: Barbarian Outpost → walk 33 {charge:3853=1}
+  best      38t: Games necklace: Barbarian Outpost → walk 33 {charge:3853=1}
 coordinate:12033
-  best      131t: Ring of dueling: Castle Wars → walk 125 {charge:2552=1}
-  alt       151t: Castle Wars Minigame Teleport → walk 124 {cooldown:888=1}
-  alt       154t: Nightmare Zone Minigame Teleport → walk 127 {cooldown:888=1}
+  best      130t: Ring of dueling: Castle Wars → walk 125 {charge:2552=1}
+  alt       150t: Castle Wars Minigame Teleport → walk 124 {cooldown:888=1}
+  alt       153t: Nightmare Zone Minigame Teleport → walk 127 {cooldown:888=1}
 coordinate:12101
-  best      129t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
-  alt       168t: Ring of dueling: Ferox Enclave → walk 162 {charge:2552=1}
-  alt       189t: Clan Wars Minigame Teleport → walk 162 {cooldown:888=1}
+  best      128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  alt       167t: Ring of dueling: Ferox Enclave → walk 162 {charge:2552=1}
+  alt       162t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Chaos Temple → walk 143 {charge:2552=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 coordinate:19844
   best      none
   note      no route from what you have
 coordinate:2725
-  best      181t: Games necklace: Corporeal Beast → walk 175 {charge:3853=1}
-  alt       195t: Ring of dueling: Ferox Enclave → walk 189 {charge:2552=1}
-  alt       216t: Clan Wars Minigame Teleport → walk 189 {cooldown:888=1}
+  best      96t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 78 {charge:2552=1, charge:21166=1} withdraw [21166]
+  direct    180t: Games necklace: Corporeal Beast → walk 175 {charge:3853=1}
+  alt       184t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 164 {charge:1712=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 coordinate:28909
-  best      75t: Varrock Teleport → walk 70 {item:556=3, item:554=1, item:563=1}
-  alt       112t: Skills necklace: Cooking Guild → walk 106 {charge:11968=1}
-  alt       130t: Ring of dueling: Emir's Arena → walk 124 {charge:2552=1}
+  best      74t: Varrock Teleport → walk 70 {item:556=3, item:554=1, item:563=1}
+  alt       89t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 70 {charge:2552=1, item:8007=1} withdraw [8007]
+  alt       111t: Skills necklace: Cooking Guild → walk 106 {charge:11968=1}
 coordinate:3556
-  best      69t: Games necklace: Corporeal Beast → walk 63 {charge:3853=1}
-  alt       83t: Ring of dueling: Ferox Enclave → walk 77 {charge:2552=1}
-  alt       104t: Clan Wars Minigame Teleport → walk 77 {cooldown:888=1}
+  best      58t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 39 {charge:2552=1, charge:21166=1} withdraw [21166]
+  direct    68t: Games necklace: Corporeal Beast → walk 63 {charge:3853=1}
+  alt       82t: Ring of dueling: Ferox Enclave → walk 77 {charge:2552=1}
+  alt       80t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 60 {charge:1712=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 cryptic:'a bag belt only?', he asked his balding brothers.
-  best      43t: Amulet of glory: Edgeville → walk 37 {charge:1712=1}
-  alt       79t: Falador Teleport → walk 74 {item:556=3, item:555=1, item:563=1}
-  alt       80t: Skills necklace: Cooking Guild → walk 74 {charge:11968=1}
+  best      23t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Monastery → walk 5 {charge:2552=1, charge:11972=1} withdraw [11972]
+  direct    42t: Amulet of glory: Edgeville → walk 37 {charge:1712=1}
 cryptic:elvish onions.
   best      none
   note      no route from what you have
@@ -86,160 +89,195 @@ cryptic:leader of the yak city.
   best      none
   note      no route from what you have
 cryptic:search the chest in the left-hand tower of camelot castle.
-  best      32t: Camelot Teleport → walk 27 {item:556=5, item:563=1}
+  best      31t: Camelot Teleport → walk 27 {item:556=5, item:563=1}
+  alt       46t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 27 {charge:2552=1, item:8010=1} withdraw [8010]
 cryptic:search the wheelbarrow in rimmington mine.
-  best      40t: Skills necklace: Crafting Guild → walk 34 {charge:11968=1}
-  alt       72t: Amulet of glory: Draynor Village → walk 66 {charge:1712=1}
-  alt       75t: Falador Teleport → walk 70 {item:556=3, item:555=1, item:563=1}
+  best      39t: Skills necklace: Crafting Guild → walk 34 {charge:11968=1}
+  alt       71t: Amulet of glory: Draynor Village → walk 66 {charge:1712=1}
+  alt       74t: Falador Teleport → walk 70 {item:556=3, item:555=1, item:563=1}
 cryptic:talk to the cook in the blue moon inn in varrock.
-  best      36t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
-  alt       67t: Skills necklace: Cooking Guild → walk 53 {charge:11968=1}
+  best      35t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       50t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 23 {charge:2552=1, item:8007=1} withdraw [8007]
+  alt       54t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Champions' Guild → walk 26 {charge:1712=1, charge:11972=1} withdraw [11972]
 emote:10180
-  best      52t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
-  alt       59t: Amulet of glory: Al Kharid → walk 53 {charge:1712=1}
-  alt       65t: Amulet of glory: Draynor Village → walk 59 {charge:1712=1}
+  best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
+  alt       58t: Amulet of glory: Al Kharid → walk 53 {charge:1712=1}
+  alt       64t: Amulet of glory: Draynor Village → walk 59 {charge:1712=1}
 emote:10222
-  best      46t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
-  alt       79t: Skills necklace: Fishing Guild → walk 73 {charge:11968=1}
+  best      45t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
+  alt       59t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 41 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       78t: Skills necklace: Fishing Guild → walk 73 {charge:11968=1}
 emote:10264
-  best      33t: Games necklace: Barbarian Outpost → walk 27 {charge:3853=1}
+  best      32t: Games necklace: Barbarian Outpost → walk 27 {charge:3853=1}
 emote:12080
-  best      266t: Varrock Teleport → walk 261 {item:556=3, item:554=1, item:563=1}
-  faster, under the margin 230t (rank 260): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Salve Graveyard Teleport → walk 116 {item:554=1, item:555=1, item:563=3, item:566=2} leaves you on ARCEUUS
-  alt       230t (rank 260): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Salve Graveyard Teleport → walk 116 {item:554=1, item:555=1, item:563=3, item:566=2} leaves you on ARCEUUS
-  alt       303t: Skills necklace: Cooking Guild → walk 297 {charge:11968=1}
+  best      221t: Ring of dueling: Castle Wars → walk 4 → bank → Ectophial → walk 201 {charge:2552=1} withdraw [4251]
+  direct    265t: Varrock Teleport → walk 261 {item:556=3, item:554=1, item:563=1}
+  alt       223t: Amulet of glory: Edgeville → walk 5 → bank → Digsite pendant: Digsite → walk 204 {charge:1712=1, charge:11194=1} withdraw [11194]
+  alt       228t (rank 258): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Salve Graveyard Teleport → walk 116 {item:554=1, item:555=1, item:563=3, item:566=2} leaves you on ARCEUUS
 emote:19833
-  best      31t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
+  best      30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
+  alt       45t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 26 {charge:2552=1, item:8007=1} withdraw [8007]
+  alt       56t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Champions' Guild → walk 36 {charge:1712=1, charge:11972=1} withdraw [11972]
 emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
   best      none
   note      walk too long
 fairyring:a i q 0 4 4 0
-  best      104t: Skills necklace: Crafting Guild → walk 98 {charge:11968=1}
-  alt       115t: Amulet of glory: Draynor Village → walk 109 {charge:1712=1}
-  alt       140t: Falador Teleport → walk 135 {item:556=3, item:555=1, item:563=1}
+  best      103t: Skills necklace: Crafting Guild → walk 98 {charge:11968=1}
+  alt       114t: Amulet of glory: Draynor Village → walk 109 {charge:1712=1}
+  alt       139t: Falador Teleport → walk 135 {item:556=3, item:555=1, item:563=1}
 fairyring:a i r 2 3 3 1
   best      none
   note      no route from what you have
 fairyring:a l p 1 1 4 0
-  best      51t: Games necklace: Barbarian Outpost → walk 45 {charge:3853=1}
+  best      50t: Games necklace: Barbarian Outpost → walk 45 {charge:3853=1}
 fairyring:b j r 1 1 2 3
   best      none
   note      no route from what you have
 fairyring:c i s 0 0 0 9
-  best      92t: Kourend Castle Teleport → walk 87 {item:554=1, item:555=1, item:563=2}
+  best      91t: Kourend Castle Teleport → walk 87 {item:554=1, item:555=1, item:563=2}
+  alt       93t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 3. Xeric's Inferno → walk 75 {charge:2552=1, charge:13393=1} withdraw [13393]
+  alt       108t: Amulet of glory: Edgeville → walk 5 → bank → Xeric's talisman: 4. Xeric's Heart → walk 89 {charge:1712=1, charge:13393=1} withdraw [13393]
 fairyring:d i p 8 5 1 1
   best      none
   note      no route from what you have
 falo:a blood red weapon, a strong curved sword, found on the island of primate lords.
-  best      61t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
-  alt       96t: Skills necklace: Fishing Guild → walk 90 {charge:11968=1}
+  best      60t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
+  alt       74t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 56 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       79t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 60 {charge:1712=1, charge:11972=1} withdraw [11972]
 falo:a fiery axe of great inferno, when you use it, you'll wonder where the logs go.
-  best      61t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
-  alt       96t: Skills necklace: Fishing Guild → walk 90 {charge:11968=1}
+  best      60t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
+  alt       74t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 56 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       79t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 60 {charge:1712=1, charge:11972=1} withdraw [11972]
 falo:a shiny helmet of flight, to obtain this with melee, struggle you might.
-  best      61t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
-  alt       96t: Skills necklace: Fishing Guild → walk 90 {charge:11968=1}
+  best      60t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
+  alt       74t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 56 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       79t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 60 {charge:1712=1, charge:11972=1} withdraw [11972]
 falo:it can hold down a boat or crush a goat, this object, you see, is quite heavy.
-  best      61t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
-  alt       96t: Skills necklace: Fishing Guild → walk 90 {charge:11968=1}
+  best      60t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
+  alt       74t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 56 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       79t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 60 {charge:1712=1, charge:11972=1} withdraw [11972]
 falo:penance healers runners and more, obtaining this body often gives much deplore.
-  best      61t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
-  alt       96t: Skills necklace: Fishing Guild → walk 90 {charge:11968=1}
+  best      60t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
+  alt       74t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 56 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       79t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 60 {charge:1712=1, charge:11972=1} withdraw [11972]
 falo:they come from some time ago, from a land unto the east. fossilised they have become, this small and gentle beast.
-  best      61t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
-  alt       96t: Skills necklace: Fishing Guild → walk 90 {charge:11968=1}
+  best      60t: Camelot Teleport → walk 56 {item:556=5, item:563=1}
+  alt       74t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 56 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       79t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 60 {charge:1712=1, charge:11972=1} withdraw [11972]
 spot:ASGARNIA_WARRIORS
-  best      28t: Games necklace: Burthorpe → walk 22 {charge:3853=1}
-  alt       49t: Burthorpe Games Room Minigame Teleport → walk 22 {cooldown:888=1}
+  best      27t: Games necklace: Burthorpe → walk 22 {charge:3853=1}
+  alt       31t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Warriors' Guild → walk 13 {charge:2552=1, charge:11972=1} withdraw [11972]
+  alt       48t: Burthorpe Games Room Minigame Teleport → walk 22 {cooldown:888=1}
 spot:FELDIP_HILLS_GNOME_GLITER
-  best      106t: Ring of dueling: Castle Wars → walk 100 {charge:2552=1}
-  alt       115t: Nightmare Zone Minigame Teleport → walk 88 {cooldown:888=1}
-  alt       127t: Castle Wars Minigame Teleport → walk 100 {cooldown:888=1}
+  best      105t: Ring of dueling: Castle Wars → walk 100 {charge:2552=1}
+  alt       114t: Nightmare Zone Minigame Teleport → walk 88 {cooldown:888=1}
+  alt       126t: Castle Wars Minigame Teleport → walk 100 {cooldown:888=1}
 spot:KANDARIN_GRAND_TREE
-  best      89t: Necklace of passage: The Outpost → walk 83 {charge:21146=1}
-  alt       143t: Skills necklace: Fishing Guild → walk 137 {charge:11968=1}
+  best      88t: Necklace of passage: The Outpost → walk 83 {charge:21146=1}
+  alt       142t: Skills necklace: Fishing Guild → walk 137 {charge:11968=1}
 spot:MISTHALIN_VARROCK_STONE_CIRCLE
-  best      39t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
-  alt       60t: Skills necklace: Cooking Guild → walk 54 {charge:11968=1}
+  best      38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
+  faster, under the margin 36t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 18 {charge:2552=1, charge:11972=1} withdraw [11972]
+  alt       36t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 18 {charge:2552=1, charge:11972=1} withdraw [11972]
+  alt       59t: Skills necklace: Cooking Guild → walk 54 {charge:11968=1}
 spot:VARLAMORE_LOCUS_OASIS
-  best      130t: Varrock Teleport → walk 125 {item:556=3, item:554=1, item:563=1}
-  alt       167t: Skills necklace: Cooking Guild → walk 161 {charge:11968=1}
-  alt       185t: Ring of dueling: Emir's Arena → walk 179 {charge:2552=1}
+  best      129t: Varrock Teleport → walk 125 {item:556=3, item:554=1, item:563=1}
+  alt       144t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 125 {charge:2552=1, item:8007=1} withdraw [8007]
+  alt       166t: Skills necklace: Cooking Guild → walk 161 {charge:11968=1}
 spot:WILDERNESS_54
-  best      178t: Games necklace: Corporeal Beast → walk 172 {charge:3853=1}
-  alt       192t: Ring of dueling: Ferox Enclave → walk 186 {charge:2552=1}
-  alt       213t: Clan Wars Minigame Teleport → walk 186 {cooldown:888=1}
+  best      93t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 75 {charge:2552=1, charge:21166=1} withdraw [21166]
+  direct    177t: Games necklace: Corporeal Beast → walk 172 {charge:3853=1}
+  alt       181t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 161 {charge:1712=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 map:12130
-  best      75t: Ring of dueling: Castle Wars → walk 69 {charge:2552=1}
-  alt       95t: Castle Wars Minigame Teleport → walk 68 {cooldown:888=1}
-  alt       105t: Skills necklace: Cooking Guild → walk 99 {charge:11968=1}
+  best      74t: Ring of dueling: Castle Wars → walk 69 {charge:2552=1}
+  alt       94t: Castle Wars Minigame Teleport → walk 68 {cooldown:888=1}
+  alt       104t: Skills necklace: Cooking Guild → walk 99 {charge:11968=1}
 map:19785
   best      none
   note      no route from what you have
 map:2719
-  best      54t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
-  alt       73t: Skills necklace: Cooking Guild → walk 67 {charge:11968=1}
-  alt       77t: Amulet of glory: Edgeville → walk 71 {charge:1712=1}
+  best      53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
+  alt       72t: Skills necklace: Cooking Guild → walk 67 {charge:11968=1}
+  alt       68t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 49 {charge:2552=1, item:8009=1} withdraw [8009]
 map:3520
-  best      47t: Nightmare Zone Minigame Teleport → walk 20 {cooldown:888=1}
-  alt       93t: Fishing Trawler Minigame Teleport → walk 66 {cooldown:888=1}
+  best      46t: Nightmare Zone Minigame Teleport → walk 20 {cooldown:888=1}
+  alt       57t: Ring of dueling: Castle Wars → walk 4 → bank → Watchtower tablet → walk 39 {charge:2552=1, item:8012=1} withdraw [8012]
+  alt       92t: Fishing Trawler Minigame Teleport → walk 66 {cooldown:888=1}
 map:3599
-  best      75t: Fishing Trawler Minigame Teleport → walk 48 {cooldown:888=1}
-  alt       87t: Nightmare Zone Minigame Teleport → walk 60 {cooldown:888=1}
-  alt       92t: Skills necklace: Fishing Guild → walk 86 {charge:11968=1}
+  best      62t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 44 {charge:2552=1, item:8011=1} withdraw [8011]
+  direct    74t: Fishing Trawler Minigame Teleport → walk 48 {cooldown:888=1}
+  alt       86t: Nightmare Zone Minigame Teleport → walk 60 {cooldown:888=1}
+  alt       91t: Skills necklace: Fishing Guild → walk 86 {charge:11968=1}
 map:7241
-  best      68t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
-  alt       79t: Camelot Teleport → walk 74 {item:556=5, item:563=1}
+  best      53t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 34 {charge:2552=1, item:8011=1} withdraw [8011]
+  direct    67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  alt       78t: Camelot Teleport → walk 74 {item:556=5, item:563=1}
+  alt       82t: Amulet of glory: Edgeville → walk 5 → bank → Combat bracelet: Ranging Guild → walk 62 {charge:1712=1, charge:11972=1} withdraw [11972]
 music:23138
-  best      21t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 16 {charge:2552=1, item:8009=1} withdraw [8009]
 music:23142
-  best      21t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 16 {charge:2552=1, item:8009=1} withdraw [8009]
 music:23157
-  best      21t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 16 {charge:2552=1, item:8009=1} withdraw [8009]
 music:23174
-  best      21t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 16 {charge:2552=1, item:8009=1} withdraw [8009]
 music:23178
-  best      21t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 16 {charge:2552=1, item:8009=1} withdraw [8009]
 music:24773
-  best      21t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 16 {charge:2552=1, item:8009=1} withdraw [8009]
 skill:CHARLIE:i need to give charlie a cooked pike.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
-  alt       50t: Skills necklace: Cooking Guild → walk 44 {charge:11968=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  alt       34t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 15 {charge:2552=1, charge:11972=1} withdraw [11972]
+  alt       36t: Amulet of glory: Edgeville → walk 5 → bank → Varrock tablet → walk 16 {charge:1712=1, item:8007=1} withdraw [8007]
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      39t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       68t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
+  alt       52t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 34 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
-  best      39t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       68t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
+  alt       52t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 34 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
-  best      39t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       68t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
+  alt       52t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 34 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
 skill:SHERLOCK:kill a lizardman shaman.
-  best      39t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       68t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
+  alt       52t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 34 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
 skill:SHERLOCK:score a goal in skullball.
-  best      39t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       68t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
+  alt       52t: Ring of dueling: Castle Wars → walk 4 → bank → Camelot tablet → walk 34 {charge:2552=1, item:8010=1} withdraw [8010]
+  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
 cryptic:search through chests found in the upstairs of houses in eastern falador.
-  best      34t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
-  alt       48t: Falador Teleport → walk 43 {item:556=3, item:555=1, item:563=1}
+  best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
+  alt       47t: Falador Teleport → walk 43 {item:556=3, item:555=1, item:563=1}
+  alt       62t: Ring of dueling: Castle Wars → walk 4 → bank → Falador tablet → walk 43 {charge:2552=1, item:8009=1} withdraw [8009]
 cryptic:you will need to under-cook to solve this one.
-  best      27t: Lumbridge Teleport → walk 22 {item:556=3, item:557=1, item:563=1}
-  alt       47t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}
+  best      26t: Lumbridge Teleport → walk 22 {item:556=3, item:557=1, item:563=1}
+  alt       41t: Ring of dueling: Castle Wars → walk 4 → bank → Lumbridge tablet → walk 22 {charge:2552=1, item:8008=1} withdraw [8008]
+  alt       46t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}
 cryptic:search through some drawers in the upstairs of a house in rimmington.
-  best      55t: Skills necklace: Crafting Guild → walk 49 {charge:11968=1}
-  alt       83t: Amulet of glory: Draynor Village → walk 77 {charge:1712=1}
-  alt       91t: Falador Teleport → walk 86 {item:556=3, item:555=1, item:563=1}
+  best      54t: Skills necklace: Crafting Guild → walk 49 {charge:11968=1}
+  alt       82t: Amulet of glory: Draynor Village → walk 77 {charge:1712=1}
+  alt       90t: Falador Teleport → walk 86 {item:556=3, item:555=1, item:563=1}
 anagram:12566
-  best      14t: Skills necklace: Mining Guild → walk 8 {charge:11968=1}
+  best      13t: Skills necklace: Mining Guild → walk 8 {charge:11968=1}
 cryptic:search the crates in a bank in varrock.
-  best      28t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
-  alt       38t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  best      27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       37t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
+  alt       42t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 23 {charge:2552=1, item:8007=1} withdraw [8007]
 emote:12021
-  best      52t: Necklace of passage: Wizards' Tower → walk 46 {charge:21146=1}
-  alt       54t: Amulet of glory: Draynor Village → walk 48 {charge:1712=1}
-  alt       68t: Lumbridge Teleport → walk 63 {item:556=3, item:557=1, item:563=1}
+  best      51t: Necklace of passage: Wizards' Tower → walk 46 {charge:21146=1}
+  alt       53t: Amulet of glory: Draynor Village → walk 48 {charge:1712=1}
+  alt       67t: Lumbridge Teleport → walk 63 {item:556=3, item:557=1, item:563=1}
 coordinate:2840,3423,0
   best      none
   note      no route from what you have
@@ -247,6 +285,6 @@ coordinate:2303,3328,0
   best      none
   note      no route from what you have
 emote:19791
-  best      56t: Nightmare Zone Minigame Teleport → walk 29 {cooldown:888=1}
-  alt       80t: Fishing Trawler Minigame Teleport → walk 53 {cooldown:888=1}
-  alt       100t: Ring of dueling: Castle Wars → walk 94 {charge:2552=1}
+  best      44t: Ring of dueling: Castle Wars → walk 4 → bank → Watchtower tablet → walk 26 {charge:2552=1, item:8012=1} withdraw [8012]
+  direct    55t: Nightmare Zone Minigame Teleport → walk 29 {cooldown:888=1}
+  alt       79t: Fishing Trawler Minigame Teleport → walk 53 {cooldown:888=1}

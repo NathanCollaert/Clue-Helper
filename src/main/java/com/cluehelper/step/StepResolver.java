@@ -13,15 +13,18 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.CrypticClue;
+import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.cluescrolls.clues.HotColdClue;
 import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
 import net.runelite.client.plugins.cluescrolls.clues.ThreeStepCrypticClue;
+import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 
 /** Turns core's current clue into a {@link Step}: key, normalised targets, NPCs, objects, requirements. */
 @Slf4j
 @Singleton
 public class StepResolver
 {
+	private static final int NO_STASH = -1;
 	private static final Set<String> SPADE_OR_DOG_TIERS = Set.of("beginner", "easy", "medium", "hard", "elite");
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
@@ -85,7 +88,7 @@ public class StepResolver
 			.regions(List.of())
 			.objectIds(List.of())
 			.objectNames(List.of())
-			.requirements(new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of()))
+			.requirements(new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), NO_STASH))
 			.cacheRows(List.of())
 			.known(false)
 			.build();
@@ -195,7 +198,8 @@ public class StepResolver
 	{
 		SpadeNeed spade = !clue.isRequiresSpade() ? SpadeNeed.NONE
 			: SPADE_OR_DOG_TIERS.contains(tier) ? SpadeNeed.SPADE_OR_DIGGING_DOG : SpadeNeed.SPADE;
+		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
 		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
-			CoreClueReader.lightSourceVarbitId(clue), CoreClueReader.itemRequirements(clue));
+			CoreClueReader.lightSourceVarbitId(clue), CoreClueReader.itemRequirements(clue), stash == null ? NO_STASH : stash.getObjectId());
 	}
 }

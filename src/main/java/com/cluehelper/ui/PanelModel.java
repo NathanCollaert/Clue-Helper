@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Value;
@@ -48,6 +49,19 @@ public class PanelModel
 		boolean followed;
 	}
 
+	/** What the panel says about the remembered bank (PLAN §5.2 Bank). */
+	@Value
+	public static class BankInfo
+	{
+		public static final BankInfo NONE = new BankInfo(0, false, id -> "item " + id);
+
+		/** When the bank was last seen (epoch millis); 0 for never. */
+		long seenAt;
+		/** No bank seen on this profile yet, and one would count: say "Open your bank once". */
+		boolean promptOpen;
+		IntFunction<String> itemNames;
+	}
+
 	/**
 	 * @param state     from {@link PanelState#of}
 	 * @param nowItemWorn the current sub-step's item is worn, so its option is in the equipment tab
@@ -55,6 +69,12 @@ public class PanelModel
 	 */
 	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
 		boolean nowItemWorn, Book f2pBook)
+	{
+		return of(state, dormantReason, plan, committed, now, next, nowItemWorn, f2pBook, BankInfo.NONE, System.currentTimeMillis());
+	}
+
+	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
+		boolean nowItemWorn, Book f2pBook, BankInfo bank, long nowMillis)
 	{
 		PanelModelBuilder model = PanelModel.builder().state(state);
 		if (state == PanelState.DORMANT)
@@ -79,7 +99,12 @@ public class PanelModel
 		{
 			notes.add("You're on " + bookName(f2pBook) + "; F2P worlds can't change book");
 		}
-		List<RouteCard> cards = cards(plan, committed);
+		notes.addAll(plan.getRequirementNotes());
+		if (bank.isPromptOpen())
+		{
+			notes.add("Open your bank once so banked teleports count");
+		}
+		List<RouteCard> cards = cards(plan, committed, bank, nowMillis);
 		if (cards.isEmpty() && notes.isEmpty())
 		{
 			notes.add(plan == Plan.NONE ? "Waiting for the first plan" : "No route from what you have");
@@ -90,6 +115,11 @@ public class PanelModel
 	/** The followed route first, then Best, Direct, Same book, the faster one under the margin and the alternatives. */
 	static List<RouteCard> cards(Plan plan, Route committed)
 	{
+		return cards(plan, committed, BankInfo.NONE, 0);
+	}
+
+	static List<RouteCard> cards(Plan plan, Route committed, BankInfo bank, long nowMillis)
+	{
 		List<RouteCard> cards = new ArrayList<>();
 		Set<String> shown = new HashSet<>();
 		Route best = plan.getBest();
@@ -99,26 +129,59 @@ public class PanelModel
 			return cards;
 		}
 		boolean followingBest = best == null || best.getIdentity().equals(first.getIdentity());
-		add(cards, shown, followingBest ? "Best" : "Following", first, null, true);
-		add(cards, shown, "Best", best, first, false);
-		add(cards, shown, "Direct", plan.getDirect(), first, false);
-		add(cards, shown, "Same book", plan.getSameBook(), first, false);
-		add(cards, shown, "Under the margin", plan.getFasterUnqualified(), first, false);
+		String bankFlags = bankFlags(bank, nowMillis);
+		add(cards, shown, followingBest ? "Best" : "Following", first, null, true, bankFlags, bank.getItemNames());
+		add(cards, shown, "Best", best, first, false, bankFlags, bank.getItemNames());
+		add(cards, shown, "Direct", plan.getDirect(), first, false, bankFlags, bank.getItemNames());
+		add(cards, shown, "Same book", plan.getSameBook(), first, false, bankFlags, bank.getItemNames());
+		add(cards, shown, "Under the margin", plan.getFasterUnqualified(), first, false, bankFlags, bank.getItemNames());
 		for (Route alternative : plan.getAlternatives())
 		{
-			add(cards, shown, "Also", alternative, first, false);
+			add(cards, shown, "Also", alternative, first, false, bankFlags, bank.getItemNames());
 		}
 		return cards;
 	}
 
-	private static void add(List<RouteCard> cards, Set<String> shown, String label, Route route, Route reference, boolean followed)
+	private static void add(List<RouteCard> cards, Set<String> shown, String label, Route route, Route reference, boolean followed,
+		String bankFlags, IntFunction<String> itemNames)
 	{
 		if (route == null || !shown.add(route.getIdentity()))
 		{
 			return;
 		}
 		String saving = reference == null ? "" : savingText(route.getTicks() - reference.getTicks());
-		cards.add(new RouteCard(label + saving, route.getTicks(), legs(route), flags(route), followed));
+		String flags = flags(route);
+		if (route.isBanked() && !bankFlags.isEmpty())
+		{
+			flags = flags.isEmpty() ? bankFlags : bankFlags + " · " + flags;
+		}
+		cards.add(new RouteCard(label + saving, route.getTicks(), legs(route, itemNames), flags, followed));
+	}
+
+	/** "in bank, seen 3 days ago": the bank's age, the confidence of every banked route. */
+	static String bankFlags(BankInfo bank, long nowMillis)
+	{
+		return bank.getSeenAt() == 0 ? "" : "in bank, seen " + age(nowMillis - bank.getSeenAt());
+	}
+
+	static String age(long millis)
+	{
+		long minutes = millis / 60_000;
+		if (minutes < 1)
+		{
+			return "just now";
+		}
+		if (minutes < 60)
+		{
+			return minutes + " min ago";
+		}
+		long hours = minutes / 60;
+		if (hours < 24)
+		{
+			return hours + (hours == 1 ? " hour ago" : " hours ago");
+		}
+		long days = hours / 24;
+		return days + (days == 1 ? " day ago" : " days ago");
 	}
 
 	private static String savingText(int delta)
@@ -132,11 +195,32 @@ public class PanelModel
 
 	static String legs(Route route)
 	{
+		return legs(route, id -> "item " + id);
+	}
+
+	static String legs(Route route, IntFunction<String> itemNames)
+	{
+		String withdraw = withdrawText(route, itemNames);
 		if (route.getLegs().isEmpty())
 		{
-			return "You're there";
+			return route.isOpenBankStart() ? withdraw + " → you're there" : "You're there";
 		}
-		return route.getLegs().stream().map(PanelModel::leg).collect(Collectors.joining(" → "));
+		String legs = route.getLegs().stream().map(leg -> leg.getKind() == Leg.Kind.BANK ? "bank: " + withdraw : leg(leg))
+			.collect(Collectors.joining(" → "));
+		return route.isOpenBankStart() ? withdraw + " → " + legs : legs;
+	}
+
+	/** "withdraw Xeric's talisman + 2 clue items": items core's *clue* tag shows are only counted. */
+	static String withdrawText(Route route, IntFunction<String> itemNames)
+	{
+		List<String> names = route.getWithdraw().stream().filter(use -> !route.getWithdrawInCoreTag().contains(use.getItemId()))
+			.map(use -> itemNames.apply(use.getItemId())).collect(Collectors.toList());
+		int tagged = route.getWithdraw().size() - names.size();
+		if (tagged > 0)
+		{
+			names.add(tagged + " clue item" + (tagged == 1 ? "" : "s"));
+		}
+		return names.isEmpty() ? "withdraw nothing" : "withdraw " + String.join(" + ", names);
 	}
 
 	private static String leg(Leg leg)

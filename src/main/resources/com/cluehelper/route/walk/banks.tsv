@@ -1,0 +1,134 @@
+Tile	Name	Kind	Members	Skills	Quests	Varbits	VarPlayers	GroupStorage
+1243 3121 0	Tal Teklan	bank	Y		Children of the Sun			Y
+1248 3758 0	Farming Guild	bank	Y	85 Farming				Y
+1253 3741 0	Farming Guild	bank	Y					Y
+1254 3571 0	Mount Quidamortem	bank	Y					Y
+1324 3824 0	Mount Karuulm	bank	Y					Y
+1380 2866 0	Mistrock	bank	Y		Children of the Sun			Y
+1387 3309 0	Nemus Retreat	bank	Y		Children of the Sun			Y
+1399 2925 0	Aldarin	bank	Y		Children of the Sun			Y
+1416 3350 0	Auburnvale	bank	Y		Children of the Sun			Y
+1438 3828 0	Lovakengj	bank	Y					Y
+1452 9567 1	Cam Torum	bank	Y		Perilous Moons			Y
+1454 3858 0	Sulphur Mine	bank	Y					Y
+1477 3874 0	Sulphur Mine	bank	Y					Y
+1478 3856 0	Sulphur Mine	bank	Y					Y
+1478 3873 0	Blast Mine	bank	Y					Y
+1479 3857 0	Blast Mine	bank	Y					Y
+1483 3646 0	Shayzien Encampment	bank	Y					Y
+1488 3592 0	Shayzien	bank	Y					Y
+1499 3857 0	Blast Mine	bank	Y					Y
+1499 3857 0	Sulphur Mine	bank	Y					Y
+1501 3871 0	Blast Mine	bank	Y					Y
+1501 3871 0	Sulphur Mine	bank	Y					Y
+1512 3421 0	Land's End	bank	Y					Y
+1519 3228 0	Quetzacalli Gorge	bank	Y		Children of the Sun			Y
+1524 3740 0	Lovakengj	bank	Y					Y
+1525 3293 0	The Darkfrost	bank	Y		Children of the Sun			Y
+1542 3040 0	Hunter Guild	bank	Y		Children of the Sun			Y
+1551 9873 0	Woodcutting Guild	bank	Y					Y
+1592 3476 0	Woodcutting Guild	bank	Y					Y
+1611 3681 2	Kourend Castle	bank	Y					Y
+1624 3744 0	Arceuus	bank	Y					Y
+1640 3944 0	Wintertodt Camp	bank	Y					Y
+1647 3118 0	Fortis west bank	bank	Y		Children of the Sun			Y
+1674 3615 0	Hosidius Kitchen	bank	Y					Y
+1719 3465 0	Hosidius Sand Crabs	bank	Y					Y
+1746 5476 0	Clan Hall	bank	N					Y
+1748 3599 0	Hosidius	bank	Y					Y
+1779 3094 0	Fortis east bank	bank	Y		Children of the Sun			Y
+1800 3790 0	Port Piscarilius	bank	Y					Y
+1804 9501 0	Fortis Colosseum	bank	Y				4130>1999	Y
+1809 3566 0	Hosidius Vinery	bank	Y					Y
+1882 3315 1	Port Roberts	bank	Y					Y
+1935 2754 0	Deepfin Point	bank	Y					Y
+1948 4957 0	Blast Furnace	bank	Y		The Giant Dwarf			Y
+2011 9186 0	Deepfin Mine	bank	Y			18361=1		Y
+2020 5931 0	Soul Wars	bank	Y					Y
+2093 9198 0	Deepfin Mine	bank	Y			18362=1		Y
+2096 3687 0	Buccaneers' Haven	bank	Y			18369=1		Y
+2098 3919 0	Lunar Isle	bank	Y		Lunar Diplomacy			Y
+2195 2314 0	Sunbleak Island	bank	Y			18358=1		Y
+2212 2859 0	Soul Wars	bank	Y					Y
+2280 2544 0	Bank Boat	bank	Y					Y
+2330 3690 0	Piscatoris	bank	Y		Swan Song			Y
+2335 3807 0	Neitiznot	bank	Y		The Fremennik Isles			Y
+2352 3162 0	Lletya	bank	Y		Mourning's End Part I			Y
+2381 4458 0	Zanaris	bank	Y		Lost City			Y
+2396 5985 0	Hallowed Sepulchre	bank	Y		Sins of the Father			Y
+2417 3801 0	Jatizso	bank	Y		The Fremennik Isles			Y
+2443 3083 0	Castle Wars	bank	Y					Y
+2445 3425 1	Tree Gnome Stronghold	bank	Y					Y
+2445 5180 0	Mor Ul Rek	bank	Y					Y
+2448 3482 1	Tree Gnome Stronghold	bank	Y					Y
+2465 2848 1	Myths' Guild	bank	Y		Dragon Slayer II			Y
+2534 4712 0	Mage Arena	bank	Y		Mage Arena I			Y
+2536 3573 0	Barbarian Outpost	bank	Y					Y
+2543 5141 0	Mor Ul Rek	bank	Y					Y
+2569 2864 0	Corsair Cove	bank	Y		The Corsair Curse			Y
+2586 3419 0	Fishing Guild	bank	Y					Y
+2613 3092 0	Yanille	bank	Y					Y
+2618 3332 0	Ardougne	bank	Y					Y
+2620 3895 0	Etceteria	bank	Y		Throne of Miscellania			Y
+2654 2387 0	Charred Island	bank	Y			18353=1		Y
+2655 3283 0	Ardougne	bank	Y					Y
+2661 3162 0	Port Khazard	bank	Y					Y
+2666 2653 0	Void Knights' Outpost	bank	Y					Y
+2701 5349 0	Dorgesh-Kaan	bank	Y		Death to the Dorgeshuun			Y
+2724 3493 0	Seers' Village	bank	Y					Y
+2732 3379 2	Legends' Guild	bank	Y		Legends' Quest			Y
+2780 2783 0	Ape Atoll	bank	Y		Monkey Madness II			Y
+2799 5169 0	Sophanem	bank	Y		Contact!			Y
+2809 3441 0	Catherby	bank	Y					Y
+2836 10207 0	Keldagrim	bank	Y		The Giant Dwarf			Y
+2843 3543 0	Warriors' Guild	bank	Y					Y
+2852 2954 0	Shilo Village	bank	Y		Shilo Village			Y
+2904 5205 0	Ancient Prison	bank	Y		The Frozen Door			Y
+2935 3280 0	Crafting Guild	bank	Y	99 Crafting				Y
+2935 3280 0	Crafting Guild	bank	Y			4464=1		Y
+2947 3368 0	Falador	bank	N					Y
+2978 5798 0	Ruins of Camdozaal	bank	Y		Below Ice Mountain			Y
+2984 2268 0	Onyx Crest	bank	Y			18363=1		Y
+3012 3355 0	Falador	bank	N					Y
+3013 5625 0	Ourania	bank	Y					Y
+3013 9718 0	Mining Guild	bank	Y					Y
+3038 3000 0	The Pandemonium	bank	Y					Y
+3040 4969 1	Rogues' Den	bank	Y					Y
+3092 3243 0	Draynor Village	bank	N					Y
+3094 3491 0	Edgeville	bank	N					Y
+3130 3631 0	Ferox Enclave	bank	Y					Y
+3147 3450 0	Cooks' Guild	bank	Y	99 Cooking				Y
+3147 3450 0	Cooks' Guild	bank	Y			4481=1		Y
+3156 2835 0	Ruins of Unkah	bank	Y					Y
+3162 3489 0	Grand Exchange	bank	N					Y
+3182 2418 0	Great Conch	bank	Y		Troubled Tortugans			Y
+3185 3440 0	Varrock	bank	N					Y
+3195 4569 0	Tarn's Lair	bank	Y		Haunted Mine			Y
+3208 3220 2	Lumbridge Castle	bank	N					Y
+3218 9623 0	Culinaromancer's Chest	bank	Y		Recipe for Disaster			Y
+3253 3420 0	Varrock	bank	N					Y
+3256 6105 0	Prifddinas	bank	Y		Song of the Elves			Y
+3269 3167 0	Al Kharid	bank	N					Y
+3279 5200 0	Chambers of Xeric	bank	Y					Y
+3295 6059 0	Prifddinas	bank	Y		Song of the Elves			Y
+3304 5199 0	Chambers of Xeric	bank	Y					Y
+3308 3120 0	Shantay Pass	bank	Y					Y
+3333 5194 0	Chambers of Xeric	bank	Y					Y
+3353 9118 0	Tombs of Amascut	bank	Y		Beneath Cursed Sands			Y
+3365 3318 1	Mage Training Arena	bank	Y					Y
+3374 11493 0	Giants' Foundry	bank	Y		Sleeping Giants			Y
+3382 3269 0	Emir's Arena	bank	Y					Y
+3420 4058 0	Daimon's Crater	bank	Y					Y
+3427 2891 0	Nardah	bank	Y					Y
+3495 3211 0	Burgh de Rott	bank	Y		In Aid of the Myreque			Y
+3512 3480 0	Canifis	bank	Y		Priest in Peril			Y
+3604 3367 0	Darkmeyer	bank	Y		Sins of the Father			Y
+3618 9473 0	Temple of the Eye	bank	Y		Temple of the Eye			Y
+3651 3208 0	Ver Sinhaza	bank	Y		Priest in Peril			Y
+3680 2982 0	Mos Le'Harmless	bank	Y		Cabin Fever			Y
+3688 3466 0	Port Phasmatys	bank	Y		Ghosts Ahoy			Y
+3741 3805 0	Fossil Island Museum Camp	bank	Y		Bone Voyage			Y
+3760 5666 0	Motherlode Mine	bank	Y					Y
+3768 3899 0	Fossil Island Shipwreck	bank	Y		Bone Voyage			Y
+3810 3021 0	Trouble Brewing	bank	Y		Cabin Fever			Y
+3819 3809 0	Fossil Island Volcano	bank	Y		Bone Voyage			Y

@@ -129,7 +129,10 @@ public final class RuneModel
 		return runeNames.getOrDefault(rune, "rune " + rune);
 	}
 
-	/** Pays {@code quantity} of {@code rune} from a worn staff or tome, else the inventory and then a held pouch. */
+	/**
+	 * Pays {@code quantity} of {@code rune} from a worn staff or tome, else the inventory, a held pouch, and in a
+	 * banked snapshot the bank and group storage.
+	 */
 	public Supply supply(int rune, int quantity, PlayerSnapshot player)
 	{
 		for (int source : unlimited.getOrDefault(rune, Collections.emptySet()))
@@ -141,7 +144,7 @@ public final class RuneModel
 		}
 		List<ItemUse> used = new ArrayList<>();
 		int have = 0;
-		for (Container container : new Container[]{Container.INVENTORY, Container.RUNE_POUCH})
+		for (Container container : new Container[]{Container.INVENTORY, Container.RUNE_POUCH, Container.BANK, Container.GROUP_STORAGE})
 		{
 			for (int payer : payers.getOrDefault(rune, List.of(rune)))
 			{

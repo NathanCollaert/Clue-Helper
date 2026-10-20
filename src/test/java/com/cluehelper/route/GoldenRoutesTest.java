@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Charge;
+import com.cluehelper.player.Container;
 import com.cluehelper.player.Loadouts;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.RuneModel;
@@ -34,6 +35,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -61,6 +64,9 @@ public class GoldenRoutesTest
 		"coordinate:2840,3423,0",
 		"coordinate:2303,3328,0",
 		"emote:19791");
+
+	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin (B15). */
+	private static final List<String> TIPPING_POINTS = List.of("coordinate:3556", "map:3599", "spot:MISTHALIN_VARROCK_STONE_CIRCLE");
 
 	private static WalkTable table;
 	private static Catalog catalog;
@@ -93,7 +99,8 @@ public class GoldenRoutesTest
 			List<Integer> searchCounts = new ArrayList<>();
 			for (Step step : sample(loadout))
 			{
-				PlanInput input = input(ready(loadout.getCarried()), step, PlanStart.teleportOnly(ANYWHERE), settings).build();
+				PlanInput input = input(ready(loadout.getCarried()), step, PlanStart.teleportOnly(ANYWHERE), settings)
+					.banked(loadout.getBankedSnapshot() == null ? null : ready(loadout.getBankedSnapshot())).build();
 				Plan plan = checked(input);
 				nanos.add(plan.getSearchNanos());
 				labelCounts.add(plan.getLabels());
@@ -129,7 +136,8 @@ public class GoldenRoutesTest
 			checked(input(glory1, draynor, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(glory1).build())));
 		PlayerSnapshot minigames = mid.toBuilder().inventory(Map.of()).build();
 		lines.add(line("consumption: minigame teleports only, bank on, to Varrock bank crates",
-			checked(input(minigames, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(withBank(minigames, "Varrock tablet")).build())));
+			checked(input(minigames, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(withBank(minigames, Map.of(
+				Loadouts.itemId("Varrock tablet"), 5))).build())));
 
 		PlayerSnapshot lunarMaxed = onBook(maxed, Book.LUNAR, false);
 		lines.add(line("Lunar, swap runes and Max cape carried, to Varrock: Spellbook Swap, not the cape",
@@ -145,9 +153,13 @@ public class GoldenRoutesTest
 			checked(input(pending, senntisten, PlanStart.teleportOnly(ANYWHERE), plain).revertTicksLeft(150).build())));
 		lines.add(line("99 Magic, no cape uses left today, Ancient target",
 			checked(input(capeUsesLeft(maxed, 0), senntisten, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		PlayerSnapshot noSwapRunes = withoutSwapRunes(lunarMaxed);
 		lines.add(line("Lunar, swap runes only in the bank (bank on)",
-			checked(input(withoutSwapRunes(lunarMaxed), varrock, PlanStart.teleportOnly(ANYWHERE), bankOn)
-				.banked(lunarMaxed).build())));
+			checked(input(noSwapRunes, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn)
+				.banked(withBank(noSwapRunes, Map.of(ItemID.ASTRALRUNE, 1000, ItemID.COSMICRUNE, 1000))).build())));
+		lines.add(line("Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best",
+			checked(input(capeUsesLeft(noSwapRunes, 0), senntisten, PlanStart.teleportOnly(ANYWHERE), bankOn)
+				.banked(withBank(capeUsesLeft(noSwapRunes, 0), Map.of(ItemID.ASTRALRUNE, 1000, ItemID.COSMICRUNE, 1000))).build())));
 
 		lines.add(line("Wilderness start at level 26 (3100,3720), to Varrock",
 			checked(input(maxed, varrock, PlanStart.teleportOnly(new WorldPoint(3100, 3720, 0)), plain).build())));
@@ -163,8 +175,10 @@ public class GoldenRoutesTest
 		lines.add(line("avoidWilderness, target outside: no Wilderness landing",
 			checked(input(hcim, step("emote:12021"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
 
+		PlayerSnapshot midBank = ready(Loadouts.load("mid-ironman").getBankedSnapshot());
 		lines.add(line("bank tipping point: mid-ironman, bank on, to Varrock bank crates",
-			checked(input(mid, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(withBank(mid, Loadouts.load("mid-ironman").getBanked())).build())));
+			checked(input(mid, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(midBank).build())));
+		bankCases(lines, maxed, mid, midBank, bankOn);
 		lines.add(line("start on a node: standing at the Varrock Teleport landing, to Varrock bank crates",
 			checked(input(mid, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3213, 3424, 0))), plain).build())));
 
@@ -176,6 +190,78 @@ public class GoldenRoutesTest
 		List<String> failures = new ArrayList<>();
 		compare("special", lines, failures);
 		assertTrue(String.join("\n", failures), failures.isEmpty());
+	}
+
+	/** B15: bank tipping points, Nathan's Fountain of Rune case, required items from every source, the open bank and the PIN. */
+	private static void bankCases(List<String> lines, PlayerSnapshot maxed, PlayerSnapshot mid, PlayerSnapshot midBank,
+		PlannerSettings bankOn)
+	{
+		Step fountain = step("coordinate:12101");
+		PlayerSnapshot noCapeUses = capeUsesLeft(maxed, 0);
+		lines.add(line("Nathan's case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked",
+			checked(input(noCapeUses, fountain, PlanStart.teleportOnly(ANYWHERE), bankOn)
+				.banked(withBank(noCapeUses, Map.of(Loadouts.itemId("Wilderness sword 4"), 1))).build())));
+		for (String key : TIPPING_POINTS)
+		{
+			lines.add(line("bank tipping point: mid-ironman, " + key,
+				checked(input(mid, step(key), PlanStart.teleportOnly(ANYWHERE), bankOn).banked(midBank).build())));
+			lines.add(line("bank tipping point with the PIN still to come: mid-ironman, " + key,
+				checked(input(mid, step(key), PlanStart.teleportOnly(ANYWHERE), bankOn).banked(midBank).pinPending(true).build())));
+		}
+
+		Step draynorDig = step("map:w348");
+		RequiredItems spade = required(RequiredItems.Stash.NONE, need("spade", ItemRequirements.item(ItemID.SPADE), false));
+		PlayerSnapshot glory1 = mid.toBuilder().inventory(Map.of(itemId("AMULET_OF_GLORY_1"), 1)).charges(Map.of(
+			itemId("AMULET_OF_GLORY_1"), new Charge(1, Charge.Source.ITEM_ID))).build();
+		lines.add(line("required spade: glory(1) carried, a spade in the bank, to Draynor (dig)",
+			checked(input(glory1, draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
+				.banked(withBank(glory1, Map.of(ItemID.SPADE, 1))).build())));
+		lines.add(line("required spade: carried, to Draynor (dig)",
+			checked(input(with(mid, ItemID.SPADE), draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
+				.banked(midBank).build())));
+		lines.add(line("required spade: nowhere, at a tool leprechaun",
+			checked(input(mid, draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade.toBuilder().spadeAtLeprechaun(true).build())
+				.banked(midBank).build())));
+
+		Step emote = step("emote:12021");
+		PlayerSnapshot emoteItemBanked = midBank.toBuilder().bank(merged(midBank.getBank(), ItemID.BRONZE_FULL_HELM)).build();
+		RequiredItems.Need helm = need("Bronze full helm", ItemRequirements.item(ItemID.BRONZE_FULL_HELM), true);
+		for (RequiredItems.Stash stash : List.of(RequiredItems.Stash.FILLED, RequiredItems.Stash.UNKNOWN))
+		{
+			lines.add(line("emote item in the bank, STASH " + stash.name().toLowerCase(),
+				checked(input(mid, emote, PlanStart.teleportOnly(ANYWHERE), bankOn).required(required(stash, helm))
+					.banked(emoteItemBanked).build())));
+		}
+
+		int geBank = table.node(new WorldPoint(3162, 3489, 0));
+		lines.add(line("at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required",
+			checked(input(mid, step("cryptic:search the crates in a bank in varrock."), PlanStart.atNode(table, geBank), bankOn)
+				.atOpenBank(true).required(spade).banked(midBank.toBuilder().bank(merged(midBank.getBank(), ItemID.SPADE)).build()).build())));
+	}
+
+	private static RequiredItems.Need need(String name, ItemRequirement requirement, boolean stepItem)
+	{
+		return new RequiredItems.Need(name, requirement, stepItem, false);
+	}
+
+	private static RequiredItems required(RequiredItems.Stash stash, RequiredItems.Need... needs)
+	{
+		return RequiredItems.builder().needs(List.of(needs)).stash(stash).build();
+	}
+
+	/** The player carrying one {@code itemId} as well. */
+	private static PlayerSnapshot with(PlayerSnapshot player, int itemId)
+	{
+		Map<Integer, Integer> inventory = new HashMap<>(player.getInventory());
+		inventory.put(itemId, 1);
+		return player.toBuilder().inventory(inventory).build();
+	}
+
+	private static Map<Integer, Integer> merged(Map<Integer, Integer> bank, int itemId)
+	{
+		Map<Integer, Integer> out = new HashMap<>(bank);
+		out.put(itemId, 1);
+		return out;
 	}
 
 	// ---------------------------------------------------------------- invariants
@@ -220,7 +306,7 @@ public class GoldenRoutesTest
 		{
 			fewer.add(input.toBuilder().settings(input.getSettings().toBuilder().spellbookChanges(SpellbookChanges.OFF).build()).build());
 		}
-		if (input.getSettings().isBankEdge())
+		if (input.getSettings().isBankEdge() && input.getBanked() != null && input.getRequired().isEmpty())
 		{
 			fewer.add(input.toBuilder().settings(input.getSettings().toBuilder().bankEdge(false).build()).build());
 		}
@@ -253,6 +339,7 @@ public class GoldenRoutesTest
 		{
 			out.append("\n  note      ").append(plan.getNote());
 		}
+		plan.getRequirementNotes().forEach(note -> out.append("\n  needs     ").append(note));
 		return out.toString();
 	}
 
@@ -265,7 +352,20 @@ public class GoldenRoutesTest
 		String extras = route.getRankHalfTicks() != route.getHalfTicks() ? " (rank " + (route.getRankHalfTicks() + 1) / 2 + ")" : "";
 		String spent = route.getSpent().isEmpty() ? "" : " " + route.getSpent();
 		String ends = route.getEndBook() != route.getStartBook() ? " leaves you on " + route.getEndBook() : "";
-		return route.getTicks() + "t" + extras + ": " + route.describe() + spent + ends;
+		return route.getTicks() + "t" + extras + ": " + (route.isOpenBankStart() ? "(at the open bank) " : "") + route.describe() + spent
+			+ ends + withdraw(route);
+	}
+
+	/** Each banked route's withdraw list, the load-bearing output of B15 besides the ticks. */
+	private static String withdraw(Route route)
+	{
+		if (!route.isBanked())
+		{
+			return "";
+		}
+		String items = route.getWithdraw().stream().map(use -> use.getItemId() + (use.getContainer() == Container.GROUP_STORAGE ? " (group)" : ""))
+			.collect(Collectors.joining(", "));
+		return " withdraw [" + items + "]" + (route.isDepositFirst() ? " deposit first" : "") + (route.isPinIncluded() ? " +PIN" : "");
 	}
 
 	private static String probeLine(Plan plan)
@@ -379,17 +479,10 @@ public class GoldenRoutesTest
 		return player.toBuilder().inventory(inventory).build();
 	}
 
-	private static PlayerSnapshot withBank(PlayerSnapshot player, String... families)
+	/** The player with this bank remembered: what A_banked judges. */
+	private static PlayerSnapshot withBank(PlayerSnapshot player, Map<Integer, Integer> bank)
 	{
-		return withBank(player, Arrays.stream(families).map(Loadouts::itemId).collect(Collectors.toList()));
-	}
-
-	/** A_banked stand-in until B15: the bank's items as if carried. */
-	private static PlayerSnapshot withBank(PlayerSnapshot player, List<Integer> banked)
-	{
-		Map<Integer, Integer> inventory = new HashMap<>(player.getInventory());
-		banked.forEach(id -> inventory.merge(id, 1, Integer::sum));
-		return player.toBuilder().inventory(inventory).build();
+		return player.toBuilder().bank(bank).build();
 	}
 
 	private static int itemId(String gameval)

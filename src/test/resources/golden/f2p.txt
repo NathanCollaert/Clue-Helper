@@ -1,95 +1,93 @@
 anagram:an earl
-  best      63t: Lumbridge Teleport → walk 58 {item:556=3, item:557=1, item:563=1}
-  alt       83t: Lumbridge Home Teleport → walk 58 {cooldown:892=1}
+  best      62t: Lumbridge Teleport → walk 58 {item:556=3, item:557=1, item:563=1}
+  alt       82t: Lumbridge Home Teleport → walk 58 {cooldown:892=1}
 anagram:carpet ahoy
-  best      25t: Varrock Teleport → walk 20 {item:556=3, item:554=1, item:563=1}
+  best      24t: Varrock Teleport → walk 20 {item:556=3, item:554=1, item:563=1}
 anagram:i cord
-  best      42t: Falador Teleport → walk 37 {item:556=3, item:555=1, item:563=1}
+  best      41t: Falador Teleport → walk 37 {item:556=3, item:555=1, item:563=1}
 anagram:in bar
-  best      84t: Falador Teleport → walk 79 {item:556=3, item:555=1, item:563=1}
-  alt       119t: Lumbridge Teleport → walk 114 {item:556=3, item:557=1, item:563=1}
-  alt       136t: Varrock Teleport → walk 131 {item:556=3, item:554=1, item:563=1}
+  best      83t: Falador Teleport → walk 79 {item:556=3, item:555=1, item:563=1}
+  alt       118t: Lumbridge Teleport → walk 114 {item:556=3, item:557=1, item:563=1}
+  alt       135t: Varrock Teleport → walk 131 {item:556=3, item:554=1, item:563=1}
 anagram:rug deter
-  best      37t: Varrock Teleport → walk 32 {item:556=3, item:554=1, item:563=1}
+  best      36t: Varrock Teleport → walk 32 {item:556=3, item:554=1, item:563=1}
 anagram:sir share red
-  best      15t: Falador Teleport → walk 10 {item:556=3, item:555=1, item:563=1}
+  best      14t: Falador Teleport → walk 10 {item:556=3, item:555=1, item:563=1}
 map:w346
-  best      49t: Varrock Teleport → walk 44 {item:556=3, item:554=1, item:563=1}
+  best      48t: Varrock Teleport → walk 44 {item:556=3, item:554=1, item:563=1}
 map:w347
-  best      63t: Varrock Teleport → walk 58 {item:556=3, item:554=1, item:563=1}
-  alt       97t: Lumbridge Teleport → walk 92 {item:556=3, item:557=1, item:563=1}
-  alt       117t: Lumbridge Home Teleport → walk 92 {cooldown:892=1}
+  best      62t: Varrock Teleport → walk 58 {item:556=3, item:554=1, item:563=1}
+  alt       96t: Lumbridge Teleport → walk 92 {item:556=3, item:557=1, item:563=1}
+  alt       116t: Lumbridge Home Teleport → walk 92 {cooldown:892=1}
 map:w348
-  best      75t: Lumbridge Teleport → walk 70 {item:556=3, item:557=1, item:563=1}
-  alt       95t: Lumbridge Home Teleport → walk 70 {cooldown:892=1}
-  alt       115t: Falador Teleport → walk 110 {item:556=3, item:555=1, item:563=1}
+  best      74t: Lumbridge Teleport → walk 70 {item:556=3, item:557=1, item:563=1}
+  alt       94t: Lumbridge Home Teleport → walk 70 {cooldown:892=1}
+  alt       114t: Falador Teleport → walk 110 {item:556=3, item:555=1, item:563=1}
 map:w351
-  best      54t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
-  alt       104t: Varrock Teleport → walk 99 {item:556=3, item:554=1, item:563=1}
+  best      53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
+  alt       103t: Varrock Teleport → walk 99 {item:556=3, item:554=1, item:563=1}
 map:w356
-  best      95t: Lumbridge Teleport → walk 90 {item:556=3, item:557=1, item:563=1}
-  alt       115t: Lumbridge Home Teleport → walk 90 {cooldown:892=1}
-  alt       156t: Falador Teleport → walk 151 {item:556=3, item:555=1, item:563=1}
+  best      94t: Lumbridge Teleport → walk 90 {item:556=3, item:557=1, item:563=1}
+  alt       114t: Lumbridge Home Teleport → walk 90 {cooldown:892=1}
+  alt       155t: Falador Teleport → walk 151 {item:556=3, item:555=1, item:563=1}
 cryptic:always walking around the castle grounds and somehow knows everyone's age.
-  best      5t: Lumbridge Teleport {item:556=3, item:557=1, item:563=1}
-  alt       25t: Lumbridge Home Teleport {cooldown:892=1}
+  best      4t: Lumbridge Teleport {item:556=3, item:557=1, item:563=1}
+  alt       24t: Lumbridge Home Teleport {cooldown:892=1}
 cryptic:in a village of barbarians, i am the one who guards the village from up high.
-  best      72t: Varrock Teleport → walk 67 {item:556=3, item:554=1, item:563=1}
-  alt       89t: Falador Teleport → walk 84 {item:556=3, item:555=1, item:563=1}
-  alt       141t: Lumbridge Teleport → walk 136 {item:556=3, item:557=1, item:563=1}
+  best      71t: Varrock Teleport → walk 67 {item:556=3, item:554=1, item:563=1}
+  alt       88t: Falador Teleport → walk 84 {item:556=3, item:555=1, item:563=1}
+  alt       140t: Lumbridge Teleport → walk 136 {item:556=3, item:557=1, item:563=1}
 cryptic:in the place duke horacio calls home, talk to a man with a hat dropped by goblins.
-  best      24t: Lumbridge Teleport → walk 11 {item:556=3, item:557=1, item:563=1}
-  alt       44t: Lumbridge Home Teleport → walk 11 {cooldown:892=1}
+  best      23t: Lumbridge Teleport → walk 11 {item:556=3, item:557=1, item:563=1}
+  alt       43t: Lumbridge Home Teleport → walk 11 {cooldown:892=1}
 cryptic:near the open desert i reside, to get past me you must abide. go forward if you dare, for when you pass me, you'll be sweating by your hair.
-  best      82t: Lumbridge Teleport → walk 77 {item:556=3, item:557=1, item:563=1}
-  alt       102t: Lumbridge Home Teleport → walk 77 {cooldown:892=1}
-  alt       164t: Varrock Teleport → walk 159 {item:556=3, item:554=1, item:563=1}
+  best      81t: Lumbridge Teleport → walk 77 {item:556=3, item:557=1, item:563=1}
+  alt       101t: Lumbridge Home Teleport → walk 77 {cooldown:892=1}
 cryptic:talk to charlie the tramp in varrock.
-  best      22t: Varrock Teleport → walk 17 {item:556=3, item:554=1, item:563=1}
+  best      21t: Varrock Teleport → walk 17 {item:556=3, item:554=1, item:563=1}
 emote:blow a raspberry at aris in her tent. equip a gold ring and a gold necklace.
-  best      10t: Varrock Teleport → walk 5 {item:556=3, item:554=1, item:563=1}
+  best      9t: Varrock Teleport → walk 5 {item:556=3, item:554=1, item:563=1}
 emote:bow to brugsen bursen at the grand exchange.
-  best      39t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
+  best      38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
 emote:cheer at iffie nitter. equip a chef hat and a red cape.
-  best      12t: Varrock Teleport → walk 7 {item:556=3, item:554=1, item:563=1}
+  best      11t: Varrock Teleport → walk 7 {item:556=3, item:554=1, item:563=1}
 emote:clap at bob's brilliant axes. equip a bronze axe and leather boots.
-  best      20t: Lumbridge Teleport → walk 15 {item:556=3, item:557=1, item:563=1}
-  alt       40t: Lumbridge Home Teleport → walk 15 {cooldown:892=1}
+  best      19t: Lumbridge Teleport → walk 15 {item:556=3, item:557=1, item:563=1}
+  alt       39t: Lumbridge Home Teleport → walk 15 {cooldown:892=1}
 emote:panic at al kharid mine.
-  best      52t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
-  alt       72t: Lumbridge Home Teleport → walk 47 {cooldown:892=1}
-  alt       103t: Varrock Teleport → walk 98 {item:556=3, item:554=1, item:563=1}
+  best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
+  alt       71t: Lumbridge Home Teleport → walk 47 {cooldown:892=1}
 emote:spin at flynn's mace shop.
-  best      14t: Falador Teleport → walk 9 {item:556=3, item:555=1, item:563=1}
+  best      13t: Falador Teleport → walk 9 {item:556=3, item:555=1, item:563=1}
 spot:DRAYNOR_MANOR_MUSHROOMS
-  best      116t: Varrock Teleport → walk 111 {item:556=3, item:554=1, item:563=1}
-  alt       118t: Lumbridge Teleport → walk 113 {item:556=3, item:557=1, item:563=1}
-  alt       124t: Falador Teleport → walk 119 {item:556=3, item:555=1, item:563=1}
+  best      115t: Varrock Teleport → walk 111 {item:556=3, item:554=1, item:563=1}
+  alt       117t: Lumbridge Teleport → walk 113 {item:556=3, item:557=1, item:563=1}
+  alt       123t: Falador Teleport → walk 119 {item:556=3, item:555=1, item:563=1}
 spot:DRAYNOR_WHEAT_FIELD
-  best      80t: Lumbridge Teleport → walk 75 {item:556=3, item:557=1, item:563=1}
-  alt       100t: Lumbridge Home Teleport → walk 75 {cooldown:892=1}
-  alt       113t: Varrock Teleport → walk 108 {item:556=3, item:554=1, item:563=1}
+  best      79t: Lumbridge Teleport → walk 75 {item:556=3, item:557=1, item:563=1}
+  alt       99t: Lumbridge Home Teleport → walk 75 {cooldown:892=1}
+  alt       112t: Varrock Teleport → walk 108 {item:556=3, item:554=1, item:563=1}
 spot:ICE_MOUNTAIN
-  best      82t: Falador Teleport → walk 77 {item:556=3, item:555=1, item:563=1}
-  alt       118t: Varrock Teleport → walk 113 {item:556=3, item:554=1, item:563=1}
-  alt       140t: Clan Wars Minigame Teleport → walk 113 {cooldown:888=1}
+  best      81t: Falador Teleport → walk 77 {item:556=3, item:555=1, item:563=1}
+  alt       117t: Varrock Teleport → walk 113 {item:556=3, item:554=1, item:563=1}
+  alt       139t: Clan Wars Minigame Teleport → walk 113 {cooldown:888=1}
 spot:LUMBRIDGE_COW_FIELD
-  best      78t: Lumbridge Teleport → walk 73 {item:556=3, item:557=1, item:563=1}
-  alt       98t: Lumbridge Home Teleport → walk 73 {cooldown:892=1}
-  alt       130t: Varrock Teleport → walk 125 {item:556=3, item:554=1, item:563=1}
+  best      77t: Lumbridge Teleport → walk 73 {item:556=3, item:557=1, item:563=1}
+  alt       97t: Lumbridge Home Teleport → walk 73 {cooldown:892=1}
+  alt       129t: Varrock Teleport → walk 125 {item:556=3, item:554=1, item:563=1}
 spot:NORTHEAST_OF_AL_KHARID_MINE
-  best      73t: Lumbridge Teleport → walk 68 {item:556=3, item:557=1, item:563=1}
-  alt       93t: Varrock Teleport → walk 88 {item:556=3, item:554=1, item:563=1}
-  alt       93t: Lumbridge Home Teleport → walk 68 {cooldown:892=1}
+  best      72t: Lumbridge Teleport → walk 68 {item:556=3, item:557=1, item:563=1}
+  alt       92t: Varrock Teleport → walk 88 {item:556=3, item:554=1, item:563=1}
+  alt       92t: Lumbridge Home Teleport → walk 68 {cooldown:892=1}
 skill:CHARLIE:i need to give charlie a cooked pike.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
 skill:CHARLIE:i need to give charlie a cooked trout.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
 skill:CHARLIE:i need to give charlie a leather body.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
 skill:CHARLIE:i need to give charlie a raw herring.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
 skill:CHARLIE:i need to give charlie a raw trout.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
 skill:CHARLIE:i need to give charlie one iron dagger.
-  best      21t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}

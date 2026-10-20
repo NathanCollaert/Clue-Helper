@@ -18,8 +18,11 @@ import net.runelite.api.Quest;
  */
 public final class AvailabilityEngine
 {
-	private static final List<Container> CARRIED = List.of(Container.INVENTORY, Container.WORN);
-	private static final List<Container> WORN_ONLY = List.of(Container.WORN);
+	/** Carried first, so a banked snapshot withdraws only what the player lacks (its bank maps are empty otherwise). */
+	private static final List<Container> CARRIED = List.of(Container.INVENTORY, Container.WORN, Container.BANK,
+		Container.GROUP_STORAGE);
+	/** At a bank a withdrawn item can be worn before the teleport. */
+	private static final List<Container> WORN_ONLY = List.of(Container.WORN, Container.BANK, Container.GROUP_STORAGE);
 	/** Shortest Path lists every charge of an item as its own alternative: glory(1) to glory(t6) is 12. */
 	private static final int MAX_ALTERNATIVES_NAMED = 2;
 
@@ -33,7 +36,10 @@ public final class AvailabilityEngine
 		this.itemNames = itemNames;
 	}
 
-	/** {@code A_carried}: the inventory, worn items and a held rune pouch. */
+	/**
+	 * {@code A_carried} for a live snapshot: the inventory, worn items and a held rune pouch. For a banked snapshot
+	 * ({@link PlayerSnapshot#getBank()} filled) this is {@code A_banked}, and witnesses name what to withdraw.
+	 */
 	public AvailabilitySet carried(List<CatalogRow> rows, PlayerSnapshot player, long nowMinutes)
 	{
 		List<RowAvailability> judged = rows.stream().map(row -> judge(row, player, nowMinutes)).collect(Collectors.toList());

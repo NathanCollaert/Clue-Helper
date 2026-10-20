@@ -50,8 +50,14 @@ public final class PlayerSnapshot
 	private final Map<Integer, Integer> varps;
 	private final UnknownVars unknownVars;
 	private final SpellbookState spellbook;
-	/** Per held item id, where its charges are known. */
+	/** Per held item id, where its charges are known; in a banked snapshot banked items too. */
 	private final Map<Integer, Charge> charges;
+	/** Empty inventory slots: withdrawing more stacks than this means depositing first (PLAN §5.4 Edge cases). */
+	private final int freeInventorySlots;
+	/** The remembered bank, placeholders left out; empty except in a banked snapshot ({@code A_banked}, B15). */
+	private final Map<Integer, Integer> bank;
+	/** GIM group storage, remembered like the bank; empty except in a banked snapshot. */
+	private final Map<Integer, Integer> groupStorage;
 
 	@Builder(toBuilder = true)
 	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
@@ -59,7 +65,8 @@ public final class PlayerSnapshot
 		Map<Integer, Integer> worn, int weapon, boolean pouchHeld, Map<Integer, Integer> pouch,
 		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
-		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges)
+		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
+		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage)
 	{
 		this.version = version;
 		this.tick = tick;
@@ -86,6 +93,9 @@ public final class PlayerSnapshot
 		this.unknownVars = unknownVars == null ? UnknownVars.UNREAD : unknownVars;
 		this.spellbook = spellbook;
 		this.charges = copy(charges);
+		this.freeInventorySlots = freeInventorySlots;
+		this.bank = copy(bank);
+		this.groupStorage = copy(groupStorage);
 	}
 
 	public int boosted(Skill skill)
@@ -102,6 +112,14 @@ public final class PlayerSnapshot
 		if (container == Container.WORN)
 		{
 			return worn.getOrDefault(itemId, 0);
+		}
+		if (container == Container.BANK)
+		{
+			return bank.getOrDefault(itemId, 0);
+		}
+		if (container == Container.GROUP_STORAGE)
+		{
+			return groupStorage.getOrDefault(itemId, 0);
 		}
 		return container == Container.RUNE_POUCH ? pouch.getOrDefault(itemId, 0) : 0;
 	}

@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.link.ClueLink;
+import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.ItemUse;
@@ -75,6 +76,7 @@ public class StepGuide
 	private final ClueLink clueLink;
 	private final RoutePlanner routes;
 	private final PlayerModel player;
+	private final BankMemory bankMemory;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private final Map<String, Integer> spellWidgets = new HashMap<>();
 
@@ -93,14 +95,16 @@ public class StepGuide
 	private Book refusalBook;
 	private int refusalCheckTick;
 	private Set<Integer> highlightItems = Set.of();
+	private Set<Integer> bankHighlightItems = Set.of();
 	private int highlightSpellWidget = -1;
 	private boolean highlightWorn;
 	private int highlightMenuWidget = ScrollBook.NO_WIDGET;
 	private Tab highlightTab = Tab.NONE;
 
 	@Inject
-	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player)
+	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory)
 	{
+		this.bankMemory = bankMemory;
 		this.client = client;
 		this.clueLink = clueLink;
 		this.routes = routes;
@@ -154,6 +158,12 @@ public class StepGuide
 	public Set<Integer> getHighlightItems()
 	{
 		return highlightItems;
+	}
+
+	/** Item ids to outline in the open bank for the withdraw sub-step. */
+	public Set<Integer> getBankHighlightItems()
+	{
+		return bankHighlightItems;
 	}
 
 	public Tab getHighlightTab()
@@ -284,7 +294,7 @@ public class StepGuide
 		route = committed;
 		routeStep = step;
 		steps = committed == null || step == null ? List.of() : stillAtAct(step, tile) ? List.of(SubSteps.act(step))
-			: SubSteps.of(committed, step);
+			: SubSteps.of(committed, step, id -> client.getItemDefinition(id).getName());
 		index = 0;
 		jumpedThisSubStep = false;
 		advance(tile);
@@ -326,6 +336,7 @@ public class StepGuide
 		waiting = null;
 		refusalCandidate = null;
 		highlightItems = Set.of();
+		bankHighlightItems = Set.of();
 		highlightSpellWidget = -1;
 		highlightMenuWidget = ScrollBook.NO_WIDGET;
 		highlightTab = Tab.NONE;
@@ -356,7 +367,9 @@ public class StepGuide
 			case CHANGE_BOOK:
 				return client.getVarbitValue(VarbitID.SPELLBOOK) == step.getBook().ordinal();
 			case BANK:
-				return client.getWidget(InterfaceID.Bankmain.UNIVERSE) != null;
+				return bankMemory.isBankOpen();
+			case WITHDRAW:
+				return !bankMemory.isBankOpen();
 			default:
 				return false;
 		}
@@ -366,6 +379,7 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		highlightItems = Set.of();
+		bankHighlightItems = current == null ? Set.of() : current.getBankItems();
 		highlightSpellWidget = -1;
 		highlightWorn = false;
 		highlightMenuWidget = ScrollBook.NO_WIDGET;

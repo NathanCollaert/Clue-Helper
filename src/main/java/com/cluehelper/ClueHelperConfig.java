@@ -80,6 +80,32 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "useBank",
+		name = "Use the bank",
+		description = "Count banked teleports and items (and GIM group storage). A bank stop is shown as Best only when it beats going direct by 5 ticks or 10%",
+		section = routesSection,
+		position = 3
+	)
+	default boolean useBank()
+	{
+		return true;
+	}
+
+	@Range(min = -2, max = 20)
+	@Units(Units.TICKS)
+	@ConfigItem(
+		keyName = "bankStopExtraTicks",
+		name = "Bank stop extra",
+		description = "Ticks added to every bank stop, if you bank slower (or faster) than the measured 3 ticks plus 2 per item",
+		section = routesSection,
+		position = 4
+	)
+	default int bankStopExtraTicks()
+	{
+		return 0;
+	}
+
+	@ConfigItem(
 		keyName = "spellbookChanges",
 		name = "Spellbook changes",
 		description = "Spellbook Swap only never leaves you on another book",

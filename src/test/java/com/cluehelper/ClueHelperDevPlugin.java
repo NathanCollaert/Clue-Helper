@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.swing.JLabel;
@@ -42,6 +43,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
@@ -152,6 +154,10 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
+		BankTrace bankTrace = new BankTrace(client, clueHelper.getBankMemory(), clueHelper.getGuide(),
+			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+		eventBus.register(bankTrace);
+		unregister.add(() -> eventBus.unregister(bankTrace));
 		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
 		if (autoRunPending)
 		{
@@ -206,7 +212,16 @@ public class ClueHelperDevPlugin extends Plugin
 			.forEach(candidate -> line.append(" | ").append(candidate));
 		log.info(line.toString());
 		String name = String.format("%03d-%d-%d-%d.png", ++landingFrameCount, to.getX(), to.getY(), to.getPlane());
-		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(LANDING_FRAMES, name))));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(LANDING_FRAMES, name))));
+	}
+
+	/** Never a frame of the bank PIN keypad. */
+	private void requestFrame(Consumer<Image> listener)
+	{
+		if (client.getWidget(InterfaceID.BANKPIN_KEYPAD, 0) == null)
+		{
+			drawManager.requestNextFrameListener(listener);
+		}
 	}
 
 	private static String text(WorldPoint tile)
@@ -529,7 +544,7 @@ public class ClueHelperDevPlugin extends Plugin
 		String key = step == null ? "none" : step.getKey().replaceAll("[^a-zA-Z0-9]+", "-");
 		String name = String.format("%03d-%s-%s.png", ++stepFrameCount, change.name().toLowerCase(Locale.ROOT),
 			key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
-		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
 	}
 
 	/** A frame whenever the number of available sample rows changes: banking the pouch, casting, wielding. */
@@ -559,7 +574,7 @@ public class ClueHelperDevPlugin extends Plugin
 		lastPlannedStep = plan.getStepKey();
 		String key = plan.getStepKey().replaceAll("[^a-zA-Z0-9]+", "-");
 		String name = String.format("%03d-%s.png", ++routeFrameCount, key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
-		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(ROUTE_FRAMES, name))));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(ROUTE_FRAMES, name))));
 	}
 
 	private void saveLiveFrame()
@@ -571,7 +586,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		String name = String.format("live-%03d-t%d-%s-game.png", ++liveFrameCount, client.getTickCount(),
 			current.getKind().name().toLowerCase(Locale.ROOT));
-		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name))));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name))));
 	}
 
 	/** A game frame and a sidebar snapshot per new sub-step, for reading a live run's guidance afterwards. */
@@ -585,7 +600,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		lastGuideText = text;
 		String name = String.format("%03d-%s", ++guideFrameCount, current.getKind().name().toLowerCase(Locale.ROOT));
-		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
 		SwingUtilities.invokeLater(() -> snapshotTo(clueHelper.getPanel(), new File(GUIDE_FRAMES, name + "-panel.png")));
 	}
 
@@ -613,7 +628,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		lastAvailableCount = available;
 		String name = String.format("%03d-v%d-available-%d.png", ++playerFrameCount, carried.getSnapshotVersion(), available);
-		drawManager.requestNextFrameListener(frame -> executor.execute(() -> writeFrame(frame, new File(PLAYER_FRAMES, name))));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(PLAYER_FRAMES, name))));
 	}
 
 	private static void writeFrame(Image frame, File file)

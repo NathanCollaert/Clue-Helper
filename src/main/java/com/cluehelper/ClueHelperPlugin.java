@@ -3,8 +3,11 @@ package com.cluehelper;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.link.ClueLink;
+import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.MemoryStore;
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
+import com.cluehelper.player.CheckLines;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.PlannerRunner;
@@ -27,13 +30,17 @@ import javax.swing.SwingUtilities;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.WidgetClosed;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -58,6 +65,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDependency(ClueScrollPlugin.class)
 public class ClueHelperPlugin extends Plugin
 {
+	private static final int ULTIMATE_IRONMAN = 2;
+
 	@Inject
 	private ClientToolbar clientToolbar;
 
@@ -67,6 +76,16 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private MemoryStore memory;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private BankMemory bankMemory;
+
+	@Inject
+	private StashMemory stashMemory;
+
+	@Inject
+	private CheckLines checkLines;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -92,6 +111,12 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private ClientThread clientThread;
+
+	@Inject
+	private Client client;
+
+	@Inject
+	private ClueHelperConfig config;
 
 	@Inject
 	private OverlayManager overlayManager;
@@ -217,6 +242,26 @@ public class ClueHelperPlugin extends Plugin
 	{
 		clueLink.onItemContainerChanged(event);
 		playerModel.onItemContainerChanged(event);
+		bankMemory.onItemContainerChanged(event);
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded event)
+	{
+		bankMemory.onWidgetLoaded(event);
+	}
+
+	@Subscribe
+	public void onWidgetClosed(WidgetClosed event)
+	{
+		bankMemory.onWidgetClosed(event);
+	}
+
+	@Subscribe
+	public void onMenuOptionClicked(MenuOptionClicked event)
+	{
+		stashMemory.onMenuOptionClicked(event);
+		checkLines.onMenuOptionClicked(event);
 	}
 
 	@Subscribe
@@ -235,12 +280,18 @@ public class ClueHelperPlugin extends Plugin
 	public void onGameStateChanged(GameStateChanged event)
 	{
 		playerModel.onGameStateChanged(event);
+		bankMemory.onGameStateChanged(event);
 	}
 
 	@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
 		guide.onChatMessage(event);
+		stashMemory.onChatMessage(event);
+		if (checkLines.onChatMessage(event))
+		{
+			playerModel.onChargesLearned();
+		}
 	}
 
 	@Subscribe
@@ -256,6 +307,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onRuneScapeProfileChanged(RuneScapeProfileChanged event)
 	{
 		memory.reload();
+		bankMemory.onProfileChanged();
 	}
 
 	@Subscribe
@@ -301,8 +353,18 @@ public class ClueHelperPlugin extends Plugin
 			return;
 		}
 		PanelModel model = PanelModel.of(panelState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
-			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p());
+			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p(), bankInfo(), System.currentTimeMillis());
 		SwingUtilities.invokeLater(() -> target.show(model));
+	}
+
+	/** "Open your bank once" while this profile has no bank and one would count: not UIM, useBank on (B13). */
+	private PanelModel.BankInfo bankInfo()
+	{
+		BankMemory.Seen bank = bankMemory.getBank();
+		PlayerSnapshot snapshot = playerModel.getSnapshot();
+		boolean bankCounts = config.useBank() && snapshot != null && snapshot.getAccountType() != ULTIMATE_IRONMAN;
+		return new PanelModel.BankInfo(bank == null ? 0 : bank.seenAt, bank == null && bankCounts,
+			id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Members keep their book on an F2P world, where no book can be changed and only Standard has teleports. */

@@ -3,6 +3,7 @@ package com.cluehelper.guide;
 import com.cluehelper.player.Book;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.SpellbookChange;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
@@ -25,6 +26,8 @@ public class SubStep
 		FAIRY_RING,
 		CHANGE_BOOK,
 		BANK,
+		/** At the open bank: take the withdraw list; done when the bank closes. */
+		WITHDRAW,
 		/** Talk, search, dig or emote: panel text only in M1. */
 		ACT
 	}
@@ -43,6 +46,9 @@ public class SubStep
 	/** The teleport to highlight (spell or item), or a fairy ring's landing. */
 	CatalogRow row;
 	SpellbookChange change;
+	/** WITHDRAW: the bank items to outline (route items and those core's *clue* tag lacks). */
+	@Builder.Default
+	Set<Integer> bankItems = Set.of();
 
 	public boolean isTravel()
 	{

@@ -1,6 +1,8 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.Book;
+import com.cluehelper.player.Container;
+import com.cluehelper.player.ItemUse;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
@@ -70,6 +72,7 @@ public final class Planner
 		plan.alternatives(probes || orders.size() > 1 ? List.of() : alternatives(in, searches, orders, picks));
 		plan.why(probes ? List.of() : WhyList.of(ctx, orders.get(0).get(0)));
 		plan.note(picks.best == null ? noRouteNote(ctx, orders) : ctx.targetInWilderness ? "Wilderness target" : null);
+		plan.requirementNotes(requirementNotes(ctx));
 		return plan.searchNanos(System.nanoTime() - started).contextNanos(contextNanos).labels(searches.labels)
 			.searches(searches.count).build();
 	}
@@ -137,6 +140,7 @@ public final class Planner
 		Stream.of(picks.best, picks.direct, picks.sameBook).filter(Objects::nonNull).forEach(route ->
 		{
 			excluded.add(route.getFirstTransportKey());
+			excludeAfterBank(route, excluded);
 			identities.add(route.getIdentity());
 			shown.add(route);
 		});
@@ -154,6 +158,7 @@ public final class Planner
 			{
 				break;
 			}
+			excludeAfterBank(next, excluded);
 			if (!repeats(next, shown) && !loops(next) && identities.add(next.getIdentity()))
 			{
 				alternatives.add(next);
@@ -161,6 +166,15 @@ public final class Planner
 			}
 		}
 		return alternatives;
+	}
+
+	private static void excludeAfterBank(Route route, Set<String> excluded)
+	{
+		String afterBank = route.getAfterBankTransportKey();
+		if (afterBank != null)
+		{
+			excluded.add(afterBank);
+		}
 	}
 
 	/**
@@ -234,6 +248,36 @@ public final class Planner
 			}
 		});
 		return ticks;
+	}
+
+	/**
+	 * Required items no source meets are listed, and the best route is still shown (PLAN §5.4). An unknown STASH never
+	 * forces a bank stop silently: the note says a filled one would save it.
+	 */
+	static List<String> requirementNotes(PlanContext ctx)
+	{
+		RequiredItems required = ctx.in.getRequired();
+		List<String> notes = new ArrayList<>();
+		if (!ctx.required.getMissing().isEmpty())
+		{
+			notes.add("Not found on you or in your bank: " + ctx.required.getMissing().stream().map(RequiredItems.Need::getName)
+				.collect(Collectors.joining(", ")));
+		}
+		boolean stepItemsFromBank = !ctx.required.isCarried() && ctx.required.isBanked()
+			&& required.getNeeds().stream().anyMatch(RequiredItems.Need::isStepItem);
+		if (required.getStash() == RequiredItems.Stash.UNKNOWN && (stepItemsFromBank || !ctx.required.getMissing().isEmpty()))
+		{
+			notes.add("STASH unknown — search it once. If it's filled, skip the bank");
+		}
+		else if (required.getStash() == RequiredItems.Stash.FILLED)
+		{
+			notes.add("Emote items are in the STASH");
+		}
+		if (required.isSpadeAtLeprechaun() && ctx.required.getMissing().stream().anyMatch(need -> need.getName().equalsIgnoreCase("spade")))
+		{
+			notes.add("Your spade is with a tool leprechaun");
+		}
+		return notes;
 	}
 
 	/** PLAN 5.7: no route because no node walks to the target within 200 tiles (and it isn't in the scene). */
@@ -414,11 +458,21 @@ public final class Planner
 				tally(ctx, label.ref, spent);
 				tally(ctx, label.ref2, spent);
 			}
+			List<ItemUse> withdraw = withdraw(ctx, goal);
+			boolean banked = goal.b == PlanContext.BANKED;
+			boolean depositFirst = banked && slotsNeeded(ctx, withdraw) > ctx.in.getPlayer().getFreeInventorySlots();
+			int extra = depositFirst ? PlanContext.DEPOSIT_FIRST_HALF_TICKS : 0;
+			boolean bankLeg = legs.stream().anyMatch(leg -> leg.getKind() == Leg.Kind.BANK);
 			return Route.builder()
 				.legs(List.copyOf(legs))
-				.halfTicks(goal.half)
-				.rankHalfTicks(rank)
-				.banked(goal.b == PlanContext.BANKED)
+				.halfTicks(goal.half + extra)
+				.rankHalfTicks(rank + extra)
+				.banked(banked)
+				.withdraw(withdraw)
+				.withdrawInCoreTag(inCoreTag(ctx, goal, withdraw))
+				.depositFirst(depositFirst)
+				.pinIncluded(bankLeg && ctx.in.isPinPending())
+				.openBankStart(banked && !bankLeg)
 				.changed(goal.c != LabelSearch.NONE)
 				.walkedChange(goal.c == LabelSearch.WALKED)
 				.startBook(ctx.homeBook)
@@ -427,6 +481,59 @@ public final class Planner
 				.confidence(goal.confidence())
 				.wilderness(wilderness)
 				.build();
+		}
+
+		/** The route's own bank items, then the step's required ones; one entry per item. */
+		private static List<ItemUse> withdraw(PlanContext ctx, LabelSearch.Label goal)
+		{
+			if (goal.b != PlanContext.BANKED)
+			{
+				return List.of();
+			}
+			Map<Integer, ItemUse> byItem = new LinkedHashMap<>(routeWithdraw(goal));
+			ctx.required.getWithdraw().forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+			return List.copyOf(byItem.values());
+		}
+
+		private static Map<Integer, ItemUse> routeWithdraw(LabelSearch.Label goal)
+		{
+			Map<Integer, ItemUse> byItem = new LinkedHashMap<>();
+			for (LabelSearch.Label label : goal.chain())
+			{
+				for (Object ref : new Object[]{label.ref, label.ref2})
+				{
+					List<ItemUse> uses = ref instanceof PlanContext.Teleport ? ((PlanContext.Teleport) ref).withdrawUses
+						: ref instanceof PlanContext.Change ? ((PlanContext.Change) ref).withdrawUses : null;
+					if (label.b == PlanContext.BANKED && uses != null)
+					{
+						uses.forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+					}
+				}
+			}
+			return byItem;
+		}
+
+		/** Required items whose every need is one core's *clue* tag covers; the route's own items never are. */
+		private static Set<Integer> inCoreTag(PlanContext ctx, LabelSearch.Label goal, List<ItemUse> withdraw)
+		{
+			Set<Integer> routeItems = routeWithdraw(goal).keySet();
+			Set<Integer> tagged = new HashSet<>();
+			for (ItemUse use : withdraw)
+			{
+				List<RequiredItems.Need> helped = ctx.in.getRequired().getNeeds().stream()
+					.filter(need -> need.getRequirement().fulfilledBy(use.getItemId())).collect(Collectors.toList());
+				if (!routeItems.contains(use.getItemId()) && !helped.isEmpty() && helped.stream().allMatch(RequiredItems.Need::isInCoreTag))
+				{
+					tagged.add(use.getItemId());
+				}
+			}
+			return Set.copyOf(tagged);
+		}
+
+		/** A stack of something already in the inventory takes no new slot. */
+		private static int slotsNeeded(PlanContext ctx, List<ItemUse> withdraw)
+		{
+			return (int) withdraw.stream().filter(use -> ctx.in.getPlayer().count(Container.INVENTORY, use.getItemId()) == 0).count();
 		}
 
 		/** Every unit a leg uses, tracked by the search or not, for the route's spent list. */

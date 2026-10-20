@@ -32,9 +32,16 @@ final class PlanContext
 {
 	static final int NOT_BANKED = 0;
 	static final int BANKED = 1;
-	/** Bank stop: open + equip + PIN (PLAN placeholder, B14 calibrates; B02 used 5 ticks). */
-	static final int BANK_STOP_HALF_TICKS = 10;
-	static final int LEG_OVERHEAD_TICKS = 1;
+	/** Bank stop, arrival to the next transport's first click: open 1 tick, leave 2 (B14). */
+	static final int BANK_STOP_HALF_TICKS = 6;
+	/** Shortest Path's Duration already is click → landing (B14). */
+	static final int LEG_OVERHEAD_TICKS = 0;
+	/** Each item stack withdrawn, worn or deposited at the bank: 2 ticks (B14), charged on the edge that needs it. */
+	static final int WITHDRAW_HALF_TICKS = 4;
+	/** The bank PIN on the first open of a session (B14: 3–4 ticks). */
+	static final int PIN_HALF_TICKS = 8;
+	/** "Deposit first" when the withdraw list needs more slots than are free: one more click (PLAN §5.4 Edge cases). */
+	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
 	static final int SWAP_DURATION_TICKS = 4;
 	static final int SWAP_MENU_TICKS = 1;
 	private static final OriginClass[] ABSTRACT_CLASSES = {OriginClass.WILD0, OriginClass.WILD20, OriginClass.WILD30, OriginClass.POH};
@@ -59,6 +66,14 @@ final class PlanContext
 	final Book homeBook;
 	final boolean startPending;
 	final boolean targetInWilderness;
+	/** Arrival to the next transport's first click, PIN and the player's own extra included. */
+	final int bankStopHalfTicks;
+	/** How the step's required items can be met; arrivals without the bank don't count when only the bank meets them. */
+	final RequiredItems.Verdict required;
+	/** Item ids the required items withdraw, sorted. */
+	final int[] requiredWithdraw;
+	private byte[] bankUsable;
+	private boolean[] bankItemUses;
 
 	PlanContext(PlanInput in)
 	{
@@ -80,7 +95,59 @@ final class PlanContext
 		{
 			options[BANKED] = new Options(in.getBanked(), BANKED);
 		}
+		bankStopHalfTicks = 2 * in.getSettings().getBankStopExtraTicks() + BANK_STOP_HALF_TICKS + (in.isPinPending() ? PIN_HALF_TICKS : 0);
+		required = in.getRequired().judge(in.getPlayer(), options[BANKED] == null ? null : in.getBanked());
+		requiredWithdraw = required.getWithdraw().stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
 		expandBooks();
+	}
+
+	/** Whether an arrival without a bank stop completes the step: its required items are carried, or nothing meets them. */
+	boolean arrivesWithoutBank()
+	{
+		return required.isCarried() || !required.isBanked();
+	}
+
+	/**
+	 * A fairy ring or altar here takes something from the bank (a staff, runes): the only places worth walking to after
+	 * a bank stop before anything is withdrawn.
+	 */
+	boolean usesBankItems(int node)
+	{
+		Options banked = options[BANKED];
+		if (banked == null)
+		{
+			return false;
+		}
+		if (bankItemUses == null)
+		{
+			bankItemUses = new boolean[nodeCount()];
+			banked.fairyEntries.forEach((at, entry) -> bankItemUses[at] |= entry.withdraw.length > 0
+				|| banked.fairyLandings.stream().anyMatch(landing -> landing.withdraw.length > 0));
+			banked.located.forEach((at, change) -> bankItemUses[at] |= change.withdraw.length > 0);
+		}
+		return node < bankItemUses.length && bankItemUses[node];
+	}
+
+	/** A bank stop here gives the banked state: a bank, not a deposit box, whose own gates pass (PLAN §5.4 Banked). */
+	boolean isUsableBank(int node)
+	{
+		if (!isTableNode(node) || !table.is(node, WalkTable.KIND_BANK))
+		{
+			return false;
+		}
+		if (bankUsable == null)
+		{
+			bankUsable = new byte[table.nodeCount()];
+		}
+		if (bankUsable[node] == 0)
+		{
+			PlayerSnapshot judgedAt = in.getPlayer().toBuilder().wildernessLevel(0).build();
+			boolean usable = table.banks(node).stream().anyMatch(bank -> !bank.isDepositOnly() && in.getEngine()
+				.judge(CatalogRow.builder().name(bank.getName()).requirements(bank.getRequirements()).build(), judgedAt, in.getNowMinutes())
+				.isAvailable());
+			bankUsable[node] = (byte) (usable ? 1 : 2);
+		}
+		return bankUsable[node] == 1;
 	}
 
 	int nodeCount()
@@ -250,6 +317,9 @@ final class PlanContext
 		int[] res;
 		int[] amounts;
 		int consumed;
+		/** What it takes from the bank or group storage, by item id (sorted), and as witness uses. */
+		int[] withdraw;
+		List<ItemUse> withdrawUses;
 		RowAvailability.Confidence confidence;
 		boolean minigame;
 		int maxWilderness;
@@ -263,6 +333,8 @@ final class PlanContext
 		int halfTicks;
 		int[] res;
 		int[] amounts;
+		int[] withdraw;
+		List<ItemUse> withdrawUses;
 		boolean capeUse;
 		RowAvailability.Confidence confidence;
 	}
@@ -354,6 +426,8 @@ final class PlanContext
 			tele.res = spending.res;
 			tele.amounts = spending.amounts;
 			tele.consumed = spending.consumed;
+			tele.withdrawUses = withdrawUses(judged.getWitness());
+			tele.withdraw = ids(tele.withdrawUses);
 			return tele;
 		}
 
@@ -367,8 +441,28 @@ final class PlanContext
 			Spending spending = spending(change.getSpends(), judged.getWitness(), player, bankState);
 			c.res = spending.res;
 			c.amounts = spending.amounts;
+			c.withdrawUses = withdrawUses(judged.getWitness());
+			c.withdraw = ids(c.withdrawUses);
 			return c;
 		}
+	}
+
+	private static List<ItemUse> withdrawUses(List<ItemUse> witness)
+	{
+		List<ItemUse> stored = new ArrayList<>();
+		for (ItemUse use : witness)
+		{
+			if (use.getContainer() == Container.BANK || use.getContainer() == Container.GROUP_STORAGE)
+			{
+				stored.add(use);
+			}
+		}
+		return List.copyOf(stored);
+	}
+
+	private static int[] ids(List<ItemUse> uses)
+	{
+		return uses.stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
 	}
 
 	private static final class Spending
@@ -450,7 +544,8 @@ final class PlanContext
 		{
 			Charge charge = player.getCharges().get(itemId);
 			int perItem = charge == null ? 1 : Math.max(0, charge.getCharges());
-			int held = player.count(Container.INVENTORY, itemId) + player.count(Container.WORN, itemId);
+			int held = player.count(Container.INVENTORY, itemId) + player.count(Container.WORN, itemId)
+				+ player.count(Container.BANK, itemId) + player.count(Container.GROUP_STORAGE, itemId);
 			return set("charge:" + itemId, bankState, Math.max(1, held) * perItem);
 		}
 

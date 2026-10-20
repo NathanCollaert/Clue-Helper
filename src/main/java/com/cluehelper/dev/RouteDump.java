@@ -7,6 +7,7 @@ import com.cluehelper.route.RoutePlanner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /** {@code ::ch-routes} and the {@code [CH-ROUTE]} log lines: every candidate with its ticks, rank and spent. */
 final class RouteDump
@@ -33,10 +34,11 @@ final class RouteDump
 	String header(Plan plan)
 	{
 		PlanStart start = routes.getStart();
-		return String.format("Plan %s: %d searches, %d labels, %.1f ms (judging %.1f ms); start %s, nearest node %d, scene BFS %.2f ms%s",
+		return String.format("Plan %s: %d searches, %d labels, %.1f ms (judging %.1f ms); start %s, nearest node %d, scene BFS %.2f ms%s%s",
 			plan.getStepKey(), plan.getSearches(), plan.getLabels(), plan.getSearchNanos() / NANOS_PER_MS,
 			plan.getContextNanos() / NANOS_PER_MS, start == null ? "none" : start.getKind(), routes.getNearestNode(),
-			routes.getLastBfsNanos() / NANOS_PER_MS, plan.getNote() == null ? "" : "; " + plan.getNote());
+			routes.getLastBfsNanos() / NANOS_PER_MS, plan.getNote() == null ? "" : "; " + plan.getNote(),
+			plan.getRequirementNotes().isEmpty() ? "" : "; needs: " + String.join("; ", plan.getRequirementNotes()));
 	}
 
 	List<String> summary(Plan plan)
@@ -60,13 +62,24 @@ final class RouteDump
 		return lines;
 	}
 
+	private static String withdraw(Route route)
+	{
+		if (!route.isBanked())
+		{
+			return "";
+		}
+		return " withdraw " + route.getWithdraw().stream().map(use -> String.valueOf(use.getItemId())).collect(Collectors.joining(",", "[", "]"))
+			+ (route.getWithdrawInCoreTag().isEmpty() ? "" : " coreTag" + route.getWithdrawInCoreTag())
+			+ (route.isDepositFirst() ? " depositFirst" : "") + (route.isPinIncluded() ? " +PIN" : "");
+	}
+
 	private static void line(List<String> lines, String label, Route route)
 	{
 		if (route != null)
 		{
 			lines.add(label + " " + route.getTicks() + "t (rank " + (route.getRankHalfTicks() + 1) / 2 + ", " + route.getConfidence()
-				+ "): " + route.describe() + " " + route.getSpent()
-				+ (route.getEndBook() != route.getStartBook() ? " leaves you on " + route.getEndBook() : ""));
+				+ "): " + (route.isOpenBankStart() ? "(open bank) " : "") + route.describe() + " " + route.getSpent()
+				+ (route.getEndBook() != route.getStartBook() ? " leaves you on " + route.getEndBook() : "") + withdraw(route));
 		}
 	}
 }
