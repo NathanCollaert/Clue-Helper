@@ -100,7 +100,7 @@ public final class SubSteps
 					break;
 				case WILDERNESS_EXIT:
 					steps.add(SubStep.builder().kind(SubStep.Kind.WILDERNESS_EXIT).text("Walk south out of deep Wilderness")
-						.detail("≈ " + leg.getTicks() + " ticks; teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
+						.detail("Teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
 					break;
 				case SWAP_TELEPORT:
 					steps.add(swap(leg));
@@ -162,15 +162,14 @@ public final class SubSteps
 
 	private static SubStep walkToStage(Leg leg, Stage stage)
 	{
-		String ticks = "≈ " + leg.getTicks() + " ticks";
 		int radius = stage.getRadius() > 0 ? stage.getRadius() : ARRIVE_TILES;
 		if (!stage.isOurMarker())
 		{
-			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail(ticks + "; follow the Clue Scroll marker")
+			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail("Follow the Clue Scroll marker")
 				.goal(leg.getTo()).radius(radius).build();
 		}
 		String text = stage.getNpcIds().isEmpty() ? "Walk to the marker" : "Walk to the outlined NPC";
-		return SubStep.builder().kind(SubStep.Kind.WALK).text(text).detail(ticks)
+		return SubStep.builder().kind(SubStep.Kind.WALK).text(text)
 			.waypoint(leg.getTo()).goal(leg.getTo()).radius(radius).npcIds(stage.getNpcIds()).build();
 	}
 
@@ -181,46 +180,40 @@ public final class SubSteps
 			.npcIds(stage.getNpcIds()).build();
 	}
 
-	/**
-	 * Items core's *clue* tag already shows are only counted in the text, but still outlined in the bank so the spade is
-	 * easy to find.
-	 */
+	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
 	static SubStep withdraw(Route route, IntFunction<String> itemNames)
 	{
-		List<ItemUse> ours = route.getWithdraw().stream().filter(use -> !route.getWithdrawInCoreTag().contains(use.getItemId()))
-			.collect(Collectors.toList());
-		int fromCoreTag = route.getWithdraw().size() - ours.size();
-		List<String> lines = new ArrayList<>();
-		ours.forEach(use -> lines.add(itemNames.apply(use.getItemId()) + (use.getContainer() == Container.GROUP_STORAGE ? " (group storage)" : "")));
-		if (fromCoreTag > 0)
+		if (route.getWithdraw().isEmpty())
 		{
-			lines.add(fromCoreTag + " from the Clue Scroll plugin's clue tag");
+			return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text("Close the bank").build();
 		}
-		if (route.isDepositFirst())
-		{
-			lines.add(0, "Deposit first: not enough free slots");
-		}
-		String text = route.getWithdraw().isEmpty() ? "Close the bank" : "Withdraw " + String.join(", ", lines);
-		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text(text)
-			.detail(route.getWithdraw().isEmpty() ? null : "Then close the bank")
+		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemNames)).collect(Collectors.toList());
+		String text = route.isDepositFirst() ? "Deposit to free slots, then withdraw:" : "Withdraw from the bank:";
+		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text(text).items(List.copyOf(items))
 			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
+	}
+
+	/** No amount: a required item's use carries the whole banked stack, not what the step needs. */
+	private static String itemLine(ItemUse use, IntFunction<String> itemNames)
+	{
+		String storage = use.getContainer() == Container.GROUP_STORAGE ? " (group storage)" : "";
+		return itemNames.apply(use.getItemId()) + storage;
 	}
 
 	private static SubStep walk(Leg leg, Leg next, Step step)
 	{
-		String ticks = "≈ " + leg.getTicks() + " ticks";
 		if (step.getWaypointAct() != null && step.getTargets().contains(leg.getTo()))
 		{
-			return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the marker").detail(ticks)
+			return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the marker")
 				.waypoint(leg.getTo()).goal(leg.getTo()).radius(step.isActAnywhere() ? ARRIVE_TILES : PROBE_ARRIVE_TILES).build();
 		}
 		if (step.getTargets().contains(leg.getTo()))
 		{
 			int radius = step.getKind() == TargetKind.AREA ? AREA_ARRIVE_TILES : ARRIVE_TILES;
-			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail(ticks + "; follow the Clue Scroll marker")
+			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail("Follow the Clue Scroll marker")
 				.goal(leg.getTo()).radius(radius).build();
 		}
-		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to " + walkGoal(next)).detail(ticks)
+		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to " + walkGoal(next))
 			.waypoint(leg.getTo()).goal(leg.getTo()).radius(ARRIVE_TILES).build();
 	}
 
@@ -243,7 +236,7 @@ public final class SubSteps
 
 	private static SubStep exit(Leg leg, Exit exit)
 	{
-		return SubStep.builder().kind(SubStep.Kind.EXIT).text(exitText(exit)).detail("≈ " + leg.getTicks() + " ticks")
+		return SubStep.builder().kind(SubStep.Kind.EXIT).text(exitText(exit))
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(LANDING_TILES).exit(exit).build();
 	}
 
@@ -452,7 +445,6 @@ public final class SubSteps
 		boolean coded = landing.getCode() != null && landing.getCode().length() == 3;
 		return SubStep.builder().kind(SubStep.Kind.FAIRY_RING)
 			.text(coded ? "Fairy ring " + landing.getCode() : "Fairy ring to " + where)
-			.detail(coded ? where : null)
 			.waypoint(leg.getFrom()).goal(leg.getTo()).radius(LANDING_TILES).row(landing).build();
 	}
 

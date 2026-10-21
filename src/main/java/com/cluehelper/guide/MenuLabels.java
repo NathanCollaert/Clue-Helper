@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public final class MenuLabels
 {
-	static final Set<String> TELEPORT_LIST_OPENERS = Set.of("rub", "teleport", "teleports", "teleport menu", "operate",
+	static final Set<String> TELEPORT_LIST_OPENERS = Set.of("rub", "open", "teleport", "teleports", "teleport menu", "operate",
 		"travel", "tree", "activate", "configure", "ring configure", "perks", "spellbook", "commune");
 	/** Catalog (Shortest Path) labels that the worn Max cape's options name differently. */
 	private static final Map<String, String> GAME_NAMES = Map.of(
@@ -99,6 +99,14 @@ public final class MenuLabels
 	{
 		Matcher key = label == null ? null : HOTKEY_LABEL.matcher(label.trim());
 		return key != null && key.find() ? MenuLines.HOTKEYS.indexOf(key.group(1).charAt(0)) : -1;
+	}
+
+	/** Whether the line as displayed already starts with its key: "C. Le-sabrè", "1: Tree Gnome Village", "[G] Varrock". */
+	static boolean showsKey(String text, char key)
+	{
+		String plain = TAGS.matcher(text == null ? "" : text).replaceAll("").trim();
+		String upper = plain.toUpperCase(Locale.ROOT);
+		return upper.startsWith("[" + key + "]") || upper.startsWith(key + ".") || upper.startsWith(key + ":");
 	}
 
 	static boolean isOpener(String option)

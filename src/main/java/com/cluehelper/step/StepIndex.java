@@ -300,17 +300,11 @@ public final class StepIndex
 	public static final class Challenge
 	{
 		private String question;
-		private Integer answer;
 		private String box;
 
 		public String getQuestion()
 		{
 			return question;
-		}
-
-		public Integer getAnswer()
-		{
-			return answer;
 		}
 
 		public String getBox()

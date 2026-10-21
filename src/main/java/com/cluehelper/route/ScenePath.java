@@ -12,8 +12,6 @@ public final class ScenePath
 	private static final int MIN_AHEAD_TILES = 8;
 	/** A ladder or cave entrance landing this close to a goal off the scene (a basement NPC) is the way there. */
 	private static final int EXIT_NEAR_GOAL_TILES = 20;
-	/** Where tools/walk/WalkGen.java puts each walk's waypoint. */
-	private static final int WAYPOINT_TILES = 40;
 
 	private ScenePath()
 	{
@@ -50,7 +48,7 @@ public final class ScenePath
 		}
 		int playerLeft = direct - scene.cost(table.placed(start));
 		WorldPoint waypoint = directEntry < 0 ? null : table.entryWaypoint(directEntry);
-		int waypointLeft = direct - WAYPOINT_TILES;
+		int waypointLeft = direct - WalkTable.WAYPOINT_TILES;
 		WorldPoint drawable = null;
 		int drawableLeft = Integer.MAX_VALUE;
 		WorldPoint beyond = null;
@@ -77,6 +75,13 @@ public final class ScenePath
 			}
 		}
 		boolean waypointAhead = waypoint != null && waypointLeft <= playerLeft - MIN_AHEAD_TILES;
+		WorldPoint nearGoal = nearGoalWaypoint(scene, table, start, target, playerLeft);
+		boolean nearGoalFirst = nearGoal != null && (drawable == null || WalkTable.WAYPOINT_TILES < drawableLeft)
+			&& (!waypointAhead || WalkTable.WAYPOINT_TILES < waypointLeft);
+		if (nearGoalFirst)
+		{
+			return scene.pathTo(nearGoal);
+		}
 		if (drawable != null && (!waypointAhead || drawableLeft < waypointLeft))
 		{
 			return scene.pathTo(drawable);
@@ -86,6 +91,18 @@ public final class ScenePath
 			return scene.costNear(waypoint) != SceneBfs.UNREACHED ? scene.pathTo(waypoint) : scene.pathToward(waypoint);
 		}
 		return scene.pathToward(beyond != null ? beyond : goal);
+	}
+
+	/**
+	 * The walk back from the goal has its own waypoint, 40 tiles from the goal: on the same way, often still in the scene
+	 * when the forward waypoint is behind the player and the goal past the edge.
+	 */
+	private static WorldPoint nearGoalWaypoint(SceneBfs.Result scene, WalkTable table, int start, int target, int playerLeft)
+	{
+		int back = entry(table, target, start);
+		WorldPoint at = back < 0 ? null : table.entryWaypoint(back);
+		boolean ahead = WalkTable.WAYPOINT_TILES <= playerLeft - MIN_AHEAD_TILES;
+		return ahead && at != null && scene.getScene().contains(at) && scene.cost(at) != SceneBfs.UNREACHED ? at : null;
 	}
 
 	private static int entry(WalkTable table, int from, int to)

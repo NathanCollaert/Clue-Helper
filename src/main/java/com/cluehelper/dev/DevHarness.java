@@ -14,8 +14,7 @@ import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
-import com.cluehelper.ui.PanelModel;
-import com.cluehelper.ui.PanelState;
+import com.cluehelper.ui.BoxState;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +83,7 @@ public class DevHarness
 		this.guide = guide;
 	}
 
-	public void start(Supplier<PanelState> shownState, Supplier<PanelState> signalledState)
+	public void start(Supplier<BoxState> shownState, Supplier<BoxState> signalledState)
 	{
 		DevCommands c = new DevCommands(this::reply);
 		c.register("selftest", "run the in-client self-tests", args -> runSelfTests());
@@ -199,7 +198,6 @@ public class DevHarness
 			reply(String.format("  %s%d %s: %s%s", step == guide.getCurrent() ? "> " : "", i + 1, step.getKind(), step.getText(),
 				step.getDetail() == null ? "" : " (" + step.getDetail() + ")"));
 		}
-		guide.getMapWaypoints().forEach((tile, label) -> log.info("{}   map {} {}", GUIDE_TAG, tile, label));
 	}
 
 	private void toggleOverlay()
@@ -283,7 +281,7 @@ public class DevHarness
 			poh.forget();
 		}
 		HouseState house = poh.getHouse();
-		reply("house: " + house.getSource() + (house.getScannedAt() == 0 ? ", never scanned" : ", scanned " + PanelModel.age(System.currentTimeMillis() - house.getScannedAt()))
+		reply("house: " + house.getSource() + (house.getScannedAt() == 0 ? ", never scanned" : ", scanned " + age(System.currentTimeMillis() - house.getScannedAt()))
 			+ "; in a house: " + poh.isInHouse() + " (" + poh.getOwnership() + ")");
 		reply("furniture " + house.getFurniture() + "; walks " + house.getWalkTicks());
 		reply(house.getNexusKeys().size() + " nexus destinations; left-click Xeric " + house.getXericLeftClick() + ", digsite "
@@ -301,5 +299,16 @@ public class DevHarness
 				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", message, null);
 			}
 		});
+	}
+
+	private static String age(long millis)
+	{
+		long minutes = millis / 60_000;
+		if (minutes < 60)
+		{
+			return minutes + " min ago";
+		}
+		long hours = minutes / 60;
+		return hours < 24 ? hours + " h ago" : hours / 24 + " d ago";
 	}
 }

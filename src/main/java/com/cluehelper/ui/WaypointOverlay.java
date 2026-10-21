@@ -78,18 +78,18 @@ public class WaypointOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		SubStep current = guide.getCurrent();
-		WorldView view = client.getTopLevelWorldView();
-		if (inConversation())
+		if (!config.pathLine() || inConversation())
 		{
 			return null;
 		}
+		SubStep current = guide.getCurrent();
+		WorldView view = client.getTopLevelWorldView();
 		WorldPoint waypoint = current == null ? null : current.getWaypoint();
 		SceneBfs.Result scene = planScene();
 		if (waypoint == null && current != null && current.getKind() == SubStep.Kind.WALK_TO_CLUE && current.getGoal() != null)
 		{
 			// Core marks the clue itself; only the way there is ours.
-			if (config.pathLine() && scene != null && view != null)
+			if (scene != null && view != null)
 			{
 				drawPath(graphics, view, scene, current.getGoal());
 			}
@@ -99,7 +99,7 @@ public class WaypointOverlay extends Overlay
 			&& guide.getHighlightObjects().isEmpty())
 		{
 			WorldPoint act = actTarget(view);
-			if (act != null && config.pathLine() && scene != null && view != null)
+			if (act != null && scene != null && view != null)
 			{
 				drawPath(graphics, view, scene, act);
 			}
@@ -126,7 +126,7 @@ public class WaypointOverlay extends Overlay
 		{
 			return null;
 		}
-		if (config.pathLine() && scene != null)
+		if (scene != null)
 		{
 			drawPath(graphics, view, scene, goal);
 		}
@@ -224,7 +224,7 @@ public class WaypointOverlay extends Overlay
 		{
 			return;
 		}
-		if (config.pathLine() && scene != null)
+		if (scene != null)
 		{
 			drawPath(graphics, view, scene, at);
 		}
@@ -277,7 +277,7 @@ public class WaypointOverlay extends Overlay
 	private void drawPathToObject(Graphics2D graphics, WorldView view)
 	{
 		SceneBfs.Result scene = view.isInstance() ? instanceScene(view) : planScene();
-		if (!config.pathLine() || scene == null)
+		if (scene == null)
 		{
 			return;
 		}

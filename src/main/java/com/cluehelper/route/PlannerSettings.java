@@ -34,7 +34,6 @@ public class PlannerSettings
 		boolean avoid = config.avoidWilderness() == AvoidWilderness.ALWAYS
 			|| config.avoidWilderness() == AvoidWilderness.HARDCORE_ONLY && hardcore;
 		return PlannerSettings.builder()
-			.routeCount(config.routeCount())
 			.spellbookChanges(config.spellbookChanges())
 			.avoidWilderness(avoid)
 			.consumablePenalty(config.consumablePenalty())

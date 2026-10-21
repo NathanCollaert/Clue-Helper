@@ -36,7 +36,6 @@ import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -140,6 +139,7 @@ public class StepGuide
 	/** When the guided step began: an act's event counts from then. */
 	private int stepSince = ActWatcher.NEVER;
 	private SubStep fightView;
+	private SubStep afterFight;
 	/** The STASH unit to put the last emote step's items back into; null once done or walked away from. */
 	private WorldPoint depositAt;
 	private int depositSince = ActWatcher.NEVER;
@@ -169,7 +169,6 @@ public class StepGuide
 	private String objectOption;
 	private Set<Integer> bankHighlightItems = Set.of();
 	private int highlightSpellWidget = -1;
-	private boolean highlightWorn;
 	private int highlightMenuWidget = ScrollBook.NO_WIDGET;
 	private Tab highlightTab = Tab.NONE;
 	private MenuTarget menuTarget = MenuTarget.NONE;
@@ -245,8 +244,13 @@ public class StepGuide
 		return index < steps.size() ? steps.get(index) : null;
 	}
 
+	/** During a fight, the act to do again. */
 	public SubStep getNext()
 	{
+		if (afterFight != null)
+		{
+			return afterFight;
+		}
 		return index + 1 < steps.size() ? steps.get(index + 1) : null;
 	}
 
@@ -359,38 +363,9 @@ public class StepGuide
 		return menuHint;
 	}
 
-	public boolean isHighlightWorn()
-	{
-		return highlightWorn;
-	}
-
 	public int getHighlightSpellWidget()
 	{
 		return highlightSpellWidget;
-	}
-
-	public Map<WorldPoint, String> getMapWaypoints()
-	{
-		Map<WorldPoint, String> places = new LinkedHashMap<>();
-		Route shown = route;
-		Step step = routeStep;
-		if (shown == null || step == null)
-		{
-			return places;
-		}
-		for (Leg leg : shown.getLegs())
-		{
-			WorldPoint to = leg.getKind() == Leg.Kind.SPELLBOOK_CHANGE ? leg.getChange().getTile() : leg.getTo();
-			if (to != null && leg.getKind() != Leg.Kind.BANK && !step.getTargets().contains(to))
-			{
-				places.putIfAbsent(to, leg.getKind() == Leg.Kind.WALK || leg.getKind() == Leg.Kind.WILDERNESS_EXIT ? "walk here" : leg.describe());
-			}
-		}
-		if (step.getWaypointAct() != null)
-		{
-			places.putIfAbsent(step.getTargets().get(0), step.getWaypointAct());
-		}
-		return places;
 	}
 
 	private void onPlan(Plan plan)
@@ -623,6 +598,7 @@ public class StepGuide
 	{
 		SubStep act = index < steps.size() ? steps.get(index) : null;
 		SubStep view = null;
+		SubStep again = null;
 		if (act != null && act.isFights())
 		{
 			NPC enemy = actWatcher.getEnemy();
@@ -630,7 +606,8 @@ public class StepGuide
 			{
 				boolean emote = act.getDone() == SubStep.Done.URI_HERE;
 				view = SubStep.builder().kind(SubStep.Kind.ACT).text("Kill the " + (enemy.getName() == null ? "enemy" : enemy.getName()))
-					.detail(emote ? "Stay equipped, then perform the emote again" : "Then dig again").build();
+					.detail(emote ? "Stay equipped" : null).build();
+				again = act.toBuilder().text(act.getAgain()).build();
 			}
 			else if (actWatcher.foughtSince(stepSince))
 			{
@@ -639,6 +616,7 @@ public class StepGuide
 		}
 		boolean changed = !Objects.equals(view, fightView);
 		fightView = view;
+		afterFight = again;
 		return changed;
 	}
 
@@ -818,7 +796,7 @@ public class StepGuide
 		return step.getKey() + "@" + step.getTargets();
 	}
 
-	/** The panel shows the acts alone: nothing to travel. */
+	/** The box shows the acts alone: nothing to travel. */
 	public boolean isAtStep()
 	{
 		return !steps.isEmpty() && steps.stream().allMatch(sub -> sub.getKind() == SubStep.Kind.ACT);
@@ -909,7 +887,6 @@ public class StepGuide
 		highlightItems = Set.of();
 		bankHighlightItems = current == null ? Set.of() : current.getBankItems();
 		highlightSpellWidget = -1;
-		highlightWorn = false;
 		highlightMenuWidget = ScrollBook.NO_WIDGET;
 		highlightTab = Tab.NONE;
 		menuTarget = MenuTarget.NONE;
@@ -1289,7 +1266,7 @@ public class StepGuide
 			.collect(Collectors.toList());
 		heldUses = List.copyOf(held);
 		highlightItems = held.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet());
-		highlightWorn = !held.isEmpty() && held.stream().allMatch(use -> use.getContainer() == Container.WORN);
+		boolean highlightWorn = !held.isEmpty() && held.stream().allMatch(use -> use.getContainer() == Container.WORN);
 		highlightTab = held.isEmpty() ? Tab.NONE : highlightWorn ? Tab.EQUIPMENT : Tab.INVENTORY;
 	}
 

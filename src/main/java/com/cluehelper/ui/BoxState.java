@@ -1,6 +1,6 @@
 package com.cluehelper.ui;
 
-public enum PanelState
+public enum BoxState
 {
 	DORMANT("Off on this world",
 		"Clue Helper stays off on seasonal, Deadman, beta and other special worlds."),
@@ -8,8 +8,7 @@ public enum PanelState
 		"Clue Helper works alongside RuneLite's Clue Scroll plugin. Turn it back on to continue."),
 	READ_CLUE("Read the clue to start",
 		"The Clue Scroll plugin knows a clue only once it has been read."),
-	NO_CLUE("No clue",
-		"Read a clue scroll and the fastest ways to its step show here."),
+	NO_CLUE(null, null),
 	WORKING("Working…",
 		"Ranking routes from what you have."),
 	ROUTES(null, null);
@@ -17,7 +16,7 @@ public enum PanelState
 	private final String title;
 	private final String detail;
 
-	PanelState(String title, String detail)
+	BoxState(String title, String detail)
 	{
 		this.title = title;
 		this.detail = detail;
@@ -38,7 +37,22 @@ public enum PanelState
 		return this == WORKING || this == ROUTES;
 	}
 
-	public static PanelState of(boolean dormant, boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean planning)
+	/** The box is always in view, so core off and dormant would nag a player who isn't doing a clue. */
+	public boolean shownWhen(boolean carryingClue)
+	{
+		switch (this)
+		{
+			case NO_CLUE:
+				return false;
+			case CORE_OFF:
+			case DORMANT:
+				return carryingClue;
+			default:
+				return true;
+		}
+	}
+
+	public static BoxState of(boolean dormant, boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean planning)
 	{
 		if (dormant)
 		{

@@ -1,6 +1,8 @@
 package com.cluehelper.ui;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -14,6 +16,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.TileObject;
 import net.runelite.api.WorldView;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 import net.runelite.client.util.ImageUtil;
@@ -32,6 +35,8 @@ public class Highlighter
 	private static final int FEATHER = 4;
 	private static final int ARC = 6;
 	private static final float STROKE = 2f;
+	private static final int BADGE_PAD = 3;
+	private static final int BADGE_GAP = 4;
 
 	private final Client client;
 	private final ModelOutlineRenderer outlines;
@@ -113,5 +118,27 @@ public class Highlighter
 	public void tile(Graphics2D graphics, Polygon tile)
 	{
 		OverlayUtil.renderPolygon(graphics, tile, Markers.COLOUR);
+	}
+
+	/**
+	 * The keyboard key of a menu line, in a badge just after its text ({@code textEnd}), drawn only where it fits inside
+	 * {@code visible}, so a line scrolled out of its list gets none.
+	 */
+	public void keyBadge(Graphics2D graphics, char key, int textEnd, int centreY, Rectangle visible)
+	{
+		graphics.setFont(FontManager.getRunescapeSmallFont());
+		FontMetrics metrics = graphics.getFontMetrics();
+		int height = metrics.getAscent() + BADGE_PAD;
+		int width = Math.max(height, metrics.charWidth(key) + 2 * BADGE_PAD);
+		Rectangle badge = new Rectangle(textEnd + BADGE_GAP, centreY - height / 2, width, height);
+		if (!visible.contains(badge))
+		{
+			return;
+		}
+		graphics.setColor(Markers.COLOUR);
+		graphics.fill(new RoundRectangle2D.Double(badge.x, badge.y, badge.width, badge.height, ARC, ARC));
+		graphics.setColor(Color.BLACK);
+		graphics.drawString(String.valueOf(key), badge.x + (badge.width - metrics.charWidth(key)) / 2,
+			badge.y + (badge.height + metrics.getAscent()) / 2 - 1);
 	}
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import lombok.Value;
 
 /**
- * The panel's hot/cold card. The branch preview names only core's candidates, grouped by the reading each would give
+ * The box's hot/cold lines. The branch preview names only core's candidates, grouped by the reading each would give
  * at the probe: never a candidate list of our own.
  */
 @Value
@@ -67,7 +67,7 @@ public class HotColdView
 			default:
 				title = plan.getReadings() == 0 ? "No feels yet: " + kept + " spots" : kept + " spots fit your " + plan.getReadings() + feels(plan.getReadings());
 				Probe probe = plan.getChoice().getProbe();
-				lines.add(probe.getKind() == Probe.Kind.HERE ? "Feel where you stand:" : "Next feel, ≈ " + probe.getTicks() + " ticks away:");
+				lines.add(probe.getKind() == Probe.Kind.HERE ? "Feel where you stand:" : "Next feel:");
 				lines.addAll(branchLines(plan, in.getCoreSpots(), spots));
 				break;
 		}

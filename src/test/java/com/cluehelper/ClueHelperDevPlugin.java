@@ -15,11 +15,9 @@ import com.cluehelper.route.SceneFiles;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.ui.ClueHelperPanel;
-import com.cluehelper.ui.PanelState;
-import com.cluehelper.ui.TextBlock;
-import java.awt.Component;
-import java.awt.Container;
+import com.cluehelper.ui.BoxState;
+import com.cluehelper.ui.GuideBox;
+import com.cluehelper.ui.GuideOverlay;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -34,8 +32,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.swing.JLabel;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +52,6 @@ import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.DrawManager;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.util.Text;
 
 /**
  * Dev launcher only: self-tests that need files or drive other plugins, which the plugin jar must not do.
@@ -64,7 +59,7 @@ import net.runelite.client.util.Text;
  * and again a few ticks after the first login.
  */
 @Slf4j
-@PluginDescriptor(name = "Clue Helper Dev", description = "Dev only: panel snapshots and plugin toggle checks")
+@PluginDescriptor(name = "Clue Helper Dev", description = "Dev only: game frames and plugin toggle checks")
 public class ClueHelperDevPlugin extends Plugin
 {
 	private static final String TAG = "[CH-TEST]";
@@ -84,7 +79,6 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final int LANDING_JUMP_TILES = 4;
 	private static final int LANDING_CANDIDATES = 2;
 	private static final int FRAME_NAME_KEY_CHARS = 50;
-	private static final int STATE_DELAY_MS = 400;
 	private static final int PLUGIN_DELAY_MS = 2000;
 	private static final int AUTO_RUN_AFTER_TICKS = 5;
 	/** Hub plugins add their sidebar tabs late; the first run waits for them. */
@@ -159,7 +153,6 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getRoutes().addListener(this::onPlanned));
 		unregister.add(clueHelper.getGuide().addListener(this::saveGuideFrames));
-		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new PanelStatesTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
 		BankTrace bankTrace = new BankTrace(client, clueHelper.getBankMemory(), clueHelper.getGuide(),
@@ -192,10 +185,7 @@ public class ClueHelperDevPlugin extends Plugin
 			overlayManager.remove(dialTrace);
 		});
 		HotColdTrace hotColdTrace = new HotColdTrace(client, clueHelper.getHotCold(), name ->
-		{
-			requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(HotColdTrace.FRAMES, name + "-game.png"))));
-			SwingUtilities.invokeLater(() -> snapshotTo(clueHelper.getPanel(), new File(HotColdTrace.FRAMES, name + "-panel.png")));
-		});
+			requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(HotColdTrace.FRAMES, name + "-game.png")))));
 		unregister.add(hotColdTrace::stop);
 		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
 		if (autoRunPending)
@@ -273,52 +263,6 @@ public class ClueHelperDevPlugin extends Plugin
 		clientThread.invokeLater(() -> eventBus.post(new CommandExecuted("ch-selftest", new String[0])));
 	}
 
-	private final class PanelStatesTest implements SelfTest
-	{
-		@Override
-		public int order()
-		{
-			return 100;
-		}
-
-		@Override
-		public String name()
-		{
-			return "panel shows every state";
-		}
-
-		@Override
-		public void run(SelfTestRun run)
-		{
-			SwingUtilities.invokeLater(() ->
-			{
-				ClueHelperPanel panel = clueHelper.getPanel();
-				Component previousTab = selectTab(panel);
-				showStates(run, panel, previousTab, 0);
-			});
-		}
-
-		private void showStates(SelfTestRun run, ClueHelperPanel panel, Component previousTab, int index)
-		{
-			PanelState[] states = PanelState.values();
-			if (index == states.length)
-			{
-				panel.display(clueHelper.panelState());
-				restoreTab(panel, previousTab);
-				run.done();
-				return;
-			}
-			PanelState state = states[index];
-			panel.display(state);
-			later(STATE_DELAY_MS, () ->
-			{
-				checkShows(run, panel, state);
-				snapshot(panel, "state-" + state.name().toLowerCase(Locale.ROOT));
-				showStates(run, panel, previousTab, index + 1);
-			});
-		}
-	}
-
 	private final class CoreToggleTest implements SelfTest
 	{
 		@Override
@@ -330,7 +274,7 @@ public class ClueHelperDevPlugin extends Plugin
 		@Override
 		public String name()
 		{
-			return "core toggle drives the panel";
+			return "core toggle drives the box";
 		}
 
 		@Override
@@ -345,22 +289,23 @@ public class ClueHelperDevPlugin extends Plugin
 					run.done();
 					return;
 				}
-				ClueHelperPanel panel = clueHelper.getPanel();
-				Component previousTab = selectTab(panel);
 				setPluginRunning(core, false);
 				later(PLUGIN_DELAY_MS, () ->
 				{
-					checkShows(run, panel, PanelState.CORE_OFF);
-					snapshot(panel, "core-off");
+					GuideBox box = clueHelper.getGuideOverlay().getShown();
+					run.check(box.getState() == BoxState.CORE_OFF, "box state " + box.getState() + ", expected CORE_OFF");
+					run.check(box.isShown() == box.isCarryingClue(), "core-off box shown " + box.isShown()
+						+ " with a clue carried " + box.isCarryingClue());
+					frame("core-off");
 					setPluginRunning(core, true);
 					executor.execute(configManager::sendConfig);
 					later(PLUGIN_DELAY_MS, () ->
 					{
 						run.check(pluginManager.isPluginActive(core), "core Clue Scroll running again");
-						checkShows(run, panel, clueHelper.panelState());
-						run.check(panel.getShownState() != PanelState.CORE_OFF, "panel left the core-off state");
-						snapshot(panel, "core-on");
-						restoreTab(panel, previousTab);
+						BoxState shown = clueHelper.getGuideOverlay().getShown().getState();
+						run.check(shown == clueHelper.boxState(), "box shows " + shown + ", signals say " + clueHelper.boxState());
+						run.check(shown != BoxState.CORE_OFF, "box left the core-off state");
+						frame("core-on");
 						run.done();
 					});
 				});
@@ -387,21 +332,17 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			SwingUtilities.invokeLater(() ->
 			{
-				ClueHelperPanel before = clueHelper.getPanel();
 				stopOrStart(clueHelper, false);
 				later(PLUGIN_DELAY_MS, () ->
 				{
-					run.check(clueHelper.getPanel() == null, "panel released on stop");
-					run.check(before.getParent() == null || !before.isShowing(), "old panel off screen");
+					run.check(!overlayManager.anyMatch(GuideOverlay.class::isInstance), "box overlay removed on stop");
 					stopOrStart(clueHelper, true);
 					later(PLUGIN_DELAY_MS, () ->
 					{
-						ClueHelperPanel after = clueHelper.getPanel();
-						run.check(after != null && after != before, "a new panel on start");
-						if (after != null)
-						{
-							run.check(after.getShownState() == clueHelper.panelState(), "new panel shows " + clueHelper.panelState());
-						}
+						run.check(overlayManager.anyMatch(GuideOverlay.class::isInstance), "box overlay back on start");
+						BoxState shown = clueHelper.getGuideOverlay().getShown().getState();
+						run.check(shown == clueHelper.boxState(), "box shows " + shown + " after the restart, signals say "
+							+ clueHelper.boxState());
 						List<String> names = clueHelper.getDevHarness().getSelfTests().testNames();
 						run.check(names.size() == new HashSet<>(names).size(), "built-in tests registered once after the restart: " + names);
 						run.done();
@@ -409,17 +350,6 @@ public class ClueHelperDevPlugin extends Plugin
 				});
 			});
 		}
-	}
-
-	private void checkShows(SelfTestRun run, ClueHelperPanel panel, PanelState state)
-	{
-		run.check(panel.getShownState() == state, "panel state " + panel.getShownState() + ", expected " + state);
-		if (state.getTitle() != null)
-		{
-			run.check(visibleText(panel, state.getTitle()), state + ": title '" + state.getTitle() + "' visible");
-		}
-		run.check(visibleText(panel, "Route 1") == state.showsRoutes(),
-			state + ": route placeholders " + (state.showsRoutes() ? "visible" : "hidden"));
 	}
 
 	private void setPluginRunning(Plugin plugin, boolean running)
@@ -459,105 +389,10 @@ public class ClueHelperDevPlugin extends Plugin
 		throw new IllegalStateException("no " + type.getSimpleName() + " loaded");
 	}
 
-	private static Component selectTab(ClueHelperPanel panel)
+	private void frame(String name)
 	{
-		JTabbedPane tabs = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, panel);
-		if (tabs == null)
-		{
-			log.info("{} NOTE the sidebar has no tab holding the panel (collapsed?)", TAG);
-			return null;
-		}
-		Component previous = tabs.getSelectedComponent();
-		tabs.setSelectedComponent(tabComponent(panel, tabs));
-		return previous;
-	}
-
-	private static void restoreTab(ClueHelperPanel panel, Component previous)
-	{
-		JTabbedPane tabs = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, panel);
-		if (tabs != null && previous != null && tabs.indexOfComponent(previous) >= 0)
-		{
-			tabs.setSelectedComponent(previous);
-		}
-	}
-
-	private static Component tabComponent(Component panel, JTabbedPane tabs)
-	{
-		Component c = panel;
-		while (c.getParent() != null && c.getParent() != tabs)
-		{
-			c = c.getParent();
-		}
-		return c;
-	}
-
-	private static boolean visibleText(Container root, String text)
-	{
-		for (Component c : root.getComponents())
-		{
-			if (c.isVisible() && text.equals(textOf(c)) && visibleChain(c, root))
-			{
-				return true;
-			}
-			if (c instanceof Container && c.isVisible() && visibleText((Container) c, text))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static String textOf(Component c)
-	{
-		if (c instanceof JLabel)
-		{
-			return Text.removeTags(((JLabel) c).getText()).trim();
-		}
-		return c instanceof TextBlock ? ((TextBlock) c).getText() : null;
-	}
-
-	private static boolean visibleChain(Component c, Container root)
-	{
-		for (Component p = c; p != null && p != root; p = p.getParent())
-		{
-			if (!p.isVisible())
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void snapshot(ClueHelperPanel panel, String name)
-	{
-		snapshotTo(panel, new File(SNAPSHOTS, String.format("%02d-%s.png", ++snapshotCount, name)));
-	}
-
-	private void snapshotTo(ClueHelperPanel panel, File file)
-	{
-		if (panel == null)
-		{
-			return;
-		}
-		Component target = panel.getParent() != null ? panel.getParent() : panel;
-		if (target.getWidth() <= 0 || target.getHeight() <= 0)
-		{
-			log.info("{} NOTE snapshot {} skipped: the panel has no size (sidebar collapsed?)", TAG, file.getName());
-			return;
-		}
-		BufferedImage image = new BufferedImage(target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = image.createGraphics();
-		target.paint(g);
-		g.dispose();
-		try
-		{
-			ImageIO.write(image, "png", file);
-			log.info("{} snapshot {}", TAG, file.getAbsolutePath());
-		}
-		catch (Exception e)
-		{
-			log.warn("{} snapshot {} failed", TAG, file, e);
-		}
+		File file = new File(SNAPSHOTS, String.format("%02d-%s.png", ++snapshotCount, name));
+		requestFrame(frame -> executor.execute(() -> writeFrame(frame, file)));
 	}
 
 	private static void clearOldPngs(File dir)
@@ -634,7 +469,6 @@ public class ClueHelperDevPlugin extends Plugin
 		lastGuideText = text;
 		String name = String.format("%03d-%s", ++guideFrameCount, current.getKind().name().toLowerCase(Locale.ROOT));
 		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
-		SwingUtilities.invokeLater(() -> snapshotTo(clueHelper.getPanel(), new File(GUIDE_FRAMES, name + "-panel.png")));
 	}
 
 	private void sample()

@@ -6,6 +6,7 @@ import com.cluehelper.step.Stage;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.SpellbookChange;
+import java.util.List;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Value;
@@ -76,6 +77,9 @@ public class SubStep
 	String again;
 	@Builder.Default
 	Set<Integer> bankItems = Set.of();
+	/** Shown one per line under the text: the items to withdraw. */
+	@Builder.Default
+	List<String> items = List.of();
 	/** An act's item, used by its left click: the strange device for a feel. */
 	@Builder.Default
 	Set<Integer> actItems = Set.of();

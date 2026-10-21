@@ -66,6 +66,24 @@ public class SceneBfsTest
 		assertTrue(String.join("\n", mismatches), mismatches.isEmpty());
 	}
 
+	/**
+	 * Past the walk's own waypoint, with the goal up stairs beyond the scene's edge, the line still leads on: Daer Krand
+	 * in the Sisterhood Sanctuary, from the corridor north of the medallion's landing.
+	 */
+	@Test
+	public void lineLeadsOnPastTheWaypoint() throws IOException
+	{
+		WalkTable table = WalkTable.load();
+		boolean[] allRows = new boolean[table.rowCount()];
+		Arrays.fill(allRows, true);
+		SceneBfs.Scene scene = read("3760_9648_1").getScene();
+		for (WorldPoint at : List.of(new WorldPoint(3814, 9731, 1), new WorldPoint(3826, 9733, 1)))
+		{
+			List<WorldPoint> line = ScenePath.toward(SceneBfs.run(scene, at, table, allRows), table, new WorldPoint(3821, 9780, 2));
+			assertTrue("a line from " + at, line.size() > 1);
+		}
+	}
+
 	/** A table walk longer than the scene is wide may leave the scene, where the BFS can't follow. */
 	private static boolean insideScene(SceneBfs.Result bfs, int expected)
 	{

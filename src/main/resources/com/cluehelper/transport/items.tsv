@@ -280,7 +280,7 @@ item	Book of the dead: Jewelry of Jubilation		1544 3761 0			25818=1			7801=1;603
 item	Book of the dead: A Dark Disposition		1681 3746 0			25818=1			7857=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:7857=ARCQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Drakan's medallion: Ver Sinhaza		3649 3230 0			22400=1					20	4	1	F	none	any	Y				item:22400=DRAKANS_MEDALLION
 item	Drakan's medallion: Darkmeyer		3592 3337 0			22400=1		Sins of the Father			20	4	1	F	none	any	Y				item:22400=DRAKANS_MEDALLION
-item	Drakan's medallion: Slepe		3808 9700 0			22400=1			12416=1		20	4	1	F	none	any	Y				item:22400=DRAKANS_MEDALLION varbit:12416=SLEPE_TELEPORT_UNLOCKED
+item	Drakan's medallion: Slepe		3808 9700 1			22400=1			12416=1		20	4	1	F	none	any	Y				item:22400=DRAKANS_MEDALLION varbit:12416=SLEPE_TELEPORT_UNLOCKED
 cape	Mythical cape		2457 2850 0			21913=1|22114=1|24855=1					20	4	1	F	none	any	N				item:21913=POH_TROPHY_MYTHICAL_CAPE item:22114=MYTHICAL_CAPE item:24855=SKILLCAPE_MAX_MYTHICAL
 item	Stony basalt		2845 3694 0			22601=1			6528=207		20	4	1	T	item	any	Y				item:22601=STRONGHOLD_TELEPORT_BASALT varbit:6528=MY2ARM_STATUS
 item	Stony basalt: Roof		2837 3695 0			22601=1	73 Agility		6528=207;4493=1		20	4	1	T	item	any	Y				item:22601=STRONGHOLD_TELEPORT_BASALT varbit:6528=MY2ARM_STATUS varbit:4493=FREMENNIK_DIARY_HARD_COMPLETE

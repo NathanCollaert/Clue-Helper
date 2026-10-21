@@ -108,9 +108,7 @@ final class Acts
 			String box = challenge.getBox().toLowerCase().contains("light") ? "light box" : "puzzle box";
 			return List.of(talk, act("Solve the " + box + ", then talk to " + npc + " again", "The Clue Scroll plugin's Puzzle Solver helps"));
 		}
-		boolean cipher = ClueTypes.CIPHER.equals(step.getType());
-		return List.of(talk, act("Talk to " + npc + " again: answer the challenge",
-			cipher ? "The answer shows beside the \"Enter amount\" prompt" : CORE_DETAILS));
+		return List.of(talk, act("Talk to " + npc + " again: answer the challenge", CORE_DETAILS));
 	}
 
 	private static SubStep act(String text, String detail)

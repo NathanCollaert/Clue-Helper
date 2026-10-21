@@ -257,7 +257,8 @@ public final class SceneBfs
 
 		/**
 		 * A goal outside the scene, or unreached in it, is drawn toward: to the reached tile nearest it, weighted by the walk
-		 * there. A guess past the scene's edge, redrawn as the scene moves.
+		 * there. A guess past the scene's edge, redrawn as the scene moves. A goal on a floor the scene doesn't reach (up
+		 * stairs past the edge) is aimed at from the floors it does.
 		 */
 		public List<WorldPoint> pathToward(WorldPoint goal)
 		{
@@ -265,13 +266,22 @@ public final class SceneBfs
 			{
 				return pathTo(goal);
 			}
-			WorldPoint best = null;
-			long bestScore = Long.MAX_VALUE;
-			int plane = goal.getPlane();
+			WorldPoint best = nearestReached(goal, goal.getPlane());
+			for (int plane = 0; best == null && plane < scene.getFlags().length; plane++)
+			{
+				best = nearestReached(goal, plane);
+			}
+			return best == null ? new ArrayList<>() : pathTo(best);
+		}
+
+		private WorldPoint nearestReached(WorldPoint goal, int plane)
+		{
 			if (plane < 0 || plane >= scene.getFlags().length || scene.getFlags()[plane] == null)
 			{
-				return new ArrayList<>();
+				return null;
 			}
+			WorldPoint best = null;
+			long bestScore = Long.MAX_VALUE;
 			for (int x = 0; x < scene.getSizeX(); x++)
 			{
 				for (int y = 0; y < scene.getSizeY(); y++)
@@ -291,7 +301,7 @@ public final class SceneBfs
 					}
 				}
 			}
-			return best == null ? new ArrayList<>() : pathTo(best);
+			return best;
 		}
 
 		/** Corners don't count: the game walks to a straight side to use an object. Null when no side is reached. */

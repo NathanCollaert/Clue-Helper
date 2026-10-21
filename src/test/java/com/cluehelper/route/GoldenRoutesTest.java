@@ -138,6 +138,24 @@ public class GoldenRoutesTest
 		assertTrue("no golden route uses " + COVERAGE.missing(), COVERAGE.missing().isEmpty());
 	}
 
+	/** Partway to the Gu'Tanoth cave its entrance lies past the loaded scene; going back to the landing must not win. */
+	@Test
+	public void startJoinsALongWalkPartway() throws IOException
+	{
+		SceneFiles.Recorded recorded;
+		try (InputStream in = GoldenRoutesTest.class.getResourceAsStream("/scenes/2504_2864_0.scene.gz"))
+		{
+			recorded = SceneFiles.read(in);
+		}
+		WorldPoint partway = new WorldPoint(2538, 2940, 0);
+		boolean[] allRows = new boolean[table.rowCount()];
+		Arrays.fill(allRows, true);
+		PlanStart start = PlanStart.scene(partway, SceneBfs.run(recorded.getScene(), partway, table, allRows));
+		PlayerSnapshot maxed = ready(Loadouts.load("maxed-main").getCarried());
+		Route best = checked(input(maxed, step("coordinate:3548"), start, PlannerSettings.builder().build()).build()).getBest();
+		assertTrue("walks on: " + best.describe(), best.getLegs().stream().allMatch(leg -> leg.getKind() == Leg.Kind.WALK));
+	}
+
 	@Test
 	public void specialCasesMatchTheirGoldenFile() throws IOException
 	{

@@ -15,10 +15,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Menu;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
+import net.runelite.api.FontTypeFace;
 import net.runelite.api.NPC;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.WidgetClosed;
@@ -56,6 +58,10 @@ public class MenuLines
 	private static final String MAP_REGION = "Select";
 	/** Same cyan as {@code Markers.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
+	/** Chat options are children 1–5 under the "Select an Option" title, and keys 1–5 pick them. */
+	private static final int CHAT_OPTION_KEYS = 5;
+	private static final int ALIGN_CENTRE = 1;
+	private static final int ALIGN_RIGHT = 2;
 
 	private final Client client;
 	private final QuetzalIcons quetzalIcons;
@@ -105,7 +111,7 @@ public class MenuLines
 				int[] ints = intTail(8);
 				if (ints != null)
 				{
-					nexusLines.put(ints[3], new int[]{ints[7], ints[0]});
+					nexusLines.put(ints[3], new int[]{ints[7], ints[0], ints[4]});
 				}
 				break;
 			}
@@ -272,12 +278,65 @@ public class MenuLines
 		entry.setOption(ColorUtil.wrapWithColorTag(Text.removeTags(entry.getOption()), new Color(TEXT_COLOUR)));
 	}
 
+	/**
+	 * The target's coloured lines that a key press also picks, where the line's text, as other plugins left it, doesn't
+	 * already show the key.
+	 */
+	public List<KeyBadge> keyBadges(MenuTarget target)
+	{
+		Found found = new Found();
+		find(target, found);
+		List<KeyBadge> badges = new ArrayList<>();
+		found.keys.forEach((line, key) ->
+		{
+			Widget text = descendants(line).stream().filter(MenuLines::hasText).findFirst().orElse(null);
+			if (text != null && !MenuLabels.showsKey(text.getText(), key))
+			{
+				Rectangle bounds = text.getBounds();
+				badges.add(new KeyBadge(key, textEnd(text), bounds.y + bounds.height / 2, insideParents(text)));
+			}
+		});
+		return badges;
+	}
+
+	@Value
+	public static class KeyBadge
+	{
+		char key;
+		int textEnd;
+		int centreY;
+		/** Where the line can be seen: a badge outside it belongs to a line scrolled out of view. */
+		Rectangle visible;
+	}
+
+	private static int textEnd(Widget text)
+	{
+		FontTypeFace font = text.getFont();
+		Rectangle bounds = text.getBounds();
+		int width = font == null ? bounds.width : Math.min(bounds.width, font.getTextWidth(Text.removeTags(text.getText())));
+		switch (text.getXTextAlignment())
+		{
+			case ALIGN_CENTRE:
+				return bounds.x + (bounds.width + width) / 2;
+			case ALIGN_RIGHT:
+				return bounds.x + bounds.width;
+			default:
+				return bounds.x + width;
+		}
+	}
+
 	private List<Widget> lineWidgets(MenuTarget target)
 	{
-		List<Widget> out = new ArrayList<>();
+		Found found = new Found();
+		find(target, found);
+		return found.widgets;
+	}
+
+	private void find(MenuTarget target, Found out)
+	{
 		if (target == null || target == MenuTarget.NONE)
 		{
-			return out;
+			return;
 		}
 		switch (target.getLine())
 		{
@@ -285,7 +344,7 @@ public class MenuLines
 				nexus(target, out);
 				break;
 			case BOX:
-				add(child(boxLines.get(target.getLineId())), out);
+				out.add(child(boxLines.get(target.getLineId())));
 				break;
 			case FAIRY_CODE:
 				fairyCode(target.getLineKey(), out);
@@ -302,9 +361,8 @@ public class MenuLines
 		}
 		for (MenuTarget alternative : target.getAlternatives())
 		{
-			out.addAll(lineWidgets(alternative));
+			find(alternative, out);
 		}
-		return out;
 	}
 
 	public List<Rectangle> menuRows(MenuTarget target)
@@ -358,12 +416,13 @@ public class MenuLines
 		return 0;
 	}
 
-	private void nexus(MenuTarget target, List<Widget> out)
+	private void nexus(MenuTarget target, Found out)
 	{
-		Widget line = child(nexusLines.get(target.getLineId()));
+		int[] at = nexusLines.get(target.getLineId());
+		Widget line = child(at);
 		if (visible(line))
 		{
-			add(labelOf(line), out);
+			out.add(labelOf(line), hotkey(at[2] - 1));
 			return;
 		}
 		Widget map = client.getWidget(InterfaceID.TelenexusTeleport.FRAME);
@@ -381,7 +440,7 @@ public class MenuLines
 			}
 			if (hasAction(icon, MAP_TELEPORT) && MenuLabels.matches(icon.getName(), target.getLineName()))
 			{
-				add(icon, out);
+				out.add(icon);
 				return;
 			}
 			if (hasAction(icon, MAP_REGION) && MenuLabels.matches(icon.getName(), target.getLineKey()))
@@ -389,10 +448,10 @@ public class MenuLines
 				region = icon;
 			}
 		}
-		add(region, out);
+		out.add(region);
 	}
 
-	private void fairyCode(String code, List<Widget> out)
+	private void fairyCode(String code, Found out)
 	{
 		String letters = FairyDials.letters(code);
 		if (letters == null)
@@ -400,14 +459,14 @@ public class MenuLines
 			return;
 		}
 		int logComponent = LOG_FIRST_CODE + LOG_COMPONENTS_PER_CODE * FairyDials.logIndex(letters);
-		add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | logComponent), out);
+		out.add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | logComponent));
 		if (fairyDials.isDialled(letters))
 		{
-			add(client.getWidget(InterfaceID.Fairyrings.CONFIRM), out);
+			out.add(client.getWidget(InterfaceID.Fairyrings.CONFIRM));
 		}
 	}
 
-	private void minigame(String name, List<Widget> out)
+	private void minigame(String name, Found out)
 	{
 		if (visible(client.getWidget(InterfaceID.Minigames.MINIGAMES)))
 		{
@@ -425,7 +484,7 @@ public class MenuLines
 		}
 		if (MenuLabels.matches(current.getText(), name))
 		{
-			add(client.getWidget(InterfaceID.Grouping.TELEPORT), out);
+			out.add(client.getWidget(InterfaceID.Grouping.TELEPORT));
 			return;
 		}
 		Widget contents = client.getWidget(InterfaceID.Grouping.DROPDOWN_CONTENTS);
@@ -436,19 +495,19 @@ public class MenuLines
 			{
 				if (visible(line) && MenuLabels.matches(line.getText(), name))
 				{
-					add(line, out);
+					out.add(line);
 					return;
 				}
 			}
 		}
-		add(client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP), out);
+		out.add(client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP));
 	}
 
 	/**
 	 * The Minigame Teleport spell opens a grid of cards, one per minigame, each with the game's name and its places;
 	 * the card whose name is the row's game is outlined. A row like "Rat Pits: 4. Port Sarim" names the game first.
 	 */
-	private void minigameCard(String name, List<Widget> out)
+	private void minigameCard(String name, Found out)
 	{
 		String game = name.split(": ")[0];
 		for (int card = InterfaceID.Minigames.MINIGAME_21; card <= InterfaceID.Minigames.MINIGAME_1; card++)
@@ -456,14 +515,14 @@ public class MenuLines
 			Widget widget = client.getWidget(card);
 			if (visible(widget) && hasTextMatching(widget, game))
 			{
-				add(widget, out);
+				out.add(widget);
 				return;
 			}
 		}
 	}
 
 	/** A game with several places asks which one next, e.g. "Port Sarim (wily cats)" for "Rat Pits: 4. Port Sarim". */
-	private boolean minigamePlace(String name, List<Widget> out)
+	private boolean minigamePlace(String name, Found out)
 	{
 		String[] parts = name.split(": ", 2);
 		Widget options = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
@@ -477,7 +536,7 @@ public class MenuLines
 		{
 			if (visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
 			{
-				add(line, out);
+				out.add(line, chatKey(line));
 				return true;
 			}
 		}
@@ -516,7 +575,7 @@ public class MenuLines
 		return false;
 	}
 
-	private void quetzal(int quetzalTableId, List<Widget> out)
+	private void quetzal(int quetzalTableId, Found out)
 	{
 		int[] at = quetzalIcons.position(quetzalTableId);
 		if (at == null)
@@ -532,10 +591,10 @@ public class MenuLines
 		{
 			return;
 		}
-		add(QuetzalIcons.nearest(icons.getDynamicChildren(), at), out);
+		out.add(QuetzalIcons.nearest(icons.getDynamicChildren(), at));
 	}
 
-	private void labelled(MenuTarget target, List<Widget> out)
+	private void labelled(MenuTarget target, Found out)
 	{
 		String destination = target.destination();
 		if (destination == null)
@@ -546,7 +605,7 @@ public class MenuLines
 		{
 			if (MenuLabels.matches(line.getKey(), destination))
 			{
-				add(child(line.getValue()), out);
+				out.add(child(line.getValue()), hotkey(line.getValue()[2]));
 				return;
 			}
 		}
@@ -555,7 +614,7 @@ public class MenuLines
 		{
 			if (index >= 0 && line[2] == index)
 			{
-				add(child(line), out);
+				out.add(child(line), hotkey(index));
 				return;
 			}
 		}
@@ -572,7 +631,7 @@ public class MenuLines
 			{
 				if (visible(option) && MenuLabels.matches(option.getText(), labels.get(i)))
 				{
-					add(option, out);
+					out.add(option, chatKey(option));
 					return;
 				}
 			}
@@ -687,11 +746,39 @@ public class MenuLines
 		return false;
 	}
 
-	private static void add(Widget widget, List<Widget> out)
+	private static char hotkey(int index)
 	{
-		if (visible(widget))
+		return index >= 0 && index < HOTKEYS.length() ? HOTKEYS.charAt(index) : 0;
+	}
+
+	private static char chatKey(Widget option)
+	{
+		int index = option.getIndex();
+		return index >= 1 && index <= CHAT_OPTION_KEYS ? (char) ('0' + index) : 0;
+	}
+
+	/** The target's lines, and the key that picks each one where the menu has keys. */
+	private static final class Found
+	{
+		final List<Widget> widgets = new ArrayList<>();
+		final Map<Widget, Character> keys = new IdentityHashMap<>();
+
+		void add(Widget widget)
 		{
-			out.add(widget);
+			add(widget, (char) 0);
+		}
+
+		void add(Widget widget, char key)
+		{
+			if (!visible(widget))
+			{
+				return;
+			}
+			widgets.add(widget);
+			if (key != 0)
+			{
+				keys.put(widget, key);
+			}
 		}
 	}
 
@@ -712,16 +799,21 @@ public class MenuLines
 	 */
 	private static Rectangle clipped(Widget widget)
 	{
-		Rectangle bounds = widget.getBounds();
-		for (Widget parent = widget.getParent(); parent != null && !bounds.isEmpty(); parent = parent.getParent())
+		return widget.getBounds().intersection(insideParents(widget));
+	}
+
+	private static Rectangle insideParents(Widget widget)
+	{
+		Rectangle area = new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
+		for (Widget parent = widget.getParent(); parent != null && !area.isEmpty(); parent = parent.getParent())
 		{
 			Rectangle outer = parent.getBounds();
 			if (outer != null && outer.width > 0)
 			{
-				bounds = bounds.intersection(outer);
+				area = area.intersection(outer);
 			}
 		}
-		return bounds;
+		return area;
 	}
 
 	/** A nexus row ({@code ROWS1}) has no text; its label sits at the same height in the {@code TEXT1} layer. */

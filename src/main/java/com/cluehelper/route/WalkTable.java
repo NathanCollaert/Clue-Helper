@@ -21,6 +21,8 @@ public final class WalkTable
 	public static final WalkTable EMPTY = new WalkTable();
 	public static final int NO_NODE = -1;
 	public static final int NO_PATH = -1;
+	/** Where tools/walk/WalkGen.java puts each walk's waypoint. */
+	public static final int WAYPOINT_TILES = 40;
 	static final String DIRECTORY = "walk/";
 
 	public static final int KIND_LANDING = 1;
@@ -133,7 +135,6 @@ public final class WalkTable
 		return entryGateSet[entry];
 	}
 
-	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
 	/** The tile 40 tiles along the entry's walk (gates passing), or null for a shorter walk. */
 	public WorldPoint entryWaypoint(int entry)
 	{
@@ -141,6 +142,7 @@ public final class WalkTable
 		return value == 0 ? null : unpack(value - 1);
 	}
 
+	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
 	public int entryOpen(int entry)
 	{
 		return entryOpen[entry];

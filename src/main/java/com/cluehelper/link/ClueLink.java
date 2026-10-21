@@ -132,7 +132,7 @@ public class ClueLink
 	/**
 	 * Call from a GameTick handler at priority -1.
 	 *
-	 * @return whether anything the panel shows changed: active, needs-read or has-step
+	 * @return whether anything the box shows changed: active, needs-read or has-step
 	 */
 	public boolean onGameTick()
 	{
@@ -144,7 +144,7 @@ public class ClueLink
 		ClueScroll clue = active ? service.getClue() : null;
 		Step step = clue == null ? null : resolve(clue);
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
-			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && holdsClue());
+			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && carriesClue());
 		if (change != StepChange.UNCHANGED)
 		{
 			current = step;
@@ -172,7 +172,8 @@ public class ClueLink
 		}
 	}
 
-	private boolean holdsClue()
+	/** Client thread only. Whether the inventory holds a clue item, read or not. */
+	public boolean carriesClue()
 	{
 		if (inventoryChanged)
 		{

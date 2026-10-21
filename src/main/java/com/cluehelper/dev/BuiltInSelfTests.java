@@ -12,7 +12,7 @@ import com.cluehelper.step.ClueFacts;
 import com.cluehelper.step.CoreClueReader;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepKey;
-import com.cluehelper.ui.PanelState;
+import com.cluehelper.ui.BoxState;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -58,14 +58,14 @@ class BuiltInSelfTests
 		this.roundTrip = memory.slot(ROUND_TRIP_KEY, String.class, () -> null);
 	}
 
-	List<SelfTest> create(Supplier<PanelState> shownState, Supplier<PanelState> signalledState)
+	List<SelfTest> create(Supplier<BoxState> shownState, Supplier<BoxState> signalledState)
 	{
 		return Arrays.asList(
 			SelfTest.of("config", this::checkConfig),
 			SelfTest.of("core link", this::checkCoreLink),
 			SelfTest.of("core link reads a clue", this::checkClueRead),
-			SelfTest.of("panel state", run ->
-				run.check(shownState.get() == signalledState.get(), "panel shows " + shownState.get() + ", signals say " + signalledState.get())),
+			SelfTest.of("box state", run ->
+				run.check(shownState.get() == signalledState.get(), "box shows " + shownState.get() + ", signals say " + signalledState.get())),
 			SelfTest.of("memory store", this::checkMemoryRoundTrip),
 			SelfTest.of("player snapshot", this::checkPlayerSnapshot),
 			new PlannerRunnerTest());
@@ -73,8 +73,6 @@ class BuiltInSelfTests
 
 	private void checkConfig(SelfTestRun run)
 	{
-		int routes = config.routeCount();
-		run.check(routes >= 1 && routes <= 5, "routeCount " + routes + " is within 1-5");
 		run.check(config.consumablePenalty() >= 0 && config.capeUsePenalty() >= 0 && config.strandPenalty() >= 0,
 			"penalties are not negative");
 		run.check(config.avoidWilderness() != null && config.spellbookChanges() != null && config.diggingDog() != null,

@@ -26,22 +26,18 @@ import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
-import com.cluehelper.ui.ClueHelperPanel;
-import com.cluehelper.ui.Icons;
-import com.cluehelper.ui.ChallengeAnswerOverlay;
 import com.cluehelper.ui.FurnitureOverlay;
+import com.cluehelper.ui.GuideBox;
+import com.cluehelper.ui.GuideOverlay;
 import com.cluehelper.ui.ItemHighlightOverlay;
 import com.cluehelper.ui.MenuLineOverlay;
-import com.cluehelper.ui.PanelModel;
-import com.cluehelper.ui.PanelState;
+import com.cluehelper.ui.BoxState;
 import com.cluehelper.ui.WidgetHighlightOverlay;
 import com.cluehelper.ui.WaypointOverlay;
-import com.cluehelper.ui.WorldMapMarkers;
 import com.google.inject.Provides;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.SwingUtilities;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +67,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.ui.ClientToolbar;
-import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -89,9 +83,6 @@ public class ClueHelperPlugin extends Plugin
 	private static final String FORGET_HOUSE_KEY = "pohForget";
 	private static final String HOUSE_KEY_PREFIX = "poh";
 	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "hotColdWildernessPenalty");
-
-	@Inject
-	private ClientToolbar clientToolbar;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -186,13 +177,12 @@ public class ClueHelperPlugin extends Plugin
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
-	private ChallengeAnswerOverlay answerOverlay;
+	@Getter(AccessLevel.PACKAGE)
+	private GuideOverlay guideOverlay;
 
 	@Inject
 	private SceneDoors sceneDoors;
 
-	@Inject
-	private WorldMapMarkers mapMarkers;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -202,13 +192,11 @@ public class ClueHelperPlugin extends Plugin
 	@Named("developerMode")
 	private boolean developerMode;
 
-	@Getter(AccessLevel.PACKAGE)
-	private ClueHelperPanel panel;
-	private NavigationButton navigationButton;
 	private Runnable unregisterRoutes;
 	private Runnable unregisterGuide;
 	private Runnable unregisterHotCold;
 	private boolean shownWorking;
+	private boolean shownCarryingClue;
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -219,14 +207,7 @@ public class ClueHelperPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		panel = new ClueHelperPanel();
-		navigationButton = NavigationButton.builder()
-			.tooltip("Clue Helper")
-			.icon(Icons.logo())
-			.priority(7)
-			.panel(panel)
-			.build();
-		clientToolbar.addNavigation(navigationButton);
+		guideOverlay.show(GuideBox.EMPTY);
 		clueLink.start();
 		playerModel.start();
 		poh.start();
@@ -237,17 +218,17 @@ public class ClueHelperPlugin extends Plugin
 		routes.start();
 		guide.start();
 		hotCold.start();
-		unregisterRoutes = routes.addListener(plan -> showPanelState());
-		unregisterGuide = guide.addListener(this::onGuideChanged);
-		unregisterHotCold = hotCold.addListener(this::showPanelState);
+		unregisterRoutes = routes.addListener(plan -> showBox());
+		unregisterGuide = guide.addListener(this::showBox);
+		unregisterHotCold = hotCold.addListener(this::showBox);
 		for (Overlay overlay : overlays())
 		{
 			overlayManager.add(overlay);
 		}
-		clientThread.invokeLater(this::showPanelState);
+		clientThread.invokeLater(this::showBox);
 		if (developerMode)
 		{
-			devHarness.start(this::shownPanelState, this::panelState);
+			devHarness.start(() -> guideOverlay.getShown().getState(), this::boxState);
 		}
 	}
 
@@ -264,16 +245,12 @@ public class ClueHelperPlugin extends Plugin
 		unregisterRoutes.run();
 		hotCold.stop();
 		guide.stop();
-		clientThread.invokeLater(mapMarkers::clear);
 		routes.stop();
 		planner.cancelAll();
 		availability.stop();
 		poh.stop();
 		playerModel.stop();
 		clueLink.stop();
-		clientToolbar.removeNavigation(navigationButton);
-		navigationButton = null;
-		panel = null;
 	}
 
 	@Subscribe
@@ -281,7 +258,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		if (clueLink.onPluginChanged(event))
 		{
-			clientThread.invokeLater(this::showPanelState);
+			clientThread.invokeLater(this::showBox);
 		}
 	}
 
@@ -291,7 +268,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		if (clueLink.onGameTick())
 		{
-			showPanelState();
+			showBox();
 		}
 		bankMemory.onGameTick();
 		poh.onGameTick();
@@ -303,10 +280,12 @@ public class ClueHelperPlugin extends Plugin
 		routes.onGameTick();
 		hotCold.onGameTick();
 		guide.onGameTick();
-		if (planner.isWorking() != shownWorking)
+		boolean carryingClue = clueLink.carriesClue();
+		if (planner.isWorking() != shownWorking || carryingClue != shownCarryingClue)
 		{
 			shownWorking = planner.isWorking();
-			showPanelState();
+			shownCarryingClue = carryingClue;
+			showBox();
 		}
 	}
 
@@ -421,7 +400,7 @@ public class ClueHelperPlugin extends Plugin
 		{
 			return;
 		}
-		clientThread.invokeLater(mapMarkers::refresh);
+		clientThread.invokeLater(this::showBox);
 		if (FORGET_HOUSE_KEY.equals(event.getKey()) && config.pohForget())
 		{
 			configManager.setConfiguration(ClueHelperConfig.GROUP, FORGET_HOUSE_KEY, false);
@@ -436,7 +415,7 @@ public class ClueHelperPlugin extends Plugin
 			clientThread.invokeLater(() ->
 			{
 				hotCold.onConfigChanged();
-				showPanelState();
+				showBox();
 			});
 		}
 	}
@@ -458,26 +437,14 @@ public class ClueHelperPlugin extends Plugin
 		devHarness.onCommandExecuted(event);
 	}
 
-	private PanelState shownPanelState()
+	BoxState boxState()
 	{
-		ClueHelperPanel shown = panel;
-		return shown == null ? null : shown.getShownState();
-	}
-
-	PanelState panelState()
-	{
-		return PanelState.of(dormantReason() != null, clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
+		return BoxState.of(dormantReason() != null, clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
 	}
 
 	private Overlay[] overlays()
 	{
-		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, menuLineOverlay, furnitureOverlay, answerOverlay};
-	}
-
-	private void onGuideChanged()
-	{
-		mapMarkers.refresh();
-		showPanelState();
+		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
 	}
 
 	private String dormantReason()
@@ -486,20 +453,19 @@ public class ClueHelperPlugin extends Plugin
 		return snapshot == null ? null : snapshot.getDormantReason();
 	}
 
-	/** Client thread only: reads the guide's state, then hands it to Swing. */
-	private void showPanelState()
+	/** Client thread only: reads the guide's state into one value for the overlay. */
+	private void showBox()
 	{
-		ClueHelperPanel target = panel;
-		if (target == null)
+		GuideBox box = GuideBox.of(boxState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
+			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts(),
+			guide.getMenuHint());
+		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
+		GuideBox.GuideBoxBuilder shown = atStep.toBuilder().carryingClue(clueLink.carriesClue());
+		if (atStep.getState().showsRoutes())
 		{
-			return;
+			shown.hotCold(hotColdView());
 		}
-		PanelModel model = PanelModel.of(panelState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
-			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p(), bankInfo(), houseInfo(), guide.getMenuHint(),
-			System.currentTimeMillis());
-		PanelModel atStep = guide.isAtStep() ? model.atTheStep() : model;
-		PanelModel shown = atStep.getState().showsRoutes() ? atStep.toBuilder().hotCold(hotColdView()).build() : atStep;
-		SwingUtilities.invokeLater(() -> target.show(shown));
+		guideOverlay.show(shown.build());
 	}
 
 	private HotColdView hotColdView()
@@ -519,21 +485,14 @@ public class ClueHelperPlugin extends Plugin
 			hotCold.spotsOf(beginner), beginner, hotCold.hitpoints()));
 	}
 
-	private PanelModel.BankInfo bankInfo()
+	private GuideBox.Prompts prompts()
 	{
-		BankMemory.Seen bank = bankMemory.getBank();
 		PlayerSnapshot snapshot = playerModel.getSnapshot();
 		boolean bankCounts = config.useBank() && snapshot != null && snapshot.getAccountType() != ULTIMATE_IRONMAN;
-		boolean promptOpen = bank == null && bankCounts;
-		return new PanelModel.BankInfo(bank == null ? 0 : bank.seenAt, promptOpen, id -> client.getItemDefinition(id).getName());
-	}
-
-	private PanelModel.HouseInfo houseInfo()
-	{
 		HouseState house = poh.getHouse();
-		boolean known = !house.getNexusKeys().isEmpty() || !house.getFurniture().isEmpty();
-		boolean onlyNexusVarbitsKnown = known && house.getSource() == HouseState.Source.VARBITS;
-		return new PanelModel.HouseInfo(house.getScannedAt(), onlyNexusVarbitsKnown, house.getSource() == HouseState.Source.MANUAL);
+		boolean houseKnown = !house.getNexusKeys().isEmpty() || !house.getFurniture().isEmpty();
+		boolean onlyNexusVarbitsKnown = houseKnown && house.getSource() == HouseState.Source.VARBITS;
+		return new GuideBox.Prompts(bankMemory.getBank() == null && bankCounts, onlyNexusVarbitsKnown);
 	}
 
 	/** Members keep their book on an F2P world, where no book can be changed and only Standard has teleports. */

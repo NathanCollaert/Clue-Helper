@@ -14,7 +14,7 @@ public interface ClueHelperConfig extends Config
 
 	@ConfigSection(
 		name = "Routes",
-		description = "How routes are ranked and shown",
+		description = "How routes are ranked",
 		position = 0
 	)
 	String routesSection = "routes";
@@ -53,19 +53,6 @@ public interface ClueHelperConfig extends Config
 		position = 5
 	)
 	String hotColdSection = "hotCold";
-
-	@Range(min = 1, max = 5)
-	@ConfigItem(
-		keyName = "routeCount",
-		name = "Routes shown",
-		description = "Routes shown in the panel. Direct (no bank stop) and Same book are shown in addition when they exist",
-		section = routesSection,
-		position = 0
-	)
-	default int routeCount()
-	{
-		return 3;
-	}
 
 	@Range(max = 50)
 	@Units(Units.TICKS)
@@ -209,8 +196,8 @@ public interface ClueHelperConfig extends Config
 
 	@ConfigItem(
 		keyName = "pathLine",
-		name = "Path line",
-		description = "Draw the path to the route's next waypoint. Never drawn onto the clue's own target",
+		name = "Path",
+		description = "Draw the path to where to go next. Never drawn onto the clue's own target",
 		section = guidanceSection,
 		position = 3
 	)
@@ -220,13 +207,13 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "worldMapMarker",
-		name = "World map marker",
-		description = "Mark the route's waypoints on the world map. Never the clue's own target",
+		keyName = "showNextStep",
+		name = "Show the next step",
+		description = "Show the step after the current one in the box",
 		section = guidanceSection,
-		position = 5
+		position = 4
 	)
-	default boolean worldMapMarker()
+	default boolean showNextStep()
 	{
 		return true;
 	}
