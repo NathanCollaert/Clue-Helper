@@ -9,9 +9,8 @@ import javax.inject.Singleton;
 import net.runelite.client.config.ConfigManager;
 
 /**
- * What the plugin remembers per RuneScape profile, as JSON in the profile's config through the
- * client's Gson. Nothing is read or written until the client has a profile, which needs a login;
- * before that every slot holds its fresh value in memory only.
+ * Nothing is read or written until the client has a RuneScape profile, which needs a login; before that every slot
+ * holds its fresh value in memory only.
  */
 @Singleton
 public class MemoryStore
@@ -33,7 +32,7 @@ public class MemoryStore
 	}
 
 	/**
-	 * A value stored under {@code key} in the current profile. Create each slot once and keep it.
+	 * Create each slot once and keep it: the store holds on to every slot it makes.
 	 *
 	 * @param fresh the value of a profile that has none stored, or whose stored JSON is unreadable
 	 */
@@ -49,7 +48,7 @@ public class MemoryStore
 		return profile.profileKey() != null;
 	}
 
-	/** Call on {@code RuneScapeProfileChanged}: every slot reads its value again from the new profile. */
+	/** Call on {@code RuneScapeProfileChanged}. */
 	public void reload()
 	{
 		for (MemorySlot<?> slot : slots)

@@ -1,9 +1,7 @@
 package com.cluehelper.step;
 
-/** How a step's targets combine (PLAN §5.4). */
 public enum TargetKind
 {
-	/** Any one of the tiles will do. */
 	ANY_OF,
 	/** An NPC that walks around inside its regions. */
 	AREA,

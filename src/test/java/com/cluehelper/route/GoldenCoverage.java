@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * B17's gate: every Tier A and B kind of transport, bank stop and spellbook change shows up in at least one golden
- * route. Counts every shown route (Best, Direct, Same book, alternatives) of every case, with the first case per kind.
- */
 final class GoldenCoverage
 {
 	static final List<String> KINDS = List.of(
@@ -48,7 +44,6 @@ final class GoldenCoverage
 		}
 	}
 
-	/** One line per kind; MISSING where no golden route has it. */
 	List<String> lines()
 	{
 		List<String> out = new ArrayList<>();

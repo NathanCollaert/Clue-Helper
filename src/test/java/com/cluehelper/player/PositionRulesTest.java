@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
 
-/** Replays the positions B03 and B04 logged live: on a boat, in the POH, in the Gauntlet, in the Wilderness. */
 public class PositionRulesTest
 {
 	private static final Pattern READING = Pattern.compile(
@@ -63,11 +62,10 @@ public class PositionRulesTest
 			for (JsonObject event : events(file, "wild"))
 			{
 				int game = Math.max(0, event.get("level").getAsInt());
-				// The probe read norm a moment after the level changed; raw is the tile at the change.
-				WorldPoint raw = tile(reading(event.get("position").getAsString()).group(2));
-				if (PositionRules.wildernessLevel(raw) != game)
+				WorldPoint tileAtLevelChange = tile(reading(event.get("position").getAsString()).group(2));
+				if (PositionRules.wildernessLevel(tileAtLevelChange) != game)
 				{
-					wrong.add(raw + ": game " + game + ", ours " + PositionRules.wildernessLevel(raw));
+					wrong.add(tileAtLevelChange + ": game " + game + ", ours " + PositionRules.wildernessLevel(tileAtLevelChange));
 				}
 				checked++;
 			}

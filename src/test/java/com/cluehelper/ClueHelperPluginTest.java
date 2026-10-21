@@ -4,7 +4,7 @@ import com.cluehelper.dev.UiWatchdogPlugin;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-/** Dev launcher: `gradlew dev` starts a client with Clue Helper, its dev plugin and the UI watchdog. */
+/** Dev launcher, started by `gradlew dev`. */
 public class ClueHelperPluginTest
 {
 	public static void main(String[] args) throws Exception

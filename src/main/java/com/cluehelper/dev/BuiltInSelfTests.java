@@ -26,12 +26,11 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.PluginManager;
 
-/** The self-tests every developer-mode run has. Later blocks add their own next to these. */
 @Singleton
 class BuiltInSelfTests
 {
 	private static final String ROUND_TRIP_KEY = "devSelfTest";
-	/** Aether, the newest rune in enum 982 (B04). */
+	/** Aether, the newest rune in enum 982. */
 	private static final int LAST_POUCH_TYPE = 23;
 
 	private final Client client;
@@ -59,18 +58,14 @@ class BuiltInSelfTests
 		this.roundTrip = memory.slot(ROUND_TRIP_KEY, String.class, () -> null);
 	}
 
-	/**
-	 * @param shown the state the panel shows
-	 * @param expected the state the plugin's signals call for
-	 */
-	List<SelfTest> create(Supplier<PanelState> shown, Supplier<PanelState> expected)
+	List<SelfTest> create(Supplier<PanelState> shownState, Supplier<PanelState> signalledState)
 	{
 		return Arrays.asList(
 			SelfTest.of("config", this::checkConfig),
 			SelfTest.of("core link", this::checkCoreLink),
 			SelfTest.of("core link reads a clue", this::checkClueRead),
 			SelfTest.of("panel state", run ->
-				run.check(shown.get() == expected.get(), "panel shows " + shown.get() + ", signals say " + expected.get())),
+				run.check(shownState.get() == signalledState.get(), "panel shows " + shownState.get() + ", signals say " + signalledState.get())),
 			SelfTest.of("memory store", this::checkMemoryRoundTrip),
 			SelfTest.of("player snapshot", this::checkPlayerSnapshot),
 			new PlannerRunnerTest());

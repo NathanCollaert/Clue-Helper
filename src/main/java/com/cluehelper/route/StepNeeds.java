@@ -19,18 +19,14 @@ import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 import net.runelite.client.plugins.cluescrolls.clues.item.SlotLimitationRequirement;
 
-/**
- * Turns a step's requirements into {@link RequiredItems} on the client thread: the spade unless a digging dog
- * follows, a light unless the fire pit is lit, and the step's own items, with the STASH and the tool leprechaun as
- * they stand now (PLAN §5.4 Required items).
- */
+/** Client thread only: reads varbits. */
 @Singleton
 public class StepNeeds
 {
-	/** Core's {@code ClueScrollOverlay.HAS_SPADE} (1.13.2). */
+	/** Copy of core's {@code ClueScrollOverlay.HAS_SPADE} (1.13.2). */
 	private static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
 		ItemRequirements.item(ItemID.EASTER23_SPADE));
-	/** Core's {@code ClueScrollOverlay.HAS_LIGHT} item ids (1.13.2), read with javap. */
+	/** Core's {@code ClueScrollOverlay.HAS_LIGHT} item ids (1.13.2). */
 	private static final int[] LIGHT_SOURCES = {594, 33, 32, 4531, 4534, 4524, 4539, 4550, 4702, 9065, 5013, 9804, 9805, 13137,
 		13138, 13139, 13140, 20720, 29777, 13280, 13342, 26824, 26826, 26828, 26830, 26832, 26834, 26836, 26838, 26840, 26842,
 		26844, 26846, 26848, 30363};

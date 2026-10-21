@@ -27,10 +27,8 @@ import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.Text;
 
 /**
- * Finds the lines a {@link MenuTarget} points at, for the overlay (B16, PLAN §4 item 7). The teleport interfaces are
- * read from their own scripts' arguments before better-teleport-menu rewrites anything (B12): the nexus by struct id
- * (script 2675), the jewellery box by index (1688), 187 lists by line (218). Bounds are read at draw time. Text lines
- * and menu options are coloured, never rewritten or hidden (no {@code setText}, no {@code setHidden}). Client thread.
+ * Teleport interfaces are read from their scripts' arguments, before better-teleport-menu rewrites them. Lines and menu
+ * options are only recoloured, never rewritten or hidden. Client thread only.
  */
 @Singleton
 public class MenuLines
@@ -45,28 +43,26 @@ public class MenuLines
 	private static final int LIST_GROUP = 187;
 	private static final int NEXUS_GROUP = 17;
 	private static final int BOX_GROUP = 590;
-	/** A menu row is 15 px; the title above the first row and the border below the last take the rest. */
-	private static final int MENU_ROW = 15;
-	private static final int MENU_BOTTOM = 3;
-	/** The fairy ring travel log: a component per code from AIP at 12, each followed by its favourite star (1.13.2). */
+	private static final int MENU_ROW_HEIGHT = 15;
+	private static final int MENU_BOTTOM_BORDER = 3;
 	private static final int LOG_FIRST_CODE = 12;
+	/** Each code in the travel log is followed by its favourite star. */
+	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String MAP_TELEPORT = "Teleport";
 	private static final String MAP_REGION = "Select";
-	/** Markers' cyan: the colour of every Clue Helper highlight. */
+	/** Same cyan as {@code Markers.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
 
 	private final Client client;
 	private final QuetzalIcons quetzalIcons;
 	private final FairyDials fairyDials;
 	private final Map<String, int[]> listLines = new HashMap<>();
-	/** The open 187 list's title, and where each of its lines is drawn (the widget text carries a greyed line's colour). */
 	private String listTitle;
 	private final List<int[]> rawListLines = new ArrayList<>();
 	private boolean listFresh;
 	private final Map<Integer, int[]> nexusLines = new HashMap<>();
 	private final Map<Integer, int[]> boxLines = new HashMap<>();
-	/** Lines coloured for the target, with the colour to put back. */
-	private final Map<Widget, Integer> coloured = new IdentityHashMap<>();
+	private final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
 
 	@Inject
 	MenuLines(Client client, QuetzalIcons quetzalIcons, FairyDials fairyDials)
@@ -76,7 +72,7 @@ public class MenuLines
 		this.fairyDials = fairyDials;
 	}
 
-	/** From the plugin's handler at priority 2: better-teleport-menu works at 1. */
+	/** Call from a handler at priority 2, ahead of better-teleport-menu's at 1. */
 	public void onScriptPreFired(ScriptPreFired event)
 	{
 		switch (event.getScriptId())
@@ -124,8 +120,8 @@ public class MenuLines
 	}
 
 	/**
-	 * Once per list drawn, a tick after its lines: hands over the title and each line's widget text with its colour tags
-	 * (B17's planted spirit trees: a tree that can't be used is greyed; the script's own label has no colour).
+	 * Once per list, a tick after its lines are drawn. Hands over the widget texts rather than the script's labels: only
+	 * they carry the grey of a planted spirit tree that can't be used.
 	 */
 	public void takeFreshList(BiConsumer<String, List<String>> reader)
 	{
@@ -148,7 +144,7 @@ public class MenuLines
 
 	public void onWidgetClosed(WidgetClosed event)
 	{
-		coloured.keySet().removeIf(line -> line.getId() >>> 16 == event.getGroupId());
+		originalTextColours.keySet().removeIf(line -> line.getId() >>> 16 == event.getGroupId());
 		if (event.getGroupId() == LIST_GROUP)
 		{
 			listLines.clear();
@@ -163,7 +159,7 @@ public class MenuLines
 		}
 	}
 
-	/** Interface lines without text (map icons, region shields, the travel log): outlined, clipped to their box. */
+	/** Only the target's lines without text (map icons, region shields, travel log codes); text lines are coloured. */
 	public List<Rectangle> lines(MenuTarget target)
 	{
 		List<Rectangle> out = new ArrayList<>();
@@ -178,10 +174,7 @@ public class MenuLines
 		return out;
 	}
 
-	/**
-	 * Client tick: colours the target's text lines blue, as Quest Helper does (Nathan, B16), and puts back the colour of
-	 * lines no longer wanted. Only the text colour changes, never the text or its visibility.
-	 */
+	/** Call every client tick: it also puts back the colour of lines no longer wanted. */
 	public void colourLines(MenuTarget target, boolean enabled)
 	{
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -189,7 +182,7 @@ public class MenuLines
 		{
 			lineWidgets(target).stream().filter(MenuLines::hasText).forEach(wanted::add);
 		}
-		for (Iterator<Map.Entry<Widget, Integer>> it = coloured.entrySet().iterator(); it.hasNext(); )
+		for (Iterator<Map.Entry<Widget, Integer>> it = originalTextColours.entrySet().iterator(); it.hasNext(); )
 		{
 			Map.Entry<Widget, Integer> line = it.next();
 			if (!wanted.contains(line.getKey()))
@@ -200,7 +193,7 @@ public class MenuLines
 		}
 		for (Widget line : wanted)
 		{
-			coloured.putIfAbsent(line, line.getTextColor());
+			originalTextColours.putIfAbsent(line, line.getTextColor());
 			if (line.getTextColor() != TEXT_COLOUR)
 			{
 				line.setTextColor(TEXT_COLOUR);
@@ -208,7 +201,7 @@ public class MenuLines
 		}
 	}
 
-	/** On {@code MenuOpened}: the target's option (and its sub-menu line) in blue, the rest of the text as the game wrote it. */
+	/** Call on {@code MenuOpened}. */
 	public void colourMenu(MenuTarget target, boolean enabled)
 	{
 		if (!enabled || target == null || target == MenuTarget.NONE)
@@ -225,7 +218,7 @@ public class MenuLines
 		for (MenuEntry entry : entries)
 		{
 			Menu sub = entry.getSubMenu();
-			if (sub == null || destination == null || !concerns(entry, target))
+			if (sub == null || destination == null || !isOptionOnTarget(entry, target))
 			{
 				continue;
 			}
@@ -287,7 +280,6 @@ public class MenuLines
 		return out;
 	}
 
-	/** The rows of the open menu the target picks, as screen rectangles (the dev trace). */
 	public List<Rectangle> menuRows(MenuTarget target)
 	{
 		List<Rectangle> out = new ArrayList<>();
@@ -304,7 +296,6 @@ public class MenuLines
 		return out;
 	}
 
-	/** The destination's own option, else the option leading to it (a sub-menu), else one that opens the teleport list. */
 	private int[] pickRows(MenuEntry[] entries, MenuTarget target)
 	{
 		String destination = target.destination();
@@ -320,7 +311,7 @@ public class MenuLines
 		return pick < 0 ? new int[0] : new int[]{pick};
 	}
 
-	/** A 187 line exists for the target but another plugin hides it (spirit-tree-map, B12): its hotkey, else 0. */
+	/** The hotkey of the target's 187 line when another plugin (spirit-tree-map) hides it, else 0. */
 	public char hiddenListHotkey(MenuTarget target)
 	{
 		if (target == null || target.getLine() != MenuTarget.Line.LABEL || target.destination() == null)
@@ -374,7 +365,6 @@ public class MenuLines
 		add(region, out);
 	}
 
-	/** The code in the travel log, and the teleport button once the dials show it; the dials are {@link FairyDials}'. */
 	private void fairyCode(String code, List<Widget> out)
 	{
 		String letters = FairyDials.letters(code);
@@ -382,14 +372,14 @@ public class MenuLines
 		{
 			return;
 		}
-		add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | (LOG_FIRST_CODE + 2 * FairyDials.logIndex(letters))), out);
+		int logComponent = LOG_FIRST_CODE + LOG_COMPONENTS_PER_CODE * FairyDials.logIndex(letters);
+		add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | logComponent), out);
 		if (fairyDials.isDialled(letters))
 		{
 			add(client.getWidget(InterfaceID.Fairyrings.CONFIRM), out);
 		}
 	}
 
-	/** The Grouping tab: the minigame chosen shows the Teleport button; else the dropdown, then its line. */
 	private void minigame(String name, List<Widget> out)
 	{
 		Widget current = client.getWidget(InterfaceID.Grouping.CURRENTGAME);
@@ -418,13 +408,9 @@ public class MenuLines
 		add(client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP), out);
 	}
 
-	/**
-	 * The site's icon on whichever quetzal map is open (Renu's 874, the whistle's 949): the icon nearest the position the
-	 * cache's Quetzal table gives it, never a fixed pixel offset (B17).
-	 */
-	private void quetzal(int site, List<Widget> out)
+	private void quetzal(int quetzalTableId, List<Widget> out)
 	{
-		int[] at = quetzalIcons.position(site);
+		int[] at = quetzalIcons.position(quetzalTableId);
 		if (at == null)
 		{
 			return;
@@ -441,7 +427,6 @@ public class MenuLines
 		add(QuetzalIcons.nearest(icons.getDynamicChildren(), at), out);
 	}
 
-	/** A 187 list line, else a chatbox option, matching the destination (then any earlier label of the path). */
 	private void labelled(MenuTarget target, List<Widget> out)
 	{
 		String destination = target.destination();
@@ -524,7 +509,7 @@ public class MenuLines
 	{
 		for (int i = entries.length - 1; i >= 0; i--)
 		{
-			if (concerns(entries[i], target) && wanted.test(entries[i]))
+			if (isOptionOnTarget(entries[i], target) && wanted.test(entries[i]))
 			{
 				return i;
 			}
@@ -532,8 +517,7 @@ public class MenuLines
 		return -1;
 	}
 
-	/** The entry is an option on the target's item or object. */
-	private static boolean concerns(MenuEntry entry, MenuTarget target)
+	private static boolean isOptionOnTarget(MenuEntry entry, MenuTarget target)
 	{
 		if (target.getItemIds().contains(entry.getItemId()))
 		{
@@ -564,8 +548,8 @@ public class MenuLines
 	/** Entries run bottom-up: the last one is the top row. */
 	private static Rectangle row(Menu menu, int count, int index)
 	{
-		int top = menu.getMenuY() + menu.getMenuHeight() - MENU_BOTTOM - count * MENU_ROW;
-		return new Rectangle(menu.getMenuX(), top + (count - 1 - index) * MENU_ROW, menu.getMenuWidth(), MENU_ROW);
+		int top = menu.getMenuY() + menu.getMenuHeight() - MENU_BOTTOM_BORDER - count * MENU_ROW_HEIGHT;
+		return new Rectangle(menu.getMenuX(), top + (count - 1 - index) * MENU_ROW_HEIGHT, menu.getMenuWidth(), MENU_ROW_HEIGHT);
 	}
 
 	private Widget child(int[] at)
@@ -609,8 +593,8 @@ public class MenuLines
 	}
 
 	/**
-	 * Rows past a scrolling list's window keep {@code hidden = false} with bounds below the box (B12): clip them to every
-	 * enclosing widget, since the list's own layer is as tall as all its rows and only the scroll window is visible (B17).
+	 * Rows scrolled out of view keep {@code hidden = false} and their bounds, and the list's layer is as tall as all its
+	 * rows, so only clipping to every ancestor leaves the visible part.
 	 */
 	private static Rectangle clipped(Widget widget)
 	{
@@ -626,11 +610,7 @@ public class MenuLines
 		return bounds;
 	}
 
-	/**
-	 * A nexus row is a text-less background in the row layer; its label is drawn at the same height in the text layer
-	 * (B17, live: {@code ROWS1} and {@code TEXT1}), and the label is what gets coloured. The row itself when no label is
-	 * found.
-	 */
+	/** A nexus row ({@code ROWS1}) has no text; its label sits at the same height in the {@code TEXT1} layer. */
 	private Widget labelOf(Widget row)
 	{
 		if (hasText(row))

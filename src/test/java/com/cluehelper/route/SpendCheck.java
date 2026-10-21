@@ -13,10 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * The golden run's first invariant, tallied from a route's legs rather than the search's labels: nothing is
- * spent beyond what the player has (items and runes, charges, a cooldown or daily teleport once, cape uses).
- */
+/** Tallied from the route's legs rather than the search's labels, so it checks the search independently. */
 final class SpendCheck
 {
 	private SpendCheck()
@@ -79,7 +76,6 @@ final class SpendCheck
 		}
 	}
 
-	/** Carried, and after a bank stop the bank and group storage too. */
 	private static int stored(PlayerSnapshot player, int id)
 	{
 		return player.count(Container.INVENTORY, id) + player.count(Container.WORN, id) + player.count(Container.BANK, id)

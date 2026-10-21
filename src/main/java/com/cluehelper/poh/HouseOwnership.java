@@ -5,16 +5,13 @@ import java.util.function.LongSupplier;
 import lombok.Getter;
 
 /**
- * Whose house the player is in (Estate-Agent's entry tracking, PLAN §5.2 POH, B12). You can never be logged in inside
- * a house, so every entry follows a click outside: the last classified click within 15 s of the house loading decides,
- * and build mode is a hard confirm. Anything else is UNCERTAIN, which never learns.
- * <p>
- * Clicks are classified by their <b>option</b>: B12 saw the bank's {@code Withdraw-All} on "Teleport to house" read as an
- * own entry when the target text was matched.
+ * A player can't log in inside a house, so every entry follows a click outside; build mode is a hard confirm. Anything
+ * else is UNCERTAIN, which never learns. Clicks are classified by their option, not their target: the bank's
+ * {@code Withdraw-All} on "Teleport to house" would otherwise read as an own entry.
  */
 public final class HouseOwnership
 {
-	/** Far longer than a click-to-load (1.6–5.9 s in B12), far shorter than any other way into a house. */
+	/** Far longer than a click-to-load (1.6–5.9 s), far shorter than any other way into a house. */
 	static final long ENTRY_TTL_MILLIS = 15_000;
 
 	public enum Ownership
@@ -33,7 +30,6 @@ public final class HouseOwnership
 	private boolean inHouse;
 	@Getter
 	private Ownership ownership = Ownership.UNCERTAIN;
-	/** The click that decided the current visit, for the log. */
 	@Getter
 	private String entryClick;
 
@@ -46,7 +42,7 @@ public final class HouseOwnership
 		this.clock = clock;
 	}
 
-	/** Every menu click; only clicks outside a house count (inside, a stranger's portal offers the owner's options). */
+	/** Only clicks outside a house count: inside, a stranger's portal offers the owner's options. */
 	public void observeClick(String option, String target)
 	{
 		if (inHouse)
@@ -86,7 +82,6 @@ public final class HouseOwnership
 		}
 	}
 
-	/** The house scene loaded. */
 	public void entered(boolean buildMode)
 	{
 		inHouse = true;
@@ -109,7 +104,7 @@ public final class HouseOwnership
 		pendingClick = null;
 	}
 
-	/** Build mode seen during the visit: one-way, it can prove "mine" and never "not mine". */
+	/** One-way: build mode can prove "mine", never "not mine". */
 	public void buildModeSeen()
 	{
 		if (inHouse)
@@ -119,7 +114,6 @@ public final class HouseOwnership
 		}
 	}
 
-	/** The plugin started (or the client logged in) with the player already inside: nothing was seen. */
 	public void startedInside(boolean buildMode)
 	{
 		inHouse = true;

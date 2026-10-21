@@ -18,17 +18,14 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-/**
- * The current waypoint on the minimap, as our own overlay (never a hint arrow): a diamond while it is on the
- * minimap, else an arrow at the minimap's edge pointing towards it.
- */
+/** Our own overlay, never the game's hint arrow. */
 public class MinimapMarkerOverlay extends Overlay
 {
-	/** Pixels from the minimap's centre to just inside its rim, in both fixed and resizable layouts. */
+	/** Just inside the minimap's rim, in both fixed and resizable layouts. */
 	private static final int MINIMAP_RADIUS = 64;
 	/**
-	 * A far waypoint is projected this many tiles out, keeping its direction: localToMinimap gives null past 50 tiles,
-	 * and squares its distance in an int.
+	 * A far waypoint is projected this many tiles out, keeping its direction: localToMinimap gives null past 50 tiles
+	 * and squares the distance in an int.
 	 */
 	private static final int PROJECT_TILES = 40;
 	private static final int EDGE_ARROW = 7;

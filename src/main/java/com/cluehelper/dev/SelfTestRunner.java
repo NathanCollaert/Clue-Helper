@@ -18,11 +18,7 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.callback.ClientThread;
 
-/**
- * Runs the registered in-client checks one after another, each starting on the client thread,
- * and logs a "[CH-TEST] PASS/FAIL/SKIP" line per check plus a final RESULT line. A test that
- * throws or never finishes fails, and the run carries on.
- */
+/** A test that throws or never finishes fails, and the run carries on. */
 @Slf4j
 @Singleton
 public class SelfTestRunner

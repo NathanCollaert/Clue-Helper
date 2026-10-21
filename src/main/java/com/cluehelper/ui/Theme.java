@@ -9,10 +9,7 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 
-/**
- * Colours, sizes and fonts of the panel, built on RuneLite's own palette. Spacing comes from one
- * 4px scale, and padding inside a box is never larger than the space around it.
- */
+/** Spacing comes from one 4px scale, and padding inside a box is never larger than the space around it. */
 public final class Theme
 {
 	public static final Color CANVAS = ColorScheme.DARK_GRAY_COLOR;
@@ -32,7 +29,6 @@ public final class Theme
 	public static final int ROW_HEIGHT = 32;
 	public static final int ARC = 10;
 
-	/** Around the panel's content and between cards. */
 	public static final int SIDE = SPACE_S;
 	public static final int GAP = SPACE_S;
 	public static final int CARD_PAD = SPACE_S;
@@ -54,7 +50,7 @@ public final class Theme
 		return FontManager.getRunescapeSmallFont();
 	}
 
-	/** Antialiased copy of {@code g}; dispose it when done. */
+	/** Dispose the copy when done. */
 	public static Graphics2D smooth(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g.create();

@@ -3,7 +3,7 @@ package com.cluehelper.player;
 import java.util.Map;
 import java.util.TreeMap;
 
-/** How often the snapshot is rebuilt, why, and what it costs (B08 verdict question 2). Client thread only. */
+/** Client thread only. */
 public final class RebuildStats
 {
 	private static final double NANOS_PER_MS = 1_000_000.0;

@@ -3,7 +3,7 @@ package com.cluehelper.dev;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The S12 step log of one profile: every resolved step, oldest first. Stored as JSON. */
+/** Oldest entry first. Stored as JSON in the profile, so field names are persisted keys. */
 public final class StepLog
 {
 	private List<Entry> entries = new ArrayList<>();
@@ -18,8 +18,8 @@ public final class StepLog
 	}
 
 	/**
-	 * Whether the newest entry has this key. ClueLink reports a re-read, a pick-up or a core
-	 * re-enable as a new step (B03), but for step frequencies it is the same step again.
+	 * ClueLink reports a re-read, a pick-up or a core re-enable as a new step, but for step
+	 * frequencies it is the same step again.
 	 */
 	boolean endsWith(String key)
 	{
@@ -27,14 +27,13 @@ public final class StepLog
 		return !list.isEmpty() && list.get(list.size() - 1).getKey().equals(key);
 	}
 
-	/** Appends, dropping the oldest entries beyond {@code max}. */
-	void append(Entry entry, int max)
+	void append(Entry entry, int maxEntries)
 	{
 		List<Entry> list = entries();
 		list.add(entry);
-		if (list.size() > max)
+		if (list.size() > maxEntries)
 		{
-			list.subList(0, list.size() - max).clear();
+			list.subList(0, list.size() - maxEntries).clear();
 		}
 	}
 

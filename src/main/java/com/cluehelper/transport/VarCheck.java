@@ -2,7 +2,6 @@ package com.cluehelper.transport;
 
 import lombok.Value;
 
-/** One varbit or varp clause of a catalog row, in Shortest Path's syntax ({@code 4560&1}, {@code 892@30}). */
 @Value
 public class VarCheck
 {

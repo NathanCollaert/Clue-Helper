@@ -3,9 +3,8 @@ package com.cluehelper.step;
 import net.runelite.api.gameval.ItemID;
 
 /**
- * The step key: core's identity for a step, built only from public getters (PLAN §4 Data). Item
- * ids are aliases, never the key, unless the type owns one item per entry. Cache rows hang off
- * the key and are never the key themselves: one key can own two rows, and two keys one row.
+ * Built from core's public getters only. An item id is the key only when the type has one item per
+ * entry. A cache row is never the key: one key can own two rows, and two keys one row.
  */
 public final class StepKey
 {

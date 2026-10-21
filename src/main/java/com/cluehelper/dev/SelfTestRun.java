@@ -1,6 +1,6 @@
 package com.cluehelper.dev;
 
-/** What a running {@link SelfTest} reports to. Safe to use from any thread. */
+/** Safe to use from any thread. */
 public interface SelfTestRun
 {
 	void check(boolean ok, String what);

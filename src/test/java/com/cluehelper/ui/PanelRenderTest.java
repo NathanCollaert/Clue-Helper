@@ -23,10 +23,6 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.laf.RuneLiteLAF;
 import org.junit.Test;
 
-/**
- * Lays the panel out offscreen at the sidebar's width in every state, checks nothing runs past
- * the edge, and writes build/panel/&lt;state&gt;.png (2x) to look at.
- */
 public class PanelRenderTest
 {
 	private static final int WIDTH = PluginPanel.PANEL_WIDTH;
@@ -57,7 +53,7 @@ public class PanelRenderTest
 		writeLogo();
 	}
 
-	/** Long names everywhere: a followed route, two more with savings, notes, and more transports than "Show why" lists. */
+	/** Long names everywhere, and more transports than "Show why" lists. */
 	private static PanelModel threeRoutes()
 	{
 		List<Plan.Option> why = new ArrayList<>();

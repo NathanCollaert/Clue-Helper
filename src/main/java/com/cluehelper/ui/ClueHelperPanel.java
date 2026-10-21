@@ -19,10 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.ui.PluginPanel;
 
-/** The sidebar panel: a status card, the current sub-step, notes, route cards and "Show why". Swing thread only. */
+/** Swing thread only. */
 public class ClueHelperPanel extends PluginPanel
 {
-	/** "Show why" lists this many transports, then a count of the rest. */
 	static final int WHY_ROWS = 20;
 	private static final Color WARNING = new Color(255, 170, 60);
 
@@ -60,7 +59,6 @@ public class ClueHelperPanel extends PluginPanel
 		show(PanelModel.EMPTY);
 	}
 
-	/** Shows a state over the routes already shown (the self-test and the WORKING line). */
 	public void display(PanelState state)
 	{
 		show((shown == null ? PanelModel.EMPTY : shown).toBuilder().state(state).build());
@@ -175,7 +173,6 @@ public class ClueHelperPanel extends PluginPanel
 		}
 	}
 
-	/** A gap before each group except the very first; returns false from then on. */
 	private boolean gap(boolean first)
 	{
 		if (!first)

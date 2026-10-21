@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-/** A profile config in memory, for tests of anything that keeps state in a {@link MemoryStore}. */
 public final class FakeProfileConfig implements ProfileConfig
 {
 	private final Map<String, Map<String, String>> profiles = new HashMap<>();

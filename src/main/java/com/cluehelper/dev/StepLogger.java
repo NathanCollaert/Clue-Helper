@@ -8,11 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * S12: records tier, type and key of every resolved step in the current profile, so step
- * frequencies accrue during v1 for v2's loadout weights. Records only while enabled, which is
- * developer mode.
- */
+/** Collects step frequencies to weight loadouts later. Records only while enabled, which is developer mode. */
 @Singleton
 public class StepLogger
 {

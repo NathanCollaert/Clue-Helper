@@ -1,6 +1,5 @@
 package com.cluehelper.step;
 
-/** The type names steps, keys and fixtures use. */
 public final class ClueTypes
 {
 	public static final String CRYPTIC = "cryptic";

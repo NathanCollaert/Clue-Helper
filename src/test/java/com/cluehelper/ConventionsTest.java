@@ -22,8 +22,8 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 /**
- * House rules checked on the source and class files, without loading any plugin class: what a
- * hub reviewer would flag, and the config-panel crash a nested config enum causes.
+ * Checks source and class files without loading any plugin class: what a hub reviewer would flag,
+ * and nested config enums, which crash the config panel.
  */
 public class ConventionsTest
 {
@@ -46,7 +46,7 @@ public class ConventionsTest
 			Pattern.compile("\\bjava\\.lang\\.reflect\\b|\\.getDeclared(Field|Method|Constructor)s?\\s*\\(|\\.setAccessible\\s*\\("));
 	}
 
-	private static final Set<String> M1_CONFIG_KEYS = new TreeSet<>(Arrays.asList(
+	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
 		"routeCount", "consumablePenalty", "avoidWilderness",
 		"highlightItems", "highlightSpells", "highlightMenus",
 		"pathLine", "minimapMarker", "worldMapMarker",
@@ -78,7 +78,7 @@ public class ConventionsTest
 		assertEquals("banned APIs in src/main:\n" + String.join("\n", hits), 0, hits.size());
 	}
 
-	/** These change core's shared state, which every overlay of core reads (B07). Safe only offline. */
+	/** These change core's shared state, which every overlay of core reads. Safe only offline. */
 	private static final Pattern MUTATING_CORE_CALL = Pattern.compile(
 		"\\.(forText|forChatboxText|update|reset|resetClue|setChallengeCompleted|makeOverlayHint|makeWorldOverlayHint|makeSTASHOverlay)\\s*\\(");
 	private static final String CORE_CLUE_PACKAGE = "import net.runelite.client.plugins.cluescrolls";
@@ -106,7 +106,7 @@ public class ConventionsTest
 	}
 
 	@Test
-	public void configHasEveryM1Key() throws IOException
+	public void configHasEveryKey() throws IOException
 	{
 		Set<String> keys = new TreeSet<>();
 		Matcher m = Pattern.compile("keyName\\s*=\\s*\"(\\w+)\"").matcher(configSource());
@@ -114,7 +114,7 @@ public class ConventionsTest
 		{
 			keys.add(m.group(1));
 		}
-		assertEquals(M1_CONFIG_KEYS, keys);
+		assertEquals(CONFIG_KEYS, keys);
 	}
 
 	@Test

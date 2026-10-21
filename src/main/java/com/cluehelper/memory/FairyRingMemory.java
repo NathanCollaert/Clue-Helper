@@ -18,21 +18,19 @@ import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.util.Text;
 
 /**
- * The fairy ring code the player last travelled to: what a ring's "Last-destination" goes to (B17). The dials alone
- * aren't it (Nathan: turning them without travelling doesn't change the last destination), so it is learned on travel:
- * the dials as they stood when the teleport was confirmed, kept once the player lands. A "Last-destination (XYZ)" seen in
- * a menu corrects it. Remembered per profile. Client thread.
+ * Client thread. Turning the dials without travelling doesn't change a ring's Last-destination, so the code is the
+ * dials as they stood at the confirm, kept once the player lands. A "Last-destination (XYZ)" menu entry corrects it.
  */
 @Singleton
 public class FairyRingMemory
 {
 	static final String KEY = "fairyRing";
-	/** Each dial's letters by its varbit value, as the dials turn. */
+	/** Each dial's letters by its varbit value, which follows the turning order. */
 	private static final String[] LEFT_DIAL = {"A", "D", "C", "B"};
 	private static final String[] MIDDLE_DIAL = {"I", "L", "K", "J"};
 	private static final String[] RIGHT_DIAL = {"P", "S", "R", "Q"};
 	private static final Pattern LAST_DESTINATION = Pattern.compile("last-destination \\(([A-Z]{3})\\)", Pattern.CASE_INSENSITIVE);
-	/** A ring teleport lands within a few ticks of the confirm (B14: 7 with the arrival lock). */
+	/** A ring teleport lands about 7 ticks after the confirm, arrival lock included. */
 	private static final int LANDING_WITHIN_TICKS = 12;
 	private static final int JUMP_TILES = 4;
 
@@ -53,14 +51,13 @@ public class FairyRingMemory
 		this.remembered = memory.slot(KEY, Last.class, Last::new);
 	}
 
-	/** Log lines for the dev trace. */
-	public Runnable addListener(Consumer<String> listener)
+	public Runnable addListener(Consumer<String> devTraceLines)
 	{
-		listeners.add(listener);
-		return () -> listeners.remove(listener);
+		listeners.add(devTraceLines);
+		return () -> listeners.remove(devTraceLines);
 	}
 
-	/** On start and after a profile change: what this profile remembers goes to the snapshot. */
+	/** Call on start and after a profile change. */
 	public void publish()
 	{
 		String code = remembered.get().code;
@@ -72,7 +69,7 @@ public class FairyRingMemory
 		}
 	}
 
-	/** The confirm on the dials (also after picking a travel-log line): the dials now are where the ring sends the player. */
+	/** At the confirm the dials show where the ring sends the player, also after picking a travel-log line. */
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		Matcher last = LAST_DESTINATION.matcher(Text.removeTags(event.getMenuOption()));
@@ -86,7 +83,7 @@ public class FairyRingMemory
 		}
 	}
 
-	/** A hovered or opened menu naming "Last-destination (XYZ)": the game's own word for it. */
+	/** A "Last-destination (XYZ)" entry is the game's own word, so it wins over what travel taught. */
 	public void onMenuEntries(MenuEntry[] entries)
 	{
 		for (MenuEntry entry : entries)

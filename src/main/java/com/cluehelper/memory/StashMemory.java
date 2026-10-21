@@ -17,10 +17,8 @@ import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 import net.runelite.client.util.Text;
 
 /**
- * What the player's STASH units hold (PLAN §5.2, B13). Built state is each unit's own varbit, read live; filled
- * state has no var (the Clue Scroll plugin's tick, script 1479, is built state too: B16 emptied a unit and it stayed
- * 1), so it is learned from the two Search chat lines and remembered per unit with the date. A unit never seen counts
- * as filled while {@code stashBuiltIsFilled} is on (Nathan, B16), else as unknown. Client thread.
+ * Client thread. Filled state has no var: the Clue Scroll plugin's tick (script 1479) is built state too and stays 1
+ * for an emptied unit. So it is learned from the two Search chat lines.
  */
 @Singleton
 public class StashMemory
@@ -33,7 +31,7 @@ public class StashMemory
 	static final String KEY = "stash";
 	static final String WITHDRAWN = "You withdraw your items from the STASH unit.";
 	static final String DEPOSITED = "You deposit your items into the STASH unit.";
-	/** A Search line lands 0–3 ticks after the click, or 8 when the first Search of a session asks for the PIN (B13). */
+	/** A Search line lands 0–3 ticks after the click, or 8 when the first Search of a session asks for the PIN. */
 	static final int SEARCH_LINE_TICKS = 8;
 	private static final String SEARCH = "Search";
 	private static final int CORE_STASH_SCRIPT = 1479;
@@ -57,7 +55,6 @@ public class StashMemory
 		this.remembered = memory.slot(KEY, Units.class, Units::new);
 	}
 
-	/** The state of the unit with this object id. */
 	public State state(int objectId)
 	{
 		if (!isBuilt(objectId))
@@ -73,9 +70,8 @@ public class StashMemory
 	}
 
 	/**
-	 * The Clue Scroll plugin's STASH tick: game script 1479 with the unit's object id leaves 1 or 0 on the int stack.
-	 * B16 checks live whether it means built or filled. Client thread, outside any script: scripts don't nest (a call
-	 * from a chat command's handler trips the client's assertion).
+	 * Client thread, outside any script: scripts don't nest, and a call from a chat command's handler trips the
+	 * client's assertion.
 	 */
 	public int coreCheck(int objectId)
 	{
@@ -83,19 +79,17 @@ public class StashMemory
 		return client.getIntStack()[0];
 	}
 
-	/** Every unit's object id, for the dev probe. */
 	public static Set<Integer> unitObjects()
 	{
 		return UNIT_OBJECTS;
 	}
 
-	/** Whether the unit is built (its varbit), for the dev probe. */
 	public boolean built(int objectId)
 	{
 		return isBuilt(objectId);
 	}
 
-	/** When the unit's state was last seen (epoch millis), or 0. */
+	/** Epoch millis, or 0 when never seen. */
 	public long seenAt(int objectId)
 	{
 		Seen seen = remembered.get().units.get(objectId);
@@ -137,7 +131,7 @@ public class StashMemory
 		remembered.set(units);
 	}
 
-	/** The unit object is a multiloc on its own {@code HH_CONSTRUCTED_*} varbit, readable at login (B13). */
+	/** The unit object is a multiloc on its own {@code HH_CONSTRUCTED_*} varbit, readable at login. */
 	private boolean isBuilt(int objectId)
 	{
 		int varbit = builtVarbits.computeIfAbsent(objectId, id ->

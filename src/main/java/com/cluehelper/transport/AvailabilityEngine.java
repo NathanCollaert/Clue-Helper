@@ -13,9 +13,8 @@ import java.util.stream.Collectors;
 import net.runelite.api.Quest;
 
 /**
- * Judges catalog rows against a snapshot (PLAN §4 item 4): a pure function of its inputs, so it runs on
- * any thread. Spell rows keep their book and are never filtered by it: the planner decides which
- * book a route casts from.
+ * Pure, so it runs on any thread. Spell rows are never filtered by their book: the planner decides which book a
+ * route casts from.
  */
 public final class AvailabilityEngine
 {
@@ -30,17 +29,14 @@ public final class AvailabilityEngine
 	private final RuneModel runes;
 	private final IntFunction<String> itemNames;
 
-	/** @param itemNames names for why-not lines; any thread */
+	/** @param itemNames called from any thread */
 	public AvailabilityEngine(RuneModel runes, IntFunction<String> itemNames)
 	{
 		this.runes = runes;
 		this.itemNames = itemNames;
 	}
 
-	/**
-	 * {@code A_carried} for a live snapshot: the inventory, worn items and a held rune pouch. For a banked snapshot
-	 * ({@link PlayerSnapshot#getBank()} filled) this is {@code A_banked}, and witnesses name what to withdraw.
-	 */
+	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */
 	public AvailabilitySet carried(List<CatalogRow> rows, PlayerSnapshot player, long nowMinutes)
 	{
 		List<RowAvailability> judged = rows.stream().map(row -> judge(row, player, nowMinutes)).collect(Collectors.toList());
@@ -122,7 +118,7 @@ public final class AvailabilityEngine
 		}
 	}
 
-	/** Unknown counts as unavailable: a tree never seen grown may be dead or not planted (B17 trap). */
+	/** Unknown counts as unavailable: a tree never seen grown may be dead or not planted. */
 	private static void checkPlanted(String patch, PlayerSnapshot player, Verdict v)
 	{
 		if (!player.getPlantedTrees().contains(patch))
@@ -195,11 +191,7 @@ public final class AvailabilityEngine
 		}
 	}
 
-	/**
-	 * Of two variants that both pay: the one already carried rather than one from the bank, then, for an item that spends
-	 * charges, the one with fewest charges known (Nathan, B17: use up the partly charged necklaces first). Ties keep the
-	 * catalog's order.
-	 */
+	/** Fewest known charges wins, so partly charged items get used up first; ties keep the catalog's order. */
 	private static boolean preferred(Paid a, Paid b, boolean spendsCharges, PlayerSnapshot player)
 	{
 		int bankA = fromStorage(a.witness);
@@ -216,7 +208,7 @@ public final class AvailabilityEngine
 		return (int) witness.stream().filter(use -> use.getContainer() == Container.BANK || use.getContainer() == Container.GROUP_STORAGE).count();
 	}
 
-	/** The witness's charges where every item's count is known; unknown counts as more than any known. */
+	/** Unknown counts as more than any known total. */
 	private static int knownCharges(List<ItemUse> witness, PlayerSnapshot player)
 	{
 		int total = 0;

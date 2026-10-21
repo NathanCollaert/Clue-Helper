@@ -20,20 +20,19 @@ import net.runelite.api.widgets.WidgetModalMode;
 import net.runelite.client.util.Text;
 
 /**
- * Which planted spirit trees are grown (PLAN §5.2, B17), as Shortest Path learns them: the spirit tree menu lists the
- * planted patches, greyed when the tree can't be used; inside a patch's region its {@code FARMING_TRANSMIT_*} varbit
- * is 20 for a grown tree. Remembered per profile with the date. A patch never observed is not grown. Client thread.
+ * Client thread. Learned as Shortest Path does: the spirit tree menu greys a planted tree that can't be used, and
+ * inside a patch's region its {@code FARMING_TRANSMIT_*} varbit reads {@link #GROWN} for a grown tree.
  */
 @Singleton
 public class SpiritTreeMemory
 {
 	static final String KEY = "spiritTrees";
 	public static final String MENU_TITLE = "Spirit Tree Locations";
-	/** The patch varbit's value for a grown, usable tree (core's farming tracker: 8-19 growing, 21+ diseased or dead). */
+	/** As core's farming tracker reads the varbit: 8-19 is growing, 21 and up diseased or dead. */
 	static final int GROWN = 20;
 	private static final String GREYED = "5f5f5f";
 
-	/** Patch name, its region, and the region-scoped transmit varbit that describes it there. */
+	/** Patch name → {region, transmit varbit}; the varbit describes the patch only inside its region. */
 	private static final Map<String, int[]> PATCHES = Map.of(
 		"Port Sarim", new int[]{12082, VarbitID.FARMING_TRANSMIT_A},
 		"Etceteria", new int[]{10300, VarbitID.FARMING_TRANSMIT_B},
@@ -58,21 +57,19 @@ public class SpiritTreeMemory
 		this.remembered = memory.slot(KEY, Patches.class, Patches::new);
 	}
 
-	/** Planted trees known grown, by patch name. */
 	public Set<String> grown()
 	{
 		return remembered.get().patches.entrySet().stream().filter(e -> e.getValue().value == GROWN)
 			.map(Map.Entry::getKey).collect(Collectors.toUnmodifiableSet());
 	}
 
-	/** Log lines for the dev trace. */
-	public Runnable addListener(Consumer<String> listener)
+	public Runnable addListener(Consumer<String> devTraceLines)
 	{
-		listeners.add(listener);
-		return () -> listeners.remove(listener);
+		listeners.add(devTraceLines);
+		return () -> listeners.remove(devTraceLines);
 	}
 
-	/** On start and after a profile change: what this profile remembers goes to the snapshot. */
+	/** Call on start and after a profile change. */
 	public void publish()
 	{
 		Set<String> now = grown();
@@ -84,10 +81,7 @@ public class SpiritTreeMemory
 		}
 	}
 
-	/**
-	 * A spirit tree menu just opened: each planted patch it lists is grown unless its line is greyed. Patches it doesn't
-	 * list keep what was known (Shortest Path: the menu is authoritative only for its own lines).
-	 */
+	/** Patches the menu doesn't list keep what was known: the menu only speaks for its own lines. */
 	public void onListMenu(String title, List<String> rawLines)
 	{
 		if (!MENU_TITLE.equalsIgnoreCase(Text.removeTags(title == null ? "" : title).trim()))
@@ -107,8 +101,8 @@ public class SpiritTreeMemory
 	}
 
 	/**
-	 * In a patch's region its transmit varbit describes that patch, once the region has held for two ticks (the slot is
-	 * refilled after a region change) and while no modal interface is open (varbits aren't sent then).
+	 * The transmit varbit counts only once the region has held for two ticks (it is refilled after a region change) and
+	 * while no modal interface is open (varbits aren't sent then).
 	 */
 	public void onGameTick()
 	{
@@ -187,7 +181,7 @@ public class SpiritTreeMemory
 
 	static final class Seen
 	{
-		/** The patch varbit's value, or 20 / 0 from the menu. */
+		/** The patch varbit's value; from the menu, {@link SpiritTreeMemory#GROWN} or 0. */
 		int value;
 		long seenAt;
 	}

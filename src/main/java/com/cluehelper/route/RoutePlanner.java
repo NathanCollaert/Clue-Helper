@@ -40,21 +40,17 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 
 /**
- * Keeps the current step's plan (PLAN §5.4 Re-planning and commitment). On the client thread each tick it
- * works out the start (a scene BFS when the player's tile moved) and re-plans only when the step, the
- * snapshot, the nearest node or the book state changes, never per tile. Plans run on the executor through
- * {@link PlannerRunner}; only the latest result lands.
+ * Client thread, except the plans themselves, which run on the executor through {@link PlannerRunner}. Re-plans only
+ * when a {@link Trigger} input changes, never per tile.
  */
 @Slf4j
 @Singleton
 public class RoutePlanner
 {
-	/** A new Best replaces the committed route only when it is at least this much faster (PLAN §5.4). */
 	static final int COMMIT_MARGIN_TICKS = 5;
-	/** Ticks a Spellbook Swap's free cast stays pending after 3617 turns 1 (B04). */
+	/** A Spellbook Swap's free cast stays pending this long after varbit 3617 turns 1. */
 	static final int SWAP_WINDOW_TICKS = 200;
 	private static final int NOT_REFUSED = -1;
-	/** Walking in the scene re-plans when the walk to a target in it changes by this much: the commit margin. */
 	static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
 	private static final int NO_TARGET_IN_SCENE = -1;
 	private static final long NO_SCENE = Long.MIN_VALUE;
@@ -86,18 +82,14 @@ public class RoutePlanner
 	private volatile int nearestNode = WalkTable.NO_NODE;
 	@Getter
 	private volatile long lastBfsNanos;
-	/** The scene walk to the nearest target, in buckets of {@link #TARGET_WALK_BUCKET_TILES}. */
 	private int targetWalkBucket = NO_TARGET_IN_SCENE;
 	private Trigger lastTrigger;
 	@Getter
 	private volatile Plan plan = Plan.NONE;
-	/** The route StepGuide follows; kept unless a new one is 5 ticks faster or it became invalid. */
 	@Getter
 	private volatile Route committed;
 	private String committedStep;
-	/** 4816 when the game last refused a cape change: uses left count as 0 until it moves (PLAN §5.4 Consumption). */
-	private int capeRefusedAt = NOT_REFUSED;
-	/** Spellbook changes the game refused this session. */
+	private int swapCheckAtCapeRefusal = NOT_REFUSED;
 	private final Set<String> refusedChanges = new HashSet<>();
 
 	@Inject
@@ -148,7 +140,7 @@ public class RoutePlanner
 		return () -> listeners.remove(listener);
 	}
 
-	/** From the plugin's GameTick handler, after the player model's and availability's. */
+	/** Call after the player model's and availability's GameTick handlers. */
 	public void onGameTick()
 	{
 		Step step = clueLink.getCurrentStep();
@@ -207,26 +199,26 @@ public class RoutePlanner
 		runner.submit(() -> Planner.plan(input), this::onPlanned);
 	}
 
-	/** Client thread: the game refused a cape change for today's limit, whatever 4816 says. */
+	/** Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says. */
 	public void onCapeChangesRefused()
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
 		Integer used = snapshot == null ? null : snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		capeRefusedAt = used == null ? 0 : used;
+		swapCheckAtCapeRefusal = used == null ? 0 : used;
 		lastTrigger = null;
-		log.debug("cape change refused at 4816 = {}", capeRefusedAt);
+		log.debug("cape change refused at 4816 = {}", swapCheckAtCapeRefusal);
 	}
 
 	/**
-	 * Client thread: the game refused this teleport (the Music cape's "untrimmed cape" rule, B16): no var says so, so it
-	 * isn't offered again this session.
+	 * Client thread. No var tells of some refusals (the Music cape's "untrimmed cape" rule), so the row isn't offered
+	 * again this session.
 	 */
 	public void onTeleportRefused(String row)
 	{
 		onChangeRefused(row);
 	}
 
-	/** Client thread: the game refused this spellbook change; it isn't offered again this session. */
+	/** Client thread. */
 	public void onChangeRefused(String change)
 	{
 		if (refusedChanges.add(change))
@@ -236,17 +228,17 @@ public class RoutePlanner
 		}
 	}
 
-	/** After a cape refusal, no cape uses are left until 4816 moves. */
+	/** After a cape refusal, no cape uses are left until SB_SWAP_CHECK moves. */
 	private PlayerSnapshot withRefusals(PlayerSnapshot snapshot)
 	{
-		if (capeRefusedAt == NOT_REFUSED)
+		if (swapCheckAtCapeRefusal == NOT_REFUSED)
 		{
 			return snapshot;
 		}
 		Integer used = snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		if (used != null && used != capeRefusedAt)
+		if (used != null && used != swapCheckAtCapeRefusal)
 		{
-			capeRefusedAt = NOT_REFUSED;
+			swapCheckAtCapeRefusal = NOT_REFUSED;
 			return snapshot;
 		}
 		Map<Integer, Integer> varbits = new HashMap<>(snapshot.getVarbits());
@@ -257,7 +249,6 @@ public class RoutePlanner
 		return snapshot.toBuilder().varbits(varbits).spellbook(noCapeUses).build();
 	}
 
-	/** The start of the next plan: the POH node, a scene BFS on the surface, else teleports only. */
 	private void updateStart(WalkData.Loaded data, PlayerSnapshot snapshot, RuneModel runes, Step step)
 	{
 		Position position = player.getPosition();
@@ -295,9 +286,8 @@ public class RoutePlanner
 		SceneBfs.Scene scene = SceneBfs.Scene.capture(view);
 		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, position.getTile(), table, rowOpen);
 		lastBfsNanos = System.nanoTime() - started;
-		// A scene whose base has moved but whose collision flags are still loading walls the player in: the BFS then
-		// reaches only their own tile. Keep the last start and try again next tick.
-		if (sceneReloaded && bfs != null && bfs.reachedTiles() <= 1 && start != null)
+		boolean collisionStillLoading = sceneReloaded && bfs != null && bfs.reachedTiles() <= 1;
+		if (collisionStillLoading && start != null)
 		{
 			lastTile = null;
 			lastSceneBase = NO_SCENE;
@@ -334,7 +324,6 @@ public class RoutePlanner
 			: Math.max(PlanInput.NO_REVERT_WINDOW, SWAP_WINDOW_TICKS - (client.getTickCount() - since));
 	}
 
-	/** Client thread. Applies the commitment rule, then hands the plan on. */
 	private void onPlanned(Plan planned)
 	{
 		plan = planned;
@@ -343,10 +332,6 @@ public class RoutePlanner
 		listeners.forEach(listener -> listener.accept(planned));
 	}
 
-	/**
-	 * Keeps the committed route while it is still offered (same identity) and the new Best isn't 5 ticks faster
-	 * than what it has left. A route no longer offered (item gone, cooldown hit, book changed) is invalid.
-	 */
 	private Route commit(Plan planned)
 	{
 		Route best = planned.getBest();
@@ -400,13 +385,12 @@ public class RoutePlanner
 		player.watch(varbits, varps);
 	}
 
-	/** What a re-plan depends on; walking changes it only through the nearest node or the walk to a target in the scene. */
+	/** Walking changes it only through the nearest node or the walk to a target in the scene. */
 	@Value
 	private static class Trigger
 	{
 		Step step;
 		long snapshotVersion;
-		/** A_carried is judged again on a new snapshot or when a cooldown clears. */
 		long carriedVersion;
 		long carriedValidUntil;
 		int nearestNode;
@@ -415,7 +399,6 @@ public class RoutePlanner
 		SpellbookState spellbook;
 		PlannerSettings settings;
 		Set<String> refusedChanges;
-		/** The remembered bank or the PIN state changed; while the bank is open, every withdraw. */
 		long bankVersion;
 		boolean atOpenBank;
 		RequiredItems required;

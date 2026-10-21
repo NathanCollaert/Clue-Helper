@@ -6,17 +6,14 @@ import com.cluehelper.transport.SpellbookChange;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
-/** One step of a route. Ticks are half-ticks internally; {@link #getTicks()} rounds up. */
 @Value
 public class Leg
 {
 	public enum Kind
 	{
 		WALK,
-		/** Walking due south out of the Wilderness to where more teleports work. */
 		WILDERNESS_EXIT,
 		TELEPORT,
-		/** Spellbook Swap fused with the spell it enables (PLAN §5.4). */
 		SWAP_TELEPORT,
 		FAIRY_RING,
 		SPELLBOOK_CHANGE,
@@ -27,12 +24,11 @@ public class Leg
 	WorldPoint from;
 	WorldPoint to;
 	int halfTicks;
-	/** The teleport, fairy-ring entry or Swap's spell; null for walks, changes and bank stops. */
+	/** For a fairy ring, the entry ring; null for walks, spellbook changes and bank stops. */
 	CatalogRow row;
-	/** For a fairy ring, the landing row (its code). */
 	CatalogRow landing;
 	SpellbookChange change;
-	/** The book after this leg; for a pending Spellbook Swap, the temporary book. */
+	/** For a pending Spellbook Swap, the temporary book. */
 	Book bookAfter;
 
 	public int getTicks()

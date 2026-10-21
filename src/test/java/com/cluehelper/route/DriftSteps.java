@@ -13,14 +13,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
-/** Steps as StepResolver gives them, rebuilt from the drift snapshot: for golden routes and the dev sampler. */
 public final class DriftSteps
 {
 	private DriftSteps()
 	{
 	}
 
-	/** The drift snapshot's resolved steps (one line per key, first var branch), as StepResolver gives them. */
+	/** Keeps the first var branch of each key. */
 	public static Map<String, Step> read() throws IOException
 	{
 		Map<String, Step> read = new LinkedHashMap<>();

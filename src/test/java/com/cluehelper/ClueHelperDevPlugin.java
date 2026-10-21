@@ -59,10 +59,9 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.Text;
 
 /**
- * Dev launcher only: the self-tests that need files or drive other plugins, which the plugin jar
- * must not do. Snapshots go to build/selftest/, and a game frame per step change to build/steps/. With -Dcluehelper.selftest=true (gradlew dev
- * -Pselftest) it runs ::ch-selftest once the UI has settled, and again a few ticks after the
- * first login.
+ * Dev launcher only: self-tests that need files or drive other plugins, which the plugin jar must not do.
+ * With -Dcluehelper.selftest=true (gradlew dev -Pselftest) it runs ::ch-selftest once the UI has settled,
+ * and again a few ticks after the first login.
  */
 @Slf4j
 @PluginDescriptor(name = "Clue Helper Dev", description = "Dev only: panel snapshots and plugin toggle checks")
@@ -77,10 +76,9 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File ROUTE_FRAMES = new File("build/routes");
 	private static final File SCENES = new File("build/scenes");
 	private static final File GUIDE_FRAMES = new File("build/guide");
-	/** While a route is followed, a game frame this often (about 5 s), to see highlights between sub-step changes. */
+	/** About 5 s, to see highlights between sub-step changes. */
 	private static final int LIVE_FRAME_TICKS = 8;
 	private static final int MOST_LIVE_FRAMES = 200;
-	/** Scenes recorded per run for the scene BFS check: one per new plan that starts with a scene walk. */
 	private static final int MOST_SCENES = 12;
 	/** Farther than a run tick can carry you: a teleport, a ladder or a boat. */
 	private static final int LANDING_JUMP_TILES = 4;
@@ -206,7 +204,7 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.clear();
 	}
 
-	/** Priority -2: after the plugin's -1 handler has read the position. */
+	/** Runs after the plugin's priority -1 handler has read the position. */
 	@Subscribe(priority = -2)
 	public void onGameTick(GameTick tick)
 	{
@@ -220,7 +218,6 @@ public class ClueHelperDevPlugin extends Plugin
 		postSelfTest();
 	}
 
-	/** Logs every jump with the catalog landings nearest to it. */
 	private void checkLanding()
 	{
 		Position position = clueHelper.getPlayerModel().getPosition();
@@ -269,7 +266,6 @@ public class ClueHelperDevPlugin extends Plugin
 		clientThread.invokeLater(() -> eventBus.post(new CommandExecuted("ch-selftest", new String[0])));
 	}
 
-	/** Shows every panel state in the real sidebar, checks what is visible and snapshots each. */
 	private final class PanelStatesTest implements SelfTest
 	{
 		@Override
@@ -316,7 +312,6 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 	}
 
-	/** Turns core Clue Scroll off and on the way the plugin list does, and back as it was. */
 	private final class CoreToggleTest implements SelfTest
 	{
 		@Override
@@ -366,7 +361,6 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 	}
 
-	/** Stops and starts Clue Helper itself: the panel and its tab must go and come back cleanly. */
 	private final class RestartTest implements SelfTest
 	{
 		@Override
@@ -572,7 +566,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 	}
 
-	/** The next game frame after a step change, so a run's reads can be checked against core's overlay. */
+	/** Lets a run's reads be checked against core's overlay afterwards. */
 	private void saveStepFrame(StepChange change, Step step)
 	{
 		String key = step == null ? "none" : step.getKey().replaceAll("[^a-zA-Z0-9]+", "-");
@@ -581,8 +575,7 @@ public class ClueHelperDevPlugin extends Plugin
 		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
 	}
 
-	/** A frame whenever the number of available sample rows changes: banking the pouch, casting, wielding. */
-	/** A frame per step's first plan, and the scene it started from (test resources for the scene BFS check). */
+	/** The recorded scenes are test resources for the scene BFS check. */
 	private void onPlanned(Plan plan)
 	{
 		PlanStart start = clueHelper.getRoutes().getStart();
@@ -623,7 +616,6 @@ public class ClueHelperDevPlugin extends Plugin
 		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name))));
 	}
 
-	/** A game frame and a sidebar snapshot per new sub-step, for reading a live run's guidance afterwards. */
 	private void saveGuideFrames()
 	{
 		SubStep current = clueHelper.getGuide().getCurrent();
@@ -638,7 +630,6 @@ public class ClueHelperDevPlugin extends Plugin
 		SwingUtilities.invokeLater(() -> snapshotTo(clueHelper.getPanel(), new File(GUIDE_FRAMES, name + "-panel.png")));
 	}
 
-	/** Once per run on the first plan, and on {@code ::ch-sample}. */
 	private void sample()
 	{
 		new RouteSampler(client, clueHelper, catalogData.get().getNow(null), walkData.get().getNow(null), executor).run();

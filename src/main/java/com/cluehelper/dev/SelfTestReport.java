@@ -3,7 +3,6 @@ package com.cluehelper.dev;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The totals of one self-test run. */
 public final class SelfTestReport
 {
 	private int passed;

@@ -4,13 +4,12 @@ import java.util.List;
 import lombok.Value;
 import net.runelite.api.Quest;
 
-/** One spell as the cache describes it (enum 1981 and its per-book enums, B04). */
 @Value
 public class Spell
 {
 	Book book;
 	String name;
-	/** The spell's object id, which carries its params. */
+	/** The cache object that carries the spell's params. */
 	int obj;
 	int level;
 	boolean members;

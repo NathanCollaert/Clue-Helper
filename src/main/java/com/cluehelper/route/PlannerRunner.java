@@ -46,13 +46,11 @@ public class PlannerRunner
 		background.execute(() -> run(id, job, onResult));
 	}
 
-	/** Drops the result of every job submitted so far. */
 	public void cancelAll()
 	{
 		finishedGeneration = generation.incrementAndGet();
 	}
 
-	/** Whether the latest job's result is still to come. */
 	public boolean isWorking()
 	{
 		return finishedGeneration != generation.get();

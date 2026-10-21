@@ -9,7 +9,6 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
-/** The route's places on the world map, in our own point class so removing them never touches anyone else's. */
 @Singleton
 public class WorldMapMarkers
 {
@@ -28,7 +27,7 @@ public class WorldMapMarkers
 		this.config = config;
 	}
 
-	/** Client thread, after the guide changed or the config did. */
+	/** Call on the client thread after the guide or the config changes. */
 	public void refresh()
 	{
 		Map<WorldPoint, String> places = config.worldMapMarker() ? guide.getMapWaypoints() : Map.of();
@@ -47,6 +46,7 @@ public class WorldMapMarkers
 		shown = Map.of();
 	}
 
+	/** Our own point class, so removing ours never touches anyone else's. */
 	private static final class RoutePoint extends WorldMapPoint
 	{
 		RoutePoint(WorldPoint tile, String tooltip)

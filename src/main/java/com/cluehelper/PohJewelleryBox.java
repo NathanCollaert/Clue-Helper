@@ -1,6 +1,5 @@
 package com.cluehelper;
 
-/** The jewellery box built in the house, for {@code pohSource} Manual. */
 public enum PohJewelleryBox
 {
 	NONE("None"),

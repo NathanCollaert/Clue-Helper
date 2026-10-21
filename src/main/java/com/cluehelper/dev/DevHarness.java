@@ -29,7 +29,6 @@ import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-/** Everything the plugin adds in developer mode, and nothing outside it. */
 @Slf4j
 @Singleton
 public class DevHarness
@@ -82,11 +81,7 @@ public class DevHarness
 		this.guide = guide;
 	}
 
-	/**
-	 * @param shown the state the panel shows
-	 * @param expected the state the plugin's signals call for
-	 */
-	public void start(Supplier<PanelState> shown, Supplier<PanelState> expected)
+	public void start(Supplier<PanelState> shownState, Supplier<PanelState> signalledState)
 	{
 		DevCommands c = new DevCommands(this::reply);
 		c.register("selftest", "run the in-client self-tests", args -> runSelfTests());
@@ -101,7 +96,7 @@ public class DevHarness
 		c.register("stash", "compare every STASH unit's built varbit, the core check (script 1479) and what we remember",
 			args -> clientThread.invokeLater(this::stashes));
 		c.register("overlay", "toggle the route graph overlay: walk-table nodes, scene BFS walks, origin class", args -> toggleOverlay());
-		for (SelfTest test : builtInSelfTests.create(shown, expected))
+		for (SelfTest test : builtInSelfTests.create(shownState, signalledState))
 		{
 			unregister.add(selfTests.register(test));
 		}
@@ -165,7 +160,6 @@ public class DevHarness
 		routeDump.summary(plan).forEach(line -> log.info("{}   {}", RouteDump.TAG, line));
 	}
 
-	/** One line per change of sub-step or highlight, so a live run can be followed in the log. */
 	private void onGuideChanged()
 	{
 		String line = guideLine();

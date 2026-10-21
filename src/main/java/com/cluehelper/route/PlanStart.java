@@ -5,26 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
-/** Where a plan starts and how its first walk is costed (PLAN §5.4 Walk edges). */
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PlanStart
 {
 	public enum Kind
 	{
-		/** Start legs from a BFS over the loaded scene. */
 		SCENE,
-		/** Standing on a walk-table node: its table entries are the start legs. */
 		AT_NODE,
-		/** No walk leg (an instance, a boat, nothing in the scene): routes start with a teleport. */
 		TELEPORT_ONLY
 	}
 
 	Kind kind;
 	WorldPoint tile;
-	/** For {@link Kind#SCENE}. */
 	SceneBfs.Result scene;
-	/** For {@link Kind#AT_NODE}. */
 	int node;
 
 	public static PlanStart scene(WorldPoint tile, SceneBfs.Result scene)

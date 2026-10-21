@@ -20,24 +20,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.runelite.api.coords.WorldPoint;
 
-/**
- * Plans one step (PLAN §5.4): pure, so it runs on the executor with snapshot data only.
- * <p>
- * One forward label search gives each (banked, change category)'s best route; the bottom-up margin rule
- * picks Best among them, and Direct and Same book come from the same search. Alternatives with new first
- * transports come from searches that leave the earlier routes' first transports out.
- */
+/** Pure, so it runs on the executor with snapshot data only. */
 public final class Planner
 {
-	/** The margin a route with a bank stop or a walked change must beat its reference by (PLAN §5.4). */
+	/** A route with a bank stop or a walked change must beat its reference by this margin. */
 	static final int MARGIN_MIN_HALF_TICKS = 10;
 	static final int MARGIN_PERCENT = 10;
 	private static final int REGION_SIZE = 64;
-	/** Alternatives are shown only within Best's rank plus this, or plus Best's own rank if that is more. */
 	static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
-	/** Landings this close count as the same place: catalog landings spread 0–2 tiles (B09). */
+	/** Catalog landings of one place spread 0–2 tiles. */
 	private static final int SAME_LANDING_TILES = 2;
-	/** Rejected repeats and round trips each cost a search; past this many the plan shows what it has. */
+	/** Rejected repeats and round trips count against this too. */
 	static final int MOST_ALTERNATIVE_SEARCHES = 12;
 
 	private Planner()
@@ -77,7 +70,6 @@ public final class Planner
 			.searches(searches.count).build();
 	}
 
-	/** Each leg's goal nodes, per order to try: three-step tries all 6 orders, other sequences go in turn. */
 	private static List<List<int[]>> legOrders(PlanContext ctx, Step step)
 	{
 		List<int[]> nodes = step.getTargets().stream().map(tile -> new int[]{ctx.nodeAt(tile)}).collect(Collectors.toList());
@@ -109,7 +101,7 @@ public final class Planner
 		}
 	}
 
-	/** Half the area's radius, walked: (radius ÷ 2) tiles, which is radius ÷ 2 half-ticks (PLAN §5.4 AREA). */
+	/** The expected search: half the area's radius, run at one tile per half-tick. */
 	static int areaHalfTicks(Step step)
 	{
 		List<Integer> regions = step.getRegions();
@@ -178,8 +170,8 @@ public final class Planner
 	}
 
 	/**
-	 * Comes back to where it already was: leaving the shown routes' transports out can leave a round trip as the
-	 * cheapest route with a transport ("walk to ring BIP, ring to DIP, ring back to BIP, walk 35").
+	 * Leaving the shown routes' transports out can leave a round trip as the cheapest route with a transport ("walk to
+	 * ring BIP, ring to DIP, ring back to BIP, walk 35").
 	 */
 	static boolean loops(Route route)
 	{
@@ -206,7 +198,6 @@ public final class Planner
 		return false;
 	}
 
-	/** Where the route's first transport lands; null for a walk. */
 	private static WorldPoint firstLanding(Route route)
 	{
 		Leg first = route.getFirstTransport();
@@ -214,8 +205,8 @@ public final class Planner
 	}
 
 	/**
-	 * Lands beside a shown route and saves nothing it spends: Fishing cape and Max cape to Otto's Grotto are one
-	 * alternative, while a free home teleport beside a paid spell stays.
+	 * Fishing cape and Max cape to Otto's Grotto are one alternative, while a free home teleport beside a paid spell
+	 * stays.
 	 */
 	private static boolean repeats(Route route, List<Route> shown)
 	{
@@ -251,10 +242,7 @@ public final class Planner
 		return ticks;
 	}
 
-	/**
-	 * Required items no source meets are listed, and the best route is still shown (PLAN §5.4). An unknown STASH never
-	 * forces a bank stop silently: the note says a filled one would save it.
-	 */
+	/** An unknown STASH never forces a bank stop silently: the note says a filled one would save it. */
 	static List<String> requirementNotes(PlanContext ctx)
 	{
 		RequiredItems required = ctx.in.getRequired();
@@ -281,7 +269,7 @@ public final class Planner
 		return notes;
 	}
 
-	/** PLAN 5.7: no route because no node walks to the target within 200 tiles (and it isn't in the scene). */
+	/** The walk table holds walks up to 200 tiles only, so a target no entry reaches is too far to walk. */
 	private static String noRouteNote(PlanContext ctx, List<List<int[]>> orders)
 	{
 		Set<Integer> reachable = new HashSet<>();
@@ -297,7 +285,6 @@ public final class Planner
 		return walkTooLong ? "walk too long" : "no route from what you have";
 	}
 
-	/** Runs the label searches of one plan, keeping their totals. */
 	private static final class Searches
 	{
 		final PlanContext ctx;
@@ -313,7 +300,6 @@ public final class Planner
 			this.probes = probes;
 		}
 
-		/** For a sequence with several orders, the order whose Best is lowest. */
 		LabelSearch bestOrder(List<List<int[]>> orders, Set<String> excluded, int rankLimit)
 		{
 			LabelSearch best = null;
@@ -336,7 +322,6 @@ public final class Planner
 		}
 	}
 
-	/** PLAN §5.4's bottom-up margin rule over one search's category bests, plus Direct and Same book. */
 	static final class Picks
 	{
 		Route best;
@@ -405,7 +390,6 @@ public final class Planner
 			return a == null ? b : b == null ? a : b.getRankHalfTicks() < a.getRankHalfTicks() ? b : a;
 		}
 
-		/** Beats the reference by more than max(5 ticks, 10%); anything beats no reference. */
 		static boolean qualifies(Route route, Route reference)
 		{
 			if (route == null)
@@ -421,7 +405,6 @@ public final class Planner
 		}
 	}
 
-	/** Builds the route a goal label stands for. */
 	static final class RouteBuilder
 	{
 		private RouteBuilder()
@@ -484,7 +467,6 @@ public final class Planner
 				.build();
 		}
 
-		/** The route's own bank items, then the step's required ones; one entry per item. */
 		private static List<ItemUse> withdraw(PlanContext ctx, LabelSearch.Label goal)
 		{
 			if (goal.b != PlanContext.BANKED)
@@ -514,7 +496,6 @@ public final class Planner
 			return byItem;
 		}
 
-		/** Required items whose every need is one core's *clue* tag covers; the route's own items never are. */
 		private static Set<Integer> inCoreTag(PlanContext ctx, LabelSearch.Label goal, List<ItemUse> withdraw)
 		{
 			Set<Integer> routeItems = routeWithdraw(goal).keySet();
@@ -537,7 +518,7 @@ public final class Planner
 			return (int) withdraw.stream().filter(use -> ctx.in.getPlayer().count(Container.INVENTORY, use.getItemId()) == 0).count();
 		}
 
-		/** Every unit a leg uses, tracked by the search or not, for the route's spent list. */
+		/** Every unit a leg uses, tracked by the search or not. */
 		private static void tally(PlanContext ctx, Object ref, Map<String, Integer> spent)
 		{
 			int[] res = ref instanceof PlanContext.Teleport ? ((PlanContext.Teleport) ref).res

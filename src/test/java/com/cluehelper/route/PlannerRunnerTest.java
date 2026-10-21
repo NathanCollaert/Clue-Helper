@@ -13,7 +13,6 @@ import org.junit.Test;
 
 public class PlannerRunnerTest
 {
-	/** Runs queued tasks only when told to, so each test picks the interleaving. */
 	private static final class ManualExecutor implements Executor
 	{
 		final Deque<Runnable> queue = new ArrayDeque<>();

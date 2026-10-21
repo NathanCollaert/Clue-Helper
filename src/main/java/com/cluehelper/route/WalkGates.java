@@ -6,10 +6,7 @@ import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Requirements;
 import java.util.List;
 
-/**
- * Which of the walk table's gates (quest, skill and var gated doors and shortcuts, B02) a snapshot passes.
- * An unread var fails its gate, so an unread account walks the always-open way.
- */
+/** An unread var fails its gate, so an unread account walks the always-open way. */
 public final class WalkGates
 {
 	private final WalkTable table;
@@ -40,13 +37,12 @@ public final class WalkGates
 		}
 	}
 
-	/** Tiles for this table entry: the full cost when every gate passes, else the open cost, else {@link WalkTable#NO_PATH}. */
+	/** {@link WalkTable#NO_PATH} when the failed gates block every way. */
 	public int cost(int entry)
 	{
 		return setPass[table.entryGateSet(entry)] ? table.entryFull(entry) : table.entryOpen(entry);
 	}
 
-	/** Per walk row, whether the scene BFS may use it. */
 	public boolean[] rowOpen()
 	{
 		boolean[] open = new boolean[table.rowCount()];

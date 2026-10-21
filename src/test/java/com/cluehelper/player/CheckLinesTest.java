@@ -5,11 +5,11 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-/** B13's verbatim Check lines: each item words its count differently, and only these teach a charge count. */
+/** Verbatim Check lines: each item words its count differently, and only these teach a charge count. */
 public class CheckLinesTest
 {
 	@Test
-	public void readsEveryCheckLineB13Saw()
+	public void readsEveryRecordedCheckLine()
 	{
 		assertEquals(686, (int) CheckLines.parse("The pendant has 686 charges."));
 		assertEquals(891, (int) CheckLines.parse("Your ring of shadows has 891 charges remaining."));

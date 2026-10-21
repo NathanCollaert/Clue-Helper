@@ -41,9 +41,8 @@ import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 
 /**
- * Keeps an up-to-date {@link PlayerSnapshot} (PLAN §4 item 3). Every event handler runs on the client
- * thread; changes only mark the model dirty, and the snapshot is rebuilt at most once per tick, from
- * the plugin's GameTick. Anything off the client thread reads snapshots only.
+ * Event handlers run on the client thread and only mark the model dirty; {@link #onGameTick()} rebuilds the snapshot
+ * at most once per tick. Off the client thread, read snapshots only.
  */
 @Slf4j
 @Singleton
@@ -56,7 +55,6 @@ public class PlayerModel
 	private static final int[] POUCH_QUANTITIES = {VarbitID.RUNE_POUCH_QUANTITY_1, VarbitID.RUNE_POUCH_QUANTITY_2,
 		VarbitID.RUNE_POUCH_QUANTITY_3, VarbitID.RUNE_POUCH_QUANTITY_4, VarbitID.RUNE_POUCH_QUANTITY_5,
 		VarbitID.RUNE_POUCH_QUANTITY_6};
-	/** The cooldown varps hold the epoch minute the cooldown started (Shortest Path's {@code @} clauses). */
 	private static final List<Integer> OWN_VARPS = List.of(VarPlayerID.QP, VarPlayerID.AIDE_TELE_TIMER,
 		VarPlayerID.SLUG2_REGIONUID);
 	private static final Set<WorldType> DORMANT_WORLDS = EnumSet.of(WorldType.SEASONAL, WorldType.DEADMAN,
@@ -75,7 +73,6 @@ public class PlayerModel
 
 	private final Set<Integer> watchedVarbits = new HashSet<>();
 	private final Set<Integer> watchedVarps = new HashSet<>();
-	/** The varps that hold a watched varbit or are watched themselves: a change to one rebuilds. */
 	private final Set<Integer> watchedVarpIndices = new HashSet<>();
 	private Map<Quest, QuestState> quests = Map.of();
 	private boolean questsRead;
@@ -90,7 +87,6 @@ public class PlayerModel
 	private volatile RuneModel runeModel;
 	private volatile PlayerSnapshot snapshot;
 	private volatile Position position = Position.NONE;
-	/** The tick varbit 3617 was first seen at 1, or {@link #UNKNOWN_TICK} (none, or already 1 at login). */
 	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	@Inject
@@ -123,15 +119,15 @@ public class PlayerModel
 		position = Position.NONE;
 	}
 
-	/** The newest snapshot; null while logged out. */
+	/** Null while logged out. */
 	public PlayerSnapshot getSnapshot()
 	{
 		return snapshot;
 	}
 
 	/**
-	 * Where the player is now, read every tick. A snapshot copies it only when its kind or Wilderness level
-	 * changes, so walking doesn't make a new snapshot version.
+	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
+	 * new snapshot version.
 	 */
 	public Position getPosition()
 	{
@@ -139,15 +135,15 @@ public class PlayerModel
 	}
 
 	/**
-	 * The tick a pending Spellbook Swap began (3617 turned 1), so the planner knows how much of its 200 ticks
-	 * is left; {@link #UNKNOWN_TICK} when there is none, or it was already pending when first seen.
+	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
+	 * when first seen.
 	 */
 	public int getPendingRevertSinceTick()
 	{
 		return pendingRevertSinceTick;
 	}
 
-	/** Null until the first tick after login, when it is read from the cache. */
+	/** Null until the first tick after login. */
 	public RuneModel getRuneModel()
 	{
 		return runeModel;
@@ -165,7 +161,7 @@ public class PlayerModel
 		return () -> listeners.remove(listener);
 	}
 
-	/** Adds vars the snapshot copies from now on (catalog rows' Varbits and VarPlayers). Any thread. */
+	/** Any thread; the vars are watched from the next tick on. */
 	public void watch(Collection<Integer> varbits, Collection<Integer> varps)
 	{
 		for (int id : varbits)
@@ -219,37 +215,33 @@ public class PlayerModel
 		markDirty("stats");
 	}
 
-	/** The planted spirit trees known grown changed (SpiritTreeMemory, B17). Client thread. */
+	/** Client thread. */
 	public void setPlantedTrees(Set<String> next)
 	{
 		plantedTrees = Set.copyOf(next);
 		markDirty("spirit trees");
 	}
 
-	/** The fairy ring code last travelled to changed (FairyRingMemory, B17). Client thread. */
+	/** Client thread. */
 	public void setLastFairyRing(String code)
 	{
 		lastFairyRing = code;
 		markDirty("fairy ring");
 	}
 
-	/** The house state changed (PohService, B16). Client thread. */
+	/** Client thread. */
 	public void setHouse(HouseState next)
 	{
 		house = next;
 		markDirty("house");
 	}
 
-	/** A Check line taught a charge count. */
 	public void onChargesLearned()
 	{
 		markDirty("charges");
 	}
 
-	/**
-	 * What is known about these items' charges, in PLAN §4 item 4's order, for items that aren't held (the remembered
-	 * bank). Client thread.
-	 */
+	/** Client thread. Also answers for items that aren't held, such as the remembered bank's. */
 	public Map<Integer, Charge> charges(Collection<Integer> itemIds)
 	{
 		Map<Integer, Charge> charges = new HashMap<>(chargeReader.read(itemIds));
@@ -264,7 +256,6 @@ public class PlayerModel
 		return charges;
 	}
 
-	/** From the plugin's GameTick handler. */
 	public void onGameTick()
 	{
 		if (client.getGameState() != GameState.LOGGED_IN || client.getLocalPlayer() == null)

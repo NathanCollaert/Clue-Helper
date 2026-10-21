@@ -30,10 +30,9 @@ import net.runelite.client.plugins.cluescrolls.clues.ThreeStepCrypticClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /**
- * Reads core's clue through its public getters only. Never calls the methods that change core's
- * state ({@code forText}, {@code update}, {@code reset}, {@code setChallengeCompleted}, the
- * overlay hints), and copies every array core hands out. Every lookup that takes the plugin gets
- * the real instance: about 13 entries throw on {@code null}.
+ * Public getters only, never the methods that change core's state ({@code forText}, {@code update},
+ * {@code reset}, {@code setChallengeCompleted}, the overlay hints); every array core hands out is copied.
+ * Lookups that take the plugin need the real instance: about 13 entries throw on {@code null}.
  */
 public final class CoreClueReader
 {
@@ -111,7 +110,6 @@ public final class CoreClueReader
 		return ClueFacts.of(clue.getClass().getSimpleName());
 	}
 
-	/** What core points at, in core's order, without nulls or repeats. */
 	static List<WorldPoint> locations(ClueScroll clue, ClueScrollPlugin plugin)
 	{
 		WorldPoint[] points = null;
@@ -126,7 +124,7 @@ public final class CoreClueReader
 		return points == null ? List.of() : distinct(Arrays.asList(points));
 	}
 
-	/** Core's single location for a type that also hands out a twin (coordinate clues), else null. */
+	/** The location without the twin {@code getLocations} adds for coordinate clues; null for other types. */
 	static WorldPoint primaryLocation(ClueScroll clue, ClueScrollPlugin plugin)
 	{
 		return clue instanceof LocationClueScroll ? ((LocationClueScroll) clue).getLocation(plugin) : null;
@@ -222,7 +220,6 @@ public final class CoreClueReader
 		return clue instanceof CoordinateClue ? ((CoordinateClue) clue).getLightSourceVarbitId() : -1;
 	}
 
-	/** The step's own words. Core's coordinate clue has none, so it gets its tile. */
 	static String displayText(ClueScroll clue, ClueFacts facts, ClueScrollPlugin plugin)
 	{
 		if (clue instanceof MapClue)

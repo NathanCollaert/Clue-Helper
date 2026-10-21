@@ -17,19 +17,7 @@ import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 
-/**
- * Parses the requirement columns of one catalog row, in Shortest Path's TSV syntax:
- * <ul>
- * <li>Items: {@code AIR_RUNE=3&LAW_RUNE=1}, {@code 1712=1|1710=1}, {@code UNLOCK_XERICS_HONOUR=1};
- * {@code &&} and {@code ||} as in Shortest Path's files;</li>
- * <li>Skills: {@code 25 Magic;50 Agility}, {@code Max Total}, {@code 100 Combat}, {@code 50 Quest};</li>
- * <li>Quests: names separated by {@code ;};</li>
- * <li>Varbits and VarPlayers: {@code id op value} separated by {@code ;}, op one of {@code = > < & @};</li>
- * <li>Wilderness level: the highest level the row works from.</li>
- * </ul>
- * Unlike Shortest Path, nothing that fails to parse is dropped: it becomes an error on the row.
- * A {@code 4070=n} varbit clause becomes the row's {@link Book}.
- */
+/** Unlike Shortest Path, nothing that fails to parse is dropped: it becomes an error on the row. */
 public final class RequirementParser
 {
 	public static final String ITEMS = "Items";
@@ -56,7 +44,7 @@ public final class RequirementParser
 
 	private final Function<String, List<Integer>> itemNames;
 
-	/** @param itemNames resolves a named item group (Shortest Path's ItemVariations names); null when unknown */
+	/** @param itemNames resolves Shortest Path's ItemVariations names; returns null for an unknown name */
 	public RequirementParser(Function<String, List<Integer>> itemNames)
 	{
 		this.itemNames = itemNames;

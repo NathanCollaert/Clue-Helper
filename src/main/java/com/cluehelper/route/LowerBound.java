@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 /**
- * A* lower bounds for one leg's targets, in half-ticks: the shortest table walk to a target with every gate
- * open, capped by the cheapest teleport or fairy ring followed by such a walk. It never overestimates and is
- * consistent over every edge kind, so the label search stays exact while popping far fewer labels.
+ * A* lower bounds in half-ticks. They must never overestimate and must stay consistent over every edge kind, or the
+ * label search stops being exact.
  */
 final class LowerBound
 {

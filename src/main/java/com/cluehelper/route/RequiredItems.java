@@ -14,8 +14,7 @@ import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /**
- * What the step needs at its target (PLAN §5.4 Required items): a spade, a light, emote, Falo, Charlie or Sherlock
- * items. Each is core's own {@link ItemRequirement}, tested only through {@code fulfilledBy}. Built on the client
+ * Each need is core's own {@link ItemRequirement}, tested only through {@code fulfilledBy}. Built on the client
  * thread; judging is pure.
  */
 @Value
@@ -24,7 +23,6 @@ public class RequiredItems
 {
 	public static final RequiredItems NONE = RequiredItems.builder().build();
 
-	/** The STASH unit of an emote step, as far as we know it. */
 	public enum Stash
 	{
 		NONE, NOT_BUILT, FILLED, EMPTY, UNKNOWN
@@ -34,7 +32,7 @@ public class RequiredItems
 	List<Need> needs = List.of();
 	@Builder.Default
 	Stash stash = Stash.NONE;
-	/** The tool leprechaun holds the player's spade (1437); the planner doesn't route there. */
+	/** The planner doesn't route to the tool leprechaun, it only notes it. */
 	boolean spadeAtLeprechaun;
 
 	@Value
@@ -42,25 +40,21 @@ public class RequiredItems
 	{
 		String name;
 		ItemRequirement requirement;
-		/** One of the step's own items (emote, Falo, Sherlock, Charlie), which a filled STASH holds for emotes. */
 		boolean stepItem;
 		/** Core's *clue* bank tag lists it already, so our bank highlights leave it out. */
 		boolean inCoreTag;
 	}
 
-	/** How the needs can be met from one plan's snapshots. */
 	@Value
 	public static class Verdict
 	{
 		public static final Verdict MET = new Verdict(true, true, List.of(), List.of());
 
-		/** Met by what the player carries (or a STASH known to be filled). */
+		/** A STASH known to be filled counts as carried. */
 		boolean carried;
 		/** Met with the bank added. */
 		boolean banked;
-		/** The minimised withdraw list when only the bank meets them. */
 		List<ItemUse> withdraw;
-		/** Needs nothing remembered meets. */
 		List<Need> missing;
 	}
 
@@ -90,10 +84,6 @@ public class RequiredItems
 		return new Verdict(false, true, minimalWithdraw(open, carried, banked), List.of());
 	}
 
-	/**
-	 * Every stored item that helps, then each dropped while the needs stay met with the rest (PLAN §5.4): the bank
-	 * before group storage, lowest id first.
-	 */
 	private static List<ItemUse> minimalWithdraw(List<Need> open, Map<Integer, Integer> carried, PlayerSnapshot banked)
 	{
 		List<ItemUse> candidates = new ArrayList<>();

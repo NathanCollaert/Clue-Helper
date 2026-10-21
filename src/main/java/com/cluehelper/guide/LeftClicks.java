@@ -11,15 +11,14 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 
 /**
- * The left-click option of the items and objects the mouse has been over, read from the hover menu's top entry after
- * Menu Entry Swapper's swaps (Nathan, B16: only that click counts as one click). Unknown until hovered once.
+ * Read from the hover menu's top entry, so Menu Entry Swapper's swaps are included. An item or object's left click is
+ * unknown until the mouse has been over it once.
  */
 final class LeftClicks
 {
 	private static final String ITEM = "item:";
 	private static final String WORN = "worn:";
 	private static final String WORN_ID = "wornid:";
-	/** An equipment slot's item sits in its second child. */
 	private static final int SLOT_ITEM_CHILD = 1;
 	private static final String OBJECT = "object:";
 	private static final Set<MenuAction> OBJECT_OPTIONS = EnumSet.of(MenuAction.GAME_OBJECT_FIRST_OPTION,
@@ -28,11 +27,10 @@ final class LeftClicks
 
 	private final Map<String, String> options = new HashMap<>();
 
-	/** The hover menu's top entry; true when it changed what is known. */
-	boolean learn(MenuEntry top)
+	boolean learn(MenuEntry hoverMenuTop)
 	{
-		String key = key(top);
-		String option = top.getOption();
+		String key = key(hoverMenuTop);
+		String option = hoverMenuTop.getOption();
 		return key != null && option != null && !option.equals(options.put(key, option));
 	}
 
@@ -42,8 +40,8 @@ final class LeftClicks
 	}
 
 	/**
-	 * Worn items' options carry no item id, only the name as the target; a left click Menu Entry Swapper put on top
-	 * carries neither (B17: the Max cape's "Home"), so the slot's item is the key then.
+	 * Worn items' options carry only the item name as the target, and a left click Menu Entry Swapper put on top (the Max
+	 * cape's "Home") carries neither, so the slot's item id is the fallback key.
 	 */
 	String worn(int itemId, String itemName)
 	{

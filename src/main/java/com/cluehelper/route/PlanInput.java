@@ -8,7 +8,7 @@ import java.util.Set;
 import lombok.Builder;
 import lombok.Value;
 
-/** Everything one plan reads: snapshot data only, never the client, so it runs on any thread. */
+/** Snapshot data only, never the client, so a plan runs on any thread. */
 @Value
 @Builder(toBuilder = true)
 public class PlanInput
@@ -17,11 +17,9 @@ public class PlanInput
 
 	Step step;
 	PlayerSnapshot player;
-	/** What the player has with the remembered bank added (A_banked); null when no bank counts (UIM, useBank off, never seen). */
+	/** Null when no bank counts (UIM, useBank off, bank never seen). */
 	PlayerSnapshot banked;
-	/** The next bank open asks for the PIN (B14: 4 ticks). */
 	boolean pinPending;
-	/** The bank interface is open: the plan starts banked, with no stop cost (PLAN §5.4 At an open bank). */
 	boolean atOpenBank;
 	@Builder.Default
 	RequiredItems required = RequiredItems.NONE;
@@ -33,12 +31,11 @@ public class PlanInput
 	NoTeleportAreas noTeleport = NoTeleportAreas.NONE;
 	PlanStart start;
 	PlannerSettings settings;
-	/** Ticks left of a pending Spellbook Swap's free cast; {@link #NO_REVERT_WINDOW} when none or unknown. */
+	/** Ticks left of a pending Spellbook Swap's free cast. */
 	@Builder.Default
 	int revertTicksLeft = NO_REVERT_WINDOW;
-	/** Spellbook changes and teleports (by row name) the game refused this session (PLAN §5.4 Consumption); never offered. */
+	/** Row names of spellbook changes and teleports the game refused this session; never offered. */
 	@Builder.Default
 	Set<String> refusedChanges = Set.of();
-	/** The plan starts inside a house that isn't the player's: its furniture is not theirs (B16). */
 	boolean foreignHouseStart;
 }

@@ -12,9 +12,8 @@ import java.util.regex.Pattern;
 import net.runelite.api.coords.WorldPoint;
 
 /**
- * Reads the bundled catalog TSVs ({@code tools/catalog/seed.py} writes them from Shortest Path's) into
- * rows with parsed requirements. A requirement that doesn't parse stays on its row as an error; a
- * malformed tile or number fails the load, which the schema test catches before release.
+ * A requirement that doesn't parse stays on its row as an error; a malformed tile or number fails the whole load,
+ * which the schema test catches before release.
  */
 public final class CatalogLoader
 {

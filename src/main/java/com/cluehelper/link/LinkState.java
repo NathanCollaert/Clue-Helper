@@ -3,13 +3,8 @@ package com.cluehelper.link;
 import java.util.Objects;
 
 /**
- * ClueLink's rules without the client (B03), so recorded logs replay through them:
- * <ul>
- * <li>core active: seeded at start, set by {@code PluginChanged}, re-checked every tick;</li>
- * <li>a new step is a key change or any key after a read without one; never object identity,
- * because core hands out the same static entry again for re-reads and later trails;</li>
- * <li>a clue needs reading when core is active, has no clue, and the inventory holds one.</li>
- * </ul>
+ * ClueLink's rules without the client, so recorded logs replay through them. A new step is told by its key, never by
+ * object identity: core hands out the same static entry again for re-reads and later trails.
  */
 final class LinkState
 {
@@ -29,18 +24,12 @@ final class LinkState
 		return setActive(coreActive);
 	}
 
-	/** Runs on the Swing thread. @return whether the active flag changed */
+	/** Swing thread. @return whether the active flag changed */
 	boolean onPluginChanged(boolean loaded)
 	{
 		return setActive(loaded);
 	}
 
-	/**
-	 * One read of core at GameTick priority -1.
-	 *
-	 * @param key the step key of core's clue, or null when core has none
-	 * @param targets compared with the last read's to tell an updated step
-	 */
 	StepChange tick(boolean coreActive, String key, Object targets, boolean inventoryHoldsClue)
 	{
 		setActive(coreActive);

@@ -15,12 +15,7 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 
-/**
- * Charges of held items, in PLAN §4 item 4's order: the item id, the memoirs' charge varbit while
- * held, the last value seen while held (remembered per profile), then RuneLite's Item Charges plugin
- * (read only). An item none of them knows has no entry: its charges are unknown. Client thread only.
- * The {@code CHARGES_*_QUANTITY} varbits are never a source: they always read 0 (B13).
- */
+/** Client thread only. The {@code CHARGES_*_QUANTITY} varbits are never a source: they always read 0. */
 @Singleton
 public class ChargeReader
 {
@@ -32,7 +27,7 @@ public class ChargeReader
 	private static final Map<Integer, Integer> CHARGE_VARBITS = Map.of(
 		ItemID.VEOS_KHAREDSTS_MEMOIRS, VarbitID.VEOS_MEMOIR_CHARGES,
 		ItemID.BOOK_OF_THE_DEAD, VarbitID.VEOS_MEMOIR_CHARGES);
-	/** Profiles may still hold values that M1 read from varbits that are not counts; they are ignored and dropped. */
+	/** Older profiles hold non-count varbit values for these; they are ignored and dropped on the next write. */
 	private static final Set<Integer> UNTRUSTED_REMEMBERED = Set.of(
 		ItemID.XERIC_TALISMAN, ItemID.RING_OF_SHADOWS, ItemID.CAMULET);
 	private static final Map<Integer, String> ITEM_CHARGES_KEYS = Map.of(ItemID.CHRONICLE, "chronicle");
@@ -50,7 +45,6 @@ public class ChargeReader
 		this.remembered = memory.slot(MEMORY_KEY, RememberedCharges.class, RememberedCharges::new);
 	}
 
-	/** The varbits whose change should rebuild the snapshot. */
 	static Collection<Integer> chargeVarbits()
 	{
 		return CHARGE_VARBITS.values();
@@ -124,7 +118,6 @@ public class ChargeReader
 		return trusted;
 	}
 
-	/** The stored form: item id → the last charge count seen while held. */
 	static final class RememberedCharges
 	{
 		Map<Integer, Integer> charges = new HashMap<>();

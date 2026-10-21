@@ -26,13 +26,10 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
-/**
- * The current sub-step's waypoint in the scene (PLAN §4 item 7): its tile, our own arrow above it, and the
- * path line from the player; at a bank, the arrow sits on the outlined booth or chest and the path ends beside it. Waypoints are never core's target, so the line ends where core's marker takes over.
- */
+/** Waypoints are never core's target, so the path ends where core's marker takes over. */
 public class WaypointOverlay extends Overlay
 {
-	/** Within this of a bank stop where only the banker is outlined, the outline is enough: no tile, arrow or path. */
+	/** Near a bank stop where only the banker is outlined, the outline is guidance enough. */
 	private static final int NEAR_BANK_TILES = 6;
 	private static final int ARROW_Z_OFFSET = 180;
 	private static final float PATH_STROKE = 2f;
@@ -100,26 +97,22 @@ public class WaypointOverlay extends Overlay
 		return null;
 	}
 
-	/** Near a bank where only the banker is outlined: the outline is the guidance, a walk there is noise (B16). */
 	private boolean besideOutlinedBanker(WorldPoint waypoint)
 	{
 		Player local = client.getLocalPlayer();
 		return bankOutlined() && local != null && local.getWorldLocation().distanceTo2D(waypoint) <= NEAR_BANK_TILES;
 	}
 
-	/** The booth, chest or banker is outlined instead of the tile in front of it (Nathan, B16). */
 	private boolean bankOutlined()
 	{
 		return guide.isBankStop() && !(guide.getHighlightObjects().isEmpty() && guide.getHighlightNpcs().isEmpty());
 	}
 
-	/** The game's hint arrow already points there (as Quest Helper's NpcStep checks): ours would double it. */
 	private boolean hintArrowAt(WorldPoint waypoint)
 	{
 		return client.hasHintArrow() && waypoint.equals(client.getHintArrowPoint());
 	}
 
-	/** The part of the path still ahead, from the tile nearest the player on: it shortens as they walk (Nathan, B16). */
 	private List<WorldPoint> ahead(List<WorldPoint> path)
 	{
 		Player local = client.getLocalPlayer();
@@ -142,7 +135,7 @@ public class WaypointOverlay extends Overlay
 		return path.subList(nearest, path.size());
 	}
 
-	/** The booth or chest the walk reaches first: the game walks to the nearest side of the one clicked (B16). */
+	/** The game walks to the nearest side of the booth or chest clicked. */
 	private TileObject cheapestBank(WorldView view, SceneBfs.Result scene)
 	{
 		TileObject best = null;
@@ -159,7 +152,6 @@ public class WaypointOverlay extends Overlay
 		return best;
 	}
 
-	/** On the tile the game walks to for the chest: the outline is all that is left to show (Nathan, B16). */
 	private boolean standingOn(WorldPoint tile)
 	{
 		Player local = client.getLocalPlayer();

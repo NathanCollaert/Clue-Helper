@@ -8,45 +8,38 @@ import lombok.Builder;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
-/** One thing to do next on the committed route (PLAN §5.5), with what completes it. */
 @Value
 @Builder
 public class SubStep
 {
 	public enum Kind
 	{
-		/** Walk to a waypoint of ours: a fairy ring, an altar, a bank. */
 		WALK,
-		/** The last walk, onto core's target: core's own markers guide it. */
+		/** Core's own markers guide this walk. */
 		WALK_TO_CLUE,
 		WILDERNESS_EXIT,
 		TELEPORT,
-		/** Spellbook Swap to the book of the cast that follows. */
 		SPELLBOOK_SWAP,
 		FAIRY_RING,
 		CHANGE_BOOK,
 		BANK,
-		/** At the open bank: take the withdraw list; done when the bank closes. */
 		WITHDRAW,
-		/** Talk, search, dig or emote: panel text only in M1. */
+		/** Talk, search, dig or emote. */
 		ACT
 	}
 
 	Kind kind;
 	String text;
-	/** A hint under the line ("right-click the cape"), or null. */
 	String detail;
-	/** Where our arrow and markers go; null on core's target and for travel that lands far away. */
+	/** Null on core's target and for travel that lands far away. */
 	WorldPoint waypoint;
-	/** Arriving or landing within {@link #radius} of it completes the sub-step; null when another check does. */
+	/** Null when the sub-step completes some other way than arriving within {@link #radius}. */
 	WorldPoint goal;
 	int radius;
-	/** For a book change or a Swap: the book 4070 must reach. */
 	Book book;
-	/** The teleport to highlight (spell or item), or a fairy ring's landing. */
+	/** The teleport to highlight, or a fairy ring's landing. */
 	CatalogRow row;
 	SpellbookChange change;
-	/** WITHDRAW: the bank items to outline (route items and those core's *clue* tag lacks). */
 	@Builder.Default
 	Set<Integer> bankItems = Set.of();
 

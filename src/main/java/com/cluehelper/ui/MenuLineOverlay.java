@@ -16,11 +16,6 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-/**
- * The current sub-step's interface lines that have no text to colour (B16): nexus map icons and region shields, the
- * fairy ring travel log, and the fairy ring dials ({@link FairyDials}). Text lines and menu options are coloured instead
- * ({@link MenuLines}). Always on top.
- */
 public class MenuLineOverlay extends Overlay
 {
 	private static final int ARC = 6;

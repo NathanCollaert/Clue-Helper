@@ -16,16 +16,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
-/**
- * B04: pins the spellbook-change timings and var behaviour measured live (2026-10-19) against
- * the recorded logs in src/test/resources/b04/. B14 reuses the parser for S7.
- */
 public class SpellbookTimingParserTest
 {
 	private static final String RUN1 = "/b04/run1-swap-and-occult.jsonl";
 	private static final String RUN2 = "/b04/run2-cape-altars-tyss-wild.jsonl";
 	private static final Gson GSON = new Gson();
-	/** Run 2 trials whose click came from a distance (house entry or approach), so walking is in the time. */
+	/** First-click ticks in run 2 made from a distance (house entry or approach), so walking is in their time. */
 	private static final Set<Integer> CLICKED_WHILE_STILL_WALKING_TO_IT = Set.of(1602, 2009);
 
 	@Test

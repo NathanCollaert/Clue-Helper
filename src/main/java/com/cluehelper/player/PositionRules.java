@@ -2,17 +2,13 @@ package com.cluehelper.player;
 
 import net.runelite.api.coords.WorldPoint;
 
-/**
- * Turns what the client reports into a {@link Position} (B02, confirmed live in B03), and gives the
- * Wilderness level of a tile. The client calls that feed it live in {@link PlayerModel}.
- */
 public final class PositionRules
 {
-	/** Shortest Path's POH landing, the POH node of the walk table. */
+	/** Must match the POH node of Shortest Path's walk table. */
 	public static final WorldPoint POH_NODE = new WorldPoint(1858, 7051, 0);
 
 	private static final int POH_MIN_X = 1856;
-	/** Template region 8302 (x 2048–2111) holds houses too (Estate-Agent B05), beyond Shortest Path's box (B12). */
+	/** Template region 8302 (x 2048–2111) holds houses too, beyond Shortest Path's box. */
 	private static final int POH_MAX_X = 2111;
 	private static final int POH_MIN_Y = 7040;
 	private static final int POH_MAX_Y = 7111;
@@ -37,12 +33,10 @@ public final class PositionRules
 	}
 
 	/**
-	 * @param onBoat the player's world view is not the top-level one
 	 * @param boatTile the boat entity's tile through {@code fromLocalInstance}; never the player's raw
 	 *     location, which on a boat is the deck's own frozen coordinates
 	 * @param mappedTile the player's local location through {@code fromLocalInstance}, which also maps
 	 *     instances to their template
-	 * @param topLevelInstance the top-level world view is an instance
 	 */
 	public static Position classify(boolean onBoat, WorldPoint boatTile, WorldPoint mappedTile, boolean topLevelInstance)
 	{
@@ -61,13 +55,13 @@ public final class PositionRules
 		return new Position(mappedTile, topLevelInstance ? Position.Kind.INSTANCE : Position.Kind.WORLD, mappedTile);
 	}
 
-	/** x/y only: the POH template comes back on plane 2 from every floor (B03). */
+	/** x/y only: the POH template comes back on plane 2 from every floor. */
 	public static boolean isInPoh(WorldPoint tile)
 	{
 		return tile.getX() >= POH_MIN_X && tile.getX() <= POH_MAX_X && tile.getY() >= POH_MIN_Y && tile.getY() <= POH_MAX_Y;
 	}
 
-	/** 0 outside the Wilderness. The same areas as Shortest Path's {@code WildernessChecker}. */
+	/** Must match the areas of Shortest Path's {@code WildernessChecker}. */
 	public static int wildernessLevel(WorldPoint tile)
 	{
 		if (tile == null || tile.getX() < WILDERNESS_MIN_X)

@@ -6,13 +6,9 @@ import java.util.Set;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 
-/** Item rules the Shortest Path syntax can't say, applied to rows as they load. */
 public final class CatalogRules
 {
-	/**
-	 * Uncharged ids never count as a teleport item (a glory that shows as 1704 has no charges). B09's
-	 * schema test also keeps them out of the catalog.
-	 */
+	/** Never a teleport item: a glory that shows as 1704 has no charges. */
 	public static final Set<Integer> UNCHARGED = Set.of(ItemID.AMULET_OF_GLORY, ItemID.TRAIL_AMULET_OF_GLORY,
 		ItemID.RING_OF_WEALTH, ItemID.JEWL_NECKLACE_OF_SKILLS, ItemID.JEWL_BRACELET_OF_COMBAT,
 		ItemID.XERIC_TALISMAN_EMPTY, ItemID.RING_OF_SHADOWS_UNCHARGED, ItemID.TOME_OF_FIRE_UNCHARGED,

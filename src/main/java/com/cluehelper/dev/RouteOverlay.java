@@ -21,11 +21,6 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
-/**
- * Developer mode's route graph overlay ({@code ::ch-overlay}): the walk-table nodes in the loaded scene,
- * coloured by kind, each with its id and its scene-BFS walk in tiles ("-" when the BFS doesn't reach it),
- * plus the start's kind and origin class.
- */
 final class RouteOverlay extends Overlay
 {
 	private static final Map<Integer, Color> KIND_COLOURS = Map.of(

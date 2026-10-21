@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** B04: prints the parsed trials of one events.jsonl: `gradlew b04Timings -Plog=<relative path>`. */
+/** Run: {@code gradlew spellbookTimings -Plog=<relative path to an events.jsonl>}. */
 public class SpellbookTimingDump
 {
 	public static void main(String[] args) throws Exception

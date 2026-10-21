@@ -11,8 +11,8 @@ import java.util.List;
 import javax.swing.JComponent;
 
 /**
- * Text word-wrapped to a fixed width with the font's own metrics. Swing's HTML labels scale CSS
- * pixel widths, so their wrapped lines run past the label's edge and get cut off.
+ * Wraps with the font's own metrics: Swing's HTML labels scale CSS pixel widths, so their wrapped lines run past the
+ * label's edge and get cut off.
  */
 public class TextBlock extends JComponent
 {
@@ -78,7 +78,6 @@ public class TextBlock extends JComponent
 		}
 	}
 
-	/** Greedy word wrap; a single word wider than the width gets a line of its own. */
 	static List<String> wrap(String text, FontMetrics fm, int width)
 	{
 		List<String> out = new ArrayList<>();

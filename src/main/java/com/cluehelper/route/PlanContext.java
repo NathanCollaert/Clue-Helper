@@ -26,29 +26,22 @@ import java.util.Map;
 import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 
-/**
- * One plan's graph, built from the input (PLAN §5.4 Search): nodes with their origin class, the usable
- * teleports, fairy rings and spellbook changes per bank state, the resources they spend, and the books worth
- * expanding. Node ids: the walk table's, then the start, the four teleport (abstract) nodes, the goal, and
- * any tile the table lacks.
- */
 final class PlanContext
 {
 	static final int NOT_BANKED = 0;
 	static final int BANKED = 1;
-	/** Bank stop, arrival to the next transport's first click: open 1 tick, leave 2 (B14). */
+	/** Arrival to the next transport's first click: open 1 tick, leave 2. */
 	static final int BANK_STOP_HALF_TICKS = 6;
-	/** Shortest Path's Duration already is click → landing (B14). */
+	/** Shortest Path's Duration already runs from click to landing. */
 	static final int LEG_OVERHEAD_TICKS = 0;
-	/** Each item stack withdrawn, worn or deposited at the bank: 2 ticks (B14), charged on the edge that needs it. */
+	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
-	/** The bank PIN on the first open of a session (B14: 3–4 ticks). */
 	static final int PIN_HALF_TICKS = 8;
-	/** "Deposit first" when the withdraw list needs more slots than are free: one more click (PLAN §5.4 Edge cases). */
+	/** One more click when the withdraw list needs more slots than are free. */
 	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
 	static final int SWAP_DURATION_TICKS = 4;
 	static final int SWAP_MENU_TICKS = 1;
-	/** Entering the house: the scene loads about a tick after the transport's own landing (B14). */
+	/** The house scene loads about a tick after the transport's own landing. */
 	static final int HOUSE_LOAD_HALF_TICKS = 2;
 	private static final OriginClass[] ABSTRACT_CLASSES = {OriginClass.WILD0, OriginClass.WILD20, OriginClass.WILD30, OriginClass.POH};
 
@@ -57,7 +50,6 @@ final class PlanContext
 	final WalkGates gates;
 	final int start;
 	final int goal;
-	/** The walk table's POH node, or {@link WalkTable#NO_NODE}. */
 	final int pohNode;
 	private final int abstractBase;
 	private final List<WorldPoint> extraTiles = new ArrayList<>();
@@ -67,18 +59,14 @@ final class PlanContext
 
 	final Resources resources = new Resources();
 	final Options[] options = new Options[2];
-	/** Books a route may move to (PLAN §5.4 Expansion); the start book is always in. */
+	/** Books a route may change to; always holds the start book. */
 	final Set<Book> expanded = EnumSet.noneOf(Book.class);
 	final Book startBook;
-	/** The book a strand check compares against: Lunar while a Swap is pending. */
 	final Book homeBook;
 	final boolean startPending;
 	final boolean targetInWilderness;
-	/** Arrival to the next transport's first click, PIN and the player's own extra included. */
 	final int bankStopHalfTicks;
-	/** How the step's required items can be met; arrivals without the bank don't count when only the bank meets them. */
 	final RequiredItems.Verdict required;
-	/** Item ids the required items withdraw, sorted. */
 	final int[] requiredWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
@@ -111,16 +99,12 @@ final class PlanContext
 		expandBooks();
 	}
 
-	/** Whether an arrival without a bank stop completes the step: its required items are carried, or nothing meets them. */
 	boolean arrivesWithoutBank()
 	{
 		return required.isCarried() || !required.isBanked();
 	}
 
-	/**
-	 * A fairy ring or altar here takes something from the bank (a staff, runes): the only places worth walking to after
-	 * a bank stop before anything is withdrawn.
-	 */
+	/** After a bank stop with nothing withdrawn yet, these are the only nodes worth walking to. */
 	boolean usesBankItems(int node)
 	{
 		Options banked = options[BANKED];
@@ -138,7 +122,6 @@ final class PlanContext
 		return node < bankItemUses.length && bankItemUses[node];
 	}
 
-	/** A bank stop here gives the banked state: a bank, not a deposit box, whose own gates pass (PLAN §5.4 Banked). */
 	boolean isUsableBank(int node)
 	{
 		if (!isTableNode(node) || !table.is(node, WalkTable.KIND_BANK))
@@ -187,7 +170,7 @@ final class PlanContext
 		return node < table.nodeCount();
 	}
 
-	/** The node for a tile: the table's, else an extra node only start legs and teleports reach. */
+	/** A tile off the walk table gets an extra node, which only start legs and teleports reach. */
 	int nodeAt(WorldPoint tile)
 	{
 		int node = table.node(tile);
@@ -215,7 +198,7 @@ final class PlanContext
 		return node > goal ? extraTiles.get(node - goal - 1) : null;
 	}
 
-	/** Call once every node exists (after the targets are added). */
+	/** Call once every node exists, after the targets are added. */
 	void freezeNodes()
 	{
 		classes = new OriginClass[nodeCount()];
@@ -231,13 +214,11 @@ final class PlanContext
 		return classes[node];
 	}
 
-	/** One leg's A* bounds, shared by every search of this plan. */
 	LowerBound lowerBound(int[] targets)
 	{
 		return lowerBounds.computeIfAbsent(Arrays.toString(targets), k -> new LowerBound(this, targets));
 	}
 
-	/** avoidWilderness: no landing or walk into the Wilderness unless the target itself is there. */
 	boolean forbidden(int node)
 	{
 		return in.getSettings().isAvoidWilderness() && !targetInWilderness && classes[node].isWilderness();
@@ -248,23 +229,19 @@ final class PlanContext
 		return origin.allowsTeleports();
 	}
 
-	/**
-	 * The house furniture at this node can be used: not while the route is still in someone else's house (a start
-	 * there, before any transport), since the furniture judged is the player's own (B16).
-	 */
+	/** Not while the route is still in someone else's house: the furniture judged is the player's own. */
 	boolean houseUsable(int node, int hasTransport)
 	{
 		return node != pohNode || hasTransport == 1 || !in.isForeignHouseStart();
 	}
 
-	/** The ring's Last-destination goes there: one click, no dials (B14: 0 menu ticks against 5–6 dialled). */
+	/** The ring's Last-destination option goes there in one click, with no dialling. */
 	boolean isLastFairyRing(CatalogRow landing)
 	{
 		String last = in.getPlayer().getLastFairyRing();
 		return last != null && landing.getCode() != null && last.equals(landing.getCode().replace("-", ""));
 	}
 
-	/** Ranking cost of finishing on {@code book}: the cheapest way back, else the strand penalty (PLAN §5.4). */
 	int strandHalfTicks(Book book, int bankState, int capeUsesSpent)
 	{
 		if (book == homeBook)
@@ -331,7 +308,6 @@ final class PlanContext
 		}
 	}
 
-	/** A usable teleport or fairy ring in one bank state. */
 	static final class Teleport
 	{
 		CatalogRow row;
@@ -341,7 +317,6 @@ final class PlanContext
 		int[] res;
 		int[] amounts;
 		int consumed;
-		/** What it takes from the bank or group storage, by item id (sorted), and as witness uses. */
 		int[] withdraw;
 		List<ItemUse> withdrawUses;
 		RowAvailability.Confidence confidence;
@@ -349,7 +324,6 @@ final class PlanContext
 		int maxWilderness;
 	}
 
-	/** A usable spellbook change in one bank state. */
 	static final class Change
 	{
 		SpellbookChange change;
@@ -363,15 +337,13 @@ final class PlanContext
 		RowAvailability.Confidence confidence;
 	}
 
-	/** What one bank state (A_carried or A_banked) offers. */
 	final class Options
 	{
 		final List<Teleport> teleports = new ArrayList<>();
 		final Map<Integer, Teleport> fairyEntries = new HashMap<>();
 		final List<Teleport> fairyLandings = new ArrayList<>();
-		/** Transports that start at a node: the house furniture at the POH node (B16), spirit trees and Renu (B17). */
+		/** Transports that start at a node: house furniture, spirit trees, Renu. */
 		final Map<Integer, List<Teleport>> located = new HashMap<>();
-		/** Altars, Tyss and the house's altars and mounted capes, by the node they are used at. */
 		final Map<Integer, List<Change>> changes = new HashMap<>();
 		Change cape;
 		Change swap;
@@ -445,10 +417,7 @@ final class PlanContext
 			}
 		}
 
-		/**
-		 * Two banked items that give the same teleport for the same ticks: only the one with more teleports of its own is
-		 * withdrawn (Nathan, B16: the Construction cape was taken out where the Max cape does the same and more).
-		 */
+		/** Prefers e.g. the Max cape over a Construction cape that gives the same teleport. */
 		private void keepMostVersatileWithdraws(List<Teleport> all)
 		{
 			Map<String, Teleport> kept = new HashMap<>();
@@ -456,11 +425,15 @@ final class PlanContext
 			{
 				if (tele.withdraw.length > 0)
 				{
-					kept.merge(tele.node + "|" + tele.halfTicks + "|" + tele.book, tele,
-						(a, b) -> versatility(b.withdraw) > versatility(a.withdraw) ? b : a);
+					kept.merge(sameTeleportKey(tele), tele, (a, b) -> versatility(b.withdraw) > versatility(a.withdraw) ? b : a);
 				}
 			}
-			all.removeIf(tele -> tele.withdraw.length > 0 && kept.get(tele.node + "|" + tele.halfTicks + "|" + tele.book) != tele);
+			all.removeIf(tele -> tele.withdraw.length > 0 && kept.get(sameTeleportKey(tele)) != tele);
+		}
+
+		private String sameTeleportKey(Teleport tele)
+		{
+			return tele.node + "|" + tele.halfTicks + "|" + tele.book;
 		}
 
 		/** Home and minigame rows come once per animation override; with several on, the game picks one, so the longest counts. */
@@ -506,7 +479,6 @@ final class PlanContext
 		}
 	}
 
-	/** The walk inside the house to the piece a row needs: learned by the scan, else 4 ticks (PLAN §5.4 Cost). */
 	private static int houseWalkHalfTicks(Requirements requirements, PlayerSnapshot player)
 	{
 		HouseNeed need = requirements.getHouse();
@@ -518,7 +490,6 @@ final class PlanContext
 		return 2 * house.walkTicks(need.getKind() == HouseNeed.Kind.NEXUS ? HouseState.NEXUS_OBJECTS : need.getIds());
 	}
 
-	/** How many catalog rows these items unlock between them. */
 	private int versatility(int[] itemIds)
 	{
 		if (rowsPerItem == null)
@@ -563,7 +534,6 @@ final class PlanContext
 		int consumed;
 	}
 
-	/** Turns a row's Spends and its witness into resource units (PLAN §5.4 Consumption). */
 	private Spending spending(List<Spend> spends, List<ItemUse> witness, PlayerSnapshot player, int bankState)
 	{
 		Map<Integer, Integer> units = new LinkedHashMap<>();
@@ -610,10 +580,9 @@ final class PlanContext
 		return s;
 	}
 
-	/** Every resource a plan's rows spend, with how many units each bank state has. */
 	static final class Resources
 	{
-		/** No route uses one resource more often than this, so a resource with this many uses to spare can't run out. */
+		/** Assumed: no route uses one resource more often than this. */
 		private static final int MOST_USES_PER_ROUTE = 8;
 
 		private final Map<String, Integer> ids = new LinkedHashMap<>();
@@ -661,7 +630,6 @@ final class PlanContext
 			mostPerUse.set(resource, Math.max(mostPerUse.get(resource), units));
 		}
 
-		/** Whether labels must count this resource: it could run out within one route. */
 		boolean tracked(int resource)
 		{
 			int most = Math.max(available.get(resource)[0], available.get(resource)[1]);

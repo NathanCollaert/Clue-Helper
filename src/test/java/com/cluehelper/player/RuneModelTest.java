@@ -23,11 +23,6 @@ import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 import org.junit.Test;
 
-/**
- * The rune model read from B01's cache dump (cut by {@code tools/spellbook/s2_test_slice.py}): it must
- * agree with B04's spell table, and light exactly the Lunar spells the spellbook widget lit in B04's
- * open-tab frames (run 2, t532 and t564).
- */
 public class RuneModelTest
 {
 	private final RuneModel model = RuneModel.load(new SliceCacheView("/b08/cache-runes.json"));
@@ -56,15 +51,15 @@ public class RuneModelTest
 	@Test
 	public void lightsTheLunarSpellsTheWidgetLitWithTheTabOpen()
 	{
-		PlayerSnapshot t532 = nathanOnLunar(Map.of(ItemID.DEATHRUNE, 9944, ItemID.AETHERRUNE, 9814, ItemID.BLOODRUNE, 9875,
+		PlayerSnapshot noAstrals = maxedWithOnlyARunePouch(Map.of(ItemID.DEATHRUNE, 9944, ItemID.AETHERRUNE, 9814, ItemID.BLOODRUNE, 9875,
 			ItemID.FIRERUNE, 8700));
-		Set<String> noRunes = lunarCastable(t532);
+		Set<String> noRunes = lunarCastable(noAstrals);
 		assertEquals(Set.of("Lunar Home Teleport", "Minigame Teleport"), noRunes);
 
-		PlayerSnapshot t564 = nathanOnLunar(Map.of(ItemID.ASTRALRUNE, 4679, ItemID.COSMICRUNE, 16000, ItemID.LAWRUNE, 15884));
+		PlayerSnapshot withAstrals = maxedWithOnlyARunePouch(Map.of(ItemID.ASTRALRUNE, 4679, ItemID.COSMICRUNE, 16000, ItemID.LAWRUNE, 15884));
 		Set<String> expected = new TreeSet<>(noRunes);
 		expected.addAll(List.of("Cure Me", "Cure Group", "Spellbook Swap"));
-		assertEquals(expected, lunarCastable(t564));
+		assertEquals(expected, lunarCastable(withAstrals));
 	}
 
 	private Set<String> lunarCastable(PlayerSnapshot player)
@@ -74,8 +69,7 @@ public class RuneModelTest
 			.map(Spell::getName).collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	/** Run 2 after "Deposit inventory" and withdrawing the divine pouch: no staff, 99 Magic, every book unlocked. */
-	private static PlayerSnapshot nathanOnLunar(Map<Integer, Integer> pouch)
+	private static PlayerSnapshot maxedWithOnlyARunePouch(Map<Integer, Integer> pouch)
 	{
 		Map<Quest, QuestState> quests = new EnumMap<>(Quest.class);
 		for (Quest quest : Quest.values())
@@ -104,7 +98,6 @@ public class RuneModelTest
 		return new BufferedReader(new InputStreamReader(RuneModelTest.class.getResourceAsStream(resource), StandardCharsets.UTF_8));
 	}
 
-	/** The cut of the cache dump, in the shape the live client answers. */
 	static final class SliceCacheView implements CacheView
 	{
 		private final JsonObject slice;

@@ -13,12 +13,7 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.HotColdClue;
 
-/**
- * Offline access to core's clue data in the client jar this project builds against: the
- * package-private CLUES lists, read by reflection, and a ClueScrollPlugin whose fake client
- * answers every varbit and varp with one settable value, so each provider branch can be
- * evaluated. Test support only.
- */
+/** The fake client answers every varbit and varp with one settable value, so each provider branch can be evaluated. */
 final class CoreClues
 {
 	static final String CLUES_PACKAGE = "net.runelite.client.plugins.cluescrolls.clues.";
@@ -50,7 +45,6 @@ final class CoreClues
 		varState = state;
 	}
 
-	/** Every entry of one CLUES list, in core's order. */
 	static List<Object> entries(String type) throws ReflectiveOperationException
 	{
 		Object clues = staticField(CLUES_PACKAGE + type, "CLUES");
@@ -58,10 +52,7 @@ final class CoreClues
 		return new ArrayList<>(values);
 	}
 
-	/**
-	 * Every step core can hand out, by source: "CrypticClue#0" and so on, and "HotColdClue#NAME".
-	 * The hot/cold clues are reset first, as core does when it hands one out, so they have a solver.
-	 */
+	/** Hot/cold clues are reset first, as core does when it hands one out, so they have a solver. */
 	static Map<String, ClueScroll> steps() throws ReflectiveOperationException
 	{
 		Map<String, ClueScroll> steps = new LinkedHashMap<>();

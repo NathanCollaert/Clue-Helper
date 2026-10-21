@@ -14,18 +14,16 @@ import net.runelite.api.TileObject;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
-/** The loaded scene's objects a sub-step uses: house furniture by base id (every floor), or the bank at a stop. */
 final class SceneObjects
 {
 	private static final String BANK = "Bank";
-	/** Bank chests (the Crafting Guild's) open with Use. */
+	/** Some bank chests (the Crafting Guild's) open with Use. */
 	private static final String USE = "Use";
 
 	private SceneObjects()
 	{
 	}
 
-	/** Booths and chests with a Bank option near the bank stop's tile (Nathan, B16: outline the bank, not the tile). */
 	static List<TileObject> banksNear(Client client, WorldPoint at, int radius)
 	{
 		List<TileObject> found = new ArrayList<>();
@@ -55,7 +53,6 @@ final class SceneObjects
 		return found;
 	}
 
-	/** Bankers near the bank stop's tile. */
 	static List<NPC> bankersNear(Client client, WorldPoint at, int radius)
 	{
 		List<NPC> found = new ArrayList<>();
@@ -75,7 +72,6 @@ final class SceneObjects
 		return found;
 	}
 
-	/** NPCs in the scene with one of these ids, as spawned or as transformed (Renu, B17). */
 	static List<NPC> npcs(Client client, Set<Integer> ids)
 	{
 		List<NPC> found = new ArrayList<>();
@@ -127,6 +123,7 @@ final class SceneObjects
 		return false;
 	}
 
+	/** A house entry lands on one floor and moves up the next tick, so every floor is searched. */
 	static List<TileObject> find(Client client, Set<Integer> ids)
 	{
 		List<TileObject> found = new ArrayList<>();
@@ -143,7 +140,6 @@ final class SceneObjects
 		return found;
 	}
 
-	/** A house entry lands on one floor and moves up the next tick (B14): every floor is searched. */
 	private static void collect(Tile[][] plane, Set<Integer> ids, List<TileObject> found)
 	{
 		for (Tile[] column : plane)

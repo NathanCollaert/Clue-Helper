@@ -3,17 +3,12 @@ package com.cluehelper.transport;
 import java.util.List;
 import lombok.Value;
 
-/**
- * One {@code &}-part of an Items cell: satisfied by any one of its {@code |}-branches. A branch is a
- * set of interchangeable item ids with one quantity, or an unlock token.
- */
+/** Satisfied by any one of its branches; a branch's ids are interchangeable. */
 @Value
 public class ItemClause
 {
 	List<Branch> branches;
-	/** Only worn items count, e.g. the fairy-ring staff. */
 	boolean mustBeWorn;
-	/** The whole clause is waived while this passes, e.g. the Lumbridge elite diary for the fairy-ring staff. */
 	VarCheck waivedBy;
 
 	@Value
@@ -21,7 +16,7 @@ public class ItemClause
 	{
 		List<Integer> ids;
 		int quantity;
-		/** Shortest Path's {@code UNLOCK_<NAME>} token; null for an item branch. */
+		/** The name after {@code UNLOCK_}; null for an item branch. */
 		String unlock;
 
 		public boolean isUnlock()

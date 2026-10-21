@@ -24,11 +24,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
-/**
- * B16's live check: {@code [CH-POH]} lines for house entries, ownership, scans and varbits; {@code [CH-MENU]} lines for
- * every right-click menu and teleport interface opened while a sub-step has a menu target, with the entries, the target
- * and the rectangles the overlay outlines, plus a frame of each. Nothing while the bank PIN keypad is open.
- */
 @Slf4j
 final class PohTrace
 {
@@ -39,7 +34,7 @@ final class PohTrace
 		InterfaceID.FairyringsLog.UNIVERSE >>> 16, InterfaceID.QuetzalMenu.ICONS >>> 16, InterfaceID.QuetzalwhistleMenu.ICONS >>> 16);
 	private static final int MOST_FRAMES = 200;
 	private static final int NEXUS_GROUP = 17;
-	/** Interfaces the client reloads with every new scene (seen live on each landing): not a teleport's chooser. */
+	/** Interfaces the client reloads with every new scene: not a teleport's chooser. */
 	private static final Set<Integer> RELOADED_ON_LANDING = Set.of(71, 109, 116, 182, 203, 216, 218, 239, 320, 387, 429, 541, 629, 712);
 
 	private final Client client;
@@ -103,7 +98,7 @@ final class PohTrace
 		}
 	}
 
-	/** The list scripts' arguments as they arrive (B16: the diary cape's list wasn't matched). */
+	/** Runs before the plugin (priority 2) and better-teleport-menu (1), so the arguments are logged as they arrive. */
 	@Subscribe(priority = 3)
 	public void onScriptPreFired(ScriptPreFired event)
 	{
@@ -187,7 +182,6 @@ final class PohTrace
 			current.getKind(), current.getText());
 	}
 
-	/** The nexus list's layers, first lines only: which one holds the labels (B17). */
 	private void logLayer(String name, int component)
 	{
 		Widget layer = client.getWidget(component);

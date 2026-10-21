@@ -1,6 +1,5 @@
 package com.cluehelper;
 
-/** The cape on the house's cape hanger, for {@code pohSource} Manual. */
 public enum PohMountedCape
 {
 	NONE("None"),

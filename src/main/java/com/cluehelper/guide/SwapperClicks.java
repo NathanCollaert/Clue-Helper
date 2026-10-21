@@ -10,12 +10,10 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemVariationMapping;
 
 /**
- * The left clicks Menu Entry Swapper's custom swaps give, read from its own config (read-only; Nathan, B17: reading
- * other plugins' data is fine), so the one-click fill shows before anything is hovered. The format is the 1.13.2
- * plugin's: {@code object_<id>} holds the op index (0-4) or a sub-op packed as {@code ((sub + 1) << 8) | op};
+ * Reads Menu Entry Swapper's config (never writes it) so the one-click fill shows before anything is hovered. Its
+ * format: {@code object_<id>} holds the op index (0-4) or a sub-op packed as {@code ((sub + 1) << 8) | op};
  * {@code item_<id>} holds the op index, -1 for Use, or an option's hash; {@code wornitem_<id>} holds the menu identifier
- * or the option's hash (Nathan's Max cape: "Home".hashCode()). A hash is matched against the item's own options; one
- * that names a sub-menu line stays with hover learning. Client thread.
+ * or the option's hash. A hash naming a sub-menu line is left to hover learning. Client thread only.
  */
 @Singleton
 public class SwapperClicks
@@ -27,7 +25,6 @@ public class SwapperClicks
 	private static final int SUB_OP_SHIFT = 8;
 	private static final int OP_MASK = 0xFF;
 	private static final int MAX_OP_INDEX = 4;
-	/** A worn item's menu identifier 1 is Remove; identifiers from 2 on are its worn options (item params 451 on). */
 	private static final int FIRST_WORN_OPTION_ID = 2;
 	private static final int FIRST_WORN_OPTION_PARAM = 451;
 	private static final int LAST_WORN_OPTION_ID = 9;
@@ -42,7 +39,6 @@ public class SwapperClicks
 		this.configManager = configManager;
 	}
 
-	/** The swapped left click of this object (its shown form), or null when none is set or it can't be read. */
 	String object(ObjectComposition object)
 	{
 		ObjectComposition shown = object.getImpostorIds() != null && object.getImpostor() != null ? object.getImpostor() : object;
@@ -62,7 +58,6 @@ public class SwapperClicks
 		return subs == null || sub < 0 || sub >= subs.getNumOps() ? null : subs.getOp(sub);
 	}
 
-	/** The swapped left click of an inventory item, or null. */
 	String item(int itemId)
 	{
 		Integer value = swap("item_" + ItemVariationMapping.map(itemId));
@@ -93,7 +88,6 @@ public class SwapperClicks
 		return null;
 	}
 
-	/** The swapped left click of a worn item, or null. */
 	String worn(int itemId)
 	{
 		Integer value = swap("wornitem_" + ItemVariationMapping.map(itemId));

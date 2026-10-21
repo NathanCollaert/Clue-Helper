@@ -18,11 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-/**
- * Every bundled catalog row against the rules a wrong row would otherwise break silently at runtime:
- * ids named by their 1.13.2 gameval constant, no uncharged ids, no spellbook left in Varbits, Spends on
- * every consumable, Members set, valid tiles, a Wilderness level on every teleport, and a clean parse.
- */
 public class CatalogSchemaTest
 {
 	private static final Map<String, Class<?>> GAMEVAL = Map.of("item", ItemID.class, "object", ObjectID.class,
@@ -34,7 +29,7 @@ public class CatalogSchemaTest
 	private static final Pattern WHERE_ID = Pattern.compile("(object|npc):(\\d+)");
 	private static final Set<String> BOOKS = Set.of("Standard", "Ancient", "Lunar", "Arceuus");
 	private static final int MAX_COORD = (1 << 14) - 1;
-	private static final int TIER_A_ROWS = 700;
+	private static final int MIN_TELEPORT_ROWS = 700;
 
 	@Test
 	public void everyRowPassesTheSchema()
@@ -57,7 +52,7 @@ public class CatalogSchemaTest
 		catalog.getSpellbookChanges().forEach(row -> row.getRequirements().getErrors().forEach(e -> failures.add(row.getName() + ": " + e)));
 
 		assertEquals("", String.join("\n", failures));
-		assertTrue(catalog.getTeleports().size() > TIER_A_ROWS);
+		assertTrue(catalog.getTeleports().size() > MIN_TELEPORT_ROWS);
 	}
 
 	private static void teleportRules(TsvTable.Line line, Failures fail, String at)

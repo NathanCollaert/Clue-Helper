@@ -11,14 +11,13 @@ import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
 
 /**
- * B10: on scenes recorded live by the dev plugin, the scene BFS gives the walk table's cost between every pair
- * of in-scene nodes whose table walk stays inside the scene. The live flags and Shortest Path's collision map
- * are separate data, so this is where a wrong movement rule or a stale map would show.
+ * The recorded collision flags and Shortest Path's collision map are separate data, so a wrong movement rule or a
+ * stale map shows here.
  */
 public class SceneBfsTest
 {
 	private static final List<String> SCENES = List.of("2880_3232_0", "2888_3232_0");
-	/** A live door or gate closed where Shortest Path's map has it open costs a few tiles of detour. */
+	/** A door or gate closed in the recorded scene but open in Shortest Path's map costs a few tiles of detour. */
 	private static final int TOLERANCE_TILES = 4;
 
 	@Test

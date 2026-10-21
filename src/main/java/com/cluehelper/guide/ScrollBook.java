@@ -3,7 +3,6 @@ package com.cluehelper.guide;
 import java.util.Map;
 import net.runelite.api.gameval.InterfaceID;
 
-/** The master scroll book's entry per catalog row ("Master scroll book: Nardah teleport"), to highlight inside the book. */
 final class ScrollBook
 {
 	static final String ROW_PREFIX = "Master scroll book: ";

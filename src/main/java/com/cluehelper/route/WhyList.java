@@ -6,11 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-/**
- * "Show why" (PLAN §5.4 Route identity and output): every teleport and fairy-ring landing usable from the
- * start book, each with its own ticks plus the table walk from its landing to the first leg's targets, with
- * the player's gates. An estimate per transport, not a search: consumption and spellbook changes are left out.
- */
+/** An estimate per transport, not a search: consumption and spellbook changes are left out. */
 final class WhyList
 {
 	private WhyList()

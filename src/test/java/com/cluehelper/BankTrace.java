@@ -18,18 +18,12 @@ import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.util.Text;
 
-/**
- * B15's live check: {@code [CH-BANK]} lines with ticks for every bank, PIN, STASH and Check event, and every click
- * from a bank opening until a few ticks after it closes, so a bank stop can be timed from the log (B14's arrival to
- * next transport). Nothing is logged while the PIN keypad is open. A frame is saved whenever the bank shows a withdraw
- * sub-step, to check the highlights.
- */
 @Slf4j
 final class BankTrace
 {
 	static final String TAG = "[CH-BANK]";
 	static final File FRAMES = new File("build/bank");
-	/** Clicks are logged until the next transport's first click, which comes a few ticks after the bank closes (B14). */
+	/** Long enough to catch the next transport's first click, which comes a few ticks after the bank closes. */
 	private static final int AFTER_CLOSE_TICKS = 15;
 
 	private final Client client;

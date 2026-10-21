@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Value;
 
-/**
- * The house piece a POH row needs (catalog House column, B16): {@code object:29154|29155|29156} is any of these
- * furniture base ids, {@code nexus:14} a portal nexus slot set to that destination (enum 1377 key).
- */
 @Value
 public class HouseNeed
 {
@@ -17,7 +13,7 @@ public class HouseNeed
 	}
 
 	Kind kind;
-	/** Furniture base ids (any of them), or the one nexus key. */
+	/** Furniture base ids, any of which will do, or the one nexus destination key (enum 1377). */
 	List<Integer> ids;
 
 	public String describe()

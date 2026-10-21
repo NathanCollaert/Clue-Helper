@@ -24,11 +24,9 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollService;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * The link to RuneLite's Clue Scroll plugin (PLAN §4 item 1): whether it runs, the current step,
- * and whether a held clue still needs reading. Core is read once per tick, at GameTick priority
- * -1, after core's own handlers have updated it. Its active state comes from
- * {@code isPluginActive} and {@link PluginChanged}, never from {@code isPluginEnabled} or the
- * config key, which both flip before core actually stops or starts.
+ * Core is read once per tick, at GameTick priority -1, after core's own handlers have updated it. Its active state
+ * comes from {@code isPluginActive} and {@link PluginChanged}, never from {@code isPluginEnabled} or the config key,
+ * which both flip before core actually stops or starts.
  */
 @Slf4j
 @Singleton
@@ -58,7 +56,7 @@ public class ClueLink
 		this.resolver = resolver;
 	}
 
-	/** On the Swing thread, from the plugin's startUp. Core's instance exists even while it is off. */
+	/** Swing thread. Core's instance exists even while it is off. */
 	public void start()
 	{
 		core = findCore();
@@ -95,19 +93,17 @@ public class ClueLink
 		return current;
 	}
 
-	/** Core's instance, or null if the client has none. */
+	/** Null if the client has no Clue Scroll plugin. */
 	public ClueScrollPlugin getCore()
 	{
 		return core;
 	}
 
-	/** Core's clue as the service hands it out now, for the dev tools. */
 	public ClueScroll coreClue()
 	{
 		return service.getClue();
 	}
 
-	/** @return a call that removes the listener */
 	public Runnable addListener(StepListener listener)
 	{
 		listeners.add(listener);
@@ -115,7 +111,7 @@ public class ClueLink
 	}
 
 	/**
-	 * Runs on the Swing thread, so it only sets the flag.
+	 * Swing thread, so it only sets the flag.
 	 *
 	 * @return whether the active flag changed
 	 */

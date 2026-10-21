@@ -9,7 +9,7 @@ import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 import org.junit.Test;
 
-/** Every fixture item name must resolve: a name that silently resolved to nothing would drop a teleport from B10's golden routes. */
+/** A fixture item name that silently resolved to nothing would drop a teleport from the golden routes. */
 public class LoadoutsTest
 {
 	@Test

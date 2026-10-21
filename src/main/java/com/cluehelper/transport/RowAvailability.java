@@ -4,7 +4,6 @@ import com.cluehelper.player.ItemUse;
 import java.util.List;
 import lombok.Value;
 
-/** One catalog row judged against one snapshot. */
 @Value
 public class RowAvailability
 {
@@ -20,9 +19,8 @@ public class RowAvailability
 	CatalogRow row;
 	boolean available;
 	Confidence confidence;
-	/** The held items that satisfy it, per container; empty when unavailable. */
+	/** Empty when unavailable. */
 	List<ItemUse> witness;
-	/** Why it can't be used: "needs 2 law runes (has 1)", "Fairytale II - Cure a Queen not finished". */
 	List<String> whyNot;
 	/** The epoch minute a failing cooldown clears, or {@link Long#MAX_VALUE}. */
 	long passesFrom;

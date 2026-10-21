@@ -9,14 +9,9 @@ import net.runelite.api.Client;
 import net.runelite.api.gameval.DBTableID;
 import net.runelite.api.widgets.Widget;
 
-/**
- * Where each quetzal site's icon sits on the quetzal maps: the cache's Quetzal table (64) places it at
- * {@code COL_IF_X_POS, COL_IF_Y_POS} inside the map's icon layer (PLAN §4 item 7). Read once, on the client thread.
- */
 @Singleton
 public class QuetzalIcons
 {
-	/** An icon further than this from its table position is someone else's. */
 	static final int MOST_PIXELS_OFF = 24;
 
 	private final Client client;
@@ -28,14 +23,14 @@ public class QuetzalIcons
 		this.client = client;
 	}
 
-	/** The icon position of the site with this Quetzal table id, or null. */
-	public int[] position(int site)
+	/** The first call reads the cache, so it must be on the client thread. */
+	public int[] position(int quetzalTableId)
 	{
 		if (positions == null)
 		{
 			positions = read();
 		}
-		return positions.get(site);
+		return positions.get(quetzalTableId);
 	}
 
 	private Map<Integer, int[]> read()
@@ -55,7 +50,6 @@ public class QuetzalIcons
 		return out;
 	}
 
-	/** The icon whose top-left or centre is nearest the table position, within {@link #MOST_PIXELS_OFF}. */
 	static Widget nearest(Widget[] icons, int[] at)
 	{
 		Widget best = null;

@@ -4,10 +4,7 @@ import java.util.List;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
-/**
- * What a step asks of the player, as core models it. Core's item requirements are tested only
- * through their own {@code fulfilledBy}, never taken apart.
- */
+/** Core's item requirements are tested only through their own {@code fulfilledBy}, never taken apart. */
 public final class StepRequirements
 {
 	private final SpadeNeed spade;
@@ -28,7 +25,7 @@ public final class StepRequirements
 		this.stashObjectId = stashObjectId;
 	}
 
-	/** The emote step's STASH unit object (core's {@code STASHUnit}), or -1. */
+	/** The emote step's STASH unit object, or -1. */
 	public int getStashObjectId()
 	{
 		return stashObjectId;

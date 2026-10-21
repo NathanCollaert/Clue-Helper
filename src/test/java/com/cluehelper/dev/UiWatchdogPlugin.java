@@ -7,15 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
-/**
- * Dev only. Pings the Swing thread every 100ms; a ping that waits over 250ms is a visible
- * freeze, logged as "[CH-WATCHDOG]" with the Swing thread's stack so whoever holds it shows
- * up by name.
- */
 @Slf4j
 @PluginDescriptor(name = "UI Watchdog", description = "Dev only: logs UI-thread freezes with a stack trace")
 public class UiWatchdogPlugin extends Plugin
 {
+	/** Longer than this is a visible freeze. */
 	private static final long STALL_MS = 250;
 
 	private volatile boolean watching;

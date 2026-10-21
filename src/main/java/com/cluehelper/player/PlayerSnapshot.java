@@ -9,14 +9,13 @@ import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
 
 /**
- * What the player has, copied on the client thread (PLAN §4 item 3, §5.2). Immutable: every map is
- * copied in, so the planner can read it from any thread. A new version is made whenever something
- * availability depends on changes; walking alone doesn't make one (see {@link PlayerModel#getPosition()}).
+ * Immutable, so any thread can read it. Walking alone doesn't make a new version: see
+ * {@link PlayerModel#getPosition()}.
  */
 @Getter
 public final class PlayerSnapshot
 {
-	/** How a var the snapshot didn't read is judged: live it is unread; fixture loadouts declare pass or fail. */
+	/** How a var the snapshot didn't read is judged; only test loadouts declare PASS or FAIL. */
 	public enum UnknownVars
 	{
 		UNREAD, PASS, FAIL
@@ -28,17 +27,16 @@ public final class PlayerSnapshot
 	private final int wildernessLevel;
 	private final boolean membersWorld;
 	private final boolean pvpWorld;
-	/** Why the plugin should stay quiet on this world (Leagues, Deadman, beta); null on a normal world. */
+	/** Null on a normal world. */
 	private final String dormantReason;
 	/** Varbit 1777: 0 normal, 1 Ironman, 2 Ultimate, 3 Hardcore, 4 Group, 5 Hardcore Group, 6 Unranked Group. */
 	private final int accountType;
 	private final Map<Integer, Integer> inventory;
 	private final Map<Integer, Integer> worn;
-	/** The worn weapon slot's item, or -1. */
+	/** -1 when nothing is wielded. */
 	private final int weapon;
-	/** A rune pouch is in the inventory. Its varbits stay current while it is banked, so they only count then. */
+	/** The pouch varbits keep their values while it is banked, so they only count while it is held. */
 	private final boolean pouchHeld;
-	/** Rune item id → quantity; empty unless {@link #pouchHeld}. */
 	private final Map<Integer, Integer> pouch;
 	private final Map<Skill, Integer> boostedLevels;
 	private final Map<Skill, Integer> realLevels;
@@ -51,19 +49,17 @@ public final class PlayerSnapshot
 	private final Map<Integer, Integer> varps;
 	private final UnknownVars unknownVars;
 	private final SpellbookState spellbook;
-	/** Per held item id, where its charges are known; in a banked snapshot banked items too. */
+	/** Held items only, except in a banked snapshot. */
 	private final Map<Integer, Charge> charges;
-	/** Empty inventory slots: withdrawing more stacks than this means depositing first (PLAN §5.4 Edge cases). */
 	private final int freeInventorySlots;
-	/** The remembered bank, placeholders left out; empty except in a banked snapshot ({@code A_banked}, B15). */
+	/** Placeholders left out; empty except in a banked snapshot. */
 	private final Map<Integer, Integer> bank;
-	/** GIM group storage, remembered like the bank; empty except in a banked snapshot. */
+	/** Empty except in a banked snapshot. */
 	private final Map<Integer, Integer> groupStorage;
-	/** The player's own house (B16); {@link HouseState#NONE} when nothing is known. */
 	private final HouseState house;
-	/** Planted spirit trees known grown, by patch name (B17); a patch never seen is not in it. */
+	/** Patch names of spirit trees known to be grown. */
 	private final Set<String> plantedTrees;
-	/** The fairy ring code last travelled to ("CKS"), where a ring's Last-destination goes; null when unknown (B17). */
+	/** A code like "CKS", where a ring's Last-destination goes; null when unknown. */
 	private final String lastFairyRing;
 
 	@Builder(toBuilder = true)

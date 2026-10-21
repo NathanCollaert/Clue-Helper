@@ -14,11 +14,6 @@ import java.util.zip.GZIPOutputStream;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
-/**
- * A live scene's collision flags as a gzipped text file, recorded by the dev plugin for the scene BFS check:
- * a header line (base x, base y, size x, size y, planes, player x, y, plane), then per plane one line per x
- * of size-y flags, or "-" for a plane with no data.
- */
 public final class SceneFiles
 {
 	@Value

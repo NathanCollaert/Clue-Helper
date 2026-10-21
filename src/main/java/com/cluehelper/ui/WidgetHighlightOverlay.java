@@ -15,11 +15,6 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-/**
- * Outlines the spell (or Spellbook Swap) the current sub-step casts, only visible with the magic tab open (B04), and the
- * entry to pick inside a teleport interface such as the master scroll book. While the tab holding the spell or item
- * isn't open, its tab stone is outlined instead.
- */
 public class WidgetHighlightOverlay extends Overlay
 {
 	private static final int ARC = 6;
@@ -28,7 +23,7 @@ public class WidgetHighlightOverlay extends Overlay
 		StepGuide.Tab.INVENTORY, InterfaceID.Inventory.ITEMS,
 		StepGuide.Tab.EQUIPMENT, InterfaceID.Wornitems.UNIVERSE,
 		StepGuide.Tab.MAGIC, InterfaceID.MagicSpellbook.UNIVERSE);
-	/** Side-tab stones 3, 4 and 6 in the fixed, resizable classic and resizable modern layouts. */
+	/** Per tab: its stone in the fixed, resizable classic and resizable modern layouts. */
 	private static final Map<StepGuide.Tab, int[]> TAB_STONES = Map.of(
 		StepGuide.Tab.INVENTORY, new int[]{InterfaceID.Toplevel.STONE3, InterfaceID.ToplevelOsrsStretch.STONE3, InterfaceID.ToplevelPreEoc.STONE3},
 		StepGuide.Tab.EQUIPMENT, new int[]{InterfaceID.Toplevel.STONE4, InterfaceID.ToplevelOsrsStretch.STONE4, InterfaceID.ToplevelPreEoc.STONE4},
@@ -74,7 +69,6 @@ public class WidgetHighlightOverlay extends Overlay
 		return widget != null && !widget.isHidden();
 	}
 
-	/** The stone in whichever of the three client layouts is in use. */
 	private int tabStone(int[] perLayout)
 	{
 		for (int stone : perLayout)

@@ -8,11 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import net.runelite.api.gameval.ObjectID;
 
-/** House furniture by base id from what isn't a scan: the config's overrides, or the varbits readable at login (B12). */
 final class PohOverrides
 {
 	private static final int[] BOXES = {ObjectID.POH_JEWELLERY_BOX_1, ObjectID.POH_JEWELLERY_BOX_2, ObjectID.POH_JEWELLERY_BOX_3};
-	/** Box lines 1–9 are on every box, A–J from the fancy one, K–R only on the ornate one (2308 is 1-based). */
+	/** Box lines 1–9 are on every box, A–J from the fancy one, K–R only on the ornate one; varbit 2308 is 1-based. */
 	private static final int FANCY_FIRST_LINE = 10;
 	private static final int ORNATE_FIRST_LINE = 20;
 	private static final int XERIC_FIRST = ObjectID.POH_AMULET_XERIC_LOOKOUT;
@@ -108,8 +107,8 @@ final class PohOverrides
 	}
 
 	/**
-	 * Before any scan: the mounted Xeric's talisman and digsite pendant from their left-click settings, and the
-	 * jewellery box from its left-click line, which needs at least the tier that has that line.
+	 * The mounted Xeric's talisman and digsite pendant follow from their left-click settings, and the jewellery box from
+	 * its left-click line, which needs at least the tier that has that line.
 	 */
 	static Set<Integer> fromVarbits(int xeric, int digsite, int boxLine)
 	{

@@ -8,7 +8,6 @@ import javax.inject.Singleton;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
-/** Loads the bundled walk data once, off the Swing and client threads. */
 @Slf4j
 @Singleton
 public class WalkData

@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 
-/** One remembered value of the current RuneScape profile. Safe to use from any thread. */
+/** Safe to use from any thread. */
 @Slf4j
 public final class MemorySlot<T>
 {
@@ -29,7 +29,6 @@ public final class MemorySlot<T>
 		this.gson = gson;
 	}
 
-	/** Reads the stored value on first use and again whenever the profile has changed since. */
 	public synchronized T get()
 	{
 		String currentProfile = profile.profileKey();

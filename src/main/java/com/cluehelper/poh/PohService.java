@@ -45,17 +45,13 @@ import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
 
-/**
- * The player's own house (PLAN §5.2 POH, B12, B16): the nexus and the mounted Xeric/digsite settings from varbits at
- * login, the furniture from a scan two ticks after entering a house that is the player's own, or the config's overrides.
- * Persisted per profile with when each was seen. Client thread, except {@link #getHouse()}.
- */
+/** Client thread only, except {@link #getHouse()}. */
 @Slf4j
 @Singleton
 public class PohService
 {
 	static final String PROFILE_KEY = "poh";
-	/** B12: the tick-2 scan found every piece, and the tick-5 one never differed. */
+	/** Every piece has loaded two ticks after entering; later scans never found more. */
 	static final int SCAN_DELAY_TICKS = 2;
 	static final int[] NEXUS_SLOTS = {VarbitID.POH_NEXUS_TELE_1, VarbitID.POH_NEXUS_TELE_2, VarbitID.POH_NEXUS_TELE_3,
 		VarbitID.POH_NEXUS_TELE_4, VarbitID.POH_NEXUS_TELE_5, VarbitID.POH_NEXUS_TELE_6, VarbitID.POH_NEXUS_TELE_7,
@@ -70,8 +66,10 @@ public class PohService
 		VarbitID.POH_NEXUS_TELE_40, VarbitID.POH_NEXUS_TELE_41, VarbitID.POH_NEXUS_TELE_42, VarbitID.POH_NEXUS_TELE_43,
 		VarbitID.POH_NEXUS_TELE_44, VarbitID.POH_NEXUS_TELE_45};
 	static final int NEXUS_LINE_SCRIPT = 2675;
-	/** [index, 10, y, struct id, line number, 1, parity, component] (B12). */
+	/** The script's int arguments: [index, 10, y, struct id, line number, 1, parity, component]. */
 	static final int NEXUS_LINE_ARGS = 8;
+	private static final int NEXUS_ARG_STRUCT = 3;
+	private static final int NEXUS_ARG_LINE_NUMBER = 4;
 	static final int[] SETTINGS = {VarbitID.POH_NEXUS_XERIC, VarbitID.POH_NEXUS_DIGSITE, VarbitID.POH_JEWELLERYBOX_MULTI,
 		VarbitID.POH_HOUSE_LOCATION, VarbitID.POH_TELE_TOGGLE};
 
@@ -145,7 +143,7 @@ public class PohService
 		return ownership.isInHouse();
 	}
 
-	/** Log lines for the dev trace: entries, scans and what changed. Client thread. */
+	/** Listeners get the log lines on the client thread. */
 	public Runnable addListener(Consumer<String> listener)
 	{
 		listeners.add(listener);
@@ -157,7 +155,7 @@ public class PohService
 		ownership.observeClick(event.getMenuOption(), event.getMenuTarget());
 	}
 
-	/** Script 2675 draws each nexus line with its struct id and line number (B12): the line number is its hotkey. */
+	/** Script 2675 draws each nexus line with its struct id and line number, which is its hotkey. */
 	public void onScriptPreFired(ScriptPreFired event)
 	{
 		if (event.getScriptId() != NEXUS_LINE_SCRIPT || client.getIntStackSize() < NEXUS_LINE_ARGS)
@@ -166,8 +164,8 @@ public class PohService
 		}
 		int[] stack = client.getIntStack();
 		int base = client.getIntStackSize() - NEXUS_LINE_ARGS;
-		int struct = stack[base + 3];
-		int line = stack[base + 4];
+		int struct = stack[base + NEXUS_ARG_STRUCT];
+		int line = stack[base + NEXUS_ARG_LINE_NUMBER];
 		Profile profile = stored.get();
 		if (!Integer.valueOf(line).equals(profile.nexusLines.get(struct)))
 		{
@@ -198,20 +196,18 @@ public class PohService
 		}
 	}
 
-	/** The config's overrides or the forget action changed. */
 	public void onConfigChanged()
 	{
 		overridesDirty = true;
 	}
 
-	/** On {@code RuneScapeProfileChanged}, after the store reloads. */
+	/** Call on {@code RuneScapeProfileChanged}, after the store reloads. */
 	public void onProfileChanged()
 	{
 		varsDirty = true;
 		overridesDirty = true;
 	}
 
-	/** Forgets what the scan and the varbits taught this profile. */
 	public void forget()
 	{
 		stored.clear();
@@ -220,7 +216,7 @@ public class PohService
 		tell("forgot the learned house");
 	}
 
-	/** From the plugin's GameTick handler, before the player model's. */
+	/** Call from a GameTick handler that runs before the player model's. */
 	public void onGameTick()
 	{
 		if (client.getGameState() != GameState.LOGGED_IN || client.getLocalPlayer() == null)
@@ -312,7 +308,7 @@ public class PohService
 
 	private static final String PORTAL_PREFIX = "Portal chamber: ";
 
-	/** POH varbits read 0 during a world hop (B12): a read with no house location and no nexus is kept out. */
+	/** POH varbits read 0 during a world hop, so an all-zero read is ignored. */
 	private void readVars()
 	{
 		Map<Integer, Integer> values = new HashMap<>();
@@ -344,7 +340,6 @@ public class PohService
 		}
 	}
 
-	/** Every piece the catalog knows, by base id, with the walk to it from where the player stands (B12, B16). */
 	private void scan()
 	{
 		long started = System.nanoTime();
@@ -424,7 +419,7 @@ public class PohService
 		return found;
 	}
 
-	/** A walk over the instance's own collision flags, in scene coordinates. */
+	/** Uses the instance's own collision flags; its points are scene coordinates, not world ones. */
 	private static SceneBfs.Result walkFrom(WorldView view, LocalPoint at)
 	{
 		CollisionData[] maps = view.getCollisionMaps();
@@ -510,17 +505,16 @@ public class PohService
 		listeners.forEach(listener -> listener.accept(line));
 	}
 
-	/** What this profile remembers about the house. */
 	static final class Profile
 	{
-		/** POH varbits by id, as last read with a house present. */
+		/** By varbit id, as last read with a house present. */
 		Map<Integer, Integer> vars = new HashMap<>();
 		long varsSeenAt;
-		/** Base ids the last own-house scan found. */
+		/** Base ids from the last own-house scan. */
 		List<Integer> furniture = new ArrayList<>();
 		Map<Integer, Integer> walkTicks = new HashMap<>();
 		long scannedAt;
-		/** Nexus struct id → line number (its hotkey), learned when the nexus opens. */
+		/** Nexus struct id → line number, which is its hotkey. */
 		Map<Integer, Integer> nexusLines = new HashMap<>();
 	}
 }

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-/** Menu lines as B12 recorded them against catalog labels: a miss here is a highlight that silently never shows. */
+/** A miss here is a highlight that silently never shows. */
 public class MenuLabelsTest
 {
 	@Test

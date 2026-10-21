@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * The generated step data (tools/cache/c5_step_index.py, from a cache dump and B01's match): per
- * step key its tier, cache rows and cache target tiles, plus the cache row of each hot/cold spot.
- */
+/** Gson fills this from step-index.json (tools/cache/c5_step_index.py): field names are its JSON keys. */
 @Slf4j
 public final class StepIndex
 {
@@ -53,7 +50,6 @@ public final class StepIndex
 		return new StepIndex();
 	}
 
-	/** Null for a key the data doesn't have. */
 	public Entry entry(String key)
 	{
 		return steps == null ? null : steps.get(key);
@@ -100,7 +96,7 @@ public final class StepIndex
 			return rows == null ? List.of() : rows;
 		}
 
-		/** The rows' target tiles, as x, y, plane. */
+		/** Each tile as x, y, plane. */
 		public List<int[]> getTiles()
 		{
 			return tiles == null ? List.of() : tiles;

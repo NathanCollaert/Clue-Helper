@@ -15,9 +15,8 @@ import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 
 /**
- * Which held items pay for which runes, and which spells can be cast (PLAN §5.2, B04). Everything
- * except the tomes comes from the cache, so a game update that adds a staff or a rune carries over
- * by itself. The spellbook widget is never read: it is stale while the magic tab is hidden.
+ * Everything except the tomes comes from the cache, so a game update that adds a staff or a rune carries
+ * over by itself. The spellbook widget is never read: it is stale while the magic tab is hidden.
  */
 public final class RuneModel
 {
@@ -35,7 +34,7 @@ public final class RuneModel
 	private static final int PARAM_QUEST = 1189;
 	private static final int ABSENT = -1;
 
-	/** Element rune → {staves enum (OBJ → BOOLEAN), rune types enum (keyed by pouch type)}. */
+	/** {element rune, enum of its staves (OBJ → BOOLEAN), enum of the pouch types that hold it}. */
 	private static final int[][] ELEMENTS = {
 		{ItemID.AIRRUNE, 988, 983},
 		{ItemID.WATERRUNE, 989, 987},
@@ -51,19 +50,18 @@ public final class RuneModel
 
 	private final List<Spell> spells;
 	private final Map<Integer, Integer> pouchRunes;
-	/** Required rune → held runes that pay for it, the rune itself first. */
-	private final Map<Integer, List<Integer>> payers;
-	/** Required rune → worn items that make it unlimited. */
-	private final Map<Integer, Set<Integer>> unlimited;
+	/** The rune itself comes first. */
+	private final Map<Integer, List<Integer>> payersByRune;
+	private final Map<Integer, Set<Integer>> unlimitingWornItemsByRune;
 	private final Map<Integer, String> runeNames;
 
-	private RuneModel(List<Spell> spells, Map<Integer, Integer> pouchRunes, Map<Integer, List<Integer>> payers,
-		Map<Integer, Set<Integer>> unlimited, Map<Integer, String> runeNames)
+	private RuneModel(List<Spell> spells, Map<Integer, Integer> pouchRunes, Map<Integer, List<Integer>> payersByRune,
+		Map<Integer, Set<Integer>> unlimitingWornItemsByRune, Map<Integer, String> runeNames)
 	{
 		this.spells = spells;
 		this.pouchRunes = pouchRunes;
-		this.payers = payers;
-		this.unlimited = unlimited;
+		this.payersByRune = payersByRune;
+		this.unlimitingWornItemsByRune = unlimitingWornItemsByRune;
 		this.runeNames = runeNames;
 	}
 
@@ -113,7 +111,7 @@ public final class RuneModel
 		return spells;
 	}
 
-	/** The rune item a pouch type holds, or -1. */
+	/** -1 for an unknown pouch type. */
 	public int pouchRune(int pouchType)
 	{
 		return pouchRunes.getOrDefault(pouchType, -1);
@@ -121,7 +119,7 @@ public final class RuneModel
 
 	public boolean isRune(int itemId)
 	{
-		return payers.containsKey(itemId);
+		return payersByRune.containsKey(itemId);
 	}
 
 	public String runeName(int rune)
@@ -129,13 +127,9 @@ public final class RuneModel
 		return runeNames.getOrDefault(rune, "rune " + rune);
 	}
 
-	/**
-	 * Pays {@code quantity} of {@code rune} from a worn staff or tome, else the inventory, a held pouch, and in a
-	 * banked snapshot the bank and group storage.
-	 */
 	public Supply supply(int rune, int quantity, PlayerSnapshot player)
 	{
-		for (int source : unlimited.getOrDefault(rune, Collections.emptySet()))
+		for (int source : unlimitingWornItemsByRune.getOrDefault(rune, Collections.emptySet()))
 		{
 			if (player.count(Container.WORN, source) > 0)
 			{
@@ -146,7 +140,7 @@ public final class RuneModel
 		int have = 0;
 		for (Container container : new Container[]{Container.INVENTORY, Container.RUNE_POUCH, Container.BANK, Container.GROUP_STORAGE})
 		{
-			for (int payer : payers.getOrDefault(rune, List.of(rune)))
+			for (int payer : payersByRune.getOrDefault(rune, List.of(rune)))
 			{
 				int count = player.count(container, payer);
 				if (count > 0 && have < quantity)
@@ -159,7 +153,7 @@ public final class RuneModel
 		return new Supply(have >= quantity, have, have >= quantity ? List.copyOf(used) : List.of());
 	}
 
-	/** Empty when the spell can be cast now from its own book; the book itself is the planner's business. */
+	/** Ignores which book is active: that is the planner's business. */
 	public List<String> whyNotCastable(Spell spell, PlayerSnapshot player)
 	{
 		List<String> whyNot = new ArrayList<>();

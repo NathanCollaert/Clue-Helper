@@ -8,13 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * B04: turns the probe's events.jsonl into one trial per spellbook change: the click that
- * started it, the click that committed it (a dialogue choice or sub-op), the tick the book var
- * changed, and the next spell cast with the tick it was accepted. B14 reuses it for S7.
- *
- * <p>Tick arithmetic: a click is logged with the tick count of the period it happened in, and a
- * server effect (var, animation) with the count of the period before its tick boundary, so
- * "ticks from click to effect" is {@code effectTick + 1 - clickTick}.
+ * A click is logged with the tick count of the period it happened in, and a server effect (var,
+ * animation) with the count of the period before its tick boundary, so "ticks from click to effect"
+ * is {@code effectTick + 1 - clickTick}.
  */
 final class SpellbookTimingParser
 {
@@ -47,19 +43,19 @@ final class SpellbookTimingParser
 			return bookChangeTick >= 0;
 		}
 
-		/** Ticks from the committing click (sub-op, dialogue choice or the op itself) to the book var. */
+		/** The committing click is a sub-op, a dialogue choice or the op itself. */
 		int commitToBook()
 		{
 			return bookChangeTick + 1 - commitClickTick;
 		}
 
-		/** Ticks from the first click of the change to the book var, menus and walking included. */
+		/** Includes menus and walking. */
 		int firstClickToBook()
 		{
 			return bookChangeTick + 1 - firstClickTick;
 		}
 
-		/** Ticks from the book var to the player's next spell click: human reaction, an upper bound on any lock. */
+		/** Human reaction time: an upper bound on any spell lock after the change. */
 		int bookToCastClick()
 		{
 			return castClickTick < 0 ? -1 : castClickTick - bookChangeTick;

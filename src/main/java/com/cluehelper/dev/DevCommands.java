@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
-/** The {@code ::ch-*} chat commands of developer mode. */
 public class DevCommands
 {
 	static final String PREFIX = "ch-";
@@ -15,17 +14,15 @@ public class DevCommands
 	private final Map<String, Command> commands = new TreeMap<>();
 	private final Consumer<String> reply;
 
-	/** @param reply shows a line to the developer */
 	public DevCommands(Consumer<String> reply)
 	{
 		this.reply = reply;
 		register("help", "list these commands", args -> help());
 	}
 
-	/** @param name the command without its "ch-" prefix */
-	public synchronized void register(String name, String usage, Consumer<String[]> action)
+	public synchronized void register(String nameWithoutPrefix, String usage, Consumer<String[]> action)
 	{
-		commands.put(name.toLowerCase(Locale.ROOT), new Command(usage, action));
+		commands.put(nameWithoutPrefix.toLowerCase(Locale.ROOT), new Command(usage, action));
 	}
 
 	/**

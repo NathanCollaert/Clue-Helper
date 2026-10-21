@@ -13,10 +13,9 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
-/** Outlines what the current sub-step uses: the house's nexus, box or altar, and the bank's booth, chest or banker (B16). */
 public class FurnitureOverlay extends Overlay
 {
-	/** Wide enough to show on the nexus, which is cyan itself (B16: a 2-px outline went unseen). */
+	/** Wide enough to show on the nexus, which is cyan itself. */
 	private static final int OUTLINE_WIDTH = 4;
 	private static final int FEATHER = 4;
 

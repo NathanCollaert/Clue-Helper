@@ -29,18 +29,13 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-/**
- * The fairy ring dials' live check: {@code ::ch-ring CKS} draws what {@link MenuLines} and {@link FairyDials} pick for
- * that code without a clue route ({@code ::ch-ring} alone stops). {@code [CH-DIAL]} lines give the interface's letter, turn and confirm
- * widgets when it opens, every click on it and each dial varbit change, with a frame a tick after each.
- */
 @Slf4j
 final class FairyDialTrace extends Overlay
 {
 	static final String TAG = "[CH-DIAL]";
 	private static final int GROUP = InterfaceID.Fairyrings.CONFIRM >>> 16;
 	private static final int[] DIAL_VARBITS = {VarbitID.FAIRYRING_1, VarbitID.FAIRYRING_2, VarbitID.FAIRYRING_3};
-	/** MenuLineOverlay's colours (ui.Markers is package-private). */
+	/** Copies of MenuLineOverlay's colours: ui.Markers is package-private. */
 	private static final Color COLOUR = new Color(64, 208, 255);
 	private static final Color FILL = new Color(64, 208, 255, 40);
 
@@ -74,7 +69,7 @@ final class FairyDialTrace extends Overlay
 		log.info("{} t{} forced code {}", TAG, client.getTickCount(), code);
 	}
 
-	/** After the plugin's own pass, which puts back the colour of lines its (empty) target doesn't want. */
+	/** Runs after the plugin's own pass, which resets the colour of lines its (empty) target doesn't want. */
 	@Subscribe(priority = -3)
 	public void onClientTick(ClientTick tick)
 	{

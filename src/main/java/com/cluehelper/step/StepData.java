@@ -6,7 +6,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/** Loads the bundled step data once, off the Swing and client threads. */
 @Singleton
 public class StepData
 {
@@ -18,7 +17,7 @@ public class StepData
 		index = CompletableFuture.supplyAsync(() -> StepIndex.read(gson), executor);
 	}
 
-	/** Waits for the load the first time, if a step arrives within the first moments of a start. */
+	/** Blocks while the load is still running, which only a step right after start-up can hit. */
 	public StepIndex index()
 	{
 		return index.join();

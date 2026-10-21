@@ -18,12 +18,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
-/**
- * B17's live check: {@code [CH-TREE]} lines from the planted-tree memory, {@code [CH-RING]} from the fairy ring one; {@code [CH-TIME]} lines with every click and,
- * for 30 ticks after it, each tick the tile or animation changes (spirit tree, quetzal and agility shortcut timings);
- * {@code [CH-QUETZAL]} lines with the quetzal maps' icon children against the cache table, plus a frame. Nothing while the
- * bank PIN keypad is open.
- */
 @Slf4j
 final class NetworkTrace
 {
@@ -106,7 +100,6 @@ final class NetworkTrace
 		}
 	}
 
-	/** The map's icon layer, child by child, then each site's cache position (COL_IF_X/Y_POS). */
 	private void dumpQuetzalIcons(int group)
 	{
 		Widget icons = client.getWidget(group == QUETZAL_MENU ? InterfaceID.QuetzalMenu.ICONS : InterfaceID.QuetzalwhistleMenu.ICONS);

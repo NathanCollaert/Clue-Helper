@@ -3,25 +3,21 @@ package com.cluehelper.route;
 import com.cluehelper.player.PositionRules;
 import net.runelite.api.coords.WorldPoint;
 
-/** Which teleports work from a tile (PLAN §5.4 Origin class). */
 public enum OriginClass
 {
 	WILD0(0),
-	/** Wilderness levels 1–20. */
 	WILD20(20),
-	/** Levels 21–30: only rows that work to level 30. */
 	WILD30(30),
-	/** Above 30: no teleport, and no spellbook change, since no teleport could follow. */
+	/** No teleport, and no spellbook change either, since no teleport could follow. */
 	WILD_DEEP(Integer.MAX_VALUE),
-	/** Inside a house: no Grouping (minigame) teleports. */
+	/** Grouping (minigame) teleports don't work from inside a house. */
 	POH(0),
-	/** A bundled area where teleports don't work. */
 	NO_TELEPORT(Integer.MAX_VALUE);
 
-	/** The surface y of each Wilderness exit: walking due south to it reaches the class (B02, PLAN §5.4). */
+	/** Walking due south to this surface y reaches the class. */
 	static final int EXIT_WILD30_Y = 3759;
 	static final int EXIT_WILD20_Y = 3679;
-	/** Not in PLAN's list: minigame rows work only outside the Wilderness (level 0), so they need one too. */
+	/** Minigame rows work only outside the Wilderness, so level 0 needs an exit too. */
 	static final int EXIT_WILD0_Y = 3524;
 
 	private final int highestLevel;
@@ -50,7 +46,6 @@ public enum OriginClass
 		return this != WILD_DEEP && this != NO_TELEPORT;
 	}
 
-	/** Whether a row that works up to {@code maxWildernessLevel} works anywhere in this class. */
 	public boolean allows(int maxWildernessLevel)
 	{
 		return allowsTeleports() && highestLevel <= maxWildernessLevel;

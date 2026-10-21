@@ -6,7 +6,7 @@ import com.cluehelper.SpellbookChanges;
 import lombok.Builder;
 import lombok.Value;
 
-/** The config the planner reads, copied on the client thread. Penalties are ticks and affect ranking only. */
+/** Copied on the client thread. Penalties are in ticks and affect ranking only. */
 @Value
 @Builder(toBuilder = true)
 public class PlannerSettings
@@ -24,10 +24,8 @@ public class PlannerSettings
 	int capeUsePenalty = 3;
 	@Builder.Default
 	int strandPenalty = 30;
-	/** The bank-stop edge is offered whenever {@code PlanInput.banked} is set (useBank on, a bank seen, not UIM). */
 	@Builder.Default
 	boolean bankEdge = true;
-	/** Ticks on top of B14's bank stop (3 + 2 per item stack + 4 for the PIN). */
 	int bankStopExtraTicks;
 
 	public static PlannerSettings from(ClueHelperConfig config, int accountType)

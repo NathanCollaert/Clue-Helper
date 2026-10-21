@@ -28,11 +28,7 @@ import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 
-/**
- * {@code ::ch-player} and the {@code [CH-PLAYER]} log lines: the snapshot, the rune model's castable
- * spells (checked against the spellbook widget while the magic tab is open), and {@code A_carried}.
- * Client thread only.
- */
+/** Client thread only. */
 @Slf4j
 final class PlayerDump
 {
@@ -54,7 +50,6 @@ final class PlayerDump
 		this.availability = availability;
 	}
 
-	/** @param chat lines for the chat box and log; {@code logOnly} gets every catalog row */
 	void describe(Consumer<String> chat, Consumer<String> logOnly)
 	{
 		PlayerSnapshot s = model.getSnapshot();
@@ -90,7 +85,6 @@ final class PlayerDump
 		return counts.entrySet().stream().map(e -> e.getKey() + " " + e.getValue()).collect(Collectors.joining(", "));
 	}
 
-	/** Logs what changed in {@code A_carried} since the last judgement. */
 	void onJudged(AvailabilitySet carried)
 	{
 		PlayerSnapshot s = model.getSnapshot();
@@ -181,7 +175,7 @@ final class PlayerDump
 		return lines;
 	}
 
-	/** Null while the spell's widget is hidden: the widget is stale then (B04). */
+	/** Null while the spell's widget is hidden, since a hidden widget's sprite is stale. */
 	private Boolean widgetLit(Spell spell)
 	{
 		int widgetId = client.getItemDefinition(spell.getObj()).getIntValue(PARAM_SPELL_WIDGET);

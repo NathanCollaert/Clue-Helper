@@ -13,15 +13,11 @@ import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 
 /**
- * PLAN §5.4's label-setting Dijkstra. A state is (leg, node, banked, change category, book, has-transport);
- * a label at a state carries its ticks, rank and {@code spent}. Labels at one state are kept while neither
- * dominates the other (no more rank or ticks, a subset of spent, enough ahead to withdraw what it lacks), at most 4.
+ * Label-setting Dijkstra over states (leg, node, banked b, change category c, book k, has-transport t).
  * <p>
- * The change category (none, carried change, walked change) and banked are state dimensions, so the goal's
- * (banked, category) states hold each feature set's best route at once: Best, Direct and Same book never mix
- * feature sets (R13). Spellbook Swap is no state: it is fused into the spell edge it enables. A pending revert
- * is a book of its own (the temporary book) that turns into Lunar on its free cast, or by itself once the
- * route's time passes the swap's remaining window.
+ * Banked and change category are state dimensions so that the goal's states hold each feature set's best route at
+ * once, and Best, Direct and Same book never mix feature sets. Spellbook Swap is fused into the spell edge it
+ * enables. A pending revert is a book of its own that turns into Lunar on its free cast, or once its window passes.
  */
 final class LabelSearch
 {
@@ -34,10 +30,10 @@ final class LabelSearch
 	private static final int LUNAR = Book.LUNAR.ordinal();
 	private static final int MAX_LABELS = 4;
 	private static final int STATES_PER_NODE = 2 * CATEGORIES * BOOKS * 2;
-	/** How far past Best a search keeps looking for Same book (a route with no change at all). */
 	private static final int SAME_BOOK_SLACK_HALF_TICKS = 120;
 	private static final int SURFACE_WILDERNESS_MAX_Y = 3972;
 	private static final int[] NOTHING = new int[0];
+	private static final int CANNOT_CAST = -1;
 
 	private final PlanContext ctx;
 	private final List<int[]> legTargets;
@@ -53,24 +49,16 @@ final class LabelSearch
 	private final LowerBound[] bounds;
 	private final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : a.half - b.half);
 
-	/** Best label per bank state and change category at the goal; null where none was found. */
 	final Label[][] goals = new Label[2][CATEGORIES];
-	/** PROBES: per target node, per bank state and category, the best arrival. */
 	final Map<Integer, Label[][]> probeBest = new HashMap<>();
 	int labels;
 
-	/**
-	 * @param legTargets per leg, the nodes that complete it (one leg for ANY_OF, AREA and PROBES)
-	 * @param areaHalfTicks AREA's expected search, added at the goal
-	 * @param excluded transports ({@link Route#getFirstTransportKey()} form) left out, to find alternatives;
-	 *                 {@link Route#WALK} leaves out routes with no transport
-	 */
+	/** @param excluded first-transport keys to leave out; {@link Route#WALK} leaves out routes with no transport */
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded)
 	{
 		this(ctx, legTargets, probes, areaHalfTicks, excluded, Integer.MAX_VALUE);
 	}
 
-	/** @param rankLimit routes ranked above this are of no interest (an alternative far behind Best) */
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded, int rankLimit)
 	{
 		this.rankLimit = rankLimit;
@@ -91,11 +79,6 @@ final class LabelSearch
 		}
 	}
 
-	/**
-	 * Pops labels in rank order. Stops once nothing left can matter: past the best plain route (no bank stop, no
-	 * walked change), since a route needing the margin must beat it; but while that route uses a change, on to
-	 * Same book within a slack (not when looking for alternatives).
-	 */
 	void run()
 	{
 		offer(null, startNode(), startBankState(), NONE, startBook(), 0, 0, 0, 0, null, null, null, new int[0]);
@@ -126,10 +109,13 @@ final class LabelSearch
 		}
 	}
 
-	/** @param f the popped label's rank plus its lower bound to the goal */
+	/**
+	 * A route needing the margin must beat the best plain route, so nothing past it matters; while that route uses a
+	 * change, Same book is still worth a slack past it.
+	 */
 	private boolean pastEverythingUseful(int f)
 	{
-		Label plain = goals[0][NONE] != null ? goals[0][NONE] : goals[0][CHANGED];
+		Label plain = bestPlainGoal();
 		if (plain == null)
 		{
 			return false;
@@ -141,14 +127,17 @@ final class LabelSearch
 		return f > plain.rank + Math.max(plain.rank, SAME_BOOK_SLACK_HALF_TICKS);
 	}
 
-	/**
-	 * Past the best plain route only Same book (no change at all) can still be found, so labels that already changed
-	 * book are dropped there instead of expanded.
-	 */
+	/** Past the best plain route only Same book can still be found, so changed labels are dropped there. */
 	private boolean pastPlain(int f)
 	{
-		Label plain = goals[0][NONE] != null ? goals[0][NONE] : goals[0][CHANGED];
+		Label plain = bestPlainGoal();
 		return plain != null && f > plain.rank;
+	}
+
+	private Label bestPlainGoal()
+	{
+		Label[] noBankStop = goals[PlanContext.NOT_BANKED];
+		return noBankStop[NONE] != null ? noBankStop[NONE] : noBankStop[CHANGED];
 	}
 
 	private int startNode()
@@ -157,7 +146,6 @@ final class LabelSearch
 		return start.getKind() == PlanStart.Kind.AT_NODE ? start.getNode() : ctx.start;
 	}
 
-	/** At an open bank the plan starts banked, with no stop to pay for. */
 	private int startBankState()
 	{
 		return ctx.in.isAtOpenBank() && ctx.options[PlanContext.BANKED] != null ? PlanContext.BANKED : PlanContext.NOT_BANKED;
@@ -167,8 +155,6 @@ final class LabelSearch
 	{
 		return ctx.startPending ? pendingIndex(ctx.startBook) : ctx.startBook.ordinal();
 	}
-
-	// ---------------------------------------------------------------- expansion
 
 	private void expand(Label from)
 	{
@@ -200,7 +186,6 @@ final class LabelSearch
 		expandBank(from, k);
 	}
 
-	/** Transports that start here: the house furniture at the POH node (B16), a spirit tree or Renu (B17). */
 	private void expandLocatedTeleports(Label from, int k)
 	{
 		List<PlanContext.Teleport> here = ctx.options[from.b].located.get(from.node);
@@ -228,7 +213,7 @@ final class LabelSearch
 		{
 			return;
 		}
-		int[] withdrawn = from.b == PlanContext.BANKED ? union(from.withdrawn, ctx.requiredWithdraw) : from.withdrawn;
+		int[] withdrawn = from.b == PlanContext.BANKED ? sortedUnion(from.withdrawn, ctx.requiredWithdraw) : from.withdrawn;
 		int area = areaHalfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
 		Book end = endBook(k);
 		int strand = ctx.strandHalfTicks(end, from.b, capeUses(from.spent));
@@ -321,7 +306,6 @@ final class LabelSearch
 		}
 	}
 
-	/** Walking due south out of the surface Wilderness to where more teleports work (PLAN §5.4). */
 	private void expandExits(Label from, int k)
 	{
 		WorldPoint tile = ctx.tile(from.node);
@@ -355,10 +339,10 @@ final class LabelSearch
 			{
 				continue;
 			}
-			int castBook = castBook(tele.book, k);
-			if (castBook >= 0)
+			int bookAfter = bookAfterCasting(tele.book, k);
+			if (bookAfter != CANNOT_CAST)
 			{
-				transport(from, tele.node, from.c, castBook, tele.halfTicks, Leg.Kind.TELEPORT, tele, null);
+				transport(from, tele.node, from.c, bookAfter, tele.halfTicks, Leg.Kind.TELEPORT, tele, null);
 			}
 			if (swap != null && k == LUNAR && tele.book != null && tele.book != Book.LUNAR)
 			{
@@ -367,8 +351,7 @@ final class LabelSearch
 		}
 	}
 
-	/** The book after casting a row of {@code rowBook} from book {@code k}, or −1 if it can't be cast. */
-	private static int castBook(Book rowBook, int k)
+	private static int bookAfterCasting(Book rowBook, int k)
 	{
 		if (rowBook == null)
 		{
@@ -376,12 +359,12 @@ final class LabelSearch
 		}
 		if (k < FIRST_PENDING)
 		{
-			return rowBook.ordinal() == k ? k : -1;
+			return rowBook.ordinal() == k ? k : CANNOT_CAST;
 		}
-		return rowBook == pendingBook(k) ? LUNAR : -1;
+		return rowBook == pendingBook(k) ? LUNAR : CANNOT_CAST;
 	}
 
-	/** Magic and Max cape: to any expanded book, from anywhere teleports work (B04), ending a pending revert. */
+	/** The Magic or Max cape changes to any expanded book wherever teleports work, which also ends a pending revert. */
 	private void expandCape(Label from, OriginClass origin, int k)
 	{
 		PlanContext.Change cape = ctx.options[from.b].cape;
@@ -399,8 +382,8 @@ final class LabelSearch
 	}
 
 	/**
-	 * Altars, Tyss and the house's altars and mounted capes at this node. A single altar or Tyss toggles its book, or
-	 * goes back to Standard when already on it; the occult altar and a mounted cape go to any expanded book.
+	 * A single altar or Tyss toggles its book, or goes back to Standard when already on it; the occult altar and a
+	 * mounted cape go to any expanded book.
 	 */
 	private void expandLocatedChanges(Label from, OriginClass origin, int k)
 	{
@@ -442,8 +425,8 @@ final class LabelSearch
 	}
 
 	/**
-	 * The bank-stop edge, the only way into the banked state: walking past a bank flips nothing. What is withdrawn is
-	 * charged on the edges that use it, since the withdraw list is only known edge by edge (PLAN §5.4 Cost).
+	 * The only way into the banked state. Withdrawals are charged on the edges that use them, since the withdraw list
+	 * is only known edge by edge.
 	 */
 	private void expandBank(Label from, int k)
 	{
@@ -457,18 +440,18 @@ final class LabelSearch
 	private void transport(Label from, int node, int c, int k, int half, Leg.Kind kind, PlanContext.Teleport tele, Object second)
 	{
 		int[] spent = spend(from.spent, tele.res, tele.amounts, from.b);
-		int[] withdrawn = union(from.withdrawn, tele.withdraw);
+		int[] withdrawn = sortedUnion(from.withdrawn, tele.withdraw);
 		if (second instanceof PlanContext.Change)
 		{
 			PlanContext.Change swap = (PlanContext.Change) second;
 			spent = spend(spent, swap.res, swap.amounts, from.b);
-			withdrawn = union(withdrawn, swap.withdraw);
+			withdrawn = sortedUnion(withdrawn, swap.withdraw);
 		}
 		else if (second instanceof PlanContext.Teleport)
 		{
 			PlanContext.Teleport landing = (PlanContext.Teleport) second;
 			spent = spend(spent, landing.res, landing.amounts, from.b);
-			withdrawn = union(withdrawn, landing.withdraw);
+			withdrawn = sortedUnion(withdrawn, landing.withdraw);
 		}
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
@@ -481,7 +464,7 @@ final class LabelSearch
 	private void change(Label from, int node, int c, int k, PlanContext.Change change)
 	{
 		int[] spent = spend(from.spent, change.res, change.amounts, from.b);
-		int[] withdrawn = union(from.withdrawn, change.withdraw);
+		int[] withdrawn = sortedUnion(from.withdrawn, change.withdraw);
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
 			int total = change.halfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
@@ -491,17 +474,13 @@ final class LabelSearch
 		}
 	}
 
-	/**
-	 * A bank stop followed by a transport or change that takes nothing from the bank: the same route without the stop
-	 * is faster, unless the step's required items need the bank anyway or the plan started at an open bank.
-	 */
+	/** The same route without the bank stop would be faster. */
 	private boolean pointlessAfterBank(Label from, int[] withdrawn)
 	{
 		return from.b == PlanContext.BANKED && withdrawn.length == 0 && ctx.arrivesWithoutBank() && !ctx.in.isAtOpenBank();
 	}
 
-	/** Sorted item ids in either. */
-	static int[] union(int[] a, int[] b)
+	private static int[] sortedUnion(int[] a, int[] b)
 	{
 		if (b.length == 0)
 		{
@@ -531,28 +510,23 @@ final class LabelSearch
 		return n == out.length ? out : Arrays.copyOf(out, n);
 	}
 
-	/**
-	 * Label a is at least as good as label b from here on: no more ticks or rank, no more of anything spent, and ahead by
-	 * enough to withdraw later, at 2 ticks each, whatever b has withdrawn that a hasn't.
-	 */
 	private static boolean dominates(int aRank, int aHalf, int[] aSpent, int[] aWithdrawn, int bRank, int bHalf, int[] bSpent, int[] bWithdrawn)
 	{
-		int owed = PlanContext.WITHDRAW_HALF_TICKS * missing(aWithdrawn, bWithdrawn);
-		return aRank + owed <= bRank && aHalf + owed <= bHalf && subset(aSpent, bSpent);
+		int withdrawLater = PlanContext.WITHDRAW_HALF_TICKS * countMissing(aWithdrawn, bWithdrawn);
+		return aRank + withdrawLater <= bRank && aHalf + withdrawLater <= bHalf && spendsNoMore(aSpent, bSpent);
 	}
 
-	/** How many ids of {@code small} are not in {@code big} (both sorted). */
-	private static int missing(int[] big, int[] small)
+	private static int countMissing(int[] sortedHave, int[] sortedWanted)
 	{
 		int count = 0;
 		int i = 0;
-		for (int id : small)
+		for (int id : sortedWanted)
 		{
-			while (i < big.length && big[i] < id)
+			while (i < sortedHave.length && sortedHave[i] < id)
 			{
 				i++;
 			}
-			if (i >= big.length || big[i] != id)
+			if (i >= sortedHave.length || sortedHave[i] != id)
 			{
 				count++;
 			}
@@ -560,12 +534,9 @@ final class LabelSearch
 		return count;
 	}
 
-	// ---------------------------------------------------------------- labels
-
 	/**
-	 * Adds the label unless another dominates it; returns it, or null when dominated. A label also dominates
-	 * labels of a higher change category at the same place, book and bank state: whatever the higher one goes
-	 * on to do, the lower one can do too, and a lower category never needs the margin.
+	 * Returns null when dominated. A lower change category also dominates a higher one at the same place, book and bank
+	 * state: it can do whatever the higher one goes on to do, and never needs the margin.
 	 */
 	private Label offer(Label from, int node, int b, int c, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
 		Object ref, Object ref2, int[] spent)
@@ -684,9 +655,8 @@ final class LabelSearch
 	}
 
 	/**
-	 * {@code spent} plus the units of the resources that can run out, or null when that would use more than the
-	 * bank state has. A resource the player has plenty of (a stack of 1,000 runes) is never tracked, so it
-	 * doesn't split labels.
+	 * Null when the bank state hasn't enough. A resource the player has plenty of (a stack of 1,000 runes) is never
+	 * tracked, so it doesn't split labels.
 	 */
 	private int[] spend(int[] spent, int[] res, int[] amounts, int b)
 	{
@@ -710,7 +680,7 @@ final class LabelSearch
 		return merged;
 	}
 
-	/** Pairs (resource, units) sorted by resource. */
+	/** {@code pairs} is flat (resource, units) pairs, sorted by resource. */
 	private static int[] add(int[] pairs, int resource, int units)
 	{
 		for (int i = 0; i < pairs.length; i += 2)
@@ -756,8 +726,7 @@ final class LabelSearch
 		return ctx.resources.cape < 0 ? 0 : count(spent, ctx.resources.cape);
 	}
 
-	/** Every resource in {@code a} at most as used as in {@code b}. */
-	private static boolean subset(int[] a, int[] b)
+	private static boolean spendsNoMore(int[] a, int[] b)
 	{
 		for (int i = 0; i < a.length; i += 2)
 		{
@@ -768,8 +737,6 @@ final class LabelSearch
 		}
 		return true;
 	}
-
-	// ---------------------------------------------------------------- books
 
 	private int effectiveBook(int k, int half)
 	{
@@ -819,10 +786,9 @@ final class LabelSearch
 		int t;
 		int half;
 		int rank;
-		/** Rank plus the A* lower bound to the goal: the queue's order. */
 		int f;
 		int[] spent;
-		/** Item ids taken from the bank so far, sorted; each costs its 2 ticks once. */
+		/** Sorted; each id is charged its withdraw ticks once. */
 		int[] withdrawn = NOTHING;
 		Label parent;
 		Leg.Kind kind;

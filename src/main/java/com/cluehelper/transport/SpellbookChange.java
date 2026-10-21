@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
-/** One way to change spellbook ({@code spellbooks.tsv}, PLAN §4 Data), with B04's measured costs. */
 @Value
 @Builder(toBuilder = true)
 public class SpellbookChange
@@ -18,7 +17,7 @@ public class SpellbookChange
 	boolean temporary;
 	/** Null when it works anywhere or inside the house. */
 	WorldPoint tile;
-	/** POH furniture: usable at the house node, once the house scan has seen it (M2). */
+	/** Usable from the house node, once a house scan has seen the piece. */
 	boolean inHouse;
 	@Builder.Default
 	int objectId = NO_ID;

@@ -1,6 +1,5 @@
 package com.cluehelper.step;
 
-/** A Cluehelper* cache row a step maps to (B01). Never the step's identity. */
 public final class CacheRow
 {
 	private int id;
@@ -17,7 +16,7 @@ public final class CacheRow
 		return name;
 	}
 
-	/** The varbit branch this row belongs to, or null when the step has one row for every branch. */
+	/** Null when the step has one row for every branch. */
 	public Branch getWhen()
 	{
 		return when;
@@ -29,7 +28,6 @@ public final class CacheRow
 		return id + " " + name + (when == null ? "" : " when " + when);
 	}
 
-	/** Holds when the varbit equals {@code equals}, or differs from {@code notEquals}. */
 	public static final class Branch
 	{
 		private int varbit;

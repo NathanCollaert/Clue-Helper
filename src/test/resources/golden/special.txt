@@ -62,7 +62,7 @@ bank tipping point: mid-ironman, bank on, to Varrock bank crates
   best      27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       37t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
   alt       42t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 23 {charge:2552=1, item:8007=1} withdraw [8007]
-Nathan's case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked
+Fountain of Rune case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked
   best      25t: Camelot Teleport: Seers' → walk 3 → bank → Wilderness sword 4: Teleport → walk 6 {item:556=5, item:563=1} withdraw [13111] deposit first
   direct    67t: Teleport to House → House obelisk: Level 50 Wilderness → walk 52 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
@@ -123,7 +123,7 @@ at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade requ
   best      29t: (at the open bank) Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1} withdraw [952]
   alt       32t: (at the open bank) Varrock tablet → walk 23 {item:8007=1} withdraw [8007, 952]
   alt       37t: (at the open bank) walk 35 withdraw [952]
-house: Burthorpe castle steps (Eohric), no games necklace, Nathan's house
+house: Burthorpe castle steps (Eohric), no games necklace, a fully built house
   best      23t: Teleport to House → Jewellery box: Burthorpe → walk 6 {item:556=1, item:557=1, item:563=1}
   alt       31t: Max cape: Warriors' Guild → walk 26
   alt       32t: Burthorpe Games Room Minigame Teleport → walk 6 {cooldown:888=1}
@@ -131,12 +131,12 @@ house: Burthorpe castle steps (Eohric), no games necklace, no house
   best      31t: Max cape: Warriors' Guild → walk 26
   alt       32t: Burthorpe Games Room Minigame Teleport → walk 6 {cooldown:888=1}
   alt       57t: Construction cape: Taverley → walk 52
-house: Fountain of Rune 12101 on Arceuus, no cape uses left, Nathan's house
+house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      68t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 52
   alt       72t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 55
   alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
   note      Wilderness target
-house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus (B10's case)
+house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus
   best      72t (rank 102): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 55 {item:563=2, item:565=2} leaves you on ANCIENT
   same book 128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
   alt       132t: Max cape: Other Teleports: Black chinchompa → walk 127 {daily:4819=1}
@@ -160,11 +160,11 @@ house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelis
   alt       62t (rank 70): Max cape: Spellbook → ANCIENT → Annakarl Teleport → walk 55 {cape=1, item:563=2, item:565=2} leaves you on ANCIENT
   alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
   note      Wilderness target
-house: Yanille upstairs house (B17 live), the Yanille twin of the Watchtower slot, no law runes
+house: Yanille upstairs house, the Yanille twin of the Watchtower slot, no law runes
   best      37t: Construction cape: Tele to POH → Portal nexus: Yanille → walk 12
   alt       45t: Construction cape: Yanille → walk 32
   alt       56t: Nightmare Zone Minigame Teleport → walk 22 {cooldown:888=1}
-house: standing at the house portal in Hosidius with house tabs only (B17 live), Burthorpe castle steps
+house: standing at the house portal in Hosidius with house tabs only, Burthorpe castle steps
   best      24t: House portal: Home → Jewellery box: Burthorpe → walk 6
   alt       35t: House portal: Home → Jewellery box: Warriors' Guild → walk 17
 house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)
@@ -188,7 +188,7 @@ planted: Etceteria castle, mid-ironman, the Etceteria tree seen grown
   best      55t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Etceteria → walk 4 {charge:11968=1}
   alt       61t: Varrock Teleport → walk 44 → Spirit tree: Etceteria → walk 4 {item:556=3, item:554=1, item:563=1}
   alt       70t: Necklace of passage: The Outpost → walk 52 → Spirit tree: Etceteria → walk 4 {charge:21146=1}
-spirit tree to the house: at the Grand Exchange tree, mid-ironman with Nathan's house, Fountain of Rune 12101
+spirit tree to the house: at the Grand Exchange tree, mid-ironman with a fully built house, Fountain of Rune 12101
   best      72t: Spirit tree: Your house → House obelisk: Level 50 Wilderness → walk 52
   alt       76t: Spirit tree: Your house → Portal nexus: Annakarl → walk 55
   alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
@@ -197,7 +197,7 @@ quetzal: at Renu in Civitas illa Fortis, maxed, dig outside the bank on Aldarin
   best      25t: Quetzal: Aldarin → walk 17
   alt       32t: Construction cape: Aldarin → walk 27
   alt       36t: Teleport to House → Fairy ring CKQ: Varlamore: Aldarin → walk 19 {item:556=1, item:557=1, item:563=1}
-partial charges first (B17 live): passage(5) and passage(2) banked, coordinate 2807 by the Outpost
+partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost
   best      47t: Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 28 {charge:2552=1, charge:21153=1} withdraw [21153]
   direct    122t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 71 {charge:11968=1}
 quetzal whistle: carried, maxed, emote outside the gates of Cam Torum

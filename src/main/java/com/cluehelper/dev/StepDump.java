@@ -15,9 +15,8 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * {@code ::ch-step} and the step lines of the dev log. Each change also logs a fixture line in the
- * B03 replay format ({@code "event":"clue"} with the clue's facts), so a clue type the fixtures
- * lack can be cut from the log into src/test/resources.
+ * Fixture lines use the replay fixtures' format, so a clue type the fixtures lack can be cut from the
+ * log into src/test/resources.
  */
 final class StepDump
 {
@@ -45,7 +44,7 @@ final class StepDump
 		lines(step).forEach(reply);
 	}
 
-	/** On the client thread, from the step listener. */
+	/** Client thread only. */
 	String fixtureLine(int tick, StepChange change, Step step)
 	{
 		JsonObject event = new JsonObject();

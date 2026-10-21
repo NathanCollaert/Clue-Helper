@@ -47,19 +47,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * PLAN §4 Testing: golden routes, one file per fixture loadout plus one for the special cases. A cost-model
- * change regenerates them: the test writes build/golden/*.txt and fails with the changed lines; after the
- * diff is read, copy them over src/test/resources/golden/. Every route also passes two invariants: it spends
- * no more than the player has, and an extra option (spellbook changes, a bank stop) never makes Best slower.
+ * On a cost-model change the test writes build/golden/*.txt and fails with the changed lines; once the diff is read,
+ * copy them over src/test/resources/golden/.
  */
 public class GoldenRoutesTest
 {
 	private static final Path ACTUAL = Paths.get("build/golden");
-	/** Where a route starts unless a case says otherwise: the Grand Exchange, with no walk leg. */
 	private static final WorldPoint ANYWHERE = new WorldPoint(3164, 3486, 0);
 	private static final int SAMPLE_PER_TYPE = 6;
 	private static final long NOW_MINUTES = 29_000_000L;
-	/** B02's ten largest heuristic regrets on the maxed main, and Draynor Manor's fenced grounds. */
+	private static final int HOME_TELEPORT_TIMER_VARP = 892;
+	private static final int MINIGAME_TELEPORT_TIMER_VARP = 888;
+	/** The largest heuristic regrets on the maxed main, and Draynor Manor's fenced grounds. */
 	private static final List<String> REGRETS = List.of(
 		"cryptic:search through chests found in the upstairs of houses in eastern falador.",
 		"cryptic:you will need to under-cook to solve this one.",
@@ -71,7 +70,7 @@ public class GoldenRoutesTest
 		"coordinate:2303,3328,0",
 		"emote:19791");
 
-	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin (B15). */
+	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin. */
 	private static final List<String> TIPPING_POINTS = List.of("coordinate:3556", "map:3599", "spot:MISTHALIN_VARROCK_STONE_CIRCLE");
 
 	private static final GoldenCoverage COVERAGE = new GoldenCoverage();
@@ -128,7 +127,6 @@ public class GoldenRoutesTest
 		assertTrue(String.join("\n", failures), failures.isEmpty());
 	}
 
-	/** B17's gate: with both golden files planned, every Tier A/B kind appears in some route (build/golden/coverage.txt). */
 	@AfterClass
 	public static void goldenRoutesCoverEveryTierABKind() throws IOException
 	{
@@ -218,13 +216,12 @@ public class GoldenRoutesTest
 		assertTrue(String.join("\n", failures), failures.isEmpty());
 	}
 
-	/** B15: bank tipping points, Nathan's Fountain of Rune case, required items from every source, the open bank and the PIN. */
 	private static void bankCases(List<String> lines, PlayerSnapshot maxed, PlayerSnapshot mid, PlayerSnapshot midBank,
 		PlannerSettings bankOn)
 	{
 		Step fountain = step("coordinate:12101");
 		PlayerSnapshot noCapeUses = capeUsesLeft(maxed, 0);
-		lines.add(line("Nathan's case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked",
+		lines.add(line("Fountain of Rune case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked",
 			checked(input(noCapeUses, fountain, PlanStart.teleportOnly(ANYWHERE), bankOn)
 				.banked(withBank(noCapeUses, Map.of(Loadouts.itemId("Wilderness sword 4"), 1))).build())));
 		for (String key : TIPPING_POINTS)
@@ -243,7 +240,7 @@ public class GoldenRoutesTest
 			checked(input(glory1, draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
 				.banked(withBank(glory1, Map.of(ItemID.SPADE, 1))).build())));
 		lines.add(line("required spade: carried, to Draynor (dig)",
-			checked(input(with(mid, ItemID.SPADE), draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
+			checked(input(alsoCarrying(mid, ItemID.SPADE), draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
 				.banked(midBank).build())));
 		lines.add(line("required spade: nowhere, at a tool leprechaun",
 			checked(input(mid, draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade.toBuilder().spadeAtLeprechaun(true).build())
@@ -274,25 +271,20 @@ public class GoldenRoutesTest
 				.atOpenBank(true).required(spade).banked(midBank.toBuilder().bank(merged(midBank.getBank(), ItemID.SPADE)).build()).build())));
 	}
 
-	/**
-	 * B16: Nathan's house. Burthorpe castle steps (box vs Max cape: Warriors' Guild); his Fountain of Rune case through
-	 * the nexus, and through the occult altar when the house has no nexus; a profile known only from varbits; starting
-	 * inside the own house, and inside a stranger's (its furniture isn't the player's).
-	 */
 	private static void houseCases(List<String> lines, PlayerSnapshot maxed, PlannerSettings plain)
 	{
 		Step burthorpe = step("anagram:12071");
 		Step fountain = step("coordinate:12101");
-		HouseState full = Loadouts.nathansHouse();
+		HouseState full = Loadouts.fullyBuiltHouse();
 		PlayerSnapshot noNecklace = without(maxed, Loadouts.itemId("Games necklace"));
-		lines.add(line("house: Burthorpe castle steps (Eohric), no games necklace, Nathan's house",
+		lines.add(line("house: Burthorpe castle steps (Eohric), no games necklace, a fully built house",
 			checked(input(noNecklace, burthorpe, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		lines.add(line("house: Burthorpe castle steps (Eohric), no games necklace, no house",
 			checked(input(noNecklace.toBuilder().house(HouseState.NONE).build(), burthorpe, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		PlayerSnapshot arceuus = capeUsesLeft(onBook(maxed, Book.ARCEUUS, false), 0);
-		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, Nathan's house",
+		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house",
 			checked(input(arceuus, fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
-		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus (B10's case)",
+		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus",
 			checked(input(arceuus.toBuilder().house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_ALTAR_OCCULT)).build()).build(),
 				fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		HouseState varbitsOnly = full.toBuilder().furniture(Set.of(ObjectID.POH_AMULET_XERIC_INFERNO, ObjectID.POH_AMULET_DIG_FOSSIL,
@@ -307,10 +299,10 @@ public class GoldenRoutesTest
 		lines.add(line("house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelisk",
 			checked(input(maxed.toBuilder().house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_PORTAL_TEAK_ANNAKARL)).build()).build(),
 				fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
-		lines.add(line("house: Yanille upstairs house (B17 live), the Yanille twin of the Watchtower slot, no law runes",
+		lines.add(line("house: Yanille upstairs house, the Yanille twin of the Watchtower slot, no law runes",
 			checked(input(without(maxed, ItemID.LAWRUNE), step("cryptic:in a town where wizards are known to gather, search upstairs in a large house to the north."),
 				PlanStart.teleportOnly(ANYWHERE), plain).build())));
-		lines.add(line("house: standing at the house portal in Hosidius with house tabs only (B17 live), Burthorpe castle steps",
+		lines.add(line("house: standing at the house portal in Hosidius with house tabs only, Burthorpe castle steps",
 			checked(input(withoutAll(maxed, Set.of(ItemID.LAWRUNE, ItemID.SKILLCAPE_MAX, ItemID.SKILLCAPE_CONSTRUCTION, Loadouts.itemId("Games necklace"))),
 				burthorpe, PlanStart.atNode(table, table.node(new WorldPoint(1743, 3517, 0))), plain).build())));
 		lines.add(line("house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)",
@@ -319,11 +311,6 @@ public class GoldenRoutesTest
 			checked(input(maxed.toBuilder().house(HouseState.NONE).build(), step("map:w356"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 	}
 
-	/**
-	 * B17: spirit trees and quetzals. B15's live case (anagram 23133, Madame Caldarium) for a player without the Feldip
-	 * rocks' 10 Agility; a planted tree known grown against never seen (unknown is unavailable); the house as a spirit
-	 * tree landing from the Grand Exchange tree; Renu from Civitas illa Fortis; the whistle from anywhere.
-	 */
 	private static void networkCases(List<String> lines, PlayerSnapshot maxed, PlayerSnapshot mid, PlannerSettings plain)
 	{
 		Step caldarium = step("anagram:23133");
@@ -336,8 +323,8 @@ public class GoldenRoutesTest
 		lines.add(line("planted: Etceteria castle, mid-ironman, the Etceteria tree seen grown",
 			checked(input(mid.toBuilder().plantedTrees(Set.of("Etceteria")).build(), etceteria, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		PlanStart geTree = PlanStart.atNode(table, table.node(new WorldPoint(3185, 3508, 0)));
-		PlayerSnapshot midHouse = mid.toBuilder().house(Loadouts.nathansHouse()).build();
-		lines.add(line("spirit tree to the house: at the Grand Exchange tree, mid-ironman with Nathan's house, Fountain of Rune 12101",
+		PlayerSnapshot midHouse = mid.toBuilder().house(Loadouts.fullyBuiltHouse()).build();
+		lines.add(line("spirit tree to the house: at the Grand Exchange tree, mid-ironman with a fully built house, Fountain of Rune 12101",
 			checked(input(midHouse, step("coordinate:12101"), geTree, plain).build())));
 		Step aldarin = step("cryptic:dig outside the bank on aldarin.");
 		PlanStart civitas = PlanStart.atNode(table, table.node(new WorldPoint(1697, 3140, 0)));
@@ -348,10 +335,10 @@ public class GoldenRoutesTest
 		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_5, new Charge(5, Charge.Source.ITEM_ID));
 		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_2, new Charge(2, Charge.Source.ITEM_ID));
 		PlayerSnapshot twoPassages = noPassage.toBuilder().charges(passageCharges).build();
-		lines.add(line("partial charges first (B17 live): passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
+		lines.add(line("partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
 			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().bankEdge(true).build())
 				.banked(withBank(twoPassages, Map.of(ItemID.NECKLACE_OF_PASSAGE_5, 1, ItemID.NECKLACE_OF_PASSAGE_2, 1))).build())));
-		PlayerSnapshot whistle = with(maxed, Loadouts.itemId("Quetzal whistle"));
+		PlayerSnapshot whistle = alsoCarrying(maxed, Loadouts.itemId("Quetzal whistle"));
 		lines.add(line("quetzal whistle: carried, maxed, emote outside the gates of Cam Torum",
 			checked(input(whistle, step("emote:salute outside the gates of cam torum. beware of double agents! equip a full set of blue moon equipment."),
 				PlanStart.teleportOnly(ANYWHERE), plain).build())));
@@ -376,8 +363,7 @@ public class GoldenRoutesTest
 		return RequiredItems.builder().needs(List.of(needs)).stash(stash).build();
 	}
 
-	/** The player carrying one {@code itemId} as well. */
-	private static PlayerSnapshot with(PlayerSnapshot player, int itemId)
+	private static PlayerSnapshot alsoCarrying(PlayerSnapshot player, int itemId)
 	{
 		Map<Integer, Integer> inventory = new HashMap<>(player.getInventory());
 		inventory.put(itemId, 1);
@@ -402,9 +388,6 @@ public class GoldenRoutesTest
 		return out;
 	}
 
-	// ---------------------------------------------------------------- invariants
-
-	/** Plans, then checks both invariants; returns the plan. */
 	private static Plan checked(PlanInput input)
 	{
 		Plan plan = Planner.plan(input);
@@ -451,8 +434,6 @@ public class GoldenRoutesTest
 		return fewer;
 	}
 
-	// ---------------------------------------------------------------- output
-
 	private static String line(String name, Plan plan)
 	{
 		COVERAGE.add(name, plan);
@@ -495,7 +476,6 @@ public class GoldenRoutesTest
 			+ ends + withdraw(route);
 	}
 
-	/** Each banked route's withdraw list, the load-bearing output of B15 besides the ticks. */
 	private static String withdraw(Route route)
 	{
 		if (!route.isBanked())
@@ -568,8 +548,6 @@ public class GoldenRoutesTest
 		timings.forEach(System.out::println);
 	}
 
-	// ---------------------------------------------------------------- inputs
-
 	static PlanInput.PlanInputBuilder input(PlayerSnapshot player, Step step, PlanStart start, PlannerSettings settings)
 	{
 		return PlanInput.builder()
@@ -583,12 +561,12 @@ public class GoldenRoutesTest
 			.settings(settings);
 	}
 
-	/** Fixtures leave the teleport timers unread; they are ready here. */
+	/** Fixtures leave the teleport timers unread. */
 	private static PlayerSnapshot ready(PlayerSnapshot player)
 	{
 		Map<Integer, Integer> varps = new HashMap<>(player.getVarps());
-		varps.put(892, 0);
-		varps.put(888, 0);
+		varps.put(HOME_TELEPORT_TIMER_VARP, 0);
+		varps.put(MINIGAME_TELEPORT_TIMER_VARP, 0);
 		return player.toBuilder().varps(varps).build();
 	}
 
@@ -625,7 +603,6 @@ public class GoldenRoutesTest
 		return player.toBuilder().inventory(inventory).build();
 	}
 
-	/** The player with this bank remembered: what A_banked judges. */
 	private static PlayerSnapshot withBank(PlayerSnapshot player, Map<Integer, Integer> bank)
 	{
 		return player.toBuilder().bank(bank).build();
@@ -643,9 +620,6 @@ public class GoldenRoutesTest
 		}
 	}
 
-	// ---------------------------------------------------------------- steps
-
-	/** Up to {@link #SAMPLE_PER_TYPE} steps per clue type, evenly spread over the sorted keys, plus B02's regrets. */
 	private static List<Step> sample(Loadouts.Loadout loadout)
 	{
 		JsonElement tiers = loadout.getFixture().get("tiers");
@@ -692,7 +666,6 @@ public class GoldenRoutesTest
 		return steps.values().stream().filter(s -> s.getKind() == kind).findFirst().orElseThrow();
 	}
 
-	/** Three master cryptic parts, in the order the scroll lists them. */
 	private static Step threeStep()
 	{
 		List<WorldPoint> parts = new ArrayList<>();
@@ -705,7 +678,6 @@ public class GoldenRoutesTest
 			.targets(parts).regions(List.of()).known(true).build();
 	}
 
-	/** Eight master hot/cold spots, as B19 will hand them over. */
 	private static Step probes()
 	{
 		List<WorldPoint> spots = steps.values().stream().filter(s -> s.getType().equals("hotcold spot")).limit(8)

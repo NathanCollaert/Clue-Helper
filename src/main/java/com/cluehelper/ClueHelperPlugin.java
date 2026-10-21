@@ -261,7 +261,7 @@ public class ClueHelperPlugin extends Plugin
 		}
 	}
 
-	/** Priority -1: core updates its clue in its own priority-0 handlers, which must run first. */
+	/** Runs after core's priority-0 handlers, which update its clue. */
 	@Subscribe(priority = -1)
 	public void onGameTick(GameTick tick)
 	{
@@ -312,7 +312,7 @@ public class ClueHelperPlugin extends Plugin
 		menuLines.colourLines(guide.getMenuTarget(), config.highlightMenus());
 	}
 
-	/** After Menu Entry Swapper's swaps: the hover menu's top entry is the left click. */
+	/** Runs after Menu Entry Swapper's swaps, so the menu's top entry is the real left click. */
 	@Subscribe(priority = -1)
 	public void onPostMenuSort(PostMenuSort event)
 	{
@@ -324,7 +324,7 @@ public class ClueHelperPlugin extends Plugin
 		}
 	}
 
-	/** After other plugins have built the menu: our option is coloured, nothing is added, removed or reordered. */
+	/** Runs after other plugins build the menu; only colours our option, never adds, removes or reorders entries. */
 	@Subscribe(priority = -1)
 	public void onMenuOpened(MenuOpened event)
 	{
@@ -332,7 +332,7 @@ public class ClueHelperPlugin extends Plugin
 		fairyRings.onMenuEntries(event.getMenuEntries());
 	}
 
-	/** Priority 2: the menu scripts' arguments are read before better-teleport-menu (priority 1) rewrites them (B12). */
+	/** Reads the menu scripts' arguments before better-teleport-menu (priority 1) rewrites them. */
 	@Subscribe(priority = 2)
 	public void onScriptPreFired(ScriptPreFired event)
 	{
@@ -447,7 +447,7 @@ public class ClueHelperPlugin extends Plugin
 		return snapshot == null ? null : snapshot.getDormantReason();
 	}
 
-	/** Client thread: the guide's state is read here, then handed to Swing. */
+	/** Client thread only: reads the guide's state, then hands it to Swing. */
 	private void showPanelState()
 	{
 		ClueHelperPanel target = panel;
@@ -461,23 +461,21 @@ public class ClueHelperPlugin extends Plugin
 		SwingUtilities.invokeLater(() -> target.show(model));
 	}
 
-	/** "Open your bank once" while this profile has no bank and one would count: not UIM, useBank on (B13). */
 	private PanelModel.BankInfo bankInfo()
 	{
 		BankMemory.Seen bank = bankMemory.getBank();
 		PlayerSnapshot snapshot = playerModel.getSnapshot();
 		boolean bankCounts = config.useBank() && snapshot != null && snapshot.getAccountType() != ULTIMATE_IRONMAN;
-		return new PanelModel.BankInfo(bank == null ? 0 : bank.seenAt, bank == null && bankCounts,
-			id -> client.getItemDefinition(id).getName());
+		boolean promptOpen = bank == null && bankCounts;
+		return new PanelModel.BankInfo(bank == null ? 0 : bank.seenAt, promptOpen, id -> client.getItemDefinition(id).getName());
 	}
 
-	/** "Visit your house once" while only the nexus varbits are known (B16). */
 	private PanelModel.HouseInfo houseInfo()
 	{
 		HouseState house = poh.getHouse();
 		boolean known = !house.getNexusKeys().isEmpty() || !house.getFurniture().isEmpty();
-		return new PanelModel.HouseInfo(house.getScannedAt(), known && house.getSource() == HouseState.Source.VARBITS,
-			house.getSource() == HouseState.Source.MANUAL);
+		boolean onlyNexusVarbitsKnown = known && house.getSource() == HouseState.Source.VARBITS;
+		return new PanelModel.HouseInfo(house.getScannedAt(), onlyNexusVarbitsKnown, house.getSource() == HouseState.Source.MANUAL);
 	}
 
 	/** Members keep their book on an F2P world, where no book can be changed and only Standard has teleports. */

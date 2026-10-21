@@ -12,10 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 
-/**
- * B12's recorded entries (5 own, 3 foreign) replayed through the state machine: a wrong OWNED would silently teach the
- * planner a stranger's furniture. Plus the false signal B12 found: the bank's Withdraw-All on a house tablet.
- */
+/** A wrong OWNED would silently teach the planner a stranger's furniture. */
 public class HouseOwnershipTest
 {
 	@Test

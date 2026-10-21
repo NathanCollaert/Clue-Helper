@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Value;
 
-/** Everything the panel shows, built on the client thread and handed to Swing as one immutable value. */
+/** Built on the client thread and handed to Swing as one immutable value. */
 @Value
 @Builder(toBuilder = true)
 public class PanelModel
@@ -24,9 +24,8 @@ public class PanelModel
 	public static final PanelModel EMPTY = PanelModel.builder().state(PanelState.NO_CLUE).build();
 
 	PanelState state;
-	/** Replaces the state's own detail line (the dormant world's reason). */
+	/** Replaces the state's own detail line. */
 	String statusDetail;
-	/** The current sub-step, its hint and the one after; null without a route. */
 	String now;
 	String nowDetail;
 	String next;
@@ -43,44 +42,35 @@ public class PanelModel
 		String label;
 		int ticks;
 		String legs;
-		/** "leaves you on Ancient · charges unknown"; empty when nothing to say. */
 		String flags;
-		/** The route the guide follows. */
 		boolean followed;
 	}
 
-	/** What the panel says about the remembered bank (PLAN §5.2 Bank). */
 	@Value
 	public static class BankInfo
 	{
 		public static final BankInfo NONE = new BankInfo(0, false, id -> "item " + id);
 
-		/** When the bank was last seen (epoch millis); 0 for never. */
+		/** Epoch millis; 0 for never. */
 		long seenAt;
-		/** No bank seen on this profile yet, and one would count: say "Open your bank once". */
 		boolean promptOpen;
 		IntFunction<String> itemNames;
 	}
 
-	/** What the panel says about the player's house (PLAN §5.2 POH, B16). */
 	@Value
 	public static class HouseInfo
 	{
 		public static final HouseInfo NONE = new HouseInfo(0, false, false);
 
-		/** When an own-house scan last ran (epoch millis); 0 for never. */
+		/** Epoch millis; 0 for never. */
 		long scannedAt;
-		/** The house is known only from the nexus varbits: say "Visit your house once". */
+		/** The house is known only from the nexus varbits. */
 		boolean promptVisit;
 		/** The furniture comes from the config's overrides. */
 		boolean manual;
 	}
 
-	/**
-	 * @param state     from {@link PanelState#of}
-	 * @param nowItemWorn the current sub-step's item is worn, so its option is in the equipment tab
-	 * @param f2pBook   the book a member is stuck on while on an F2P world, or null
-	 */
+	/** @param f2pBook the book a member is stuck on while on an F2P world, or null */
 	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
 		boolean nowItemWorn, Book f2pBook)
 	{
@@ -88,7 +78,7 @@ public class PanelModel
 			System.currentTimeMillis());
 	}
 
-	/** @param menuHint replaces the sub-step's hint: the hotkey when another plugin hides the list line (B16) */
+	/** @param menuHint replaces the sub-step's hint */
 	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
 		boolean nowItemWorn, Book f2pBook, BankInfo bank, HouseInfo house, String menuHint, long nowMillis)
 	{
@@ -133,7 +123,6 @@ public class PanelModel
 		return model.notes(notes).routes(cards).why(plan.getWhy() == null ? List.of() : plan.getWhy()).build();
 	}
 
-	/** The followed route first, then Best, Direct, Same book, the faster one under the margin and the alternatives. */
 	static List<RouteCard> cards(Plan plan, Route committed)
 	{
 		return cards(plan, committed, BankInfo.NONE, "", 0);
@@ -183,13 +172,12 @@ public class PanelModel
 		cards.add(new RouteCard(label + saving, route.getTicks(), legs(route, itemNames), flags, followed));
 	}
 
-	/** "in bank, seen 3 days ago": the bank's age, the confidence of every banked route. */
+	/** The bank's age is the confidence of every banked route. */
 	static String bankFlags(BankInfo bank, long nowMillis)
 	{
 		return bank.getSeenAt() == 0 ? "" : "in bank, seen " + age(nowMillis - bank.getSeenAt());
 	}
 
-	/** "house seen 3 days ago": how old the furniture is, on every route that uses the house. */
 	static String houseFlags(HouseInfo house, long nowMillis)
 	{
 		if (house.isManual())
@@ -252,7 +240,6 @@ public class PanelModel
 		return route.isOpenBankStart() ? withdraw + " → " + legs : legs;
 	}
 
-	/** "withdraw Xeric's talisman + 2 clue items": items core's *clue* tag shows are only counted. */
 	static String withdrawText(Route route, IntFunction<String> itemNames)
 	{
 		List<String> names = route.getWithdraw().stream().filter(use -> !route.getWithdrawInCoreTag().contains(use.getItemId()))

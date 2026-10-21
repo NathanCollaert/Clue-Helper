@@ -20,9 +20,8 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 /**
- * B03's recorded live logs (src/test/resources/b03/) replayed through the production key rule
- * and ClueLink's rules ({@link LinkState}), tick by tick. Fixtures of more clue types can be cut
- * from the dev log's "[CH-STEP] fixture" lines, which use the same "clue" event format.
+ * Fixtures of more clue types can be cut from the dev log's "[CH-STEP] fixture" lines, which use the same "clue"
+ * event format.
  */
 public class CoreLinkFixtureTest
 {
@@ -84,7 +83,6 @@ public class CoreLinkFixtureTest
 		}
 	}
 
-	/** The flag follows isPluginActive and PluginChanged: never the config key, which flips first. */
 	@Test
 	public void replayKeepsTheActiveFlagOnCoresRealState() throws IOException
 	{
@@ -152,8 +150,8 @@ public class CoreLinkFixtureTest
 	}
 
 	/**
-	 * Feeds a recorded run into LinkState the way ClueLink does: the probe's events of a tick
-	 * first (it logged clue reads at GameTick -1 and only on a change), then one tick read.
+	 * Each tick's recorded events first, then one tick read: the probe logged clue reads at GameTick -1, and only on a
+	 * change.
 	 */
 	private static Replay replay(String resource) throws IOException
 	{

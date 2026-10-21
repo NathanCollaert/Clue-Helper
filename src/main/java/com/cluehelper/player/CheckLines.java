@@ -15,10 +15,8 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.util.Text;
 
 /**
- * Charges from an item's own "Check" line, remembered per item id with the date (B13: the
- * {@code CHARGES_*_QUANTITY} varbits always read 0, so this is the only source for most charged items). A
- * teleport doesn't change the remembered count: no chat line says it was used, and the label says when it was
- * checked. Client thread, except {@link #charges()}.
+ * Client thread, except {@link #charges()}. A teleport doesn't lower the remembered count: no chat line says it was
+ * used, so the count is shown with the time it was checked.
  */
 @Singleton
 public class CheckLines
@@ -26,7 +24,7 @@ public class CheckLines
 	static final String MEMORY_KEY = "checkLines";
 	/** "Unlimited charges" counts as this many: more than any route spends. */
 	public static final int UNLIMITED = 10_000;
-	/** The line came on the click's own tick in every B13 sample. */
+	/** The line arrives on the click's own tick; the rest is slack. */
 	private static final int LINE_TICKS = 2;
 	private static final String CHECK = "Check";
 	private static final Pattern COUNT = Pattern.compile("\\bhas ([\\d,]+) charges?\\b", Pattern.CASE_INSENSITIVE);
@@ -45,7 +43,7 @@ public class CheckLines
 		this.remembered = memory.slot(MEMORY_KEY, Remembered.class, Remembered::new);
 	}
 
-	/** Item id → the last Check line's count. Any thread. */
+	/** Keyed by item id. Any thread. */
 	public Map<Integer, Checked> charges()
 	{
 		return remembered.get().items;
@@ -83,7 +81,7 @@ public class CheckLines
 		return true;
 	}
 
-	/** The count a Check line states, or null when the line isn't one (B13's verbatim lines). */
+	/** Null when the line isn't a Check line. */
 	static Integer parse(String line)
 	{
 		if (UNLIMITED_LINE.matcher(line).find())

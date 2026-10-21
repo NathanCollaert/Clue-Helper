@@ -1,6 +1,5 @@
 package com.cluehelper;
 
-/** The house's spellbook altar, for {@code pohSource} Manual. */
 public enum PohAltar
 {
 	NONE("None"),

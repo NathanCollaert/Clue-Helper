@@ -19,7 +19,6 @@ import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
 import net.runelite.client.plugins.cluescrolls.clues.ThreeStepCrypticClue;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 
-/** Turns core's current clue into a {@link Step}: key, normalised targets, NPCs, objects, requirements. */
 @Slf4j
 @Singleton
 public class StepResolver
@@ -73,7 +72,7 @@ public class StepResolver
 			.build();
 	}
 
-	/** A step for a clue core's getters threw on: nothing but its class, so it still shows as a step. */
+	/** For a clue whose getters threw: only its class, so it still shows as a step. */
 	public static Step unreadable(ClueScroll clue)
 	{
 		String type = clue.getClass().getSimpleName();
@@ -95,7 +94,7 @@ public class StepResolver
 	}
 
 	/**
-	 * A three-step's key joins its three parts' texts, so no step data can hold it; its parts are
+	 * A three-step's key joins its parts' texts, so the step data can't hold it, but its parts are
 	 * master cryptics the data does hold. Null unless the data has every part.
 	 */
 	private StepIndex.Entry threeStepEntry(ThreeStepCrypticClue clue)
@@ -127,9 +126,9 @@ public class StepResolver
 	}
 
 	/**
-	 * Core's tiles, except: a coordinate clue keeps only the tile the cache names (core adds a
-	 * Prifddinas mirror twin to every coordinate clue, and for 2 of the 3 that have one it is the
-	 * wrong tile, B02); a step core gives no tile (Falo, skill challenges) gets the cache's.
+	 * Core adds a Prifddinas mirror twin to coordinate clues, the wrong tile for 2 of the 3 that get
+	 * one, so a coordinate clue keeps only the tile the cache names. A step core gives no tile (Falo,
+	 * skill challenges) gets the cache's.
 	 */
 	private static List<WorldPoint> targets(ClueScroll clue, ClueScrollPlugin plugin, ClueFacts facts, StepIndex.Entry entry)
 	{

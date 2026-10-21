@@ -1,6 +1,5 @@
 package com.cluehelper;
 
-/** The garden's transport, for {@code pohSource} Manual. */
 public enum PohGarden
 {
 	NONE("None"),

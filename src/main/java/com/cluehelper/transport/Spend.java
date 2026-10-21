@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import lombok.Value;
 
-/** One resource a row uses up (the Spends column): {@code runes}, {@code cooldown:892}, {@code daily:6069}, … */
 @Value
 public class Spend
 {

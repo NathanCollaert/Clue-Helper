@@ -5,8 +5,8 @@ import java.util.Map;
 
 /**
  * Items that left the inventory or equipment right after a Deposit click, held until the bank's own update confirms
- * them. Walking off on the next tick closes the bank before that update arrives (B16: Nathan's Max cape went in and
- * the plugin thought it was gone), so ticks without one mean the items went in anyway.
+ * them. Walking off on the next tick closes the bank before that update arrives, so ticks without one mean the items
+ * went in anyway.
  */
 final class LateDeposits
 {
@@ -30,7 +30,7 @@ final class LateDeposits
 		clickTick = tick;
 	}
 
-	/** The inventory and equipment together, unnoted, after any change to either. */
+	/** @param now the inventory and equipment together, unnoted, after any change to either */
 	void onCarried(Map<Integer, Integer> now, int tick)
 	{
 		boolean bankAlreadySeen = tick == bankSeenTick;
@@ -55,7 +55,7 @@ final class LateDeposits
 		ticksWaited = 0;
 	}
 
-	/** Each game tick: the deposits no bank update has confirmed in time, once; empty otherwise. */
+	/** Each game tick: the deposits no bank update confirmed in time, returned once; empty otherwise. */
 	Map<Integer, Integer> onTick()
 	{
 		if (pending.isEmpty() || ++ticksWaited < CONFIRM_TICKS)

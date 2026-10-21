@@ -54,40 +54,32 @@ import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.util.Text;
 
 /**
- * Follows the committed route sub-step by sub-step (PLAN §4 item 6, §5.5) and says what the highlights and
- * markers point at. Client thread only.
- * <p>
- * Each plan starts from where the player is, so a new committed route is the rest of the way: the guide
- * takes it from its first sub-step and moves on as each completes. While a teleport or book change is under
- * way (the player is animating), a new route waits: casting spends runes or starts a cooldown, which re-plans
- * from the old tile before the landing.
+ * Client thread only. While a teleport or book change is under way, a new route waits: the cast spends runes or starts
+ * a cooldown, which re-plans from the old tile before the landing.
  */
 @Slf4j
 @Singleton
 public class StepGuide
 {
-	/** The side tab the current sub-step's highlight sits in. */
 	public enum Tab
 	{
 		NONE, INVENTORY, EQUIPMENT, MAGIC
 	}
 
-	/** A single tick's move farther than running carries you: a teleport, a ladder, a boat. */
+	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
 	static final int JUMP_TILES = 4;
-	/** A refused change leaves the book as it was; the next tick shows whether it changed. */
+	/** A refused book change leaves the book as it was; the next tick shows whether it changed. */
 	static final int REFUSAL_CHECK_TICKS = 2;
-	/** A teleport animates on its click's tick or within two (B14): three ticks without one means it was refused. */
+	/** A teleport animates on its click's tick or within two: three ticks without one means it was refused. */
 	static final int TELEPORT_REFUSAL_TICKS = 3;
-	/** The spell object's param holding its spellbook widget id (B08). */
 	private static final int PARAM_SPELL_WIDGET = 596;
 	private static final String CAPE_LIMIT_TEXT = "five times per day";
 	private static final int NO_ANIMATION = -1;
 	private static final int NEVER = Integer.MIN_VALUE;
-	/** Furniture is looked up again this often while a sub-step uses it: it can load a tick after the house scene. */
 	private static final int OBJECT_REFRESH_TICKS = 5;
 	/** A bank node sits on the walkable tile in front of its booth, chest or banker. */
 	private static final int BANK_TILES = 3;
-	/** The five spirit tree patches' objects (multilocs on their transmit varbits), and the grown tree they show. */
+	/** The patch objects are multilocs on their transmit varbits; the grown tree is the form they show. */
 	private static final Set<Integer> PLANTED_SPIRIT_TREES = Set.of(ObjectID.FARMING_SPIRIT_TREE_PATCH_1,
 		ObjectID.FARMING_SPIRIT_TREE_PATCH_2, ObjectID.FARMING_SPIRIT_TREE_PATCH_3, ObjectID.FARMING_SPIRIT_TREE_PATCH_4,
 		ObjectID.FARMING_SPIRIT_TREE_PATCH_5, ObjectID.SPIRIT_TREE_FULLYGROWN);
@@ -97,17 +89,17 @@ public class StepGuide
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Set.of(ObjectID.FAIRYRING_HOMEHUB, ObjectID.FAIRYRING_MINORHUB,
 		ObjectID.POH_FAIRY_RING, ObjectID.POH_SPIRIT_RING);
 	private static final String SPELLBOOK_OPTION = "Spellbook";
-	/** Catalog landings spread 0–2 tiles (B09): another menu's line within this lands at the same place. */
+	/** Catalog landings spread 0–2 tiles, so another menu's line within this lands at the same place. */
 	private static final int SAME_LANDING_TILES = 3;
-	/** Minigame Teleport is a spell on every book (since 2026-03-11): Nathan casts it rather than using the Grouping tab. */
+	/** Minigame Teleport is a spell on every book, so it is cast rather than picked from the Grouping tab. */
 	private static final Map<Book, Integer> MINIGAME_SPELLS = Map.of(
 		Book.STANDARD, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD,
 		Book.ANCIENT, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ANCIENT,
 		Book.LUNAR, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_LUNAR,
 		Book.ARCEUUS, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ARCEUUS);
 	/**
-	 * Once the act is reached, it stays while the player is this close to a target on any plane: core's tile can
-	 * be on another floor than its NPC (Donovan stands upstairs, his tile is on the ground floor).
+	 * Core's tile can be on another floor than its NPC (Donovan stands upstairs, his tile is on the ground floor), so a
+	 * reached act stays while the player is this close to a target on any plane.
 	 */
 	static final int STAY_AT_ACT_TILES = 20;
 
@@ -124,8 +116,7 @@ public class StepGuide
 	private Runnable unregister;
 	private Route route;
 	private Step routeStep;
-	/** The step whose act the player has reached; a teleport or other jump clears it. */
-	private String arrivedAt;
+	private String actReachedStepKey;
 	private List<SubStep> steps = List.of();
 	private int index;
 	private Route waiting;
@@ -152,12 +143,12 @@ public class StepGuide
 	private List<TileObject> fillObjects = List.of();
 	private int objectsFoundTick = NEVER;
 	/**
-	 * Searches since the target or scene changed that found nothing: a house's furniture appears a tick or two after the
-	 * load (B17), so those first ticks are searched every tick, then every {@link #OBJECT_REFRESH_TICKS}.
+	 * A house's furniture appears a tick or two after the load, so empty searches repeat every tick at first, then every
+	 * {@link #OBJECT_REFRESH_TICKS}.
 	 */
 	private int emptySearches;
 	private String menuHint;
-	/** A teleport was clicked: a game message right after it with no animation means the game refused it. */
+	/** A game message right after a teleport click, with no animation, means the game refused it. */
 	private int teleportClickTick = NEVER;
 	private String teleportRefusal;
 	private int teleportCheckTick = NEVER;
@@ -192,7 +183,7 @@ public class StepGuide
 		clear();
 	}
 
-	/** Runs on the client thread whenever the current sub-step or route changes. */
+	/** Listeners run on the client thread. */
 	public Runnable addListener(Runnable listener)
 	{
 		listeners.add(listener);
@@ -204,7 +195,6 @@ public class StepGuide
 		return route;
 	}
 
-	/** Null without a route. */
 	public SubStep getCurrent()
 	{
 		return index < steps.size() ? steps.get(index) : null;
@@ -215,7 +205,6 @@ public class StepGuide
 		return index + 1 < steps.size() ? steps.get(index + 1) : null;
 	}
 
-	/** Opening a bank, or walking to the one about to be opened: its booth, chest or banker is outlined, not the tile. */
 	public boolean isBankStop()
 	{
 		SubStep current = getCurrent();
@@ -229,13 +218,11 @@ public class StepGuide
 		return steps;
 	}
 
-	/** Item ids to outline in the inventory and equipment for the current sub-step. */
 	public Set<Integer> getHighlightItems()
 	{
 		return highlightItems;
 	}
 
-	/** Item ids to outline in the open bank for the withdraw sub-step. */
 	public Set<Integer> getBankHighlightItems()
 	{
 		return bankHighlightItems;
@@ -246,61 +233,51 @@ public class StepGuide
 		return highlightTab;
 	}
 
-	/** The entry to outline inside a teleport interface (the master scroll book), or -1. */
 	public int getHighlightMenuWidget()
 	{
 		return highlightMenuWidget;
 	}
 
-	/** What to outline in right-click menus and teleport interfaces for the current sub-step (B16). */
 	public MenuTarget getMenuTarget()
 	{
 		return menuTarget;
 	}
 
-	/** The house furniture or the bank booths and chests the current sub-step uses, as loaded in the scene. */
 	public List<TileObject> getHighlightObjects()
 	{
 		return highlightObjects;
 	}
 
-	/** The held items whose left click teleports straight to the destination: filled, not only outlined. */
 	public Set<Integer> getFillItems()
 	{
 		return fillItems;
 	}
 
-	/** The furniture whose left click teleports straight to the destination. */
 	public List<TileObject> getFillObjects()
 	{
 		return fillObjects;
 	}
 
-	/** The bankers of the current bank stop. */
 	public List<NPC> getHighlightNpcs()
 	{
 		return highlightNpcs;
 	}
 
-	/** "Press 5: Feldip Hills" while another plugin hides the list line to pick; null otherwise. */
 	public String getMenuHint()
 	{
 		return menuHint;
 	}
 
-	/** The highlighted item is worn, so its option is in the equipment tab. */
 	public boolean isHighlightWorn()
 	{
 		return highlightWorn;
 	}
 
-	/** The spellbook widget to outline for the current sub-step, or -1. */
 	public int getHighlightSpellWidget()
 	{
 		return highlightSpellWidget;
 	}
 
-	/** Every place of ours on the rest of the route, for the world map: landings, rings, altars; never core's target. */
 	public Map<WorldPoint, String> getMapWaypoints()
 	{
 		Map<WorldPoint, String> places = new LinkedHashMap<>();
@@ -333,7 +310,7 @@ public class StepGuide
 		follow(committed);
 	}
 
-	/** From the plugin's PostMenuSort handler, after Menu Entry Swapper's: what a left click on the hovered thing does. */
+	/** Call from a PostMenuSort handler that runs after Menu Entry Swapper's. */
 	public void onPostMenuSort()
 	{
 		if (client.isMenuOpen() || client.isKeyPressed(KeyCode.KC_SHIFT))
@@ -348,7 +325,7 @@ public class StepGuide
 		}
 	}
 
-	/** From the plugin's GameTick handler, after the planner's. */
+	/** Call from a GameTick handler that runs after the planner's. */
 	public void onGameTick()
 	{
 		WorldPoint tile = player.getPosition().getTile();
@@ -358,7 +335,7 @@ public class StepGuide
 		jumpedThisSubStep |= jumped;
 		if (jumped)
 		{
-			arrivedAt = null;
+			actReachedStepKey = null;
 		}
 		boolean changed = false;
 		if (waiting != null && !isUnderWay())
@@ -421,7 +398,6 @@ public class StepGuide
 		return changed;
 	}
 
-	/** The scene is reloading: what was found in it is gone; once loaded, it is looked up again at once (no blank tick). */
 	public void onGameStateChanged(GameStateChanged event)
 	{
 		if (event.getGameState() == GameState.LOADING || event.getGameState() == GameState.HOPPING)
@@ -438,7 +414,6 @@ public class StepGuide
 		}
 	}
 
-	/** A click on the current teleport's item or furniture, for the refusal check below. */
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		SubStep current = getCurrent();
@@ -456,7 +431,7 @@ public class StepGuide
 		}
 	}
 
-	/** MESBOX lines during a book change are the refusal backstop (PLAN §5.4 Consumption, B04). */
+	/** MESBOX lines during a book change are the refusal backstop. */
 	public void onChatMessage(ChatMessage message)
 	{
 		SubStep current = getCurrent();
@@ -482,7 +457,6 @@ public class StepGuide
 		refusalCheckTick = client.getTickCount() + REFUSAL_CHECK_TICKS;
 	}
 
-	/** Still here and not animating a few ticks after the message: the teleport didn't happen. */
 	private void checkTeleportRefusal()
 	{
 		if (teleportRefusal == null || client.getTickCount() < teleportCheckTick)
@@ -532,7 +506,6 @@ public class StepGuide
 		notifyListeners();
 	}
 
-	/** Moves past every completed sub-step; returns whether any completed. */
 	private boolean advance(WorldPoint tile)
 	{
 		boolean moved = false;
@@ -545,14 +518,14 @@ public class StepGuide
 		SubStep current = getCurrent();
 		if (current != null && current.getKind() == SubStep.Kind.ACT && routeStep != null)
 		{
-			arrivedAt = routeStep.getKey();
+			actReachedStepKey = routeStep.getKey();
 		}
 		return moved;
 	}
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
 	{
-		return step.getKey().equals(arrivedAt) && tile != null
+		return step.getKey().equals(actReachedStepKey) && tile != null
 			&& step.getTargets().stream().anyMatch(target -> target.distanceTo2D(tile) <= STAY_AT_ACT_TILES);
 	}
 
@@ -560,7 +533,7 @@ public class StepGuide
 	{
 		route = null;
 		routeStep = null;
-		arrivedAt = null;
+		actReachedStepKey = null;
 		steps = List.of();
 		index = 0;
 		waiting = null;
@@ -577,7 +550,6 @@ public class StepGuide
 		menuHint = null;
 	}
 
-	/** A teleport, fairy ring or book change has started and not finished: hold the route it belongs to. */
 	private boolean isUnderWay()
 	{
 		SubStep current = getCurrent();
@@ -659,7 +631,7 @@ public class StepGuide
 			MenuTarget.MenuTargetBuilder target = MenuTarget.builder().itemIds(highlightItems).itemNames(names(highlightItems))
 				.alternatives(sameLanding(current));
 			menuTarget = SubSteps.isQuetzalMap(row)
-				? target.path(List.of(SIGNAL_OPTION)).line(MenuTarget.Line.QUETZAL).lineId(SubSteps.quetzalSite(row)).build()
+				? target.path(List.of(SIGNAL_OPTION)).line(MenuTarget.Line.QUETZAL).lineId(SubSteps.quetzalTableId(row)).build()
 				: target.path(optionPath(row.getName())).build();
 		}
 		else if (current.getKind() == SubStep.Kind.FAIRY_RING && current.getRow().getCode() != null)
@@ -682,10 +654,7 @@ public class StepGuide
 		fillItems = oneClickItems(oneClickLabel);
 	}
 
-	/**
-	 * The option that teleports straight there: the path's last label, else the row's ("Jewellery box: Emir's Arena").
-	 * None for a quetzal: its option only opens the map.
-	 */
+	/** None for a quetzal: its option only opens the map. */
 	private String directLabel(SubStep current)
 	{
 		if (menuTarget.getLine() == MenuTarget.Line.QUETZAL)
@@ -708,7 +677,6 @@ public class StepGuide
 			.collect(Collectors.toUnmodifiableSet());
 	}
 
-	/** What hovering showed, else what Menu Entry Swapper's own swap gives (B17). */
 	private String leftClick(ItemUse use)
 	{
 		boolean worn = use.getContainer() == Container.WORN;
@@ -721,10 +689,6 @@ public class StepGuide
 		return worn ? swapperClicks.worn(use.getItemId()) : swapperClicks.item(use.getItemId());
 	}
 
-	/**
-	 * The objects whose left click teleports straight there. A fairy ring's does when it is "Last-destination (code)"
-	 * for the code wanted (Nathan, B17).
-	 */
 	private List<TileObject> oneClickObjects(List<TileObject> objects)
 	{
 		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
@@ -734,7 +698,7 @@ public class StepGuide
 			.collect(Collectors.toUnmodifiableList());
 	}
 
-	/** "Last-destination (CKS)" as hovered; or a "Last-destination" without its code (Menu Entry Swapper) and CKS remembered. */
+	/** Menu Entry Swapper's "Last-destination" carries no code, so the remembered last ring stands in for it. */
 	private boolean ringGoesTo(String leftClick, String code)
 	{
 		if (MenuLabels.isLastDestination(leftClick, code))
@@ -758,11 +722,6 @@ public class StepGuide
 		return swapped != null ? swapped : OneClick.defaultClick(definition);
 	}
 
-	/**
-	 * A located row's menu (catalog Menu column): the nexus by struct id and map region, the jewellery box by line index,
-	 * a quetzal site by its map icon, a 187 list line or the object's own option by label. Outside the house the
-	 * object is the row's own (a spirit tree), and Renu for a quetzal.
-	 */
 	static MenuTarget houseTarget(CatalogRow row)
 	{
 		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objectsOf(row));
@@ -777,7 +736,7 @@ public class StepGuide
 		{
 			case "quetzal":
 				return target.npcIds(Set.of(NpcID.QUETZAL_CHILD_GREEN)).path(List.of(TRAVEL_OPTION)).line(MenuTarget.Line.QUETZAL)
-					.lineId(SubSteps.quetzalSite(row)).build();
+					.lineId(SubSteps.quetzalTableId(row)).build();
 			case "list":
 				return target.path(listPath(row, outside, parts[1])).build();
 			case "nexus":
@@ -793,11 +752,7 @@ public class StepGuide
 		}
 	}
 
-	/**
-	 * The option that opens a 187 list, then its line: Travel on a spirit tree outside, Tree on the house's (B17: on a
-	 * spiritual fairy tree "Ring-configure" opens a list too, and was coloured instead). Other house lists name the line
-	 * only.
-	 */
+	/** On the house's spiritual fairy tree "Ring-configure" opens a list too, so the Tree option is named. */
 	private static List<String> listPath(CatalogRow row, boolean outside, String line)
 	{
 		if (outside)
@@ -807,7 +762,6 @@ public class StepGuide
 		return row.getCategory() == Category.SPIRIT_TREE ? List.of(TREE_OPTION, line) : List.of(line);
 	}
 
-	/** The furniture a house row needs, else the row's own object; a planted tree is whichever patch object is there. */
 	private static Set<Integer> objectsOf(CatalogRow row)
 	{
 		HouseNeed need = row.isInHouse() ? row.getRequirements().getHouse() : null;
@@ -822,10 +776,6 @@ public class StepGuide
 		return row.getObjectId() < 0 ? Set.of() : Set.of(row.getObjectId());
 	}
 
-	/**
-	 * The house's other menus that land where this teleport does, among the rows the player can use now: a respawn
-	 * portal goes to the player's own respawn point (B16: it was offered as Lumbridge and landed in Edgeville).
-	 */
 	private List<MenuTarget> sameLanding(SubStep current)
 	{
 		WorldPoint landing = current.getGoal();
@@ -848,7 +798,6 @@ public class StepGuide
 		return List.copyOf(same);
 	}
 
-	/** "Max cape: Other Teleports: Feldip Hills" → [Other Teleports, Feldip Hills]: the options below the item. */
 	static List<String> optionPath(String rowName)
 	{
 		String[] parts = rowName.split(": ");
@@ -884,7 +833,7 @@ public class StepGuide
 		return row.getCategory() == Category.SPELL || row.getCategory() == Category.HOME;
 	}
 
-	/** The held items that let the player use the row, runes left out: the spell widget covers those. */
+	/** Runes are left out: the spell widget covers those. */
 	private void highlightHeld(CatalogRow row)
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
@@ -909,7 +858,6 @@ public class StepGuide
 		return CatalogRow.builder().name(change.getName()).requirements(change.getRequirements()).build();
 	}
 
-	/** Spell rows are named after the spell, with a destination after a colon or a variant in brackets. */
 	private int spellWidget(CatalogRow row)
 	{
 		RuneModel runes = player.getRuneModel();

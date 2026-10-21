@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.Value;
 
-/** A tab-separated table read by its header: columns in any order, unknown columns kept but unused, {@code #} lines skipped. */
 final class TsvTable
 {
 	private static final String COMMENT = "#";

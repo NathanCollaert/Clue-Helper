@@ -21,11 +21,8 @@ import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
 
 /**
- * The last-seen bank and GIM group storage of this profile, with the time each was seen (PLAN §5.2, B13). Every
- * bank event replaces the copy in memory; it is written to the profile only when the bank closes and at logout,
- * since each save costs about 1 ms on the client thread and a visit fires one event per withdraw. Also knows
- * whether the bank PIN is still to come this session (B14: 4 ticks on the first open). Client thread, except the
- * getters.
+ * Client thread, except the getters. Saved to the profile only when the bank closes and at logout: each save costs
+ * about 1 ms on the client thread and a bank visit fires one event per withdraw.
  */
 @Slf4j
 @Singleton
@@ -52,7 +49,7 @@ public class BankMemory
 	/** The PIN is asked once per login: a bank or PIN screen seen since then means it's done. */
 	private volatile boolean pinDoneThisSession;
 	private volatile long version;
-	/** From the bank's own load and close events: the bank widget can outlive a closed bank. */
+	/** Tracked from the bank's own load and close events: the bank widget can outlive a closed bank. */
 	private volatile boolean bankOpen;
 
 	@Inject
@@ -64,21 +61,20 @@ public class BankMemory
 		this.pin = memory.slot(PIN_KEY, Pin.class, Pin::new);
 	}
 
-	/** The bank as last seen; null when this profile has never opened it. Any thread. */
+	/** Null when this profile has never opened it. Any thread. */
 	public Seen getBank()
 	{
 		Seen live = liveBank;
 		return live != null ? live : seenOrNull(storedBank.get());
 	}
 
-	/** GIM group storage as last seen; null when never seen or not a group account. Any thread. */
+	/** Null when never seen or not a group account. Any thread. */
 	public Seen getGroupStorage()
 	{
 		Seen live = liveGroup;
 		return live != null ? live : seenOrNull(storedGroup.get());
 	}
 
-	/** Whether the next bank open asks for the PIN: the keypad has been seen on this profile and not yet this session. */
 	public boolean isPinPending()
 	{
 		return pin.get().seen && !pinDoneThisSession;
@@ -143,7 +139,7 @@ public class BankMemory
 		}
 	}
 
-	/** Before the planner's tick: deposits the bank never confirmed are added to it (B16). */
+	/** Call before the planner's tick, so the plan never sees an unconfirmed deposit as missing. */
 	public void onGameTick()
 	{
 		Map<Integer, Integer> deposited = lateDeposits.onTick();
@@ -200,7 +196,6 @@ public class BankMemory
 		version++;
 	}
 
-	/** Forgets this profile's bank and group storage ({@code ::ch-bank clear}). */
 	public void clear()
 	{
 		liveBank = null;
@@ -230,7 +225,7 @@ public class BankMemory
 		log.debug("bank memory saved in {} ms", (System.nanoTime() - started) / 1e6);
 	}
 
-	/** Placeholders arrive as quantity 1 under a placeholder id, so they are told apart by definition (B13). */
+	/** Placeholders arrive as quantity 1 under a placeholder id, so they are told apart by definition. */
 	private Seen seen(ItemContainer container)
 	{
 		Seen seen = new Seen();
@@ -248,7 +243,7 @@ public class BankMemory
 		return seen;
 	}
 
-	/** The inventory and equipment together, notes as the items they stand for: what a deposit puts in the bank. */
+	/** Notes count as the items they stand for, as a deposit puts them in the bank. */
 	private Map<Integer, Integer> carried()
 	{
 		Map<Integer, Integer> carried = new HashMap<>();
@@ -286,9 +281,9 @@ public class BankMemory
 		return stored == null || stored.seenAt == 0 ? null : stored;
 	}
 
-	/** A remembered container: item id → quantity, and when it was seen (epoch millis). */
 	public static final class Seen
 	{
+		/** Epoch millis; 0 when never seen. */
 		public long seenAt;
 		public Map<Integer, Integer> items = new HashMap<>();
 	}

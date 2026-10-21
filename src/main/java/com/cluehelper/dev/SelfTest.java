@@ -2,7 +2,6 @@ package com.cluehelper.dev;
 
 import java.util.function.Consumer;
 
-/** One in-client check, run by {@link SelfTestRunner}. */
 public interface SelfTest
 {
 	String name();

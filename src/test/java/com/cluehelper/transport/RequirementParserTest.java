@@ -8,14 +8,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
-/**
- * The full Shortest Path requirement syntax, one row per case. A cell that fails to parse must show
- * up as an error on the row: Shortest Path drops it silently, which makes a teleport vanish.
- */
 public class RequirementParserTest
 {
 	private static final String[][] CASES = {
-		// column, cell, expected
 		{"Items", "AIR_RUNE=3&&FIRE_RUNE=1&&LAW_RUNE=1", "items 556x3 & 554x1 & 563x1"},
 		{"Items", "1706=1||1708=1||1710=1", "items 1706x1|1708x1|1710x1"},
 		{"Items", "SHANTAY_PASS=1|COINS=5", "items 1854x1|995x5"},
@@ -55,10 +50,13 @@ public class RequirementParserTest
 		List<String> failures = new ArrayList<>();
 		for (String[] c : CASES)
 		{
-			String actual = describe(parser.parse(Map.of(c[0], c[1])));
-			if (!actual.equals(c[2]))
+			String column = c[0];
+			String cell = c[1];
+			String expected = c[2];
+			String actual = describe(parser.parse(Map.of(column, cell)));
+			if (!actual.equals(expected))
 			{
-				failures.add(c[0] + " '" + c[1] + "': expected '" + c[2] + "', got '" + actual + "'");
+				failures.add(column + " '" + cell + "': expected '" + expected + "', got '" + actual + "'");
 			}
 		}
 		assertEquals("", String.join("\n", failures));

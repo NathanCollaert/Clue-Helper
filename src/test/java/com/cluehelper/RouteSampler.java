@@ -24,10 +24,6 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 
-/**
- * B10's in-client check without ten clue scrolls: plans a fixed spread of real steps from the player's live
- * snapshot and position ({@code [CH-SAMPLE]} lines, read against the world map), and times the scene BFS warm.
- */
 @Slf4j
 final class RouteSampler
 {
@@ -60,7 +56,7 @@ final class RouteSampler
 		this.executor = executor;
 	}
 
-	/** Client thread: times the scene BFS here, then plans the steps on the executor. */
+	/** Client thread only: times the scene BFS here, then plans the steps on the executor. */
 	void run()
 	{
 		PlayerModel model = clueHelper.getPlayerModel();

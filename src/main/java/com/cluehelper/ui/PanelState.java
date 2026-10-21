@@ -23,7 +23,6 @@ public enum PanelState
 		this.detail = detail;
 	}
 
-	/** Null for {@link #ROUTES}, which shows the route list instead of a status card. */
 	public String getTitle()
 	{
 		return title;
@@ -39,7 +38,6 @@ public enum PanelState
 		return this == WORKING || this == ROUTES;
 	}
 
-	/** A special world or core being off overrides everything: nothing else runs then. */
 	public static PanelState of(boolean dormant, boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean planning)
 	{
 		if (dormant)

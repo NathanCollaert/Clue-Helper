@@ -22,14 +22,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
-/** Turns a committed route and its step into the sub-steps StepGuide walks through (PLAN §5.5). */
 public final class SubSteps
 {
-	/** Close enough to a waypoint of ours to use what is there (a fairy ring, an altar). */
 	static final int ARRIVE_TILES = 3;
-	/** Catalog landings spread 0–2 tiles (B09); some teleports land anywhere in a small area. */
+	/** Some teleports land anywhere in a small area, beyond the catalog's 0–2 tile spread. */
 	static final int LANDING_TILES = 10;
-	/** An NPC that walks around: being in its area is enough. */
+	/** A wandering NPC: being in its area is enough. */
 	static final int AREA_ARRIVE_TILES = 15;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
@@ -45,13 +43,13 @@ public final class SubSteps
 	{
 	}
 
-	/** @param itemNames item names for the withdraw list; client thread */
+	/** Client thread only, for the {@code itemNames} lookups. */
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames)
 	{
 		return of(route, step, itemNames, HouseState.NONE);
 	}
 
-	/** @param house for the nexus hotkeys, which follow the player's own slot order */
+	/** {@code house} gives the nexus hotkeys, which follow the player's own slot order. */
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house)
 	{
 		List<SubStep> steps = new ArrayList<>();
@@ -98,8 +96,8 @@ public final class SubSteps
 	}
 
 	/**
-	 * The withdraw list. Items core's *clue* tag already shows are only counted in the text, but outlined in the bank like
-	 * the rest (Nathan, B16: the spade must be easy to find).
+	 * Items core's *clue* tag already shows are only counted in the text, but still outlined in the bank so the spade is
+	 * easy to find.
 	 */
 	static SubStep withdraw(Route route, IntFunction<String> itemNames)
 	{
@@ -165,7 +163,7 @@ public final class SubSteps
 		return row.getCategory() == Category.QUETZAL ? "Renu" : "the marker";
 	}
 
-	/** The Swap's book is its spell's: after the fused cast the leg is back on Lunar. */
+	/** The Swap's book is its spell's, not the leg's: after the cast the player is back on Lunar. */
 	private static SubStep swap(Leg leg)
 	{
 		Book book = leg.getRow().getRequirements().getBook();
@@ -234,29 +232,21 @@ public final class SubSteps
 		}
 	}
 
-	/** The row's landing is picked on a quetzal map (Renu's or the whistle's): catalog Menu {@code quetzal <site id>}. */
 	static boolean isQuetzalMap(CatalogRow row)
 	{
 		return row.getMenu() != null && row.getMenu().startsWith(QUETZAL_MENU);
 	}
 
-	/** The Quetzal table id of the row's site, or -1. */
-	static int quetzalSite(CatalogRow row)
+	static int quetzalTableId(CatalogRow row)
 	{
 		return isQuetzalMap(row) ? Integer.parseInt(row.getMenu().substring(QUETZAL_MENU.length())) : -1;
 	}
 
-	/** "Castle Wars Minigame Teleport" → "Castle Wars", as the Grouping dropdown lists it. */
 	static String minigameName(CatalogRow row)
 	{
 		return row.getName().replace(MINIGAME_SUFFIX, "");
 	}
 
-	/**
-	 * The key that picks the row's line in the list it opens (Nathan, B16): the nexus slot's, the jewellery box line's, a
-	 * 187 list line's ("5: Feldip Hills"), or the number a catalog name gives ("Achievement diary cape: 7. Kaleb Paramaya");
-	 * 0 when there is none.
-	 */
 	static char hotkey(CatalogRow row, HouseState house)
 	{
 		String menu = row.getMenu();
@@ -287,7 +277,6 @@ public final class SubSteps
 		return detail == null ? "In the list, " + press : detail + ", then " + press;
 	}
 
-	/** "Portal nexus → Annakarl": the piece, then the place, without the left/right-click note of the catalog name. */
 	static String houseText(CatalogRow row)
 	{
 		String name = CLICK_NOTE.matcher(row.getName()).replaceFirst("");
@@ -299,7 +288,6 @@ public final class SubSteps
 		return colon < 0 ? "Use the " + name.toLowerCase() : name.substring(0, colon) + " → " + name.substring(colon + 2);
 	}
 
-	/** How to pick it: the nexus map region first, the box's teleport menu, or the object's own option. */
 	private static String houseDetail(CatalogRow row)
 	{
 		String menu = row.getMenu();
@@ -323,7 +311,6 @@ public final class SubSteps
 		}
 	}
 
-	/** The nexus destination as the cache names it: "Portal nexus: Respawn (Camelot)" → "Respawn". */
 	static String nexusPlace(String rowName)
 	{
 		String place = rowName.substring(rowName.indexOf(": ") + 2);
@@ -390,7 +377,6 @@ public final class SubSteps
 		return name.charAt(0) + name.substring(1).toLowerCase();
 	}
 
-	/** What to do on arrival; the Clue Scroll plugin's overlay shows the details. */
 	static SubStep act(Step step)
 	{
 		if (needsItemFromNpc(step))
@@ -403,8 +389,8 @@ public final class SubSteps
 	}
 
 	/**
-	 * A cryptic naming both an NPC and an object: the NPC holds the key the object needs (12 of core's 13 such steps;
-	 * Juna's "speak to the guardian" is the other). Kill-for-key sub-steps with the NPC's place are B20's.
+	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to
+	 * the guardian".
 	 */
 	private static boolean needsItemFromNpc(Step step)
 	{
@@ -454,7 +440,6 @@ public final class SubSteps
 		return "Do the clue step";
 	}
 
-	/** Whether {@code tile} is within {@code radius} of {@code goal} on the same plane. */
 	static boolean near(WorldPoint tile, WorldPoint goal, int radius)
 	{
 		return tile != null && goal != null && tile.getPlane() == goal.getPlane() && tile.distanceTo2D(goal) <= radius;

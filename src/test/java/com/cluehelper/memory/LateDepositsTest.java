@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 import org.junit.Test;
 
-/** B16: Nathan deposited his Max cape and walked off the next tick; the bank update never came. */
 public class LateDepositsTest
 {
 	private static final int MAX_CAPE = 13280;

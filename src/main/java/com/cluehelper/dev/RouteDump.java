@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-/** {@code ::ch-routes} and the {@code [CH-ROUTE]} log lines: every candidate with its ticks, rank and spent. */
 final class RouteDump
 {
 	static final String TAG = "[CH-ROUTE]";
@@ -22,7 +21,6 @@ final class RouteDump
 		this.routes = routes;
 	}
 
-	/** @param chat the short lines; {@code logOnly} gets every candidate */
 	void describe(Consumer<String> chat, Consumer<String> logOnly)
 	{
 		Plan plan = routes.getPlan();

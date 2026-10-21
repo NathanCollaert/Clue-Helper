@@ -26,13 +26,9 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * Offline tool (B01, B07): writes core's clue data (the package-private CLUES lists of the client jar
- * this project builds against) to JSON for tools/cache/c1_match.py and c5_step_index.py, with
- * each entry's runtime step key. Provider lambdas are evaluated against a fake client under
- * every var state in {@link CoreClues#VAR_STATES}, so each
- * varbit- or quest-dependent entry lists all its branches.
- *
- * Run: gradlew coreClues (writes tools/cache/out/core-clues.json).
+ * Writes core's clue data to JSON for tools/cache/c1_match.py and c5_step_index.py. Provider lambdas run
+ * under every var state in {@link CoreClues#VAR_STATES}, so varbit- or quest-dependent entries list all
+ * their branches. Run: gradlew coreClues.
  */
 public class CoreClueExport
 {
@@ -93,7 +89,7 @@ public class CoreClueExport
 		return array;
 	}
 
-	/** The runtime step key under var state 0, which the step index generator joins on. */
+	/** The step index generator joins on this key, taken under var state 0. */
 	private static JsonObject withStepKey(JsonObject described, ClueScroll clue)
 	{
 		described.addProperty("stepKey", StepKey.of(CoreClueReader.facts(clue, fakePlugin)));

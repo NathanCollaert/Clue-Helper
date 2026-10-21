@@ -5,11 +5,10 @@ import java.awt.image.BufferedImage;
 
 public final class Icons
 {
-	/**
-	 * A clue scroll in OSRS item-sprite style: hard pixels, black outline, a lit edge and a shadow
-	 * per material. One pixel per character: 'K' outline, 'p'/'q'/'r' parchment lit, base and
-	 * shadow, 'l' ink, '.' transparent.
-	 */
+	private static final Color PARCHMENT_LIT = new Color(244, 228, 184);
+	private static final Color PARCHMENT = new Color(218, 194, 142);
+	private static final Color PARCHMENT_SHADOW = new Color(176, 150, 100);
+	private static final Color INK = new Color(110, 80, 44);
 	private static final String[] LOGO = {
 		"................",
 		".KKKKKKKKKKKKKK.",
@@ -53,13 +52,13 @@ public final class Icons
 			case 'K':
 				return Color.BLACK;
 			case 'p':
-				return new Color(244, 228, 184);
+				return PARCHMENT_LIT;
 			case 'q':
-				return new Color(218, 194, 142);
+				return PARCHMENT;
 			case 'r':
-				return new Color(176, 150, 100);
+				return PARCHMENT_SHADOW;
 			case 'l':
-				return new Color(110, 80, 44);
+				return INK;
 			default:
 				return null;
 		}

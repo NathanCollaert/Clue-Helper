@@ -8,20 +8,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Compares a menu line's text with a catalog label (B16). Lines carry hotkeys, colour tags and aliases the catalog
- * doesn't: {@code <col=735a28>1</col>: Tree Gnome Village}, {@code [L] Marim (Ape Atoll)}, {@code 1 :  Barrows}.
- * Only for lines no script argument identifies (right-click options, 187 and chatbox lists): the nexus and the
- * jewellery box are matched by struct id and index, never by text (better-teleport-menu rewrites them).
+ * Text matching is only for lines no script argument identifies: the nexus and the jewellery box are matched by struct
+ * id and index instead, because better-teleport-menu rewrites their text.
  */
 public final class MenuLabels
 {
-	/** Options that open the teleport list rather than naming a destination. */
-	static final Set<String> OPENERS = Set.of("rub", "teleport", "teleports", "teleport menu", "operate", "travel", "tree",
-		"activate", "configure", "ring configure", "perks", "spellbook", "commune");
-	/**
-	 * Catalog labels (Shortest Path's names) whose option reads differently in the game, as seen live on the worn Max
-	 * cape (B16): its Feldip Hills teleport is "Carnivorous chinchompas" under Skilling Areas, Tele to POH is "Home".
-	 */
+	static final Set<String> TELEPORT_LIST_OPENERS = Set.of("rub", "teleport", "teleports", "teleport menu", "operate",
+		"travel", "tree", "activate", "configure", "ring configure", "perks", "spellbook", "commune");
+	/** Catalog (Shortest Path) labels that the worn Max cape's options name differently. */
 	private static final Map<String, String> GAME_NAMES = Map.of(
 		"feldip hills", "carnivorous chinchompas",
 		"tele to poh", "home");
@@ -53,16 +47,19 @@ public final class MenuLabels
 		return NOT_WORD.matcher(plain.toLowerCase(Locale.ROOT)).replaceAll(" ").trim();
 	}
 
-	/**
-	 * The same place: equal once normalised, or one starts the other ("Black chinchompa" and "Black chinchompas"). Never
-	 * a match inside a name: "Ardougne" is not "West Ardougne".
-	 */
 	public static boolean matches(String line, String label)
 	{
-		return same(line, label) || line != null && line.lastIndexOf(':') > 0 && same(line.substring(line.lastIndexOf(':') + 1), label);
+		return same(line, label) || same(withoutRegionPrefix(line), label);
 	}
 
-	/** Diary Masters lines name the region first: "7: Karamja: Kaleb Paramaya (retired)" is Kaleb Paramaya. */
+	/** Diary Masters lines name the region first: "7: Karamja: Kaleb Paramaya (retired)". */
+	private static String withoutRegionPrefix(String line)
+	{
+		int lastColon = line == null ? -1 : line.lastIndexOf(':');
+		return lastColon > 0 ? line.substring(lastColon + 1) : null;
+	}
+
+	/** A prefix matches plurals ("Black chinchompas"), never a name inside another: "Ardougne" isn't "West Ardougne". */
 	private static boolean same(String line, String label)
 	{
 		String a = normalise(line);
@@ -83,10 +80,7 @@ public final class MenuLabels
 		return Math.min(a.length(), b.length()) >= SHORTEST_PARTIAL && (a.startsWith(b) || b.startsWith(a));
 	}
 
-	/**
-	 * An item option "Monastery Teleport" for the catalog's "Kandarin Monastery" (B17, the Ardougne cloak): every word
-	 * before "teleport" is a whole word of the label.
-	 */
+	/** Item options like the Ardougne cloak's "Monastery Teleport" for the catalog's "Kandarin Monastery". */
 	private static boolean namesPlaceOf(String option, String label)
 	{
 		if (!option.endsWith(TELEPORT_SUFFIX) || option.length() == TELEPORT_SUFFIX.length())
@@ -98,8 +92,8 @@ public final class MenuLabels
 	}
 
 	/**
-	 * The position a catalog label's hotkey gives ("C. Le-sabrè" is the 12th line), or -1. The diary cape's sub-menu
-	 * names regions and its list names "Morytania: Le-sabrè", but both keep the hotkey order (B16).
+	 * The diary cape's sub-menu and list name a line differently ("Morytania: Le-sabrè") but keep the hotkey order, so a
+	 * label's hotkey ("C. Le-sabrè") gives its line, or -1.
 	 */
 	static int hotkeyIndex(String label)
 	{
@@ -109,10 +103,9 @@ public final class MenuLabels
 
 	static boolean isOpener(String option)
 	{
-		return OPENERS.contains(normalise(option));
+		return TELEPORT_LIST_OPENERS.contains(normalise(option));
 	}
 
-	/** A fairy ring's "Last-destination (BKS)" option, when it is the code wanted. */
 	static boolean isLastDestination(String option, String code)
 	{
 		String plain = TAGS.matcher(option == null ? "" : option).replaceAll("").toUpperCase(Locale.ROOT).replace(" ", "");

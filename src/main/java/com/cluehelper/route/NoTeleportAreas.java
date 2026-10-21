@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.runelite.api.coords.WorldPoint;
 
-/** The bundled {@code no-teleport.tsv}: boxes where no teleport works (origin class {@link OriginClass#NO_TELEPORT}). */
 public final class NoTeleportAreas
 {
 	public static final NoTeleportAreas NONE = new NoTeleportAreas(List.of());

@@ -21,11 +21,7 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
-/**
- * B02's seven fixture loadouts ({@code src/test/resources/loadouts/}, copied from
- * {@code tools/geometry/fixtures/}) as player snapshots, for B10's golden routes. A fixture names its
- * items by family; each family maps to its fully charged id.
- */
+/** A fixture names its items by family; each family maps to its fully charged id. */
 public final class Loadouts
 {
 	public static final List<String> NAMES = List.of("maxed-main", "mid-ironman", "hcim", "gim", "uim", "fresh", "f2p");
@@ -69,11 +65,10 @@ public final class Loadouts
 		Map.entry("Watchtower tablet", ItemID.POH_TABLET_WATCHTOWERTELEPORT),
 		Map.entry("Wilderness sword 4", ItemID.WILDERNESS_SWORD_ELITE),
 		Map.entry("Xeric's talisman", ItemID.XERIC_TALISMAN));
-	/** Charges of the families whose id encodes them (Charge.Source.ITEM_ID live); the rest stay unknown. */
+	/** Families whose item id encodes the charges; the rest stay unknown. */
 	private static final Map<String, Integer> CHARGES = Map.of("Amulet of glory", 4, "Burning amulet", 5, "Combat bracelet", 6,
 		"Digsite pendant", 5, "Games necklace", 8, "Necklace of passage", 5, "Ring of dueling", 8, "Ring of wealth", 5,
 		"Skills necklace", 6, "Slayer ring", 8);
-	/** "runes": true carries this many of every standard-book rune. */
 	private static final int RUNE_STACK = 1000;
 	private static final List<Integer> RUNES = List.of(ItemID.AIRRUNE, ItemID.WATERRUNE, ItemID.EARTHRUNE, ItemID.FIRERUNE,
 		ItemID.MINDRUNE, ItemID.BODYRUNE, ItemID.COSMICRUNE, ItemID.CHAOSRUNE, ItemID.NATURERUNE, ItemID.LAWRUNE,
@@ -84,6 +79,7 @@ public final class Loadouts
 	private static final int INVENTORY_SLOTS = 28;
 	private static final int BANKED_TABLETS = 5;
 	private static final int GROUP_IRONMAN = 4;
+	private static final int NEXUS_SLOTS = 41;
 
 	private Loadouts()
 	{
@@ -94,11 +90,8 @@ public final class Loadouts
 	{
 		String name;
 		PlayerSnapshot carried;
-		/** Item ids the fixture banks; "*" in the fixture means every fixture item it doesn't carry. */
 		List<Integer> banked;
-		/** The carried snapshot with the bank added (a GIM's in group storage), as A_banked sees it; null without a bank. */
 		PlayerSnapshot bankedSnapshot;
-		/** The fixture as written, for the planner settings it carries (types, tiers, avoidWilderness, poh). */
 		JsonObject fixture;
 	}
 
@@ -157,7 +150,7 @@ public final class Loadouts
 			.varps(values)
 			.unknownVars(varsPass ? PlayerSnapshot.UnknownVars.PASS : PlayerSnapshot.UnknownVars.FAIL)
 			.charges(charges)
-			.house("full".equals(f.get("poh").getAsString()) ? nathansHouse() : HouseState.NONE)
+			.house("full".equals(f.get("poh").getAsString()) ? fullyBuiltHouse() : HouseState.NONE)
 			.plantedTrees(strings(f, "plantedTrees"))
 			.spellbook(new SpellbookState(Book.valueOf(f.get("book").getAsString().toUpperCase()), false,
 				SpellbookState.CAPE_CHANGES_PER_DAY, varsPass || values.getOrDefault(VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, 0) == 1,
@@ -167,7 +160,6 @@ public final class Loadouts
 		return new Loadout(name, snapshot, List.copyOf(banked), bankedSnapshot(snapshot, bankedFamilies), f);
 	}
 
-	/** Tablets come five to a stack; ids that encode charges carry them, like the carried ones. */
 	private static PlayerSnapshot bankedSnapshot(PlayerSnapshot carried, List<String> families)
 	{
 		if (families.isEmpty())
@@ -190,15 +182,11 @@ public final class Loadouts
 		return carried.toBuilder().bank(group ? Map.of() : stored).groupStorage(group ? stored : Map.of()).charges(charges).build();
 	}
 
-	/**
-	 * Nathan's house as B12 scanned it: every nexus slot (keys 1–41 in his order), the ornate jewellery box, mounted
-	 * glory, Xeric's talisman (Inferno) and digsite pendant (Fossil Island), occult altar, mounted Max cape, obelisk and a
-	 * spiritual fairy tree. Walks are the unlearned 4 ticks.
-	 */
-	public static HouseState nathansHouse()
+	/** Walks stay at the unlearned 4 ticks. */
+	public static HouseState fullyBuiltHouse()
 	{
 		Set<Integer> keys = new HashSet<>();
-		for (int key = 1; key <= 41; key++)
+		for (int key = 1; key <= NEXUS_SLOTS; key++)
 		{
 			keys.add(key);
 		}
@@ -215,13 +203,11 @@ public final class Loadouts
 			.build();
 	}
 
-	/** The rune model from B01's cache slice, as the live client would build it. */
 	public static RuneModel runeModel()
 	{
 		return RuneModel.load(new RuneModelTest.SliceCacheView("/b08/cache-runes.json"));
 	}
 
-	/** A fixture family's fully charged item id. */
 	public static int itemId(String family)
 	{
 		Integer id = ITEMS.get(family);

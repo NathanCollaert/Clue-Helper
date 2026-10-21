@@ -34,12 +34,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * PLAN §4 Data drift test: fails when core's clue data or our step data moves under us.
- * Every step core has is resolved through our own StepResolver, with a ClueScrollPlugin whose
- * client answers every var with one value, under each value in {@link CoreClues#VAR_STATES}.
- * <p>
- * On a snapshot difference the test writes build/drift/core-steps.tsv; review the diff, then
- * copy it over src/test/resources/drift/core-steps.tsv. A cache-side change is caught when
+ * On a snapshot difference this writes build/drift/core-steps.tsv: review the diff, then copy it over
+ * src/test/resources/drift/core-steps.tsv. A cache-side change shows up only once
  * tools/cache/c5_step_index.py regenerates step-index.json from a newer dump.
  */
 public class CoreDriftTest
@@ -48,8 +44,8 @@ public class CoreDriftTest
 	private static final Path ACTUAL = Paths.get("build/drift/core-steps.tsv");
 	private static final Path VIEW_ROWS = Paths.get("build/drift/steps.json");
 	private static final String SPOT_PREFIX = "spot:";
+	private static final int MOST_DIFF_LINES = 40;
 
-	/** B01: core entries no cache row matches, each explained there. */
 	private static final Set<String> EXPECTED_WITHOUT_ROW = new TreeSet<>(List.of(
 		"cryptic:search a crate in the haymaker's arms.",
 		"hotcold:beginner:leagues tutor",
@@ -58,9 +54,8 @@ public class CoreDriftTest
 
 	private static StepIndex index;
 	private static Map<String, ClueScroll> steps;
-	/** Step key → the source entries that produce it, e.g. "CrypticClue#12". */
 	private static final Map<String, List<String>> SOURCES_BY_KEY = new TreeMap<>();
-	/** Step key → its resolved snapshot line per distinct var-state branch. */
+	/** Step key → snapshot columns → the var states that resolve to them. */
 	private static final Map<String, Map<String, List<Integer>>> SNAPSHOT = new TreeMap<>();
 	private static final List<String> UNSTABLE_KEYS = new ArrayList<>();
 	private static final Map<String, Step> FIRST_BRANCH = new TreeMap<>();
@@ -161,7 +156,6 @@ public class CoreDriftTest
 		}
 	}
 
-	/** B07 live run: the three-step Nathan read, rebuilt from core's own parts, then with a part solved. */
 	@Test
 	public void threeStepTakesItsPartsRowsAndShrinksAsPartsAreSolved() throws ReflectiveOperationException
 	{
@@ -190,7 +184,6 @@ public class CoreDriftTest
 		assertEquals(whole.getTargets().subList(1, 3), oneSolved.getTargets());
 	}
 
-	/** A key the step data lacks still gets core's targets, so a new core clue never shows nothing. */
 	@Test
 	public void unknownStepsStillGetCoresTargets() throws ReflectiveOperationException
 	{
@@ -279,7 +272,6 @@ public class CoreDriftTest
 		}
 	}
 
-	/** The lines only one side has, by key, at most 40. */
 	private static String diff(List<String> golden, List<String> actual)
 	{
 		Set<String> goldenSet = new TreeSet<>(golden);
@@ -294,7 +286,7 @@ public class CoreDriftTest
 			out.add("+ " + line);
 		}
 		out.sort((a, b) -> a.substring(2).compareTo(b.substring(2)));
-		int shown = Math.min(out.size(), 40);
+		int shown = Math.min(out.size(), MOST_DIFF_LINES);
 		return String.join("\n", out.subList(0, shown)) + (out.size() > shown ? "\n… " + (out.size() - shown) + " more" : "");
 	}
 

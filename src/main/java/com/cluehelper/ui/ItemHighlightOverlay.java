@@ -13,10 +13,6 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import net.runelite.client.util.ImageUtil;
 
-/**
- * Outlines the item the current sub-step uses, in the inventory and the equipment tab, and what to withdraw in the bank;
- * fills it too when its left click teleports straight there.
- */
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
 

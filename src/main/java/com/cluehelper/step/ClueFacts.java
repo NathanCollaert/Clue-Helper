@@ -3,9 +3,8 @@ package com.cluehelper.step;
 import java.util.Locale;
 
 /**
- * The public facts a step key is built from, read off core's live clue. The field names match
- * the "fields" object of the B03 fixtures and of {@code ::ch-step}'s fixture lines, so recorded
- * clues replay through the same key rule.
+ * Field names match the "fields" object of the replay fixtures and of {@code ::ch-step}'s fixture
+ * lines, so recorded clues replay through the same key rule.
  */
 public final class ClueFacts
 {
@@ -120,7 +119,6 @@ public final class ClueFacts
 		return rawChallenge;
 	}
 
-	/** Tags dropped, whitespace collapsed, lower case: the text form every text key uses. */
 	public static String normalise(String text)
 	{
 		if (text == null)

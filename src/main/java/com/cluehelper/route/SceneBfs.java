@@ -13,9 +13,8 @@ import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
 /**
- * Start legs (PLAN §5.4 Walk edges, B02): walking costs from the player's tile over the loaded scene's
- * collision flags plus the in-scene door, stair and shortcut rows, to every walk-table node and target in
- * the scene. No Chebyshev anywhere: a tile the BFS doesn't reach has no walk. Costs are tiles (half-ticks).
+ * No Chebyshev fallback: a tile the BFS doesn't reach has no walk. Costs are tiles, which are half-ticks when
+ * running.
  */
 public final class SceneBfs
 {
@@ -35,10 +34,9 @@ public final class SceneBfs
 	private static final int BUCKETS = 1024;
 	private static final int BORDER_LOW = 1;
 	private static final int BORDER_HIGH = 5;
-	/** How far beside a blocked waypoint the path line may end. */
-	private static final int BESIDE_TILES = 2;
+	private static final int MAX_TILES_BESIDE_WAYPOINT = 2;
+	private static final int NO_DIRECTION = -1;
 
-	/** One top-level, non-instanced scene's collision flags, copied on the client thread. */
 	@Value
 	public static class Scene
 	{
@@ -46,10 +44,10 @@ public final class SceneBfs
 		int baseY;
 		int sizeX;
 		int sizeY;
-		/** [plane][x][y], as {@link CollisionData#getFlags()}; a null plane has no data. */
+		/** [plane][x][y]; a null plane has no data. */
 		int[][][] flags;
 
-		/** Null for an instanced scene or one without collision data. Client thread. */
+		/** Client thread only. Null for an instanced scene or one without collision data. */
 		public static Scene capture(WorldView view)
 		{
 			CollisionData[] maps = view == null || view.isInstance() ? null : view.getCollisionMaps();
@@ -73,7 +71,7 @@ public final class SceneBfs
 			return new Scene(view.getBaseX(), view.getBaseY(), view.getSizeX(), view.getSizeY(), flags);
 		}
 
-		/** Inside the walkable part: the client blocks the scene's first row and last five (seen live, B10). */
+		/** The client blocks the scene's first row and last five. */
 		public boolean contains(WorldPoint tile)
 		{
 			int x = tile.getX() - baseX;
@@ -83,7 +81,6 @@ public final class SceneBfs
 		}
 	}
 
-	/** Walk costs from one start tile over one scene. */
 	public static final class Result
 	{
 		private final Scene scene;
@@ -95,7 +92,6 @@ public final class SceneBfs
 			this.cost = cost;
 		}
 
-		/** Tiles from the start, or {@link #UNREACHED} (also outside the scene). */
 		public int cost(WorldPoint tile)
 		{
 			if (tile == null || !scene.contains(tile))
@@ -111,9 +107,8 @@ public final class SceneBfs
 		}
 
 		/**
-		 * The tiles from the start to {@code waypoint}, traced back one step at a time. A waypoint on a blocked tile (a
-		 * fairy ring, an altar) is reached at the reachable tile closest to it. A door or stairs row breaks the trace, so the
-		 * path then begins past it; empty when nothing near the waypoint is reached.
+		 * A waypoint on a blocked tile (a fairy ring, an altar) is reached at the reachable tile closest to it. A door or
+		 * stairs row breaks the trace, so the path then begins past it.
 		 */
 		public List<WorldPoint> pathTo(WorldPoint waypoint)
 		{
@@ -131,8 +126,8 @@ public final class SceneBfs
 			path.add(goal);
 			while (c > 0)
 			{
-				int step = previous(flags, x, y, plane, c);
-				if (step < 0)
+				int step = arrivalDirection(flags, x, y, plane, c);
+				if (step == NO_DIRECTION)
 				{
 					break;
 				}
@@ -145,10 +140,7 @@ public final class SceneBfs
 			return path;
 		}
 
-		/**
-		 * The cheapest reached tile straight beside an object's footprint (corners don't count): where the game walks to
-		 * use it. Null when no side is reached.
-		 */
+		/** Corners don't count: the game walks to a straight side to use an object. Null when no side is reached. */
 		public WorldPoint cheapestBeside(WorldPoint southWest, int sizeX, int sizeY)
 		{
 			WorldPoint best = null;
@@ -171,7 +163,6 @@ public final class SceneBfs
 			return best;
 		}
 
-		/** Tiles to {@code tile}, or to the closest reached tile beside it when it is blocked (furniture, an altar). */
 		public int costNear(WorldPoint tile)
 		{
 			return cost(nearestReached(tile));
@@ -186,9 +177,9 @@ public final class SceneBfs
 			WorldPoint best = waypoint;
 			int bestCost = UNREACHED;
 			int bestDistance = Integer.MAX_VALUE;
-			for (int dx = -BESIDE_TILES; dx <= BESIDE_TILES; dx++)
+			for (int dx = -MAX_TILES_BESIDE_WAYPOINT; dx <= MAX_TILES_BESIDE_WAYPOINT; dx++)
 			{
-				for (int dy = -BESIDE_TILES; dy <= BESIDE_TILES; dy++)
+				for (int dy = -MAX_TILES_BESIDE_WAYPOINT; dy <= MAX_TILES_BESIDE_WAYPOINT; dy++)
 				{
 					WorldPoint tile = waypoint.dx(dx).dy(dy);
 					int c = cost(tile);
@@ -204,8 +195,7 @@ public final class SceneBfs
 			return best;
 		}
 
-		/** The direction that reached (x, y) from a tile one cheaper, or -1. */
-		private int previous(int[][] flags, int x, int y, int plane, int c)
+		private int arrivalDirection(int[][] flags, int x, int y, int plane, int c)
 		{
 			for (int d = 0; d < DX.length; d++)
 			{
@@ -217,7 +207,7 @@ public final class SceneBfs
 					return d;
 				}
 			}
-			return -1;
+			return NO_DIRECTION;
 		}
 
 		public int reachedTiles()
@@ -235,10 +225,6 @@ public final class SceneBfs
 	{
 	}
 
-	/**
-	 * @param rowOpen whether each walk-table row may be used (its gate passes); rows whose ends aren't both in
-	 *                the scene are ignored
-	 */
 	public static Result run(Scene scene, WorldPoint start, WalkTable table, boolean[] rowOpen)
 	{
 		int planes = scene.getFlags().length;
@@ -321,7 +307,7 @@ public final class SceneBfs
 		return true;
 	}
 
-	/** The game's movement rule for one step in direction {@code d} (DX/DY order). */
+	/** The game's movement rule; {@code d} indexes DX and DY. */
 	static boolean canMove(int[][] f, int x, int y, int d)
 	{
 		switch (d)

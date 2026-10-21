@@ -18,12 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
 
-/**
- * Keeps {@code A_carried} and {@code A_banked} current for the loaded catalog: judged again on every new snapshot,
- * when the remembered bank changes, and when a cooldown clears (no var changes then). {@code A_banked} judges the
- * snapshot with the remembered bank and group storage added; it stays empty for an Ultimate Ironman, with
- * {@code useBank} off, or before the bank was ever seen. Client thread, except the getters.
- */
+/** Client thread, except the getters. Also judges again when a cooldown clears, since no var changes then. */
 @Singleton
 public class AvailabilityService
 {
@@ -96,7 +91,7 @@ public class AvailabilityService
 		return catalog;
 	}
 
-	/** From the plugin's GameTick handler, after the player model's. */
+	/** Call after {@link PlayerModel#onGameTick()} on the same tick. */
 	public void onGameTick()
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
@@ -123,7 +118,7 @@ public class AvailabilityService
 		}
 	}
 
-	/** The snapshot with the remembered bank and group storage added, or null when no bank counts (PLAN §5.2). */
+	/** Null when no bank counts. */
 	private PlayerSnapshot withBank(PlayerSnapshot snapshot)
 	{
 		BankMemory.Seen bank = bankMemory.getBank();
@@ -147,7 +142,7 @@ public class AvailabilityService
 			.build();
 	}
 
-	/** Listeners run on the client thread, each time {@code A_carried} is judged again. */
+	/** Listeners run on the client thread, each time the catalog is judged again. */
 	public Runnable addListener(Consumer<AvailabilitySet> listener)
 	{
 		listeners.add(listener);
@@ -159,13 +154,13 @@ public class AvailabilityService
 		return carried;
 	}
 
-	/** {@code A_banked}; empty when no bank counts. */
+	/** Empty when no bank counts. */
 	public AvailabilitySet getBanked()
 	{
 		return banked;
 	}
 
-	/** The snapshot {@code A_banked} was judged on, for {@code PlanInput.banked}; null when no bank counts. */
+	/** Null when no bank counts. */
 	public PlayerSnapshot getBankedSnapshot()
 	{
 		return bankedSnapshot;

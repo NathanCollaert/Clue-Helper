@@ -6,7 +6,7 @@ import net.runelite.api.Client;
 import net.runelite.api.EnumComposition;
 import net.runelite.api.ItemComposition;
 
-/** {@link CacheView} over the live client. Client thread only. */
+/** Client thread only. */
 final class ClientCacheView implements CacheView
 {
 	private static final int MULTIRUNES_TABLE = 91;
