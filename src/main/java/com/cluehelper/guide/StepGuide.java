@@ -721,10 +721,16 @@ public class StepGuide
 		return worn ? swapperClicks.worn(use.getItemId()) : swapperClicks.item(use.getItemId());
 	}
 
+	/**
+	 * The objects whose left click teleports straight there. A fairy ring's does when it is "Last-destination (code)"
+	 * for the code wanted (Nathan, B17).
+	 */
 	private List<TileObject> oneClickObjects(List<TileObject> objects)
 	{
+		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
 		return objects.stream()
-			.filter(object -> OneClick.teleportsTo(leftClick(object), oneClickLabel))
+			.filter(object -> ring ? MenuLabels.isLastDestination(leftClick(object), menuTarget.getLineKey())
+				: OneClick.teleportsTo(leftClick(object), oneClickLabel))
 			.collect(Collectors.toUnmodifiableList());
 	}
 
