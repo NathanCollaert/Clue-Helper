@@ -27,6 +27,9 @@ public class Plan
 	List<Candidate> candidates;
 	/** PROBES steps only. */
 	Map<WorldPoint, Integer> probeTicks;
+	/** PROBES steps only: each tile's ranking ticks, penalties included. */
+	@Builder.Default
+	Map<WorldPoint, Integer> probeRanks = Map.of();
 	List<Option> why;
 	String note;
 	@Builder.Default

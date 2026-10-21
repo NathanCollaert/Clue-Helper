@@ -1,5 +1,6 @@
 package com.cluehelper.step;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
@@ -23,6 +24,18 @@ public final class StepRequirements
 		this.lightSourceVarbitId = lightSourceVarbitId;
 		this.items = List.copyOf(items);
 		this.stashObjectId = stashObjectId;
+	}
+
+	public static StepRequirements none()
+	{
+		return new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), -1);
+	}
+
+	public StepRequirements plus(ItemRequirement item)
+	{
+		List<ItemRequirement> more = new ArrayList<>(items);
+		more.add(item);
+		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, more, stashObjectId);
 	}
 
 	/** The emote step's STASH unit object, or -1. */

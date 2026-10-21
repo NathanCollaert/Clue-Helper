@@ -53,7 +53,7 @@ public class ConventionsTest
 		"spellbookChanges", "capeUsePenalty", "strandPenalty",
 		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks",
 		"pohSource", "pohJewelleryBox", "pohMountedGlory", "pohGarden", "pohObelisk", "pohAltar", "pohMountedCape",
-		"pohMythicalCape", "pohPortals", "pohForget", "stashBuiltIsFilled"));
+		"pohMythicalCape", "pohPortals", "pohForget", "stashBuiltIsFilled", "hotColdPlanner", "hotColdWildernessPenalty"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 
@@ -78,9 +78,14 @@ public class ConventionsTest
 		assertEquals("banned APIs in src/main:\n" + String.join("\n", hits), 0, hits.size());
 	}
 
-	/** These change core's shared state, which every overlay of core reads. Safe only offline. */
+	/**
+	 * These change core's shared state, which every overlay of core reads. Safe only offline. Core's hot/cold set is
+	 * live, so it is only ever copied; a solver of our own over it would share the set.
+	 */
 	private static final Pattern MUTATING_CORE_CALL = Pattern.compile(
-		"\\.(forText|forChatboxText|update|reset|resetClue|setChallengeCompleted|makeOverlayHint|makeWorldOverlayHint|makeSTASHOverlay)\\s*\\(");
+		"\\.(forText|forChatboxText|update|reset|resetClue|setChallengeCompleted|makeOverlayHint|makeWorldOverlayHint|makeSTASHOverlay|signal)\\s*\\("
+			+ "|getPossibleLocations\\(\\)\\s*\\.\\s*(add|addAll|remove|removeIf|removeAll|retainAll|clear|iterator)\\s*\\("
+			+ "|new\\s+HotColdSolver\\s*\\(");
 	private static final String CORE_CLUE_PACKAGE = "import net.runelite.client.plugins.cluescrolls";
 
 	@Test

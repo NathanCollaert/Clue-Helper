@@ -44,7 +44,8 @@ public final class Planner
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
 			return Plan.builder().stepKey(step == null ? null : step.getKey()).alternatives(List.of()).candidates(List.of())
-				.probeTicks(Map.of()).why(List.of()).note(step == null ? "no step" : "no target tile for this step yet").build();
+				.probeTicks(Map.of()).why(List.of()).note(step == null ? "no step" : ClueTypes.HOT_COLD.equals(step.getType())
+					? "choosing where to feel" : "no target tile for this step yet").build();
 		}
 		PlanContext ctx = new PlanContext(in);
 		List<List<int[]>> orders = legOrders(ctx, step);
@@ -61,10 +62,11 @@ public final class Planner
 			.sameBook(picks.best != null && picks.best.isChanged() ? picks.sameBook : null)
 			.fasterUnqualified(picks.fasterUnqualified)
 			.candidates(picks.candidates);
-		plan.probeTicks(probes ? probeTicks(ctx, first) : Map.of());
+		Map<WorldPoint, Integer> probeRanks = new LinkedHashMap<>();
+		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
 		plan.alternatives(probes || orders.size() > 1 ? List.of() : alternatives(in, searches, orders, picks));
 		plan.why(probes ? List.of() : WhyList.of(ctx, orders.get(0).get(0)));
-		plan.note(picks.best == null ? noRouteNote(ctx, orders) : ctx.targetInWilderness ? "Wilderness target" : null);
+		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.targetInWilderness ? "Wilderness target" : null);
 		plan.requirementNotes(requirementNotes(ctx));
 		return plan.searchNanos(System.nanoTime() - started).contextNanos(contextNanos).labels(searches.labels)
 			.searches(searches.count).build();
@@ -219,7 +221,8 @@ public final class Planner
 		});
 	}
 
-	private static Map<WorldPoint, Integer> probeTicks(PlanContext ctx, LabelSearch search)
+	/** Fills {@code ranks} with each tile's ranking ticks, rounded up. */
+	private static Map<WorldPoint, Integer> probeTicks(PlanContext ctx, LabelSearch search, Map<WorldPoint, Integer> ranks)
 	{
 		Map<WorldPoint, Integer> ticks = new LinkedHashMap<>();
 		search.probeBest.forEach((node, best) ->
@@ -237,6 +240,7 @@ public final class Planner
 			if (pick != null)
 			{
 				ticks.put(ctx.tile(node), pick.getTicks());
+				ranks.put(ctx.tile(node), (pick.getRankHalfTicks() + 1) / 2);
 			}
 		});
 		return ticks;

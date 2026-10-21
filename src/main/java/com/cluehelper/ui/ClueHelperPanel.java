@@ -1,5 +1,6 @@
 package com.cluehelper.ui;
 
+import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.route.Plan;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -141,6 +142,11 @@ public class ClueHelperPanel extends PluginPanel
 			return;
 		}
 		boolean first = !somethingAbove;
+		if (model.getHotCold() != null)
+		{
+			first = gap(first);
+			dynamic.add(hotColdCard(model.getHotCold()));
+		}
 		for (String note : model.getNotes())
 		{
 			first = gap(first);
@@ -203,6 +209,35 @@ public class ClueHelperPanel extends PluginPanel
 			TextBlock flags = new TextBlock(Theme.small(), Theme.TEXT_FAINT, Theme.CARD_TEXT_WIDTH);
 			flags.setText(route.getFlags());
 			card.add(flags);
+		}
+		return card;
+	}
+
+	private static JPanel hotColdCard(HotColdView view)
+	{
+		JPanel card = new Card();
+		card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+		card.setBorder(new EmptyBorder(Theme.CARD_PAD, Theme.CARD_PAD, Theme.CARD_PAD, Theme.CARD_PAD));
+		card.add(overline("HOT/COLD", Theme.ACCENT, 0));
+		TextBlock title = new TextBlock(Theme.body(), Theme.TEXT, Theme.CARD_TEXT_WIDTH);
+		title.setText(view.getTitle());
+		card.add(title);
+		if (!view.getLines().isEmpty())
+		{
+			card.add(Box.createVerticalStrut(Theme.SPACE_XS));
+		}
+		for (int i = 0; i < view.getLines().size(); i++)
+		{
+			TextBlock line = new TextBlock(Theme.small(), i == 0 ? Theme.TEXT_MUTED : Theme.TEXT, Theme.CARD_TEXT_WIDTH);
+			line.setText(view.getLines().get(i));
+			card.add(line);
+		}
+		for (String warning : view.getWarnings())
+		{
+			card.add(Box.createVerticalStrut(Theme.SPACE_XS));
+			TextBlock line = new TextBlock(Theme.small(), WARNING, Theme.CARD_TEXT_WIDTH);
+			line.setText(warning);
+			card.add(line);
 		}
 		return card;
 	}

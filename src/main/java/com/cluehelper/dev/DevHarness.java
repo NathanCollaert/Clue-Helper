@@ -1,6 +1,7 @@
 package com.cluehelper.dev;
 
 import com.cluehelper.guide.StepGuide;
+import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
@@ -56,13 +57,15 @@ public class DevHarness
 	private final List<Runnable> unregister = new ArrayList<>();
 	private boolean overlayShown;
 	private volatile DevCommands commands;
+	private final HotColdService hotCold;
 
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, SelfTestRunner selfTests, StepLogger stepLogger,
 		BuiltInSelfTests builtInSelfTests, ClueLink clueLink, Gson gson, PlayerModel player,
 		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager, StepGuide guide,
-		PohService poh, StashMemory stash)
+		PohService poh, StashMemory stash, HotColdService hotCold)
 	{
+		this.hotCold = hotCold;
 		this.poh = poh;
 		this.stash = stash;
 		this.client = client;
@@ -95,6 +98,8 @@ public class DevHarness
 		c.register("poh", "[forget] show what is known about your house, or forget it", this::house);
 		c.register("stash", "compare every STASH unit's built varbit, the core check (script 1479) and what we remember",
 			args -> clientThread.invokeLater(this::stashes));
+		c.register("hotcold", "[reset] show the hot/cold step's feel log, or restart it keeping its last reading as the anchor",
+			args -> clientThread.invokeLater(() -> hotColdLog(args)));
 		c.register("overlay", "toggle the route graph overlay: walk-table nodes, scene BFS walks, origin class", args -> toggleOverlay());
 		for (SelfTest test : builtInSelfTests.create(shownState, signalledState))
 		{
@@ -227,6 +232,16 @@ public class DevHarness
 			report.failures().forEach(failure -> reply("  failed: " + failure));
 		});
 		reply(started ? "Self-test started: " + selfTests.testNames().size() + " tests" : "A self-test run is already going");
+	}
+
+	private void hotColdLog(String[] args)
+	{
+		if (args.length > 0 && args[0].equalsIgnoreCase("reset"))
+		{
+			reply(hotCold.restartLog());
+			return;
+		}
+		hotCold.describeLog().forEach(this::reply);
 	}
 
 	private void stepLog(String[] args)

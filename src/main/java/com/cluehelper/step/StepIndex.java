@@ -107,6 +107,13 @@ public final class StepIndex
 	{
 		private int row;
 		private String name;
+		private int[] tile;
+
+		/** The row's centre as x, y, plane; null in an index generated before B19. */
+		public int[] getTile()
+		{
+			return tile;
+		}
 
 		public int getRow()
 		{

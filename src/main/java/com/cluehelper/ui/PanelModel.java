@@ -1,6 +1,7 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.guide.SubStep;
+import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.player.Book;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Plan;
@@ -35,6 +36,8 @@ public class PanelModel
 	List<RouteCard> routes = List.of();
 	@Builder.Default
 	List<Plan.Option> why = List.of();
+	/** Null outside a hot/cold step, or with the probe planner off. */
+	HotColdView hotCold;
 
 	@Value
 	public static class RouteCard

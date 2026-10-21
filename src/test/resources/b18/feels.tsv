@@ -1,0 +1,169 @@
+# B18 run 20261021-124554: device lines, logins and clue reads. tick, event, tier, 3544, core count, core spots (when 5 or fewer), message
+0	login	beginner				
+7	read	beginner				
+19	feel	beginner	48090320	2	LUMBRIDGE_COW_FIELD,NORTHEAST_OF_AL_KHARID_MINE	The device is very cold, and the same temperature as last time.
+118	login	beginner				
+135	login	beginner				
+143	feel	beginner	52792464	2	LUMBRIDGE_COW_FIELD,NORTHEAST_OF_AL_KHARID_MINE	The device is warm, and warmer than last time.
+178	login	beginner				
+182	feel	beginner	52792464	2	LUMBRIDGE_COW_FIELD,NORTHEAST_OF_AL_KHARID_MINE	The device is warm, and the same temperature as last time.
+249	feel	beginner	52792464	2	LUMBRIDGE_COW_FIELD,NORTHEAST_OF_AL_KHARID_MINE	The strange device doesn't seem to work here.
+288	feel	beginner	52792464	2	LUMBRIDGE_COW_FIELD,NORTHEAST_OF_AL_KHARID_MINE	The strange device doesn't seem to work here.
+333	login	beginner				
+348	login	beginner				
+363	feel	beginner	50662573	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very cold, but colder than last time.
+370	feel	beginner	50662573	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very cold, and the same temperature as last time.
+526	login	beginner				
+548	login	beginner				
+595	feel	beginner	54643953	1	NORTHEAST_OF_AL_KHARID_MINE	The device is visibly shaking and burns to the touch. This must be the spot.
+600	feel	beginner	54643956	1	NORTHEAST_OF_AL_KHARID_MINE	The device is visibly shaking and burns to the touch. This must be the spot.
+610	feel	beginner	54594804	1	NORTHEAST_OF_AL_KHARID_MINE	The device is visibly shaking and burns to the touch. This must be the spot.
+614	feel	beginner	54594805	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+619	feel	beginner	54545649	1	NORTHEAST_OF_AL_KHARID_MINE	The device is visibly shaking and burns to the touch. This must be the spot.
+623	feel	beginner	54529265	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+628	feel	beginner	54594798	1	NORTHEAST_OF_AL_KHARID_MINE	The device is visibly shaking and burns to the touch. This must be the spot.
+631	feel	beginner	54594797	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+791	feel	beginner	54430961	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+797	feel	beginner	54447345	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and warmer than last time.
+806	feel	beginner	54447350	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+862	feel	beginner	54594810	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+1134	login	beginner				
+1146	login	beginner				
+1405	login	beginner				
+1669	login	beginner				
+1830	login	beginner				
+1877	feel	beginner	55086321	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+1955	login	beginner				
+1973	feel	beginner	54103281	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2065	feel	beginner	54594823	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and warmer than last time.
+2073	feel	beginner	54594837	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2198	feel	beginner	54594835	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and warmer than last time.
+2199	feel	beginner	54594833	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and warmer than last time.
+2201	feel	beginner	54594829	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and warmer than last time.
+2202	feel	beginner	54594827	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and warmer than last time.
+2203	feel	beginner	54594825	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and warmer than last time.
+2204	feel	beginner	54594823	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and warmer than last time.
+2324	feel	beginner	54594824	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2324	feel	beginner	54594824	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2325	feel	beginner	54594825	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2325	feel	beginner	54594825	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2325	feel	beginner	54594825	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2325	feel	beginner	54594825	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2325	feel	beginner	54594825	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2326	feel	beginner	54594826	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2326	feel	beginner	54594826	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2326	feel	beginner	54594826	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2326	feel	beginner	54594826	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2327	feel	beginner	54594827	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2327	feel	beginner	54594827	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2327	feel	beginner	54594827	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2327	feel	beginner	54594827	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2328	feel	beginner	54594828	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2328	feel	beginner	54594828	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2328	feel	beginner	54594828	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2329	feel	beginner	54594829	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2329	feel	beginner	54594829	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2329	feel	beginner	54594829	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2329	feel	beginner	54594829	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2330	feel	beginner	54594830	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, but colder than last time.
+2330	feel	beginner	54594830	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2330	feel	beginner	54594830	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2330	feel	beginner	54594830	1	NORTHEAST_OF_AL_KHARID_MINE	The device is incredibly hot, and the same temperature as last time.
+2331	feel	beginner	54594831	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2331	feel	beginner	54594831	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2331	feel	beginner	54594831	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2331	feel	beginner	54594831	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2332	feel	beginner	54594832	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2332	feel	beginner	54594832	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2332	feel	beginner	54594832	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2332	feel	beginner	54594832	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2333	feel	beginner	54594833	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2333	feel	beginner	54594833	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2333	feel	beginner	54594833	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2333	feel	beginner	54594833	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2334	feel	beginner	54594834	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2334	feel	beginner	54594834	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2334	feel	beginner	54594834	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2334	feel	beginner	54594834	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2335	feel	beginner	54594835	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2335	feel	beginner	54594835	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2335	feel	beginner	54594835	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2335	feel	beginner	54594835	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2336	feel	beginner	54594836	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2336	feel	beginner	54594836	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2336	feel	beginner	54594836	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2336	feel	beginner	54594836	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2337	feel	beginner	54594837	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2337	feel	beginner	54594837	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2337	feel	beginner	54594837	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, and the same temperature as last time.
+2582	login	beginner				
+2594	login	beginner				
+2627	login	beginner				
+2650	feel	beginner	53464374	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very hot, but colder than last time.
+2659	feel	beginner	53447990	1	NORTHEAST_OF_AL_KHARID_MINE	The device is hot, but colder than last time.
+2680	feel	beginner	53464404	1	NORTHEAST_OF_AL_KHARID_MINE	The device is hot, but colder than last time.
+2687	feel	beginner	53464405	1	NORTHEAST_OF_AL_KHARID_MINE	The device is warm, but colder than last time.
+2701	login	beginner				
+2716	login	beginner				
+2744	feel	beginner	53562460	1	NORTHEAST_OF_AL_KHARID_MINE	The device is warm, but colder than last time.
+2754	feel	beginner	53562459	1	NORTHEAST_OF_AL_KHARID_MINE	The device is cold, but colder than last time.
+2767	login	beginner				
+2789	login	beginner				
+2829	feel	beginner	51334317	1	NORTHEAST_OF_AL_KHARID_MINE	The device is cold, but colder than last time.
+2832	feel	beginner	51334317	1	NORTHEAST_OF_AL_KHARID_MINE	The device is cold, and the same temperature as last time.
+2838	feel	beginner	51317933	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very cold, but colder than last time.
+2856	login	beginner				
+2868	login	beginner				
+2893	feel	beginner	46419308	1	NORTHEAST_OF_AL_KHARID_MINE	The device is very cold, but colder than last time.
+2897	feel	beginner	46402924	1	NORTHEAST_OF_AL_KHARID_MINE	The device is ice cold, but colder than last time.
+2911	login	beginner				
+2922	login	beginner				
+2974	login	beginner				
+2993	login	beginner				
+3100	login	beginner				
+3123	read	master				
+3181	read	master				
+3259	feel	master	48090320	73		The device is ice cold.
+3259	feel	master	48090320	73		The power of the strange device hurts you in the process.
+3332	login	master				
+3366	feel	master	28577213	30		The device is ice cold, but colder than last time.
+3366	feel	master	28577213	30		The power of the strange device hurts you in the process.
+3421	login	master				
+3435	login	master				
+3440	feel	master	57216399	11		The device is very cold, and warmer than last time.
+3440	feel	master	57216399	11		The power of the strange device hurts you in the process.
+3503	login	master				
+3506	feel	master	59936194	3	MORYTANIA_MOS_LES_HARMLESS_BAR,WILDERNESS_35,WILDERNESS_49	The device is ice cold, but colder than last time.
+3506	feel	master	59936194	3	MORYTANIA_MOS_LES_HARMLESS_BAR,WILDERNESS_35,WILDERNESS_49	The power of the strange device hurts you in the process.
+3550	login	master				
+3562	login	master				
+3564	feel	master	51613236	1	WILDERNESS_49	The device is very cold, and warmer than last time.
+3564	feel	master	51613236	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3715	login	master				
+3732	login	master				
+3763	login	master				
+3818	feel	master	51466058	1	WILDERNESS_49	The device is incredibly hot, and warmer than last time.
+3818	feel	master	51466058	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3822	feel	master	51449674	1	WILDERNESS_49	The device is visibly shaking and burns to the touch. This must be the spot.
+3822	feel	master	51449674	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3830	feel	master	51384142	1	WILDERNESS_49	The device is visibly shaking and burns to the touch. This must be the spot.
+3830	feel	master	51384142	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3833	feel	master	51384143	1	WILDERNESS_49	The device is incredibly hot, but colder than last time.
+3833	feel	master	51384143	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3837	feel	master	51302218	1	WILDERNESS_49	The device is incredibly hot, and the same temperature as last time.
+3837	feel	master	51302218	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3842	feel	master	51318602	1	WILDERNESS_49	The device is visibly shaking and burns to the touch. This must be the spot.
+3842	feel	master	51318602	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3846	feel	master	51384134	1	WILDERNESS_49	The device is visibly shaking and burns to the touch. This must be the spot.
+3846	feel	master	51384134	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3850	feel	master	51384133	1	WILDERNESS_49	The device is incredibly hot, but colder than last time.
+3850	feel	master	51384133	1	WILDERNESS_49	The power of the strange device hurts you in the process.
+3960	feel	master	51384133	1	WILDERNESS_49	The strange device cools as you find your treasure.
+3980	read	master				
+4026	feel	master	51384133			The strange device is inactive.
+4046	login	master				
+4135	login	master				
+4142	read	master				
+4159	login	master				
+4177	login	master				
+4215	login	master				

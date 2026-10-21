@@ -3,6 +3,9 @@ package com.cluehelper;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.StepGuide;
+import com.cluehelper.hotcold.HotColdPlan;
+import com.cluehelper.hotcold.HotColdService;
+import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.FairyRingMemory;
@@ -17,6 +20,8 @@ import com.cluehelper.poh.PohService;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.ClueHelperPanel;
@@ -31,6 +36,7 @@ import com.cluehelper.ui.WidgetHighlightOverlay;
 import com.cluehelper.ui.WaypointOverlay;
 import com.cluehelper.ui.WorldMapMarkers;
 import com.google.inject.Provides;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.SwingUtilities;
@@ -80,6 +86,7 @@ public class ClueHelperPlugin extends Plugin
 	private static final int ULTIMATE_IRONMAN = 2;
 	private static final String FORGET_HOUSE_KEY = "pohForget";
 	private static final String HOUSE_KEY_PREFIX = "poh";
+	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "hotColdWildernessPenalty");
 
 	@Inject
 	private ClientToolbar clientToolbar;
@@ -139,6 +146,10 @@ public class ClueHelperPlugin extends Plugin
 	private StepGuide guide;
 
 	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private HotColdService hotCold;
+
+	@Inject
 	private ClientThread clientThread;
 
 	@Inject
@@ -188,6 +199,7 @@ public class ClueHelperPlugin extends Plugin
 	private NavigationButton navigationButton;
 	private Runnable unregisterRoutes;
 	private Runnable unregisterGuide;
+	private Runnable unregisterHotCold;
 	private boolean shownWorking;
 
 	@Provides
@@ -216,8 +228,10 @@ public class ClueHelperPlugin extends Plugin
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
 		guide.start();
+		hotCold.start();
 		unregisterRoutes = routes.addListener(plan -> showPanelState());
 		unregisterGuide = guide.addListener(this::onGuideChanged);
+		unregisterHotCold = hotCold.addListener(this::showPanelState);
 		for (Overlay overlay : overlays())
 		{
 			overlayManager.add(overlay);
@@ -237,8 +251,10 @@ public class ClueHelperPlugin extends Plugin
 		{
 			overlayManager.remove(overlay);
 		}
+		unregisterHotCold.run();
 		unregisterGuide.run();
 		unregisterRoutes.run();
+		hotCold.stop();
 		guide.stop();
 		clientThread.invokeLater(mapMarkers::clear);
 		routes.stop();
@@ -277,6 +293,7 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
+		hotCold.onGameTick();
 		guide.onGameTick();
 		if (planner.isWorking() != shownWorking)
 		{
@@ -309,7 +326,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
-		menuLines.colourLines(guide.getMenuTarget(), config.highlightMenus());
+		menuLines.colourLines(guide.getMenuTarget(), guide.getHighlightMenuWidget(), config.highlightMenus());
 	}
 
 	/** Runs after Menu Entry Swapper's swaps, so the menu's top entry is the real left click. */
@@ -376,6 +393,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
+		hotCold.onChatMessage(event);
 		guide.onChatMessage(event);
 		stashMemory.onChatMessage(event);
 		if (checkLines.onChatMessage(event))
@@ -401,6 +419,14 @@ public class ClueHelperPlugin extends Plugin
 		{
 			clientThread.invokeLater(poh::onConfigChanged);
 		}
+		else if (HOT_COLD_KEYS.contains(event.getKey()))
+		{
+			clientThread.invokeLater(() ->
+			{
+				hotCold.onConfigChanged();
+				showPanelState();
+			});
+		}
 	}
 
 	@Subscribe
@@ -409,6 +435,7 @@ public class ClueHelperPlugin extends Plugin
 		memory.reload();
 		bankMemory.onProfileChanged();
 		poh.onProfileChanged();
+		hotCold.onProfileChanged();
 		spiritTrees.publish();
 		fairyRings.publish();
 	}
@@ -458,7 +485,25 @@ public class ClueHelperPlugin extends Plugin
 		PanelModel model = PanelModel.of(panelState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
 			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p(), bankInfo(), houseInfo(), guide.getMenuHint(),
 			System.currentTimeMillis());
-		SwingUtilities.invokeLater(() -> target.show(model));
+		PanelModel shown = model.getState().showsRoutes() ? model.toBuilder().hotCold(hotColdView()).build() : model;
+		SwingUtilities.invokeLater(() -> target.show(shown));
+	}
+
+	private HotColdView hotColdView()
+	{
+		Step step = clueLink.getCurrentStep();
+		if (step == null || !ClueTypes.HOT_COLD.equals(step.getType()) || !config.hotColdPlanner())
+		{
+			return null;
+		}
+		HotColdPlan plan = hotCold.getPlan();
+		if (plan == null || !plan.getStepKey().equals(step.getKey()))
+		{
+			return null;
+		}
+		boolean beginner = "beginner".equals(step.getTier());
+		return HotColdView.of(new HotColdView.Inputs(plan, hotCold.getCoreSpots(), hotCold.isCoreReset(),
+			hotCold.spotsOf(beginner), beginner, hotCold.hitpoints()));
 	}
 
 	private PanelModel.BankInfo bankInfo()

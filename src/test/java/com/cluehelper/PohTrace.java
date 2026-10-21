@@ -88,6 +88,14 @@ final class PohTrace
 		{
 			log.info("{} t{} interface {} lines {} hint {}", MENU_TAG, client.getTickCount(), pendingInterface,
 				rects(lines.lines(target)), guide.getMenuHint());
+			if (pendingInterface == InterfaceID.MINIGAMES)
+			{
+				logMinigameCards();
+			}
+			if (pendingInterface == InterfaceID.BOOKOFSCROLLS && guide.getHighlightMenuWidget() >= 0)
+			{
+				logScrollEntry(guide.getHighlightMenuWidget());
+			}
 			if (pendingInterface == NEXUS_GROUP)
 			{
 				logLayer("rows", InterfaceID.TelenexusTeleport.ROWS1);
@@ -180,6 +188,50 @@ final class PohTrace
 		log.info("{} t{} click {}|{}|{}|{} widget {}:{}[{}] during {} '{}'", MENU_TAG, client.getTickCount(), event.getMenuOption(),
 			event.getMenuTarget(), event.getMenuAction(), event.getId(), widget >>> 16, widget & 0xFFFF, event.getParam0(),
 			current.getKind(), current.getText());
+	}
+
+	private void logScrollEntry(int entry)
+	{
+		List<String> parts = new ArrayList<>();
+		for (int id = entry; id <= entry + 3; id++)
+		{
+			Widget w = client.getWidget(id);
+			parts.add((id & 0xFFFF) + (w == null ? " null" : " type " + w.getType() + " item " + w.getItemId() + " sprite " + w.getSpriteId()
+				+ " model " + w.getModelId() + " text '" + w.getText() + "' " + w.getBounds()));
+		}
+		log.info("{} t{} scroll entry {}", MENU_TAG, client.getTickCount(), parts);
+	}
+
+	private void logMinigameCards()
+	{
+		List<String> cards = new ArrayList<>();
+		for (int card = InterfaceID.Minigames.MINIGAME_21; card <= InterfaceID.Minigames.MINIGAME_1; card++)
+		{
+			Widget widget = client.getWidget(card);
+			List<String> texts = new ArrayList<>();
+			collectTexts(widget, texts);
+			cards.add((card & 0xFFFF) + (widget == null ? " null" : widget.isHidden() ? " hidden" : "") + " " + texts);
+		}
+		log.info("{} t{} minigame cards {}", MENU_TAG, client.getTickCount(), cards);
+	}
+
+	private static void collectTexts(Widget widget, List<String> out)
+	{
+		if (widget == null)
+		{
+			return;
+		}
+		if (widget.getText() != null && !widget.getText().isBlank())
+		{
+			out.add(widget.getText());
+		}
+		for (Widget[] children : new Widget[][]{widget.getStaticChildren(), widget.getDynamicChildren(), widget.getNestedChildren()})
+		{
+			for (int i = 0; children != null && i < children.length; i++)
+			{
+				collectTexts(children[i], out);
+			}
+		}
 	}
 
 	private void logLayer(String name, int component)

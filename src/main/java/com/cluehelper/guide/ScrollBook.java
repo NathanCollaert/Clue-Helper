@@ -3,10 +3,10 @@ package com.cluehelper.guide;
 import java.util.Map;
 import net.runelite.api.gameval.InterfaceID;
 
-final class ScrollBook
+public final class ScrollBook
 {
 	static final String ROW_PREFIX = "Master scroll book: ";
-	static final int NO_WIDGET = -1;
+	public static final int NO_WIDGET = -1;
 	private static final Map<String, Integer> ENTRIES = Map.ofEntries(
 		Map.entry("Digsite teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_DIGSITE),
 		Map.entry("Feldip hills teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_FELDIP),
@@ -26,6 +26,17 @@ final class ScrollBook
 
 	private ScrollBook()
 	{
+	}
+
+	/** Each scroll's picture, charges and name are the three widgets after its entry (gameval order, 1.13.2). */
+	public static int picture(int entry)
+	{
+		return entry + 1;
+	}
+
+	static int[] texts(int entry)
+	{
+		return new int[]{entry + 2, entry + 3};
 	}
 
 	static int entry(String rowName)

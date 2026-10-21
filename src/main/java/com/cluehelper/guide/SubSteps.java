@@ -29,6 +29,8 @@ public final class SubSteps
 	static final int LANDING_TILES = 10;
 	/** A wandering NPC: being in its area is enough. */
 	static final int AREA_ARRIVE_TILES = 15;
+	/** A feel's information depends on its exact tile, so the walk ends on the marker. */
+	static final int PROBE_ARRIVE_TILES = 0;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
 	private static final String QUETZAL_MENU = "quetzal ";
@@ -123,6 +125,11 @@ public final class SubSteps
 	private static SubStep walk(Leg leg, Leg next, Step step)
 	{
 		String ticks = "≈ " + leg.getTicks() + " ticks";
+		if (step.getWaypointAct() != null && step.getTargets().contains(leg.getTo()))
+		{
+			return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the marker").detail(ticks)
+				.waypoint(leg.getTo()).goal(leg.getTo()).radius(step.isActAnywhere() ? ARRIVE_TILES : PROBE_ARRIVE_TILES).build();
+		}
 		if (step.getTargets().contains(leg.getTo()))
 		{
 			int radius = step.getKind() == TargetKind.AREA ? AREA_ARRIVE_TILES : ARRIVE_TILES;
@@ -379,6 +386,12 @@ public final class SubSteps
 
 	static SubStep act(Step step)
 	{
+		if (step.getWaypointAct() != null)
+		{
+			return SubStep.builder().kind(SubStep.Kind.ACT).text(step.getWaypointAct())
+				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
+				.actItems(step.getActItems()).build();
+		}
 		if (needsItemFromNpc(step))
 		{
 			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";

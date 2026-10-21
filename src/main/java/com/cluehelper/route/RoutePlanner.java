@@ -1,6 +1,7 @@
 package com.cluehelper.route;
 
 import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.PlayerModel;
@@ -66,6 +67,7 @@ public class RoutePlanner
 	private final BankMemory bankMemory;
 	private final StepNeeds stepNeeds;
 	private final PohService poh;
+	private final ProbeTarget probeTarget;
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile WalkData.Loaded walk;
@@ -94,9 +96,11 @@ public class RoutePlanner
 
 	@Inject
 	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
-		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds, PohService poh)
+		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds, PohService poh,
+		ProbeTarget probeTarget)
 	{
 		this.poh = poh;
+		this.probeTarget = probeTarget;
 		this.bankMemory = bankMemory;
 		this.stepNeeds = stepNeeds;
 		this.client = client;
@@ -143,7 +147,7 @@ public class RoutePlanner
 	/** Call after the player model's and availability's GameTick handlers. */
 	public void onGameTick()
 	{
-		Step step = clueLink.getCurrentStep();
+		Step step = probeTarget.travelStep(clueLink.getCurrentStep());
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		WalkData.Loaded data = walk;
@@ -178,7 +182,40 @@ public class RoutePlanner
 			return;
 		}
 		lastTrigger = trigger;
-		PlanInput input = PlanInput.builder()
+		PlanInput input = input(step, snapshot, runes, data, loadedCatalog, settings, banked, required, atOpenBank, foreignHouse);
+		runner.submit(() -> Planner.plan(input), this::onPlanned);
+	}
+
+	/**
+	 * Client thread. What a plan for {@code step} would get now, for searches of other planners; null until the
+	 * first plan's inputs are all loaded.
+	 */
+	public PlanInput inputFor(Step step, RequiredItems required)
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		RuneModel runes = player.getRuneModel();
+		WalkData.Loaded data = walk;
+		Catalog loadedCatalog = catalog;
+		if (step == null || snapshot == null || runes == null || data == null || loadedCatalog == null || start == null)
+		{
+			return null;
+		}
+		snapshot = withRefusals(snapshot);
+		boolean foreignHouse = poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
+		return input(step, snapshot, runes, data, loadedCatalog, PlannerSettings.from(config, snapshot.getAccountType()),
+			availability.getBankedSnapshot(), required, bankMemory.isBankOpen(), foreignHouse);
+	}
+
+	/** Loaded walk data; null until it is. */
+	public WalkData.Loaded getWalk()
+	{
+		return walk;
+	}
+
+	private PlanInput input(Step step, PlayerSnapshot snapshot, RuneModel runes, WalkData.Loaded data, Catalog loadedCatalog,
+		PlannerSettings settings, PlayerSnapshot banked, RequiredItems required, boolean atOpenBank, boolean foreignHouse)
+	{
+		return PlanInput.builder()
 			.step(step)
 			.player(snapshot)
 			.banked(banked == null ? null : withRefusals(banked))
@@ -196,7 +233,6 @@ public class RoutePlanner
 			.refusedChanges(Set.copyOf(refusedChanges))
 			.foreignHouseStart(foreignHouse)
 			.build();
-		runner.submit(() -> Planner.plan(input), this::onPlanned);
 	}
 
 	/** Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says. */

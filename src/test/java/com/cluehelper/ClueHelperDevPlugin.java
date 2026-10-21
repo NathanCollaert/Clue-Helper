@@ -153,6 +153,7 @@ public class ClueHelperDevPlugin extends Plugin
 		clearOldPngs(ROUTE_FRAMES);
 		clearOldPngs(GUIDE_FRAMES);
 		clearOldPngs(PohTrace.FRAMES);
+		clearOldPngs(HotColdTrace.FRAMES);
 		SCENES.mkdirs();
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
@@ -190,6 +191,12 @@ public class ClueHelperDevPlugin extends Plugin
 			eventBus.unregister(dialTrace);
 			overlayManager.remove(dialTrace);
 		});
+		HotColdTrace hotColdTrace = new HotColdTrace(client, clueHelper.getHotCold(), name ->
+		{
+			requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(HotColdTrace.FRAMES, name + "-game.png"))));
+			SwingUtilities.invokeLater(() -> snapshotTo(clueHelper.getPanel(), new File(HotColdTrace.FRAMES, name + "-panel.png")));
+		});
+		unregister.add(hotColdTrace::stop);
 		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
 		if (autoRunPending)
 		{

@@ -47,6 +47,7 @@ final class LabelSearch
 	private final int rankLimit;
 	private final Label[] slots;
 	private final LowerBound[] bounds;
+	private final boolean[][] targets;
 	private final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : a.half - b.half);
 
 	final Label[][] goals = new Label[2][CATEGORIES];
@@ -73,9 +74,14 @@ final class LabelSearch
 		this.revertHalfTicks = ctx.startPending ? 2 * ctx.in.getRevertTicksLeft() : -1;
 		this.slots = new Label[legTargets.size() * nodes * STATES_PER_NODE * MAX_LABELS];
 		this.bounds = new LowerBound[legTargets.size()];
+		this.targets = new boolean[legTargets.size()][nodes];
 		for (int leg = 0; leg < bounds.length; leg++)
 		{
 			bounds[leg] = probes ? null : ctx.lowerBound(legTargets.get(leg));
+			for (int target : legTargets.get(leg))
+			{
+				targets[leg][target] = true;
+			}
 		}
 	}
 
@@ -766,14 +772,7 @@ final class LabelSearch
 
 	private boolean isTarget(int leg, int node)
 	{
-		for (int target : legTargets.get(leg))
-		{
-			if (target == node)
-			{
-				return true;
-			}
-		}
-		return false;
+		return targets[leg][node];
 	}
 
 	static final class Label

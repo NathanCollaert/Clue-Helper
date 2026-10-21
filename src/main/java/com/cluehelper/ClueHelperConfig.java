@@ -47,6 +47,13 @@ public interface ClueHelperConfig extends Config
 	)
 	String houseSection = "house";
 
+	@ConfigSection(
+		name = "Hot/cold",
+		description = "Where to feel the strange device next",
+		position = 5
+	)
+	String hotColdSection = "hotCold";
+
 	@Range(min = 1, max = 5)
 	@ConfigItem(
 		keyName = "routeCount",
@@ -378,5 +385,29 @@ public interface ClueHelperConfig extends Config
 	default boolean pohForget()
 	{
 		return false;
+	}
+
+	@ConfigItem(
+		keyName = "hotColdPlanner",
+		name = "Probe planner",
+		description = "Suggest where to feel next, from your feels so far, and route there. Off: the Clue Scroll plugin's list only",
+		section = hotColdSection,
+		position = 0
+	)
+	default boolean hotColdPlanner()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "hotColdWildernessPenalty",
+		name = "Avoid Wilderness feels",
+		description = "Prefer feeling outside the Wilderness when a feel there would be only a little faster",
+		section = hotColdSection,
+		position = 1
+	)
+	default boolean hotColdWildernessPenalty()
+	{
+		return true;
 	}
 }

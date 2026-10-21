@@ -14,6 +14,7 @@ import java.util.List;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
@@ -66,6 +67,12 @@ public class WaypointOverlay extends Overlay
 		}
 		SceneBfs.Result scene = planScene();
 		TileObject bank = bankOutlined() ? cheapestBank(view, scene) : null;
+		NPC approached = bank == null && approachOutlined() ? nearestNpc() : null;
+		if (approached != null)
+		{
+			drawApproach(graphics, view, scene, approached);
+			return null;
+		}
 		WorldPoint goal = bank == null ? waypoint : beside(view, scene, bank);
 		if (bank == null && besideOutlinedBanker(waypoint) || bank != null && standingOn(goal))
 		{
@@ -103,9 +110,46 @@ public class WaypointOverlay extends Overlay
 		return bankOutlined() && local != null && local.getWorldLocation().distanceTo2D(waypoint) <= NEAR_BANK_TILES;
 	}
 
+	/** A bank, or the object of a located teleport the walk leads to. */
 	private boolean bankOutlined()
 	{
-		return guide.isBankStop() && !(guide.getHighlightObjects().isEmpty() && guide.getHighlightNpcs().isEmpty());
+		return (guide.isBankStop() || guide.isApproach()) && !(guide.getHighlightObjects().isEmpty() && guide.getHighlightNpcs().isEmpty());
+	}
+
+	private boolean approachOutlined()
+	{
+		return guide.isApproach() && guide.getHighlightObjects().isEmpty() && !guide.getHighlightNpcs().isEmpty();
+	}
+
+	/** Renu and other NPCs that teleport: the arrow sits on the NPC and the path leads to it. */
+	private void drawApproach(Graphics2D graphics, WorldView view, SceneBfs.Result scene, NPC npc)
+	{
+		Player local = client.getLocalPlayer();
+		WorldPoint at = npc.getWorldLocation();
+		if (local == null || local.getWorldLocation().distanceTo2D(at) <= 1)
+		{
+			return;
+		}
+		if (config.pathLine() && scene != null)
+		{
+			drawPath(graphics, view, scene, at);
+		}
+		OverlayUtil.renderActorOverlayImage(graphics, npc, Markers.ARROW_IMAGE, Markers.COLOUR, ARROW_Z_OFFSET);
+	}
+
+	private NPC nearestNpc()
+	{
+		Player local = client.getLocalPlayer();
+		NPC best = null;
+		for (NPC npc : guide.getHighlightNpcs())
+		{
+			if (local != null && (best == null
+				|| npc.getWorldLocation().distanceTo2D(local.getWorldLocation()) < best.getWorldLocation().distanceTo2D(local.getWorldLocation())))
+			{
+				best = npc;
+			}
+		}
+		return best;
 	}
 
 	private boolean hintArrowAt(WorldPoint waypoint)

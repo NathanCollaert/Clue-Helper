@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.Book;
@@ -110,6 +111,7 @@ public class StepGuide
 	private final BankMemory bankMemory;
 	private final MenuLines menuLines;
 	private final AvailabilityService availability;
+	private final ProbeTarget probeTarget;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private final Map<String, Integer> spellWidgets = new HashMap<>();
 
@@ -156,8 +158,9 @@ public class StepGuide
 
 	@Inject
 	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
-		AvailabilityService availability, SwapperClicks swapperClicks)
+		AvailabilityService availability, SwapperClicks swapperClicks, ProbeTarget probeTarget)
 	{
+		this.probeTarget = probeTarget;
 		this.swapperClicks = swapperClicks;
 		this.menuLines = menuLines;
 		this.availability = availability;
@@ -211,6 +214,18 @@ public class StepGuide
 		SubStep next = getNext();
 		return current != null && (current.getKind() == SubStep.Kind.BANK
 			|| current.getKind() == SubStep.Kind.WALK && next != null && next.getKind() == SubStep.Kind.BANK);
+	}
+
+	/**
+	 * Walking to a located teleport's object or NPC (Renu, a spirit tree): like a bank, it is outlined and pointed at
+	 * from the walk on.
+	 */
+	public boolean isApproach()
+	{
+		SubStep current = getCurrent();
+		SubStep next = getNext();
+		return current != null && current.getKind() == SubStep.Kind.WALK && next != null && next.getKind() == SubStep.Kind.TELEPORT
+			&& next.getRow() != null && next.getRow().isLocated();
 	}
 
 	public List<SubStep> getSteps()
@@ -295,6 +310,10 @@ public class StepGuide
 				places.putIfAbsent(to, leg.getKind() == Leg.Kind.WALK || leg.getKind() == Leg.Kind.WILDERNESS_EXIT ? "walk here" : leg.describe());
 			}
 		}
+		if (step.getWaypointAct() != null)
+		{
+			places.putIfAbsent(step.getTargets().get(0), step.getWaypointAct());
+		}
 		return places;
 	}
 
@@ -368,8 +387,9 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
-		Set<Integer> ids = menuTarget.getObjectIds();
-		Set<Integer> npcIds = menuTarget.getNpcIds();
+		MenuTarget target = isApproach() ? houseTarget(getNext().getRow()) : menuTarget;
+		Set<Integer> ids = target.getObjectIds();
+		Set<Integer> npcIds = target.getNpcIds();
 		if (ids.isEmpty() && npcIds.isEmpty() && !bank)
 		{
 			highlightObjects = List.of();
@@ -492,7 +512,7 @@ public class StepGuide
 
 	private void follow(Route committed)
 	{
-		Step step = clueLink.getCurrentStep();
+		Step step = probeTarget.travelStep(clueLink.getCurrentStep());
 		WorldPoint tile = player.getPosition().getTile();
 		route = committed;
 		routeStep = step;
@@ -518,15 +538,21 @@ public class StepGuide
 		SubStep current = getCurrent();
 		if (current != null && current.getKind() == SubStep.Kind.ACT && routeStep != null)
 		{
-			actReachedStepKey = routeStep.getKey();
+			actReachedStepKey = actKey(routeStep);
 		}
 		return moved;
 	}
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
 	{
-		return step.getKey().equals(actReachedStepKey) && tile != null
+		return actKey(step).equals(actReachedStepKey) && tile != null
 			&& step.getTargets().stream().anyMatch(target -> target.distanceTo2D(tile) <= STAY_AT_ACT_TILES);
+	}
+
+	/** Each probe tile of a hot/cold step is an act of its own. */
+	private static String actKey(Step step)
+	{
+		return step.getWaypointAct() == null ? step.getKey() : step.getKey() + "@" + step.getTargets();
 	}
 
 	private void clear()
@@ -603,6 +629,13 @@ public class StepGuide
 		{
 			return;
 		}
+		if (current.getKind() == SubStep.Kind.ACT && !current.getActItems().isEmpty())
+		{
+			highlightItems = current.getActItems();
+			fillItems = current.getActItems();
+			highlightTab = Tab.INVENTORY;
+			return;
+		}
 		if (current.getKind() == SubStep.Kind.SPELLBOOK_SWAP)
 		{
 			highlightSpellWidget = InterfaceID.MagicSpellbook.SPELLBOOK_SWAP;
@@ -671,8 +704,9 @@ public class StepGuide
 
 	private Set<Integer> oneClickItems(String label)
 	{
+		boolean oneDestination = label == null && hasOneDestination(getCurrent());
 		return heldUses.stream()
-			.filter(use -> OneClick.teleportsTo(leftClick(use), label))
+			.filter(use -> oneDestination ? OneClick.isOwnTeleport(leftClickOrFirstAction(use)) : OneClick.teleportsTo(leftClick(use), label))
 			.map(ItemUse::getItemId)
 			.collect(Collectors.toUnmodifiableSet());
 	}
@@ -687,6 +721,24 @@ public class StepGuide
 			return learned;
 		}
 		return worn ? swapperClicks.worn(use.getItemId()) : swapperClicks.item(use.getItemId());
+	}
+
+	/** Before a hover, a carried item no swap applies to left-clicks its first inventory action. */
+	private String leftClickOrFirstAction(ItemUse use)
+	{
+		String known = leftClick(use);
+		if (known != null || use.getContainer() == Container.WORN)
+		{
+			return known;
+		}
+		for (String action : client.getItemDefinition(use.getItemId()).getInventoryActions())
+		{
+			if (action != null)
+			{
+				return action;
+			}
+		}
+		return null;
 	}
 
 	private List<TileObject> oneClickObjects(List<TileObject> objects)
@@ -796,6 +848,12 @@ public class StepGuide
 			}
 		}
 		return List.copyOf(same);
+	}
+
+	private static boolean hasOneDestination(SubStep current)
+	{
+		return current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
+			&& optionPath(current.getRow().getName()).isEmpty();
 	}
 
 	static List<String> optionPath(String rowName)

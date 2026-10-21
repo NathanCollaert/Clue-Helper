@@ -2,6 +2,7 @@ package com.cluehelper.ui;
 
 import static org.junit.Assert.assertTrue;
 
+import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.route.Plan;
 import java.awt.Component;
 import java.awt.Container;
@@ -49,6 +50,9 @@ public class PanelRenderTest
 			check(routes, "routes-3", ROUTES_HEIGHT);
 			routes.toggleWhy();
 			check(routes, "routes-why", WHY_HEIGHT);
+			ClueHelperPanel hotCold = new ClueHelperPanel();
+			hotCold.show(hotColdFeel());
+			check(hotCold, "hotcold", ROUTES_HEIGHT);
 		});
 		writeLogo();
 	}
@@ -74,6 +78,24 @@ public class PanelRenderTest
 				new PanelModel.RouteCard("Under the margin · -3", 130, "Clan Wars Minigame Teleport → walk south 21 → walk 162", "", false),
 				new PanelModel.RouteCard("Also · +29", 162, "Last Man Standing Minigame Teleport → walk 162", "not everything read yet", false)))
 			.why(why)
+			.build();
+	}
+
+	/** The longest spot descriptions core has, and every warning at once. */
+	private static PanelModel hotColdFeel()
+	{
+		return PanelModel.builder()
+			.state(PanelState.ROUTES)
+			.now("Feel the device here")
+			.hotCold(new HotColdView("7 spots fit your 3 feels", List.of(
+				"Next feel, ≈ 14 ticks away:",
+				"If very hot: Between the Gnome Stronghold and the Grand Tree, by the ladder; Outside the Fishing Guild",
+				"If hot, warmer: 3 spots (Kandarin 2, Western Province 1)",
+				"If hot, colder: North of the Warriors' Guild in Burthorpe",
+				"Else: 1 other"), List.of(
+				"HP 18: every master feel deals 4–8 damage",
+				"Core's list may have dropped the spot. Re-read the clue and feel again")))
+			.routes(List.of(new PanelModel.RouteCard("Best", 14, "Fairy ring CKR → walk 3", "", true)))
 			.build();
 	}
 

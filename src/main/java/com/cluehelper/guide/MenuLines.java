@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import javax.inject.Inject;
@@ -41,6 +42,9 @@ public class MenuLines
 	static final int BOX_LINE = 1688;
 	static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int LIST_GROUP = 187;
+	private static final Pattern MINIGAME_PLACE_NUMBER = Pattern.compile("^\\d+\\. ");
+	/** A minigame card's text is its name, a break, then its places. */
+	private static final String LINE_BREAK = "<br>";
 	private static final int NEXUS_GROUP = 17;
 	private static final int BOX_GROUP = 590;
 	private static final int MENU_ROW_HEIGHT = 15;
@@ -177,10 +181,27 @@ public class MenuLines
 	/** Call every client tick: it also puts back the colour of lines no longer wanted. */
 	public void colourLines(MenuTarget target, boolean enabled)
 	{
+		colourLines(target, ScrollBook.NO_WIDGET, enabled);
+	}
+
+	/** @param entryWidget a scroll book entry whose name and charges are coloured too, or -1 */
+	public void colourLines(MenuTarget target, int entryWidget, boolean enabled)
+	{
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
 		if (enabled)
 		{
 			lineWidgets(target).stream().filter(MenuLines::hasText).forEach(wanted::add);
+			if (entryWidget != ScrollBook.NO_WIDGET)
+			{
+				for (int text : ScrollBook.texts(entryWidget))
+				{
+					Widget line = client.getWidget(text);
+					if (visible(line) && hasText(line))
+					{
+						wanted.add(line);
+					}
+				}
+			}
 		}
 		for (Iterator<Map.Entry<Widget, Integer>> it = originalTextColours.entrySet().iterator(); it.hasNext(); )
 		{
@@ -382,6 +403,15 @@ public class MenuLines
 
 	private void minigame(String name, List<Widget> out)
 	{
+		if (visible(client.getWidget(InterfaceID.Minigames.MINIGAMES)))
+		{
+			minigameCard(name, out);
+			return;
+		}
+		if (minigamePlace(name, out))
+		{
+			return;
+		}
 		Widget current = client.getWidget(InterfaceID.Grouping.CURRENTGAME);
 		if (!visible(current))
 		{
@@ -406,6 +436,78 @@ public class MenuLines
 			}
 		}
 		add(client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP), out);
+	}
+
+	/**
+	 * The Minigame Teleport spell opens a grid of cards, one per minigame, each with the game's name and its places;
+	 * the card whose name is the row's game is outlined. A row like "Rat Pits: 4. Port Sarim" names the game first.
+	 */
+	private void minigameCard(String name, List<Widget> out)
+	{
+		String game = name.split(": ")[0];
+		for (int card = InterfaceID.Minigames.MINIGAME_21; card <= InterfaceID.Minigames.MINIGAME_1; card++)
+		{
+			Widget widget = client.getWidget(card);
+			if (visible(widget) && hasTextMatching(widget, game))
+			{
+				add(widget, out);
+				return;
+			}
+		}
+	}
+
+	/** A game with several places asks which one next, e.g. "Port Sarim (wily cats)" for "Rat Pits: 4. Port Sarim". */
+	private boolean minigamePlace(String name, List<Widget> out)
+	{
+		String[] parts = name.split(": ", 2);
+		Widget options = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
+		Widget[] lines = parts.length < 2 || !visible(options) ? null : options.getDynamicChildren();
+		if (lines == null)
+		{
+			return false;
+		}
+		String place = MenuLabels.normalise(MINIGAME_PLACE_NUMBER.matcher(parts[1]).replaceFirst(""));
+		for (Widget line : lines)
+		{
+			if (visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
+			{
+				add(line, out);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** The widget and everything under it. */
+	public static List<Widget> descendants(Widget widget)
+	{
+		List<Widget> out = new ArrayList<>();
+		if (widget == null)
+		{
+			return out;
+		}
+		out.add(widget);
+		for (Widget[] children : new Widget[][]{widget.getStaticChildren(), widget.getDynamicChildren(), widget.getNestedChildren()})
+		{
+			for (int i = 0; children != null && i < children.length; i++)
+			{
+				out.addAll(descendants(children[i]));
+			}
+		}
+		return out;
+	}
+
+	private static boolean hasTextMatching(Widget widget, String label)
+	{
+		for (Widget part : descendants(widget))
+		{
+			String text = part.getText();
+			if (text != null && MenuLabels.matches(text.split(LINE_BREAK, 2)[0], label))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void quetzal(int quetzalTableId, List<Widget> out)

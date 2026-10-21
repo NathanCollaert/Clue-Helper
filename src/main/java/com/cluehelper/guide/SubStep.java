@@ -42,6 +42,9 @@ public class SubStep
 	SpellbookChange change;
 	@Builder.Default
 	Set<Integer> bankItems = Set.of();
+	/** An act's item, used by its left click: the strange device for a feel. */
+	@Builder.Default
+	Set<Integer> actItems = Set.of();
 
 	public boolean isTravel()
 	{
