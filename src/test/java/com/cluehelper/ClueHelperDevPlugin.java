@@ -2,6 +2,7 @@ package com.cluehelper;
 
 import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
+import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.player.Position;
@@ -54,6 +55,7 @@ import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.DrawManager;
+import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.Text;
 
 /**
@@ -107,6 +109,12 @@ public class ClueHelperDevPlugin extends Plugin
 
 	@Inject
 	private DrawManager drawManager;
+
+	@Inject
+	private OverlayManager overlayManager;
+
+	@Inject
+	private FairyDials fairyDials;
 
 	@Inject
 	private CatalogData catalogData;
@@ -174,6 +182,15 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			eventBus.unregister(networkTrace);
 			networkTrace.stop();
+		});
+		FairyDialTrace dialTrace = new FairyDialTrace(client, clueHelper.getMenuLines(), fairyDials,
+			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+		eventBus.register(dialTrace);
+		overlayManager.add(dialTrace);
+		unregister.add(() ->
+		{
+			eventBus.unregister(dialTrace);
+			overlayManager.remove(dialTrace);
 		});
 		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
 		if (autoRunPending)

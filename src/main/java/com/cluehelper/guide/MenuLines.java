@@ -50,7 +50,6 @@ public class MenuLines
 	private static final int MENU_BOTTOM = 3;
 	/** The fairy ring travel log: a component per code from AIP at 12, each followed by its favourite star (1.13.2). */
 	private static final int LOG_FIRST_CODE = 12;
-	private static final String RING_LETTERS = "ABCDIJKLPQRS";
 	private static final String MAP_TELEPORT = "Teleport";
 	private static final String MAP_REGION = "Select";
 	/** Markers' cyan: the colour of every Clue Helper highlight. */
@@ -58,6 +57,7 @@ public class MenuLines
 
 	private final Client client;
 	private final QuetzalIcons quetzalIcons;
+	private final FairyDials fairyDials;
 	private final Map<String, int[]> listLines = new HashMap<>();
 	/** The open 187 list's title, and where each of its lines is drawn (the widget text carries a greyed line's colour). */
 	private String listTitle;
@@ -69,10 +69,11 @@ public class MenuLines
 	private final Map<Widget, Integer> coloured = new IdentityHashMap<>();
 
 	@Inject
-	MenuLines(Client client, QuetzalIcons quetzalIcons)
+	MenuLines(Client client, QuetzalIcons quetzalIcons, FairyDials fairyDials)
 	{
 		this.client = client;
 		this.quetzalIcons = quetzalIcons;
+		this.fairyDials = fairyDials;
 	}
 
 	/** From the plugin's handler at priority 2: better-teleport-menu works at 1. */
@@ -373,23 +374,19 @@ public class MenuLines
 		add(region, out);
 	}
 
+	/** The code in the travel log, and the teleport button once the dials show it; the dials are {@link FairyDials}'. */
 	private void fairyCode(String code, List<Widget> out)
 	{
-		String letters = code == null ? "" : code.replace("-", "");
-		if (letters.length() != 3)
+		String letters = FairyDials.letters(code);
+		if (letters == null)
 		{
 			return;
 		}
-		int a = RING_LETTERS.indexOf(letters.charAt(0));
-		int b = RING_LETTERS.indexOf(letters.charAt(1)) - 4;
-		int c = RING_LETTERS.indexOf(letters.charAt(2)) - 8;
-		if (a < 0 || a > 3 || b < 0 || b > 3 || c < 0 || c > 3)
+		add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | (LOG_FIRST_CODE + 2 * FairyDials.logIndex(letters))), out);
+		if (fairyDials.isDialled(letters))
 		{
-			return;
+			add(client.getWidget(InterfaceID.Fairyrings.CONFIRM), out);
 		}
-		int index = (a * 4 + b) * 4 + c;
-		add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | (LOG_FIRST_CODE + 2 * index)), out);
-		add(client.getWidget(InterfaceID.Fairyrings.CONFIRM), out);
 	}
 
 	/** The Grouping tab: the minigame chosen shows the Teleport button; else the dropdown, then its line. */
