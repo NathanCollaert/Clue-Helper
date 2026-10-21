@@ -435,7 +435,8 @@ final class LabelSearch
 		{
 			if (landing.node != from.node && !ctx.forbidden(landing.node) && !excluded.contains(Route.fairyKey(landing.row)))
 			{
-				transport(from, landing.node, from.c, k, Math.max(entry.halfTicks, landing.halfTicks), Leg.Kind.FAIRY_RING, entry, landing);
+				int half = Math.max(entry.halfTicks, landing.halfTicks) - (ctx.isLastFairyRing(landing.row) ? 2 * landing.row.getMenuTicks() : 0);
+				transport(from, landing.node, from.c, k, half, Leg.Kind.FAIRY_RING, entry, landing);
 			}
 		}
 	}

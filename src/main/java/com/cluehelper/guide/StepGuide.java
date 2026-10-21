@@ -729,9 +729,21 @@ public class StepGuide
 	{
 		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
 		return objects.stream()
-			.filter(object -> ring ? MenuLabels.isLastDestination(leftClick(object), menuTarget.getLineKey())
+			.filter(object -> ring ? ringGoesTo(leftClick(object), menuTarget.getLineKey())
 				: OneClick.teleportsTo(leftClick(object), oneClickLabel))
 			.collect(Collectors.toUnmodifiableList());
+	}
+
+	/** "Last-destination (CKS)" as hovered; or a "Last-destination" without its code (Menu Entry Swapper) and CKS remembered. */
+	private boolean ringGoesTo(String leftClick, String code)
+	{
+		if (MenuLabels.isLastDestination(leftClick, code))
+		{
+			return true;
+		}
+		PlayerSnapshot snapshot = player.getSnapshot();
+		String last = snapshot == null ? null : snapshot.getLastFairyRing();
+		return leftClick != null && !leftClick.contains("(") && MenuLabels.isLastDestination(leftClick + " (" + last + ")", code);
 	}
 
 	private String leftClick(TileObject object)

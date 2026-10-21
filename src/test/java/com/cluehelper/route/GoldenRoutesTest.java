@@ -313,6 +313,8 @@ public class GoldenRoutesTest
 		lines.add(line("house: standing at the house portal in Hosidius with house tabs only (B17 live), Burthorpe castle steps",
 			checked(input(withoutAll(maxed, Set.of(ItemID.LAWRUNE, ItemID.SKILLCAPE_MAX, ItemID.SKILLCAPE_CONSTRUCTION, Loadouts.itemId("Games necklace"))),
 				burthorpe, PlanStart.atNode(table, table.node(new WorldPoint(1743, 3517, 0))), plain).build())));
+		lines.add(line("house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)",
+			checked(input(maxed.toBuilder().lastFairyRing("BIQ").build(), step("cipher:19904"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		lines.add(line("house: map w356 without a house (the overworld fairy rings)",
 			checked(input(maxed.toBuilder().house(HouseState.NONE).build(), step("map:w356"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 	}

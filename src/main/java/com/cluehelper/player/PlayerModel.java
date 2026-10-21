@@ -83,6 +83,7 @@ public class PlayerModel
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
 	private Set<String> plantedTrees = Set.of();
+	private String lastFairyRing;
 	private String dirtyBecause;
 	private long version;
 
@@ -223,6 +224,13 @@ public class PlayerModel
 	{
 		plantedTrees = Set.copyOf(next);
 		markDirty("spirit trees");
+	}
+
+	/** The fairy ring code last travelled to changed (FairyRingMemory, B17). Client thread. */
+	public void setLastFairyRing(String code)
+	{
+		lastFairyRing = code;
+		markDirty("fairy ring");
 	}
 
 	/** The house state changed (PohService, B16). Client thread. */
@@ -429,6 +437,7 @@ public class PlayerModel
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
 			.plantedTrees(plantedTrees)
+			.lastFairyRing(lastFairyRing)
 			.build();
 	}
 

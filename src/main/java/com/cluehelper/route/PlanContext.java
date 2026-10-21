@@ -257,6 +257,13 @@ final class PlanContext
 		return node != pohNode || hasTransport == 1 || !in.isForeignHouseStart();
 	}
 
+	/** The ring's Last-destination goes there: one click, no dials (B14: 0 menu ticks against 5–6 dialled). */
+	boolean isLastFairyRing(CatalogRow landing)
+	{
+		String last = in.getPlayer().getLastFairyRing();
+		return last != null && landing.getCode() != null && last.equals(landing.getCode().replace("-", ""));
+	}
+
 	/** Ranking cost of finishing on {@code book}: the cheapest way back, else the strand penalty (PLAN §5.4). */
 	int strandHalfTicks(Book book, int bankState, int capeUsesSpent)
 	{

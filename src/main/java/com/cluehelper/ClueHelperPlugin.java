@@ -5,6 +5,7 @@ import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
+import com.cluehelper.memory.FairyRingMemory;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.SpiritTreeMemory;
 import com.cluehelper.memory.StashMemory;
@@ -37,6 +38,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
@@ -102,6 +104,10 @@ public class ClueHelperPlugin extends Plugin
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private SpiritTreeMemory spiritTrees;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private FairyRingMemory fairyRings;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -205,6 +211,7 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.start();
 		poh.start();
 		clientThread.invokeLater(spiritTrees::publish);
+		clientThread.invokeLater(fairyRings::publish);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
@@ -266,6 +273,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.onGameTick();
 		menuLines.takeFreshList(spiritTrees::onListMenu);
 		spiritTrees.onGameTick();
+		fairyRings.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
@@ -309,6 +317,11 @@ public class ClueHelperPlugin extends Plugin
 	public void onPostMenuSort(PostMenuSort event)
 	{
 		guide.onPostMenuSort();
+		MenuEntry[] entries = client.getMenu().getMenuEntries();
+		if (!client.isMenuOpen() && entries.length > 0)
+		{
+			fairyRings.onMenuEntries(new MenuEntry[]{entries[entries.length - 1]});
+		}
 	}
 
 	/** After other plugins have built the menu: our option is coloured, nothing is added, removed or reordered. */
@@ -316,6 +329,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onMenuOpened(MenuOpened event)
 	{
 		menuLines.colourMenu(guide.getMenuTarget(), config.highlightMenus());
+		fairyRings.onMenuEntries(event.getMenuEntries());
 	}
 
 	/** Priority 2: the menu scripts' arguments are read before better-teleport-menu (priority 1) rewrites them (B12). */
@@ -330,6 +344,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		stashMemory.onMenuOptionClicked(event);
+		fairyRings.onMenuOptionClicked(event);
 		bankMemory.onMenuOptionClicked(event);
 		poh.onMenuOptionClicked(event);
 		guide.onMenuOptionClicked(event);
@@ -395,6 +410,7 @@ public class ClueHelperPlugin extends Plugin
 		bankMemory.onProfileChanged();
 		poh.onProfileChanged();
 		spiritTrees.publish();
+		fairyRings.publish();
 	}
 
 	@Subscribe

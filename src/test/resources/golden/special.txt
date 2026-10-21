@@ -167,6 +167,10 @@ house: Yanille upstairs house (B17 live), the Yanille twin of the Watchtower slo
 house: standing at the house portal in Hosidius with house tabs only (B17 live), Burthorpe castle steps
   best      24t: House portal: Home → Jewellery box: Burthorpe → walk 6
   alt       35t: House portal: Home → Jewellery box: Warriors' Guild → walk 17
+house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)
+  best      38t: Teleport to House → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 22 {item:556=1, item:557=1, item:563=1}
+  alt       57t: Desert amulet 4: Kalphite cave → walk 52
+  alt       65t: Lumbridge Teleport → walk 61 {item:556=3, item:557=1, item:563=1}
 house: map w356 without a house (the overworld fairy rings)
   best      21t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
   alt       28t: Slayer ring: Fremennik → walk 12 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11866=1}

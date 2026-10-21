@@ -167,7 +167,7 @@ public class ClueHelperDevPlugin extends Plugin
 			eventBus.unregister(pohTrace);
 			pohTrace.stop();
 		});
-		NetworkTrace networkTrace = new NetworkTrace(client, clueHelper.getSpiritTrees(),
+		NetworkTrace networkTrace = new NetworkTrace(client, clueHelper.getSpiritTrees(), clueHelper.getFairyRings(),
 			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
 		eventBus.register(networkTrace);
 		unregister.add(() ->

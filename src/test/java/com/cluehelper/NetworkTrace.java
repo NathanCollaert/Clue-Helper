@@ -1,5 +1,6 @@
 package com.cluehelper;
 
+import com.cluehelper.memory.FairyRingMemory;
 import com.cluehelper.memory.SpiritTreeMemory;
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
 /**
- * B17's live check: {@code [CH-TREE]} lines from the planted-tree memory; {@code [CH-TIME]} lines with every click and,
+ * B17's live check: {@code [CH-TREE]} lines from the planted-tree memory, {@code [CH-RING]} from the fairy ring one; {@code [CH-TIME]} lines with every click and,
  * for 30 ticks after it, each tick the tile or animation changes (spirit tree, quetzal and agility shortcut timings);
  * {@code [CH-QUETZAL]} lines with the quetzal maps' icon children against the cache table, plus a frame. Nothing while the
  * bank PIN keypad is open.
@@ -27,6 +28,7 @@ import net.runelite.client.eventbus.Subscribe;
 final class NetworkTrace
 {
 	static final String TREE_TAG = "[CH-TREE]";
+	static final String RING_TAG = "[CH-RING]";
 	static final String TIME_TAG = "[CH-TIME]";
 	static final String QUETZAL_TAG = "[CH-QUETZAL]";
 	private static final int WATCH_TICKS = 30;
@@ -41,11 +43,17 @@ final class NetworkTrace
 	private int lastAnimation = -2;
 	private int pendingQuetzal = -1;
 
-	NetworkTrace(Client client, SpiritTreeMemory trees, Consumer<File> saveFrame)
+	NetworkTrace(Client client, SpiritTreeMemory trees, FairyRingMemory rings, Consumer<File> saveFrame)
 	{
 		this.client = client;
 		this.saveFrame = saveFrame;
-		unregister = trees.addListener(line -> log.info("{} t{} {}", TREE_TAG, client.getTickCount(), line));
+		Runnable untrees = trees.addListener(line -> log.info("{} t{} {}", TREE_TAG, client.getTickCount(), line));
+		Runnable unrings = rings.addListener(line -> log.info("{} t{} {}", RING_TAG, client.getTickCount(), line));
+		unregister = () ->
+		{
+			untrees.run();
+			unrings.run();
+		};
 	}
 
 	void stop()

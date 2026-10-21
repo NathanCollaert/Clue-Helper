@@ -63,6 +63,8 @@ public final class PlayerSnapshot
 	private final HouseState house;
 	/** Planted spirit trees known grown, by patch name (B17); a patch never seen is not in it. */
 	private final Set<String> plantedTrees;
+	/** The fairy ring code last travelled to ("CKS"), where a ring's Last-destination goes; null when unknown (B17). */
+	private final String lastFairyRing;
 
 	@Builder(toBuilder = true)
 	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
@@ -72,7 +74,7 @@ public final class PlayerSnapshot
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
 		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
 		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house,
-		Set<String> plantedTrees)
+		Set<String> plantedTrees, String lastFairyRing)
 	{
 		this.version = version;
 		this.tick = tick;
@@ -104,6 +106,7 @@ public final class PlayerSnapshot
 		this.groupStorage = copy(groupStorage);
 		this.house = house == null ? HouseState.NONE : house;
 		this.plantedTrees = plantedTrees == null ? Set.of() : Set.copyOf(plantedTrees);
+		this.lastFairyRing = lastFairyRing;
 	}
 
 	public int boosted(Skill skill)
