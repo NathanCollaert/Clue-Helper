@@ -1,6 +1,6 @@
 {
   "name": "maxed-main",
-  "description": "Maxed main (Nathan's profile): every quest, diary and unlock, standard book with runes, a clue carry, everything banked, full POH in Hosidius.",
+  "description": "Maxed main (Nathan's profile): every quest, diary and unlock, standard book with runes, a clue carry, everything banked, full POH in Hosidius, all five planted spirit trees grown (B17 live).",
   "members": true,
   "bank": true,
   "walkTier": "full",
@@ -21,6 +21,7 @@
   ],
   "banked": "*",
   "poh": "full",
+  "plantedTrees": ["Port Sarim", "Etceteria", "Brimhaven", "Hosidius", "Farming Guild"],
   "types": "*",
   "avoidWilderness": false,
   "tiers": "*"

@@ -75,6 +75,26 @@ final class SceneObjects
 		return found;
 	}
 
+	/** NPCs in the scene with one of these ids, as spawned or as transformed (Renu, B17). */
+	static List<NPC> npcs(Client client, Set<Integer> ids)
+	{
+		List<NPC> found = new ArrayList<>();
+		WorldView view = client.getTopLevelWorldView();
+		if (ids.isEmpty() || view == null)
+		{
+			return found;
+		}
+		for (NPC npc : view.npcs())
+		{
+			NPCComposition composition = npc.getTransformedComposition();
+			if (ids.contains(npc.getId()) || composition != null && ids.contains(composition.getId()))
+			{
+				found.add(npc);
+			}
+		}
+		return found;
+	}
+
 	private static boolean banks(ObjectComposition composition)
 	{
 		if (composition == null)

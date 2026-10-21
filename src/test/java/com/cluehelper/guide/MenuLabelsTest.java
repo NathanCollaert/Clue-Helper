@@ -23,6 +23,9 @@ public class MenuLabelsTest
 		assertTrue(MenuLabels.matches("7: Karamja: Kaleb Paramaya (retired)", "7. Kaleb Paramaya"));
 		assertTrue(MenuLabels.matches("Carnivorous chinchompas", "Feldip Hills"));
 		assertTrue(MenuLabels.matches("Black chinchompas", "Black chinchompa"));
+		assertTrue(MenuLabels.matches("Monastery Teleport", "Kandarin Monastery"));
+		assertTrue(MenuLabels.matches("Farm Teleport", "Ardougne Farm"));
+		assertFalse(MenuLabels.matches("Farm Teleport", "Kandarin Monastery"));
 		assertFalse(MenuLabels.matches("Xeric's Heart", "Xeric's Honour"));
 		assertFalse(MenuLabels.matches("Ardougne", "West Ardougne Teleport"));
 		assertTrue(MenuLabels.isLastDestination("Last-destination (BKS)", "BKS"));

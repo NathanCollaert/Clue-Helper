@@ -39,6 +39,7 @@ import net.runelite.api.Client;
 import net.runelite.api.KeyCode;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
+import net.runelite.api.ObjectComposition;
 import net.runelite.api.Player;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
@@ -47,6 +48,7 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.NpcID;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.util.Text;
@@ -85,6 +87,13 @@ public class StepGuide
 	private static final int OBJECT_REFRESH_TICKS = 5;
 	/** A bank node sits on the walkable tile in front of its booth, chest or banker. */
 	private static final int BANK_TILES = 3;
+	/** The five spirit tree patches' objects (multilocs on their transmit varbits), and the grown tree they show. */
+	private static final Set<Integer> PLANTED_SPIRIT_TREES = Set.of(ObjectID.FARMING_SPIRIT_TREE_PATCH_1,
+		ObjectID.FARMING_SPIRIT_TREE_PATCH_2, ObjectID.FARMING_SPIRIT_TREE_PATCH_3, ObjectID.FARMING_SPIRIT_TREE_PATCH_4,
+		ObjectID.FARMING_SPIRIT_TREE_PATCH_5, ObjectID.SPIRIT_TREE_FULLYGROWN);
+	private static final String TRAVEL_OPTION = "Travel";
+	private static final String TREE_OPTION = "Tree";
+	private static final String SIGNAL_OPTION = "Signal";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Set.of(ObjectID.FAIRYRING_HOMEHUB, ObjectID.FAIRYRING_MINORHUB,
 		ObjectID.POH_FAIRY_RING, ObjectID.POH_SPIRIT_RING);
 	private static final String SPELLBOOK_OPTION = "Spellbook";
@@ -129,6 +138,7 @@ public class StepGuide
 	private Set<Integer> highlightItems = Set.of();
 	private Set<Integer> fillItems = Set.of();
 	private final LeftClicks leftClicks = new LeftClicks();
+	private final SwapperClicks swapperClicks;
 	private List<ItemUse> heldUses = List.of();
 	private String oneClickLabel;
 	private Set<Integer> bankHighlightItems = Set.of();
@@ -141,6 +151,11 @@ public class StepGuide
 	private List<NPC> highlightNpcs = List.of();
 	private List<TileObject> fillObjects = List.of();
 	private int objectsFoundTick = NEVER;
+	/**
+	 * Searches since the target or scene changed that found nothing: a house's furniture appears a tick or two after the
+	 * load (B17), so those first ticks are searched every tick, then every {@link #OBJECT_REFRESH_TICKS}.
+	 */
+	private int emptySearches;
 	private String menuHint;
 	/** A teleport was clicked: a game message right after it with no animation means the game refused it. */
 	private int teleportClickTick = NEVER;
@@ -150,8 +165,9 @@ public class StepGuide
 
 	@Inject
 	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
-		AvailabilityService availability)
+		AvailabilityService availability, SwapperClicks swapperClicks)
 	{
+		this.swapperClicks = swapperClicks;
 		this.menuLines = menuLines;
 		this.availability = availability;
 		this.bankMemory = bankMemory;
@@ -376,7 +392,8 @@ public class StepGuide
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
 		Set<Integer> ids = menuTarget.getObjectIds();
-		if (ids.isEmpty() && !bank)
+		Set<Integer> npcIds = menuTarget.getNpcIds();
+		if (ids.isEmpty() && npcIds.isEmpty() && !bank)
 		{
 			highlightObjects = List.of();
 			highlightNpcs = List.of();
@@ -384,11 +401,13 @@ public class StepGuide
 			return;
 		}
 		int tick = client.getTickCount();
-		if (objectsFoundTick == NEVER || tick - objectsFoundTick >= OBJECT_REFRESH_TICKS)
+		boolean nothingYet = highlightObjects.isEmpty() && highlightNpcs.isEmpty() && emptySearches < OBJECT_REFRESH_TICKS;
+		if (objectsFoundTick == NEVER || nothingYet || tick - objectsFoundTick >= OBJECT_REFRESH_TICKS)
 		{
+			emptySearches = objectsFoundTick == NEVER ? 0 : emptySearches + 1;
 			objectsFoundTick = tick;
 			highlightObjects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, ids);
-			highlightNpcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : List.of();
+			highlightNpcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.npcs(client, npcIds);
 			fillObjects = bank ? List.of() : oneClickObjects(highlightObjects);
 		}
 	}
@@ -628,16 +647,20 @@ public class StepGuide
 			highlightTab = Tab.MAGIC;
 			menuTarget = MenuTarget.builder().line(MenuTarget.Line.MINIGAME).lineName(SubSteps.minigameName(current.getRow())).build();
 		}
-		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory().isHouse())
+		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().isLocated())
 		{
 			menuTarget = houseTarget(current.getRow()).toBuilder().alternatives(sameLanding(current)).build();
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory() != Category.MINIGAME)
 		{
-			highlightHeld(current.getRow());
-			highlightMenuWidget = ScrollBook.entry(current.getRow().getName());
-			menuTarget = MenuTarget.builder().itemIds(highlightItems).itemNames(names(highlightItems))
-				.path(optionPath(current.getRow().getName())).alternatives(sameLanding(current)).build();
+			CatalogRow row = current.getRow();
+			highlightHeld(row);
+			highlightMenuWidget = ScrollBook.entry(row.getName());
+			MenuTarget.MenuTargetBuilder target = MenuTarget.builder().itemIds(highlightItems).itemNames(names(highlightItems))
+				.alternatives(sameLanding(current));
+			menuTarget = SubSteps.isQuetzalMap(row)
+				? target.path(List.of(SIGNAL_OPTION)).line(MenuTarget.Line.QUETZAL).lineId(SubSteps.quetzalSite(row)).build()
+				: target.path(optionPath(row.getName())).build();
 		}
 		else if (current.getKind() == SubStep.Kind.FAIRY_RING && current.getRow().getCode() != null)
 		{
@@ -659,9 +682,16 @@ public class StepGuide
 		fillItems = oneClickItems(oneClickLabel);
 	}
 
-	/** The option that teleports straight there: the path's last label, else the row's ("Jewellery box: Emir's Arena"). */
+	/**
+	 * The option that teleports straight there: the path's last label, else the row's ("Jewellery box: Emir's Arena").
+	 * None for a quetzal: its option only opens the map.
+	 */
 	private String directLabel(SubStep current)
 	{
+		if (menuTarget.getLine() == MenuTarget.Line.QUETZAL)
+		{
+			return null;
+		}
 		if (menuTarget.destination() != null)
 		{
 			return menuTarget.destination();
@@ -678,11 +708,17 @@ public class StepGuide
 			.collect(Collectors.toUnmodifiableSet());
 	}
 
+	/** What hovering showed, else what Menu Entry Swapper's own swap gives (B17). */
 	private String leftClick(ItemUse use)
 	{
-		return use.getContainer() == Container.WORN
-			? leftClicks.worn(client.getItemDefinition(use.getItemId()).getName())
+		boolean worn = use.getContainer() == Container.WORN;
+		String learned = worn ? leftClicks.worn(use.getItemId(), client.getItemDefinition(use.getItemId()).getName())
 			: leftClicks.item(use.getItemId());
+		if (learned != null)
+		{
+			return learned;
+		}
+		return worn ? swapperClicks.worn(use.getItemId()) : swapperClicks.item(use.getItemId());
 	}
 
 	private List<TileObject> oneClickObjects(List<TileObject> objects)
@@ -695,26 +731,37 @@ public class StepGuide
 	private String leftClick(TileObject object)
 	{
 		String learned = leftClicks.object(object.getId());
-		return learned != null ? learned : OneClick.defaultClick(client.getObjectDefinition(object.getId()));
+		if (learned != null)
+		{
+			return learned;
+		}
+		ObjectComposition definition = client.getObjectDefinition(object.getId());
+		String swapped = swapperClicks.object(definition);
+		return swapped != null ? swapped : OneClick.defaultClick(definition);
 	}
 
 	/**
-	 * A house row's menu (catalog Menu column): the nexus by struct id and map region, the jewellery box by line index,
-	 * a 187 list line or the object's own option by label.
+	 * A located row's menu (catalog Menu column): the nexus by struct id and map region, the jewellery box by line index,
+	 * a quetzal site by its map icon, a 187 list line or the object's own option by label. Outside the house the
+	 * object is the row's own (a spirit tree), and Renu for a quetzal.
 	 */
 	static MenuTarget houseTarget(CatalogRow row)
 	{
-		HouseNeed need = row.getRequirements().getHouse();
-		Set<Integer> objects = need == null ? Set.of() : Set.copyOf(need.getKind() == HouseNeed.Kind.NEXUS ? HouseState.NEXUS_OBJECTS : need.getIds());
-		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objects);
+		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objectsOf(row));
 		String menu = row.getMenu();
 		if (menu == null)
 		{
 			return target.build();
 		}
 		String[] parts = menu.split(" ", 2);
+		boolean outside = !row.isInHouse();
 		switch (parts[0])
 		{
+			case "quetzal":
+				return target.npcIds(Set.of(NpcID.QUETZAL_CHILD_GREEN)).path(List.of(TRAVEL_OPTION)).line(MenuTarget.Line.QUETZAL)
+					.lineId(SubSteps.quetzalSite(row)).build();
+			case "list":
+				return target.path(listPath(row, outside, parts[1])).build();
 			case "nexus":
 			{
 				String[] nexus = parts[1].split(" ", 2);
@@ -726,6 +773,35 @@ public class StepGuide
 			default:
 				return target.path(List.of(parts[1])).build();
 		}
+	}
+
+	/**
+	 * The option that opens a 187 list, then its line: Travel on a spirit tree outside, Tree on the house's (B17: on a
+	 * spiritual fairy tree "Ring-configure" opens a list too, and was coloured instead). Other house lists name the line
+	 * only.
+	 */
+	private static List<String> listPath(CatalogRow row, boolean outside, String line)
+	{
+		if (outside)
+		{
+			return List.of(TRAVEL_OPTION, line);
+		}
+		return row.getCategory() == Category.SPIRIT_TREE ? List.of(TREE_OPTION, line) : List.of(line);
+	}
+
+	/** The furniture a house row needs, else the row's own object; a planted tree is whichever patch object is there. */
+	private static Set<Integer> objectsOf(CatalogRow row)
+	{
+		HouseNeed need = row.isInHouse() ? row.getRequirements().getHouse() : null;
+		if (need != null)
+		{
+			return Set.copyOf(need.getKind() == HouseNeed.Kind.NEXUS ? HouseState.NEXUS_OBJECTS : need.getIds());
+		}
+		if (row.getObjectId() == ObjectID.SPIRIT_TREE_FULLYGROWN)
+		{
+			return PLANTED_SPIRIT_TREES;
+		}
+		return row.getObjectId() < 0 ? Set.of() : Set.of(row.getObjectId());
 	}
 
 	/**
@@ -744,7 +820,7 @@ public class StepGuide
 		for (RowAvailability judged : availability.getCarried().available())
 		{
 			CatalogRow row = judged.getRow();
-			boolean house = row.getRequirements().getHouse() != null && row.getMenu() != null;
+			boolean house = row.isInHouse() && row.getMenu() != null;
 			if (house && row != current.getRow() && row.getDestination() != null
 				&& SubSteps.near(row.getDestination(), landing, SAME_LANDING_TILES))
 			{

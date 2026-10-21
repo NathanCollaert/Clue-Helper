@@ -1,254 +1,254 @@
 # Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
-Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Gameval
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560=0;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&1;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&2;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&4;888@20	0	19	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&8;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&16;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&32;888@20	0	25	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&64;888@20	0	20	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&128;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&256;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&512;888@20	0	19	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560=0;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&1;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&2;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&4;888@20	0	19	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&8;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&16;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&32;888@20	0	25	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&64;888@20	0	20	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&128;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&256;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&512;888@20	0	19	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560=0;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&1;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&2;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&4;888@20	0	19	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&8;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&16;888@20	0	24	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&32;888@20	0	25	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&64;888@20	0	20	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&128;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&256;888@20	0	21	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&512;888@20	0	19	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	N			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y			varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Barbarian Assault Minigame Teleport		2531 3569 0						3264=11	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varbit:3264=BARBASSAULT_ARENANEWB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Blast Furnace Minigame Teleport		2934 10184 0						571>4	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varbit:571=GIANTDWARF_QUEST varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Burthorpe Games Room Minigame Teleport		2899 3553 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560=0;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&1;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&2;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&4;888@20	0	19	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&8;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&16;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&32;888@20	0	25	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&64;888@20	0	20	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&128;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&256;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&512;888@20	0	19	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Castle Wars Minigame Teleport		2442 3093 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560=0;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&1;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&2;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&4;888@20	0	19	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&8;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&16;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&32;888@20	0	25	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&64;888@20	0	20	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&128;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&256;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&512;888@20	0	19	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Clan Wars Minigame Teleport		3150 3635 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Fishing Trawler Minigame Teleport		2658 3157 0				15 Fishing			4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Giant's Foundry Minigame Teleport		3361 3149 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Guardians of the Rift Minigame Teleport		3614 9477 0					Temple of the Eye		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560=0;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&1;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&2;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&4;888@20	0	19	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&8;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&16;888@20	0	24	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&32;888@20	0	25	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&64;888@20	0	20	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&128;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&256;888@20	0	21	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&512;888@20	0	19	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Last Man Standing Minigame Teleport		3150 3635 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Mage Training Arena Minigame Teleport		3363 3295 0						1499>0	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varbit:1499=MAGICTRAINING_ENTRA_NOOB varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Nightmare Zone Minigame Teleport		2609 3114 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Pest Control Minigame Teleport		2658 2663 0				40 Combat			4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 1. Ardougne		2561 3319 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 2. Varrock		3262 3405 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 3. Keldagrim		2914 10193 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Rat Pits Minigame Teleport: 4. Port Sarim		3018 3231 0					Ratcatchers		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Shades of Mort'ton Minigame Teleport		3506 3304 0					Shades of Mort'ton		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Trouble Brewing Minigame Teleport		3801 3015 0				40 Cooking	Cabin Fever		4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	TzHaar Fight Pit Minigame Teleport		2399 5177 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID

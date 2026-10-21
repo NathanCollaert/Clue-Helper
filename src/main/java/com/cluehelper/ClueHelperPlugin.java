@@ -6,6 +6,7 @@ import com.cluehelper.guide.StepGuide;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.MemoryStore;
+import com.cluehelper.memory.SpiritTreeMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.CheckLines;
@@ -97,6 +98,10 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private CheckLines checkLines;
+
+	@Inject
+	@Getter(AccessLevel.PACKAGE)
+	private SpiritTreeMemory spiritTrees;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -199,6 +204,7 @@ public class ClueHelperPlugin extends Plugin
 		clueLink.start();
 		playerModel.start();
 		poh.start();
+		clientThread.invokeLater(spiritTrees::publish);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
@@ -258,6 +264,8 @@ public class ClueHelperPlugin extends Plugin
 		}
 		bankMemory.onGameTick();
 		poh.onGameTick();
+		menuLines.takeFreshList(spiritTrees::onListMenu);
+		spiritTrees.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
@@ -386,6 +394,7 @@ public class ClueHelperPlugin extends Plugin
 		memory.reload();
 		bankMemory.onProfileChanged();
 		poh.onProfileChanged();
+		spiritTrees.publish();
 	}
 
 	@Subscribe

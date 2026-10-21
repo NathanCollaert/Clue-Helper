@@ -19,7 +19,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class CatalogLoader
 {
 	static final List<String> TELEPORT_FILES = List.of("spells.tsv", "home_teleports.tsv", "minigames.tsv", "items.tsv",
-		"fairy_rings.tsv", "poh.tsv");
+		"fairy_rings.tsv", "poh.tsv", "spirit_trees.tsv", "quetzals.tsv");
 	static final String SPELLBOOK_FILE = "spellbooks.tsv";
 
 	static final String CATEGORY = "Category";
@@ -35,6 +35,7 @@ public final class CatalogLoader
 	static final String FROM = "From";
 	static final String TO = "To";
 	static final String MENU = "Menu";
+	static final String OBJECT = "menuOption menuTarget objectID";
 
 	private static final String ANY = "any";
 	private static final String ANYWHERE = "anywhere";
@@ -97,6 +98,7 @@ public final class CatalogLoader
 			.spends(Spend.parse(line.get(SPENDS)))
 			.requirements(CatalogRules.fairyRingStaff(parser.parse(line.getCells())))
 			.menu(menu.isEmpty() ? null : menu)
+			.objectId(objectId(line.get(OBJECT)))
 			.build();
 	}
 
@@ -137,6 +139,12 @@ public final class CatalogLoader
 			return built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
 		}
 		return built;
+	}
+
+	/** The last word of "Travel Spirit tree 26261"; -1 for an empty cell. */
+	private static int objectId(String cell)
+	{
+		return cell.isEmpty() ? -1 : Integer.parseInt(cell.substring(cell.lastIndexOf(' ') + 1));
 	}
 
 	private static Book book(String cell)

@@ -32,9 +32,9 @@ map:w348
   alt       29t: Teleport to House → Mounted glory: Draynor Village → walk 15 {item:556=1, item:557=1, item:563=1}
   alt       33t: Necklace of passage: Wizards' Tower → walk 28 {charge:21146=1}
 map:w351
-  best      51t: Skills necklace: Mining Guild → walk 46 {charge:11968=1}
-  alt       53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
-  alt       54t: Ring of wealth: Falador Park → walk 49 {charge:11980=1}
+  best      53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
+  alt       58t: Skills necklace: Mining Guild → walk 53 {charge:11968=1}
+  alt       61t: Ring of wealth: Falador Park → walk 56 {charge:11980=1}
 map:w356
   best      20t: Teleport to House → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {item:556=1, item:557=1, item:563=1}
   alt       21t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
@@ -111,7 +111,7 @@ cryptic:talk to the cook in the blue moon inn in varrock.
 emote:10180
   best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
   alt       56t: Teleport to House → Fairy ring: Zanaris → walk 39 {item:556=1, item:557=1, item:563=1}
-  alt       58t: Amulet of glory: Al Kharid → walk 53 {charge:1712=1}
+  alt       53t (rank 61): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 47 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
 emote:10222
   best      19t: Kandarin headgear 4: Teleport → walk 14
   alt       45t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
@@ -186,8 +186,8 @@ spot:MISTHALIN_VARROCK_STONE_CIRCLE
   alt       37t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 18 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
 spot:VARLAMORE_LOCUS_OASIS
   best      43t: Teleport to House → Fairy ring AJP: Varlamore: Avium Savannah → walk 26 {item:556=1, item:557=1, item:563=1}
-  alt       77t: Civitas illa Fortis Teleport → walk 73 {item:557=1, item:554=1, item:563=2}
-  alt       77t: Max cape: Other Teleports: Hunter Guild → walk 72
+  alt       44t: Civitas illa Fortis Teleport → walk 9 → Quetzal: Outer Fortis → walk 24 {item:557=1, item:554=1, item:563=2}
+  alt       44t: Ring of dueling: Fortis Colosseum → walk 8 → Quetzal: Outer Fortis → walk 24 {charge:2552=1}
 spot:WILDERNESS_54
   best      10t (rank 18): Max cape: Spellbook → LUNAR → Ice Plateau Teleport → walk 4 {cape=1, item:555=8, item:9075=3, item:563=3} leaves you on LUNAR
   same book 20t: Teleport to House → Portal nexus: Ice Plateau → walk 4 {item:556=1, item:557=1, item:563=1}
@@ -200,13 +200,13 @@ map:19785
   best      33t: Morytania legs: Burgh de Rott → walk 28
   alt       56t: Master scroll book: Mort'ton teleport → walk 51 {charge:21389=1}
 map:2719
-  best      52t: Skills necklace: Mining Guild → walk 47 {charge:11968=1}
-  alt       53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
-  alt       54t: Ring of wealth: Falador Park → walk 49 {charge:11980=1}
+  best      53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
+  alt       59t: Skills necklace: Mining Guild → walk 54 {charge:11968=1}
+  alt       61t: Ring of wealth: Falador Park → walk 56 {charge:11980=1}
 map:3520
   best      24t: Watchtower Teleport: Yanille → walk 19 {item:557=2, item:563=2}
-  alt       43t: Watchtower Teleport → walk 39 {item:557=2, item:563=2}
   alt       43t: Construction cape: Yanille → walk 38
+  alt       39t: Camelot Teleport: Seers' → walk 3 → bank → Watchtower tablet: Yanille → walk 19 {item:556=5, item:563=1, item:8012=1} withdraw [8012] deposit first
 map:3599
   best      21t: Teleport to House → Fairy ring DJP: Kandarin: Tower of Life → walk 4 {item:556=1, item:557=1, item:563=1}
   alt       27t: Ardougne cloak: Kandarin Monastery → walk 22
@@ -287,5 +287,5 @@ coordinate:2303,3328,0
   alt       57t: Teleport to House → Spirit tree: Prifddinas → walk 41 {item:556=1, item:557=1, item:563=1}
 emote:19791
   best      30t: Watchtower Teleport → walk 26 {item:557=2, item:563=2}
-  alt       34t: Watchtower Teleport: Yanille → walk 29 {item:557=2, item:563=2}
+  alt       38t: Watchtower Teleport: Yanille → walk 33 {item:557=2, item:563=2}
   alt       41t: Construction cape: Yanille → walk 36

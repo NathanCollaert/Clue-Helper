@@ -58,6 +58,7 @@ public final class Loadouts
 		Map.entry("Necklace of passage", ItemID.NECKLACE_OF_PASSAGE_5),
 		Map.entry("Pendant of ates", ItemID.PENDANT_OF_ATES),
 		Map.entry("Pharaoh's sceptre", ItemID.PHARAOHS_SCEPTRE),
+		Map.entry("Quetzal whistle", ItemID.HG_QUETZALWHISTLE_PERFECTED),
 		Map.entry("Ring of dueling", ItemID.RING_OF_DUELING_8),
 		Map.entry("Ring of wealth", ItemID.RING_OF_WEALTH_5),
 		Map.entry("Royal seed pod", ItemID.MM2_ROYAL_SEED_POD),
@@ -157,6 +158,7 @@ public final class Loadouts
 			.unknownVars(varsPass ? PlayerSnapshot.UnknownVars.PASS : PlayerSnapshot.UnknownVars.FAIL)
 			.charges(charges)
 			.house("full".equals(f.get("poh").getAsString()) ? nathansHouse() : HouseState.NONE)
+			.plantedTrees(strings(f, "plantedTrees"))
 			.spellbook(new SpellbookState(Book.valueOf(f.get("book").getAsString().toUpperCase()), false,
 				SpellbookState.CAPE_CHANGES_PER_DAY, varsPass || values.getOrDefault(VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, 0) == 1,
 				quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED, quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED,
@@ -276,6 +278,13 @@ public final class Loadouts
 		double range = 0.325 * Math.floor(3 * l.get(Skill.RANGED) / 2.0);
 		double mage = 0.325 * Math.floor(3 * l.get(Skill.MAGIC) / 2.0);
 		return (int) Math.floor(base + Math.max(melee, Math.max(range, mage)));
+	}
+
+	private static Set<String> strings(JsonObject f, String key)
+	{
+		Set<String> out = new HashSet<>();
+		array(f, key).forEach(value -> out.add(value.getAsString()));
+		return out;
 	}
 
 	private static Iterable<JsonElement> array(JsonObject f, String key)

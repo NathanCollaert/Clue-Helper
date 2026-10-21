@@ -1,5 +1,6 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.player.PositionRules;
 import java.util.List;
 import lombok.Builder;
 import lombok.Value;
@@ -34,6 +35,21 @@ public class CatalogRow
 	 * {@code op Karamja} (the object's own option); null otherwise.
 	 */
 	String menu;
+	/** The object to use, from Shortest Path's menuOption menuTarget objectID column (a spirit tree); -1 when none. */
+	@Builder.Default
+	int objectId = -1;
+
+	/** Starts at the POH node: house furniture, used from inside the player's own house. */
+	public boolean isInHouse()
+	{
+		return PositionRules.POH_NODE.equals(origin);
+	}
+
+	/** Used where it stands: house furniture, a spirit tree or Renu (fairy rings are entries and landings instead). */
+	public boolean isLocated()
+	{
+		return origin != null && category != Category.FAIRY_RING;
+	}
 
 	/** Usable from anywhere: neither a fairy-ring entry nor a fairy-ring landing. */
 	public boolean isGlobal()

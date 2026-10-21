@@ -201,7 +201,7 @@ public class PanelModel
 
 	static boolean usesHouse(Route route)
 	{
-		return route.getLegs().stream().anyMatch(leg -> leg.getRow() != null && leg.getRow().getCategory().isHouse()
+		return route.getLegs().stream().anyMatch(leg -> leg.getRow() != null && leg.getRow().isInHouse()
 			|| leg.getChange() != null && leg.getChange().isInHouse()
 			|| leg.getRow() != null && leg.getRow().getRequirements().getHouse() != null);
 	}

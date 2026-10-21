@@ -362,7 +362,7 @@ final class PlanContext
 		final List<Teleport> teleports = new ArrayList<>();
 		final Map<Integer, Teleport> fairyEntries = new HashMap<>();
 		final List<Teleport> fairyLandings = new ArrayList<>();
-		/** Transports that start at a node: the house furniture at the POH node (B16). */
+		/** Transports that start at a node: the house furniture at the POH node (B16), spirit trees and Renu (B17). */
 		final Map<Integer, List<Teleport>> located = new HashMap<>();
 		/** Altars, Tyss and the house's altars and mounted capes, by the node they are used at. */
 		final Map<Integer, List<Change>> changes = new HashMap<>();
@@ -393,8 +393,9 @@ final class PlanContext
 				}
 				else if (row.getOrigin() != null)
 				{
-					tele.halfTicks += houseWalkHalfTicks(row.getRequirements(), player);
-					located.computeIfAbsent(nodeAt(row.getOrigin()), k -> new ArrayList<>()).add(tele);
+					int from = nodeAt(row.getOrigin());
+					tele.halfTicks += from == pohNode ? houseWalkHalfTicks(row.getRequirements(), player) : 0;
+					located.computeIfAbsent(from, k -> new ArrayList<>()).add(tele);
 				}
 				else if (row.getCode() != null)
 				{

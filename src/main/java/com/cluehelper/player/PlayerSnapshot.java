@@ -1,6 +1,7 @@
 package com.cluehelper.player;
 
 import java.util.Map;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import net.runelite.api.Quest;
@@ -60,6 +61,8 @@ public final class PlayerSnapshot
 	private final Map<Integer, Integer> groupStorage;
 	/** The player's own house (B16); {@link HouseState#NONE} when nothing is known. */
 	private final HouseState house;
+	/** Planted spirit trees known grown, by patch name (B17); a patch never seen is not in it. */
+	private final Set<String> plantedTrees;
 
 	@Builder(toBuilder = true)
 	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
@@ -68,7 +71,8 @@ public final class PlayerSnapshot
 		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
 		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
-		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house)
+		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house,
+		Set<String> plantedTrees)
 	{
 		this.version = version;
 		this.tick = tick;
@@ -99,6 +103,7 @@ public final class PlayerSnapshot
 		this.bank = copy(bank);
 		this.groupStorage = copy(groupStorage);
 		this.house = house == null ? HouseState.NONE : house;
+		this.plantedTrees = plantedTrees == null ? Set.of() : Set.copyOf(plantedTrees);
 	}
 
 	public int boosted(Skill skill)

@@ -37,10 +37,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -71,6 +73,10 @@ public class GoldenRoutesTest
 
 	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin (B15). */
 	private static final List<String> TIPPING_POINTS = List.of("coordinate:3556", "map:3599", "spot:MISTHALIN_VARROCK_STONE_CIRCLE");
+
+	private static final GoldenCoverage COVERAGE = new GoldenCoverage();
+	private static boolean fixturesRan;
+	private static boolean specialRan;
 
 	private static WalkTable table;
 	private static Catalog catalog;
@@ -118,7 +124,20 @@ public class GoldenRoutesTest
 			compare(fixture, lines, failures);
 		}
 		writeTimings();
+		fixturesRan = true;
 		assertTrue(String.join("\n", failures), failures.isEmpty());
+	}
+
+	/** B17's gate: with both golden files planned, every Tier A/B kind appears in some route (build/golden/coverage.txt). */
+	@AfterClass
+	public static void goldenRoutesCoverEveryTierABKind() throws IOException
+	{
+		if (!fixturesRan || !specialRan)
+		{
+			return;
+		}
+		Files.write(ACTUAL.resolve("coverage.txt"), COVERAGE.lines(), StandardCharsets.UTF_8);
+		assertTrue("no golden route uses " + COVERAGE.missing(), COVERAGE.missing().isEmpty());
 	}
 
 	@Test
@@ -184,6 +203,7 @@ public class GoldenRoutesTest
 			checked(input(mid, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(midBank).build())));
 		bankCases(lines, maxed, mid, midBank, bankOn);
 		houseCases(lines, maxed, plain);
+		networkCases(lines, maxed, mid, plain);
 		lines.add(line("start on a node: standing at the Varrock Teleport landing, to Varrock bank crates",
 			checked(input(mid, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3213, 3424, 0))), plain).build())));
 
@@ -194,6 +214,7 @@ public class GoldenRoutesTest
 
 		List<String> failures = new ArrayList<>();
 		compare("special", lines, failures);
+		specialRan = true;
 		assertTrue(String.join("\n", failures), failures.isEmpty());
 	}
 
@@ -283,6 +304,64 @@ public class GoldenRoutesTest
 			checked(input(maxed, burthorpe, inside, plain).build())));
 		lines.add(line("house: standing in a stranger's house, Burthorpe castle steps",
 			checked(input(maxed, burthorpe, inside, plain).foreignHouseStart(true).build())));
+		lines.add(line("house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelisk",
+			checked(input(maxed.toBuilder().house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_PORTAL_TEAK_ANNAKARL)).build()).build(),
+				fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("house: Yanille upstairs house (B17 live), the Yanille twin of the Watchtower slot, no law runes",
+			checked(input(without(maxed, ItemID.LAWRUNE), step("cryptic:in a town where wizards are known to gather, search upstairs in a large house to the north."),
+				PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("house: standing at the house portal in Hosidius with house tabs only (B17 live), Burthorpe castle steps",
+			checked(input(withoutAll(maxed, Set.of(ItemID.LAWRUNE, ItemID.SKILLCAPE_MAX, ItemID.SKILLCAPE_CONSTRUCTION, Loadouts.itemId("Games necklace"))),
+				burthorpe, PlanStart.atNode(table, table.node(new WorldPoint(1743, 3517, 0))), plain).build())));
+		lines.add(line("house: map w356 without a house (the overworld fairy rings)",
+			checked(input(maxed.toBuilder().house(HouseState.NONE).build(), step("map:w356"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
+	}
+
+	/**
+	 * B17: spirit trees and quetzals. B15's live case (anagram 23133, Madame Caldarium) for a player without the Feldip
+	 * rocks' 10 Agility; a planted tree known grown against never seen (unknown is unavailable); the house as a spirit
+	 * tree landing from the Grand Exchange tree; Renu from Civitas illa Fortis; the whistle from anywhere.
+	 */
+	private static void networkCases(List<String> lines, PlayerSnapshot maxed, PlayerSnapshot mid, PlannerSettings plain)
+	{
+		Step caldarium = step("anagram:23133");
+		lines.add(line("spirit tree: anagram 23133 (Madame Caldarium), maxed", checked(input(maxed, caldarium, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("spirit tree: anagram 23133 (Madame Caldarium), maxed with 1 Agility",
+			checked(input(withLevel(maxed, Skill.AGILITY, 1), caldarium, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		Step etceteria = step("spot:FREMENNIK_PROVINCE_ETCETERIA_CASTLE");
+		lines.add(line("planted: Etceteria castle, mid-ironman, the Etceteria tree never seen",
+			checked(input(mid, etceteria, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("planted: Etceteria castle, mid-ironman, the Etceteria tree seen grown",
+			checked(input(mid.toBuilder().plantedTrees(Set.of("Etceteria")).build(), etceteria, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		PlanStart geTree = PlanStart.atNode(table, table.node(new WorldPoint(3185, 3508, 0)));
+		PlayerSnapshot midHouse = mid.toBuilder().house(Loadouts.nathansHouse()).build();
+		lines.add(line("spirit tree to the house: at the Grand Exchange tree, mid-ironman with Nathan's house, Fountain of Rune 12101",
+			checked(input(midHouse, step("coordinate:12101"), geTree, plain).build())));
+		Step aldarin = step("cryptic:dig outside the bank on aldarin.");
+		PlanStart civitas = PlanStart.atNode(table, table.node(new WorldPoint(1697, 3140, 0)));
+		lines.add(line("quetzal: at Renu in Civitas illa Fortis, maxed, dig outside the bank on Aldarin",
+			checked(input(maxed, aldarin, civitas, plain).build())));
+		PlayerSnapshot noPassage = withoutAll(mid, Set.of(ItemID.NECKLACE_OF_PASSAGE_5, ItemID.NECKLACE_OF_PASSAGE_2));
+		Map<Integer, Charge> passageCharges = new HashMap<>(noPassage.getCharges());
+		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_5, new Charge(5, Charge.Source.ITEM_ID));
+		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_2, new Charge(2, Charge.Source.ITEM_ID));
+		PlayerSnapshot twoPassages = noPassage.toBuilder().charges(passageCharges).build();
+		lines.add(line("partial charges first (B17 live): passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
+			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().bankEdge(true).build())
+				.banked(withBank(twoPassages, Map.of(ItemID.NECKLACE_OF_PASSAGE_5, 1, ItemID.NECKLACE_OF_PASSAGE_2, 1))).build())));
+		PlayerSnapshot whistle = with(maxed, Loadouts.itemId("Quetzal whistle"));
+		lines.add(line("quetzal whistle: carried, maxed, emote outside the gates of Cam Torum",
+			checked(input(whistle, step("emote:salute outside the gates of cam torum. beware of double agents! equip a full set of blue moon equipment."),
+				PlanStart.teleportOnly(ANYWHERE), plain).build())));
+	}
+
+	private static PlayerSnapshot withLevel(PlayerSnapshot player, Skill skill, int level)
+	{
+		Map<Skill, Integer> boosted = new HashMap<>(player.getBoostedLevels());
+		Map<Skill, Integer> real = new HashMap<>(player.getRealLevels());
+		boosted.put(skill, level);
+		real.put(skill, level);
+		return player.toBuilder().boostedLevels(boosted).realLevels(real).build();
 	}
 
 	private static RequiredItems.Need need(String name, ItemRequirement requirement, boolean stepItem)
@@ -374,6 +453,7 @@ public class GoldenRoutesTest
 
 	private static String line(String name, Plan plan)
 	{
+		COVERAGE.add(name, plan);
 		StringBuilder out = new StringBuilder(name);
 		out.append("\n  best      ").append(describe(plan.getBest()));
 		if (plan.getDirect() != null)

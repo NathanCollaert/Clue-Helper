@@ -12,7 +12,8 @@ anagram:25784
   best      28t: Xeric's talisman: 1. Xeric's Lookout → walk 23 {charge:13393=1}
 anagram:7268
   best      95t: Necklace of passage: The Outpost → walk 90 {charge:21146=1}
-  alt       149t: Skills necklace: Fishing Guild → walk 144 {charge:11968=1}
+  alt       103t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 53 {charge:11968=1}
+  alt       109t: Varrock Teleport → walk 44 → Spirit tree: Gnome Stronghold → walk 53 {item:556=3, item:554=1, item:563=1}
 anagram:duo plug
   best      none
   note      no route from what you have
@@ -50,9 +51,9 @@ cipher:19910
 cipher:23172
   best      38t: Games necklace: Barbarian Outpost → walk 33 {charge:3853=1}
 coordinate:12033
-  best      130t: Ring of dueling: Castle Wars → walk 125 {charge:2552=1}
-  alt       150t: Castle Wars Minigame Teleport → walk 124 {cooldown:888=1}
-  alt       153t: Nightmare Zone Minigame Teleport → walk 127 {cooldown:888=1}
+  best      115t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Feldip Hills → walk 65 {charge:11968=1}
+  alt       121t: Varrock Teleport → walk 44 → Spirit tree: Feldip Hills → walk 65 {item:556=3, item:554=1, item:563=1}
+  alt       122t: Varrock tablet → walk 44 → Spirit tree: Feldip Hills → walk 65 {item:8007=1}
 coordinate:12101
   best      128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
   alt       167t: Ring of dueling: Ferox Enclave → walk 162 {charge:2552=1}
@@ -90,15 +91,14 @@ cryptic:search the chest in the left-hand tower of camelot castle.
   alt       32t: Camelot tablet → walk 27 {item:8010=1}
 cryptic:search the wheelbarrow in rimmington mine.
   best      39t: Skills necklace: Crafting Guild → walk 34 {charge:11968=1}
-  alt       71t: Amulet of glory: Draynor Village → walk 66 {charge:1712=1}
-  alt       74t: Falador Teleport → walk 70 {item:556=3, item:555=1, item:563=1}
+  alt       75t: Amulet of glory: Draynor Village → walk 70 {charge:1712=1}
 cryptic:talk to the cook in the blue moon inn in varrock.
   best      35t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       36t: Varrock tablet → walk 23 {item:8007=1}
   alt       66t: Skills necklace: Cooking Guild → walk 53 {charge:11968=1}
 emote:10180
   best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
-  alt       58t: Amulet of glory: Al Kharid → walk 53 {charge:1712=1}
+  alt       62t: Amulet of glory: Al Kharid → walk 57 {charge:1712=1}
   alt       64t: Amulet of glory: Draynor Village → walk 59 {charge:1712=1}
 emote:10222
   best      45t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
@@ -118,8 +118,8 @@ emote:clap in the magic axe hut. beware of double agents! equip only some flared
   note      walk too long
 fairyring:a i q 0 4 4 0
   best      103t: Skills necklace: Crafting Guild → walk 98 {charge:11968=1}
-  alt       114t: Amulet of glory: Draynor Village → walk 109 {charge:1712=1}
-  alt       139t: Falador Teleport → walk 135 {item:556=3, item:555=1, item:563=1}
+  alt       118t: Amulet of glory: Draynor Village → walk 113 {charge:1712=1}
+  alt       143t: Falador Teleport → walk 139 {item:556=3, item:555=1, item:563=1}
 fairyring:a i r 2 3 3 1
   best      none
   note      no route from what you have
@@ -167,8 +167,9 @@ spot:FELDIP_HILLS_GNOME_GLITER
   alt       114t: Nightmare Zone Minigame Teleport → walk 88 {cooldown:888=1}
   alt       126t: Castle Wars Minigame Teleport → walk 100 {cooldown:888=1}
 spot:KANDARIN_GRAND_TREE
-  best      88t: Necklace of passage: The Outpost → walk 83 {charge:21146=1}
-  alt       142t: Skills necklace: Fishing Guild → walk 137 {charge:11968=1}
+  best      83t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 32 {charge:11968=1}
+  alt       88t: Necklace of passage: The Outpost → walk 83 {charge:21146=1}
+  alt       89t: Varrock Teleport → walk 44 → Spirit tree: Gnome Stronghold → walk 32 {item:556=3, item:554=1, item:563=1}
 spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
   alt       39t: Varrock tablet → walk 34 {item:8007=1}
@@ -248,8 +249,8 @@ cryptic:you will need to under-cook to solve this one.
   alt       46t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}
 cryptic:search through some drawers in the upstairs of a house in rimmington.
   best      54t: Skills necklace: Crafting Guild → walk 49 {charge:11968=1}
-  alt       82t: Amulet of glory: Draynor Village → walk 77 {charge:1712=1}
-  alt       90t: Falador Teleport → walk 86 {item:556=3, item:555=1, item:563=1}
+  alt       85t: Amulet of glory: Draynor Village → walk 80 {charge:1712=1}
+  alt       94t: Falador Teleport → walk 90 {item:556=3, item:555=1, item:563=1}
 anagram:12566
   best      13t: Skills necklace: Mining Guild → walk 8 {charge:11968=1}
 cryptic:search the crates in a bank in varrock.

@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,7 @@ public final class MenuLabels
 	private static final Pattern ALIAS = Pattern.compile("\\s*\\([^)]*\\)\\s*$");
 	private static final Pattern NOT_WORD = Pattern.compile("[^a-z0-9]+");
 	private static final int SHORTEST_PARTIAL = 4;
+	private static final String TELEPORT_SUFFIX = " teleport";
 
 	private MenuLabels()
 	{
@@ -74,11 +76,25 @@ public final class MenuLabels
 		{
 			return true;
 		}
-		if (a.equals(b))
+		if (a.equals(b) || namesPlaceOf(a, b))
 		{
 			return true;
 		}
 		return Math.min(a.length(), b.length()) >= SHORTEST_PARTIAL && (a.startsWith(b) || b.startsWith(a));
+	}
+
+	/**
+	 * An item option "Monastery Teleport" for the catalog's "Kandarin Monastery" (B17, the Ardougne cloak): every word
+	 * before "teleport" is a whole word of the label.
+	 */
+	private static boolean namesPlaceOf(String option, String label)
+	{
+		if (!option.endsWith(TELEPORT_SUFFIX) || option.length() == TELEPORT_SUFFIX.length())
+		{
+			return false;
+		}
+		List<String> words = List.of(label.split(" "));
+		return words.containsAll(List.of(option.substring(0, option.length() - TELEPORT_SUFFIX.length()).split(" ")));
 	}
 
 	/**

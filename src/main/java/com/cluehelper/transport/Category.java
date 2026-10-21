@@ -6,14 +6,12 @@ import java.util.Locale;
 public enum Category
 {
 	SPELL, HOME, MINIGAME, FAIRY_RING, TABLET, SCROLL, JEWELLERY, DIARY, CAPE, ITEM,
-	/** House furniture (B16): every one of these starts at the POH node. */
-	NEXUS, JEWELLERY_BOX, MOUNTED, PORTAL, SPIRIT_TREE, OBELISK;
-
-	/** Furniture inside the player's house, used from the POH node. */
-	public boolean isHouse()
-	{
-		return ordinal() >= NEXUS.ordinal();
-	}
+	/** House furniture (B16), used from the POH node. */
+	NEXUS, JEWELLERY_BOX, MOUNTED, PORTAL, OBELISK,
+	/** In the house garden and out in the world (B17). */
+	SPIRIT_TREE,
+	/** Renu at every quetzal site (B17); the whistle is an ITEM row. */
+	QUETZAL;
 
 	static Category of(String cell)
 	{

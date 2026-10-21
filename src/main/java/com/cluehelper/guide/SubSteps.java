@@ -33,6 +33,7 @@ public final class SubSteps
 	static final int AREA_ARRIVE_TILES = 15;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
+	private static final String QUETZAL_MENU = "quetzal ";
 	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
 	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
 	private static final Map<String, String> CHANGE_WARNINGS = Map.of(
@@ -148,9 +149,20 @@ public final class SubSteps
 				return place(next.getChange());
 			case BANK:
 				return "the bank";
+			case TELEPORT:
+				return located(next.getRow());
 			default:
 				return "the marker";
 		}
+	}
+
+	private static String located(CatalogRow row)
+	{
+		if (row.getCategory() == Category.SPIRIT_TREE && !row.isInHouse())
+		{
+			return "the spirit tree";
+		}
+		return row.getCategory() == Category.QUETZAL ? "Renu" : "the marker";
 	}
 
 	/** The Swap's book is its spell's: after the fused cast the leg is back on Lunar. */
@@ -164,14 +176,15 @@ public final class SubSteps
 	private static SubStep teleport(Leg leg, HouseState house)
 	{
 		CatalogRow row = leg.getRow();
+		WorldPoint standsAt = row.isLocated() && !row.isInHouse() ? leg.getFrom() : null;
 		return SubStep.builder().kind(SubStep.Kind.TELEPORT).text(teleportText(row)).detail(withHotkey(teleportDetail(row), hotkey(row, house)))
-			.goal(leg.getTo()).radius(LANDING_TILES).row(row).build();
+			.waypoint(standsAt).goal(leg.getTo()).radius(LANDING_TILES).row(row).build();
 	}
 
 	static String teleportText(CatalogRow row)
 	{
 		String name = row.getName();
-		if (row.getCategory().isHouse())
+		if (row.isLocated() || isQuetzalMap(row))
 		{
 			return houseText(row);
 		}
@@ -193,9 +206,21 @@ public final class SubSteps
 
 	private static String teleportDetail(CatalogRow row)
 	{
-		if (row.getCategory().isHouse())
+		if (row.isInHouse())
 		{
 			return houseDetail(row);
+		}
+		if (row.getCategory() == Category.SPIRIT_TREE)
+		{
+			return "Travel";
+		}
+		if (row.getCategory() == Category.QUETZAL)
+		{
+			return "Renu: Travel, then pick it on the map";
+		}
+		if (isQuetzalMap(row))
+		{
+			return "Signal, then pick it on the map";
 		}
 		switch (row.getCategory())
 		{
@@ -207,6 +232,18 @@ public final class SubSteps
 			default:
 				return null;
 		}
+	}
+
+	/** The row's landing is picked on a quetzal map (Renu's or the whistle's): catalog Menu {@code quetzal <site id>}. */
+	static boolean isQuetzalMap(CatalogRow row)
+	{
+		return row.getMenu() != null && row.getMenu().startsWith(QUETZAL_MENU);
+	}
+
+	/** The Quetzal table id of the row's site, or -1. */
+	static int quetzalSite(CatalogRow row)
+	{
+		return isQuetzalMap(row) ? Integer.parseInt(row.getMenu().substring(QUETZAL_MENU.length())) : -1;
 	}
 
 	/** "Castle Wars Minigame Teleport" → "Castle Wars", as the Grouping dropdown lists it. */

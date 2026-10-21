@@ -65,6 +65,7 @@ public final class AvailabilityEngine
 		req.getQuests().forEach(quest -> checkQuest(quest, player, v));
 		req.getVars().forEach(check -> checkVar(check, player, nowMinutes, v));
 		checkHouse(req.getHouse(), player, v);
+		req.getPlantedTrees().forEach(patch -> checkPlanted(patch, player, v));
 		req.getItems().forEach(clause -> checkClause(clause, req.isSpendsCharges(), player, nowMinutes, v));
 		return v.result(row);
 	}
@@ -121,6 +122,15 @@ public final class AvailabilityEngine
 		}
 	}
 
+	/** Unknown counts as unavailable: a tree never seen grown may be dead or not planted (B17 trap). */
+	private static void checkPlanted(String patch, PlayerSnapshot player, Verdict v)
+	{
+		if (!player.getPlantedTrees().contains(patch))
+		{
+			v.no("spirit tree at " + patch + " not seen grown");
+		}
+	}
+
 	private static void checkVar(VarCheck check, PlayerSnapshot player, long nowMinutes, Verdict v)
 	{
 		Integer value = check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
@@ -151,14 +161,14 @@ public final class AvailabilityEngine
 		}
 		List<String> shortfalls = new ArrayList<>();
 		String unread = null;
+		Paid best = null;
 		for (ItemClause.Branch branch : clause.getBranches())
 		{
 			Paid paid = pay(branch, clause.isMustBeWorn(), spendsCharges, player);
 			if (paid.witness != null)
 			{
-				v.witness.addAll(paid.witness);
-				v.chargesUnknown |= paid.chargesUnknown;
-				return;
+				best = best == null || preferred(paid, best, spendsCharges, player) ? paid : best;
+				continue;
 			}
 			if (paid.unread != null)
 			{
@@ -169,7 +179,12 @@ public final class AvailabilityEngine
 				shortfalls.add(paid.shortfall);
 			}
 		}
-		if (unread != null)
+		if (best != null)
+		{
+			v.witness.addAll(best.witness);
+			v.chargesUnknown |= best.chargesUnknown;
+		}
+		else if (unread != null)
 		{
 			v.unread(unread);
 		}
@@ -178,6 +193,43 @@ public final class AvailabilityEngine
 			v.no(shortfalls.size() <= MAX_ALTERNATIVES_NAMED ? String.join(" or ", shortfalls)
 				: shortfalls.get(0) + " or one of " + (shortfalls.size() - 1) + " other variants");
 		}
+	}
+
+	/**
+	 * Of two variants that both pay: the one already carried rather than one from the bank, then, for an item that spends
+	 * charges, the one with fewest charges known (Nathan, B17: use up the partly charged necklaces first). Ties keep the
+	 * catalog's order.
+	 */
+	private static boolean preferred(Paid a, Paid b, boolean spendsCharges, PlayerSnapshot player)
+	{
+		int bankA = fromStorage(a.witness);
+		int bankB = fromStorage(b.witness);
+		if (bankA != bankB)
+		{
+			return bankA < bankB;
+		}
+		return spendsCharges && knownCharges(a.witness, player) < knownCharges(b.witness, player);
+	}
+
+	private static int fromStorage(List<ItemUse> witness)
+	{
+		return (int) witness.stream().filter(use -> use.getContainer() == Container.BANK || use.getContainer() == Container.GROUP_STORAGE).count();
+	}
+
+	/** The witness's charges where every item's count is known; unknown counts as more than any known. */
+	private static int knownCharges(List<ItemUse> witness, PlayerSnapshot player)
+	{
+		int total = 0;
+		for (ItemUse use : witness)
+		{
+			Charge charge = player.getCharges().get(use.getItemId());
+			if (charge == null || charge.getCharges() < 0)
+			{
+				return Integer.MAX_VALUE;
+			}
+			total += charge.getCharges();
+		}
+		return total;
 	}
 
 	private Paid pay(ItemClause.Branch branch, boolean mustBeWorn, boolean spendsCharges, PlayerSnapshot player)

@@ -36,6 +36,9 @@ public class Requirements
 	boolean spendsCharges;
 	/** The house piece a POH row needs; null for rows outside the house (B16). */
 	HouseNeed house;
+	/** Planted spirit trees the row starts or lands at, by patch name ("Port Sarim"); each must be known grown (B17). */
+	@Builder.Default
+	Set<String> plantedTrees = Set.of();
 	@Builder.Default
 	List<String> errors = List.of();
 }

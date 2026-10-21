@@ -82,6 +82,7 @@ public class PlayerModel
 	private volatile boolean questsDirty;
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
+	private Set<String> plantedTrees = Set.of();
 	private String dirtyBecause;
 	private long version;
 
@@ -215,6 +216,13 @@ public class PlayerModel
 	public void onStatChanged()
 	{
 		markDirty("stats");
+	}
+
+	/** The planted spirit trees known grown changed (SpiritTreeMemory, B17). Client thread. */
+	public void setPlantedTrees(Set<String> next)
+	{
+		plantedTrees = Set.copyOf(next);
+		markDirty("spirit trees");
 	}
 
 	/** The house state changed (PohService, B16). Client thread. */
@@ -420,6 +428,7 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
+			.plantedTrees(plantedTrees)
 			.build();
 	}
 

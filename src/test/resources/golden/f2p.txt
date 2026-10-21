@@ -6,7 +6,7 @@ anagram:carpet ahoy
 anagram:i cord
   best      41t: Falador Teleport → walk 37 {item:556=3, item:555=1, item:563=1}
 anagram:in bar
-  best      83t: Falador Teleport → walk 79 {item:556=3, item:555=1, item:563=1}
+  best      84t: Falador Teleport → walk 80 {item:556=3, item:555=1, item:563=1}
   alt       118t: Lumbridge Teleport → walk 114 {item:556=3, item:557=1, item:563=1}
   alt       135t: Varrock Teleport → walk 131 {item:556=3, item:554=1, item:563=1}
 anagram:rug deter

@@ -38,7 +38,7 @@ Lunar, swap runes only in the bank (bank on)
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
   best      43t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 26
   alt       50t: Master scroll book: Digsite teleport → walk 45 {charge:21389=1}
-  alt       55t: Construction cape: Tele to POH → Portal nexus: Respawn (Civitas illa Fortis) → walk 38
+  alt       51t: Ring of dueling: Fortis Colosseum → walk 8 → Quetzal: Civitas illa Fortis → walk 31 {charge:2552=1}
 Wilderness start at level 26 (3100,3720), to Varrock
   best      32t: Slayer ring: Stronghold → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
   alt       32t: Slayer ring: Slayer Tower → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
@@ -155,18 +155,63 @@ house: standing in a stranger's house, Burthorpe castle steps
   best      11t: Games necklace: Burthorpe → walk 6 {charge:3853=1}
   alt       23t: Teleport to House → Jewellery box: Burthorpe → walk 6 {item:556=1, item:557=1, item:563=1}
   alt       31t: Max cape: Warriors' Guild → walk 26
+house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelisk
+  best      65t: Teleport to House → Portal chamber: Annakarl → walk 55 {item:556=1, item:557=1, item:563=1}
+  alt       62t (rank 70): Max cape: Spellbook → ANCIENT → Annakarl Teleport → walk 55 {cape=1, item:563=2, item:565=2} leaves you on ANCIENT
+  alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  note      Wilderness target
+house: Yanille upstairs house (B17 live), the Yanille twin of the Watchtower slot, no law runes
+  best      37t: Construction cape: Tele to POH → Portal nexus: Yanille → walk 12
+  alt       45t: Construction cape: Yanille → walk 32
+  alt       56t: Nightmare Zone Minigame Teleport → walk 22 {cooldown:888=1}
+house: standing at the house portal in Hosidius with house tabs only (B17 live), Burthorpe castle steps
+  best      24t: House portal: Home → Jewellery box: Burthorpe → walk 6
+  alt       35t: House portal: Home → Jewellery box: Warriors' Guild → walk 17
+house: map w356 without a house (the overworld fairy rings)
+  best      21t: Necklace of passage: Wizards' Tower → walk 16 {charge:21146=1}
+  alt       28t: Slayer ring: Fremennik → walk 12 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11866=1}
+  alt       28t: Ring of wealth: Miscellania → walk 13 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11980=1}
+spirit tree: anagram 23133 (Madame Caldarium), maxed
+  best      36t: Max cape: Other Teleports: Feldip Hills → walk 31 {daily:4819=1}
+  alt       40t: Master scroll book: Feldip hills teleport → walk 35 {charge:21389=1}
+  alt       51t: Teleport to House → Spirit tree: Feldip Hills → walk 35 {item:556=1, item:557=1, item:563=1}
+spirit tree: anagram 23133 (Madame Caldarium), maxed with 1 Agility
+  best      51t: Teleport to House → Spirit tree: Feldip Hills → walk 35 {item:556=1, item:557=1, item:563=1}
+planted: Etceteria castle, mid-ironman, the Etceteria tree never seen
+  best      none
+  note      no route from what you have
+planted: Etceteria castle, mid-ironman, the Etceteria tree seen grown
+  best      55t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Etceteria → walk 4 {charge:11968=1}
+  alt       61t: Varrock Teleport → walk 44 → Spirit tree: Etceteria → walk 4 {item:556=3, item:554=1, item:563=1}
+  alt       70t: Necklace of passage: The Outpost → walk 52 → Spirit tree: Etceteria → walk 4 {charge:21146=1}
+spirit tree to the house: at the Grand Exchange tree, mid-ironman with Nathan's house, Fountain of Rune 12101
+  best      72t: Spirit tree: Your house → House obelisk: Level 50 Wilderness → walk 52
+  alt       76t: Spirit tree: Your house → Portal nexus: Annakarl → walk 55
+  alt       128t: Games necklace: Corporeal Beast → walk 123 {charge:3853=1}
+  note      Wilderness target
+quetzal: at Renu in Civitas illa Fortis, maxed, dig outside the bank on Aldarin
+  best      25t: Quetzal: Aldarin → walk 17
+  alt       32t: Construction cape: Aldarin → walk 27
+  alt       36t: Teleport to House → Fairy ring CKQ: Varlamore: Aldarin → walk 19 {item:556=1, item:557=1, item:563=1}
+partial charges first (B17 live): passage(5) and passage(2) banked, coordinate 2807 by the Outpost
+  best      47t: Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 28 {charge:2552=1, charge:21153=1} withdraw [21153]
+  direct    122t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 71 {charge:11968=1}
+quetzal whistle: carried, maxed, emote outside the gates of Cam Torum
+  best      19t: Quetzal whistle: Cam Torum → walk 6 {charge:29275=1}
+  alt       26t: Civitas illa Fortis Teleport → walk 9 → Quetzal: Cam Torum → walk 6 {item:557=1, item:554=1, item:563=2}
+  alt       26t: Ring of dueling: Fortis Colosseum → walk 8 → Quetzal: Cam Torum → walk 6 {charge:2552=1}
 start on a node: standing at the Varrock Teleport landing, to Varrock bank crates
   best      23t: walk 23
   alt       27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       37t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
 AREA: cryptic:anger those who adhere to saradomin's edicts to prevent travel.
-  best      49t: Rat Pits Minigame Teleport: 4. Port Sarim → walk 15 {cooldown:888=1}
-  alt       52t: Amulet of glory: Draynor Village → walk 39 {charge:1712=1}
-  alt       58t: Construction cape: Rimmington → walk 45
+  best      39t: Teleport to House → Spirit tree: Port Sarim → walk 15 {item:556=1, item:557=1, item:563=1}
+  alt       49t: Rat Pits Minigame Teleport: 4. Port Sarim → walk 15 {cooldown:888=1}
+  alt       55t: Amulet of glory: Draynor Village → walk 42 {charge:1712=1}
 SEQUENCE skill: skill:CHARLIE:i need to give charlie a cooked pike.
   best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
   alt       32t: Teleport to House → Portal nexus: Varrock → walk 16 {item:556=1, item:557=1, item:563=1}
   alt       32t: Teleport to House → Jewellery box: Champions' Guild → walk 15 {item:556=1, item:557=1, item:563=1}
 SEQUENCE three-step (6 orders)
   best      86t: Skills necklace: Mining Guild → walk 28 → Lumbridge Teleport → walk 22 → Varrock Teleport → walk 23 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
-PROBES (hot/cold spots): {2860,3562,0=27, 2915,3425,0=59, 2917,3295,0=13, 2972,3486,0=58, 2976,3239,0=39, 3030,3364,0=29, 3031,3304,0=58, 3033,3438,0=51}
+PROBES (hot/cold spots): {2860,3562,0=27, 2915,3425,0=59, 2917,3295,0=13, 2972,3486,0=58, 2976,3239,0=39, 3030,3364,0=29, 3031,3304,0=59, 3033,3438,0=51}

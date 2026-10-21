@@ -200,7 +200,7 @@ final class LabelSearch
 		expandBank(from, k);
 	}
 
-	/** Transports that start here: the house furniture at the POH node (B16). */
+	/** Transports that start here: the house furniture at the POH node (B16), a spirit tree or Renu (B17). */
 	private void expandLocatedTeleports(Label from, int k)
 	{
 		List<PlanContext.Teleport> here = ctx.options[from.b].located.get(from.node);

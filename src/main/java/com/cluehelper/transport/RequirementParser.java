@@ -42,6 +42,7 @@ public final class RequirementParser
 	public static final String MEMBERS = "Members";
 	public static final String CONSUMABLE = "Consumable";
 	public static final String HOUSE = "House";
+	public static final String PLANTED = "Planted";
 
 	private static final int MAX_SKILL_LEVEL = 99;
 	private static final int MAX_COMBAT_LEVEL = 126;
@@ -92,8 +93,14 @@ public final class RequirementParser
 			.members(isTrue(cell(cells, MEMBERS)))
 			.spendsCharges(isTrue(cell(cells, CONSUMABLE)))
 			.house(house)
+			.plantedTrees(parsePlanted(cell(cells, PLANTED)))
 			.errors(List.copyOf(out.errors))
 			.build();
+	}
+
+	private static Set<String> parsePlanted(String cell)
+	{
+		return cell.isEmpty() ? Set.of() : Set.of(cell.trim().split("\\s*;\\s*"));
 	}
 
 	private static HouseNeed parseHouse(String cell, Parsed out)

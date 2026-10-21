@@ -26,7 +26,9 @@ public class MenuTarget
 		/** Fairy ring travel log entry by code, then the dials' confirm button. */
 		FAIRY_CODE,
 		/** Grouping: the minigame in the dropdown, then the Teleport button. */
-		MINIGAME
+		MINIGAME,
+		/** A quetzal map (Renu's or the whistle's): the site's icon, placed by the cache's Quetzal table (B17). */
+		QUETZAL
 	}
 
 	/** Right-click options on these items (inventory or worn). */
@@ -38,12 +40,15 @@ public class MenuTarget
 	/** Right-click options on these objects (base ids), and outlined in the scene. */
 	@Builder.Default
 	Set<Integer> objectIds = Set.of();
+	/** Right-click options on these NPCs (Renu), and outlined in the scene. */
+	@Builder.Default
+	Set<Integer> npcIds = Set.of();
 	/** Option labels from the top menu down a sub-menu; the last one names the destination. */
 	@Builder.Default
 	List<String> path = List.of();
 	@Builder.Default
 	Line line = Line.LABEL;
-	/** NEXUS: struct id; BOX: line index. */
+	/** NEXUS: struct id; BOX: line index; QUETZAL: the site's Quetzal table id. */
 	int lineId;
 	/** NEXUS: the map region shield; FAIRY_CODE: the code. */
 	String lineKey;
@@ -58,7 +63,7 @@ public class MenuTarget
 
 	public boolean isEmpty()
 	{
-		return itemIds.isEmpty() && objectIds.isEmpty() && path.isEmpty() && line == Line.LABEL;
+		return itemIds.isEmpty() && objectIds.isEmpty() && npcIds.isEmpty() && path.isEmpty() && line == Line.LABEL;
 	}
 
 	/** The destination label: the last option of the path. */

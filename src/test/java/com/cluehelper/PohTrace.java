@@ -21,6 +21,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
 /**
@@ -35,8 +36,9 @@ final class PohTrace
 	static final String MENU_TAG = "[CH-MENU]";
 	static final File FRAMES = new File("build/poh-menus");
 	private static final Set<Integer> TELEPORT_INTERFACES = Set.of(17, 187, 219, 590, InterfaceID.Fairyrings.ROOT_RECT0 >>> 16,
-		InterfaceID.FairyringsLog.UNIVERSE >>> 16);
+		InterfaceID.FairyringsLog.UNIVERSE >>> 16, InterfaceID.QuetzalMenu.ICONS >>> 16, InterfaceID.QuetzalwhistleMenu.ICONS >>> 16);
 	private static final int MOST_FRAMES = 200;
+	private static final int NEXUS_GROUP = 17;
 	/** Interfaces the client reloads with every new scene (seen live on each landing): not a teleport's chooser. */
 	private static final Set<Integer> RELOADED_ON_LANDING = Set.of(71, 109, 116, 182, 203, 216, 218, 239, 320, 387, 429, 541, 629, 712);
 
@@ -91,6 +93,11 @@ final class PohTrace
 		{
 			log.info("{} t{} interface {} lines {} hint {}", MENU_TAG, client.getTickCount(), pendingInterface,
 				rects(lines.lines(target)), guide.getMenuHint());
+			if (pendingInterface == NEXUS_GROUP)
+			{
+				logLayer("rows", InterfaceID.TelenexusTeleport.ROWS1);
+				logLayer("text", InterfaceID.TelenexusTeleport.TEXT1);
+			}
 			frame("interface-" + pendingInterface);
 			pendingInterface = -1;
 		}
@@ -178,6 +185,20 @@ final class PohTrace
 		log.info("{} t{} click {}|{}|{}|{} widget {}:{}[{}] during {} '{}'", MENU_TAG, client.getTickCount(), event.getMenuOption(),
 			event.getMenuTarget(), event.getMenuAction(), event.getId(), widget >>> 16, widget & 0xFFFF, event.getParam0(),
 			current.getKind(), current.getText());
+	}
+
+	/** The nexus list's layers, first lines only: which one holds the labels (B17). */
+	private void logLayer(String name, int component)
+	{
+		Widget layer = client.getWidget(component);
+		Widget[] children = layer == null ? null : layer.getDynamicChildren();
+		List<String> lines = new ArrayList<>();
+		for (int i = 0; children != null && i < Math.min(4, children.length); i++)
+		{
+			Widget c = children[i];
+			lines.add(i + ": y " + c.getRelativeY() + " h " + c.getHeight() + " text '" + c.getText() + "' colour " + Integer.toHexString(c.getTextColor()));
+		}
+		log.info("{} t{} nexus {} layer: {} children {}", MENU_TAG, client.getTickCount(), name, children == null ? 0 : children.length, lines);
 	}
 
 	private String describe(MenuTarget target)

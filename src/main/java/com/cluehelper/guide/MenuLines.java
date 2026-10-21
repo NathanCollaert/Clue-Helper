@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,6 +18,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Menu;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
+import net.runelite.api.NPC;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.gameval.InterfaceID;
@@ -55,16 +57,22 @@ public class MenuLines
 	private static final int TEXT_COLOUR = 0x40D0FF;
 
 	private final Client client;
+	private final QuetzalIcons quetzalIcons;
 	private final Map<String, int[]> listLines = new HashMap<>();
+	/** The open 187 list's title, and where each of its lines is drawn (the widget text carries a greyed line's colour). */
+	private String listTitle;
+	private final List<int[]> rawListLines = new ArrayList<>();
+	private boolean listFresh;
 	private final Map<Integer, int[]> nexusLines = new HashMap<>();
 	private final Map<Integer, int[]> boxLines = new HashMap<>();
 	/** Lines coloured for the target, with the colour to put back. */
 	private final Map<Widget, Integer> coloured = new IdentityHashMap<>();
 
 	@Inject
-	MenuLines(Client client)
+	MenuLines(Client client, QuetzalIcons quetzalIcons)
 	{
 		this.client = client;
+		this.quetzalIcons = quetzalIcons;
 	}
 
 	/** From the plugin's handler at priority 2: better-teleport-menu works at 1. */
@@ -75,6 +83,8 @@ public class MenuLines
 			case LIST_TITLE:
 			case LIST_TITLE_ALT:
 				listLines.clear();
+				rawListLines.clear();
+				listTitle = objectTail();
 				break;
 			case LIST_LINE:
 			case LIST_LINE_ALT:
@@ -84,6 +94,8 @@ public class MenuLines
 				if (ints != null && label != null)
 				{
 					listLines.put(MenuLabels.normalise(label), new int[]{ints[0], ints[3], ints[3]});
+					rawListLines.add(new int[]{ints[0], ints[3]});
+					listFresh = true;
 				}
 				break;
 			}
@@ -110,6 +122,29 @@ public class MenuLines
 		}
 	}
 
+	/**
+	 * Once per list drawn, a tick after its lines: hands over the title and each line's widget text with its colour tags
+	 * (B17's planted spirit trees: a tree that can't be used is greyed; the script's own label has no colour).
+	 */
+	public void takeFreshList(BiConsumer<String, List<String>> reader)
+	{
+		if (!listFresh)
+		{
+			return;
+		}
+		listFresh = false;
+		List<String> texts = new ArrayList<>();
+		for (int[] at : rawListLines)
+		{
+			Widget line = child(at);
+			if (line != null && line.getText() != null)
+			{
+				texts.add(line.getText());
+			}
+		}
+		reader.accept(listTitle, texts);
+	}
+
 	public void onWidgetClosed(WidgetClosed event)
 	{
 		coloured.keySet().removeIf(line -> line.getId() >>> 16 == event.getGroupId());
@@ -133,9 +168,10 @@ public class MenuLines
 		List<Rectangle> out = new ArrayList<>();
 		for (Widget widget : lineWidgets(target))
 		{
-			if (!hasText(widget))
+			Rectangle shown = hasText(widget) ? null : clipped(widget);
+			if (shown != null && !shown.isEmpty())
 			{
-				out.add(clipped(widget));
+				out.add(shown);
 			}
 		}
 		return out;
@@ -236,6 +272,9 @@ public class MenuLines
 			case MINIGAME:
 				minigame(target.getLineName(), out);
 				break;
+			case QUETZAL:
+				quetzal(target.getLineId(), out);
+				break;
 			default:
 				labelled(target, out);
 				break;
@@ -305,7 +344,7 @@ public class MenuLines
 		Widget line = child(nexusLines.get(target.getLineId()));
 		if (visible(line))
 		{
-			add(line, out);
+			add(labelOf(line), out);
 			return;
 		}
 		Widget map = client.getWidget(InterfaceID.TelenexusTeleport.FRAME);
@@ -380,6 +419,29 @@ public class MenuLines
 			}
 		}
 		add(client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP), out);
+	}
+
+	/**
+	 * The site's icon on whichever quetzal map is open (Renu's 874, the whistle's 949): the icon nearest the position the
+	 * cache's Quetzal table gives it, never a fixed pixel offset (B17).
+	 */
+	private void quetzal(int site, List<Widget> out)
+	{
+		int[] at = quetzalIcons.position(site);
+		if (at == null)
+		{
+			return;
+		}
+		Widget icons = client.getWidget(InterfaceID.QuetzalMenu.ICONS);
+		if (!visible(icons))
+		{
+			icons = client.getWidget(InterfaceID.QuetzalwhistleMenu.ICONS);
+		}
+		if (!visible(icons))
+		{
+			return;
+		}
+		add(QuetzalIcons.nearest(icons.getDynamicChildren(), at), out);
 	}
 
 	/** A 187 list line, else a chatbox option, matching the destination (then any earlier label of the path). */
@@ -493,7 +555,13 @@ public class MenuLines
 		boolean objectOption = type == MenuAction.GAME_OBJECT_FIRST_OPTION || type == MenuAction.GAME_OBJECT_SECOND_OPTION
 			|| type == MenuAction.GAME_OBJECT_THIRD_OPTION || type == MenuAction.GAME_OBJECT_FOURTH_OPTION
 			|| type == MenuAction.GAME_OBJECT_FIFTH_OPTION;
-		return objectOption && target.getObjectIds().contains(entry.getIdentifier());
+		if (objectOption && target.getObjectIds().contains(entry.getIdentifier()))
+		{
+			return true;
+		}
+		NPC npc = entry.getNpc();
+		return npc != null && (target.getNpcIds().contains(npc.getId())
+			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId()));
 	}
 
 	/** Entries run bottom-up: the last one is the top row. */
@@ -543,16 +611,48 @@ public class MenuLines
 		return widget.getText() != null && !Text.removeTags(widget.getText()).isBlank();
 	}
 
-	/** Rows past a scrolling list's window keep {@code hidden = false} with bounds below the box (B12): clip them. */
+	/**
+	 * Rows past a scrolling list's window keep {@code hidden = false} with bounds below the box (B12): clip them to every
+	 * enclosing widget, since the list's own layer is as tall as all its rows and only the scroll window is visible (B17).
+	 */
 	private static Rectangle clipped(Widget widget)
 	{
 		Rectangle bounds = widget.getBounds();
-		Widget parent = widget.getParent();
-		if (parent != null && parent.getBounds() != null && parent.getBounds().width > 0)
+		for (Widget parent = widget.getParent(); parent != null && !bounds.isEmpty(); parent = parent.getParent())
 		{
-			bounds = bounds.intersection(parent.getBounds());
+			Rectangle outer = parent.getBounds();
+			if (outer != null && outer.width > 0)
+			{
+				bounds = bounds.intersection(outer);
+			}
 		}
 		return bounds;
+	}
+
+	/**
+	 * A nexus row is a text-less background in the row layer; its label is drawn at the same height in the text layer
+	 * (B17, live: {@code ROWS1} and {@code TEXT1}), and the label is what gets coloured. The row itself when no label is
+	 * found.
+	 */
+	private Widget labelOf(Widget row)
+	{
+		if (hasText(row))
+		{
+			return row;
+		}
+		Widget text = client.getWidget(InterfaceID.TelenexusTeleport.TEXT1);
+		Widget[] labels = text == null ? null : text.getDynamicChildren();
+		int top = row.getRelativeY();
+		int bottom = top + row.getHeight();
+		for (Widget label : labels == null ? new Widget[0] : labels)
+		{
+			int middle = label == null ? -1 : label.getRelativeY() + label.getHeight() / 2;
+			if (label != null && hasText(label) && middle >= top && middle < bottom)
+			{
+				return label;
+			}
+		}
+		return row;
 	}
 
 	private int[] intTail(int count)
