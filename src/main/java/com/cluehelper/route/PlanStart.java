@@ -18,6 +18,7 @@ public class PlanStart
 
 	Kind kind;
 	WorldPoint tile;
+	/** The loaded scene's walk from the tile; also kept for a teleport-only start, where it reaches no node. */
 	SceneBfs.Result scene;
 	int node;
 
@@ -33,6 +34,11 @@ public class PlanStart
 
 	public static PlanStart teleportOnly(WorldPoint tile)
 	{
-		return new PlanStart(Kind.TELEPORT_ONLY, tile, null, WalkTable.NO_NODE);
+		return teleportOnly(tile, null);
+	}
+
+	public static PlanStart teleportOnly(WorldPoint tile, SceneBfs.Result scene)
+	{
+		return new PlanStart(Kind.TELEPORT_ONLY, tile, scene, WalkTable.NO_NODE);
 	}
 }

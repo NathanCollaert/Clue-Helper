@@ -26,7 +26,7 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * Writes core's clue data to JSON for tools/cache/c1_match.py and c5_step_index.py. Provider lambdas run
+ * Writes core's clue data to JSON for tools/cache/c1_match.py and tools/steps/generate.py. Provider lambdas run
  * under every var state in {@link CoreClues#VAR_STATES}, so varbit- or quest-dependent entries list all
  * their branches. Run: gradlew coreClues.
  */

@@ -1,6 +1,7 @@
 package com.cluehelper;
 
 import com.cluehelper.dev.DevHarness;
+import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.hotcold.HotColdPlan;
@@ -20,16 +21,17 @@ import com.cluehelper.poh.PohService;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.route.SceneDoors;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.ClueHelperPanel;
 import com.cluehelper.ui.Icons;
+import com.cluehelper.ui.ChallengeAnswerOverlay;
 import com.cluehelper.ui.FurnitureOverlay;
 import com.cluehelper.ui.ItemHighlightOverlay;
 import com.cluehelper.ui.MenuLineOverlay;
-import com.cluehelper.ui.MinimapMarkerOverlay;
 import com.cluehelper.ui.PanelModel;
 import com.cluehelper.ui.PanelState;
 import com.cluehelper.ui.WidgetHighlightOverlay;
@@ -146,6 +148,9 @@ public class ClueHelperPlugin extends Plugin
 	private StepGuide guide;
 
 	@Inject
+	private ActWatcher actWatcher;
+
+	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private HotColdService hotCold;
 
@@ -181,7 +186,10 @@ public class ClueHelperPlugin extends Plugin
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
-	private MinimapMarkerOverlay minimapOverlay;
+	private ChallengeAnswerOverlay answerOverlay;
+
+	@Inject
+	private SceneDoors sceneDoors;
 
 	@Inject
 	private WorldMapMarkers mapMarkers;
@@ -306,6 +314,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
 		clueLink.onItemContainerChanged(event);
+		actWatcher.onItemContainerChanged(event);
 		playerModel.onItemContainerChanged(event);
 		bankMemory.onItemContainerChanged(event);
 	}
@@ -361,6 +370,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		stashMemory.onMenuOptionClicked(event);
+		sceneDoors.onMenuOptionClicked(event);
 		fairyRings.onMenuOptionClicked(event);
 		bankMemory.onMenuOptionClicked(event);
 		poh.onMenuOptionClicked(event);
@@ -394,8 +404,10 @@ public class ClueHelperPlugin extends Plugin
 	public void onChatMessage(ChatMessage event)
 	{
 		hotCold.onChatMessage(event);
+		actWatcher.onChatMessage(event);
 		guide.onChatMessage(event);
 		stashMemory.onChatMessage(event);
+		sceneDoors.onChatMessage(event);
 		if (checkLines.onChatMessage(event))
 		{
 			playerModel.onChargesLearned();
@@ -459,7 +471,7 @@ public class ClueHelperPlugin extends Plugin
 
 	private Overlay[] overlays()
 	{
-		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, minimapOverlay, menuLineOverlay, furnitureOverlay};
+		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, menuLineOverlay, furnitureOverlay, answerOverlay};
 	}
 
 	private void onGuideChanged()
@@ -485,7 +497,8 @@ public class ClueHelperPlugin extends Plugin
 		PanelModel model = PanelModel.of(panelState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
 			guide.getNext(), guide.isHighlightWorn(), stuckBookOnF2p(), bankInfo(), houseInfo(), guide.getMenuHint(),
 			System.currentTimeMillis());
-		PanelModel shown = model.getState().showsRoutes() ? model.toBuilder().hotCold(hotColdView()).build() : model;
+		PanelModel atStep = guide.isAtStep() ? model.atTheStep() : model;
+		PanelModel shown = atStep.getState().showsRoutes() ? atStep.toBuilder().hotCold(hotColdView()).build() : atStep;
 		SwingUtilities.invokeLater(() -> target.show(shown));
 	}
 

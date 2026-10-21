@@ -23,6 +23,9 @@ import lombok.Value;
 public class PanelModel
 {
 	public static final PanelModel EMPTY = PanelModel.builder().state(PanelState.NO_CLUE).build();
+	private static final String NO_ROUTE = "No route from what you have";
+	private static final String NO_PLAN_YET = "Waiting for the first plan";
+	private static final Set<String> ROUTE_NOTES = Set.of(NO_ROUTE, NO_PLAN_YET, "Walk too long", "No target tile for this step yet");
 
 	PanelState state;
 	/** Replaces the state's own detail line. */
@@ -73,6 +76,13 @@ public class PanelModel
 		boolean manual;
 	}
 
+	/** At the step itself nothing is travelled: no route cards, no "Show why", no notes about routes. */
+	public PanelModel atTheStep()
+	{
+		List<String> kept = notes.stream().filter(note -> !ROUTE_NOTES.contains(note)).collect(Collectors.toList());
+		return toBuilder().routes(List.of()).why(List.of()).notes(List.copyOf(kept)).build();
+	}
+
 	/** @param f2pBook the book a member is stuck on while on an F2P world, or null */
 	public static PanelModel of(PanelState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
 		boolean nowItemWorn, Book f2pBook)
@@ -121,7 +131,7 @@ public class PanelModel
 		List<RouteCard> cards = cards(plan, committed, bank, houseFlags(house, nowMillis), nowMillis);
 		if (cards.isEmpty() && notes.isEmpty())
 		{
-			notes.add(plan == Plan.NONE ? "Waiting for the first plan" : "No route from what you have");
+			notes.add(plan == Plan.NONE ? NO_PLAN_YET : NO_ROUTE);
 		}
 		return model.notes(notes).routes(cards).why(plan.getWhy() == null ? List.of() : plan.getWhy()).build();
 	}

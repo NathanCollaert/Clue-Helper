@@ -80,14 +80,18 @@ spot:NORTHEAST_OF_AL_KHARID_MINE
   alt       92t: Varrock Teleport → walk 88 {item:556=3, item:554=1, item:563=1}
   alt       92t: Lumbridge Home Teleport → walk 68 {cooldown:892=1}
 skill:CHARLIE:i need to give charlie a cooked pike.
-  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      85t: Varrock Teleport → walk 61 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}
+  alt       148t: Falador Teleport → walk 79 → walk 66 {item:556=3, item:555=1, item:563=1}
 skill:CHARLIE:i need to give charlie a cooked trout.
-  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      85t: Varrock Teleport → walk 61 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}
+  alt       148t: Falador Teleport → walk 79 → walk 66 {item:556=3, item:555=1, item:563=1}
 skill:CHARLIE:i need to give charlie a leather body.
   best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
 skill:CHARLIE:i need to give charlie a raw herring.
-  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      117t: Falador Teleport → walk 93 → Varrock Teleport → walk 16 {item:556=6, item:555=1, item:563=2, item:554=1}
+  alt       155t: Lumbridge Teleport → walk 131 → Varrock Teleport → walk 16 {item:556=6, item:557=1, item:563=2, item:554=1}
 skill:CHARLIE:i need to give charlie a raw trout.
-  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      85t: Varrock Teleport → walk 61 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}
+  alt       148t: Falador Teleport → walk 79 → walk 66 {item:556=3, item:555=1, item:563=1}
 skill:CHARLIE:i need to give charlie one iron dagger.
-  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
+  best      39t: Varrock Teleport → walk 15 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}

@@ -2,6 +2,7 @@ package com.cluehelper.step;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
@@ -13,16 +14,24 @@ public final class StepRequirements
 	private final int firePitVarbitId;
 	private final int lightSourceVarbitId;
 	private final List<ItemRequirement> items;
+	private final List<ItemRequirement> ownItems;
 	private final int stashObjectId;
 
 	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
 		int stashObjectId)
+	{
+		this(spade, light, firePitVarbitId, lightSourceVarbitId, items, List.of(), stashObjectId);
+	}
+
+	private StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
+		List<ItemRequirement> ownItems, int stashObjectId)
 	{
 		this.spade = spade;
 		this.light = light;
 		this.firePitVarbitId = firePitVarbitId;
 		this.lightSourceVarbitId = lightSourceVarbitId;
 		this.items = List.copyOf(items);
+		this.ownItems = List.copyOf(ownItems);
 		this.stashObjectId = stashObjectId;
 	}
 
@@ -35,7 +44,20 @@ public final class StepRequirements
 	{
 		List<ItemRequirement> more = new ArrayList<>(items);
 		more.add(item);
-		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, more, stashObjectId);
+		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, more, ownItems, stashObjectId);
+	}
+
+	/** An item the step's route needs that core's *clue* bank tag doesn't list: a source's tools, Charlie's item. */
+	public StepRequirements plusOwn(ItemRequirement item)
+	{
+		List<ItemRequirement> more = new ArrayList<>(ownItems);
+		more.add(item);
+		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, items, more, stashObjectId);
+	}
+
+	public List<ItemRequirement> getOwnItems()
+	{
+		return ownItems;
 	}
 
 	/** The emote step's STASH unit object, or -1. */
@@ -81,6 +103,26 @@ public final class StepRequirements
 			}
 		}
 		return true;
+	}
+
+	/** By value: a rewritten step (a probe trip, a stage dropped) is rebuilt every tick and must equal the last one. */
+	@Override
+	public boolean equals(Object other)
+	{
+		if (!(other instanceof StepRequirements))
+		{
+			return false;
+		}
+		StepRequirements that = (StepRequirements) other;
+		return spade == that.spade && light == that.light && firePitVarbitId == that.firePitVarbitId
+			&& lightSourceVarbitId == that.lightSourceVarbitId && stashObjectId == that.stashObjectId && items.equals(that.items)
+			&& ownItems.equals(that.ownItems);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(spade, light, firePitVarbitId, lightSourceVarbitId, stashObjectId, items, ownItems);
 	}
 
 	@Override

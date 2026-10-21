@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
@@ -27,6 +28,7 @@ import net.runelite.client.plugins.cluescrolls.clues.NpcClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.ObjectClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
 import net.runelite.client.plugins.cluescrolls.clues.ThreeStepCrypticClue;
+import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /**
@@ -213,6 +215,49 @@ public final class CoreClueReader
 			requirements = ((SkillChallengeClue) clue).getItemRequirements();
 		}
 		return requirements == null ? List.of() : distinct(Arrays.asList(requirements));
+	}
+
+	/** The three-step's parts core hasn't marked solved, in core's order. */
+	static List<CrypticClue> unsolvedParts(ThreeStepCrypticClue clue)
+	{
+		List<CrypticClue> parts = new ArrayList<>();
+		for (Map.Entry<CrypticClue, Boolean> part : List.copyOf(clue.getClueSteps()))
+		{
+			if (!part.getValue())
+			{
+				parts.add(part.getKey());
+			}
+		}
+		return parts;
+	}
+
+	static List<String> emotes(ClueScroll clue)
+	{
+		if (!(clue instanceof EmoteClue))
+		{
+			return List.of();
+		}
+		EmoteClue emote = (EmoteClue) clue;
+		List<String> names = new ArrayList<>();
+		for (Emote each : new Emote[]{emote.getFirstEmote(), emote.getSecondEmote()})
+		{
+			if (each != null)
+			{
+				names.add(each.getName());
+			}
+		}
+		return List.copyOf(names);
+	}
+
+	static boolean challengeCompleted(ClueScroll clue)
+	{
+		return clue instanceof SkillChallengeClue && ((SkillChallengeClue) clue).isChallengeCompleted();
+	}
+
+	/** Null for a Sherlock challenge: only Charlie's ask for an item back. */
+	static ItemRequirement returnItem(ClueScroll clue)
+	{
+		return clue instanceof SkillChallengeClue ? ((SkillChallengeClue) clue).getReturnItem() : null;
 	}
 
 	static int lightSourceVarbitId(ClueScroll clue)

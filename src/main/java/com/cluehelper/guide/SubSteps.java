@@ -4,11 +4,14 @@ import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
+import com.cluehelper.route.Exit;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Route;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.SpadeNeed;
+import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
@@ -16,6 +19,7 @@ import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +36,7 @@ public final class SubSteps
 	/** A feel's information depends on its exact tile, so the walk ends on the marker. */
 	static final int PROBE_ARRIVE_TILES = 0;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
+	private static final String TALK_TO = "Talk to";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
 	private static final String QUETZAL_MENU = "quetzal ";
 	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
@@ -51,8 +56,17 @@ public final class SubSteps
 		return of(route, step, itemNames, HouseState.NONE);
 	}
 
-	/** {@code house} gives the nexus hotkeys, which follow the player's own slot order. */
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house)
+	{
+		return of(route, step, itemNames, house, leg -> null, false);
+	}
+
+	/**
+	 * {@code house} gives the nexus hotkeys, which follow the player's own slot order; {@code exits} names the exit a
+	 * start leg leaves the scene by, or null; {@code takeFromStash} when the step's items wait in its STASH unit.
+	 */
+	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
+		Function<Leg, Exit> exits, boolean takeFromStash)
 	{
 		List<SubStep> steps = new ArrayList<>();
 		List<Leg> legs = route.getLegs();
@@ -60,14 +74,29 @@ public final class SubSteps
 		{
 			steps.add(withdraw(route, itemNames));
 		}
+		List<Stage> stages = step.getStages().stream().filter(stage -> !stage.getTiles().isEmpty()).collect(Collectors.toList());
+		int stage = 0;
 		for (int i = 0; i < legs.size(); i++)
 		{
 			Leg leg = legs.get(i);
 			Leg next = i + 1 < legs.size() ? legs.get(i + 1) : null;
+			Exit exit = leg.getKind() == Leg.Kind.WALK ? exits.apply(leg) : null;
+			Stage reached = stage < stages.size() - 1 && stages.get(stage).getTiles().contains(leg.getTo()) ? stages.get(stage) : null;
+			if (reached != null && leg.getKind() == Leg.Kind.WALK && exit == null)
+			{
+				steps.add(walkToStage(leg, reached));
+				steps.add(stageAct(reached));
+				stage++;
+				continue;
+			}
 			switch (leg.getKind())
 			{
 				case WALK:
-					steps.add(walk(leg, next, step));
+					if (exit == null && entersStepArea(leg, step))
+					{
+						steps.add(enter(step.getData()));
+					}
+					steps.add(exit != null ? exit(leg, exit) : walk(leg, next, step));
 					break;
 				case WILDERNESS_EXIT:
 					steps.add(SubStep.builder().kind(SubStep.Kind.WILDERNESS_EXIT).text("Walk south out of deep Wilderness")
@@ -92,9 +121,64 @@ public final class SubSteps
 					steps.add(withdraw(route, itemNames));
 					break;
 			}
+			if (reached != null)
+			{
+				steps.add(stageAct(reached));
+				stage++;
+			}
 		}
-		steps.add(act(step));
+		Stage last = stages.isEmpty() ? null : stages.get(stages.size() - 1);
+		if (last != null && last.getKind() != Stage.Kind.FINAL)
+		{
+			steps.add(stageAct(last));
+		}
+		else
+		{
+			steps.addAll(Acts.of(step, takeFromStash));
+		}
+		addActsDoneAnywhere(steps, step);
 		return steps;
+	}
+
+	/** After the last bank stop, which may be what brings the task's items. */
+	private static void addActsDoneAnywhere(List<SubStep> steps, Step step)
+	{
+		int at = 0;
+		for (int i = 0; i < steps.size(); i++)
+		{
+			if (steps.get(i).getKind() == SubStep.Kind.WITHDRAW)
+			{
+				at = i + 1;
+			}
+		}
+		for (Stage stage : step.getStages())
+		{
+			if (stage.getTiles().isEmpty())
+			{
+				steps.add(at++, stageAct(stage));
+			}
+		}
+	}
+
+	private static SubStep walkToStage(Leg leg, Stage stage)
+	{
+		String ticks = "≈ " + leg.getTicks() + " ticks";
+		int radius = stage.getRadius() > 0 ? stage.getRadius() : ARRIVE_TILES;
+		if (!stage.isOurMarker())
+		{
+			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail(ticks + "; follow the Clue Scroll marker")
+				.goal(leg.getTo()).radius(radius).build();
+		}
+		String text = stage.getNpcIds().isEmpty() ? "Walk to the marker" : "Walk to the outlined NPC";
+		return SubStep.builder().kind(SubStep.Kind.WALK).text(text).detail(ticks)
+			.waypoint(leg.getTo()).goal(leg.getTo()).radius(radius).npcIds(stage.getNpcIds()).build();
+	}
+
+	/** Ends when the stage is dropped from the step, which brings a new plan. */
+	static SubStep stageAct(Stage stage)
+	{
+		return SubStep.builder().kind(SubStep.Kind.ACT).text(stage.getAct()).detail(stage.getDetail()).stage(stage)
+			.npcIds(stage.getNpcIds()).build();
 	}
 
 	/**
@@ -138,6 +222,40 @@ public final class SubSteps
 		}
 		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to " + walkGoal(next)).detail(ticks)
 			.waypoint(leg.getTo()).goal(leg.getTo()).radius(ARRIVE_TILES).build();
+	}
+
+	/** The last walk to the step starts outside its hand-written way in. */
+	private static boolean entersStepArea(Leg leg, Step step)
+	{
+		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
+		return way != null && step.getTargets().contains(leg.getTo()) && !way.isInside(leg.getFrom());
+	}
+
+	private static SubStep enter(StepIndex.Entry data)
+	{
+		StepIndex.WayIn way = data.getEntry();
+		String needs = data.getRequires().stream().map(StepIndex.Requires::getName).collect(Collectors.joining(", "));
+		String option = way.getOption() == null || way.getOption().isEmpty() ? null : way.getOption();
+		String detail = option == null ? needs : needs.isEmpty() ? option : option + "; needs " + needs;
+		return SubStep.builder().kind(SubStep.Kind.ENTER).text("Go in: " + way.getText()).detail(detail.isEmpty() ? null : detail)
+			.waypoint(way.getTile()).wayIn(way).build();
+	}
+
+	private static SubStep exit(Leg leg, Exit exit)
+	{
+		return SubStep.builder().kind(SubStep.Kind.EXIT).text(exitText(exit)).detail("≈ " + leg.getTicks() + " ticks")
+			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(LANDING_TILES).exit(exit).build();
+	}
+
+	static String exitText(Exit exit)
+	{
+		String target = exit.getTarget().isEmpty() ? "exit" : exit.getTarget().toLowerCase();
+		String option = exit.getOption().replace('-', ' ');
+		if (option.equals(TALK_TO) && !exit.getTarget().isEmpty())
+		{
+			return TALK_TO + " " + exit.getTarget();
+		}
+		return option.isEmpty() ? "Take the " + target : option + (option.equals("Travel") ? " with the " : " the ") + target;
 	}
 
 	private static String walkGoal(Leg next)
@@ -395,8 +513,8 @@ public final class SubSteps
 		if (needsItemFromNpc(step))
 		{
 			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
-			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what)
-				.detail("Get the key from " + step.getNpcs().get(0) + " first; the Clue Scroll plugin says how").build();
+			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what + " with the key")
+				.detail("The key comes from " + step.getNpcs().get(0)).build();
 		}
 		return SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step)).detail("The Clue Scroll plugin shows the details").build();
 	}

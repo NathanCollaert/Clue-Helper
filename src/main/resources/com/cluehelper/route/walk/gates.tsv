@@ -16,156 +16,161 @@ id	Skills	Quests	Varbits	VarPlayers
 14			12341=1	
 15			13841>10	
 16			16632>9	
-17			1869=5	
-18			1990>39	
-19			2573=320	
-20			260>19	
-21			3311=340	
-22			3598=1	
-23			3637>152	
-24			3741=1	
-25			3759>1	
-26			4469=1	
-27			487>10	
-28			496=1	
-29			5087=1	
-30			5088=1	
-31			538=1	
-32			5421=1	
-33			5628=1	
-34			5629>0	
-35			6027>6	
-36			6076=1	
-37			6528>199	
-38			6528>74	
-39			8397=1	
-40			8398=1	
-41		Another Slice of H.A.M.		
-42		Below Ice Mountain		
-43		Children of the Sun		
-44		Creature of Fenkenstrain		
-45		Death on the Isle		
-46		Death to the Dorgeshuun		
-47		Desert Treasure I		
-48		Dragon Slayer II		
-49		Enter the Abyss		
-50		Garden of Tranquillity		
-51		In Aid of the Myreque		
-52		Lost City		
-53		Monkey Madness II		
-54		Mourning's End Part II		
-55		Perilous Moons		
-56		Regicide		
-57		Shadow of the Storm		
-58		Shadows of Custodia		
-59		Sins of the Father		
-60		Song of the Elves		
-61		Swan Song		
-62		The Lost Tribe		
-63		Troll Stronghold		
-64		Watchtower		
-65		Waterfall Quest	4476=1	
-66	1 Agility			
-67	1 Agility	Mourning's End Part II		
-68	10 Agility			
-69	13 Agility			
-70	13 Agility		532>3	
-71	14 Agility		4462=1	
-72	15 Agility			
-73	15 Agility		6076=1	
-74	16 Agility			
-75	17 Agility			
-76	18 Agility			
-77	20 Agility			
-78	21 Agility			
-79	23 Agility;24 Ranged;28 Strength		5810=1	
-80	23 Agility;28 Strength;24 Ranged	Observatory Quest		
-81	24 Agility			
-82	25 Agility			
-83	25 Agility		1990>39	
-84	26 Agility			
-85	28 Agility			
-86	29 Agility			
-87	30 Agility			
-88	30 Agility			176=10
-89	31 Agility			
-90	31 Prayer			
-91	32 Agility			
-92	33 Agility			
-93	35 Agility			
-94	35 Agility	Garden of Tranquillity		
-95	36 Agility			
-96	37 Agility			150=160
-97	38 Agility			
-98	4 Agility			
-99	40 Agility			
-100	41 Agility			
-101	42 Agility			
-102	43 Agility			
-103	44 Agility			
-104	45 Agility			
-105	45 Farming			
-106	46 Agility			
-107	46 Agility		6312=1	
-108	47 Agility			
-109	47 Agility			328=15
-110	48 Agility			
-111	49 Agility			
-112	5 Agility			
-113	50 Agility			
-114	50 Agility			139>0
-115	50 Agility			139>6
-116	50 Firemaking			
-117	50 Thieving			
-118	51 Agility			
-119	52 Agility			
-120	54 Agility			
-121	55 Agility			
-122	56 Agility			
-123	57 Agility			
-124	58 Agility			
-125	58 Thieving			
-126	59 Agility			
-127	59 Agility	Shadows of Custodia		
-128	60 Agility			
-129	60 Mining			
-130	60 Woodcutting			
-131	61 Agility			
-132	62 Agility			
-133	63 Agility			
-134	63 Agility		10449=1	
-135	63 Agility		10450=1	
-136	64 Agility			
-137	64 Agility	Shadows of Custodia		
-138	65 Agility			
-139	66 Agility			
-140	66 Magic			
-141	67 Agility			
-142	67 Agility		4464=1	
-143	68 Agility			
-144	68 Fishing			
-145	69 Agility			
-146	69 Agility		4441=2;5023=2	
-147	69 Agility		7255=138	
-148	70 Agility			
-149	70 Hitpoints			
-150	71 Agility			
-151	71 Agility	Watchtower		
-152	72 Agility			
-153	73 Agility			
-154	74 Agility			
-155	76 Agility			328=15
-156	77 Agility			
-157	78 Agility			
-158	79 Agility			
-159	79 Agility			139>49
-160	80 Agility			
-161	81 Agility			
-162	82 Agility			
-163	82 Agility	Cabin Fever		
-164	83 Agility			
-165	84 Agility			
-166	85 Agility			
-167	86 Agility			
-168	93 Agility;78 Mining	Darkness of Hallowvale		
-169	96 Agility	Legends' Quest		
+17			18356=1	
+18			1869=5	
+19			1990>39	
+20			2573=320	
+21			260>19	
+22			3311=340	
+23			3598=1	
+24			3637>152	
+25			3741=1	
+26			3759>1	
+27			4469=1	
+28			487>10	
+29			496=1	
+30			5087=1	
+31			5088=1	
+32			538=1	
+33			5421=1	
+34			5628=1	
+35			5629>0	
+36			6027>6	
+37			6076=1	
+38			6528>199	
+39			6528>74	
+40			8397=1	
+41			8398=1	
+42		Another Slice of H.A.M.		
+43		Below Ice Mountain		
+44		Children of the Sun		
+45		Creature of Fenkenstrain		
+46		Death on the Isle		
+47		Death to the Dorgeshuun		
+48		Desert Treasure I		
+49		Dragon Slayer II		
+50		Enter the Abyss		
+51		Garden of Tranquillity		
+52		In Aid of the Myreque		
+53		Lost City		
+54		Monkey Madness II		
+55		Mourning's End Part II		
+56		Perilous Moons		
+57		Recipe for Disaster - Pirate Pete		
+58		Regicide		
+59		Shadow of the Storm		
+60		Shadows of Custodia		
+61		Sins of the Father		
+62		Song of the Elves		
+63		Swan Song		
+64		The Lost Tribe		
+65		Troll Stronghold		
+66		Watchtower		
+67		Waterfall Quest	4476=1	
+68	1 Agility			
+69	1 Agility	Mourning's End Part II		
+70	10 Agility			
+71	13 Agility			
+72	13 Agility		532>3	
+73	14 Agility		4462=1	
+74	15 Agility			
+75	15 Agility		6076=1	
+76	16 Agility			
+77	17 Agility			
+78	18 Agility			
+79	20 Agility			
+80	21 Agility			
+81	23 Agility;24 Ranged;28 Strength		5810=1	
+82	23 Agility;28 Strength;24 Ranged	Observatory Quest		
+83	23 Thieving			
+84	24 Agility			
+85	25 Agility			
+86	25 Agility		1990>39	
+87	26 Agility			
+88	28 Agility			
+89	29 Agility			
+90	30 Agility			
+91	30 Agility			176=10
+92	31 Agility			
+93	31 Prayer			
+94	32 Agility			
+95	32 Cooking			
+96	33 Agility			
+97	35 Agility			
+98	35 Agility	Garden of Tranquillity		
+99	36 Agility			
+100	37 Agility			150=160
+101	38 Agility			
+102	4 Agility			
+103	40 Agility			
+104	41 Agility			
+105	42 Agility			
+106	43 Agility			
+107	44 Agility			
+108	45 Agility			
+109	45 Farming			
+110	46 Agility			
+111	46 Agility		6312=1	
+112	47 Agility			
+113	47 Agility			328=15
+114	48 Agility			
+115	49 Agility			
+116	5 Agility			
+117	50 Agility			
+118	50 Agility			139>0
+119	50 Agility			139>6
+120	50 Firemaking			
+121	50 Thieving			
+122	51 Agility			
+123	52 Agility			
+124	54 Agility			
+125	55 Agility			
+126	56 Agility			
+127	57 Agility			
+128	58 Agility			
+129	58 Thieving			
+130	59 Agility			
+131	59 Agility	Shadows of Custodia		
+132	60 Agility			
+133	60 Mining			
+134	60 Woodcutting			
+135	61 Agility			
+136	62 Agility			
+137	63 Agility			
+138	63 Agility		10449=1	
+139	63 Agility		10450=1	
+140	64 Agility			
+141	64 Agility	Shadows of Custodia		
+142	65 Agility			
+143	66 Agility			
+144	66 Magic			
+145	67 Agility			
+146	67 Agility		4464=1	
+147	68 Agility			
+148	68 Fishing			
+149	69 Agility			
+150	69 Agility		4441=2;5023=2	
+151	69 Agility		7255=138	
+152	70 Agility			
+153	70 Hitpoints			
+154	71 Agility			
+155	71 Agility	Watchtower		
+156	72 Agility			
+157	73 Agility			
+158	74 Agility			
+159	76 Agility			328=15
+160	77 Agility			
+161	78 Agility			
+162	79 Agility			
+163	79 Agility			139>49
+164	80 Agility			
+165	81 Agility			
+166	81 Thieving			
+167	82 Agility			
+168	82 Agility	Cabin Fever		
+169	83 Agility			
+170	84 Agility			
+171	85 Agility			
+172	86 Agility			
+173	93 Agility;78 Mining	Darkness of Hallowvale		
+174	96 Agility	Legends' Quest		

@@ -182,9 +182,10 @@ public class DevHarness
 		{
 			return "no route";
 		}
-		return String.format("%d/%d %s %s | waypoint %s | items %s | widgets %s | route %s",
-			guide.getSteps().indexOf(current) + 1, guide.getSteps().size(), current.getKind(), current.getText(),
+		return String.format("%d/%d %s %s (%s) | waypoint %s | items %s | widgets %s | objects %d | at step %s | route %s",
+			guide.getSteps().indexOf(current) + 1, guide.getSteps().size(), current.getKind(), current.getText(), current.getDetail(),
 			current.getWaypoint(), guide.getHighlightItems(), guide.getHighlightSpellWidget() + "/" + guide.getHighlightMenuWidget(),
+			guide.getHighlightObjects().size() + guide.getHighlightNpcs().size(), guide.isAtStep(),
 			guide.getRoute() == null ? "-" : guide.getRoute().describe());
 	}
 

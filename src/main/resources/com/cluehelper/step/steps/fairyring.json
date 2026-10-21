@@ -1,0 +1,16 @@
+{
+"dump": "2026-10-18",
+"steps": {
+"fairyring:a i q 0 4 4 0": {"fairyRing":{"ring":3,"steps":[0,4,4,0]},"items":[19862],"regions":[3],"rows":[{"id":1902,"name":"CLUEHELPER_FAIRYRING_HARD_1"}],"targets":[{"kind":"coord","text":"Near fairy ring (AIQ).","tile":[3000,3110,0]}],"tier":"hard","tiles":[[3000,3110,0]]},
+"fairyring:a i r 2 3 3 1": {"fairyRing":{"ring":2,"steps":[2,3,3,1]},"items":[19864],"regions":[2],"rows":[{"id":1901,"name":"CLUEHELPER_FAIRYRING_HARD_0"}],"targets":[{"kind":"coord","text":"Near fairy ring (AIR).","tile":[2702,3246,0]}],"tier":"hard","tiles":[[2702,3246,0]]},
+"fairyring:a j p 3 0 1 5": {"fairyRing":{"ring":30,"steps":[3,0,1,5]},"items":[28915],"regions":[21],"rows":[{"id":3504,"name":"CLUEHELPER_FAIRYRING_HARD_VM01"}],"targets":[{"kind":"coord","text":"Near fairy ring (AJP)","tile":[1646,3012,0]}],"tier":"hard","tiles":[[1646,3012,0]]},
+"fairyring:a l p 1 1 4 0": {"fairyRing":{"ring":10,"steps":[1,1,4,0]},"items":[19866],"regions":[8],"rows":[{"id":1903,"name":"CLUEHELPER_FAIRYRING_HARD_2"}],"targets":[{"kind":"coord","text":"Near fairy ring (ALP).","tile":[2504,3633,0]}],"tier":"hard","tiles":[[2504,3633,0]]},
+"fairyring:b i p 7 0 1 3": {"fairyRing":{"ring":300,"steps":[7,0,1,3]},"items":[19868],"regions":[5],"rows":[{"id":1906,"name":"CLUEHELPER_FAIRYRING_HARD_5"}],"targets":[{"kind":"coord","text":"Near fairy ring (BIP).","tile":[3407,3330,0]}],"tier":"hard","tiles":[[3407,3330,0]]},
+"fairyring:b j r 1 1 2 3": {"fairyRing":{"ring":332,"steps":[1,1,2,3]},"items":[19870],"regions":[2,3,4],"rows":[{"id":1905,"name":"CLUEHELPER_FAIRYRING_HARD_4"}],"targets":[{"kind":"coord","text":"Near fairy ring (BJR).","tile":[2648,4729,0]}],"tier":"hard","tiles":[[2648,4729,0]]},
+"fairyring:b l p 6 2 0 0": {"fairyRing":{"ring":310,"steps":[6,2,0,0]},"items":[19872],"regions":[2],"rows":[{"id":1904,"name":"CLUEHELPER_FAIRYRING_HARD_3"}],"targets":[{"kind":"coord","text":"Near fairy ring (BLP).","tile":[2439,5132,0]}],"tier":"hard","tiles":[[2439,5132,0]]},
+"fairyring:c i s 0 0 0 9": {"fairyRing":{"ring":201,"steps":[0,0,0,9]},"items":[19880],"regions":[10],"rows":[{"id":1907,"name":"CLUEHELPER_FAIRYRING_HARD_6"}],"targets":[{"kind":"coord","text":"Near fairy ring (CIS).","tile":[1630,3868,0]}],"tier":"hard","tiles":[[1630,3868,0]]},
+"fairyring:c k p 0 2 2 4": {"fairyRing":{"ring":220,"steps":[0,2,2,4]},"items":[19874],"regions":[1],"rows":[{"id":1908,"name":"CLUEHELPER_FAIRYRING_HARD_7"}],"targets":[{"kind":"coord","text":"Near fairy ring (CKP).","tile":[2073,4846,0]}],"tier":"hard","tiles":[[2073,4846,0]]},
+"fairyring:d i p 8 5 1 1": {"fairyRing":{"ring":100,"steps":[8,5,1,1]},"items":[19876],"regions":[1,11],"rows":[{"id":1909,"name":"CLUEHELPER_FAIRYRING_HARD_8"}],"targets":[{"kind":"coord","text":"Near fairy ring (DIP).","tile":[3041,4770,0]}],"tier":"hard","tiles":[[3041,4770,0]]},
+"fairyring:d k s 2 3 1 0": {"fairyRing":{"ring":121,"steps":[2,3,1,0]},"items":[19878],"regions":[8],"rows":[{"id":1910,"name":"CLUEHELPER_FAIRYRING_HARD_9"}],"targets":[{"kind":"coord","text":"Near fairy ring (DKS).","tile":[2747,3720,0]}],"tier":"hard","tiles":[[2747,3720,0]]}
+}
+}

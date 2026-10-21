@@ -296,10 +296,10 @@ cryptic:2 musical birds. dig in front of the spinning light.	*	cryptic	master	AN
 cryptic:46 is my number. my body is the colour of burnt orange and crawls among those with eight. three mouths i have, yet i cannot eat. my blinking blue eye hides my grave.	*	cryptic	hard	ANY_OF	3170,3885,0					spade or dog	1417	46 is my number. My body is the colour of burnt orange and crawls among those with eight. Three mouths I have, yet I cannot eat. My blinking blue eye hides my grave.
 cryptic:a chisel and hammer reside in his home, strange for one of magic. impress him with your magical equipment.	*	cryptic	master	ANY_OF	2682,3325,0	Wizard Cromperty				none	1477	A chisel and hammer reside in his home, strange for one of magic. Impress him with your magical equipment.
 cryptic:a crate found in the tower of a church is your next location.	*	cryptic	easy	ANY_OF	2612,3304,1			357		none	1294	A crate found in the tower of a church is your next location.
-cryptic:a demon's best friend holds the next step of this clue.	*	cryptic	elite	ANY_OF						none	1464	A demon's best friend holds the next step of this clue.
+cryptic:a demon's best friend holds the next step of this clue.	*	cryptic	elite	AREA	2855,9844,0					none	1464	A demon's best friend holds the next step of this clue.
 cryptic:a dwarf, approaching death, but very much in the light.	*	cryptic	master	ANY_OF	1863,4639,0	Thorgel				none	1471	A dwarf, approaching death, but very much in the light.
 cryptic:a general who sets a 'shining' example.	*	cryptic	hard	ANY_OF	2186,3148,0	General Hining				none	1392	A general who sets a 'shining' example.
-cryptic:a graceful man of many colours, his crates must be full of many delights.	*	cryptic	medium	ANY_OF	1506,3590,2	Hill Giant		42067		none	2287	A graceful man of many colours, his crates must be full of many delights.
+cryptic:a graceful man of many colours, his crates must be full of many delights.	*	cryptic	medium	SEQUENCE	1444,3613,0|1506,3590,2	Hill Giant		42067		none	2287	A graceful man of many colours, his crates must be full of many delights.
 cryptic:a great view - watch the rapidly drying hides get splashed. check the box you are sitting on.	*	cryptic	hard	ANY_OF	2523,3493,1			359		none	1398	A great view - watch the rapidly drying hides get splashed. Check the box you are sitting on.
 cryptic:a guthixian ring lies between two peaks. search the stones and you'll find what you seek.	*	cryptic	elite	ANY_OF	2922,3484,0			26633		none	1440	A Guthixian ring lies between two peaks. Search the stones and you'll find what you seek.
 cryptic:a massive battle rages beneath so be careful when you dig by the large broken crossbow.	*	cryptic	master	ANY_OF	2927,3761,0					spade	1492	A massive battle rages beneath so be careful when you dig by the large broken crossbow.
@@ -312,7 +312,7 @@ cryptic:and so on, and so on, and so on. walking from the land of many unimporta
 cryptic:anger abbot langley.	*	cryptic	master	ANY_OF	3058,3487,0	Abbot Langley				none	1469	Anger Abbot Langley.
 cryptic:anger those who adhere to saradomin's edicts to prevent travel.	*	cryptic	master	AREA	3042,3236,0	Monk of Entrana	12082			none	1474	Anger those who adhere to Saradomin's edicts to prevent travel.
 cryptic:are you somewhat entertained?	*	cryptic	medium	ANY_OF	1802,9504,0	Gloria				none	3496	Are you somewhat entertained?
-cryptic:banish a chilling spirit.	*	cryptic	elite	ANY_OF		Frost Nagua				none	3696	Banish a chilling spirit.
+cryptic:banish a chilling spirit.	*	cryptic	elite	AREA	1627,9623,0	Frost Nagua				none	3696	Banish a chilling spirit.
 cryptic:belladonna, my dear. if only i had gloves, then i could hold you at last.	*	cryptic	easy	AREA	3088,3357,0	Tool Leprechaun	12340			none	1268	Belladonna, my dear. If only I had gloves, then I could hold you at last.
 cryptic:citric cellar.	*	cryptic	hard	ANY_OF	2490,3488,0	Heckel Funch				none	1373	Citric cellar.
 cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an old god you desire.	0,4,5,10,100	cryptic	master	ANY_OF	3293,3933,1|3448,3549,1|3119,9996,0	Viggora				none	1495	Come brave adventurer, your sense is on fire. If you talk to me, it's an old god you desire.
@@ -322,7 +322,7 @@ cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an
 cryptic:come have a cip with this great soot covered denizen.	*	cryptic	hard	ANY_OF	2527,3891,0	Miner Magnus				none	1370	Come have a cip with this great soot covered denizen.
 cryptic:come to the evil ledge, yew know yew want to. try not to get stung.	*	cryptic	hard	ANY_OF	3089,3468,0					spade or dog	1410	Come to the evil ledge, Yew know yew want to. Try not to get stung.
 cryptic:covered in shadows, the centre of the circle is where you will find the answer.	*	cryptic	hard	ANY_OF	3488,3289,0					spade or dog	1412	Covered in shadows, the centre of the circle is where you will find the answer.
-cryptic:crush the spirited earth.	*	cryptic	elite	ANY_OF		Earthen Nagua				none	5180	Crush the spirited earth.
+cryptic:crush the spirited earth.	*	cryptic	elite	AREA	1389,9313,0	Earthen Nagua				none	5180	Crush the spirited earth.
 cryptic:darkness wanders around me, but fills my mind with knowledge.	*	cryptic	master	ANY_OF	1633,3825,2	Biblia				none	1479	Darkness wanders around me, but fills my mind with knowledge.
 cryptic:desert insects is what i see. taking care of them was my responsibility. your solution is found by digging near me.	*	cryptic	elite	ANY_OF	3307,9505,0					spade or dog	1449	Desert insects is what I see. Taking care of them was my responsibility. Your solution is found by digging near me.
 cryptic:dig at a waterfall by the pines in the serpent's shadow.	*	cryptic	easy	ANY_OF	1490,3257,0					spade or dog	3695	Dig at a waterfall by the pines in the serpent's shadow.
@@ -348,9 +348,9 @@ cryptic:fiendish cooks probably won't dig the dirty dishes.	*	cryptic	master	ANY
 cryptic:find a crate close to the monks that like to paaarty!	*	cryptic	medium	ANY_OF	2614,3204,0			354		none	1362	Find a crate close to the monks that like to paaarty!
 cryptic:four blades i have, yet draw no blood; still i turn my prey to powder. if you are brave, come search my roof; it is there my blades are louder.	*	cryptic	hard	ANY_OF	3166,3309,2			12963		none	1395	Four blades I have, yet draw no blood; Still I turn my prey to powder. If you are brave, come search my roof; It is there my blades are louder.
 cryptic:generally speaking, his nose was very bent.	*	cryptic	hard	ANY_OF	2957,3511,0	General Bentnoze				none	1387	Generally speaking, his nose was very bent.
-cryptic:ghostly bones.	*	cryptic	elite	ANY_OF						none	1455	Ghostly bones.
-cryptic:go to the village being attacked by trolls, search the drawers in one of the houses.	*	cryptic	medium	ANY_OF	2921,3577,0	Penda		350		none	2284	Go to the village being attacked by trolls, search the drawers in one of the houses.
-cryptic:go to this building to be illuminated, and check the drawers while you are there.	*	cryptic	medium	AREA	2512,3641,1	Market Guard	10553	350		none	2283	Go to this building to be illuminated, and check the drawers while you are there.
+cryptic:ghostly bones.	*	cryptic	elite	AREA	1638,9993,0					none	1455	Ghostly bones.
+cryptic:go to the village being attacked by trolls, search the drawers in one of the houses.	*	cryptic	medium	SEQUENCE	2909,3539,0|2921,3577,0	Penda		350		none	2284	Go to the village being attacked by trolls, search the drawers in one of the houses.
+cryptic:go to this building to be illuminated, and check the drawers while you are there.	*	cryptic	medium	SEQUENCE	2643,3677,0|2512,3641,1	Market Guard	10553	350		none	2283	Go to this building to be illuminated, and check the drawers while you are there.
 cryptic:gold i see, yet gold i require. give me 875 if death you desire.	*	cryptic	hard	ANY_OF	2745,3151,0	Saniboch				none	1375	Gold I see, yet gold I require. Give me 875 if death you desire.
 cryptic:great demons, dragons and spiders protect this blue rock, beneath which, you may find what you seek.	*	cryptic	master	ANY_OF	3045,10265,0					spade	1483	Great demons, dragons and spiders protect this blue rock, beneath which, you may find what you seek.
 cryptic:green is the colour of my death as the winter-guise, i swoop towards the ground.	*	cryptic	elite	ANY_OF	2780,3783,0					spade or dog	1443	Green is the colour of my death as the winter-guise, I swoop towards the ground.
@@ -378,21 +378,21 @@ cryptic:identify the back of this over-acting brother. (he's a long way from hom
 cryptic:if a man carried my burden, he would break his back. i am not rich, but leave silver in my track. speak to the keeper of my trail.	*	cryptic	hard	ANY_OF	3014,3222,0	Gerrant				none	1385	If a man carried my burden, he would break his back. I am not rich, but leave silver in my track. Speak to the keeper of my trail.
 cryptic:if you look closely enough, it seems that the archers have lost more than their needles.	*	cryptic	hard	ANY_OF	2672,3416,0			300		none	1397	If you look closely enough, it seems that the archers have lost more than their needles.
 cryptic:if you're feeling brave, dig beneath the dragon's eye.	*	cryptic	master	ANY_OF	2410,4714,0					spade	1485	If you're feeling brave, dig beneath the dragon's eye.
-cryptic:in a town where everyone has perfect vision, seek some locked drawers in a house that sits opposite a workshop.	*	cryptic	medium	ANY_OF	2709,3478,0	Chicken		25766		none	2286	In a town where everyone has perfect vision, seek some locked drawers in a house that sits opposite a workshop.
-cryptic:in a town where the guards are armed with maces, search the upstairs rooms of the public house.	*	cryptic	medium	AREA	2574,3326,1	Guard dog	10547|10548	348		none	2282	In a town where the guards are armed with maces, search the upstairs rooms of the Public House.
-cryptic:in a town where thieves steal from stalls, search for some drawers in the upstairs of a house near the bank.	*	cryptic	medium	AREA	2611,3324,1	Guard	10291|10292|10547|10548	348		none	2278	In a town where thieves steal from stalls, search for some drawers in the upstairs of a house near the bank.
-cryptic:in a town where wizards are known to gather, search upstairs in a large house to the north.	*	cryptic	medium	AREA	2593,3108,1	Man	10288	375		none	2280	In a town where wizards are known to gather, search upstairs in a large house to the north.
+cryptic:in a town where everyone has perfect vision, seek some locked drawers in a house that sits opposite a workshop.	*	cryptic	medium	SEQUENCE	2649,3441,0|2709,3478,0	Chicken		25766		none	2286	In a town where everyone has perfect vision, seek some locked drawers in a house that sits opposite a workshop.
+cryptic:in a town where the guards are armed with maces, search the upstairs rooms of the public house.	*	cryptic	medium	SEQUENCE	2635,3313,0|2574,3326,1	Guard dog	10547|10548	348		none	2282	In a town where the guards are armed with maces, search the upstairs rooms of the Public House.
+cryptic:in a town where thieves steal from stalls, search for some drawers in the upstairs of a house near the bank.	*	cryptic	medium	SEQUENCE	2661,3306,0|2611,3324,1	Guard	10291|10292|10547|10548	348		none	2278	In a town where thieves steal from stalls, search for some drawers in the upstairs of a house near the bank.
+cryptic:in a town where wizards are known to gather, search upstairs in a large house to the north.	*	cryptic	medium	SEQUENCE	2594,3105,0|2593,3108,1	Man	10288	375		none	2280	In a town where wizards are known to gather, search upstairs in a large house to the north.
 cryptic:in a village made of bamboo, look for some crates under one of the houses.	*	cryptic	medium	ANY_OF	2800,3074,0			356		none	1364	In a village made of bamboo, look for some crates under one of the houses.
 cryptic:in a village of barbarians, i am the one who guards the village from up high.	*	cryptic	beginner	ANY_OF	3097,3432,2	Hunding				none	1235	In a village of barbarians, I am the one who guards the village from up high.
-cryptic:in a while...	*	cryptic	elite	ANY_OF						none	1463	In a while...
+cryptic:in a while...	*	cryptic	elite	AREA	3266,2887,0					none	1463	In a while...
 cryptic:in the city where merchants are said to have lived, talk to a man with a splendid cape, but a hat dropped by goblins.	*	cryptic	hard	ANY_OF	3143,3445,0	Head chef				none	1378	In the city where merchants are said to have lived, talk to a man with a splendid cape, but a hat dropped by goblins.
 cryptic:in the place duke horacio calls home, talk to a man with a hat dropped by goblins.	*	cryptic	beginner	AREA	3208,3213,0	Cook	12850			none	1234	In the place Duke Horacio calls home, talk to a man with a hat dropped by goblins.
 cryptic:it seems to have reached the end of the line, and it's still empty.	*	cryptic	hard	ANY_OF	3041,9820,0			6045		none	1402	It seems to have reached the end of the line, and it's still empty.
 cryptic:leader of the yak city.	*	cryptic	hard	ANY_OF	2336,3799,0	Mawnis Burowgar				none	1389	Leader of the Yak City.
-cryptic:let's hope you don't meet a watery death when you encounter this fiend.	*	cryptic	elite	ANY_OF						none	1456	Let's hope you don't meet a watery death when you encounter this fiend.
+cryptic:let's hope you don't meet a watery death when you encounter this fiend.	*	cryptic	elite	AREA	1738,5348,0					none	1456	Let's hope you don't meet a watery death when you encounter this fiend.
 cryptic:look in the ground floor crates of houses in falador.	*	cryptic	easy	ANY_OF	3029,3355,0			24088		none	1288	Look in the ground floor crates of houses in Falador.
 cryptic:mine was the strangest birth under the sun. i left the crimson sack, yet life had not begun. entered the world, and yet was seen by none.	*	cryptic	hard	ANY_OF	2832,9586,0					spade or dog	1414	Mine was the strangest birth under the sun. I left the crimson sack, yet life had not begun. Entered the world, and yet was seen by none.
-cryptic:mix yellow with blue and add heat, make sure you bring protection.	*	cryptic	elite	ANY_OF						none	1462	Mix yellow with blue and add heat, make sure you bring protection.
+cryptic:mix yellow with blue and add heat, make sure you bring protection.	*	cryptic	elite	AREA	2977,3616,0					none	1462	Mix yellow with blue and add heat, make sure you bring protection.
 cryptic:monk's residence in the far west. see robe storage device.	*	cryptic	easy	ANY_OF	1746,3490,0			350		none	1331	Monk's residence in the far west. See robe storage device.
 cryptic:more resources than i can handle, but in a very dangerous area. can't wait to strike gold!	*	cryptic	elite	ANY_OF	3183,3941,0					spade or dog	1452	More resources than I can handle, but in a very dangerous area. Can't wait to strike gold!
 cryptic:must be full of railings.	*	cryptic	hard	ANY_OF	2576,3464,0			6176		none	1400	Must be full of railings.
@@ -407,14 +407,14 @@ cryptic:one of several rhyming brothers, in business attire with an obsession fo
 cryptic:one of the sailors in port sarim is your next destination.	*	cryptic	easy	ANY_OF	3026,3216,0	Captain Tobias				none	1244	One of the sailors in Port Sarim is your next destination.
 cryptic:pentagrams and demons, burnt bones and remains, i wonder what the blood contains.	*	cryptic	master	ANY_OF	3297,3890,0					spade	1481	Pentagrams and demons, burnt bones and remains, I wonder what the blood contains.
 cryptic:probably filled with books on magic.	*	cryptic	hard	ANY_OF	3096,9572,0			380		none	1396	Probably filled with books on magic.
-cryptic:probably filled with wizards socks.	*	cryptic	medium	AREA	3116,9562,0	Wizard	12337|12437	350		none	2281	Probably filled with wizards socks.
+cryptic:probably filled with wizards socks.	*	cryptic	medium	SEQUENCE	3109,3164,0|3116,9562,0	Wizard	12337|12437	350		none	2281	Probably filled with wizards socks.
 cryptic:read 'how to breed scorpions.' by o.w.thathurt.	*	cryptic	hard	ANY_OF	2703,3409,1			380		none	1401	Read 'How to breed scorpions.' By O.W.Thathurt.
-cryptic:reflection is the weakness for these eyes of evil.	*	cryptic	elite	ANY_OF						none	1457	Reflection is the weakness for these eyes of evil.
+cryptic:reflection is the weakness for these eyes of evil.	*	cryptic	elite	AREA	2740,10008,0					none	1457	Reflection is the weakness for these eyes of evil.
 cryptic:right on the blessed border, cursed by the evil ones. on the spot inaccessible by both; i will be waiting. the bugs' imminent possession holds the answer.	*	cryptic	elite	ANY_OF	3410,3324,0					spade or dog	1442	Right on the blessed border, cursed by the evil ones. On the spot inaccessible by both; I will be waiting. The bugs' imminent possession holds the answer.
 cryptic:robin wishes to see your finest ranged equipment.	*	cryptic	master	ANY_OF	3673,3492,0	Robin				none	1468	Robin wishes to see your finest ranged equipment.
 cryptic:rotting next to a ditch. dig next to the fish.	*	cryptic	hard	ANY_OF	3547,3183,0					spade or dog	1419	Rotting next to a ditch. Dig next to the fish.
 cryptic:salty peter.	*	cryptic	easy	ANY_OF	1703,3524,0	Konoo				none	1269	Salty peter.
-cryptic:scattered coins and gems fill the floor. the chest you seek is in the north east.	*	cryptic	elite	ANY_OF	2288,4702,0	King Black Dragon		375		none	2289	Scattered coins and gems fill the floor. The chest you seek is in the north east.
+cryptic:scattered coins and gems fill the floor. the chest you seek is in the north east.	*	cryptic	elite	SEQUENCE	2273,4695,0|2288,4702,0	King Black Dragon		375		none	2289	Scattered coins and gems fill the floor. The chest you seek is in the north east.
 cryptic:search a bookcase in lumbridge swamp.	*	cryptic	easy	ANY_OF	3146,3177,0			9523		none	1312	Search a bookcase in Lumbridge Swamp.
 cryptic:search a bookcase in the wizards tower.	*	cryptic	easy	ANY_OF	3113,3159,0			12539		none	1282	Search a bookcase in the Wizards tower.
 cryptic:search a crate in the haymaker's arms.	*	cryptic	unknown	ANY_OF	1720,3652,1			27532		none		Search a crate in the Haymaker's arms.
@@ -432,7 +432,7 @@ cryptic:search the boxes in the house near the south entrance to varrock.	*	cryp
 cryptic:search the boxes just outside the armour shop in east ardougne.	*	cryptic	easy	ANY_OF	2654,3299,0			361		none	1330	Search the boxes just outside the Armour shop in East Ardougne.
 cryptic:search the boxes next to a chest that needs a crystal key.	*	cryptic	easy	ANY_OF	2915,3452,0			360		none	1347	Search the boxes next to a chest that needs a crystal key.
 cryptic:search the boxes of falador's general store.	*	cryptic	easy	ANY_OF	2955,3390,0			24088		none	1298	Search the boxes of Falador's general store.
-cryptic:search the bucket in the port sarim jail.	*	cryptic	easy	ANY_OF	3013,3179,0			9568		none	1280	Search the bucket in the Port Sarim jail.
+cryptic:search the bucket in the port sarim jail.	*	cryptic	easy	ANY_OF	3013,3180,0			9568		none	1280	Search the bucket in the Port Sarim jail.
 cryptic:search the bush at the digsite centre.	*	cryptic	easy	ANY_OF	3345,3378,0			2357		none	1306	Search the bush at the digsite centre.
 cryptic:search the chest in barbarian village.	*	cryptic	easy	ANY_OF	3085,3429,0			375		none	1309	Search the chest in Barbarian Village.
 cryptic:search the chest in fred the farmer's bedroom.	*	cryptic	easy	ANY_OF	3185,3274,0			375		none	1342	Search the chest in Fred the Farmer's bedroom.
@@ -481,7 +481,7 @@ cryptic:search the food barrel at the top of the hunter guild.	*	cryptic	easy	AN
 cryptic:search the open crate found in the hosidius kitchens.	*	cryptic	easy	ANY_OF	1683,3616,0			27533		none	1340	Search the open crate found in the Hosidius kitchens.
 cryptic:search the single crate in horvik's smithy in varrock.	*	cryptic	easy	ANY_OF	3228,3433,0			5106		none	1345	Search the single crate in Horvik's smithy in Varrock.
 cryptic:search the tents in the imperial guard camp in burthorpe for some boxes.	*	cryptic	easy	ANY_OF	2885,3540,0			3686		none	1320	Search the tents in the Imperial Guard camp in Burthorpe for some boxes.
-cryptic:search the upstairs drawers of a house in a village where pirates are known to have a good time.	*	cryptic	medium	ANY_OF	2809,3165,1	Pirate		348		none	2285	Search the upstairs drawers of a house in a village where pirates are known to have a good time.
+cryptic:search the upstairs drawers of a house in a village where pirates are known to have a good time.	*	cryptic	medium	SEQUENCE	2794,3185,0|2809,3165,1	Pirate		348		none	2285	Search the upstairs drawers of a house in a village where pirates are known to have a good time.
 cryptic:search the wheelbarrow in rimmington mine.	*	cryptic	easy	ANY_OF	2978,3239,0			9625		none	1335	Search the wheelbarrow in Rimmington mine.
 cryptic:search through chests found in the upstairs of houses in eastern falador.	*	cryptic	easy	ANY_OF	3041,3364,1			375		none	1311	Search through chests found in the upstairs of houses in eastern Falador.
 cryptic:search through some drawers found in taverley's houses.	*	cryptic	easy	ANY_OF	2894,3418,0			350		none	1319	Search through some drawers found in Taverley's houses.
@@ -516,7 +516,7 @@ cryptic:speak to uglug nar.	*	cryptic	medium	ANY_OF	2444,3049,0	Uglug Nar				non
 cryptic:speak to ulizius.	*	cryptic	medium	ANY_OF	3444,3461,0	Ulizius				none	1357	Speak to Ulizius.
 cryptic:strength potions with red spiders' eggs? he is quite a herbalist.	*	cryptic	easy	ANY_OF	3194,3403,0	Apothecary				none	1261	Strength potions with red spiders' eggs? He is quite a herbalist.
 cryptic:surprising? i bet he is...	*	cryptic	hard	ANY_OF	3205,3474,0	Sir Prysin				none	1388	Surprising? I bet he is...
-cryptic:surround my bones in fire, ontop the wooden pyre. finally lay me to rest, before my one last test.	*	cryptic	elite	ANY_OF						none	1458	Surround my bones in fire, ontop the wooden pyre. Finally lay me to rest, before my one last test.
+cryptic:surround my bones in fire, ontop the wooden pyre. finally lay me to rest, before my one last test.	*	cryptic	elite	AREA	1761,5322,0					none	1458	Surround my bones in fire, ontop the wooden pyre. Finally lay me to rest, before my one last test.
 cryptic:surrounded by white walls and gems.	*	cryptic	easy	ANY_OF	2945,3335,0	Herquin				none	1264	Surrounded by white walls and gems.
 cryptic:surviving.	*	cryptic	hard	ANY_OF	2983,3338,0	Sir Vyvin				none	1383	Surviving.
 cryptic:talk to a party-goer in falador.	*	cryptic	easy	ANY_OF	3046,3382,0	Lucy				none	1250	Talk to a party-goer in Falador.
@@ -542,14 +542,14 @@ cryptic:the beasts retreat, for their queen is gone; the song of this town still
 cryptic:the beasts to my east snap claws and tails, the rest to my west can slide and eat fish. the force to my north will jump and they'll wail, come dig by my fire and make a wish.	*	cryptic	hard	ANY_OF	2598,3267,0					spade or dog	1409	The beasts to my east snap claws and tails, The rest to my west can slide and eat fish. The force to my north will jump and they'll wail, Come dig by my fire and make a wish.
 cryptic:the big high war god left his mark on this place.	*	cryptic	hard	ANY_OF	3572,4372,0					spade or dog	1425	The Big High War God left his mark on this place.
 cryptic:the cheapest water for miles around, but they react badly to religious icons.	*	cryptic	hard	ANY_OF	3178,2987,0			354		none	1404	The cheapest water for miles around, but they react badly to religious icons.
-cryptic:the dead, red dragon watches over this chest. he must really dig the view.	*	cryptic	medium	ANY_OF	3353,3332,0	Barbarian		375		none	2279	The dead, red dragon watches over this chest. He must really dig the view.
+cryptic:the dead, red dragon watches over this chest. he must really dig the view.	*	cryptic	medium	SEQUENCE	3082,3419,0|3353,3332,0	Barbarian		375		none	2279	The dead, red dragon watches over this chest. He must really dig the view.
 cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	0	cryptic	master	ANY_OF	2878,3546,0	Ghommal				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
 cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	1,2,3,4,5,10,100	cryptic	master	ANY_OF	2878,3546,0	Laidee Gnonock				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
 cryptic:the effects of this fire are magnified.	*	cryptic	hard	ANY_OF	1179,3626,0					spade or dog	1423	The effects of this fire are magnified.
 cryptic:the far north eastern corner where 1 of 4 was defeated, the shadows still linger.	*	cryptic	master	ANY_OF	2744,5116,0					spade	1487	The far north eastern corner where 1 of 4 was defeated, the shadows still linger.
 cryptic:the hand ain't listening.	*	cryptic	easy	ANY_OF	3019,3232,0	The Face				none	1265	The hand ain't listening.
 cryptic:the keeper of melzars... spare? skeleton? anar?	*	cryptic	hard	ANY_OF	3068,3516,0	Oziach				none	1372	The keeper of Melzars... Spare? Skeleton? Anar?
-cryptic:the king's magic shouldn't be wasted by me.	*	cryptic	hard	ANY_OF	1934,4427,0	Guardian mummy				none	1382	The King's magic shouldn't be wasted by me.
+cryptic:the king's magic shouldn't be wasted by me.	*	cryptic	hard	ANY_OF	1930,4432,0	Guardian mummy				none	1382	The King's magic shouldn't be wasted by me.
 cryptic:the magic of 4 colours, an early experience you could learn. the large beast caged up top, rages, as his demised kin's loot now returns.	*	cryptic	hard	ANY_OF	3103,3163,2	Wizard Mizgog				none	1390	The magic of 4 colours, an early experience you could learn. The large beast caged up top, rages, as his demised kin's loot now returns.
 cryptic:the mother of the reptilian sacrifice.	*	cryptic	hard	ANY_OF	2204,3050,0	Zul-Cheray				none	1379	The mother of the reptilian sacrifice.
 cryptic:their bane awaits, but don't be going in there without permission.	*	cryptic	elite	ANY_OF	3176,2478,0	Shellbane gryphon				none	7046	Their bane awaits, but don't be going in there without permission.
@@ -573,14 +573,14 @@ cryptic:with a name like that, you'd expect a little more than just a few scimit
 cryptic:with drinks and dwarves i make my way, upon my head a glass will stay.	*	cryptic	elite	ANY_OF	1432,9584,1	Funbo				none	3497	With drinks and dwarves I make my way, upon my head a glass will stay.
 cryptic:within the town of lumbridge lives a man named bob. he walks out of his door and takes 1 step east, 7 steps north, 5 steps west and 1 step south. once he arrives, he digs a hole and buries his treasure.	*	cryptic	quest	ANY_OF	3230,3209,0					spade	2298	Within the town of Lumbridge lives a man named Bob. He walks out of his door and takes 1 step east, 7 steps north, 5 steps west and 1 step south. Once he arrives, he digs a hole and buries his treasure.
 cryptic:you have all of the elements available to solve this clue. fortunately you do not have to go as far as to stand in a draft.	*	cryptic	hard	ANY_OF	2723,9891,0			18506		none	1407	You have all of the elements available to solve this clue. Fortunately you do not have to go as far as to stand in a draft.
-cryptic:you might have to turn over a few stones to progress.	*	cryptic	elite	ANY_OF						none	1459	You might have to turn over a few stones to progress.
+cryptic:you might have to turn over a few stones to progress.	*	cryptic	elite	AREA	2700,3722,0					none	1459	You might have to turn over a few stones to progress.
 cryptic:you must be 100 to play with me.	*	cryptic	elite	ANY_OF	2638,2656,0	Squire (Veteran)				none	1437	You must be 100 to play with me.
 cryptic:you were 3 and i was the 6th. come speak to me.	*	cryptic	elite	ANY_OF	3146,9913,0	Vannaka				none	1430	You were 3 and I was the 6th. Come speak to me.
-cryptic:you will have to fly high where a sword cannot help you.	*	cryptic	elite	ANY_OF						none	1461	You will have to fly high where a sword cannot help you.
+cryptic:you will have to fly high where a sword cannot help you.	*	cryptic	elite	AREA	2882,5311,2					none	1461	You will have to fly high where a sword cannot help you.
 cryptic:you will need to under-cook to solve this one.	*	cryptic	hard	ANY_OF	3219,9617,0			357		none	1406	You will need to under-cook to solve this one.
-cryptic:you'll get licked.	*	cryptic	elite	ANY_OF						none	1460	You'll get licked.
-cryptic:you'll have to plug your nose if you use this source of herbs.	*	cryptic	elite	ANY_OF						none	1454	You'll have to plug your nose if you use this source of herbs.
-cryptic:you'll need to look for a town with a central fountain. look for a locked chest in the town's chapel.	*	cryptic	medium	AREA	3256,3487,0	Monk	10290	5108		none	2288	You'll need to look for a town with a central fountain. Look for a locked chest in the town's chapel.
+cryptic:you'll get licked.	*	cryptic	elite	AREA	3410,3570,1					none	1460	You'll get licked.
+cryptic:you'll have to plug your nose if you use this source of herbs.	*	cryptic	elite	AREA	3418,3548,1					none	1454	You'll have to plug your nose if you use this source of herbs.
+cryptic:you'll need to look for a town with a central fountain. look for a locked chest in the town's chapel.	*	cryptic	medium	SEQUENCE	2615,3209,0|3256,3487,0	Monk	10290	5108		none	2288	You'll need to look for a town with a central fountain. Look for a locked chest in the town's chapel.
 emote:10180	*	emote	easy	ANY_OF	3203,3169,0					3 item requirements	2104	Dance in the shack in Lumbridge Swamp. Equip a bronze dagger, iron full helmet and a gold ring.
 emote:10182	*	emote	easy	ANY_OF	3113,3196,0					3 item requirements	2098	Clap on the causeway to the Wizards' Tower. Equip an iron medium helmet, emerald ring and a white apron.
 emote:10184	*	emote	easy	ANY_OF	3083,3253,0					3 item requirements	2119	Yawn in Draynor marketplace. Equip studded leather chaps, an iron kiteshield and a steel longsword.
@@ -804,63 +804,63 @@ music:24773	*	music	elite	ANY_OF	2990,3384,0	Cecilia				none	1898	Play Lament fo
 music:25792	*	music	hard	ANY_OF	2990,3384,0	Cecilia				none	1894	Play Regal Pomp
 music:26943	*	music	elite	ANY_OF	2990,3384,0	Cecilia				none	1899	Play The Pharaoh
 music:28918	*	music	hard	ANY_OF	2990,3384,0	Cecilia				none	3503	Play The Moons of Ruin
-skill:CHARLIE:i need to give charlie a cooked pike.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1812	i need to give charlie a cooked pike.
-skill:CHARLIE:i need to give charlie a cooked trout.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1811	i need to give charlie a cooked trout.
+skill:CHARLIE:i need to give charlie a cooked pike.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1812	i need to give charlie a cooked pike.
+skill:CHARLIE:i need to give charlie a cooked trout.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1811	i need to give charlie a cooked trout.
 skill:CHARLIE:i need to give charlie a leather body.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1817	i need to give charlie a leather body.
-skill:CHARLIE:i need to give charlie a piece of iron ore.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1815	i need to give charlie a piece of iron ore.
-skill:CHARLIE:i need to give charlie a raw herring.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1813	i need to give charlie a raw herring.
-skill:CHARLIE:i need to give charlie a raw trout.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1814	i need to give charlie a raw trout.
-skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
+skill:CHARLIE:i need to give charlie a piece of iron ore.	*	skill	beginner	SEQUENCE	3285,3365,0|3209,3392,0	Charlie the Tramp				none	1815	i need to give charlie a piece of iron ore.
+skill:CHARLIE:i need to give charlie a raw herring.	*	skill	beginner	SEQUENCE	3014,3226,0|3209,3392,0	Charlie the Tramp				none	1813	i need to give charlie a raw herring.
+skill:CHARLIE:i need to give charlie a raw trout.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1814	i need to give charlie a raw trout.
+skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3188,3425,0|3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
 skill:CHARLIE:i need to give charlie some leather chaps.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1818	i need to give charlie some leather chaps.
 skill:SHERLOCK:activate the chivalry prayer.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				none	1841	activate the chivalry prayer.
-skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1863	angle for an anglerfish whilst sporting the finest fishing gear.
-skill:SHERLOCK:bind a blood rune at the blood altar.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1857	bind a blood rune at the blood altar.
+skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.	*	skill	master	SEQUENCE	1831,3772,0|2733,3415,0	Sherlock				3 item requirements	1863	angle for an anglerfish whilst sporting the finest fishing gear.
+skill:SHERLOCK:bind a blood rune at the blood altar.	*	skill	master	SEQUENCE	1716,3827,0|2733,3415,0	Sherlock				1 item requirement	1857	bind a blood rune at the blood altar.
 skill:SHERLOCK:burn a magic log.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1850	burn a magic log.
 skill:SHERLOCK:burn a redwood log.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1851	burn a redwood log.
 skill:SHERLOCK:burn a yew log.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1837	burn a yew log.
-skill:SHERLOCK:catch a black warlock.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1830	catch a black warlock.
-skill:SHERLOCK:catch a mottled eel with aerial fishing in lake molch.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				4 item requirements	1822	catch a mottled eel with aerial fishing in lake molch.
-skill:SHERLOCK:catch a raw shark.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1834	catch a raw shark.
-skill:SHERLOCK:catch a red chinchompa.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1831	catch a red chinchompa.
+skill:SHERLOCK:catch a black warlock.	*	skill	elite	SEQUENCE	2551,2915,0|2733,3415,0	Sherlock				1 item requirement	1830	catch a black warlock.
+skill:SHERLOCK:catch a mottled eel with aerial fishing in lake molch.	*	skill	elite	SEQUENCE	1384,3665,0|2733,3415,0	Sherlock				4 item requirements	1822	catch a mottled eel with aerial fishing in lake molch.
+skill:SHERLOCK:catch a raw shark.	*	skill	elite	SEQUENCE	2611,3392,0|2733,3415,0	Sherlock				1 item requirement	1834	catch a raw shark.
+skill:SHERLOCK:catch a red chinchompa.	*	skill	elite	SEQUENCE	2551,2915,0|2733,3415,0	Sherlock				1 item requirement	1831	catch a red chinchompa.
 skill:SHERLOCK:catch a tecu salamander.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	3502	catch a tecu salamander.
-skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1864	chop a redwood log whilst sporting the finest lumberjack gear.
-skill:SHERLOCK:complete a lap of ape atoll agility course.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1824	complete a lap of ape atoll agility course.
-skill:SHERLOCK:complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1852	complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.
+skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.	*	skill	master	SEQUENCE	1657,3505,0|2733,3415,0	Sherlock				2 item requirements	1864	chop a redwood log whilst sporting the finest lumberjack gear.
+skill:SHERLOCK:complete a lap of ape atoll agility course.	*	skill	elite	SEQUENCE	2755,2742,0|2733,3415,0	Sherlock				1 item requirement	1824	complete a lap of ape atoll agility course.
+skill:SHERLOCK:complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.	*	skill	master	SEQUENCE	2625,3677,0|2733,3415,0	Sherlock				1 item requirement	1852	complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.
 skill:SHERLOCK:cook a swordfish	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1838	cook a swordfish
 skill:SHERLOCK:craft a green dragonhide body.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1827	craft a green dragonhide body.
-skill:SHERLOCK:craft a light orb in the dorgesh-kaan bank.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1865	craft a light orb in the dorgesh-kaan bank.
-skill:SHERLOCK:craft a nature rune.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1821	craft a nature rune.
-skill:SHERLOCK:craft multiple cosmic runes from a single essence.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1839	craft multiple cosmic runes from a single essence.
-skill:SHERLOCK:create a barrows teleport tablet.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				4 item requirements	1846	create a barrows teleport tablet.
+skill:SHERLOCK:craft a light orb in the dorgesh-kaan bank.	*	skill	master	SEQUENCE	2702,5350,0|2733,3415,0	Sherlock				2 item requirements	1865	craft a light orb in the dorgesh-kaan bank.
+skill:SHERLOCK:craft a nature rune.	*	skill	elite	SEQUENCE	2868,3018,0|2733,3415,0	Sherlock				1 item requirement	1821	craft a nature rune.
+skill:SHERLOCK:craft multiple cosmic runes from a single essence.	*	skill	elite	SEQUENCE	2407,4376,0|2733,3415,0	Sherlock				1 item requirement	1839	craft multiple cosmic runes from a single essence.
+skill:SHERLOCK:create a barrows teleport tablet.	*	skill	master	SEQUENCE	1858,7051,0|2733,3415,0	Sherlock				4 item requirements	1846	create a barrows teleport tablet.
 skill:SHERLOCK:create a super defence potion.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1825	create a super defence potion.
-skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1849	create an unstrung dragonstone amulet at a furnace.
-skill:SHERLOCK:cremate a set of fiyr remains.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1860	cremate a set of fiyr remains.
+skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.	*	skill	master	SEQUENCE	3109,3499,0|2733,3415,0	Sherlock				3 item requirements	1849	create an unstrung dragonstone amulet at a furnace.
+skill:SHERLOCK:cremate a set of fiyr remains.	*	skill	master	SEQUENCE	3490,3290,0|2733,3415,0	Sherlock				3 item requirements	1860	cremate a set of fiyr remains.
 skill:SHERLOCK:cut a yew log.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1835	cut a yew log.
 skill:SHERLOCK:dissect a sacred eel.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1861	dissect a sacred eel.
 skill:SHERLOCK:enchant a piece of dragonstone jewellery.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				4 item requirements	1820	enchant a piece of dragonstone jewellery.
 skill:SHERLOCK:equip a dragon scimitar.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1819	equip a dragon scimitar.
-skill:SHERLOCK:equip an abyssal whip in front of the abyssal demons of the slayer tower.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1843	equip an abyssal whip in front of the abyssal demons of the slayer tower.
-skill:SHERLOCK:fix a magical lamp in dorgesh-kaan.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock	10834|10835		Broken lamp	1 item requirement	1836	fix a magical lamp in dorgesh-kaan.
+skill:SHERLOCK:equip an abyssal whip in front of the abyssal demons of the slayer tower.	*	skill	master	SEQUENCE	3428,3535,0|2733,3415,0	Sherlock				1 item requirement	1843	equip an abyssal whip in front of the abyssal demons of the slayer tower.
+skill:SHERLOCK:fix a magical lamp in dorgesh-kaan.	*	skill	elite	SEQUENCE	2702,5350,0|2733,3415,0	Sherlock	10834|10835		Broken lamp	1 item requirement	1836	fix a magical lamp in dorgesh-kaan.
 skill:SHERLOCK:fletch a rune dart.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1859	fletch a rune dart.
-skill:SHERLOCK:kill a fiyr shade inside mort'tons shade catacombs.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1867	kill a fiyr shade inside mort'tons shade catacombs.
-skill:SHERLOCK:kill a lizardman shaman.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1862	kill a lizardman shaman.
+skill:SHERLOCK:kill a fiyr shade inside mort'tons shade catacombs.	*	skill	master	SEQUENCE	3490,3290,0|2733,3415,0	Sherlock				1 item requirement	1867	kill a fiyr shade inside mort'tons shade catacombs.
+skill:SHERLOCK:kill a lizardman shaman.	*	skill	master	SEQUENCE	1424,3710,0|2733,3415,0	Sherlock				none	1862	kill a lizardman shaman.
 skill:SHERLOCK:kill a reanimated abyssal.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				4 item requirements	1866	kill a reanimated abyssal.
-skill:SHERLOCK:kill the spiritual, magic and godly whilst representing their own god.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1848	kill the spiritual, magic and godly whilst representing their own god.
-skill:SHERLOCK:mine a mithril ore.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1832	mine a mithril ore.
-skill:SHERLOCK:mine a piece of runite ore whilst sporting the finest mining gear.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1854	mine a piece of runite ore whilst sporting the finest mining gear.
+skill:SHERLOCK:kill the spiritual, magic and godly whilst representing their own god.	*	skill	master	SEQUENCE	2882,5311,2|2733,3415,0	Sherlock				none	1848	kill the spiritual, magic and godly whilst representing their own god.
+skill:SHERLOCK:mine a mithril ore.	*	skill	elite	SEQUENCE	3019,3339,0|2733,3415,0	Sherlock				1 item requirement	1832	mine a mithril ore.
+skill:SHERLOCK:mine a piece of runite ore whilst sporting the finest mining gear.	*	skill	master	SEQUENCE	3019,3339,0|2733,3415,0	Sherlock				2 item requirements	1854	mine a piece of runite ore whilst sporting the finest mining gear.
 skill:SHERLOCK:mine some nickel.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	7059	mine some nickel.
 skill:SHERLOCK:mix a ranging mix potion.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1858	mix a ranging mix potion.
 skill:SHERLOCK:mix an anti-venom potion.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1853	mix an anti-venom potion.
 skill:SHERLOCK:pickpocket an elf.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1856	pickpocket an elf.
-skill:SHERLOCK:plant a watermelon seed.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1840	plant a watermelon seed.
-skill:SHERLOCK:score a goal in skullball.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1823	score a goal in skullball.
-skill:SHERLOCK:slay a dust devil.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1829	slay a dust devil.
-skill:SHERLOCK:slay a nechryael in the slayer tower.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1847	slay a nechryael in the slayer tower.
-skill:SHERLOCK:smith a mithril 2h sword.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1833	smith a mithril 2h sword.
-skill:SHERLOCK:smith a runite med helm.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1844	smith a runite med helm.
+skill:SHERLOCK:plant a watermelon seed.	*	skill	elite	SEQUENCE	3055,3307,0|2733,3415,0	Sherlock				3 item requirements	1840	plant a watermelon seed.
+skill:SHERLOCK:score a goal in skullball.	*	skill	elite	SEQUENCE	3543,3463,0|2733,3415,0	Sherlock				1 item requirement	1823	score a goal in skullball.
+skill:SHERLOCK:slay a dust devil.	*	skill	elite	SEQUENCE	3180,9364,0|2733,3415,0	Sherlock				1 item requirement	1829	slay a dust devil.
+skill:SHERLOCK:slay a nechryael in the slayer tower.	*	skill	master	SEQUENCE	3428,3535,0|2733,3415,0	Sherlock				none	1847	slay a nechryael in the slayer tower.
+skill:SHERLOCK:smith a mithril 2h sword.	*	skill	elite	SEQUENCE	3188,3425,0|2733,3415,0	Sherlock				2 item requirements	1833	smith a mithril 2h sword.
+skill:SHERLOCK:smith a runite med helm.	*	skill	master	SEQUENCE	3188,3425,0|2733,3415,0	Sherlock				2 item requirements	1844	smith a runite med helm.
 skill:SHERLOCK:smith a tier 2 or above shayzien platebody.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1842	smith a tier 2 or above shayzien platebody.
-skill:SHERLOCK:steal a gem from the ardougne market.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1855	steal a gem from the ardougne market.
-skill:SHERLOCK:steal from a chest in ardougne castle.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				none	1826	steal from a chest in ardougne castle.
+skill:SHERLOCK:steal a gem from the ardougne market.	*	skill	master	SEQUENCE	2662,3302,0|2733,3415,0	Sherlock				none	1855	steal a gem from the ardougne market.
+skill:SHERLOCK:steal from a chest in ardougne castle.	*	skill	elite	SEQUENCE	2577,3298,0|2733,3415,0	Sherlock				none	1826	steal from a chest in ardougne castle.
 skill:SHERLOCK:string a yew longbow.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1828	string a yew longbow.
 skill:SHERLOCK:teleport to a spirit tree you planted yourself.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1845	teleport to a spirit tree you planted yourself.
 spot:ASGARNIA_WARRIORS	*	hotcold spot	master		2860,3562,0						690	North of the Warriors' Guild in Burthorpe.

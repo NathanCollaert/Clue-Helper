@@ -11,10 +11,20 @@ import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.RuneModel;
 import com.cluehelper.player.Spell;
+import com.cluehelper.route.Exit;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Plan;
+import com.cluehelper.route.PlanStart;
+import com.cluehelper.route.RequiredItems;
+import com.cluehelper.route.StepNeeds;
 import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.WalkData;
+import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.Stage;
+import com.cluehelper.step.StageTarget;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.AvailabilityService;
@@ -25,6 +35,7 @@ import com.cluehelper.transport.RowAvailability;
 import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +48,8 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.KeyCode;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
@@ -49,6 +62,7 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.NpcID;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
@@ -64,8 +78,12 @@ public class StepGuide
 {
 	public enum Tab
 	{
-		NONE, INVENTORY, EQUIPMENT, MAGIC
+		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC
 	}
+
+	private static final int NO_STASH = -1;
+	private static final String SEARCH_OPTION = "Search";
+	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip");
 
 	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
 	static final int JUMP_TILES = 4;
@@ -103,6 +121,9 @@ public class StepGuide
 	 * reached act stays while the player is this close to a target on any plane.
 	 */
 	static final int STAY_AT_ACT_TILES = 20;
+	/** In scene-walk tiles: 20 ticks of running. */
+	static final int ARRIVED_WALK_TILES = 40;
+	private static final int DEPOSIT_TILES = 15;
 
 	private final Client client;
 	private final ClueLink clueLink;
@@ -112,7 +133,17 @@ public class StepGuide
 	private final MenuLines menuLines;
 	private final AvailabilityService availability;
 	private final ProbeTarget probeTarget;
+	private final StageTarget stageTarget;
+	private final ActWatcher actWatcher;
+	private final StepNeeds stepNeeds;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
+	/** When the guided step began: an act's event counts from then. */
+	private int stepSince = ActWatcher.NEVER;
+	private SubStep fightView;
+	/** The STASH unit to put the last emote step's items back into; null once done or walked away from. */
+	private WorldPoint depositAt;
+	private int depositSince = ActWatcher.NEVER;
+	private int depositStashId = NO_STASH;
 	private final Map<String, Integer> spellWidgets = new HashMap<>();
 
 	private Runnable unregister;
@@ -134,6 +165,8 @@ public class StepGuide
 	private final SwapperClicks swapperClicks;
 	private List<ItemUse> heldUses = List.of();
 	private String oneClickLabel;
+	/** An outlined object is filled when its left click is this option (a STASH unit's "Search"); null for teleports. */
+	private String objectOption;
 	private Set<Integer> bankHighlightItems = Set.of();
 	private int highlightSpellWidget = -1;
 	private boolean highlightWorn;
@@ -158,8 +191,12 @@ public class StepGuide
 
 	@Inject
 	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
-		AvailabilityService availability, SwapperClicks swapperClicks, ProbeTarget probeTarget)
+		AvailabilityService availability, SwapperClicks swapperClicks, ProbeTarget probeTarget, StageTarget stageTarget,
+		ActWatcher actWatcher, StepNeeds stepNeeds)
 	{
+		this.actWatcher = actWatcher;
+		this.stepNeeds = stepNeeds;
+		this.stageTarget = stageTarget;
 		this.probeTarget = probeTarget;
 		this.swapperClicks = swapperClicks;
 		this.menuLines = menuLines;
@@ -198,8 +235,13 @@ public class StepGuide
 		return route;
 	}
 
+	/** While an enemy attacks during a dig or an emote, the fight; after it, the act again. */
 	public SubStep getCurrent()
 	{
+		if (fightView != null)
+		{
+			return fightView;
+		}
 		return index < steps.size() ? steps.get(index) : null;
 	}
 
@@ -217,15 +259,49 @@ public class StepGuide
 	}
 
 	/**
-	 * Walking to a located teleport's object or NPC (Renu, a spirit tree): like a bank, it is outlined and pointed at
-	 * from the walk on.
+	 * Walking to a located teleport's object or NPC (Renu, a spirit tree): like a bank, it is outlined from the walk on
+	 * and the line leads to it.
 	 */
 	public boolean isApproach()
 	{
 		SubStep current = getCurrent();
 		SubStep next = getNext();
-		return current != null && current.getKind() == SubStep.Kind.WALK && next != null && next.getKind() == SubStep.Kind.TELEPORT
+		boolean toNpc = current != null && current.getKind() == SubStep.Kind.WALK && !current.getNpcIds().isEmpty();
+		return toNpc || current != null && current.getKind() == SubStep.Kind.WALK && next != null && next.getKind() == SubStep.Kind.TELEPORT
 			&& next.getRow() != null && next.getRow().isLocated();
+	}
+
+	/** A staircase, ladder, door or NPC that is the way out or in: outlined and walked to like a bank. */
+	public boolean isExit()
+	{
+		SubStep current = getCurrent();
+		return current != null && (current.getKind() == SubStep.Kind.EXIT || current.getKind() == SubStep.Kind.ENTER);
+	}
+
+	/** Shortest Path names objects and NPCs alike by id, so the id is looked for as both. */
+	/** A conversation's chat options follow its option, so each menu's pick is coloured in turn. */
+	private static MenuTarget withDialogue(MenuTarget target, StepIndex.WayIn way)
+	{
+		if (way == null || way.getDialogue().isEmpty())
+		{
+			return target;
+		}
+		List<String> path = new ArrayList<>(target.getPath());
+		path.addAll(way.getDialogue());
+		return target.toBuilder().path(List.copyOf(path)).build();
+	}
+
+	/** The step's hand-written way in that this exit row is, or null. */
+	private StepIndex.WayIn wayInOf(WorldPoint origin, WorldPoint destination)
+	{
+		StepIndex.WayIn way = routeStep == null || routeStep.getData() == null ? null : routeStep.getData().getEntry();
+		return way != null && origin.equals(way.getTile()) && destination.equals(way.getTo()) ? way : null;
+	}
+
+	private static MenuTarget wayTarget(int id, String option)
+	{
+		Set<Integer> ids = id < 0 ? Set.of() : Set.of(id);
+		return MenuTarget.builder().objectIds(ids).npcIds(ids).path(option == null || option.isEmpty() ? List.of() : List.of(option)).build();
 	}
 
 	public List<SubStep> getSteps()
@@ -368,7 +444,15 @@ public class StepGuide
 				return;
 			}
 		}
+		if (routeStep != null && !isAtStep() && arrived(routeStep))
+		{
+			follow(route);
+			return;
+		}
+		actWatcher.onGameTick(routeStep);
+		checkDeposit(tile);
 		changed |= advance(tile);
+		changed |= refreshFight();
 		checkRefusal();
 		checkTeleportRefusal();
 		if (changed)
@@ -376,6 +460,7 @@ public class StepGuide
 			updateHighlights();
 		}
 		refreshObjects();
+		refreshEquipItems();
 		changed |= refreshHint();
 		if (changed)
 		{
@@ -387,7 +472,8 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
-		MenuTarget target = isApproach() ? houseTarget(getNext().getRow()) : menuTarget;
+		MenuTarget target = current != null && !current.getNpcIds().isEmpty() ? MenuTarget.builder().npcIds(current.getNpcIds()).build()
+			: isApproach() ? houseTarget(getNext().getRow()) : menuTarget;
 		Set<Integer> ids = target.getObjectIds();
 		Set<Integer> npcIds = target.getNpcIds();
 		if (ids.isEmpty() && npcIds.isEmpty() && !bank)
@@ -512,18 +598,133 @@ public class StepGuide
 
 	private void follow(Route committed)
 	{
-		Step step = probeTarget.travelStep(clueLink.getCurrentStep());
+		Step step = stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
 		WorldPoint tile = player.getPosition().getTile();
+		noteDeposit(routeStep, step);
+		if (routeStep == null || step == null || !routeStep.getKey().equals(step.getKey()))
+		{
+			stepSince = client.getTickCount();
+		}
 		route = committed;
 		routeStep = step;
-		steps = committed == null || step == null ? List.of() : stillAtAct(step, tile) ? List.of(SubSteps.act(step))
-			: SubSteps.of(committed, step, id -> client.getItemDefinition(id).getName(), house());
+		boolean atStep = step != null && (stillAtAct(step, tile) || arrived(step));
+		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
+			: SubSteps.of(committed, step, id -> client.getItemDefinition(id).getName(), house(), this::exitOf, takeFromStash(step));
+		steps = withDeposit(base);
 		index = 0;
 		jumpedThisSubStep = false;
 		advance(tile);
 		updateHighlights();
 		refreshObjects();
 		notifyListeners();
+	}
+
+	private boolean refreshFight()
+	{
+		SubStep act = index < steps.size() ? steps.get(index) : null;
+		SubStep view = null;
+		if (act != null && act.isFights())
+		{
+			NPC enemy = actWatcher.getEnemy();
+			if (enemy != null)
+			{
+				boolean emote = act.getDone() == SubStep.Done.URI_HERE;
+				view = SubStep.builder().kind(SubStep.Kind.ACT).text("Kill the " + (enemy.getName() == null ? "enemy" : enemy.getName()))
+					.detail(emote ? "Stay equipped, then perform the emote again" : "Then dig again").build();
+			}
+			else if (actWatcher.foughtSince(stepSince))
+			{
+				view = act.toBuilder().text(act.getAgain()).build();
+			}
+		}
+		boolean changed = !Objects.equals(view, fightView);
+		fightView = view;
+		return changed;
+	}
+
+	/**
+	 * After an emote step whose STASH unit is built, the items go back before moving on (Nathan's rule); the reminder
+	 * outlives the step and ends on the deposit line or 15 tiles away.
+	 */
+	private void checkDeposit(WorldPoint tile)
+	{
+		boolean deposited = actWatcher.isDone(SubStep.Done.STASH_DEPOSITED, depositSince);
+		if (depositAt != null && tile != null && (deposited || !SubSteps.near(tile, depositAt, DEPOSIT_TILES)))
+		{
+			depositAt = null;
+		}
+	}
+
+	private void noteDeposit(Step ended, Step next)
+	{
+		boolean emote = ended != null && ClueTypes.EMOTE.equals(ended.getType()) && ended.getData() != null
+			&& ended.getData().getStash() != null;
+		if (!emote || next != null && ended.getKey().equals(next.getKey()))
+		{
+			return;
+		}
+		RequiredItems.Stash stash = stepNeeds.of(ended).getStash();
+		if (stash == RequiredItems.Stash.FILLED || stash == RequiredItems.Stash.EMPTY)
+		{
+			depositAt = ended.getData().getStash().getTile();
+			depositSince = client.getTickCount();
+			depositStashId = ended.getRequirements() == null ? NO_STASH : ended.getRequirements().getStashObjectId();
+		}
+	}
+
+	private List<SubStep> withDeposit(List<SubStep> base)
+	{
+		WorldPoint tile = player.getPosition().getTile();
+		if (depositAt == null || tile == null || !SubSteps.near(tile, depositAt, DEPOSIT_TILES))
+		{
+			return base;
+		}
+		List<SubStep> all = new ArrayList<>();
+		all.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Search the STASH unit: put the items back")
+			.detail("Before moving on").done(SubStep.Done.STASH_DEPOSITED).build());
+		all.addAll(base);
+		return List.copyOf(all);
+	}
+
+	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
+	private boolean takeFromStash(Step step)
+	{
+		if (step == null || step.getData() == null || step.getData().getStash() == null || step.getRequirements() == null)
+		{
+			return false;
+		}
+		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
+		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
+		List<Item> carried = new ArrayList<>();
+		for (ItemContainer container : new ItemContainer[]{worn, inventory})
+		{
+			if (container != null)
+			{
+				carried.addAll(List.of(container.getItems()));
+			}
+		}
+		return stepNeeds.of(step).getStash() == RequiredItems.Stash.FILLED
+			&& !step.getRequirements().itemsFulfilledBy(carried.toArray(new Item[0]));
+	}
+
+	private boolean equipped(Step step)
+	{
+		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
+		return step != null && step.getRequirements() != null && worn != null && step.getRequirements().itemsFulfilledBy(worn.getItems());
+	}
+
+	/** The exit a start leg leaves the planned scene by, or null for any other walk. */
+	private Exit exitOf(Leg leg)
+	{
+		PlanStart start = routes.getStart();
+		WalkData.Loaded walk = routes.getWalk();
+		if (start == null || walk == null || start.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(start.getTile())
+			|| start.getScene().getScene().contains(leg.getTo()))
+		{
+			return null;
+		}
+		SceneBfs.ExitReach reach = start.getScene().exitTo(leg.getTo());
+		return reach == null ? null : walk.getTable().exit(reach.getOrigin(), reach.getDestination());
 	}
 
 	private boolean advance(WorldPoint tile)
@@ -535,7 +736,7 @@ public class StepGuide
 			jumpedThisSubStep = false;
 			moved = true;
 		}
-		SubStep current = getCurrent();
+		SubStep current = index < steps.size() ? steps.get(index) : null;
 		if (current != null && current.getKind() == SubStep.Kind.ACT && routeStep != null)
 		{
 			actReachedStepKey = actKey(routeStep);
@@ -549,10 +750,78 @@ public class StepGuide
 			&& step.getTargets().stream().anyMatch(target -> target.distanceTo2D(tile) <= STAY_AT_ACT_TILES);
 	}
 
-	/** Each probe tile of a hot/cold step is an act of its own. */
+	/**
+	 * Arrived where the planner can't see it: the step's NPC is in the scene a short walk away (Brimstail inside his
+	 * cave, where core's tile is the entrance), or the player is beside a cache tile of the step core doesn't give. A
+	 * step of several places or a probe trip never arrives this way: their NPCs and tiles belong to one stage.
+	 */
+	private boolean arrived(Step step)
+	{
+		PlanStart start = routes.getStart();
+		SceneBfs.Result scene = start == null ? null : start.getScene();
+		if (scene == null || step.getWaypointAct() != null || !step.getStages().isEmpty() || ClueTypes.HOT_COLD.equals(step.getType()))
+		{
+			return false;
+		}
+		for (WorldPoint other : step.getOtherTiles())
+		{
+			if (scene.getScene().contains(other) && scene.costNear(other) <= ARRIVED_WALK_TILES)
+			{
+				return true;
+			}
+		}
+		if (step.getNpcs() == null || step.getNpcs().isEmpty() || client.getTopLevelWorldView() == null)
+		{
+			return false;
+		}
+		for (NPC npc : client.getTopLevelWorldView().npcs())
+		{
+			WorldPoint at = npc.getWorldLocation();
+			if (npc.getName() != null && step.getNpcs().contains(npc.getName()) && scene.getScene().contains(at)
+				&& scene.costNear(at) <= ARRIVED_WALK_TILES)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private List<SubStep> actsHere(Step step, WorldPoint tile)
+	{
+		SubStep stageAct = actHere(step, tile);
+		return stageAct.getStage() != null ? List.of(stageAct) : Acts.of(step, takeFromStash(step));
+	}
+
+	/** At a step of several places, the act of the stage nearest to the player. */
+	private static SubStep actHere(Step step, WorldPoint tile)
+	{
+		Stage nearest = null;
+		int nearestDistance = Integer.MAX_VALUE;
+		for (Stage stage : step.getStages())
+		{
+			for (WorldPoint at : stage.getTiles())
+			{
+				int distance = tile == null || at.getPlane() != tile.getPlane() ? Integer.MAX_VALUE - 1 : at.distanceTo2D(tile);
+				if (distance < nearestDistance)
+				{
+					nearest = stage;
+					nearestDistance = distance;
+				}
+			}
+		}
+		return nearest == null || nearest.getKind() == Stage.Kind.FINAL ? SubSteps.act(step) : SubSteps.stageAct(nearest);
+	}
+
+	/** Each probe tile of a hot/cold step, and each stage left of a step of several places, is an act of its own. */
 	private static String actKey(Step step)
 	{
-		return step.getWaypointAct() == null ? step.getKey() : step.getKey() + "@" + step.getTargets();
+		return step.getKey() + "@" + step.getTargets();
+	}
+
+	/** The panel shows the acts alone: nothing to travel. */
+	public boolean isAtStep()
+	{
+		return !steps.isEmpty() && steps.stream().allMatch(sub -> sub.getKind() == SubStep.Kind.ACT);
 	}
 
 	private void clear()
@@ -576,6 +845,12 @@ public class StepGuide
 		menuHint = null;
 	}
 
+	/** A teleport or book change is animating: its item, spell and tab are already used. */
+	public boolean isTravelling()
+	{
+		return isUnderWay();
+	}
+
 	private boolean isUnderWay()
 	{
 		SubStep current = getCurrent();
@@ -595,7 +870,10 @@ public class StepGuide
 				return tile != null && tile.getY() <= step.getGoal().getY();
 			case TELEPORT:
 			case FAIRY_RING:
+			case EXIT:
 				return jumpedThisSubStep && SubSteps.near(tile, step.getGoal(), step.getRadius());
+			case ENTER:
+				return step.getWayIn().isInside(tile);
 			case SPELLBOOK_SWAP:
 			case CHANGE_BOOK:
 				return client.getVarbitValue(VarbitID.SPELLBOOK) == step.getBook().ordinal();
@@ -603,8 +881,25 @@ public class StepGuide
 				return bankMemory.isBankOpen();
 			case WITHDRAW:
 				return !bankMemory.isBankOpen();
+			case ACT:
+				return isActDone(step);
 			default:
 				return false;
+		}
+	}
+
+	private boolean isActDone(SubStep act)
+	{
+		switch (act.getDone())
+		{
+			case EQUIPPED:
+				return equipped(routeStep);
+			case STASH_DEPOSITED:
+				return depositAt == null || actWatcher.isDone(act.getDone(), stepSince);
+			case STASH_WITHDRAWN:
+				return actWatcher.isDone(act.getDone(), stepSince) || !takeFromStash(routeStep);
+			default:
+				return actWatcher.isDone(act.getDone(), stepSince);
 		}
 	}
 
@@ -624,16 +919,44 @@ public class StepGuide
 		fillObjects = List.of();
 		heldUses = List.of();
 		oneClickLabel = null;
+		objectOption = null;
 		objectsFoundTick = NEVER;
 		if (current == null)
 		{
 			return;
+		}
+		if (current.getKind() == SubStep.Kind.ACT)
+		{
+			highlightTab = current.getTab();
+			int stash = stashOf(current);
+			if (stash != NO_STASH)
+			{
+				menuTarget = MenuTarget.builder().objectIds(Set.of(stash)).build();
+				objectOption = SEARCH_OPTION;
+				return;
+			}
+			if (current.getDone() == SubStep.Done.EQUIPPED)
+			{
+				refreshEquipItems();
+				return;
+			}
 		}
 		if (current.getKind() == SubStep.Kind.ACT && !current.getActItems().isEmpty())
 		{
 			highlightItems = current.getActItems();
 			fillItems = current.getActItems();
 			highlightTab = Tab.INVENTORY;
+			return;
+		}
+		if (current.getKind() == SubStep.Kind.EXIT)
+		{
+			Exit exit = current.getExit();
+			menuTarget = withDialogue(wayTarget(exit.getObjectId(), exit.getOption()), wayInOf(exit.getOrigin(), exit.getDestination()));
+			return;
+		}
+		if (current.getKind() == SubStep.Kind.ENTER)
+		{
+			menuTarget = withDialogue(wayTarget(current.getWayIn().getObject(), current.getWayIn().getOption()), current.getWayIn());
 			return;
 		}
 		if (current.getKind() == SubStep.Kind.SPELLBOOK_SWAP)
@@ -741,8 +1064,60 @@ public class StepGuide
 		return null;
 	}
 
+	private int stashOf(SubStep act)
+	{
+		if (act.getDone() == SubStep.Done.STASH_DEPOSITED)
+		{
+			return depositStashId;
+		}
+		boolean taking = act.getDone() == SubStep.Done.STASH_WITHDRAWN && routeStep != null && routeStep.getRequirements() != null;
+		return taking ? routeStep.getRequirements().getStashObjectId() : NO_STASH;
+	}
+
+	/** The carried items the emote step wants on, refreshed every tick as they are put on. */
+	private void refreshEquipItems()
+	{
+		SubStep current = getCurrent();
+		if (current == null || current.getKind() != SubStep.Kind.ACT || current.getDone() != SubStep.Done.EQUIPPED
+			|| routeStep == null || routeStep.getRequirements() == null)
+		{
+			return;
+		}
+		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
+		Set<Integer> wanted = new HashSet<>();
+		for (Item item : inventory == null ? new Item[0] : inventory.getItems())
+		{
+			if (routeStep.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(item.getId())))
+			{
+				wanted.add(item.getId());
+			}
+		}
+		highlightItems = Set.copyOf(wanted);
+		fillItems = wanted.stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet());
+	}
+
+	private boolean wearsOnLeftClick(int itemId)
+	{
+		String learned = leftClicks.item(itemId);
+		String click = learned != null ? learned : swapperClicks.item(itemId);
+		if (click == null)
+		{
+			String[] actions = client.getItemDefinition(itemId).getInventoryActions();
+			for (int i = 0; actions != null && i < actions.length && click == null; i++)
+			{
+				click = actions[i];
+			}
+		}
+		return click != null && WEAR_OPTIONS.contains(click);
+	}
+
 	private List<TileObject> oneClickObjects(List<TileObject> objects)
 	{
+		if (objectOption != null)
+		{
+			return objects.stream().filter(object -> objectOption.equalsIgnoreCase(leftClick(object)))
+				.collect(Collectors.toUnmodifiableList());
+		}
 		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
 		return objects.stream()
 			.filter(object -> ring ? ringGoesTo(leftClick(object), menuTarget.getLineKey())
@@ -760,6 +1135,13 @@ public class StepGuide
 		PlayerSnapshot snapshot = player.getSnapshot();
 		String last = snapshot == null ? null : snapshot.getLastFairyRing();
 		return leftClick != null && !leftClick.contains("(") && MenuLabels.isLastDestination(leftClick + " (" + last + ")", code);
+	}
+
+	/** Whether a left click on {@code object} is {@code option}, Menu Entry Swapper's swaps included. */
+	public boolean isLeftClick(TileObject object, String option)
+	{
+		String click = leftClick(object);
+		return click != null && click.equalsIgnoreCase(option);
 	}
 
 	private String leftClick(TileObject object)

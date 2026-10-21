@@ -80,22 +80,20 @@ cryptic:'a bag belt only?', he asked his balding brothers.
   best      42t: Amulet of glory: Edgeville → walk 37 {charge:1712=1}
   alt       78t: Falador Teleport → walk 74 {item:556=3, item:555=1, item:563=1}
   alt       79t: Skills necklace: Cooking Guild → walk 74 {charge:11968=1}
-cryptic:elvish onions.
+cryptic:does one really need a fire to stay warm here?
   best      none
   note      no route from what you have
-cryptic:leader of the yak city.
-  best      none
-  note      no route from what you have
-cryptic:search the chest in the left-hand tower of camelot castle.
-  best      31t: Camelot Teleport → walk 27 {item:556=5, item:563=1}
-  alt       32t: Camelot tablet → walk 27 {item:8010=1}
-cryptic:search the wheelbarrow in rimmington mine.
-  best      39t: Skills necklace: Crafting Guild → walk 34 {charge:11968=1}
-  alt       75t: Amulet of glory: Draynor Village → walk 70 {charge:1712=1}
-cryptic:talk to the cook in the blue moon inn in varrock.
-  best      35t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
-  alt       36t: Varrock tablet → walk 23 {item:8007=1}
-  alt       66t: Skills necklace: Cooking Guild → walk 53 {charge:11968=1}
+cryptic:it seems to have reached the end of the line, and it's still empty.
+  best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
+cryptic:search the chest in fred the farmer's bedroom.
+  best      54t: Amulet of glory: Draynor Village → walk 49 {charge:1712=1}
+  alt       56t: Lumbridge Teleport → walk 52 {item:556=3, item:557=1, item:563=1}
+  alt       72t: Necklace of passage: Wizards' Tower → walk 67 {charge:21146=1}
+cryptic:search through chests found in the upstairs of houses in eastern falador.
+  best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
+  alt       47t: Falador Teleport → walk 43 {item:556=3, item:555=1, item:563=1}
+cryptic:talk to the mother of a basement dwelling son.
+  best      14t: Amulet of glory: Edgeville → walk 9 {charge:1712=1}
 emote:10180
   best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
   alt       62t: Amulet of glory: Al Kharid → walk 57 {charge:1712=1}
@@ -114,8 +112,10 @@ emote:19833
   best      30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
   alt       31t: Varrock tablet → walk 26 {item:8007=1}
 emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
-  best      none
-  note      walk too long
+  best      148t: Games necklace: Corporeal Beast → walk 143 {charge:3853=1}
+  alt       182t: Ring of dueling: Ferox Enclave → walk 177 {charge:2552=1}
+  alt       203t: Clan Wars Minigame Teleport → walk 177 {cooldown:888=1}
+  note      Wilderness target
 fairyring:a i q 0 4 4 0
   best      103t: Skills necklace: Crafting Guild → walk 98 {charge:11968=1}
   alt       118t: Amulet of glory: Draynor Village → walk 113 {charge:1712=1}
@@ -218,32 +218,26 @@ music:23178
 music:24773
   best      20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
 skill:CHARLIE:i need to give charlie a cooked pike.
-  best      20t: Varrock Teleport → walk 16 {item:556=3, item:554=1, item:563=1}
-  alt       21t: Varrock tablet → walk 16 {item:8007=1}
-  alt       49t: Skills necklace: Cooking Guild → walk 44 {charge:11968=1}
+  best      53t: Skills necklace: Cooking Guild → walk 28 → Varrock Teleport → walk 16 {charge:11968=1, item:556=3, item:554=1, item:563=1}
+  alt       64t: Amulet of glory: Edgeville → walk 39 → Varrock Teleport → walk 16 {charge:1712=1, item:556=3, item:554=1, item:563=1}
+  alt       104t: Falador Teleport → walk 79 → Varrock tablet → walk 16 {item:556=3, item:555=1, item:563=1, item:8007=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       39t: Camelot tablet → walk 34 {item:8010=1}
-  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      162t: Xeric's talisman: 2. Xeric's Glade → walk 120 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  alt       165t: Xeric's talisman: 4. Xeric's Heart → walk 123 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  alt       166t: Kourend Castle Teleport → walk 124 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
-  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       39t: Camelot tablet → walk 34 {item:8010=1}
-  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      45t: Skills necklace: Woodcutting Guild → walk 3 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
-  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       39t: Camelot tablet → walk 34 {item:8010=1}
-  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      54t: Amulet of glory: Edgeville → walk 12 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
+  alt       98t: Skills necklace: Cooking Guild → walk 55 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
 skill:SHERLOCK:kill a lizardman shaman.
-  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       39t: Camelot tablet → walk 34 {item:8010=1}
-  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
+  best      130t: Kourend Castle Teleport → walk 88 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
+  alt       132t: Xeric's talisman: 4. Xeric's Heart → walk 90 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  alt       134t: Xeric's talisman: 3. Xeric's Inferno → walk 92 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
 skill:SHERLOCK:score a goal in skullball.
-  best      38t: Camelot Teleport → walk 34 {item:556=5, item:563=1}
-  alt       39t: Camelot tablet → walk 34 {item:8010=1}
-  alt       67t: Skills necklace: Fishing Guild → walk 62 {charge:11968=1}
-cryptic:search through chests found in the upstairs of houses in eastern falador.
-  best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
-  alt       47t: Falador Teleport → walk 43 {item:556=3, item:555=1, item:563=1}
+  best      114t: Ectophial → walk 69 → Camelot Teleport → walk 34 {item:556=5, item:563=1}
+  alt       185t (rank 215): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Camelot tablet → walk 34 {item:554=1, item:555=1, item:563=3, item:557=1, item:566=1, item:8010=1} leaves you on ARCEUUS
+  alt       187t (rank 217): Xeric's talisman: 4. Xeric's Heart → walk 104 → Tyss: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Camelot tablet → walk 34 {charge:13393=1, item:557=1, item:563=1, item:566=1, item:8010=1} leaves you on ARCEUUS
 cryptic:you will need to under-cook to solve this one.
   best      26t: Lumbridge Teleport → walk 22 {item:556=3, item:557=1, item:563=1}
   alt       46t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}

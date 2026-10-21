@@ -163,13 +163,19 @@ public class MenuLines
 		}
 	}
 
+	/** Whether any of the target's lines is on screen, coloured or outlined: the menu is open at the teleport's line. */
+	public boolean showing(MenuTarget target)
+	{
+		return !lineWidgets(target).isEmpty();
+	}
+
 	/** Only the target's lines without text (map icons, region shields, travel log codes); text lines are coloured. */
 	public List<Rectangle> lines(MenuTarget target)
 	{
 		List<Rectangle> out = new ArrayList<>();
 		for (Widget widget : lineWidgets(target))
 		{
-			Rectangle shown = hasText(widget) ? null : clipped(widget);
+			Rectangle shown = hasTextInside(widget) ? null : clipped(widget);
 			if (shown != null && !shown.isEmpty())
 			{
 				out.add(shown);
@@ -190,7 +196,7 @@ public class MenuLines
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
 		if (enabled)
 		{
-			lineWidgets(target).stream().filter(MenuLines::hasText).forEach(wanted::add);
+			lineWidgets(target).stream().flatMap(line -> descendants(line).stream()).filter(MenuLines::hasText).forEach(wanted::add);
 			if (entryWidget != ScrollBook.NO_WIDGET)
 			{
 				for (int text : ScrollBook.texts(entryWidget))
@@ -692,6 +698,12 @@ public class MenuLines
 	private static boolean hasText(Widget widget)
 	{
 		return widget.getText() != null && !Text.removeTags(widget.getText()).isBlank();
+	}
+
+	/** A nexus row is a container whose text sits in its children: the text is recoloured, so no box is drawn. */
+	private static boolean hasTextInside(Widget widget)
+	{
+		return descendants(widget).stream().anyMatch(MenuLines::hasText);
 	}
 
 	/**

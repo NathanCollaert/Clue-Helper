@@ -37,4 +37,15 @@ public class Step
 	Set<Integer> actItems = Set.of();
 	/** The act may be done where the player stands: no marker for it. */
 	boolean actAnywhere;
+	/** Places visited in turn, each with its own act; empty for a step done in one place. */
+	@Builder.Default
+	List<Stage> stages = List.of();
+	/** The step data's entry; null for a key the data lacks. */
+	StepIndex.Entry data;
+	/** Tiles core doesn't give but the step is done at too (Brimstail inside his cave): arriving there is arriving. */
+	@Builder.Default
+	List<WorldPoint> otherTiles = List.of();
+	/** An emote step's emotes in order, by core's names. */
+	@Builder.Default
+	List<String> emotes = List.of();
 }

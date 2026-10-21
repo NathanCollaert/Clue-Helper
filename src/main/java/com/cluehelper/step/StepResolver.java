@@ -18,6 +18,8 @@ import net.runelite.client.plugins.cluescrolls.clues.HotColdClue;
 import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
 import net.runelite.client.plugins.cluescrolls.clues.ThreeStepCrypticClue;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 
 @Slf4j
 @Singleton
@@ -28,8 +30,13 @@ public class StepResolver
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
 
+	private static final String KEY_TARGET = "key";
+
 	private final Supplier<StepIndex> index;
 	private final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
+	/** One requirement per key or tool entry, so a re-read step equals the last one. */
+	private final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
+	private final Map<StepIndex.Requires, ItemRequirement> toolRequirements = new ConcurrentHashMap<>();
 
 	@Inject
 	StepResolver(StepData data)
@@ -55,21 +62,73 @@ public class StepResolver
 			log.info("No step data for {}: using the Clue Scroll plugin's targets only", key);
 		}
 		String tier = tier(facts, entry);
+		List<WorldPoint> targets = targets(clue, plugin, facts, entry);
+		List<String> npcs = CoreClueReader.npcs(clue, plugin);
+		List<Stage> stages = stages(clue, plugin, entry, targets, npcs);
 		return Step.builder()
 			.key(key)
 			.type(facts.getType())
 			.tier(tier)
 			.text(CoreClueReader.displayText(clue, facts, plugin))
-			.kind(kind(clue))
-			.targets(targets(clue, plugin, facts, entry))
-			.npcs(CoreClueReader.npcs(clue, plugin))
+			.kind(stages.isEmpty() ? kind(clue, entry) : TargetKind.SEQUENCE)
+			.targets(stages.isEmpty() ? targets : Stages.tiles(stages))
+			.npcs(npcs)
 			.regions(CoreClueReader.regions(clue))
 			.objectIds(CoreClueReader.objectIds(clue))
 			.objectNames(CoreClueReader.objectNames(clue))
 			.requirements(requirements(clue, tier))
 			.cacheRows(entry == null ? List.of() : List.copyOf(entry.getRows()))
 			.known(entry != null)
+			.stages(stages)
+			.data(entry)
+			.otherTiles(otherTiles(entry, targets))
+			.emotes(CoreClueReader.emotes(clue))
 			.build();
+	}
+
+	private List<Stage> stages(ClueScroll clue, ClueScrollPlugin plugin, StepIndex.Entry entry, List<WorldPoint> targets,
+		List<String> npcs)
+	{
+		if (clue instanceof ThreeStepCrypticClue)
+		{
+			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin);
+		}
+		StepIndex.Target key = entry == null ? null : entry.getTargets().stream()
+			.filter(target -> KEY_TARGET.equals(target.getKind()) && target.getKeyTile() != null).findFirst().orElse(null);
+		if (key != null)
+		{
+			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
+				ItemRequirements::item), targets);
+		}
+		if (clue instanceof SkillChallengeClue)
+		{
+			return Stages.challenge(entry, CoreClueReader.challengeCompleted(clue), CoreClueReader.returnItem(clue), targets,
+				tool -> toolRequirements.computeIfAbsent(tool, StepResolver::anyOf));
+		}
+		return List.of();
+	}
+
+	private static ItemRequirement anyOf(StepIndex.Requires items)
+	{
+		return ItemRequirements.any(items.getName(), items.getIds().stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new));
+	}
+
+	/** Cache tiles the step is also done at, off core's targets: Brimstail inside his cave, Martin Thwait in the den. */
+	private static List<WorldPoint> otherTiles(StepIndex.Entry entry, List<WorldPoint> targets)
+	{
+		if (entry == null)
+		{
+			return List.of();
+		}
+		List<WorldPoint> other = new ArrayList<>();
+		for (WorldPoint tile : tiles(entry))
+		{
+			if (!nearAny(tile, targets))
+			{
+				other.add(tile);
+			}
+		}
+		return List.copyOf(other);
 	}
 
 	/** For a clue whose getters threw: only its class, so it still shows as a step. */
@@ -112,7 +171,7 @@ public class StepResolver
 		return StepIndex.Entry.of(THREE_STEP_TIER, rows);
 	}
 
-	private static TargetKind kind(ClueScroll clue)
+	private static TargetKind kind(ClueScroll clue, StepIndex.Entry entry)
 	{
 		if (clue instanceof HotColdClue)
 		{
@@ -122,7 +181,8 @@ public class StepResolver
 		{
 			return TargetKind.SEQUENCE;
 		}
-		return CoreClueReader.regions(clue).isEmpty() ? TargetKind.ANY_OF : TargetKind.AREA;
+		boolean killArea = entry != null && entry.getArea() != null;
+		return CoreClueReader.regions(clue).isEmpty() && !killArea ? TargetKind.ANY_OF : TargetKind.AREA;
 	}
 
 	/**
@@ -132,6 +192,14 @@ public class StepResolver
 	 */
 	private static List<WorldPoint> targets(ClueScroll clue, ClueScrollPlugin plugin, ClueFacts facts, StepIndex.Entry entry)
 	{
+		if (entry != null && entry.getStand() != null)
+		{
+			return List.of(entry.getStand());
+		}
+		if (entry != null && entry.getArea() != null && entry.getArea().getTile() != null)
+		{
+			return List.of(entry.getArea().getTile());
+		}
 		List<WorldPoint> core = CoreClueReader.locations(clue, plugin);
 		List<WorldPoint> cache = entry == null ? List.of() : tiles(entry);
 		if (ClueTypes.COORDINATE.equals(facts.getType()) && !cache.isEmpty())

@@ -12,6 +12,7 @@ import com.cluehelper.player.RuneModel;
 import com.cluehelper.player.SpellbookState;
 import com.cluehelper.poh.HouseOwnership;
 import com.cluehelper.poh.PohService;
+import com.cluehelper.step.StageTarget;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.AvailabilityService;
@@ -53,6 +54,8 @@ public class RoutePlanner
 	static final int SWAP_WINDOW_TICKS = 200;
 	private static final int NOT_REFUSED = -1;
 	static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
+	/** The guide's landing radius: some teleports land anywhere in a small area. */
+	private static final int LANDED_TILES = 10;
 	private static final int NO_TARGET_IN_SCENE = -1;
 	private static final long NO_SCENE = Long.MIN_VALUE;
 
@@ -68,6 +71,8 @@ public class RoutePlanner
 	private final StepNeeds stepNeeds;
 	private final PohService poh;
 	private final ProbeTarget probeTarget;
+	private final StageTarget stageTarget;
+	private final SceneDoors doors;
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile WalkData.Loaded walk;
@@ -97,8 +102,10 @@ public class RoutePlanner
 	@Inject
 	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
 		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds, PohService poh,
-		ProbeTarget probeTarget)
+		ProbeTarget probeTarget, StageTarget stageTarget, SceneDoors doors)
 	{
+		this.stageTarget = stageTarget;
+		this.doors = doors;
 		this.poh = poh;
 		this.probeTarget = probeTarget;
 		this.bankMemory = bankMemory;
@@ -147,7 +154,7 @@ public class RoutePlanner
 	/** Call after the player model's and availability's GameTick handlers. */
 	public void onGameTick()
 	{
-		Step step = probeTarget.travelStep(clueLink.getCurrentStep());
+		Step step = stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		WalkData.Loaded data = walk;
@@ -319,11 +326,13 @@ public class RoutePlanner
 			gatesVersion = snapshot.getVersion();
 		}
 		long started = System.nanoTime();
-		SceneBfs.Scene scene = SceneBfs.Scene.capture(view);
+		SceneBfs.Scene scene = doors.open(client, view, SceneBfs.Scene.capture(view));
 		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, position.getTile(), table, rowOpen);
 		lastBfsNanos = System.nanoTime() - started;
-		boolean collisionStillLoading = sceneReloaded && bfs != null && bfs.reachedTiles() <= 1;
-		if (collisionStillLoading && start != null)
+		// Collision flags still loading after a reload, or the player mid-obstacle on a blocked tile (stepping stones,
+		// a log): the BFS reaches only the player's tile, so the last start stands until the next tick.
+		boolean onlyOwnTile = bfs != null && bfs.reachedTiles() <= 1;
+		if (onlyOwnTile && start != null)
 		{
 			lastTile = null;
 			lastSceneBase = NO_SCENE;
@@ -334,7 +343,7 @@ public class RoutePlanner
 		boolean targetInScene = targetWalk != SceneBfs.UNREACHED;
 		targetWalkBucket = targetInScene ? targetWalk / TARGET_WALK_BUCKET_TILES : NO_TARGET_IN_SCENE;
 		start = nearestNode != WalkTable.NO_NODE || targetInScene ? PlanStart.scene(position.getTile(), bfs)
-			: PlanStart.teleportOnly(position.getTile());
+			: PlanStart.teleportOnly(position.getTile(), bfs);
 	}
 
 	private static int nearest(WalkTable table, SceneBfs.Result bfs)
@@ -377,11 +386,23 @@ public class RoutePlanner
 			return best;
 		}
 		Route same = offered(planned, current.getIdentity());
-		if (same == null || best.getTicks() <= same.getTicks() - COMMIT_MARGIN_TICKS)
+		if (same == null || best.getTicks() <= same.getTicks() - COMMIT_MARGIN_TICKS || landsWhereItStarts(same))
 		{
 			return best;
 		}
 		return same;
+	}
+
+	/**
+	 * Right after a teleport the followed route is still offered from the landing, teleporting to where the player
+	 * already stands; keeping it would send the guide back to the teleport.
+	 */
+	private boolean landsWhereItStarts(Route route)
+	{
+		Leg first = route.getFirstTransport();
+		PlanStart from = start;
+		return first != null && from != null && from.getTile() != null && first.getTo() != null
+			&& first.getTo().getPlane() == from.getTile().getPlane() && first.getTo().distanceTo2D(from.getTile()) <= LANDED_TILES;
 	}
 
 	private static Route offered(Plan planned, String identity)

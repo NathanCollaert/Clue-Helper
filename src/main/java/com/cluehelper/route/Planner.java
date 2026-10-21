@@ -4,6 +4,7 @@ import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
 import java.util.ArrayList;
@@ -41,6 +42,11 @@ public final class Planner
 	{
 		long started = System.nanoTime();
 		Step step = in.getStep();
+		if (step != null && step.getData() != null && step.getData().isHidden())
+		{
+			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
+				.why(List.of()).note("not guided: a Leagues step").build();
+		}
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
 			return Plan.builder().stepKey(step == null ? null : step.getKey()).alternatives(List.of()).candidates(List.of())
@@ -74,6 +80,10 @@ public final class Planner
 
 	private static List<List<int[]>> legOrders(PlanContext ctx, Step step)
 	{
+		if (!step.getStages().isEmpty())
+		{
+			return stageOrders(ctx, step);
+		}
 		List<int[]> nodes = step.getTargets().stream().map(tile -> new int[]{ctx.nodeAt(tile)}).collect(Collectors.toList());
 		if (step.getKind() != TargetKind.SEQUENCE)
 		{
@@ -85,6 +95,31 @@ public final class Planner
 		}
 		List<List<int[]>> orders = new ArrayList<>();
 		permute(nodes, 0, orders);
+		return orders;
+	}
+
+	/**
+	 * One leg per stage, any of its tiles. A stage done anywhere (Sherlock's task with no place) has no leg. Three-step
+	 * parts may be visited in any order; every other step's stages keep theirs.
+	 */
+	private static List<List<int[]>> stageOrders(PlanContext ctx, Step step)
+	{
+		List<int[]> legs = new ArrayList<>();
+		boolean anyOrder = true;
+		for (Stage stage : step.getStages())
+		{
+			anyOrder &= stage.getKind() == Stage.Kind.PART;
+			if (!stage.getTiles().isEmpty())
+			{
+				legs.add(stage.getTiles().stream().mapToInt(ctx::nodeAt).toArray());
+			}
+		}
+		if (!anyOrder)
+		{
+			return List.of(legs);
+		}
+		List<List<int[]>> orders = new ArrayList<>();
+		permute(legs, 0, orders);
 		return orders;
 	}
 
@@ -276,6 +311,11 @@ public final class Planner
 	/** The walk table holds walks up to 200 tiles only, so a target no entry reaches is too far to walk. */
 	private static String noRouteNote(PlanContext ctx, List<List<int[]>> orders)
 	{
+		Step step = ctx.in.getStep();
+		if (step.getData() != null && step.getData().getReach() != null)
+		{
+			return step.getData().getReach();
+		}
 		Set<Integer> reachable = new HashSet<>();
 		WalkTable table = ctx.table;
 		for (int node = 0; node < table.nodeCount(); node++)
@@ -420,15 +460,20 @@ public final class Planner
 			List<Leg> legs = new ArrayList<>();
 			WorldPoint at = ctx.in.getStart().getTile();
 			boolean wilderness = false;
+			boolean stageReached = false;
 			for (LabelSearch.Label label : goal.chain())
 			{
 				if (label.kind == null)
 				{
+					stageReached |= label.parent != null && label.leg != label.parent.leg;
 					continue;
 				}
 				Leg leg = leg(ctx, label, at);
 				Leg last = legs.isEmpty() ? null : legs.get(legs.size() - 1);
-				if (leg.getKind() == Leg.Kind.WALK && last != null && last.getKind() == Leg.Kind.WALK)
+				boolean merge = leg.getKind() == Leg.Kind.WALK && last != null && last.getKind() == Leg.Kind.WALK
+					&& !leavesStartScene(ctx, last) && !stageReached;
+				stageReached = false;
+				if (merge)
 				{
 					legs.set(legs.size() - 1, new Leg(Leg.Kind.WALK, last.getFrom(), leg.getTo(), last.getHalfTicks() + leg.getHalfTicks(),
 						null, null, null, leg.getBookAfter()));
@@ -469,6 +514,14 @@ public final class Planner
 				.confidence(goal.confidence())
 				.wilderness(wilderness)
 				.build();
+		}
+
+		/** A start leg through an {@link Exit} stays a leg of its own, so the guide can name the exit. */
+		static boolean leavesStartScene(PlanContext ctx, Leg leg)
+		{
+			PlanStart start = ctx.in.getStart();
+			return start.getKind() == PlanStart.Kind.SCENE && leg.getFrom() != null && leg.getFrom().equals(start.getTile())
+				&& leg.getTo() != null && !start.getScene().getScene().contains(leg.getTo());
 		}
 
 		private static List<ItemUse> withdraw(PlanContext ctx, LabelSearch.Label goal)

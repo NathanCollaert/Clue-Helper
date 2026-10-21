@@ -49,7 +49,7 @@ public class ConventionsTest
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
 		"routeCount", "consumablePenalty", "avoidWilderness",
 		"highlightItems", "highlightSpells", "highlightMenus",
-		"pathLine", "minimapMarker", "worldMapMarker",
+		"pathLine", "worldMapMarker",
 		"spellbookChanges", "capeUsePenalty", "strandPenalty",
 		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks",
 		"pohSource", "pohJewelleryBox", "pohMountedGlory", "pohGarden", "pohObelisk", "pohAltar", "pohMountedCape",

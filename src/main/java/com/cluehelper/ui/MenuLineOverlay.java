@@ -5,12 +5,9 @@ import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.MenuTarget;
 import com.cluehelper.guide.StepGuide;
-import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.RoundRectangle2D;
 import javax.inject.Inject;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -18,17 +15,16 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 public class MenuLineOverlay extends Overlay
 {
-	private static final int ARC = 6;
-	private static final float STROKE = 2f;
-
 	private final StepGuide guide;
 	private final MenuLines lines;
 	private final FairyDials dials;
 	private final ClueHelperConfig config;
+	private final Highlighter highlighter;
 
 	@Inject
-	MenuLineOverlay(StepGuide guide, MenuLines lines, FairyDials dials, ClueHelperConfig config)
+	MenuLineOverlay(StepGuide guide, MenuLines lines, FairyDials dials, ClueHelperConfig config, Highlighter highlighter)
 	{
+		this.highlighter = highlighter;
 		this.guide = guide;
 		this.lines = lines;
 		this.dials = dials;
@@ -45,23 +41,14 @@ public class MenuLineOverlay extends Overlay
 		{
 			return null;
 		}
-		graphics.setStroke(new BasicStroke(STROKE));
 		for (Rectangle line : lines.lines(target))
 		{
-			draw(graphics, new RoundRectangle2D.Double(line.x, line.y, line.width, line.height, ARC, ARC));
+			highlighter.box(graphics, line);
 		}
 		if (target.getLine() == MenuTarget.Line.FAIRY_CODE)
 		{
-			dials.shapes(target.getLineKey()).forEach(shape -> draw(graphics, shape));
+			dials.shapes(target.getLineKey()).forEach(shape -> highlighter.box(graphics, shape));
 		}
 		return null;
-	}
-
-	private static void draw(Graphics2D graphics, Shape shape)
-	{
-		graphics.setColor(Markers.FILL);
-		graphics.fill(shape);
-		graphics.setColor(Markers.COLOUR);
-		graphics.draw(shape);
 	}
 }

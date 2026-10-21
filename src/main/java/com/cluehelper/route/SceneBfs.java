@@ -50,7 +50,13 @@ public final class SceneBfs
 		/** Client thread only. Null for an instanced scene or one without collision data. */
 		public static Scene capture(WorldView view)
 		{
-			CollisionData[] maps = view == null || view.isInstance() ? null : view.getCollisionMaps();
+			return view == null || view.isInstance() ? null : captureLoaded(view);
+		}
+
+		/** Client thread only. In an instance its tiles are the instance's own and match nothing in the walk table. */
+		public static Scene captureLoaded(WorldView view)
+		{
+			CollisionData[] maps = view == null ? null : view.getCollisionMaps();
 			if (maps == null)
 			{
 				return null;
@@ -81,24 +87,94 @@ public final class SceneBfs
 		}
 	}
 
+	/** A walk row out of the scene, reached by the BFS: where it starts and lands, and the cost to its landing. */
+	@Value
+	public static class ExitReach
+	{
+		WorldPoint origin;
+		WorldPoint destination;
+		int cost;
+	}
+
 	public static final class Result
 	{
 		private final Scene scene;
 		private final int[] cost;
+		private final List<ExitReach> exits;
 
-		private Result(Scene scene, int[] cost)
+		/** Each in-scene row by its destination index: {origin index, cost}. */
+		private final Map<Integer, List<int[]>> rowsInto;
+
+		private Result(Scene scene, int[] cost, List<ExitReach> exits, Map<Integer, List<int[]>> rowsInto)
 		{
 			this.scene = scene;
 			this.cost = cost;
+			this.exits = exits;
+			this.rowsInto = rowsInto;
 		}
 
+		/** A tile outside the scene costs its exit's landing when one lands within 2 tiles of it (a node's snap). */
 		public int cost(WorldPoint tile)
 		{
-			if (tile == null || !scene.contains(tile))
+			if (tile == null)
 			{
 				return UNREACHED;
 			}
+			if (!scene.contains(tile))
+			{
+				ExitReach exit = exitTo(tile);
+				return exit == null ? UNREACHED : exit.getCost();
+			}
 			return cost[index(scene, tile.getX() - scene.getBaseX(), tile.getY() - scene.getBaseY(), tile.getPlane())];
+		}
+
+		/** The cheapest reached exit landing within 2 tiles of {@code tile}, or null. */
+		public ExitReach exitTo(WorldPoint tile)
+		{
+			ExitReach best = null;
+			for (ExitReach exit : exits)
+			{
+				WorldPoint landing = exit.getDestination();
+				boolean near = landing.getPlane() == tile.getPlane()
+					&& Math.max(Math.abs(landing.getX() - tile.getX()), Math.abs(landing.getY() - tile.getY())) <= MAX_TILES_BESIDE_WAYPOINT;
+				if (near && (best == null || exit.getCost() < best.getCost()))
+				{
+					best = exit;
+				}
+			}
+			return best;
+		}
+
+		/** The reached exit landing within {@code tiles} of {@code tile} that is cheapest counting the rest on foot. */
+		public ExitReach exitNear(WorldPoint tile, int tiles)
+		{
+			ExitReach best = null;
+			int bestCost = UNREACHED;
+			for (ExitReach exit : exits)
+			{
+				WorldPoint landing = exit.getDestination();
+				int distance = Math.max(Math.abs(landing.getX() - tile.getX()), Math.abs(landing.getY() - tile.getY()));
+				if (landing.getPlane() == tile.getPlane() && distance <= tiles && exit.getCost() + distance < bestCost)
+				{
+					best = exit;
+					bestCost = exit.getCost() + distance;
+				}
+			}
+			return best;
+		}
+
+		/** The reached exits that start on {@code origin}. */
+		public List<ExitReach> exitsFrom(WorldPoint origin)
+		{
+			List<ExitReach> from = new ArrayList<>();
+			for (ExitReach exit : exits)
+			{
+				if (exit.getOrigin().equals(origin))
+				{
+					from.add(exit);
+				}
+			}
+			return from;
 		}
 
 		public Scene getScene()
@@ -108,12 +184,21 @@ public final class SceneBfs
 
 		/**
 		 * A waypoint on a blocked tile (a fairy ring, an altar) is reached at the reachable tile closest to it. A door or
-		 * stairs row breaks the trace, so the path then begins past it.
+		 * stairs row shows as a jump from its origin to its destination.
 		 */
 		public List<WorldPoint> pathTo(WorldPoint waypoint)
 		{
 			List<WorldPoint> path = new ArrayList<>();
 			WorldPoint goal = nearestReached(waypoint);
+			if (!scene.contains(goal))
+			{
+				ExitReach exit = exitTo(goal);
+				if (exit == null)
+				{
+					return path;
+				}
+				goal = nearestReached(exit.getOrigin());
+			}
 			int c = cost(goal);
 			if (c == UNREACHED)
 			{
@@ -122,22 +207,91 @@ public final class SceneBfs
 			int plane = goal.getPlane();
 			int x = goal.getX() - scene.getBaseX();
 			int y = goal.getY() - scene.getBaseY();
-			int[][] flags = scene.getFlags()[plane];
 			path.add(goal);
+			boolean onBlocked = true;
 			while (c > 0)
 			{
+				int[][] flags = scene.getFlags()[plane];
 				int step = arrivalDirection(flags, x, y, plane, c);
+				if (step == NO_DIRECTION && onBlocked)
+				{
+					step = ontoBlockedOrigin(x, y, plane, c);
+				}
 				if (step == NO_DIRECTION)
 				{
-					break;
+					int origin = rowOriginInto(index(scene, x, y, plane), c);
+					if (origin < 0)
+					{
+						break;
+					}
+					c = cost[origin];
+					plane = origin / (scene.getSizeX() * scene.getSizeY());
+					x = origin % (scene.getSizeX() * scene.getSizeY()) / scene.getSizeY();
+					y = origin % scene.getSizeY();
+					path.add(new WorldPoint(scene.getBaseX() + x, scene.getBaseY() + y, plane));
+					onBlocked = true;
+					continue;
 				}
 				x -= DX[step];
 				y -= DY[step];
 				c--;
+				onBlocked = false;
 				path.add(new WorldPoint(scene.getBaseX() + x, scene.getBaseY() + y, plane));
 			}
 			Collections.reverse(path);
 			return path;
+		}
+
+		/** The start of a walk row (a shortcut, stairs, a door) the BFS reached {@code into} by, at cost {@code c}; -1 if none. */
+		private int rowOriginInto(int into, int c)
+		{
+			for (int[] row : rowsInto.getOrDefault(into, List.of()))
+			{
+				if (cost[row[0]] != UNREACHED && cost[row[0]] + row[1] == c)
+				{
+					return row[0];
+				}
+			}
+			return -1;
+		}
+
+		/**
+		 * A goal outside the scene, or unreached in it, is drawn toward: to the reached tile nearest it, weighted by the walk
+		 * there. A guess past the scene's edge, redrawn as the scene moves.
+		 */
+		public List<WorldPoint> pathToward(WorldPoint goal)
+		{
+			if (costNear(goal) != UNREACHED)
+			{
+				return pathTo(goal);
+			}
+			WorldPoint best = null;
+			long bestScore = Long.MAX_VALUE;
+			int plane = goal.getPlane();
+			if (plane < 0 || plane >= scene.getFlags().length || scene.getFlags()[plane] == null)
+			{
+				return new ArrayList<>();
+			}
+			for (int x = 0; x < scene.getSizeX(); x++)
+			{
+				for (int y = 0; y < scene.getSizeY(); y++)
+				{
+					int c = cost[index(scene, x, y, plane)];
+					if (c == UNREACHED)
+					{
+						continue;
+					}
+					int wx = scene.getBaseX() + x;
+					int wy = scene.getBaseY() + y;
+					long score = (long) c + 2L * Math.max(Math.abs(wx - goal.getX()), Math.abs(wy - goal.getY()));
+					if (score < bestScore)
+					{
+						bestScore = score;
+						best = new WorldPoint(wx, wy, plane);
+					}
+				}
+			}
+			return best == null ? new ArrayList<>() : pathTo(best);
 		}
 
 		/** Corners don't count: the game walks to a straight side to use an object. Null when no side is reached. */
@@ -168,6 +322,10 @@ public final class SceneBfs
 			return cost(nearestReached(tile));
 		}
 
+		/**
+		 * A blocked waypoint (a crate, a fairy ring) is used from a side with no wall between, so such a side wins over
+		 * a nearer or cheaper tile behind a wall.
+		 */
 		private WorldPoint nearestReached(WorldPoint waypoint)
 		{
 			if (cost(waypoint) != UNREACHED)
@@ -183,7 +341,7 @@ public final class SceneBfs
 				{
 					WorldPoint tile = waypoint.dx(dx).dy(dy);
 					int c = cost(tile);
-					int distance = Math.max(Math.abs(dx), Math.abs(dy));
+					int distance = opensOnto(tile, waypoint) ? 0 : Math.max(Math.abs(dx), Math.abs(dy));
 					if (c != UNREACHED && (distance < bestDistance || distance == bestDistance && c < bestCost))
 					{
 						best = tile;
@@ -193,6 +351,42 @@ public final class SceneBfs
 				}
 			}
 			return best;
+		}
+
+		/** A straight neighbour with no wall between it and {@code to}. */
+		private boolean opensOnto(WorldPoint from, WorldPoint to)
+		{
+			int dx = to.getX() - from.getX();
+			int dy = to.getY() - from.getY();
+			if (from.getPlane() != to.getPlane() || Math.abs(dx) + Math.abs(dy) != 1 || !scene.contains(from) || !scene.contains(to))
+			{
+				return false;
+			}
+			int[][] flags = scene.getFlags()[from.getPlane()];
+			if (flags == null)
+			{
+				return false;
+			}
+			int fromWall = dx > 0 ? E : dx < 0 ? W : dy > 0 ? N : S;
+			int toWall = dx > 0 ? W : dx < 0 ? E : dy > 0 ? S : N;
+			int fx = from.getX() - scene.getBaseX();
+			int fy = from.getY() - scene.getBaseY();
+			return (flags[fx][fy] & fromWall) == 0 && (flags[fx + dx][fy + dy] & toWall) == 0;
+		}
+
+		/** Stairs and ladders block their own tile, which the BFS enters from a straight side only. */
+		private int ontoBlockedOrigin(int x, int y, int plane, int c)
+		{
+			for (int d = 0; d < 4; d++)
+			{
+				int px = x - DX[d];
+				int py = y - DY[d];
+				if (px >= 0 && py >= 0 && px < scene.getSizeX() && py < scene.getSizeY() && cost[index(scene, px, py, plane)] == c - 1)
+				{
+					return d;
+				}
+			}
+			return NO_DIRECTION;
 		}
 
 		private int arrivalDirection(int[][] flags, int x, int y, int plane, int c)
@@ -232,9 +426,10 @@ public final class SceneBfs
 		Arrays.fill(cost, UNREACHED);
 		if (!scene.contains(start))
 		{
-			return new Result(scene, cost);
+			return new Result(scene, cost, List.of(), Map.of());
 		}
 		Map<Integer, List<int[]>> rows = sceneRows(scene, table, rowOpen);
+		Map<Integer, List<Integer>> leaving = leavingRows(scene, table, rowOpen);
 		IntQueue[] buckets = new IntQueue[BUCKETS];
 		for (int i = 0; i < BUCKETS; i++)
 		{
@@ -259,7 +454,24 @@ public final class SceneBfs
 			}
 			bucket.size = 0;
 		}
-		return new Result(scene, cost);
+		return new Result(scene, cost, exits(table, leaving, cost), reversed(rows));
+	}
+
+	private static List<ExitReach> exits(WalkTable table, Map<Integer, List<Integer>> leaving, int[] cost)
+	{
+		List<ExitReach> exits = new ArrayList<>();
+		leaving.forEach((origin, rows) ->
+		{
+			if (cost[origin] == UNREACHED)
+			{
+				return;
+			}
+			for (int r : rows)
+			{
+				exits.add(new ExitReach(table.rowOrigin(r), table.rowDest(r), cost[origin] + table.rowCost(r)));
+			}
+		});
+		return List.copyOf(exits);
 	}
 
 	private static int expand(Scene scene, int at, int c, int[] cost, IntQueue[] buckets, Map<Integer, List<int[]>> rows)
@@ -357,6 +569,34 @@ public final class SceneBfs
 				int from = index(scene, origin.getX() - scene.getBaseX(), origin.getY() - scene.getBaseY(), origin.getPlane());
 				int to = index(scene, dest.getX() - scene.getBaseX(), dest.getY() - scene.getBaseY(), dest.getPlane());
 				rows.computeIfAbsent(from, k -> new ArrayList<>()).add(new int[]{to, table.rowCost(r)});
+			}
+		}
+		return rows;
+	}
+
+	private static Map<Integer, List<int[]>> reversed(Map<Integer, List<int[]>> rows)
+	{
+		Map<Integer, List<int[]>> into = new HashMap<>();
+		rows.forEach((origin, out) -> out.forEach(row -> into.computeIfAbsent(row[0], k -> new ArrayList<>()).add(new int[]{origin, row[1]})));
+		return into;
+	}
+
+	/** Rows from the scene to a far landing outside it, by origin index: the row numbers. */
+	private static Map<Integer, List<Integer>> leavingRows(Scene scene, WalkTable table, boolean[] rowOpen)
+	{
+		Map<Integer, List<Integer>> rows = new HashMap<>();
+		if (table == null)
+		{
+			return rows;
+		}
+		for (int r = 0; r < table.rowCount(); r++)
+		{
+			WorldPoint origin = table.rowOrigin(r);
+			WorldPoint dest = table.rowDest(r);
+			if (rowOpen[r] && scene.contains(origin) && !scene.contains(dest) && table.exit(origin, dest) != null)
+			{
+				int from = index(scene, origin.getX() - scene.getBaseX(), origin.getY() - scene.getBaseY(), origin.getPlane());
+				rows.computeIfAbsent(from, k -> new ArrayList<>()).add(r);
 			}
 		}
 		return rows;

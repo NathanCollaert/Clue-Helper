@@ -1,0 +1,46 @@
+package com.cluehelper.step;
+
+import java.util.List;
+import java.util.Set;
+import lombok.Builder;
+import lombok.Value;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+
+/** One place of a step done in several: travelled to in turn, each ending in an act of its own. */
+@Value
+@Builder(toBuilder = true)
+public class Stage
+{
+	public enum Kind
+	{
+		/** Kill one of the NPCs for the key; done once the key is carried. */
+		KEY,
+		/** One cryptic of a three-step; core drops it once solved. */
+		PART,
+		/** A skill challenge's task; done once core marks the challenge completed. */
+		TASK,
+		/** Get the item Charlie asks for; done once it is carried. */
+		FETCH,
+		/** The step's own target, done last. */
+		FINAL
+	}
+
+	Kind kind;
+	String act;
+	String detail;
+	/** Any one of these will do. */
+	List<WorldPoint> tiles;
+	/** Core marks only the step's own targets; for other stages the walk ends on our marker. */
+	boolean ourMarker;
+	/** An NPC that wanders: being this close to a tile is arriving. */
+	int radius;
+	/** The key or the item Charlie wants: the stage is done once it is carried. Null for other stages. */
+	ItemRequirement item;
+	/** What gathering the item takes (a rod and bait), needed while the stage is the source's. */
+	@Builder.Default
+	List<ItemRequirement> tools = List.of();
+	/** NPCs the stage is done with (the Grand Exchange clerks): outlined, and the walk ends on them. */
+	@Builder.Default
+	Set<Integer> npcIds = Set.of();
+}

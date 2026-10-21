@@ -30,8 +30,10 @@ public final class WalkTable
 	public static final int KIND_POH = 1 << 4;
 	public static final int KIND_CHANGE = 1 << 5;
 	public static final int KIND_ENTRY = 1 << 6;
+	/** Where a far walk row lands: only start legs walk from it, nothing walks to it. */
+	public static final int KIND_EXIT = 1 << 7;
 	private static final Map<String, Integer> KIND_BITS = Map.of("landing", KIND_LANDING, "origin", KIND_ORIGIN,
-		"bank", KIND_BANK, "target", KIND_TARGET, "poh", KIND_POH, "change", KIND_CHANGE, "entry", KIND_ENTRY);
+		"bank", KIND_BANK, "target", KIND_TARGET, "poh", KIND_POH, "change", KIND_CHANGE, "entry", KIND_ENTRY, "exit", KIND_EXIT);
 
 	private WorldPoint[] tiles = new WorldPoint[0];
 	private WorldPoint[] placed = new WorldPoint[0];
@@ -54,6 +56,10 @@ public final class WalkTable
 	private int[] rowDest = new int[0];
 	private int[] rowCost = new int[0];
 	private int[] rowGate = new int[0];
+	/** Per entry, 0 or 1 + the packed tile {@code WAYPOINT_TILES} along its walk (tools/walk/WalkGen.java). */
+	private int[] entryWaypoint = new int[0];
+	private Map<Long, Exit> exits = Map.of();
+	private Map<Long, Exit> rowObjects = Map.of();
 
 	private WalkTable()
 	{
@@ -66,7 +72,10 @@ public final class WalkTable
 		table.readGates(lines("gates.tsv"));
 		table.readTable(new Varints(bytes("table.bin")));
 		table.readRows(new Varints(bytes("rows.bin")));
+		table.readWaypoints(new Varints(bytes("waypoints.bin")));
 		table.readBanks(lines("banks.tsv"));
+		table.exits = rowActions(lines("exits.tsv"));
+		table.rowObjects = rowActions(lines("row-objects.tsv"));
 		table.indexReverse();
 		return table;
 	}
@@ -125,6 +134,13 @@ public final class WalkTable
 	}
 
 	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
+	/** The tile 40 tiles along the entry's walk (gates passing), or null for a shorter walk. */
+	public WorldPoint entryWaypoint(int entry)
+	{
+		int value = entry < entryWaypoint.length ? entryWaypoint[entry] : 0;
+		return value == 0 ? null : unpack(value - 1);
+	}
+
 	public int entryOpen(int entry)
 	{
 		return entryOpen[entry];
@@ -178,6 +194,18 @@ public final class WalkTable
 		return rowGate[row];
 	}
 
+	/** Null unless the row from {@code origin} to {@code destination} is an {@link Exit}. */
+	public Exit exit(WorldPoint origin, WorldPoint destination)
+	{
+		return exits.get(exitKey(origin, destination));
+	}
+
+	/** The object clicked to take the row from {@code origin} to {@code destination} (a ladder, a door), or null. */
+	public Exit rowObject(WorldPoint origin, WorldPoint destination)
+	{
+		return rowObjects.get(exitKey(origin, destination));
+	}
+
 	public int entryCount()
 	{
 		return entryTo.length;
@@ -227,6 +255,35 @@ public final class WalkTable
 		{
 			reverseEntry[fill[entryTo[e]]++] = e;
 		}
+	}
+
+	private static Map<Long, Exit> rowActions(List<String[]> rows)
+	{
+		Map<Long, Exit> byRow = new HashMap<>();
+		for (String[] c : rows)
+		{
+			WorldPoint origin = parseTile(c[0]);
+			WorldPoint destination = parseTile(c[1]);
+			int objectId = c[4].isEmpty() ? -1 : Integer.parseInt(c[4]);
+			byRow.putIfAbsent(exitKey(origin, destination), new Exit(origin, destination, c[2], c[3], objectId));
+		}
+		return byRow;
+	}
+
+	private static long exitKey(WorldPoint origin, WorldPoint destination)
+	{
+		return (long) pack(origin) << 32 | pack(destination) & 0xFFFFFFFFL;
+	}
+
+	private static int pack(WorldPoint tile)
+	{
+		return tile.getPlane() << 28 | tile.getY() << 14 | tile.getX();
+	}
+
+	private static WorldPoint parseTile(String cell)
+	{
+		String[] parts = cell.split(" ");
+		return new WorldPoint(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
 	}
 
 	static WorldPoint unpack(int packed)
@@ -331,6 +388,35 @@ public final class WalkTable
 		entryFull = full.toArray();
 		entryGateSet = set.toArray();
 		entryOpen = open.toArray();
+	}
+
+	/** Stored relative to each entry's start node; kept here as absolute packed tiles. */
+	private void readWaypoints(Varints in)
+	{
+		entryWaypoint = new int[entryTo.length];
+		int entry = 0;
+		for (int node = 0; node < tiles.length; node++)
+		{
+			WorldPoint from = placed[node];
+			for (; entry < entryStart[node + 1]; entry++)
+			{
+				int value = in.next();
+				if (value == 0 || from == null)
+				{
+					continue;
+				}
+				value--;
+				int plane = value & 3;
+				int dy = unzigzag(value >> 2 & 0x7FF);
+				int dx = unzigzag(value >> 13);
+				entryWaypoint[entry] = 1 + (plane << 28 | (from.getY() + dy) << 14 | from.getX() + dx);
+			}
+		}
+	}
+
+	private static int unzigzag(int value)
+	{
+		return value >>> 1 ^ -(value & 1);
 	}
 
 	private void readRows(Varints in)

@@ -6,9 +6,12 @@ import com.cluehelper.memory.StashMemory;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepRequirements;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,6 +43,8 @@ public class StepNeeds
 	private final Client client;
 	private final StashMemory stash;
 	private final ClueHelperConfig config;
+	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
+	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 
 	@Inject
 	StepNeeds(Client client, StashMemory stash, ClueHelperConfig config)
@@ -74,6 +79,17 @@ public class StepNeeds
 				needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, true, inCoreTag));
 			}
 		}
+		for (ItemRequirement item : requirements.getOwnItems())
+		{
+			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, false));
+		}
+		if (step.getData() != null)
+		{
+			for (StepIndex.Requires way : step.getData().getRequires())
+			{
+				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
+			}
+		}
 		return RequiredItems.builder()
 			.needs(List.copyOf(needs))
 			.stash(stash(requirements))
@@ -93,6 +109,12 @@ public class StepNeeds
 			return RequiredItems.Stash.NONE;
 		}
 		return RequiredItems.Stash.valueOf(stash.state(requirements.getStashObjectId()).name());
+	}
+
+	private static ItemRequirement anyOf(StepIndex.Requires way)
+	{
+		ItemRequirement[] items = way.getIds().stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new);
+		return ItemRequirements.any(way.getName(), items);
 	}
 
 	private static ItemRequirement light()

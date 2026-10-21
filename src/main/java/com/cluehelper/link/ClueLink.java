@@ -144,7 +144,7 @@ public class ClueLink
 		ClueScroll clue = active ? service.getClue() : null;
 		Step step = clue == null ? null : resolve(clue);
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
-			step == null ? null : step.getTargets(), clue == null && holdsClue());
+			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && holdsClue());
 		if (change != StepChange.UNCHANGED)
 		{
 			current = step;

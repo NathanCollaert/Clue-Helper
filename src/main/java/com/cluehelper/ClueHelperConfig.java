@@ -220,18 +220,6 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "minimapMarker",
-		name = "Minimap marker",
-		description = "Mark the route's next waypoint on the minimap. Never the clue's own target",
-		section = guidanceSection,
-		position = 4
-	)
-	default boolean minimapMarker()
-	{
-		return true;
-	}
-
-	@ConfigItem(
 		keyName = "worldMapMarker",
 		name = "World map marker",
 		description = "Mark the route's waypoints on the world map. Never the clue's own target",

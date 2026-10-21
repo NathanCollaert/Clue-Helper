@@ -36,7 +36,7 @@ import org.junit.Test;
 /**
  * On a snapshot difference this writes build/drift/core-steps.tsv: review the diff, then copy it over
  * src/test/resources/drift/core-steps.tsv. A cache-side change shows up only once
- * tools/cache/c5_step_index.py regenerates step-index.json from a newer dump.
+ * tools/steps/generate.py regenerates the step files from a newer dump.
  */
 public class CoreDriftTest
 {
@@ -108,9 +108,9 @@ public class CoreDriftTest
 	{
 		Set<String> coreKeys = SOURCES_BY_KEY.keySet();
 		Set<String> dataKeys = index.getSteps().keySet();
-		assertEquals("core keys missing from step-index.json (regenerate it, tools/cache/c5_step_index.py)",
+		assertEquals("core keys missing from the step files (regenerate them, tools/steps/generate.py)",
 			Set.of(), difference(coreKeys, dataKeys));
-		assertEquals("step-index.json keys core no longer has", Set.of(), difference(dataKeys, coreKeys));
+		assertEquals("step file keys core no longer has", Set.of(), difference(dataKeys, coreKeys));
 
 		Set<String> spotNames = new TreeSet<>();
 		for (HotColdLocation spot : HotColdLocation.values())
@@ -139,6 +139,43 @@ public class CoreDriftTest
 		StepIndex.Entry nieveOrSteve = index.entry("anagram:12059");
 		assertEquals("I EVEN / VESTE owns one row per branch of varbit 5037", List.of(true, false),
 			nieveOrSteve.getRows().stream().map(row -> row.getWhen().holdsFor(0)).collect(Collectors.toList()));
+	}
+
+	/** The step files' contract with the guide: a broken row would only show as a step with no route or no stage. */
+	@Test
+	public void stepFilesHoldWhatTheGuideNeeds()
+	{
+		List<String> broken = new ArrayList<>();
+		index.getSteps().forEach((key, entry) ->
+		{
+			boolean coreOnly = entry.getRows().isEmpty();
+			if (entry.getTier() == null && !coreOnly)
+			{
+				broken.add(key + ": no tier");
+			}
+			for (StepIndex.Target target : entry.getTargets())
+			{
+				if ("key".equals(target.getKind()) && (target.getKey() < 0 || target.getKeyTile() == null || target.getTile() == null))
+				{
+					broken.add(key + ": key target without key, kill tile or chest tile");
+				}
+				if ("kill".equals(target.getKind()) && entry.getArea() == null && entry.getReach() == null)
+				{
+					broken.add(key + ": kill target without an area or a reach note");
+				}
+			}
+			StepIndex.WayIn way = entry.getEntry();
+			if (way != null && (way.getTile() == null || way.getTo() == null || !way.isInside(way.getTo()) || way.isInside(way.getTile())))
+			{
+				broken.add(key + ": way in must start outside its box and land inside it");
+			}
+			boolean placed = !entry.getTiles().isEmpty() || entry.getArea() != null || entry.getStand() != null;
+			if (!placed && entry.getReach() == null && !entry.isHidden() && !key.startsWith("hotcold:") && !coreOnly)
+			{
+				broken.add(key + ": no tile, area, standing tile or reach note");
+			}
+		});
+		assertEquals(List.of(), broken);
 	}
 
 	@Test
