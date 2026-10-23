@@ -216,7 +216,6 @@ public class StepGuide
 	 * {@link #OBJECT_REFRESH_TICKS}.
 	 */
 	private int emptySearches;
-	private String menuHint;
 	/** A game message right after a teleport click, with no animation, means the game refused it. */
 	private int teleportClickTick = NEVER;
 	private String teleportRefusal;
@@ -405,11 +404,6 @@ public class StepGuide
 	public List<NPC> getHighlightNpcs()
 	{
 		return highlightNpcs;
-	}
-
-	public String getMenuHint()
-	{
-		return menuHint;
 	}
 
 	public int getHighlightSpellWidget()
@@ -608,7 +602,6 @@ public class StepGuide
 		refreshEquipItems();
 		refreshTaskItems();
 		refreshNamedItems();
-		changed |= refreshHint();
 		if (changed)
 		{
 			notifyListeners();
@@ -830,15 +823,6 @@ public class StepGuide
 		destinationSetFor = current.getRow().getName();
 		updateHighlights();
 		return true;
-	}
-
-	private boolean refreshHint()
-	{
-		char key = menuLines.hiddenListHotkey(menuTarget);
-		String hint = key == 0 ? null : "Press " + MenuLines.keyText(key) + ": " + menuTarget.destination();
-		boolean changed = !Objects.equals(hint, menuHint);
-		menuHint = hint;
-		return changed;
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
@@ -1221,7 +1205,6 @@ public class StepGuide
 		fillItems = Set.of();
 		fillObjects = List.of();
 		fillNpcs = List.of();
-		menuHint = null;
 	}
 
 	/** A teleport or book change is animating: its item, spell and tab are already used. */

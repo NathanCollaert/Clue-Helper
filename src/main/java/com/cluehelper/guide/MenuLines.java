@@ -414,26 +414,6 @@ public class MenuLines
 		return pick < 0 ? new int[0] : new int[]{pick};
 	}
 
-	/** The hotkey of the target's 187 line when another plugin (spirit-tree-map) hides it, else 0. */
-	public char hiddenListHotkey(MenuTarget target)
-	{
-		if (target == null || target.getLine() != MenuTarget.Line.LABEL || target.destination() == null)
-		{
-			return 0;
-		}
-		for (Map.Entry<String, int[]> line : listLines.entrySet())
-		{
-			if (MenuLabels.matches(line.getKey(), target.destination()))
-			{
-				Widget widget = child(line.getValue());
-				int index = line.getValue()[2];
-				boolean shown = widget != null && !widget.isHidden();
-				return shown || index >= HOTKEYS.length() ? 0 : HOTKEYS.charAt(index);
-			}
-		}
-		return 0;
-	}
-
 	private void nexus(MenuTarget target, Found out)
 	{
 		int[] at = nexusLines.get(target.getLineId());
@@ -623,7 +603,8 @@ public class MenuLines
 		{
 			if (MenuLabels.matches(line.getKey(), destination))
 			{
-				out.add(child(line.getValue()));
+				Widget listLine = child(line.getValue());
+				out.add(visible(listLine) ? listLine : drawnOverList(line.getValue(), destination));
 				return;
 			}
 		}
@@ -654,6 +635,22 @@ public class MenuLines
 				}
 			}
 		}
+	}
+
+	/**
+	 * Another plugin's map drawn over the hidden list (spirit-tree-map): its button for the destination, a widget in the
+	 * list's interface named after it, with an action.
+	 */
+	private Widget drawnOverList(int[] listLine, String destination)
+	{
+		for (Widget widget : descendants(client.getWidget(listLine[0] >>> 16, 0)))
+		{
+			if (visible(widget) && widget.getActions() != null && MenuLabels.matches(widget.getName(), destination))
+			{
+				return widget;
+			}
+		}
+		return null;
 	}
 
 	private boolean isDestination(MenuEntry entry, MenuTarget target, String destination)

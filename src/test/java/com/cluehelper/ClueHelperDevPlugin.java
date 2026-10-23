@@ -643,7 +643,8 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		else if (event.getCommand().equalsIgnoreCase(MockClues.COMMAND))
 		{
-			mockClues.run(event.getArguments());
+			// Commands arrive inside the chat script, and core's clue providers run quest scripts, which can't nest.
+			clientThread.invokeLater(() -> mockClues.run(event.getArguments()));
 		}
 	}
 

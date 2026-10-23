@@ -77,7 +77,7 @@ final class PohTrace
 		String now = target == null || target.isEmpty() ? null : describe(target);
 		if (now != null && !now.equals(lastTarget))
 		{
-			log.info("{} t{} target {} (hint {})", MENU_TAG, client.getTickCount(), now, guide.getMenuHint());
+			log.info("{} t{} target {}", MENU_TAG, client.getTickCount(), now);
 		}
 		lastTarget = now;
 		if (pendingMenu && client.isMenuOpen())
@@ -87,8 +87,8 @@ final class PohTrace
 		pendingMenu = false;
 		if (pendingInterface >= 0)
 		{
-			log.info("{} t{} interface {} lines {} hint {}", MENU_TAG, client.getTickCount(), pendingInterface,
-				rects(lines.lines(target)), guide.getMenuHint());
+			log.info("{} t{} interface {} lines {}", MENU_TAG, client.getTickCount(), pendingInterface,
+				rects(lines.lines(target)));
 			if (pendingInterface == InterfaceID.MINIGAMES)
 			{
 				logMinigameCards();

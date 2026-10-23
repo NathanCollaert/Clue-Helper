@@ -80,10 +80,9 @@ public class GuideBox
 	 * @param committed the route the guide follows, which the arrows and highlights show
 	 * @param next null unless the next sub-step is wanted
 	 * @param f2pBook the book a member is stuck on while on an F2P world, or null
-	 * @param menuHint replaces the sub-step's hint
 	 */
 	public static GuideBox of(BoxState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
-		Book f2pBook, Prompts prompts, String menuHint)
+		Book f2pBook, Prompts prompts)
 	{
 		GuideBoxBuilder box = GuideBox.builder().state(state);
 		if (state == BoxState.DORMANT)
@@ -96,8 +95,7 @@ public class GuideBox
 		}
 		if (now != null)
 		{
-			String detail = menuHint != null ? menuHint : now.getDetail();
-			box.now(now.getText()).nowItems(now.getItems()).nowDetail(detail).next(next == null ? null : next.getText());
+			box.now(now.getText()).nowItems(now.getItems()).nowDetail(now.getDetail()).next(next == null ? null : next.getText());
 		}
 		List<String> notes = new ArrayList<>();
 		if (plan.getNote() != null && !plan.getNote().equals(Plan.NONE.getNote()))

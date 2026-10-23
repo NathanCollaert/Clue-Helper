@@ -478,8 +478,7 @@ public class ClueHelperPlugin extends Plugin
 	private void showBox()
 	{
 		GuideBox box = GuideBox.of(boxState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
-			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts(),
-			guide.getMenuHint());
+			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
 		GuideBox.GuideBoxBuilder shown = atStep.toBuilder().carryingClue(clueLink.carriesClue());
 		if (atStep.getState().showsRoutes())

@@ -58,9 +58,10 @@ public class PlayerModel
 		VarbitID.RUNE_POUCH_QUANTITY_6};
 	private static final List<Integer> OWN_VARPS = List.of(VarPlayerID.QP, VarPlayerID.AIDE_TELE_TIMER,
 		VarPlayerID.SLUG2_REGIONUID);
+	/** Last Man Standing worlds aren't here: outside the arena they play as ordinary worlds. */
 	private static final Set<WorldType> DORMANT_WORLDS = EnumSet.of(WorldType.SEASONAL, WorldType.DEADMAN,
-		WorldType.BETA_WORLD, WorldType.TOURNAMENT_WORLD, WorldType.QUEST_SPEEDRUNNING, WorldType.LAST_MAN_STANDING,
-		WorldType.PVP_ARENA, WorldType.NOSAVE_MODE);
+		WorldType.BETA_WORLD, WorldType.TOURNAMENT_WORLD, WorldType.QUEST_SPEEDRUNNING, WorldType.PVP_ARENA,
+		WorldType.NOSAVE_MODE);
 
 	public static final int UNKNOWN_TICK = -1;
 	private static final int INVENTORY_SLOTS = 28;
