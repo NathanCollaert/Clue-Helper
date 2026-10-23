@@ -112,6 +112,12 @@ public class ActWatcher
 		}
 	}
 
+	/** Items came out of a STASH unit since {@code since} and none went back in after. */
+	boolean holdsStashItems(int since)
+	{
+		return withdrawTick >= since && withdrawTick > depositTick;
+	}
+
 	boolean isDone(SubStep.Done done, int since)
 	{
 		switch (done)

@@ -40,6 +40,20 @@ public final class Planner
 
 	public static Plan plan(PlanInput in)
 	{
+		return plan(in, true);
+	}
+
+	/**
+	 * Without the alternatives, whose searches take most of a plan's time; the followed route's way is planned again
+	 * instead, bounded by the best route plus the commit margin.
+	 */
+	public static Plan withoutAlternatives(PlanInput in)
+	{
+		return plan(in, false);
+	}
+
+	private static Plan plan(PlanInput in, boolean withAlternatives)
+	{
 		long started = System.nanoTime();
 		Step step = in.getStep();
 		if (step != null && step.getData() != null && step.getData().isHidden())
@@ -70,7 +84,8 @@ public final class Planner
 			.candidates(picks.candidates);
 		Map<WorldPoint, Integer> probeRanks = new LinkedHashMap<>();
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
-		plan.alternatives(probes || orders.size() > 1 ? List.of() : alternatives(in, searches, orders, picks));
+		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
+		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
 		plan.why(probes ? List.of() : WhyList.of(ctx, orders.get(0).get(0)));
 		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.targetInWilderness ? "Wilderness target" : null);
 		plan.requirementNotes(requirementNotes(ctx));
@@ -109,9 +124,10 @@ public final class Planner
 		for (Stage stage : step.getStages())
 		{
 			anyOrder &= stage.getKind() == Stage.Kind.PART;
-			if (!stage.getTiles().isEmpty())
+			int[] places = stage.getTiles().stream().filter(tile -> isThere(ctx, stage, tile)).mapToInt(ctx::nodeAt).toArray();
+			if (places.length > 0)
 			{
-				legs.add(stage.getTiles().stream().mapToInt(ctx::nodeAt).toArray());
+				legs.add(places);
 			}
 		}
 		if (!anyOrder)
@@ -121,6 +137,13 @@ public final class Planner
 		List<List<int[]>> orders = new ArrayList<>();
 		permute(legs, 0, orders);
 		return orders;
+	}
+
+	/** A place that needs a grown patch (a Farming Guild redwood) counts only while the player has it grown. */
+	private static boolean isThere(PlanContext ctx, Stage stage, WorldPoint tile)
+	{
+		String patch = stage.getGrownOnly().get(tile);
+		return patch == null || ctx.in.getPlayer().getPlantedTrees().contains(patch);
 	}
 
 	private static void permute(List<int[]> items, int from, List<List<int[]>> out)
@@ -160,13 +183,25 @@ public final class Planner
 		return radius / 2;
 	}
 
+	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
+	{
+		String first = in.getFollowedFirstTransport();
+		if (first == null || picks.best == null || first.equals(picks.best.getFirstTransportKey()))
+		{
+			return null;
+		}
+		int limit = picks.best.getRankHalfTicks() + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
+		LabelSearch search = searches.firstBy(orders, first, limit);
+		return search == null ? null : new Picks(searches.ctx, search).best;
+	}
+
 	private static List<Route> alternatives(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
 	{
 		List<Route> alternatives = new ArrayList<>();
 		Set<String> excluded = new HashSet<>();
 		Set<String> identities = new HashSet<>();
 		List<Route> shown = new ArrayList<>();
-		Stream.of(picks.best, picks.direct, picks.sameBook).filter(Objects::nonNull).forEach(route ->
+		Stream.of(picks.best, picks.direct, picks.sameBook, picks.fasterUnqualified).filter(Objects::nonNull).forEach(route ->
 		{
 			excluded.add(route.getFirstTransportKey());
 			excludeAfterBank(route, excluded);
@@ -297,10 +332,6 @@ public final class Planner
 		{
 			notes.add("STASH unknown — search it once. If it's filled, skip the bank");
 		}
-		else if (required.getStash() == RequiredItems.Stash.FILLED)
-		{
-			notes.add("Emote items are in the STASH");
-		}
 		if (required.isSpadeAtLeprechaun() && ctx.required.getMissing().stream().anyMatch(need -> need.getName().equalsIgnoreCase("spade")))
 		{
 			notes.add("Your spade is with a tool leprechaun");
@@ -344,25 +375,61 @@ public final class Planner
 			this.probes = probes;
 		}
 
+		/**
+		 * Each order after the first stops at the best rank so far, which leaves out its slower direct and same-book
+		 * routes; so a bounded winner runs once more in full.
+		 */
 		LabelSearch bestOrder(List<List<int[]>> orders, Set<String> excluded, int rankLimit)
 		{
 			LabelSearch best = null;
+			List<int[]> bestOrder = null;
 			int bestRank = Integer.MAX_VALUE;
+			boolean bestBounded = false;
 			for (List<int[]> order : orders)
 			{
-				LabelSearch search = new LabelSearch(ctx, order, probes, area, excluded, rankLimit);
-				search.run();
-				labels += search.labels;
-				count++;
+				int limit = Math.min(rankLimit, bestRank);
+				LabelSearch search = run(order, excluded, limit);
 				Route pick = new Picks(ctx, search).best;
 				int rank = pick == null ? Integer.MAX_VALUE : pick.getRankHalfTicks();
 				if (best == null || rank < bestRank)
 				{
 					best = search;
+					bestOrder = order;
 					bestRank = rank;
+					bestBounded = limit != rankLimit;
+				}
+			}
+			return bestBounded ? run(bestOrder, excluded, rankLimit) : best;
+		}
+
+		/** The best order's search of the routes that start with transport {@code first}; null when none is in the limit. */
+		LabelSearch firstBy(List<List<int[]>> orders, String first, int rankLimit)
+		{
+			LabelSearch best = null;
+			int bestRank = Integer.MAX_VALUE;
+			for (List<int[]> order : orders)
+			{
+				LabelSearch search = new LabelSearch(ctx, order, area, first, rankLimit);
+				search.run();
+				labels += search.labels;
+				count++;
+				Route pick = new Picks(ctx, search).best;
+				if (pick != null && pick.getRankHalfTicks() < bestRank)
+				{
+					best = search;
+					bestRank = pick.getRankHalfTicks();
 				}
 			}
 			return best;
+		}
+
+		private LabelSearch run(List<int[]> order, Set<String> excluded, int rankLimit)
+		{
+			LabelSearch search = new LabelSearch(ctx, order, probes, area, excluded, rankLimit);
+			search.run();
+			labels += search.labels;
+			count++;
+			return search;
 		}
 	}
 
@@ -513,7 +580,38 @@ public final class Planner
 				.spent(spent)
 				.confidence(goal.confidence())
 				.wilderness(wilderness)
+				.startVia(startVia(ctx, goal))
+				.startJoinedFrom(startJoinedFrom(ctx, goal))
 				.build();
+		}
+
+		private static WorldPoint startVia(PlanContext ctx, LabelSearch.Label goal)
+		{
+			LabelSearch.Label first = startWalk(ctx, goal);
+			return first == null ? null : first.ref instanceof WorldPoint ? (WorldPoint) first.ref : ctx.tile(first.node);
+		}
+
+		private static WorldPoint startJoinedFrom(PlanContext ctx, LabelSearch.Label goal)
+		{
+			LabelSearch.Label first = startWalk(ctx, goal);
+			return first != null && first.ref2 instanceof Integer ? ctx.tile((Integer) first.ref2) : null;
+		}
+
+		/** The route's first label when it walks from the scene start. */
+		private static LabelSearch.Label startWalk(PlanContext ctx, LabelSearch.Label goal)
+		{
+			if (ctx.in.getStart().getKind() != PlanStart.Kind.SCENE)
+			{
+				return null;
+			}
+			for (LabelSearch.Label label : goal.chain())
+			{
+				if (label.kind != null)
+				{
+					return label.kind == Leg.Kind.WALK ? label : null;
+				}
+			}
+			return null;
 		}
 
 		/** A start leg through an {@link Exit} stays a leg of its own, so the guide can name the exit. */
@@ -532,6 +630,10 @@ public final class Planner
 			}
 			Map<Integer, ItemUse> byItem = new LinkedHashMap<>(routeWithdraw(goal));
 			ctx.required.getWithdraw().forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+			for (int gateItem : goal.withdrawn)
+			{
+				byItem.putIfAbsent(gateItem, new ItemUse(Container.BANK, gateItem, 1));
+			}
 			return List.copyOf(byItem.values());
 		}
 

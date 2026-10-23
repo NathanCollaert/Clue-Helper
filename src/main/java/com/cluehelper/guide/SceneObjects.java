@@ -55,6 +55,12 @@ final class SceneObjects
 
 	static List<NPC> bankersNear(Client client, WorldPoint at, int radius)
 	{
+		return npcsNear(client, at, radius, BANK);
+	}
+
+	/** The NPCs within {@code radius} of {@code at} that have {@code option}. */
+	static List<NPC> npcsNear(Client client, WorldPoint at, int radius, String option)
+	{
 		List<NPC> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
 		if (at == null || view == null)
@@ -64,7 +70,7 @@ final class SceneObjects
 		for (NPC npc : view.npcs())
 		{
 			NPCComposition composition = npc.getTransformedComposition();
-			if (composition != null && hasAction(composition.getActions(), BANK) && npc.getWorldLocation().distanceTo2D(at) <= radius)
+			if (composition != null && hasAction(composition.getActions(), option) && npc.getWorldLocation().distanceTo2D(at) <= radius)
 			{
 				found.add(npc);
 			}

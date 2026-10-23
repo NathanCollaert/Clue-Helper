@@ -14,7 +14,6 @@ import net.runelite.api.coords.WorldPoint;
  */
 final class Acts
 {
-	private static final String CORE_DETAILS = "The Clue Scroll plugin shows the details";
 	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
 	private static final String KILL_TARGET = "kill";
 
@@ -22,8 +21,25 @@ final class Acts
 	{
 	}
 
-	/** @param takeFromStash the step's items are in its STASH unit and not on the player */
+	/**
+	 * Gear the act wants worn (Robin's +180 ranged attack) goes on first; a step of several places wears it per stage.
+	 *
+	 * @param takeFromStash the step's items are in its STASH unit and not on the player
+	 */
 	static List<SubStep> of(Step step, boolean takeFromStash)
+	{
+		List<String> worn = step.getData() == null || !step.getStages().isEmpty() ? List.of() : step.getData().getWornNeeds();
+		List<SubStep> acts = actsOf(step, takeFromStash);
+		if (worn.isEmpty())
+		{
+			return acts;
+		}
+		List<SubStep> equipped = new ArrayList<>(SubSteps.equip(worn));
+		equipped.addAll(acts);
+		return List.copyOf(equipped);
+	}
+
+	private static List<SubStep> actsOf(Step step, boolean takeFromStash)
 	{
 		SubStep main = SubSteps.act(step);
 		if (step.getWaypointAct() != null)
@@ -65,22 +81,35 @@ final class Acts
 	private static List<SubStep> emote(Step step, boolean takeFromStash)
 	{
 		List<SubStep> acts = new ArrayList<>();
-		if (takeFromStash)
-		{
-			acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Search the STASH unit: take the items")
-				.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build());
-		}
+		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
 		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
-		if (items)
+		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip()) : List.of());
+		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
+		if (stash != null && spot != null)
 		{
-			acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Equip the items").detail("The Clue Scroll plugin lists them")
-				.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build());
+			acts.add(SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue")
+				.goal(spot).radius(SubSteps.ARRIVE_TILES).build());
 		}
 		String emotes = step.getEmotes().isEmpty() ? "the emote" : String.join(", then ", step.getEmotes());
 		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
 			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
 		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to Uri").detail(items ? "Stay equipped" : null).build());
 		return List.copyOf(acts);
+	}
+
+	/** Take the items out of the STASH unit and put them on. */
+	static List<SubStep> fromStash(Step step)
+	{
+		SubStep take = SubStep.builder().kind(SubStep.Kind.ACT).text("Search the STASH unit: take the items")
+			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
+		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
+		return items ? List.of(take, equip()) : List.of(take);
+	}
+
+	private static SubStep equip()
+	{
+		return SubStep.builder().kind(SubStep.Kind.ACT).text("Equip the items").detail("The Clue Scroll plugin lists them")
+			.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
 	private static SubStep music(Step step)
@@ -106,9 +135,9 @@ final class Acts
 		if (challenge.getBox() != null)
 		{
 			String box = challenge.getBox().toLowerCase().contains("light") ? "light box" : "puzzle box";
-			return List.of(talk, act("Solve the " + box + ", then talk to " + npc + " again", "The Clue Scroll plugin's Puzzle Solver helps"));
+			return List.of(talk, act("Open the " + box + ", then talk to " + npc + " again", null).toBuilder().actItemNamed(box).build());
 		}
-		return List.of(talk, act("Talk to " + npc + " again: answer the challenge", CORE_DETAILS));
+		return List.of(talk, act("Talk to " + npc + " again: answer the challenge", null));
 	}
 
 	private static SubStep act(String text, String detail)
@@ -133,7 +162,7 @@ final class Acts
 
 	private static String area(StepIndex.Entry data)
 	{
-		return data.getArea() == null ? CORE_DETAILS : data.getArea().getText();
+		return data.getArea() == null ? null : data.getArea().getText();
 	}
 
 	/**

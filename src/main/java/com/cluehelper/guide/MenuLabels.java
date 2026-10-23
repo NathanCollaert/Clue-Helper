@@ -101,14 +101,6 @@ public final class MenuLabels
 		return key != null && key.find() ? MenuLines.HOTKEYS.indexOf(key.group(1).charAt(0)) : -1;
 	}
 
-	/** Whether the line as displayed already starts with its key: "C. Le-sabrè", "1: Tree Gnome Village", "[G] Varrock". */
-	static boolean showsKey(String text, char key)
-	{
-		String plain = TAGS.matcher(text == null ? "" : text).replaceAll("").trim();
-		String upper = plain.toUpperCase(Locale.ROOT);
-		return upper.startsWith("[" + key + "]") || upper.startsWith(key + ".") || upper.startsWith(key + ":");
-	}
-
 	static boolean isOpener(String option)
 	{
 		return TELEPORT_LIST_OPENERS.contains(normalise(option));

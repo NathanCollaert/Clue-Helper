@@ -45,10 +45,6 @@ public class MenuLineOverlay extends Overlay
 		{
 			highlighter.box(graphics, line);
 		}
-		for (MenuLines.KeyBadge badge : lines.keyBadges(target))
-		{
-			highlighter.keyBadge(graphics, badge.getKey(), badge.getTextEnd(), badge.getCentreY(), badge.getVisible());
-		}
 		if (target.getLine() == MenuTarget.Line.FAIRY_CODE)
 		{
 			dials.shapes(target.getLineKey()).forEach(shape -> highlighter.box(graphics, shape));

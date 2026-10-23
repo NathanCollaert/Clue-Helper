@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
 
@@ -106,6 +108,8 @@ public final class StepIndex
 		private Area area;
 		private int[] stand;
 		private List<Requires> requires;
+		private List<Gear> gear;
+		private Wander wander;
 		private WayIn entry;
 		private Reach reach;
 		private List<Place> places;
@@ -121,6 +125,15 @@ public final class StepIndex
 			entry.tier = tier;
 			entry.rows = List.copyOf(rows);
 			entry.tiles = List.of();
+			return entry;
+		}
+
+		/** A three-step: every part's rows, and what its unsolved parts need. */
+		static Entry ofParts(String tier, List<CacheRow> rows, List<Entry> unsolved)
+		{
+			Entry entry = of(tier, rows);
+			entry.requires = unsolved.stream().flatMap(part -> part.getRequires().stream()).collect(Collectors.toUnmodifiableList());
+			entry.gear = unsolved.stream().flatMap(part -> part.getGear().stream()).collect(Collectors.toUnmodifiableList());
 			return entry;
 		}
 
@@ -180,6 +193,30 @@ public final class StepIndex
 		public List<Requires> getRequires()
 		{
 			return requires == null ? List.of() : requires;
+		}
+
+		/** Hand data: where the step's NPC wanders far from core's tile (Wingstone across the desert); null for most. */
+		public Wander getWander()
+		{
+			return wander;
+		}
+
+		/** The needs the act wants worn, by name; gear for a way in is put on before going in instead. */
+		public List<String> getWornNeeds()
+		{
+			List<String> names = new ArrayList<>();
+			getGear().forEach(item -> names.add(item.getName()));
+			if (entry == null)
+			{
+				getRequires().stream().filter(Requires::isWear).forEach(need -> names.add(need.getName()));
+			}
+			return List.copyOf(names);
+		}
+
+		/** Hand data: worn gear the talk needs, picked from what the player owns. */
+		public List<Gear> getGear()
+		{
+			return gear == null ? List.of() : gear;
 		}
 
 		public WayIn getEntry()
@@ -369,10 +406,89 @@ public final class StepIndex
 	}
 
 	/** Items the way in needs; any one of {@link #getIds()} does. */
+	/** An NPC's wander range: the box it walks in, and tiles across it that routes may end on. */
+	public static final class Wander
+	{
+		private int[] area;
+		private List<int[]> tiles;
+		private String text;
+
+		/** Where to look, shown under the walk: "He wanders the desert between Nardah and the Agility Pyramid". */
+		public String getText()
+		{
+			return text;
+		}
+
+		public boolean contains(WorldPoint at)
+		{
+			return WayIn.within(area, at);
+		}
+
+		public int getWest()
+		{
+			return area[0];
+		}
+
+		public int getSouth()
+		{
+			return area[1];
+		}
+
+		public int getEast()
+		{
+			return area[2];
+		}
+
+		public int getNorth()
+		{
+			return area[3];
+		}
+
+		public int getPlane()
+		{
+			return area[4];
+		}
+
+		public List<WorldPoint> getTiles()
+		{
+			return tiles == null ? List.of() : tiles.stream().map(StepIndex::point).collect(Collectors.toUnmodifiableList());
+		}
+	}
+
+	/** Worn gear adding up to at least {@code atLeast} of its bonus (Ghommal's +100 melee strength). */
+	public static final class Gear
+	{
+		private String bonus;
+		private int atLeast;
+		private String name;
+
+		public GearBonus getBonus()
+		{
+			return GearBonus.valueOf(bonus);
+		}
+
+		public int getAtLeast()
+		{
+			return atLeast;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+	}
+
 	public static final class Requires
 	{
 		private List<Integer> ids;
 		private String name;
+		/** Worn to go in (a diving helmet), not just carried (a spade). */
+		private boolean wear;
+
+		public boolean isWear()
+		{
+			return wear;
+		}
 
 		public List<Integer> getIds()
 		{
@@ -396,9 +512,20 @@ public final class StepIndex
 		private int[] tile;
 		private int[] to;
 		private int[] inside;
+		/** The way's own floors on the way in (the pyramid's lower levels): areas as {@code inside}. */
+		private int[][] partWay;
+		/** Part way in, no line: the way can't be drawn (Pyramid Plunder's doors open in no fixed order). */
+		private boolean noLine;
 		private String text;
 		/** The chat options to pick, in order, when the way in is a conversation (Shantay's arrest). */
 		private List<String> dialogue;
+		/** Ground items to pick up part way in before going on (the Mogre Camp's rocks); null when none. */
+		private PickUp pickUp;
+
+		public PickUp getPickUp()
+		{
+			return pickUp;
+		}
 
 		/** Where the way in lands. */
 		public WorldPoint getTo()
@@ -433,8 +560,80 @@ public final class StepIndex
 
 		public boolean isInside(WorldPoint at)
 		{
-			return inside != null && at != null && at.getPlane() == inside[4] && at.getX() >= inside[0] && at.getY() >= inside[1]
-				&& at.getX() <= inside[2] && at.getY() <= inside[3];
+			return within(inside, at);
+		}
+
+		public boolean isNoLine()
+		{
+			return noLine;
+		}
+
+		/** On the way in, not yet inside. */
+		public boolean isPartWay(WorldPoint at)
+		{
+			for (int[] area : partWay == null ? new int[0][] : partWay)
+			{
+				if (within(area, at))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private static boolean within(int[] area, WorldPoint at)
+		{
+			return area != null && at != null && at.getPlane() == area[4] && at.getX() >= area[0] && at.getY() >= area[1]
+				&& at.getX() <= area[2] && at.getY() <= area[3];
+		}
+	}
+
+	/** {@code count} of ground item {@code id}, then {@code option} on one of {@code objects} to go on. */
+	public static final class PickUp
+	{
+		private int id;
+		private int count;
+		private String name;
+		private List<Integer> objects;
+		private String option;
+		private String then;
+		/** Where the game counts them when they don't go to the inventory (under water); -1 for none. */
+		private int varbit = -1;
+
+		public int getVarbit()
+		{
+			return varbit;
+		}
+
+		public int getId()
+		{
+			return id;
+		}
+
+		public int getCount()
+		{
+			return count;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+
+		public List<Integer> getObjects()
+		{
+			return objects == null ? List.of() : objects;
+		}
+
+		public String getOption()
+		{
+			return option;
+		}
+
+		/** What to do once they are picked up: "enter the cavern". */
+		public String getThen()
+		{
+			return then;
 		}
 	}
 
@@ -448,6 +647,8 @@ public final class StepIndex
 		private int[] tile;
 		private String text;
 		private List<Requires> tools;
+		private List<Integer> objects;
+		private String grown;
 
 		/** For an item source: what gathering it takes. */
 		public List<Requires> getTools()
@@ -463,6 +664,18 @@ public final class StepIndex
 		public String getText()
 		{
 			return text;
+		}
+
+		/** A patch that must be grown for this place to count (a Farming Guild redwood); null for a place always there. */
+		public String getGrown()
+		{
+			return grown;
+		}
+
+		/** What the task is done on there (an anvil), outlined; empty for a place with nothing to click. */
+		public List<Integer> getObjects()
+		{
+			return objects == null ? List.of() : objects;
 		}
 	}
 

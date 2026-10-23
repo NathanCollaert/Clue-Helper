@@ -27,6 +27,7 @@ public class PlannerSettings
 	@Builder.Default
 	boolean bankEdge = true;
 	int bankStopExtraTicks;
+	boolean scrollBookOutOfWilderness;
 
 	public static PlannerSettings from(ClueHelperConfig config, int accountType)
 	{
@@ -41,6 +42,7 @@ public class PlannerSettings
 			.strandPenalty(config.strandPenalty())
 			.bankEdge(config.useBank())
 			.bankStopExtraTicks(config.bankStopExtraTicks())
+			.scrollBookOutOfWilderness(config.scrollBookOutOfWilderness())
 			.build();
 	}
 }

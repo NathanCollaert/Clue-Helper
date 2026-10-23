@@ -30,6 +30,9 @@ public class MenuTarget
 	Set<Integer> objectIds = Set.of();
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
+	/** Interface components whose options count, by widget id (a scroll book's entry). */
+	@Builder.Default
+	Set<Integer> widgetIds = Set.of();
 	@Builder.Default
 	List<String> path = List.of();
 	@Builder.Default

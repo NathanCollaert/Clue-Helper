@@ -38,4 +38,6 @@ public class PlanInput
 	@Builder.Default
 	Set<String> refusedChanges = Set.of();
 	boolean foreignHouseStart;
+	/** The followed route's first transport key; null when no route of this step is followed. */
+	String followedFirstTransport;
 }

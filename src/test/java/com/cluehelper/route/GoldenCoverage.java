@@ -18,6 +18,8 @@ final class GoldenCoverage
 		"nexus", "jewellery box", "mounted", "portal", "obelisk",
 		"spirit tree from the house", "spirit tree", "planted spirit tree", "spirit tree to the house",
 		"quetzal", "quetzal whistle",
+		"boat", "charter", "canoe", "carpet", "minecart", "lever", "glider", "balloon", "mushtree", "wilderness obelisk",
+		"teleport to boat", "sailors' amulet",
 		"bank stop", "group storage withdraw",
 		"spellbook swap", "cape change", "walked change (altar, Tyss)", "house altar or mounted cape");
 
@@ -117,6 +119,14 @@ final class GoldenCoverage
 		if (category == Category.ITEM && row.getName().startsWith("Quetzal whistle"))
 		{
 			return "quetzal whistle";
+		}
+		if (row.getName().startsWith("Teleport to") || row.getName().startsWith("Sailing cape: Boat"))
+		{
+			return "teleport to boat";
+		}
+		if (row.getName().startsWith("Sailors' amulet"))
+		{
+			return "sailors' amulet";
 		}
 		return category.name().toLowerCase().replace('_', ' ');
 	}

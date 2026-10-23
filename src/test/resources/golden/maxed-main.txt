@@ -10,7 +10,7 @@ anagram:19758
   alt       68t: Ring of dueling: Ferox Enclave → walk 63 {charge:2552=1}
 anagram:25784
   best      28t: Xeric's talisman: 1. Xeric's Lookout → walk 23 {charge:13393=1}
-  alt       39t: Teleport to House → Mounted Xeric's talisman: Lookout → walk 23 {item:556=1, item:557=1, item:563=1}
+  alt       39t: Teleport to House → Mounted Xeric's talisman: 1. Lookout → walk 23 {item:556=1, item:557=1, item:563=1}
   alt       54t: Book of the dead: History and Hearsay → walk 49 {charge:25818=1}
 anagram:7268
   best      51t: Slayer ring: Stronghold → walk 46 {charge:11866=1}
@@ -18,8 +18,10 @@ anagram:7268
   alt       69t: Teleport to House → Spirit tree: Gnome Stronghold → walk 53 {item:556=1, item:557=1, item:563=1}
 anagram:duo plug
   best      45t: Teleport to House → Portal nexus: Marim → walk 29 {item:556=1, item:557=1, item:563=1}
+  alt       79t: Royal seed pod → walk 9 → Gnome glider: Ookookolly Undri → walk 53
+  alt       82t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Ookookolly Undri → walk 53 {charge:2552=1}
 map:w346
-  best      30t: Teleport to House → Jewellery box: Champions' Guild → walk 13 {item:556=1, item:557=1, item:563=1}
+  best      30t: Teleport to House → Jewellery box: B. Champions' Guild → walk 13 {item:556=1, item:557=1, item:563=1}
   alt       32t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 13 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
   alt       45t: Skills necklace: Cooking Guild → walk 40 {charge:11968=1}
 map:w347
@@ -59,7 +61,7 @@ cipher:23172
   best      24t (rank 32): Max cape: Spellbook → LUNAR → Barbarian Teleport → walk 18 {cape=1, item:554=3, item:9075=2, item:563=2} leaves you on LUNAR
   same book 34t: Teleport to House → Portal nexus: Barbarian Outpost → walk 18 {item:556=1, item:557=1, item:563=1}
   alt       38t: Games necklace: Barbarian Outpost → walk 33 {charge:3853=1}
-  alt       50t: Teleport to House → Jewellery box: Barbarian Outpost → walk 33 {item:556=1, item:557=1, item:563=1}
+  alt       50t: Teleport to House → Jewellery box: 6. Barbarian Outpost → walk 33 {item:556=1, item:557=1, item:563=1}
 coordinate:12033
   best      24t: Max cape: Other Teleports: Feldip Hills → walk 19 {daily:4819=1}
   alt       33t: Master scroll book: Feldip hills teleport → walk 28 {charge:21389=1}
@@ -83,18 +85,19 @@ coordinate:28909
 coordinate:3556
   best      30t: Teleport to House → House obelisk: Level 35 Wilderness → walk 15 {item:556=1, item:557=1, item:563=1}
   alt       30t: Max cape: Other Teleports: Black chinchompa → walk 25 {daily:4819=1}
-  alt       39t: Master scroll book: Revenant cave teleport → walk 34 {charge:21389=1}
+  alt       37t: Teleport to House → House obelisk: Level 50 Wilderness → walk 1 → Obelisk: Level 35 Wilderness → walk 15 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 cryptic:'a bag belt only?', he asked his balding brothers.
-  best      22t: Teleport to House → Jewellery box: Monastery → walk 5 {item:556=1, item:557=1, item:563=1}
+  best      22t: Teleport to House → Jewellery box: C. Monastery → walk 5 {item:556=1, item:557=1, item:563=1}
   alt       24t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Monastery → walk 5 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
   alt       42t: Amulet of glory: Edgeville → walk 37 {charge:1712=1}
 cryptic:does one really need a fire to stay warm here?
-  best      126t: Digsite pendant: Fossil Island → walk 121 {charge:11194=1}
-  alt       135t: Teleport to House → Mounted digsite pendant: Fossil Island (left-click) → walk 121 {item:556=1, item:557=1, item:563=1}
+  best      59t: Digsite pendant: Fossil Island → walk 5 → Mushtree: Verdant Valley → walk 41 {charge:11194=1}
+  alt       68t: Teleport to House → Mounted digsite pendant: 2. Fossil Island (left-click) → walk 5 → Mushtree: Verdant Valley → walk 41 {item:556=1, item:557=1, item:563=1}
+  alt       82t: Digsite pendant: Digsite → walk 11 → Ship: Fossil Island → walk 54 {charge:11194=1}
 cryptic:it seems to have reached the end of the line, and it's still empty.
   best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
-  alt       45t: Teleport to House → Jewellery box: Mining Guild → walk 28 {item:556=1, item:557=1, item:563=1}
+  alt       45t: Teleport to House → Jewellery box: F. Mining Guild → walk 28 {item:556=1, item:557=1, item:563=1}
   alt       55t (rank 63): Max cape: Spellbook → ANCIENT → Lassar Teleport → walk 48 {cape=1, item:563=2, item:555=4} leaves you on ANCIENT
 cryptic:search the chest in fred the farmer's bedroom.
   best      54t: Amulet of glory: Draynor Village → walk 49 {charge:1712=1}
@@ -103,15 +106,15 @@ cryptic:search the chest in fred the farmer's bedroom.
 cryptic:search through chests found in the upstairs of houses in eastern falador.
   best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
   alt       36t: Ring of wealth: Falador Park → walk 31 {charge:11980=1}
-  alt       45t: Teleport to House → Jewellery box: Mining Guild → walk 28 {item:556=1, item:557=1, item:563=1}
+  alt       45t: Teleport to House → Jewellery box: F. Mining Guild → walk 28 {item:556=1, item:557=1, item:563=1}
 cryptic:talk to the mother of a basement dwelling son.
   best      14t: Amulet of glory: Edgeville → walk 9 {charge:1712=1}
   alt       22t: Teleport to House → Mounted glory: Edgeville → walk 9 {item:556=1, item:557=1, item:563=1}
   alt       27t (rank 35): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 21 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
 emote:10180
-  best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
-  alt       56t: Teleport to House → Fairy ring: Zanaris → walk 39 {item:556=1, item:557=1, item:563=1}
-  alt       53t (rank 61): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 47 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  best      52t: Lumbridge Teleport → walk 48 {item:556=3, item:557=1, item:563=1}
+  alt       57t: Teleport to House → Fairy ring: Zanaris → walk 40 {item:556=1, item:557=1, item:563=1}
+  alt       54t (rank 62): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 48 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
 emote:10222
   best      19t: Kandarin headgear 4: Teleport → walk 14
   alt       45t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
@@ -120,7 +123,7 @@ emote:10264
   best      18t (rank 26): Max cape: Spellbook → LUNAR → Barbarian Teleport → walk 12 {cape=1, item:554=3, item:9075=2, item:563=2} leaves you on LUNAR
   same book 28t: Teleport to House → Portal nexus: Barbarian Outpost → walk 12 {item:556=1, item:557=1, item:563=1}
   alt       32t: Games necklace: Barbarian Outpost → walk 27 {charge:3853=1}
-  alt       44t: Teleport to House → Jewellery box: Barbarian Outpost → walk 27 {item:556=1, item:557=1, item:563=1}
+  alt       44t: Teleport to House → Jewellery box: 6. Barbarian Outpost → walk 27 {item:556=1, item:557=1, item:563=1}
 emote:12080
   best      24t: Slayer ring: Slayer Tower → walk 19 {charge:11866=1}
 emote:19833
@@ -129,6 +132,7 @@ emote:19833
   alt       42t: Teleport to House → Portal nexus: Varrock → walk 26 {item:556=1, item:557=1, item:563=1}
 emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
   best      77t: Teleport to House → House obelisk: Level 50 Wilderness → walk 62 {item:556=1, item:557=1, item:563=1}
+  faster, under the margin 74t: Amulet of glory: Edgeville → walk 5 → bank → walk 11 → Lever: Deserted Keep → walk 43 {charge:1712=1} withdraw [13111] deposit first
   alt       69t (rank 77): Max cape: Spellbook → ANCIENT → Annakarl Teleport → walk 62 {cape=1, item:563=2, item:565=2} leaves you on ANCIENT
   alt       78t: Teleport to House → Portal nexus: Annakarl → walk 62 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
@@ -173,17 +177,17 @@ falo:they come from some time ago, from a land unto the east. fossilised they ha
 spot:ASGARNIA_WARRIORS
   best      24t: Max cape: Warriors' Guild → walk 19
   alt       27t: Games necklace: Burthorpe → walk 22 {charge:3853=1}
-  alt       30t: Teleport to House → Jewellery box: Warriors' Guild → walk 13 {item:556=1, item:557=1, item:563=1}
+  alt       30t: Teleport to House → Jewellery box: A. Warriors' Guild → walk 13 {item:556=1, item:557=1, item:563=1}
 spot:FELDIP_HILLS_GNOME_GLITER
   best      28t: Teleport to House → Fairy ring AKS: Feldip Hills: Jungle Hunter area → walk 11 {item:556=1, item:557=1, item:563=1}
-  alt       33t: Max cape: Other Teleports: Feldip Hills → walk 28 {daily:4819=1}
-  alt       36t: Master scroll book: Feldip hills teleport → walk 31 {charge:21389=1}
+  alt       29t: Royal seed pod → walk 9 → Gnome glider: Lemantolly Undri → walk 3
+  alt       32t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Lemantolly Undri → walk 3 {charge:2552=1}
 spot:KANDARIN_GRAND_TREE
-  best      23t: Royal seed pod → walk 12
+  best      24t: Royal seed pod → walk 13
   alt       48t: Slayer ring: Stronghold → walk 43 {charge:11866=1}
   alt       48t: Teleport to House → Spirit tree: Gnome Stronghold → walk 32 {item:556=1, item:557=1, item:563=1}
 spot:MISTHALIN_VARROCK_STONE_CIRCLE
-  best      35t: Teleport to House → Jewellery box: Champions' Guild → walk 18 {item:556=1, item:557=1, item:563=1}
+  best      35t: Teleport to House → Jewellery box: B. Champions' Guild → walk 18 {item:556=1, item:557=1, item:563=1}
   alt       38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
   alt       37t: Camelot Teleport: Seers' → walk 3 → bank → Combat bracelet: Champions' Guild → walk 18 {item:556=5, item:563=1, charge:11972=1} withdraw [11972] deposit first
 spot:VARLAMORE_LOCUS_OASIS
@@ -201,6 +205,7 @@ map:12130
 map:19785
   best      33t: Morytania legs: Burgh de Rott → walk 28
   alt       56t: Master scroll book: Mort'ton teleport → walk 51 {charge:21389=1}
+  alt       63t: Ectophial → walk 14 → Boat: Slepe → walk 1 → Boat: Burgh de Rott → walk 21
 map:2719
   best      53t: Falador Teleport → walk 49 {item:556=3, item:555=1, item:563=1}
   alt       59t: Skills necklace: Mining Guild → walk 54 {charge:11968=1}
@@ -220,36 +225,37 @@ map:7241
 music:23138
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       22t: Teleport to House → Jewellery box: M. Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23142
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       22t: Teleport to House → Jewellery box: M. Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23157
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       22t: Teleport to House → Jewellery box: M. Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23174
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       22t: Teleport to House → Jewellery box: M. Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:23178
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       22t: Teleport to House → Jewellery box: M. Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 music:24773
   best      10t: Ring of wealth: Falador Park → walk 5 {charge:11980=1}
   alt       20t: Falador Teleport → walk 16 {item:556=3, item:555=1, item:563=1}
-  alt       22t: Teleport to House → Jewellery box: Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
+  alt       22t: Teleport to House → Jewellery box: M. Falador Park → walk 5 {item:556=1, item:557=1, item:563=1}
 skill:CHARLIE:i need to give charlie a cooked pike.
   best      53t: Skills necklace: Cooking Guild → walk 28 → Varrock Teleport → walk 16 {charge:11968=1, item:556=3, item:554=1, item:563=1}
   alt       64t: Amulet of glory: Edgeville → walk 39 → Varrock Teleport → walk 16 {charge:1712=1, item:556=3, item:554=1, item:563=1}
-  alt       65t: Teleport to House → Jewellery box: Cooking Guild → walk 28 → Varrock Teleport → walk 16 {item:556=4, item:557=1, item:563=2, item:554=1}
+  alt       65t: Teleport to House → Jewellery box: H. Cooking Guild → walk 28 → Varrock Teleport → walk 16 {item:556=4, item:557=1, item:563=2, item:554=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
   best      37t: Book of the dead: The Fisher's Flute → walk 25 → Kandarin headgear 4: Teleport → walk 3 {charge:25818=1}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
-  best      15t: Skills necklace: Woodcutting Guild → walk 3 → Kandarin headgear 4: Teleport → walk 3 {charge:11968=1}
-  alt       27t: Teleport to House → Jewellery box: Woodcutting Guild → walk 3 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
+  best      61t: Skills necklace: Woodcutting Guild → walk 48 → Kandarin headgear 4: Teleport → walk 3 {charge:11968=1}
+  alt       62t: Xeric's talisman: 1. Xeric's Lookout → walk 49 → Kandarin headgear 4: Teleport → walk 3 {charge:13393=1}
+  alt       73t: Teleport to House → Mounted Xeric's talisman: 1. Lookout → walk 49 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
   best      24t: Amulet of glory: Edgeville → walk 12 → Kandarin headgear 4: Teleport → walk 3 {charge:1712=1}
   alt       32t: Teleport to House → Mounted glory: Edgeville → walk 12 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
@@ -263,14 +269,14 @@ skill:SHERLOCK:score a goal in skullball.
   alt       47t (rank 55): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Kandarin headgear 4: Teleport → walk 3 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
   alt       57t: Teleport to House → Portal nexus: Fenken' Castle → walk 34 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
 cryptic:you will need to under-cook to solve this one.
-  best      26t: Lumbridge Teleport → walk 22 {item:556=3, item:557=1, item:563=1}
-  alt       28t (rank 36): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 22 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
-  alt       46t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}
+  best      28t: Lumbridge Teleport → walk 24 {item:556=3, item:557=1, item:563=1}
+  alt       30t (rank 38): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 24 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  alt       48t: Lumbridge Home Teleport → walk 24 {cooldown:892=1}
 cryptic:search through some drawers in the upstairs of a house in rimmington.
   best      14t: Construction cape: Rimmington → walk 9
 anagram:12566
   best      13t: Skills necklace: Mining Guild → walk 8 {charge:11968=1}
-  alt       25t: Teleport to House → Jewellery box: Mining Guild → walk 8 {item:556=1, item:557=1, item:563=1}
+  alt       25t: Teleport to House → Jewellery box: F. Mining Guild → walk 8 {item:556=1, item:557=1, item:563=1}
 cryptic:search the crates in a bank in varrock.
   best      27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       34t: Ring of wealth: Grand Exchange → walk 29 {charge:11980=1}

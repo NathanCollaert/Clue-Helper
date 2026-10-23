@@ -70,7 +70,7 @@ final class WhyList
 			for (int i = table.reverseFrom(node); i < table.reverseEnd(node); i++)
 			{
 				int entry = table.reverseEntry(i);
-				int tiles = ctx.gates.cost(entry);
+				int tiles = ctx.gates(PlanContext.NOT_BANKED).cost(entry);
 				int from = table.entryFrom(entry);
 				if (tiles != WalkTable.NO_PATH && head[1] + tiles < walk[from])
 				{

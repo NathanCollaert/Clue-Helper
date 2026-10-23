@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
 /** Immutable once loaded; any thread. Costs are tiles, which are half-ticks when running. */
@@ -21,7 +23,7 @@ public final class WalkTable
 	public static final WalkTable EMPTY = new WalkTable();
 	public static final int NO_NODE = -1;
 	public static final int NO_PATH = -1;
-	/** Where tools/walk/WalkGen.java puts each walk's waypoint. */
+	/** The spacing of each walk's waypoints (tools/walk/WalkGen.java). */
 	public static final int WAYPOINT_TILES = 40;
 	static final String DIRECTORY = "walk/";
 
@@ -58,10 +60,15 @@ public final class WalkTable
 	private int[] rowDest = new int[0];
 	private int[] rowCost = new int[0];
 	private int[] rowGate = new int[0];
-	/** Per entry, 0 or 1 + the packed tile {@code WAYPOINT_TILES} along its walk (tools/walk/WalkGen.java). */
-	private int[] entryWaypoint = new int[0];
+	/** Marks a point of {@link #entryWaypoints} as a row's origin or destination, above a packed tile's bits. */
+	private static final int ROW_POINT = 1 << 30;
+	/** Entry e's points are packed tiles waypoints[waypointStart[e]] up to waypoints[waypointStart[e + 1]]. */
+	private int[] waypointStart = new int[1];
+	private int[] waypoints = new int[0];
 	private Map<Long, Exit> exits = Map.of();
 	private Map<Long, Exit> rowObjects = Map.of();
+	/** Each row object's id by the packed tiles its rows start from. */
+	private Map<Integer, Set<Integer>> rowObjectsAt = Map.of();
 
 	private WalkTable()
 	{
@@ -78,6 +85,8 @@ public final class WalkTable
 		table.readBanks(lines("banks.tsv"));
 		table.exits = rowActions(lines("exits.tsv"));
 		table.rowObjects = rowActions(lines("row-objects.tsv"));
+		table.rowObjectsAt = table.rowObjects.values().stream().collect(Collectors.groupingBy(exit -> pack(exit.getOrigin()),
+			Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
 		table.indexReverse();
 		return table;
 	}
@@ -138,8 +147,25 @@ public final class WalkTable
 	/** The tile 40 tiles along the entry's walk (gates passing), or null for a shorter walk. */
 	public WorldPoint entryWaypoint(int entry)
 	{
-		int value = entry < entryWaypoint.length ? entryWaypoint[entry] : 0;
-		return value == 0 ? null : unpack(value - 1);
+		for (int i = waypointStart[entry]; i < waypointStart[entry + 1]; i++)
+		{
+			if ((waypoints[i] & ROW_POINT) == 0)
+			{
+				return unpack(waypoints[i]);
+			}
+		}
+		return null;
+	}
+
+	/** The entry's walk in order, short of its end: a tile every 40 tiles, and each ladder, door or cave it takes at both ends. */
+	public List<WorldPoint> entryWaypoints(int entry)
+	{
+		List<WorldPoint> along = new ArrayList<>();
+		for (int i = waypointStart[entry]; i < waypointStart[entry + 1]; i++)
+		{
+			along.add(unpack(waypoints[i] & ~ROW_POINT));
+		}
+		return along;
 	}
 
 	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
@@ -206,6 +232,22 @@ public final class WalkTable
 	public Exit rowObject(WorldPoint origin, WorldPoint destination)
 	{
 		return rowObjects.get(exitKey(origin, destination));
+	}
+
+	/** A row starts by {@code tile} (on it or next to it) through the object: the same id elsewhere says nothing. */
+	public boolean isRowObjectAt(int objectId, WorldPoint tile)
+	{
+		for (int dx = -1; dx <= 1; dx++)
+		{
+			for (int dy = -1; dy <= 1; dy++)
+			{
+				if (rowObjectsAt.getOrDefault(pack(tile.dx(dx).dy(dy)), Set.of()).contains(objectId))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public int entryCount()
@@ -323,6 +365,7 @@ public final class WalkTable
 			cells.put(RequirementParser.QUESTS, cell(c, 2));
 			cells.put(RequirementParser.VARBITS, cell(c, 3));
 			cells.put(RequirementParser.VARPS, cell(c, 4));
+			cells.put(RequirementParser.ITEMS, cell(c, 5));
 			parsed.add(parser.parse(cells));
 		}
 		gates = List.copyOf(parsed);
@@ -392,28 +435,32 @@ public final class WalkTable
 		entryOpen = open.toArray();
 	}
 
-	/** Stored relative to each entry's start node; kept here as absolute packed tiles. */
+	/** Stored relative to the point before, the first to the entry's start node; kept here as absolute packed tiles. */
 	private void readWaypoints(Varints in)
 	{
-		entryWaypoint = new int[entryTo.length];
+		waypointStart = new int[entryTo.length + 1];
+		IntBuffer points = new IntBuffer();
 		int entry = 0;
 		for (int node = 0; node < tiles.length; node++)
 		{
 			WorldPoint from = placed[node];
 			for (; entry < entryStart[node + 1]; entry++)
 			{
-				int value = in.next();
-				if (value == 0 || from == null)
+				waypointStart[entry] = points.size;
+				int count = in.next();
+				int x = from == null ? 0 : from.getX();
+				int y = from == null ? 0 : from.getY();
+				for (int k = 0; k < count; k++)
 				{
-					continue;
+					x += unzigzag(in.next());
+					int value = in.next();
+					y += unzigzag(value >>> 3);
+					points.add((value & 1) * ROW_POINT | (value >> 1 & 3) << 28 | y << 14 | x);
 				}
-				value--;
-				int plane = value & 3;
-				int dy = unzigzag(value >> 2 & 0x7FF);
-				int dx = unzigzag(value >> 13);
-				entryWaypoint[entry] = 1 + (plane << 28 | (from.getY() + dy) << 14 | from.getX() + dx);
 			}
 		}
+		waypointStart[entry] = points.size;
+		waypoints = points.toArray();
 	}
 
 	private static int unzigzag(int value)

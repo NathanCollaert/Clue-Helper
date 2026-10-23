@@ -81,11 +81,23 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "scrollBookOutOfWilderness",
+		name = "Scroll book stays out of Wilderness",
+		description = "For a master scroll book teleport into the Wilderness (Revenant caves), take the scroll out at a bank and bank the book first",
+		section = routesSection,
+		position = 3
+	)
+	default boolean scrollBookOutOfWilderness()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "useBank",
 		name = "Use the bank",
 		description = "Count banked teleports and items (and GIM group storage). A bank stop is shown as Best only when it beats going direct by 5 ticks or 10%",
 		section = routesSection,
-		position = 3
+		position = 4
 	)
 	default boolean useBank()
 	{
@@ -99,7 +111,7 @@ public interface ClueHelperConfig extends Config
 		name = "Bank stop extra",
 		description = "Ticks added to every bank stop, if you bank slower (or faster) than the measured 3 ticks plus 2 per item",
 		section = routesSection,
-		position = 4
+		position = 5
 	)
 	default int bankStopExtraTicks()
 	{
@@ -111,7 +123,7 @@ public interface ClueHelperConfig extends Config
 		name = "Built STASH units are filled",
 		description = "Count a built STASH unit as holding its items, as the Clue Scroll plugin's tick suggests, unless a Search showed it empty",
 		section = routesSection,
-		position = 5
+		position = 6
 	)
 	default boolean stashBuiltIsFilled()
 	{

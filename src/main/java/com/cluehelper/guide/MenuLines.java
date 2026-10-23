@@ -15,12 +15,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Menu;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.FontTypeFace;
 import net.runelite.api.NPC;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.WidgetClosed;
@@ -58,10 +56,18 @@ public class MenuLines
 	private static final String MAP_REGION = "Select";
 	/** Same cyan as {@code Markers.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
-	/** Chat options are children 1–5 under the "Select an Option" title, and keys 1–5 pick them. */
-	private static final int CHAT_OPTION_KEYS = 5;
-	private static final int ALIGN_CENTRE = 1;
-	private static final int ALIGN_RIGHT = 2;
+
+	/** A hotkey as the info box names it: upper case, in the colour of the menu line it presses. */
+	static String keyText(char key)
+	{
+		return menuColoured(String.valueOf(Character.toUpperCase(key)));
+	}
+
+	/** What to press or dial, in the colour of the menu lines; the info box closes the colour. */
+	static String menuColoured(String text)
+	{
+		return String.format("<col=%06x>%s</col>", TEXT_COLOUR, text);
+	}
 
 	private final Client client;
 	private final QuetzalIcons quetzalIcons;
@@ -278,58 +284,70 @@ public class MenuLines
 		entry.setOption(ColorUtil.wrapWithColorTag(Text.removeTags(entry.getOption()), new Color(TEXT_COLOUR)));
 	}
 
-	/**
-	 * The target's coloured lines that a key press also picks, where the line's text, as other plugins left it, doesn't
-	 * already show the key.
-	 */
-	public List<KeyBadge> keyBadges(MenuTarget target)
-	{
-		Found found = new Found();
-		find(target, found);
-		List<KeyBadge> badges = new ArrayList<>();
-		found.keys.forEach((line, key) ->
-		{
-			Widget text = descendants(line).stream().filter(MenuLines::hasText).findFirst().orElse(null);
-			if (text != null && !MenuLabels.showsKey(text.getText(), key))
-			{
-				Rectangle bounds = text.getBounds();
-				badges.add(new KeyBadge(key, textEnd(text), bounds.y + bounds.height / 2, insideParents(text)));
-			}
-		});
-		return badges;
-	}
-
-	@Value
-	public static class KeyBadge
-	{
-		char key;
-		int textEnd;
-		int centreY;
-		/** Where the line can be seen: a badge outside it belongs to a line scrolled out of view. */
-		Rectangle visible;
-	}
-
-	private static int textEnd(Widget text)
-	{
-		FontTypeFace font = text.getFont();
-		Rectangle bounds = text.getBounds();
-		int width = font == null ? bounds.width : Math.min(bounds.width, font.getTextWidth(Text.removeTags(text.getText())));
-		switch (text.getXTextAlignment())
-		{
-			case ALIGN_CENTRE:
-				return bounds.x + (bounds.width + width) / 2;
-			case ALIGN_RIGHT:
-				return bounds.x + bounds.width;
-			default:
-				return bounds.x + width;
-		}
-	}
-
 	private List<Widget> lineWidgets(MenuTarget target)
 	{
 		Found found = new Found();
 		find(target, found);
 		return found.widgets;
+	}
+
+	/** The key the charter's destination list gives the target's port, or 0 while the list isn't open. */
+	public char charterKey(MenuTarget target)
+	{
+		String destination = target == null ? null : target.destination();
+		Widget[] rows = dynamicChildren(InterfaceID.CharteringMenuSide.LIST_CONTENT);
+		for (int i = 0; destination != null && i + 1 < rows.length; i++)
+		{
+			String text = rows[i + 1] == null ? null : Text.removeTags(rows[i + 1].getText()).trim();
+			if (visible(rows[i]) && namesPort(rows[i], destination) && text != null && !text.isEmpty())
+			{
+				return text.charAt(0);
+			}
+		}
+		return 0;
+	}
+
+	/** The charter map's marker and the destination list's line both carry the port's name as their action. */
+	private boolean charter(String destination, Found out)
+	{
+		boolean found = false;
+		for (Widget marker : dynamicChildren(InterfaceID.SailingMenu.CONTENT))
+		{
+			if (visible(marker) && namesPort(marker, destination))
+			{
+				out.add(marker);
+				found = true;
+			}
+		}
+		Widget[] rows = dynamicChildren(InterfaceID.CharteringMenuSide.LIST_CONTENT);
+		for (int i = 0; i + 1 < rows.length; i++)
+		{
+			if (visible(rows[i]) && namesPort(rows[i], destination))
+			{
+				out.add(rows[i + 1]);
+				found = true;
+			}
+		}
+		return found;
+	}
+
+	private Widget[] dynamicChildren(int component)
+	{
+		Widget parent = client.getWidget(component);
+		Widget[] children = parent == null || parent.isHidden() ? null : parent.getDynamicChildren();
+		return children == null ? new Widget[0] : children;
+	}
+
+	private static boolean namesPort(Widget widget, String label)
+	{
+		for (String action : widget.getActions() == null ? new String[0] : widget.getActions())
+		{
+			if (action != null && MenuLabels.matches(action, label))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void find(MenuTarget target, Found out)
@@ -422,7 +440,7 @@ public class MenuLines
 		Widget line = child(at);
 		if (visible(line))
 		{
-			out.add(labelOf(line), hotkey(at[2] - 1));
+			out.add(labelOf(line));
 			return;
 		}
 		Widget map = client.getWidget(InterfaceID.TelenexusTeleport.FRAME);
@@ -536,7 +554,7 @@ public class MenuLines
 		{
 			if (visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
 			{
-				out.add(line, chatKey(line));
+				out.add(line);
 				return true;
 			}
 		}
@@ -597,7 +615,7 @@ public class MenuLines
 	private void labelled(MenuTarget target, Found out)
 	{
 		String destination = target.destination();
-		if (destination == null)
+		if (destination == null || charter(destination, out))
 		{
 			return;
 		}
@@ -605,7 +623,7 @@ public class MenuLines
 		{
 			if (MenuLabels.matches(line.getKey(), destination))
 			{
-				out.add(child(line.getValue()), hotkey(line.getValue()[2]));
+				out.add(child(line.getValue()));
 				return;
 			}
 		}
@@ -614,7 +632,7 @@ public class MenuLines
 		{
 			if (index >= 0 && line[2] == index)
 			{
-				out.add(child(line), hotkey(index));
+				out.add(child(line));
 				return;
 			}
 		}
@@ -631,7 +649,7 @@ public class MenuLines
 			{
 				if (visible(option) && MenuLabels.matches(option.getText(), labels.get(i)))
 				{
-					out.add(option, chatKey(option));
+					out.add(option);
 					return;
 				}
 			}
@@ -691,7 +709,7 @@ public class MenuLines
 			return true;
 		}
 		Widget widget = entry.getWidget();
-		if (widget != null && target.getItemIds().contains(widget.getItemId()))
+		if (widget != null && (target.getItemIds().contains(widget.getItemId()) || target.getWidgetIds().contains(widget.getId())))
 		{
 			return true;
 		}
@@ -746,38 +764,16 @@ public class MenuLines
 		return false;
 	}
 
-	private static char hotkey(int index)
-	{
-		return index >= 0 && index < HOTKEYS.length() ? HOTKEYS.charAt(index) : 0;
-	}
-
-	private static char chatKey(Widget option)
-	{
-		int index = option.getIndex();
-		return index >= 1 && index <= CHAT_OPTION_KEYS ? (char) ('0' + index) : 0;
-	}
-
-	/** The target's lines, and the key that picks each one where the menu has keys. */
+	/** The target's lines. */
 	private static final class Found
 	{
 		final List<Widget> widgets = new ArrayList<>();
-		final Map<Widget, Character> keys = new IdentityHashMap<>();
 
 		void add(Widget widget)
 		{
-			add(widget, (char) 0);
-		}
-
-		void add(Widget widget, char key)
-		{
-			if (!visible(widget))
+			if (visible(widget))
 			{
-				return;
-			}
-			widgets.add(widget);
-			if (key != 0)
-			{
-				keys.put(widget, key);
+				widgets.add(widget);
 			}
 		}
 	}

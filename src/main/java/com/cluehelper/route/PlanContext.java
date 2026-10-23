@@ -9,6 +9,7 @@ import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.player.SpellbookState;
+import com.cluehelper.step.Stage;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
 import com.cluehelper.transport.HouseNeed;
@@ -20,10 +21,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
 final class PlanContext
@@ -47,7 +50,6 @@ final class PlanContext
 
 	final PlanInput in;
 	final WalkTable table;
-	final WalkGates gates;
 	final int start;
 	final int goal;
 	final int pohNode;
@@ -59,15 +61,21 @@ final class PlanContext
 
 	final Resources resources = new Resources();
 	final Options[] options = new Options[2];
+	private final WalkGates[] gates = new WalkGates[2];
 	/** Books a route may change to; always holds the start book. */
 	final Set<Book> expanded = EnumSet.noneOf(Book.class);
 	final Book startBook;
 	final Book homeBook;
 	final boolean startPending;
 	final boolean targetInWilderness;
+	/** The master scroll book is carried and stays out of the Wilderness, where the target is: a bank stop comes first. */
+	final boolean depositsBookFirst;
 	final int bankStopHalfTicks;
 	final RequiredItems.Verdict required;
 	final int[] requiredWithdraw;
+	/** By target node: what a part's act wants worn (Ghommal's +100 melee strength), on the player on arrival there. */
+	private final Map<Integer, RequiredItems.Verdict> stageNeeds = new HashMap<>();
+	private final int[] stageWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
 	private Map<Integer, Integer> rowsPerItem;
@@ -76,7 +84,6 @@ final class PlanContext
 	{
 		this.in = in;
 		this.table = in.getTable();
-		this.gates = new WalkGates(table, in.getPlayer(), in.getEngine(), in.getNowMinutes());
 		int t = table.nodeCount();
 		start = t;
 		abstractBase = t + 1;
@@ -88,20 +95,82 @@ final class PlanContext
 		startBook = book == null || book.getBook() == null ? Book.STANDARD : book.isPendingRevert() && !pending ? Book.LUNAR : book.getBook();
 		homeBook = book != null && book.isPendingRevert() ? Book.LUNAR : startBook;
 		targetInWilderness = in.getStep().getTargets().stream().anyMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
+		PlayerSnapshot carrier = in.getPlayer();
+		depositsBookFirst = in.getSettings().isScrollBookOutOfWilderness() && targetInWilderness
+			&& (carrier.getInventory().containsKey(BookScrolls.BOOK) || carrier.getWorn().containsKey(BookScrolls.BOOK));
 		options[NOT_BANKED] = new Options(in.getPlayer(), NOT_BANKED);
 		if (in.getSettings().isBankEdge() && in.getBanked() != null)
 		{
 			options[BANKED] = new Options(in.getBanked(), BANKED);
+			gates[BANKED] = new WalkGates(table, in.getBanked(), in.getEngine(), in.getNowMinutes());
 		}
+		gates[NOT_BANKED] = new WalkGates(table, in.getPlayer(), in.getEngine(), in.getNowMinutes());
 		bankStopHalfTicks = 2 * in.getSettings().getBankStopExtraTicks() + BANK_STOP_HALF_TICKS + (in.isPinPending() ? PIN_HALF_TICKS : 0);
-		required = in.getRequired().judge(in.getPlayer(), options[BANKED] == null ? null : in.getBanked());
+		PlayerSnapshot bankedPlayer = options[BANKED] == null ? null : in.getBanked();
+		Set<RequiredItems.Need> atStages = judgeStageNeeds(bankedPlayer);
+		required = in.getRequired().toBuilder()
+			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(Collectors.toList()))
+			.build().judge(in.getPlayer(), bankedPlayer);
 		requiredWithdraw = required.getWithdraw().stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
+		stageWithdraw = stageNeeds.values().stream().flatMap(verdict -> verdict.getWithdraw().stream()).mapToInt(ItemUse::getItemId)
+			.distinct().sorted().toArray();
 		expandBooks();
+	}
+
+	/** After a bank stop a gate may also take a stored item, such as a knife for a web. */
+	WalkGates gates(int bankState)
+	{
+		return gates[bankState];
+	}
+
+	/**
+	 * The needs some stage wants on arrival (a part's worn gear, Sherlock's task items); each such stage's verdict is kept
+	 * by its target nodes.
+	 */
+	private Set<RequiredItems.Need> judgeStageNeeds(PlayerSnapshot bankedPlayer)
+	{
+		Set<RequiredItems.Need> atStages = new HashSet<>();
+		for (Stage stage : in.getStep().getStages())
+		{
+			List<RequiredItems.Need> wanted = in.getRequired().getNeeds().stream()
+				.filter(need -> stage.getWorn().contains(need.getName()) || stage.isTakesStepItems() && need.isStepItem())
+				.collect(Collectors.toList());
+			if (wanted.isEmpty())
+			{
+				continue;
+			}
+			atStages.addAll(wanted);
+			RequiredItems needs = in.getRequired().toBuilder().stash(RequiredItems.Stash.NONE).needs(wanted).build();
+			RequiredItems.Verdict verdict = needs.judge(in.getPlayer(), bankedPlayer);
+			stage.getTiles().forEach(tile -> stageNeeds.put(nodeAt(tile), verdict));
+		}
+		return atStages;
+	}
+
+	/** A stage whose gear is in the bank can't be done before a bank stop; one whose gear isn't owned at all can. */
+	boolean stageNeedsBank(int node, int bankState)
+	{
+		RequiredItems.Verdict verdict = stageNeeds.get(node);
+		return verdict != null && !verdict.isCarried() && verdict.isBanked() && bankState != BANKED;
+	}
+
+	int[] stageWithdraw(int node, int bankState)
+	{
+		RequiredItems.Verdict verdict = stageNeeds.get(node);
+		return verdict == null || verdict.isCarried() || bankState != BANKED ? new int[0]
+			: verdict.getWithdraw().stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
+	}
+
+	/** Every stage's bank items, taken at the bank stop as a web's knife is. */
+	int[] stageWithdraw()
+	{
+		return stageWithdraw;
 	}
 
 	boolean arrivesWithoutBank()
 	{
-		return required.isCarried() || !required.isBanked();
+		boolean depositsBook = depositsBookFirst && options[BANKED] != null;
+		return !depositsBook && (required.isCarried() || !required.isBanked());
 	}
 
 	/** After a bank stop with nothing withdrawn yet, these are the only nodes worth walking to. */
@@ -351,6 +420,7 @@ final class PlanContext
 		Options(PlayerSnapshot player, int bankState)
 		{
 			PlayerSnapshot judgedAt = player.toBuilder().wildernessLevel(0).build();
+			boolean carriesBook = player.getInventory().containsKey(BookScrolls.BOOK) || player.getWorn().containsKey(BookScrolls.BOOK);
 			Map<String, Teleport> longestVariant = new LinkedHashMap<>();
 			for (CatalogRow row : in.getCatalog().getTeleports())
 			{
@@ -363,7 +433,15 @@ final class PlanContext
 				{
 					continue;
 				}
+				boolean bookStaysOut = in.getSettings().isScrollBookOutOfWilderness();
+				boolean takenOut = BookScrolls.isTakenOutAtBank(row, bookStaysOut);
+				boolean bankedFirst = !takenOut && bookStaysOut && carriesBook && BookScrolls.intoWilderness(row);
+				if ((takenOut || bankedFirst) && bankState != BANKED)
+				{
+					continue;
+				}
 				Teleport tele = teleport(judged, player, bankState);
+				tele.halfTicks += takenOut ? 2 * BookScrolls.TAKE_OUT_TICKS : bankedFirst ? 2 * BookScrolls.DEPOSIT_TICKS : 0;
 				if (row.getOrigin() != null && row.getCategory() == Category.FAIRY_RING)
 				{
 					tele.node = nodeAt(row.getOrigin());

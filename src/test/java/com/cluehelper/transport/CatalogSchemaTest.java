@@ -131,7 +131,8 @@ public class CatalogSchemaTest
 		String menu = line.get("menuOption menuTarget objectID");
 		if (!menu.isEmpty())
 		{
-			refs.add("object:" + menu.substring(menu.lastIndexOf(' ') + 1));
+			String kind = line.get(CatalogLoader.MENU).startsWith("npc ") ? "npc:" : "object:";
+			refs.add(kind + menu.substring(menu.lastIndexOf(' ') + 1));
 		}
 		String house = line.get(RequirementParser.HOUSE);
 		if (house.startsWith("object:"))

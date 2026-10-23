@@ -1,33 +1,53 @@
 package com.cluehelper.route;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.runelite.api.coords.WorldPoint;
 
-/** The path line toward a goal the loaded scene can't walk to: the scene part of the table's shortest walk. */
+/**
+ * The path line toward a goal the loaded scene can't walk to: the scene's walk to the farthest point it reaches on the
+ * table's walk there, its waypoints 40 tiles apart. One walk is kept per goal and followed only forward, so the line
+ * doesn't swap ways as the plan's start leg moves with the player.
+ */
 public final class ScenePath
 {
-	/** Ties in the table's walk (diagonal steps, snapped nodes) differ by a tile or two. */
-	private static final int SLACK_TILES = 2;
-	/** A node only a few tiles ahead says nothing about the way on. */
-	private static final int MIN_AHEAD_TILES = 8;
 	/** A ladder or cave entrance landing this close to a goal off the scene (a basement NPC) is the way there. */
 	private static final int EXIT_NEAR_GOAL_TILES = 20;
+	/** Standing on a waypoint, the line leads on to the next one. */
+	private static final int AT_POINT_TILES = 3;
+	private static final int BESIDE_POINT_TILES = 8;
+	private static final int GOAL_NODE_TILES = 8;
 
-	private ScenePath()
-	{
-	}
+	private WorldPoint goal;
+	/** The kept walk: its start node, its waypoints, its end node. */
+	private List<WorldPoint> walk = List.of();
+	/** The point of {@code walk} the line leads to: the farthest the scene reaches, or the one after it once passed; never goes back. */
+	private int reached;
 
 	/**
-	 * The table's walk is known only between its nodes plus one waypoint per walk, so the line follows the shortest walk
-	 * from the node nearest the player: to the farthest point on it the scene can reach (a node, or the walk's waypoint
-	 * 40 tiles along), else toward the first such point past the scene. A point counts only when it is ahead of the
-	 * player, judged by the walk left from there against the player's own.
+	 * A line from a fresh walk choice. {@code via} and {@code joinedFrom}: the planned route's start leg
+	 * ({@link Route#getStartVia()}, {@link Route#getStartJoinedFrom()}).
 	 */
+	public static List<WorldPoint> toward(SceneBfs.Result scene, WalkTable table, WorldPoint goal, WorldPoint via, WorldPoint joinedFrom)
+	{
+		return new ScenePath().line(scene, table, goal, via, joinedFrom);
+	}
+
 	public static List<WorldPoint> toward(SceneBfs.Result scene, WalkTable table, WorldPoint goal)
 	{
-		int target = table == null ? WalkTable.NO_NODE : table.node(goal);
-		int start = table == null ? WalkTable.NO_NODE : nearestNode(scene, table);
-		if (scene.costNear(goal) != SceneBfs.UNREACHED)
+		return toward(scene, table, goal, null, null);
+	}
+
+	/** The next line chooses its walk again, as for a new goal. */
+	public void forget()
+	{
+		goal = null;
+	}
+
+	/** The line from the player, the start of {@code scene}; the walk is chosen again for a new goal or once left. */
+	public List<WorldPoint> line(SceneBfs.Result scene, WalkTable table, WorldPoint goal, WorldPoint via, WorldPoint joinedFrom)
+	{
+		if (scene.costNear(goal) != SceneBfs.UNREACHED || table == null)
 		{
 			return scene.pathToward(goal);
 		}
@@ -36,73 +56,142 @@ public final class ScenePath
 		{
 			return scene.pathTo(wayDown.getDestination());
 		}
-		if (target == WalkTable.NO_NODE || start == WalkTable.NO_NODE)
+		if (!goal.equals(this.goal) || !isOnWalk(scene))
+		{
+			this.goal = goal;
+			walk = walkTo(scene, table, goal, via, joinedFrom);
+			reached = 0;
+		}
+		if (walk.isEmpty())
 		{
 			return scene.pathToward(goal);
 		}
-		int directEntry = entry(table, start, target);
-		int direct = start == target ? 0 : directEntry < 0 ? WalkTable.NO_PATH : table.entryFull(directEntry);
-		if (direct == WalkTable.NO_PATH)
+		reached = farthestReached(scene);
+		while (reached + 1 < walk.size() && isPassed(scene, reached))
 		{
-			return scene.pathToward(goal);
+			reached++;
 		}
-		int playerLeft = direct - scene.cost(table.placed(start));
-		WorldPoint waypoint = directEntry < 0 ? null : table.entryWaypoint(directEntry);
-		int waypointLeft = direct - WalkTable.WAYPOINT_TILES;
-		WorldPoint drawable = null;
-		int drawableLeft = Integer.MAX_VALUE;
-		WorldPoint beyond = null;
-		int beyondLeft = Integer.MIN_VALUE;
-		for (int e = table.entriesFrom(start); e < table.entriesEnd(start); e++)
+		return lineTo(scene, walk.get(reached));
+	}
+
+	private static List<WorldPoint> walkTo(SceneBfs.Result scene, WalkTable table, WorldPoint goal, WorldPoint via, WorldPoint joinedFrom)
+	{
+		int target = nodeAt(table, goal);
+		int start = startNode(scene, table, via, joinedFrom);
+		int e = target == WalkTable.NO_NODE || start == WalkTable.NO_NODE ? -1 : entry(table, start, target);
+		if (e < 0)
 		{
-			int middle = table.entryTo(e);
-			int left = middle == target ? 0 : walk(table, middle, target);
-			if (left == WalkTable.NO_PATH || table.entryFull(e) + left > direct + SLACK_TILES || left > playerLeft - MIN_AHEAD_TILES)
+			return List.of();
+		}
+		List<WorldPoint> points = new ArrayList<>();
+		points.add(table.placed(start));
+		points.addAll(table.entryWaypoints(e));
+		points.add(table.placed(target));
+		if (!goal.equals(table.placed(target)))
+		{
+			points.add(goal);
+		}
+		return List.copyOf(points);
+	}
+
+	/** A goal that isn't a node (a STASH unit beside its clue) follows the walk to the nearest node by it. */
+	private static int nodeAt(WalkTable table, WorldPoint goal)
+	{
+		int exact = table.node(goal);
+		if (exact != WalkTable.NO_NODE)
+		{
+			return exact;
+		}
+		int best = WalkTable.NO_NODE;
+		int bestDistance = GOAL_NODE_TILES + 1;
+		for (int node = 0; node < table.nodeCount(); node++)
+		{
+			WorldPoint at = table.placed(node);
+			int distance = at == null || at.getPlane() != goal.getPlane() ? Integer.MAX_VALUE : at.distanceTo2D(goal);
+			if (distance < bestDistance)
 			{
-				continue;
+				best = node;
+				bestDistance = distance;
 			}
-			WorldPoint at = table.placed(middle);
-			boolean reached = at != null && scene.getScene().contains(at) && scene.cost(at) != SceneBfs.UNREACHED;
-			if (reached && left < drawableLeft)
+		}
+		return best;
+	}
+
+	private static int startNode(SceneBfs.Result scene, WalkTable table, WorldPoint via, WorldPoint joinedFrom)
+	{
+		int joined = joinedFrom == null ? WalkTable.NO_NODE : table.node(joinedFrom);
+		if (joined != WalkTable.NO_NODE)
+		{
+			return joined;
+		}
+		int viaNode = via == null ? WalkTable.NO_NODE : table.node(via);
+		return viaNode != WalkTable.NO_NODE ? viaNode : nearestNode(scene, table);
+	}
+
+	/** The kept walk still leads on from the scene, or runs past its edge. */
+	private boolean isOnWalk(SceneBfs.Result scene)
+	{
+		if (walk.isEmpty())
+		{
+			return false;
+		}
+		for (int i = reached; i < walk.size(); i++)
+		{
+			if (isReached(scene, walk.get(i)))
 			{
-				drawable = at;
-				drawableLeft = left;
-			}
-			else if (!reached && at != null && left > beyondLeft)
-			{
-				beyond = at;
-				beyondLeft = left;
+				return true;
 			}
 		}
-		boolean waypointAhead = waypoint != null && waypointLeft <= playerLeft - MIN_AHEAD_TILES;
-		WorldPoint nearGoal = nearGoalWaypoint(scene, table, start, target, playerLeft);
-		boolean nearGoalFirst = nearGoal != null && (drawable == null || WalkTable.WAYPOINT_TILES < drawableLeft)
-			&& (!waypointAhead || WalkTable.WAYPOINT_TILES < waypointLeft);
-		if (nearGoalFirst)
-		{
-			return scene.pathTo(nearGoal);
-		}
-		if (drawable != null && (!waypointAhead || drawableLeft < waypointLeft))
-		{
-			return scene.pathTo(drawable);
-		}
-		if (waypointAhead)
-		{
-			return scene.costNear(waypoint) != SceneBfs.UNREACHED ? scene.pathTo(waypoint) : scene.pathToward(waypoint);
-		}
-		return scene.pathToward(beyond != null ? beyond : goal);
+		return !scene.getScene().contains(walk.get(reached));
 	}
 
 	/**
-	 * The walk back from the goal has its own waypoint, 40 tiles from the goal: on the same way, often still in the scene
-	 * when the forward waypoint is behind the player and the goal past the edge.
+	 * Standing on the point, or beside it with the next one no farther without it. Only beside it: past the scene's
+	 * edge the walk to the next one is a guess that knows no cliffs.
 	 */
-	private static WorldPoint nearGoalWaypoint(SceneBfs.Result scene, WalkTable table, int start, int target, int playerLeft)
+	private boolean isPassed(SceneBfs.Result scene, int point)
 	{
-		int back = entry(table, target, start);
-		WorldPoint at = back < 0 ? null : table.entryWaypoint(back);
-		boolean ahead = WalkTable.WAYPOINT_TILES <= playerLeft - MIN_AHEAD_TILES;
-		return ahead && at != null && scene.getScene().contains(at) && scene.cost(at) != SceneBfs.UNREACHED ? at : null;
+		WorldPoint at = walk.get(point);
+		WorldPoint next = walk.get(point + 1);
+		int toPoint = scene.costNear(at);
+		if (toPoint <= AT_POINT_TILES)
+		{
+			return true;
+		}
+		if (toPoint > BESIDE_POINT_TILES || at.getPlane() != next.getPlane())
+		{
+			return false;
+		}
+		int toNext = scene.walkAtLeast(next);
+		return toNext != SceneBfs.UNREACHED && toNext <= toPoint + at.distanceTo2D(next);
+	}
+
+	private int farthestReached(SceneBfs.Result scene)
+	{
+		for (int i = walk.size() - 1; i > reached; i--)
+		{
+			if (isReached(scene, walk.get(i)))
+			{
+				return i;
+			}
+		}
+		return reached;
+	}
+
+	/** A point past the scene, or beyond a ladder or cave entrance, is drawn toward. */
+	private static List<WorldPoint> lineTo(SceneBfs.Result scene, WorldPoint point)
+	{
+		if (isReached(scene, point))
+		{
+			return scene.pathTo(point);
+		}
+		SceneBfs.ExitReach exit = scene.exitNear(point, WalkTable.WAYPOINT_TILES);
+		return exit != null ? scene.pathTo(exit.getDestination()) : scene.pathToward(point);
+	}
+
+	private static boolean isReached(SceneBfs.Result scene, WorldPoint point)
+	{
+		return point != null && scene.getScene().contains(point) && scene.costNear(point) != SceneBfs.UNREACHED;
 	}
 
 	private static int entry(WalkTable table, int from, int to)
@@ -132,21 +221,5 @@ public final class ScenePath
 			}
 		}
 		return best;
-	}
-
-	private static int walk(WalkTable table, int from, int to)
-	{
-		if (from == to)
-		{
-			return 0;
-		}
-		for (int e = table.entriesFrom(from); e < table.entriesEnd(from); e++)
-		{
-			if (table.entryTo(e) == to)
-			{
-				return table.entryFull(e);
-			}
-		}
-		return WalkTable.NO_PATH;
 	}
 }

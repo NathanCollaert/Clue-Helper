@@ -40,9 +40,10 @@ public class FurnitureOverlay extends Overlay
 		{
 			highlighter.object(graphics, object, leftClick.contains(object));
 		}
+		List<NPC> leftClickNpcs = guide.getFillNpcs();
 		for (NPC npc : guide.getHighlightNpcs())
 		{
-			highlighter.npc(graphics, npc);
+			highlighter.npc(graphics, npc, leftClickNpcs.contains(npc));
 		}
 		return null;
 	}

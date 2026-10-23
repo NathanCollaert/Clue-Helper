@@ -40,6 +40,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 import org.junit.AfterClass;
@@ -71,6 +72,12 @@ public class GoldenRoutesTest
 		"emote:19791");
 
 	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin. */
+	private static final int TEAR_OF_THE_SOUL_DOCK = 45;
+	/** The Kharazi ledge below the cliff and its vine up. */
+	private static final int LEDGE_SOUTH_Y = 2940;
+	private static final int VINE_X = 2899;
+	private static final int GREATER_TELEPORT_FOCUS = 2;
+
 	private static final List<String> TIPPING_POINTS = List.of("coordinate:3556", "map:3599", "spot:MISTHALIN_VARROCK_STONE_CIRCLE");
 
 	private static final GoldenCoverage COVERAGE = new GoldenCoverage();
@@ -156,6 +163,71 @@ public class GoldenRoutesTest
 		assertTrue("walks on: " + best.describe(), best.getLegs().stream().allMatch(leg -> leg.getKind() == Leg.Kind.WALK));
 	}
 
+	/**
+	 * The path line follows the plan's start leg, until the player has walked on past it (from the BJS fairy ring
+	 * towards Tyras Camp): on the ledge below the Kharazi cliff it never leads on past the vine to
+	 * the ledge's dead end (the nearest node changes as the player walks there, and the scene ends before the clue), and
+	 * it leads towards the hole down to Gu'Tanoth's cave, not to the glider landing whose walk the table also knows.
+	 */
+	private static final int MIN_LINE_TILES = 8;
+	private static final WorldPoint KHARAZI_CLUE = new WorldPoint(2954, 2933, 0);
+	/** Not a walk-table node: the line follows the walk to the clue beside it. */
+	private static final WorldPoint KHARAZI_STASH = new WorldPoint(2952, 2932, 0);
+
+	@Test
+	public void lineFollowsThePlannedStartLeg() throws IOException
+	{
+		PlayerSnapshot maxed = ready(Loadouts.load("maxed-main").getCarried());
+		boolean[] allRows = new boolean[table.rowCount()];
+		Arrays.fill(allRows, true);
+		for (String name : List.of("2824_2896_0", "2848_2896_0", "2808_2904_0", "2848_2888_0"))
+		{
+			SceneBfs.Scene scene = scene(name);
+			for (int x = 2880; x <= 2930; x += 2)
+			{
+				WorldPoint from = new WorldPoint(x, 2942, 0);
+				for (WorldPoint goal : List.of(KHARAZI_CLUE, KHARAZI_STASH))
+				{
+					List<WorldPoint> line = scene.contains(from) ? plannedLine(maxed, scene, from, allRows, "emote:12544", goal) : List.of();
+					WorldPoint end = line.isEmpty() ? null : line.get(line.size() - 1);
+					assertTrue(name + ": the line from " + from + " to " + goal + " ends on the ledge past the vine, at " + end,
+						end == null || end.getY() < LEDGE_SOUTH_Y || end.getX() <= VINE_X);
+				}
+			}
+		}
+		WorldPoint at = new WorldPoint(2509, 2954, 0);
+		List<WorldPoint> line = plannedLine(maxed, scene("2488_2872_0"), at, allRows, "coordinate:3548", new WorldPoint(2581, 3030, 0));
+		WorldPoint caveEntrance = new WorldPoint(2500, 2988, 0);
+		assertTrue("towards the hole from " + at + ": " + line, !line.isEmpty()
+			&& line.get(line.size() - 1).distanceTo2D(caveEntrance) < at.distanceTo2D(caveEntrance));
+
+		SceneBfs.Scene isafdar = scene("2096_3016_0");
+		WorldPoint landing = new WorldPoint(2150, 3070, 0);
+		WorldPoint tyrasClue = new WorldPoint(2209, 3161, 0);
+		Route planned = checked(input(maxed, step("coordinate:3560"), PlanStart.scene(landing, SceneBfs.run(isafdar, landing, table, allRows)),
+			PlannerSettings.builder().build()).build()).getBest();
+		WorldPoint walkedOn = new WorldPoint(2162, 3093, 0);
+		List<WorldPoint> onward = ScenePath.toward(SceneBfs.run(isafdar, walkedOn, table, allRows), table, tyrasClue, planned.getStartVia(),
+			planned.getStartJoinedFrom());
+		assertTrue("a line on from " + walkedOn + ", past the landing's walk: " + onward, onward.size() > MIN_LINE_TILES);
+	}
+
+	private List<WorldPoint> plannedLine(PlayerSnapshot player, SceneBfs.Scene scene, WorldPoint at, boolean[] rows, String key,
+		WorldPoint goal)
+	{
+		SceneBfs.Result bfs = SceneBfs.run(scene, at, table, rows);
+		Route best = checked(input(player, step(key), PlanStart.scene(at, bfs), PlannerSettings.builder().build()).build()).getBest();
+		return best.getStartVia() == null ? List.of() : ScenePath.toward(bfs, table, goal, best.getStartVia(), best.getStartJoinedFrom());
+	}
+
+	private static SceneBfs.Scene scene(String name) throws IOException
+	{
+		try (InputStream in = GoldenRoutesTest.class.getResourceAsStream("/scenes/" + name + ".scene.gz"))
+		{
+			return SceneFiles.read(in).getScene();
+		}
+	}
+
 	@Test
 	public void specialCasesMatchTheirGoldenFile() throws IOException
 	{
@@ -220,6 +292,7 @@ public class GoldenRoutesTest
 		bankCases(lines, maxed, mid, midBank, bankOn);
 		houseCases(lines, maxed, plain);
 		networkCases(lines, maxed, mid, plain);
+		rideCases(lines, maxed, plain);
 		lines.add(line("start on a node: standing at the Varrock Teleport landing, to Varrock bank crates",
 			checked(input(mid, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3213, 3424, 0))), plain).build())));
 
@@ -283,6 +356,15 @@ public class GoldenRoutesTest
 			checked(input(capesBanked, step("cryptic:search the boxes in a shop in taverley."), PlanStart.atNode(table, craftingGuildBank), bankOn)
 				.atOpenBank(true).banked(capesBanked.toBuilder().bank(capesBank).build()).build())));
 
+		PlannerSettings bookOut = bankOn.toBuilder().scrollBookOutOfWilderness(true).build();
+		Step lavaMaze = step("emote:12075");
+		lines.add(line("scroll book kept out of the Wilderness: carried, to the Lava Maze",
+			checked(input(maxed, lavaMaze, PlanStart.teleportOnly(ANYWHERE), bookOut).banked(maxed).build())));
+		PlayerSnapshot bookBanked = withoutAll(maxed, Set.of(BookScrolls.BOOK));
+		lines.add(line("scroll book kept out of the Wilderness: banked, to the Lava Maze",
+			checked(input(bookBanked, lavaMaze, PlanStart.teleportOnly(ANYWHERE), bookOut)
+				.banked(bookBanked.toBuilder().bank(merged(bookBanked.getBank(), BookScrolls.BOOK)).build()).build())));
+
 		int geBank = table.node(new WorldPoint(3162, 3489, 0));
 		lines.add(line("at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required",
 			checked(input(mid, step("cryptic:search the crates in a bank in varrock."), PlanStart.atNode(table, geBank), bankOn)
@@ -302,8 +384,9 @@ public class GoldenRoutesTest
 		PlayerSnapshot arceuus = capeUsesLeft(onBook(maxed, Book.ARCEUUS, false), 0);
 		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house",
 			checked(input(arceuus, fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
-		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus",
-			checked(input(arceuus.toBuilder().house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_ALTAR_OCCULT)).build()).build(),
+		lines.add(line("house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)",
+			checked(input(withVarbits(arceuus, Map.of(VarbitID.WILDERNESS_DIARY_HARD_COMPLETE, 0)).toBuilder()
+				.house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_ALTAR_OCCULT)).build()).build(),
 				fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		HouseState varbitsOnly = full.toBuilder().furniture(Set.of(ObjectID.POH_AMULET_XERIC_INFERNO, ObjectID.POH_AMULET_DIG_FOSSIL,
 			ObjectID.POH_JEWELLERY_BOX_3)).source(HouseState.Source.VARBITS).scannedAt(0).build();
@@ -356,10 +439,68 @@ public class GoldenRoutesTest
 		lines.add(line("partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
 			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().bankEdge(true).build())
 				.banked(withBank(twoPassages, Map.of(ItemID.NECKLACE_OF_PASSAGE_5, 1, ItemID.NECKLACE_OF_PASSAGE_2, 1))).build())));
+		lines.add(line("pharaoh's sceptre: carried, maxed, yawn in the 7th room of Pyramid Plunder",
+			checked(input(alsoCarrying(maxed, ItemID.PHARAOHS_SCEPTRE_CHARGED), step("emote:yawn in the 7th room of pyramid plunder. "
+				+ "beware of double agents! equip a pharaoh sceptre and a full set of menaphite robes."), PlanStart.teleportOnly(ANYWHERE), plain)
+				.build())));
 		PlayerSnapshot whistle = alsoCarrying(maxed, Loadouts.itemId("Quetzal whistle"));
 		lines.add(line("quetzal whistle: carried, maxed, emote outside the gates of Cam Torum",
 			checked(input(whistle, step("emote:salute outside the gates of cam torum. beware of double agents! equip a full set of blue moon equipment."),
 				PlanStart.teleportOnly(ANYWHERE), plain).build())));
+	}
+
+	/** One case per ride kind, boarding where the ride starts with nothing else to travel by; then the Sailing teleports. */
+	private static void rideCases(List<String> lines, PlayerSnapshot maxed, PlannerSettings plain)
+	{
+		String[][] rides = {
+			{"boat", "2720,3301,0", "cryptic:try not to step on any aquatic nasties while searching this crate."},
+			{"charter", "2792,3414,0", "cryptic:talk to charles at port piscarilius."},
+			{"canoe", "3132,3510,0", "cryptic:search the boxes in the goblin house near lumbridge."},
+			{"carpet", "3311,3109,0", "cipher:19768"},
+			{"minecart", "1808,3481,0", "spot:ZEAH_FARMING_GUILD_W"},
+			{"lever", "3067,10253,0", "emote:dance in the king black dragon's lair. beware of double agents! equip a black dragonhide body, black dragonhide vambraces and a black dragon mask."},
+			{"lever, then the keep's web", "3090,3475,0", "emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers."},
+			{"glider", "2465,3501,3", "cryptic:search the crates in the most north-western house in al kharid."},
+			{"balloon", "2461,3111,0", "spot:MISTHALIN_LUMBER_YARD"},
+			{"mushtree", "3764,3879,1", "anagram:21524"},
+			{"wilderness obelisk", "2979,3865,0", "spot:WILDERNESS_20"}};
+		PlayerSnapshot rider = ridesOnly(maxed);
+		for (String[] ride : rides)
+		{
+			String[] xyz = ride[1].split(",");
+			WorldPoint at = new WorldPoint(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2]));
+			lines.add(line("ride: " + ride[0] + ", boarding at " + ride[1] + " with coins, an axe and logs only, " + ride[2],
+				checked(input(rider, step(ride[2]), PlanStart.atNode(table, table.node(at)), plain).build())));
+		}
+		PlayerSnapshot axeBanked = withoutAll(rider, Set.of(ItemID.DRAGON_AXE));
+		lines.add(line("ride: lever, then the keep's web, boarding at 3090,3475,0 with the axe and a Wilderness sword banked, clap in the Magic Axe Hut",
+			checked(input(axeBanked, step("emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers."),
+				PlanStart.atNode(table, table.node(new WorldPoint(3090, 3475, 0))), plain.toBuilder().bankEdge(true).build())
+				.banked(withBank(axeBanked, Map.of(ItemID.DRAGON_AXE, 1, ItemID.WILDERNESS_SWORD_EASY, 1))).build())));
+		Step tear = step("cryptic:i sit on the beach and cry for those that have passed on.");
+		PlayerSnapshot boatAtTheTear = withVarbits(maxed, Map.of(VarbitID.SAILING_BOAT_1_OWNED, 1, VarbitID.SAILING_BOAT_1_PORT,
+			TEAR_OF_THE_SOUL_DOCK, VarbitID.SAILING_BOAT_1_TELEPORT_FOCUS, GREATER_TELEPORT_FOCUS, VarbitID.AMENITY_ROWBOAT_SOUL_TEAR, 0));
+		lines.add(line("sailing: boat 1 moored at the Tear of the Soul with a greater teleport focus, maxed, the Tear's beach",
+			checked(input(boatAtTheTear, tear, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium",
+			checked(input(alsoCarrying(maxed, ItemID.SAILORS_AMULET), step("emote:31268"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
+	}
+
+	private static PlayerSnapshot ridesOnly(PlayerSnapshot player)
+	{
+		Map<Integer, Integer> varps = new HashMap<>(player.getVarps());
+		varps.put(HOME_TELEPORT_TIMER_VARP, (int) NOW_MINUTES);
+		varps.put(MINIGAME_TELEPORT_TIMER_VARP, (int) NOW_MINUTES);
+		return player.toBuilder().inventory(Map.of(ItemID.COINS, 1_000_000, ItemID.DRAGON_AXE, 1, ItemID.LOGS, 1, ItemID.OAK_LOGS, 1,
+				ItemID.WILLOW_LOGS, 1, ItemID.YEW_LOGS, 1, ItemID.MAGIC_LOGS, 1, ItemID.ECTOTOKEN, 100))
+			.worn(Map.of()).pouchHeld(false).charges(Map.of()).house(HouseState.NONE).varps(varps).build();
+	}
+
+	private static PlayerSnapshot withVarbits(PlayerSnapshot player, Map<Integer, Integer> values)
+	{
+		Map<Integer, Integer> varbits = new HashMap<>(player.getVarbits());
+		varbits.putAll(values);
+		return player.toBuilder().varbits(varbits).build();
 	}
 
 	private static PlayerSnapshot withLevel(PlayerSnapshot player, Skill skill, int level)

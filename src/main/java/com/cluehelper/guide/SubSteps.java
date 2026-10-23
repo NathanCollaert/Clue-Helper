@@ -5,6 +5,8 @@ import com.cluehelper.player.Container;
 import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.route.Exit;
+import com.cluehelper.player.PositionRules;
+import com.cluehelper.route.BookScrolls;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Route;
 import com.cluehelper.step.ClueTypes;
@@ -28,7 +30,9 @@ import net.runelite.api.coords.WorldPoint;
 
 public final class SubSteps
 {
-	static final int ARRIVE_TILES = 3;
+	public static final int ARRIVE_TILES = 3;
+	/** The Agility Pyramid's course spans its foot; a cave's way in is a tile. */
+	private static final int ON_WAY_IN_TILES = 40;
 	/** Some teleports land anywhere in a small area, beyond the catalog's 0–2 tile spread. */
 	static final int LANDING_TILES = 10;
 	/** A wandering NPC: being in its area is enough. */
@@ -39,6 +43,16 @@ public final class SubSteps
 	private static final String TALK_TO = "Talk to";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
 	private static final String QUETZAL_MENU = "quetzal ";
+	private static final String NPC_MENU = "npc ";
+	/** Between a menu cell's option and the list line it opens. */
+	private static final String MENU_STEP = " > ";
+	private static final String SCROLL_BOOK = "master scroll book";
+	private static final String OPEN_OPTION = "Open";
+	private static final String READ_OPTION = "Read";
+	static final String REMOVE_OPTION = "Remove";
+	private static final Map<Category, String> RIDE_PLACES = Map.of(Category.BOAT, "the boat", Category.CANOE,
+		"the canoe station", Category.MINECART, "the minecart", Category.LEVER, "the lever", Category.BALLOON,
+		"the balloon basket", Category.MUSHTREE, "the mushtree", Category.WILDERNESS_OBELISK, "the obelisk");
 	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
 	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
 	private static final Map<String, String> CHANGE_WARNINGS = Map.of(
@@ -66,10 +80,20 @@ public final class SubSteps
 	 * start leg leaves the scene by, or null; {@code takeFromStash} when the step's items wait in its STASH unit.
 	 */
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
+		Function<Leg, Exit> exits, boolean takeFromStash, boolean bookStaysOut, boolean carriesBook)
+	{
+		List<SubStep> steps = withWanderNote(withWayInEquipped(of(route, step, itemNames, house, exits, takeFromStash), step.getData()),
+			step.getData());
+		boolean wildernessTarget = step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0);
+		return bookStaysOut ? withBookBanked(steps, carriesBook, wildernessTarget) : steps;
+	}
+
+	private static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
 		Function<Leg, Exit> exits, boolean takeFromStash)
 	{
 		List<SubStep> steps = new ArrayList<>();
 		List<Leg> legs = route.getLegs();
+		boolean stashFirst = takeFromStash && stashOutsideWayIn(step);
 		if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 		{
 			steps.add(withdraw(route, itemNames));
@@ -85,19 +109,30 @@ public final class SubSteps
 			if (reached != null && leg.getKind() == Leg.Kind.WALK && exit == null)
 			{
 				steps.add(walkToStage(leg, reached));
-				steps.add(stageAct(reached));
+				addStageAct(steps, reached);
 				stage++;
 				continue;
 			}
 			switch (leg.getKind())
 			{
 				case WALK:
-					if (exit == null && entersStepArea(leg, step))
+				{
+					boolean wayIn = exit != null && isWayIn(exit, step);
+					if ((exit == null || wayIn) && entersStepArea(leg, step))
 					{
+						if (stashFirst)
+						{
+							steps.add(stashWalk(stashTile(step)));
+							steps.addAll(Acts.fromStash(step));
+						}
 						steps.add(enter(step.getData()));
 					}
-					steps.add(exit != null ? exit(leg, exit) : walk(leg, next, step));
+					if (exit != null || wayIn || !boardedThere(next))
+					{
+						steps.add(exit != null && !wayIn ? exit(leg, exit) : walk(leg, next, step, takeFromStash && !stashFirst));
+					}
 					break;
+				}
 				case WILDERNESS_EXIT:
 					steps.add(SubStep.builder().kind(SubStep.Kind.WILDERNESS_EXIT).text("Walk south out of deep Wilderness")
 						.detail("Teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
@@ -123,21 +158,128 @@ public final class SubSteps
 			}
 			if (reached != null)
 			{
-				steps.add(stageAct(reached));
+				addStageAct(steps, reached);
 				stage++;
 			}
 		}
 		Stage last = stages.isEmpty() ? null : stages.get(stages.size() - 1);
 		if (last != null && last.getKind() != Stage.Kind.FINAL)
 		{
-			steps.add(stageAct(last));
+			addStageAct(steps, last);
 		}
 		else
 		{
-			steps.addAll(Acts.of(step, takeFromStash));
+			steps.addAll(Acts.of(step, takeFromStash && !stashFirst));
 		}
 		addActsDoneAnywhere(steps, step);
 		return steps;
+	}
+
+	/**
+	 * The master scroll book stays out of the Wilderness. Its own teleport there reads the loose scroll, taken out with the
+	 * bank closed (a click in the bank interface deposits), then the book is deposited; any other teleport there banks a
+	 * carried book. Each sub-step is done by what is carried and whether the bank is open, so a new plan picks up where
+	 * the player is.
+	 */
+	private static List<SubStep> withBookBanked(List<SubStep> steps, boolean carriesBook, boolean wildernessTarget)
+	{
+		for (int i = 0; i < steps.size(); i++)
+		{
+			SubStep teleport = steps.get(i);
+			CatalogRow row = teleport.getKind() == SubStep.Kind.TELEPORT ? teleport.getRow() : null;
+			boolean bookRow = row != null && BookScrolls.isTakenOutAtBank(row, true);
+			if (row != null && (bookRow || carriesBook && BookScrolls.intoWilderness(row)))
+			{
+				return bookBanked(steps, i, bookRow);
+			}
+		}
+		return carriesBook && wildernessTarget ? withBookDeposited(steps) : steps;
+	}
+
+	/** Walking into the Wilderness: the plan's bank stop takes the book. */
+	private static List<SubStep> withBookDeposited(List<SubStep> steps)
+	{
+		List<SubStep> out = new ArrayList<>(steps);
+		int bank = lastBefore(out, out.size(), SubStep.Kind.BANK);
+		if (bank >= 0)
+		{
+			out.add(bank + 1, deposit());
+		}
+		else
+		{
+			out.addAll(0, List.of(bankAgain(null), deposit(), closeBank()));
+		}
+		return List.copyOf(out);
+	}
+
+	private static List<SubStep> bookBanked(List<SubStep> steps, int teleportAt, boolean bookRow)
+	{
+		List<SubStep> out = new ArrayList<>(steps);
+		SubStep teleport = out.get(teleportAt);
+		String scroll = bookRow ? BookScrolls.scrollName(teleport.getRow()) : null;
+		if (bookRow)
+		{
+			out.set(teleportAt, teleport.toBuilder().text("Read the " + scroll + " scroll").actItemNamed(scroll.toLowerCase())
+				.actOption(READ_OPTION).build());
+		}
+		int bank = lastBefore(out, teleportAt, SubStep.Kind.BANK);
+		int withdraw = lastBefore(out, teleportAt, SubStep.Kind.WITHDRAW);
+		boolean bookFromBank = withdraw >= 0 && out.get(withdraw).getBankItems().contains(BookScrolls.BOOK);
+		WorldPoint bankTile = bank >= 0 ? out.get(bank).getWaypoint() : null;
+		if (bookRow && (bookFromBank || bank < 0))
+		{
+			out.addAll(withdraw >= 0 ? withdraw + 1 : 0, List.of(takeOut(teleport.getRow()), bankAgain(bankTile), deposit(), closeBank()));
+			return List.copyOf(out);
+		}
+		if (bank < 0)
+		{
+			out.addAll(0, List.of(bankAgain(null), deposit(), closeBank()));
+			return List.copyOf(out);
+		}
+		out.add(bank + 1, deposit());
+		if (bookRow)
+		{
+			out.add(bank, takeOut(teleport.getRow()));
+		}
+		return List.copyOf(out);
+	}
+
+	private static int lastBefore(List<SubStep> steps, int before, SubStep.Kind kind)
+	{
+		for (int i = before - 1; i >= 0; i--)
+		{
+			if (steps.get(i).getKind() == kind)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/** Opens the book, then Remove on the scroll's entry; {@code row} is the book's teleport. */
+	private static SubStep takeOut(CatalogRow row)
+	{
+		String scroll = BookScrolls.scrollName(row);
+		return SubStep.builder().kind(SubStep.Kind.ACT).text("Open the master scroll book: take out a " + scroll)
+			.detail("With the bank closed").row(row).actItemNamed(SCROLL_BOOK).actOption(OPEN_OPTION)
+			.carriedWhenDone(scroll.toLowerCase()).done(SubStep.Done.ITEM_CARRIED).build();
+	}
+
+	private static SubStep bankAgain(WorldPoint bank)
+	{
+		return SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank").detail("To deposit the master scroll book")
+			.waypoint(bank).build();
+	}
+
+	private static SubStep deposit()
+	{
+		return SubStep.builder().kind(SubStep.Kind.ACT).text("Deposit the master scroll book").detail("It stays out of the Wilderness")
+			.actItemNamed(SCROLL_BOOK).done(SubStep.Done.ITEM_GONE).build();
+	}
+
+	private static SubStep closeBank()
+	{
+		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text("Close the bank").build();
 	}
 
 	/** After the last bank stop, which may be what brings the task's items. */
@@ -165,19 +307,20 @@ public final class SubSteps
 		int radius = stage.getRadius() > 0 ? stage.getRadius() : ARRIVE_TILES;
 		if (!stage.isOurMarker())
 		{
-			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail("Follow the Clue Scroll marker")
+			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue")
 				.goal(leg.getTo()).radius(radius).build();
 		}
-		String text = stage.getNpcIds().isEmpty() ? "Walk to the marker" : "Walk to the outlined NPC";
-		return SubStep.builder().kind(SubStep.Kind.WALK).text(text)
-			.waypoint(leg.getTo()).goal(leg.getTo()).radius(radius).npcIds(stage.getNpcIds()).build();
+		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
+			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
+		return SubStep.builder().kind(SubStep.Kind.WALK).text(text).waypoint(leg.getTo()).goal(leg.getTo()).radius(radius)
+			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).build();
 	}
 
 	/** Ends when the stage is dropped from the step, which brings a new plan. */
 	static SubStep stageAct(Stage stage)
 	{
 		return SubStep.builder().kind(SubStep.Kind.ACT).text(stage.getAct()).detail(stage.getDetail()).stage(stage)
-			.npcIds(stage.getNpcIds()).build();
+			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).build();
 	}
 
 	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
@@ -200,8 +343,13 @@ public final class SubSteps
 		return itemNames.apply(use.getItemId()) + storage;
 	}
 
-	private static SubStep walk(Leg leg, Leg next, Step step)
+	private static SubStep walk(Leg leg, Leg next, Step step, boolean takeFromStash)
 	{
+		WorldPoint stash = takeFromStash ? stashTile(step) : null;
+		if (stash != null && step.getTargets().contains(leg.getTo()))
+		{
+			return stashWalk(stash);
+		}
 		if (step.getWaypointAct() != null && step.getTargets().contains(leg.getTo()))
 		{
 			return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the marker")
@@ -210,11 +358,55 @@ public final class SubSteps
 		if (step.getTargets().contains(leg.getTo()))
 		{
 			int radius = step.getKind() == TargetKind.AREA ? AREA_ARRIVE_TILES : ARRIVE_TILES;
-			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").detail("Follow the Clue Scroll marker")
+			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue")
 				.goal(leg.getTo()).radius(radius).build();
 		}
 		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to " + walkGoal(next))
 			.waypoint(leg.getTo()).goal(leg.getTo()).radius(ARRIVE_TILES).build();
+	}
+
+	/** The step's way in, when the player is on it: near its start, any floor, and not yet inside. */
+	public static SubStep goingIn(Step step, WorldPoint at)
+	{
+		StepIndex.WayIn way = step == null || step.getData() == null ? null : step.getData().getEntry();
+		boolean byStart = way != null && at != null && way.getTile() != null && at.distanceTo2D(way.getTile()) <= ON_WAY_IN_TILES;
+		boolean onIt = way != null && (byStart || way.isPartWay(at)) && !way.isInside(at);
+		return onIt ? enter(step.getData()) : null;
+	}
+
+	/**
+	 * A fairy ring, ride or spirit tree used where it stands: its own sub-step leads the line there and colours its menu
+	 * from the start, so no "Walk to" comes before it.
+	 */
+	private static boolean boardedThere(Leg next)
+	{
+		return next != null && (next.getKind() == Leg.Kind.FAIRY_RING
+			|| next.getKind() == Leg.Kind.TELEPORT && next.getRow() != null && next.getRow().isLocated() && !next.getRow().isInHouse());
+	}
+
+	private static SubStep stashWalk(WorldPoint stash)
+	{
+		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the STASH unit").waypoint(stash).goal(stash).radius(ARRIVE_TILES).build();
+	}
+
+	/** The STASH unit stands outside the step's way in (the Agility Pyramid's, at its foot): its items come first. */
+	private static boolean stashOutsideWayIn(Step step)
+	{
+		WorldPoint stash = stashTile(step);
+		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
+		return stash != null && way != null && !way.isInside(stash);
+	}
+
+	/** An exit leg that is the step's own hand-written way in, named by its text instead of "Take the exit". */
+	private static boolean isWayIn(Exit exit, Step step)
+	{
+		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
+		return way != null && exit.getOrigin().equals(way.getTile()) && exit.getDestination().equals(way.getTo());
+	}
+
+	static WorldPoint stashTile(Step step)
+	{
+		return step.getData() == null || step.getData().getStash() == null ? null : step.getData().getStash().getTile();
 	}
 
 	/** The last walk to the step starts outside its hand-written way in. */
@@ -222,6 +414,67 @@ public final class SubSteps
 	{
 		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
 		return way != null && step.getTargets().contains(leg.getTo()) && !way.isInside(leg.getFrom());
+	}
+
+	/** Before going in, the gear the way in needs worn is put on. */
+	private static void addStageAct(List<SubStep> steps, Stage stage)
+	{
+		steps.addAll(stageActs(stage));
+	}
+
+	/** Gear the act wants worn goes on just before, so each part of a three-step can wear its own. */
+	static List<SubStep> stageActs(Stage stage)
+	{
+		if (stage.getWorn().isEmpty())
+		{
+			return List.of(stageAct(stage));
+		}
+		List<SubStep> acts = new ArrayList<>(equip(stage.getWorn()));
+		acts.add(stageAct(stage));
+		return List.copyOf(acts);
+	}
+
+	/** Put on the needs named, done once worn items alone meet them. */
+	static List<SubStep> equip(List<String> wornNeeds)
+	{
+		return List.of(SubStep.builder().kind(SubStep.Kind.ACT).text("Equip the " + String.join(" and ", wornNeeds))
+			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(StepGuide.Tab.INVENTORY).build());
+	}
+
+	/** A wide wanderer is looked for rather than walked to: where it wanders goes under the walk. */
+	private static List<SubStep> withWanderNote(List<SubStep> steps, StepIndex.Entry data)
+	{
+		StepIndex.Wander wander = data == null ? null : data.getWander();
+		if (wander == null || wander.getText() == null)
+		{
+			return steps;
+		}
+		return steps.stream().map(sub -> sub.getKind() == SubStep.Kind.WALK_TO_CLUE ? sub.toBuilder().detail(wander.getText()).build() : sub)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
+	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data)
+	{
+		List<StepIndex.Requires> worn = data == null ? List.of()
+			: data.getRequires().stream().filter(StepIndex.Requires::isWear).collect(Collectors.toList());
+		if (worn.isEmpty())
+		{
+			return steps;
+		}
+		SubStep equip = SubStep.builder().kind(SubStep.Kind.ACT)
+			.text("Equip the " + worn.stream().map(StepIndex.Requires::getName).collect(Collectors.joining(" and ")))
+			.actItems(worn.stream().flatMap(need -> need.getIds().stream()).collect(Collectors.toUnmodifiableSet()))
+			.done(SubStep.Done.WAY_IN_WORN).tab(StepGuide.Tab.INVENTORY).build();
+		List<SubStep> out = new ArrayList<>();
+		for (SubStep sub : steps)
+		{
+			if (sub.getKind() == SubStep.Kind.ENTER)
+			{
+				out.add(equip);
+			}
+			out.add(sub);
+		}
+		return List.copyOf(out);
 	}
 
 	private static SubStep enter(StepIndex.Entry data)
@@ -278,7 +531,11 @@ public final class SubSteps
 		{
 			return "the spirit tree";
 		}
-		return row.getCategory() == Category.QUETZAL ? "Renu" : "the marker";
+		if (row.getMenu() != null && row.getMenu().startsWith(NPC_MENU))
+		{
+			return "the outlined NPC";
+		}
+		return row.getCategory() == Category.QUETZAL ? "Renu" : RIDE_PLACES.getOrDefault(row.getCategory(), "the marker");
 	}
 
 	/** The Swap's book is its spell's, not the leg's: after the cast the player is back on Lunar. */
@@ -293,7 +550,7 @@ public final class SubSteps
 	{
 		CatalogRow row = leg.getRow();
 		WorldPoint standsAt = row.isLocated() && !row.isInHouse() ? leg.getFrom() : null;
-		return SubStep.builder().kind(SubStep.Kind.TELEPORT).text(teleportText(row)).detail(withHotkey(teleportDetail(row), hotkey(row, house)))
+		return SubStep.builder().kind(SubStep.Kind.TELEPORT).text(withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
 			.waypoint(standsAt).goal(leg.getTo()).radius(LANDING_TILES).row(row).build();
 	}
 
@@ -324,7 +581,7 @@ public final class SubSteps
 	{
 		if (row.isInHouse())
 		{
-			return houseDetail(row);
+			return null;
 		}
 		if (row.getCategory() == Category.SPIRIT_TREE)
 		{
@@ -380,19 +637,27 @@ public final class SubSteps
 			return line < MenuLines.HOTKEYS.length() ? MenuLines.HOTKEYS.charAt(line) : 0;
 		}
 		String label = menu != null && menu.startsWith("list ") ? menu.substring("list ".length())
+			: menu != null && menu.contains(MENU_STEP) ? menu.substring(menu.lastIndexOf(MENU_STEP) + MENU_STEP.length())
 			: row.getName().substring(row.getName().lastIndexOf(": ") + 2);
 		Matcher key = LIST_HOTKEY.matcher(label);
 		return key.find() ? key.group(1).charAt(0) : 0;
 	}
 
-	private static String withHotkey(String detail, char key)
+	/**
+	 * The hotkey in the menu line's colour: the list label's own ("diary cape: B. Hatius Cosaintus"), else put before
+	 * the destination as a list label shows it ("Jewellery box: 7. Burthorpe").
+	 */
+	static String withKey(String text, char key)
 	{
 		if (key == 0)
 		{
-			return detail;
+			return text;
 		}
-		String press = "press " + key;
-		return detail == null ? "In the list, " + press : detail + ", then " + press;
+		String coloured = Matcher.quoteReplacement(MenuLines.keyText(key));
+		String inLabel = text.replaceFirst("(?<=: )" + Pattern.quote(String.valueOf(key)) + "(?=[.:] )", coloured);
+		int colon = text.lastIndexOf(": ");
+		return !inLabel.equals(text) || colon < 0 ? inLabel : text.substring(0, colon + 2) + MenuLines.keyText(key) + ". "
+			+ text.substring(colon + 2);
 	}
 
 	static String houseText(CatalogRow row)
@@ -403,30 +668,7 @@ public final class SubSteps
 		{
 			return "Enter the " + name.substring(colon + 2) + " portal";
 		}
-		return colon < 0 ? "Use the " + name.toLowerCase() : name.substring(0, colon) + " → " + name.substring(colon + 2);
-	}
-
-	private static String houseDetail(CatalogRow row)
-	{
-		String menu = row.getMenu();
-		if (menu == null)
-		{
-			return null;
-		}
-		String[] parts = menu.split(" ", 2);
-		switch (parts[0])
-		{
-			case "nexus":
-				return "Teleport Menu (map: " + parts[1].split(" ", 2)[1] + ")";
-			case "box":
-				return "Teleport Menu";
-			case "op":
-				return row.getMenuTicks() == 0 ? "Left-click" : "Right-click: " + parts[1];
-			case "list":
-				return "Right-click: Teleport menu";
-			default:
-				return null;
-		}
+		return colon < 0 ? "Use the " + name.toLowerCase() : name;
 	}
 
 	static String nexusPlace(String rowName)
@@ -444,7 +686,7 @@ public final class SubSteps
 		String where = place.startsWith(FAIRY_RING_PREFIX) && colon >= 0 ? place.substring(colon + 2) : place;
 		boolean coded = landing.getCode() != null && landing.getCode().length() == 3;
 		return SubStep.builder().kind(SubStep.Kind.FAIRY_RING)
-			.text(coded ? "Fairy ring " + landing.getCode() : "Fairy ring to " + where)
+			.text(coded ? "Fairy ring " + MenuLines.menuColoured(landing.getCode()) : "Fairy ring to " + where)
 			.waypoint(leg.getFrom()).goal(leg.getTo()).radius(LANDING_TILES).row(landing).build();
 	}
 
@@ -508,7 +750,7 @@ public final class SubSteps
 			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what + " with the key")
 				.detail("The key comes from " + step.getNpcs().get(0)).build();
 		}
-		return SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step)).detail("The Clue Scroll plugin shows the details").build();
+		return SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step)).build();
 	}
 
 	/**

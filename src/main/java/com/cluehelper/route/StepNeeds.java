@@ -3,19 +3,25 @@ package com.cluehelper.route;
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.DiggingDog;
 import com.cluehelper.memory.StashMemory;
+import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepRequirements;
+import com.cluehelper.transport.AvailabilityService;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
@@ -43,15 +49,19 @@ public class StepNeeds
 	private final Client client;
 	private final StashMemory stash;
 	private final ClueHelperConfig config;
+	private final GearPieces gearPieces;
+	private final AvailabilityService availability;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 
 	@Inject
-	StepNeeds(Client client, StashMemory stash, ClueHelperConfig config)
+	StepNeeds(Client client, StashMemory stash, ClueHelperConfig config, GearPieces gearPieces, AvailabilityService availability)
 	{
 		this.client = client;
 		this.stash = stash;
 		this.config = config;
+		this.gearPieces = gearPieces;
+		this.availability = availability;
 	}
 
 	public RequiredItems of(Step step)
@@ -89,12 +99,42 @@ public class StepNeeds
 			{
 				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
 			}
+			Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds();
+			for (StepIndex.Gear gear : step.getData().getGear())
+			{
+				GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.of(gear.getBonus(), owned));
+				needs.add(new RequiredItems.Need(gear.getName(), worn, false, false));
+			}
 		}
 		return RequiredItems.builder()
 			.needs(List.copyOf(needs))
 			.stash(stash(requirements))
 			.spadeAtLeprechaun(client.getVarbitValue(VarbitID.FARMING_TOOLS_SPADE) > 0)
 			.build();
+	}
+
+	/** Gear is picked from all of these, the bank only while banking counts. */
+	private Set<Integer> ownedItemIds()
+	{
+		Set<Integer> ids = new HashSet<>();
+		for (int container : new int[]{InventoryID.INV, InventoryID.WORN})
+		{
+			ItemContainer items = client.getItemContainer(container);
+			for (Item item : items == null ? new Item[0] : items.getItems())
+			{
+				if (item.getId() > 0)
+				{
+					ids.add(item.getId());
+				}
+			}
+		}
+		PlayerSnapshot banked = availability.getBankedSnapshot();
+		if (banked != null)
+		{
+			ids.addAll(banked.getBank().keySet());
+			ids.addAll(banked.getGroupStorage().keySet());
+		}
+		return ids;
 	}
 
 	private boolean firePitLit(StepRequirements requirements)

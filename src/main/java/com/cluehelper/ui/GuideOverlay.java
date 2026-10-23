@@ -4,7 +4,9 @@ import com.cluehelper.ClueHelperPlugin;
 import com.cluehelper.hotcold.HotColdView;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,6 +18,8 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ComponentConstants;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
+import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.Text;
 
 /** The guidance text, under the Clue Scroll plugin's own box and as wide. Renders only the value it was handed. */
 @Singleton
@@ -29,8 +33,10 @@ public class GuideOverlay extends OverlayPanel
 	private static final Color WARNING = new Color(255, 170, 60);
 	/** Dimmer than the item lines, so the step after this one reads as not yet. */
 	private static final Color UPCOMING = new Color(135, 135, 135);
+	private static final char NO_BREAK = ' ';
 
 	private volatile GuideBox box = GuideBox.EMPTY;
+	private FontMetrics metrics;
 
 	@Inject
 	GuideOverlay(ClueHelperPlugin plugin)
@@ -62,6 +68,7 @@ public class GuideOverlay extends OverlayPanel
 			return null;
 		}
 		panelComponent.setPreferredSize(new Dimension(ComponentConstants.STANDARD_WIDTH, 0));
+		metrics = graphics.getFontMetrics();
 		panelComponent.getChildren().add(TitleComponent.builder().text(TITLE).color(TEXT).build());
 		line(shown.title(), TEXT);
 		line(shown.detail(), MUTED);
@@ -81,7 +88,7 @@ public class GuideOverlay extends OverlayPanel
 		if (shown.getNext() != null)
 		{
 			gap();
-			panelComponent.getChildren().add(LineComponent.builder().left(shown.getNext()).leftColor(UPCOMING)
+			panelComponent.getChildren().add(LineComponent.builder().left(closeColours(shown.getNext(), UPCOMING)).leftColor(UPCOMING)
 				.leftFont(FontManager.getRunescapeSmallFont()).build());
 		}
 		return super.render(graphics);
@@ -105,9 +112,45 @@ public class GuideOverlay extends OverlayPanel
 
 	private void line(String text, Color colour)
 	{
-		if (text != null && !text.isEmpty())
+		if (text == null || text.isEmpty())
 		{
-			panelComponent.getChildren().add(LineComponent.builder().left(text).leftColor(colour).build());
+			return;
 		}
+		for (String part : text.contains("<col") ? wrapTagged(text) : List.of(text))
+		{
+			panelComponent.getChildren().add(LineComponent.builder().left(closeColours(part, colour)).leftColor(colour).build());
+		}
+	}
+
+	/**
+	 * LineComponent measures a word with its colour tags when it wraps, so a coloured hotkey wraps a line early. Such a
+	 * line is wrapped here on its visible text, each piece held together by non-breaking spaces.
+	 */
+	private List<String> wrapTagged(String text)
+	{
+		int width = ComponentConstants.STANDARD_WIDTH - 2 * ComponentConstants.STANDARD_BORDER;
+		List<String> lines = new ArrayList<>();
+		StringBuilder line = new StringBuilder();
+		for (String word : text.split(" "))
+		{
+			String joined = line.length() == 0 ? word : line + " " + word;
+			if (line.length() > 0 && metrics.stringWidth(Text.removeTags(joined)) > width)
+			{
+				lines.add(line.toString().replace(' ', NO_BREAK));
+				line = new StringBuilder(word);
+			}
+			else
+			{
+				line = new StringBuilder(joined);
+			}
+		}
+		lines.add(line.toString().replace(' ', NO_BREAK));
+		return lines;
+	}
+
+	/** The box's text knows no closing colour tag: a coloured hotkey switches back to the line's own colour. */
+	private static String closeColours(String text, Color colour)
+	{
+		return text.replace("</col>", ColorUtil.colorTag(colour));
 	}
 }

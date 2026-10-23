@@ -11,8 +11,8 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 
 /**
- * Read from the hover menu's top entry, so Menu Entry Swapper's swaps are included. An item or object's left click is
- * unknown until the mouse has been over it once.
+ * Read from the hover menu's top entry, so Menu Entry Swapper's swaps are included. An item, object or NPC's left click
+ * is unknown until the mouse has been over it once.
  */
 final class LeftClicks
 {
@@ -21,6 +21,9 @@ final class LeftClicks
 	private static final String WORN_ID = "wornid:";
 	private static final int SLOT_ITEM_CHILD = 1;
 	private static final String OBJECT = "object:";
+	private static final String NPC = "npc:";
+	private static final Set<MenuAction> NPC_OPTIONS = EnumSet.of(MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION,
+		MenuAction.NPC_THIRD_OPTION, MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION);
 	private static final Set<MenuAction> OBJECT_OPTIONS = EnumSet.of(MenuAction.GAME_OBJECT_FIRST_OPTION,
 		MenuAction.GAME_OBJECT_SECOND_OPTION, MenuAction.GAME_OBJECT_THIRD_OPTION, MenuAction.GAME_OBJECT_FOURTH_OPTION,
 		MenuAction.GAME_OBJECT_FIFTH_OPTION);
@@ -64,6 +67,11 @@ final class LeftClicks
 		return options.get(OBJECT + objectId);
 	}
 
+	String npc(int npcId)
+	{
+		return options.get(NPC + npcId);
+	}
+
 	private static String key(MenuEntry entry)
 	{
 		Widget widget = entry.getWidget();
@@ -80,6 +88,10 @@ final class LeftClicks
 		{
 			int slotItem = slotItem(widget);
 			return slotItem > 0 ? WORN_ID + slotItem : null;
+		}
+		if (NPC_OPTIONS.contains(entry.getType()) && entry.getNpc() != null)
+		{
+			return NPC + entry.getNpc().getId();
 		}
 		return OBJECT_OPTIONS.contains(entry.getType()) ? OBJECT + entry.getIdentifier() : null;
 	}

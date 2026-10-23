@@ -63,6 +63,14 @@ tasks.register('coreClues', JavaExec) {
 	args 'tools/cache/out/core-clues.json'
 }
 
+tasks.register('planReplay', JavaExec) {
+	group = 'tools'
+	description = 'Plan the slow-plan recordings of the dev client again and print their times: gradlew planReplay [-Pplans=<folder>]'
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.cluehelper.PlanReplay'
+	args project.findProperty('plans') ?: 'build/plans'
+}
+
 tasks.register('spellbookTimings', JavaExec) {
 	group = 'tools'
 	description = 'Print the spellbook-change trials of one probe events.jsonl: gradlew spellbookTimings -Plog=<relative path>'

@@ -43,6 +43,7 @@ final class PohTrace
 	private final Consumer<File> saveFrame;
 	private final Runnable unregister;
 	private int pendingInterface = -1;
+	private static final int TREE_CHILDREN = 80;
 	private boolean pendingMenu;
 	private int frames;
 	private String lastTarget;
@@ -100,6 +101,11 @@ final class PohTrace
 			{
 				logLayer("rows", InterfaceID.TelenexusTeleport.ROWS1);
 				logLayer("text", InterfaceID.TelenexusTeleport.TEXT1);
+			}
+			if (pendingInterface == InterfaceID.SAILING_MENU || pendingInterface == InterfaceID.CHARTERING_MENU_SIDE)
+			{
+				logTree(InterfaceID.SAILING_MENU);
+				logTree(InterfaceID.CHARTERING_MENU_SIDE);
 			}
 			frame("interface-" + pendingInterface);
 			pendingInterface = -1;
@@ -245,6 +251,35 @@ final class PohTrace
 			lines.add(i + ": y " + c.getRelativeY() + " h " + c.getHeight() + " text '" + c.getText() + "' colour " + Integer.toHexString(c.getTextColor()));
 		}
 		log.info("{} t{} nexus {} layer: {} children {}", MENU_TAG, client.getTickCount(), name, children == null ? 0 : children.length, lines);
+	}
+
+	/** Every widget of an interface we don't read yet, to learn where its lines and map markers are. */
+	private void logTree(int group)
+	{
+		for (int child = 0; child < TREE_CHILDREN; child++)
+		{
+			Widget widget = client.getWidget(group, child);
+			if (widget != null)
+			{
+				logWidget(group + ":" + child, widget);
+			}
+		}
+	}
+
+	private void logWidget(String path, Widget widget)
+	{
+		log.info("{} tree {} type {} hidden {} text '{}' name '{}' actions {} sprite {} item {} bounds {}", MENU_TAG, path,
+			widget.getType(), widget.isHidden(), widget.getText(), widget.getName(),
+			widget.getActions() == null ? "[]" : java.util.Arrays.toString(widget.getActions()), widget.getSpriteId(),
+			widget.getItemId(), widget.getBounds());
+		Widget[] dynamic = widget.getDynamicChildren();
+		for (int i = 0; dynamic != null && i < Math.min(dynamic.length, TREE_CHILDREN); i++)
+		{
+			if (dynamic[i] != null)
+			{
+				logWidget(path + "[" + i + "]", dynamic[i]);
+			}
+		}
 	}
 
 	private String describe(MenuTarget target)

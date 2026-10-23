@@ -7,13 +7,16 @@ import net.runelite.api.DecorativeObject;
 import net.runelite.api.GameObject;
 import net.runelite.api.GroundObject;
 import net.runelite.api.Model;
+import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.api.Renderable;
 import net.runelite.api.TileObject;
 import net.runelite.api.WallObject;
+import net.runelite.api.WorldView;
+import net.runelite.api.coords.LocalPoint;
 
 /**
- * The object's visible faces as one shape. Its clickbox won't do: a model that uses its bounding box as the clickbox
+ * The object's or NPC's visible faces as one shape. Its clickbox won't do: a model that uses its bounding box as the clickbox
  * (Xeric's talisman, fairy rings, spirit trees) would fill as a box. Positions follow core's ModelOutlineRenderer, so
  * the fill sits inside the outline.
  */
@@ -55,11 +58,34 @@ final class ModelSilhouette
 		return shape;
 	}
 
-	/** Back faces are left out, so every face added winds the same way and overlaps fill once. */
+	static Shape of(Client client, NPC npc)
+	{
+		Path2D.Float shape = new Path2D.Float(Path2D.WIND_NON_ZERO);
+		LocalPoint at = npc.getLocalLocation();
+		WorldView view = npc.getWorldView();
+		if (at != null && view != null)
+		{
+			int z = Perspective.getTileHeight(client, at, view.getPlane()) - npc.getAnimationHeightOffset();
+			addFaces(shape, client, view, npc, at.getX(), at.getY(), z, npc.getCurrentOrientation());
+		}
+		return shape;
+	}
+
 	private static void addFaces(Path2D shape, Client client, TileObject object, Renderable renderable, int xOffset, int yOffset,
 		int orientation)
 	{
-		Model model = renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
+		if (renderable != null)
+		{
+			addFaces(shape, client, object.getWorldView(), renderable, object.getX() + xOffset, object.getY() + yOffset,
+				object.getZ() - renderable.getAnimationHeightOffset(), orientation);
+		}
+	}
+
+	/** Back faces are left out, so every face added winds the same way and overlaps fill once. */
+	private static void addFaces(Path2D shape, Client client, WorldView view, Renderable renderable, int localX, int localY, int z,
+		int orientation)
+	{
+		Model model = renderable instanceof Model ? (Model) renderable : renderable.getModel();
 		if (model == null)
 		{
 			return;
@@ -67,8 +93,7 @@ final class ModelSilhouette
 		int count = model.getVerticesCount();
 		int[] x = new int[count];
 		int[] y = new int[count];
-		Perspective.modelToCanvas(client, object.getWorldView(), count, object.getX() + xOffset, object.getY() + yOffset,
-			object.getZ() - renderable.getAnimationHeightOffset(), orientation, model.getVerticesX(), model.getVerticesZ(),
+		Perspective.modelToCanvas(client, view, count, localX, localY, z, orientation, model.getVerticesX(), model.getVerticesZ(),
 			model.getVerticesY(), x, y);
 		int[] first = model.getFaceIndices1();
 		int[] second = model.getFaceIndices2();

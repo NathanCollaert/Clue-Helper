@@ -4,9 +4,12 @@ import com.cluehelper.player.Container;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerSnapshot;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Value;
@@ -81,10 +84,12 @@ public class RequiredItems
 			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(items(all))).collect(Collectors.toList());
 			return new Verdict(false, false, List.of(), missing);
 		}
-		return new Verdict(false, true, minimalWithdraw(open, carried, banked), List.of());
+		return new Verdict(false, true, minimalWithdraw(open, player, carried, banked), List.of());
 	}
 
-	private static List<ItemUse> minimalWithdraw(List<Need> open, Map<Integer, Integer> carried, PlayerSnapshot banked)
+	/** Drops what isn't needed, trying the gear picker's own picks last so they are the ones kept. */
+	private static List<ItemUse> minimalWithdraw(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried,
+		PlayerSnapshot banked)
 	{
 		List<ItemUse> candidates = new ArrayList<>();
 		addCandidates(open, Container.BANK, banked.getBank(), candidates);
@@ -95,6 +100,8 @@ public class RequiredItems
 			banked.getBank().forEach((id, qty) -> candidates.add(new ItemUse(Container.BANK, id, qty)));
 			banked.getGroupStorage().forEach((id, qty) -> candidates.add(new ItemUse(Container.GROUP_STORAGE, id, qty)));
 		}
+		Set<Integer> picked = gearPicks(open, player, banked);
+		candidates.sort(Comparator.comparing(candidate -> picked.contains(candidate.getItemId())));
 		List<ItemUse> kept = new ArrayList<>(candidates);
 		for (ItemUse candidate : candidates)
 		{
@@ -105,6 +112,22 @@ public class RequiredItems
 			}
 		}
 		return List.copyOf(kept);
+	}
+
+	private static Set<Integer> gearPicks(List<Need> open, PlayerSnapshot player, PlayerSnapshot banked)
+	{
+		Set<Integer> stored = new HashSet<>(banked.getBank().keySet());
+		stored.addAll(banked.getGroupStorage().keySet());
+		Set<Integer> picked = new HashSet<>();
+		for (Need need : open)
+		{
+			if (need.requirement instanceof GearRequirement)
+			{
+				((GearRequirement) need.requirement).choose(player.getWorn().keySet(), player.getInventory().keySet(), stored)
+					.ifPresent(choice -> picked.addAll(choice.getWithdraw()));
+			}
+		}
+		return picked;
 	}
 
 	private static void addCandidates(List<Need> open, Container container, Map<Integer, Integer> stored, List<ItemUse> out)

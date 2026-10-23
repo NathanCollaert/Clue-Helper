@@ -1,9 +1,9 @@
 anagram:12055
   best      50t: Games necklace: Barbarian Outpost → walk 45 {charge:3853=1}
 anagram:12568
-  best      344t: Ectophial → walk 337
-  alt       397t: Varrock Teleport → walk 393 {item:556=3, item:554=1, item:563=1}
-  alt       398t: Varrock tablet → walk 393 {item:8007=1}
+  best      213t: Ectophial → walk 164 → Boat: Mort'ton → walk 24
+  alt       241t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Lemanto Andra → walk 169 → Boat: Mort'ton → walk 24 {charge:2552=1}
+  alt       248t: Amulet of glory: Al Kharid → walk 26 → Gnome glider: Lemanto Andra → walk 169 → Boat: Mort'ton → walk 24 {charge:1712=1}
 anagram:19758
   best      180t: Kourend Castle Teleport → walk 176 {item:554=1, item:555=1, item:563=2}
   alt       182t: Xeric's talisman: 4. Xeric's Heart → walk 177 {charge:13393=1}
@@ -11,12 +11,13 @@ anagram:19758
 anagram:25784
   best      28t: Xeric's talisman: 1. Xeric's Lookout → walk 23 {charge:13393=1}
 anagram:7268
-  best      95t: Necklace of passage: The Outpost → walk 90 {charge:21146=1}
-  alt       103t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 53 {charge:11968=1}
-  alt       109t: Varrock Teleport → walk 44 → Spirit tree: Gnome Stronghold → walk 53 {item:556=3, item:554=1, item:563=1}
+  best      86t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Ta Quir Priw → walk 57 {charge:2552=1}
+  alt       94t: Amulet of glory: Al Kharid → walk 26 → Gnome glider: Ta Quir Priw → walk 57 {charge:1712=1}
+  alt       95t: Necklace of passage: The Outpost → walk 90 {charge:21146=1}
 anagram:duo plug
-  best      none
-  note      no route from what you have
+  best      165t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Ta Quir Priw → walk 33 → Boat: Ape Atoll → walk 97 {charge:2552=1}
+  alt       172t: Amulet of glory: Al Kharid → walk 26 → Gnome glider: Ta Quir Priw → walk 33 → Boat: Ape Atoll → walk 97 {charge:1712=1}
+  alt       180t: Lumbridge Teleport → walk 34 → Gnome glider: Ta Quir Priw → walk 33 → Boat: Ape Atoll → walk 97 {item:556=3, item:557=1, item:563=1}
 map:w346
   best      45t: Skills necklace: Cooking Guild → walk 40 {charge:11968=1}
   alt       48t: Varrock Teleport → walk 44 {item:556=3, item:554=1, item:563=1}
@@ -81,8 +82,9 @@ cryptic:'a bag belt only?', he asked his balding brothers.
   alt       78t: Falador Teleport → walk 74 {item:556=3, item:555=1, item:563=1}
   alt       79t: Skills necklace: Cooking Guild → walk 74 {charge:11968=1}
 cryptic:does one really need a fire to stay warm here?
-  best      none
-  note      no route from what you have
+  best      149t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Lemanto Andra → walk 24 → Ship: Fossil Island → Boat: north Fossil Island → walk 30 → Mushtree: Verdant Valley → walk 41 {charge:2552=1}
+  alt       157t: Amulet of glory: Al Kharid → walk 26 → Gnome glider: Lemanto Andra → walk 24 → Ship: Fossil Island → Boat: north Fossil Island → walk 30 → Mushtree: Verdant Valley → walk 41 {charge:1712=1}
+  alt       164t: Lumbridge Teleport → walk 34 → Gnome glider: Lemanto Andra → walk 24 → Ship: Fossil Island → Boat: north Fossil Island → walk 30 → Mushtree: Verdant Valley → walk 41 {item:556=3, item:557=1, item:563=1}
 cryptic:it seems to have reached the end of the line, and it's still empty.
   best      33t: Skills necklace: Mining Guild → walk 28 {charge:11968=1}
 cryptic:search the chest in fred the farmer's bedroom.
@@ -95,9 +97,9 @@ cryptic:search through chests found in the upstairs of houses in eastern falador
 cryptic:talk to the mother of a basement dwelling son.
   best      14t: Amulet of glory: Edgeville → walk 9 {charge:1712=1}
 emote:10180
-  best      51t: Lumbridge Teleport → walk 47 {item:556=3, item:557=1, item:563=1}
-  alt       62t: Amulet of glory: Al Kharid → walk 57 {charge:1712=1}
-  alt       64t: Amulet of glory: Draynor Village → walk 59 {charge:1712=1}
+  best      52t: Lumbridge Teleport → walk 48 {item:556=3, item:557=1, item:563=1}
+  alt       63t: Amulet of glory: Al Kharid → walk 58 {charge:1712=1}
+  alt       65t: Amulet of glory: Draynor Village → walk 60 {charge:1712=1}
 emote:10222
   best      45t: Camelot Teleport → walk 41 {item:556=5, item:563=1}
   alt       46t: Camelot tablet → walk 41 {item:8010=1}
@@ -106,8 +108,8 @@ emote:10264
   best      32t: Games necklace: Barbarian Outpost → walk 27 {charge:3853=1}
 emote:12080
   best      208t: Ectophial → walk 201
-  alt       265t: Varrock Teleport → walk 261 {item:556=3, item:554=1, item:563=1}
-  alt       266t: Varrock tablet → walk 261 {item:8007=1}
+  alt       240t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Lemanto Andra → walk 211 {charge:2552=1}
+  alt       247t: Amulet of glory: Al Kharid → walk 26 → Gnome glider: Lemanto Andra → walk 211 {charge:1712=1}
 emote:19833
   best      30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
   alt       31t: Varrock tablet → walk 26 {item:8007=1}
@@ -118,8 +120,8 @@ emote:clap in the magic axe hut. beware of double agents! equip only some flared
   note      Wilderness target
 fairyring:a i q 0 4 4 0
   best      103t: Skills necklace: Crafting Guild → walk 98 {charge:11968=1}
+  alt       105t: Pest Control Minigame Teleport → walk 7 → Ship: Port Sarim → walk 61 {cooldown:888=1}
   alt       118t: Amulet of glory: Draynor Village → walk 113 {charge:1712=1}
-  alt       143t: Falador Teleport → walk 139 {item:556=3, item:555=1, item:563=1}
 fairyring:a i r 2 3 3 1
   best      none
   note      no route from what you have
@@ -167,9 +169,9 @@ spot:FELDIP_HILLS_GNOME_GLITER
   alt       114t: Nightmare Zone Minigame Teleport → walk 88 {cooldown:888=1}
   alt       126t: Castle Wars Minigame Teleport → walk 100 {cooldown:888=1}
 spot:KANDARIN_GRAND_TREE
-  best      83t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 32 {charge:11968=1}
-  alt       88t: Necklace of passage: The Outpost → walk 83 {charge:21146=1}
-  alt       89t: Varrock Teleport → walk 44 → Spirit tree: Gnome Stronghold → walk 32 {item:556=3, item:554=1, item:563=1}
+  best      51t: Ring of dueling: Emir's Arena → walk 18 → Gnome glider: Ta Quir Priw → walk 22 {charge:2552=1}
+  alt       59t: Amulet of glory: Al Kharid → walk 26 → Gnome glider: Ta Quir Priw → walk 22 {charge:1712=1}
+  alt       66t: Lumbridge Teleport → walk 34 → Gnome glider: Ta Quir Priw → walk 22 {item:556=3, item:557=1, item:563=1}
 spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      38t: Varrock Teleport → walk 34 {item:556=3, item:554=1, item:563=1}
   alt       39t: Varrock tablet → walk 34 {item:8007=1}
@@ -222,11 +224,13 @@ skill:CHARLIE:i need to give charlie a cooked pike.
   alt       64t: Amulet of glory: Edgeville → walk 39 → Varrock Teleport → walk 16 {charge:1712=1, item:556=3, item:554=1, item:563=1}
   alt       104t: Falador Teleport → walk 79 → Varrock tablet → walk 16 {item:556=3, item:555=1, item:563=1, item:8007=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      162t: Xeric's talisman: 2. Xeric's Glade → walk 120 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  best      146t: Amulet of glory: Draynor Village → walk 34 → Ship: Port Piscarilius → walk 63 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
+  alt       162t: Xeric's talisman: 2. Xeric's Glade → walk 120 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
   alt       165t: Xeric's talisman: 4. Xeric's Heart → walk 123 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
-  alt       166t: Kourend Castle Teleport → walk 124 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
-  best      45t: Skills necklace: Woodcutting Guild → walk 3 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
+  best      91t: Skills necklace: Woodcutting Guild → walk 48 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
+  alt       92t: Xeric's talisman: 1. Xeric's Lookout → walk 49 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  alt       144t: Xeric's talisman: 2. Xeric's Glade → walk 102 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
   best      54t: Amulet of glory: Edgeville → walk 12 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
   alt       98t: Skills necklace: Cooking Guild → walk 55 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
@@ -239,12 +243,12 @@ skill:SHERLOCK:score a goal in skullball.
   alt       185t (rank 215): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Camelot tablet → walk 34 {item:554=1, item:555=1, item:563=3, item:557=1, item:566=1, item:8010=1} leaves you on ARCEUUS
   alt       187t (rank 217): Xeric's talisman: 4. Xeric's Heart → walk 104 → Tyss: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Camelot tablet → walk 34 {charge:13393=1, item:557=1, item:563=1, item:566=1, item:8010=1} leaves you on ARCEUUS
 cryptic:you will need to under-cook to solve this one.
-  best      26t: Lumbridge Teleport → walk 22 {item:556=3, item:557=1, item:563=1}
-  alt       46t: Lumbridge Home Teleport → walk 22 {cooldown:892=1}
+  best      28t: Lumbridge Teleport → walk 24 {item:556=3, item:557=1, item:563=1}
+  alt       48t: Lumbridge Home Teleport → walk 24 {cooldown:892=1}
 cryptic:search through some drawers in the upstairs of a house in rimmington.
   best      54t: Skills necklace: Crafting Guild → walk 49 {charge:11968=1}
   alt       85t: Amulet of glory: Draynor Village → walk 80 {charge:1712=1}
-  alt       94t: Falador Teleport → walk 90 {item:556=3, item:555=1, item:563=1}
+  alt       87t: Pest Control Minigame Teleport → walk 7 → Ship: Port Sarim → walk 42 {cooldown:888=1}
 anagram:12566
   best      13t: Skills necklace: Mining Guild → walk 8 {charge:11968=1}
 cryptic:search the crates in a bank in varrock.

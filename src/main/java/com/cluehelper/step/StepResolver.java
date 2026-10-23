@@ -63,7 +63,7 @@ public class StepResolver
 		}
 		String tier = tier(facts, entry);
 		List<WorldPoint> targets = targets(clue, plugin, facts, entry);
-		List<String> npcs = CoreClueReader.npcs(clue, plugin);
+		List<String> npcs = NpcAliases.withAliases(CoreClueReader.npcs(clue, plugin));
 		List<Stage> stages = stages(clue, plugin, entry, targets, npcs);
 		return Step.builder()
 			.key(key)
@@ -91,7 +91,7 @@ public class StepResolver
 	{
 		if (clue instanceof ThreeStepCrypticClue)
 		{
-			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin);
+			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::wornFor);
 		}
 		StepIndex.Target key = entry == null ? null : entry.getTargets().stream()
 			.filter(target -> KEY_TARGET.equals(target.getKind()) && target.getKeyTile() != null).findFirst().orElse(null);
@@ -102,8 +102,8 @@ public class StepResolver
 		}
 		if (clue instanceof SkillChallengeClue)
 		{
-			return Stages.challenge(entry, CoreClueReader.challengeCompleted(clue), CoreClueReader.returnItem(clue), targets,
-				tool -> toolRequirements.computeIfAbsent(tool, StepResolver::anyOf));
+			return Stages.challenge(entry, ((SkillChallengeClue) clue).getRawChallenge(), CoreClueReader.challengeCompleted(clue),
+				CoreClueReader.returnItem(clue), targets, tool -> toolRequirements.computeIfAbsent(tool, StepResolver::anyOf));
 		}
 		return List.of();
 	}
@@ -159,16 +159,32 @@ public class StepResolver
 	private StepIndex.Entry threeStepEntry(ThreeStepCrypticClue clue)
 	{
 		List<CacheRow> rows = new ArrayList<>();
+		List<StepIndex.Entry> unsolved = new ArrayList<>();
 		for (Map.Entry<CrypticClue, Boolean> part : List.copyOf(clue.getClueSteps()))
 		{
-			StepIndex.Entry partEntry = index.get().entry(StepKey.of(ClueFacts.of(ClueTypes.CRYPTIC).text(part.getKey().getText())));
+			StepIndex.Entry partEntry = partEntry(part.getKey());
 			if (partEntry == null)
 			{
 				return null;
 			}
 			rows.addAll(partEntry.getRows());
+			if (!part.getValue())
+			{
+				unsolved.add(partEntry);
+			}
 		}
-		return StepIndex.Entry.of(THREE_STEP_TIER, rows);
+		return StepIndex.Entry.ofParts(THREE_STEP_TIER, rows, unsolved);
+	}
+
+	private StepIndex.Entry partEntry(CrypticClue part)
+	{
+		return index.get().entry(StepKey.of(ClueFacts.of(ClueTypes.CRYPTIC).text(part.getText())));
+	}
+
+	private List<String> wornFor(CrypticClue part)
+	{
+		StepIndex.Entry entry = partEntry(part);
+		return entry == null ? List.of() : entry.getWornNeeds();
 	}
 
 	private static TargetKind kind(ClueScroll clue, StepIndex.Entry entry)
@@ -219,11 +235,19 @@ public class StepResolver
 			WorldPoint primary = CoreClueReader.primaryLocation(clue, plugin);
 			return primary == null ? core : List.of(primary);
 		}
-		if (core.isEmpty())
+		return withWander(core.isEmpty() ? cache : core, entry);
+	}
+
+	/** An NPC that wanders far is met wherever the route reaches its range first. */
+	private static List<WorldPoint> withWander(List<WorldPoint> targets, StepIndex.Entry entry)
+	{
+		if (entry == null || entry.getWander() == null)
 		{
-			return cache;
+			return targets;
 		}
-		return core;
+		List<WorldPoint> all = new ArrayList<>(targets);
+		entry.getWander().getTiles().stream().filter(tile -> !all.contains(tile)).forEach(all::add);
+		return List.copyOf(all);
 	}
 
 	private static boolean nearAny(WorldPoint tile, List<WorldPoint> others)

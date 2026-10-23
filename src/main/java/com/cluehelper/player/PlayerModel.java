@@ -80,9 +80,13 @@ public class PlayerModel
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
 	private Set<String> plantedTrees = Set.of();
+	/** Grown patches other than spirit trees (a Farming Guild redwood), named as the step data names them. */
+	private Set<String> grownPatches = Set.of();
 	private String lastFairyRing;
 	private String dirtyBecause;
 	private long version;
+	/** Dev builds only: levels the plugin sees instead of the account's (a lower Agility to plan without a shortcut). */
+	private Map<Skill, Integer> levelOverrides = Map.of();
 
 	private volatile RuneModel runeModel;
 	private volatile PlayerSnapshot snapshot;
@@ -223,6 +227,20 @@ public class PlayerModel
 	}
 
 	/** Client thread. */
+	public void setGrownPatches(Set<String> next)
+	{
+		grownPatches = Set.copyOf(next);
+		markDirty("grown patches");
+	}
+
+	private static Set<String> union(Set<String> a, Set<String> b)
+	{
+		Set<String> all = new HashSet<>(a);
+		all.addAll(b);
+		return Set.copyOf(all);
+	}
+
+	/** Client thread. */
 	public void setLastFairyRing(String code)
 	{
 		lastFairyRing = code;
@@ -307,6 +325,13 @@ public class PlayerModel
 		{
 			pendingRevertSinceTick = last == null ? UNKNOWN_TICK : client.getTickCount();
 		}
+	}
+
+	/** Client thread. Dev builds only: the levels to see instead of the account's; empty for the real ones. */
+	public void overrideLevels(Map<Skill, Integer> levels)
+	{
+		levelOverrides = Map.copyOf(levels);
+		markDirty("level overrides");
 	}
 
 	private void markDirty(String because)
@@ -396,6 +421,8 @@ public class PlayerModel
 			boosted.put(skill, client.getBoostedSkillLevel(skill));
 			real.put(skill, client.getRealSkillLevel(skill));
 		}
+		boosted.putAll(levelOverrides);
+		real.putAll(levelOverrides);
 		Set<Integer> held = new HashSet<>(inventory.keySet());
 		held.addAll(worn.keySet());
 		Set<WorldType> worldTypes = client.getWorldType();
@@ -427,7 +454,7 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
-			.plantedTrees(plantedTrees)
+			.plantedTrees(grownPatches.isEmpty() ? plantedTrees : union(plantedTrees, grownPatches))
 			.lastFairyRing(lastFairyRing)
 			.build();
 	}

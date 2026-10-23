@@ -13,6 +13,7 @@ import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.SceneFiles;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.ui.BoxState;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
@@ -36,8 +39,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.GameState;
+import net.runelite.api.WorldView;
+import net.runelite.api.WallObject;
+import net.runelite.api.Tile;
+import net.runelite.api.ObjectComposition;
+import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InterfaceID;
@@ -50,7 +60,9 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.DrawManager;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 /**
@@ -72,7 +84,9 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File SCENES = new File("build/scenes");
 	private static final File GUIDE_FRAMES = new File("build/guide");
 	/** About 5 s, to see highlights between sub-step changes. */
-	private static final int LIVE_FRAME_TICKS = 8;
+	private static final int LIVE_FRAME_TICKS = 16;
+	private static final int OBJECT_DUMP_TILES = 30;
+	private static final String CHALLENGE_COMPLETED = "Skill challenge completed.";
 	private static final int MOST_LIVE_FRAMES = 200;
 	private static final int MOST_SCENES = 12;
 	/** Farther than a run tick can carry you: a teleport, a ladder or a boat. */
@@ -106,6 +120,12 @@ public class ClueHelperDevPlugin extends Plugin
 	private OverlayManager overlayManager;
 
 	@Inject
+	private ClientToolbar clientToolbar;
+
+	@Inject
+	private StepResolver stepResolver;
+
+	@Inject
 	private FairyDials fairyDials;
 
 	@Inject
@@ -135,11 +155,21 @@ public class ClueHelperDevPlugin extends Plugin
 	private boolean sampled;
 	private final Set<String> recordedScenes = new HashSet<>();
 	private WorldPoint lastTile;
+	private MockClues mockClues;
+	/** PNG encoding takes seconds of CPU a minute: off RuneLite's shared executor, which other plugins' tasks wait on. */
+	private ExecutorService frameWriter;
 
 	@Override
 	protected void startUp()
 	{
 		clueHelper = find(ClueHelperPlugin.class);
+		frameWriter = Executors.newSingleThreadExecutor(runnable ->
+		{
+			Thread thread = new Thread(runnable, "clue-helper-dev-frames");
+			thread.setDaemon(true);
+			thread.setPriority(Thread.MIN_PRIORITY);
+			return thread;
+		});
 		clearOldPngs(SNAPSHOTS);
 		clearOldPngs(STEP_FRAMES);
 		clearOldPngs(PLAYER_FRAMES);
@@ -156,11 +186,11 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
 		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
 		BankTrace bankTrace = new BankTrace(client, clueHelper.getBankMemory(), clueHelper.getGuide(),
-			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(bankTrace);
 		unregister.add(() -> eventBus.unregister(bankTrace));
 		PohTrace pohTrace = new PohTrace(client, clueHelper.getPoh(), clueHelper.getGuide(), clueHelper.getMenuLines(),
-			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(pohTrace);
 		unregister.add(() ->
 		{
@@ -168,7 +198,7 @@ public class ClueHelperDevPlugin extends Plugin
 			pohTrace.stop();
 		});
 		NetworkTrace networkTrace = new NetworkTrace(client, clueHelper.getSpiritTrees(), clueHelper.getFairyRings(),
-			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(networkTrace);
 		unregister.add(() ->
 		{
@@ -176,7 +206,7 @@ public class ClueHelperDevPlugin extends Plugin
 			networkTrace.stop();
 		});
 		FairyDialTrace dialTrace = new FairyDialTrace(client, clueHelper.getMenuLines(), fairyDials,
-			file -> requestFrame(frame -> executor.execute(() -> writeFrame(frame, file))));
+			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(dialTrace);
 		overlayManager.add(dialTrace);
 		unregister.add(() ->
@@ -185,8 +215,11 @@ public class ClueHelperDevPlugin extends Plugin
 			overlayManager.remove(dialTrace);
 		});
 		HotColdTrace hotColdTrace = new HotColdTrace(client, clueHelper.getHotCold(), name ->
-			requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(HotColdTrace.FRAMES, name + "-game.png")))));
+			requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(HotColdTrace.FRAMES, name + "-game.png")))));
 		unregister.add(hotColdTrace::stop);
+		PlanTrace planTrace = new PlanTrace(client, clueHelper.getRoutes());
+		unregister.add(planTrace::stop);
+		addDevPanel();
 		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
 		if (autoRunPending)
 		{
@@ -194,9 +227,134 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 	}
 
+	private void addDevPanel()
+	{
+		DevPanel[] panel = new DevPanel[1];
+		mockClues = new MockClues(client, clueHelper.getClueLink()::getCore, stepResolver,
+			description -> SwingUtilities.invokeLater(() -> panel[0].showMock(description)),
+			ids -> SwingUtilities.invokeLater(() -> panel[0].fillList(ids)));
+		DevPanel.MockControls controls = new DevPanel.MockControls()
+		{
+			@Override
+			public void random(String tier, String type)
+			{
+				clientThread.invokeLater(() -> mockClues.random(tier, type));
+			}
+
+			@Override
+			public void randomList(String tier, String type)
+			{
+				clientThread.invokeLater(() -> mockClues.randomList(tier, type));
+			}
+
+			@Override
+			public void walk(List<String> ids, int by)
+			{
+				clientThread.invokeLater(() -> mockClues.walk(ids, by));
+			}
+
+			@Override
+			public void clear()
+			{
+				clientThread.invokeLater(mockClues::clear);
+			}
+		};
+		List<DevPanel.Action> tools = List.of(
+			command("Routes to the log", "ch-routes"),
+			command("Guide sub-steps", "ch-guide"),
+			command("Step as a fixture line", "ch-step"),
+			command("Player snapshot", "ch-player"),
+			command("Route graph overlay", "ch-overlay"),
+			new DevPanel.Action("Objects near the step", () -> clientThread.invokeLater(this::dumpObjectsNearStep)),
+			new DevPanel.Action("Skill challenge completed", () -> clientThread.invokeLater(this::completeChallenge)),
+			command("Sample routes", "ch-sample"),
+			command("Self-tests", "ch-selftest"));
+		panel[0] = new DevPanel(controls, levels -> clientThread.invokeLater(() -> clueHelper.getPlayerModel().overrideLevels(levels)), tools);
+		NavigationButton button = NavigationButton.builder()
+			.tooltip("Clue Helper dev")
+			.icon(DevPanel.icon())
+			.priority(Integer.MAX_VALUE)
+			.panel(panel[0])
+			.build();
+		clientToolbar.addNavigation(button);
+		unregister.add(() -> clientToolbar.removeNavigation(button));
+	}
+
+	/** Every wall and game object with an option around the step's tile: what a door, gate or obstacle really is. */
+	private void dumpObjectsNearStep()
+	{
+		SubStep current = clueHelper.getGuide().getCurrent();
+		WorldPoint at = current == null ? null : current.getWaypoint() != null ? current.getWaypoint() : current.getGoal();
+		WorldView view = client.getTopLevelWorldView();
+		if (at == null || view == null)
+		{
+			log.info("{} objects: no step tile", TAG);
+			return;
+		}
+		Tile[][][] tiles = view.getScene().getTiles();
+		for (int dx = -OBJECT_DUMP_TILES; dx <= OBJECT_DUMP_TILES; dx++)
+		{
+			for (int dy = -OBJECT_DUMP_TILES; dy <= OBJECT_DUMP_TILES; dy++)
+			{
+				int x = at.getX() + dx - view.getBaseX();
+				int y = at.getY() + dy - view.getBaseY();
+				Tile tile = x < 0 || y < 0 || x >= tiles[at.getPlane()].length || y >= tiles[at.getPlane()][x].length ? null
+					: tiles[at.getPlane()][x][y];
+				if (tile == null)
+				{
+					continue;
+				}
+				WallObject wall = tile.getWallObject();
+				if (wall != null)
+				{
+					logObject("wall", at.dx(dx).dy(dy), wall.getId(), wall.getConfig(), "orientation " + wall.getOrientationA() + "/" + wall.getOrientationB());
+				}
+				for (GameObject object : tile.getGameObjects())
+				{
+					if (object != null && object.getSceneMinLocation().equals(tile.getSceneLocation()))
+					{
+						logObject("game", at.dx(dx).dy(dy), object.getId(), object.getConfig(), "size " + object.sizeX() + "x" + object.sizeY());
+					}
+				}
+			}
+		}
+		client.addChatMessage(net.runelite.api.ChatMessageType.GAMEMESSAGE, "", "Objects near the step written to the log", null);
+	}
+
+	private void logObject(String kind, WorldPoint at, int id, int config, String shape)
+	{
+		ObjectComposition definition = client.getObjectDefinition(id);
+		ObjectComposition shown = definition.getImpostorIds() != null ? definition.getImpostor() : null;
+		ObjectComposition named = shown != null ? shown : definition;
+		boolean usable = named.getActions() != null && java.util.Arrays.stream(named.getActions()).anyMatch(java.util.Objects::nonNull);
+		if (!usable)
+		{
+			return;
+		}
+		log.info("{} object {} {} {} id {} shown {} name '{}' actions {} type {} {}", TAG, kind, at.getX(), at.getY(), id,
+			shown == null ? -1 : shown.getId(), (shown != null ? shown : definition).getName(),
+			java.util.Arrays.toString((shown != null ? shown : definition).getActions()), config & 0x1F, shape);
+	}
+
+	/**
+	 * The game sends this only to a player carrying the real challenge scroll; a mocked Sherlock clue gets it from here,
+	 * so the Clue Scroll plugin marks the task done.
+	 */
+	private void completeChallenge()
+	{
+		eventBus.post(new ChatMessage(null, ChatMessageType.GAMEMESSAGE, "", CHALLENGE_COMPLETED, null, 0));
+		log.info("{} posted '{}'", TAG, CHALLENGE_COMPLETED);
+	}
+
+	private DevPanel.Action command(String label, String command)
+	{
+		return new DevPanel.Action(label, () -> clientThread.invokeLater(() -> eventBus.post(new CommandExecuted(command, new String[0]))));
+	}
+
 	@Override
 	protected void shutDown()
 	{
+		frameWriter.shutdown();
 		unregister.forEach(Runnable::run);
 		unregister.clear();
 	}
@@ -240,7 +398,7 @@ public class ClueHelperDevPlugin extends Plugin
 			.forEach(candidate -> line.append(" | ").append(candidate));
 		log.info(line.toString());
 		String name = String.format("%03d-%d-%d-%d.png", ++landingFrameCount, to.getX(), to.getY(), to.getPlane());
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(LANDING_FRAMES, name))));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(LANDING_FRAMES, name))));
 	}
 
 	/** Never a frame of the bank PIN keypad. */
@@ -392,7 +550,7 @@ public class ClueHelperDevPlugin extends Plugin
 	private void frame(String name)
 	{
 		File file = new File(SNAPSHOTS, String.format("%02d-%s.png", ++snapshotCount, name));
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, file)));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file)));
 	}
 
 	private static void clearOldPngs(File dir)
@@ -414,7 +572,7 @@ public class ClueHelperDevPlugin extends Plugin
 		String key = step == null ? "none" : step.getKey().replaceAll("[^a-zA-Z0-9]+", "-");
 		String name = String.format("%03d-%s-%s.png", ++stepFrameCount, change.name().toLowerCase(Locale.ROOT),
 			key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
 	}
 
 	/** The recorded scenes are test resources for the scene BFS check. */
@@ -443,7 +601,7 @@ public class ClueHelperDevPlugin extends Plugin
 		lastPlannedStep = plan.getStepKey();
 		String key = plan.getStepKey().replaceAll("[^a-zA-Z0-9]+", "-");
 		String name = String.format("%03d-%s.png", ++routeFrameCount, key.substring(0, Math.min(key.length(), FRAME_NAME_KEY_CHARS)));
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(ROUTE_FRAMES, name))));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(ROUTE_FRAMES, name))));
 	}
 
 	private void saveLiveFrame()
@@ -455,7 +613,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		String name = String.format("live-%03d-t%d-%s-game.png", ++liveFrameCount, client.getTickCount(),
 			current.getKind().name().toLowerCase(Locale.ROOT));
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name))));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name))));
 	}
 
 	private void saveGuideFrames()
@@ -468,7 +626,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		lastGuideText = text;
 		String name = String.format("%03d-%s", ++guideFrameCount, current.getKind().name().toLowerCase(Locale.ROOT));
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
 	}
 
 	private void sample()
@@ -483,6 +641,10 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			sample();
 		}
+		else if (event.getCommand().equalsIgnoreCase(MockClues.COMMAND))
+		{
+			mockClues.run(event.getArguments());
+		}
 	}
 
 	private void savePlayerFrame(AvailabilitySet carried)
@@ -494,7 +656,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		lastAvailableCount = available;
 		String name = String.format("%03d-v%d-available-%d.png", ++playerFrameCount, carried.getSnapshotVersion(), available);
-		requestFrame(frame -> executor.execute(() -> writeFrame(frame, new File(PLAYER_FRAMES, name))));
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(PLAYER_FRAMES, name))));
 	}
 
 	private static void writeFrame(Image frame, File file)

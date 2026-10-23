@@ -117,7 +117,6 @@ Origin	Destination	Option	Object	ObjectId
 1761 4964 0	1631 4957 0	Walk-down	Stairs	24428
 1761 4965 0	1631 4957 0	Walk-down	Stairs	24428
 1761 5362 0	2531 3446 0	Ride	Aged log	25216
-1783 3458 0	1778 3417 0	Travel	Way-in	7483
 1795 3106 0	1799 9506 0	Enter	Colosseum entrance	50749
 1795 3107 0	1799 9506 0	Enter	Colosseum entrance	50749
 1798 9969 0	1670 3569 0	Climb-up	Staircase	34864
@@ -498,7 +497,7 @@ Origin	Destination	Option	Object	ObjectId
 2654 4495 0	2393 3466 0	Operate	Teleportation Device	4869
 2655 4830 0	3302 3477 0	Use	Portal	34751
 2656 10423 0	2631 4013 1	Use	Chasm	21035
-2664 3160 0	2963 9478 1	Talk-to	Way-in	5607
+2664 3160 0	2949 9520 1	Talk-to	Way-in	5607
 2695 4497 0	2759 4497 0	Climb-down	Ladder	4967
 2696 4496 0	2760 4496 0	Climb-down	Ladder	4967
 2696 4498 0	2760 4498 0	Climb-down	Ladder	4967
@@ -1207,8 +1206,7 @@ Origin	Destination	Option	Object	ObjectId
 3265 6024 0	2241 3269 0	Exit	City Gate	36523
 3265 6135 0	2241 3386 0	Exit	City Gate	36523
 3280 3412 0	1700 3141 0	Travel	Primio	12888
-3289 2786 0	1930 4432 0			
-3289 2786 0	1944 4427 0			
+3289 2786 0	1934 4428 3			
 3293 3749 0	3406 10145 0	Walk-down	Stairs	40390
 3294 3749 0	3406 10145 0	Walk-down	Stairs	40390
 3304 3124 0	3013 3180 0	Talk-to	Shantay	4642

@@ -1,5 +1,7 @@
 package com.cluehelper.route;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -7,6 +9,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.runelite.api.CollisionDataFlag;
 import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
 
@@ -82,6 +85,33 @@ public class SceneBfsTest
 			List<WorldPoint> line = ScenePath.toward(SceneBfs.run(scene, at, table, allRows), table, new WorldPoint(3821, 9780, 2));
 			assertTrue("a line from " + at, line.size() > 1);
 		}
+	}
+
+	/**
+	 * A wall along x = 15 with a closed door at y = 16 and a gap at y = 19: one tile further round beats opening the
+	 * door. The client blocks the scene's edge rows, so the wall stands well inside.
+	 */
+	@Test
+	public void aShortDetourBeatsOpeningADoor()
+	{
+		int size = 32;
+		int wallX = 15;
+		int doorY = 16;
+		int gapY = 19;
+		int[][] flags = new int[size][size];
+		int[][] doorSides = new int[size][size];
+		for (int y = 0; y < gapY; y++)
+		{
+			int[][] sides = y == doorY ? doorSides : flags;
+			sides[wallX][y] |= CollisionDataFlag.BLOCK_MOVEMENT_WEST;
+			sides[wallX - 1][y] |= CollisionDataFlag.BLOCK_MOVEMENT_EAST;
+		}
+		SceneBfs.Scene scene = new SceneBfs.Scene(0, 0, size, size, new int[][][] {flags}, new int[][][] {doorSides});
+		WorldPoint start = new WorldPoint(wallX - 3, doorY, 0);
+		List<WorldPoint> line = SceneBfs.run(scene, start, null, null).pathTo(new WorldPoint(wallX + 3, doorY, 0));
+
+		assertEquals(start, line.get(0));
+		assertFalse("through the door: " + line, line.contains(new WorldPoint(wallX, doorY, 0)));
 	}
 
 	/** A table walk longer than the scene is wide may leave the scene, where the BFS can't follow. */

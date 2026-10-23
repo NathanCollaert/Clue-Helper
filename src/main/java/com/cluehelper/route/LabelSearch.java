@@ -42,6 +42,8 @@ final class LabelSearch
 	private final int nodes;
 	private final int revertHalfTicks;
 	private final Set<String> excluded;
+	/** Only routes whose first transport has this key, a way into the house aside; null for any. */
+	private final String onlyFirst;
 	private final boolean requireTransport;
 	private final boolean wantSameBook;
 	private final int rankLimit;
@@ -62,14 +64,27 @@ final class LabelSearch
 
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded, int rankLimit)
 	{
+		this(ctx, legTargets, probes, areaHalfTicks, excluded, null, rankLimit);
+	}
+
+	/** The routes that start with transport {@code onlyFirst} ({@link Route#WALK} for none), up to {@code rankLimit}. */
+	LabelSearch(PlanContext ctx, List<int[]> legTargets, int areaHalfTicks, String onlyFirst, int rankLimit)
+	{
+		this(ctx, legTargets, false, areaHalfTicks, Set.of(), onlyFirst, rankLimit);
+	}
+
+	private LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded,
+		String onlyFirst, int rankLimit)
+	{
 		this.rankLimit = rankLimit;
 		this.ctx = ctx;
 		this.legTargets = legTargets;
 		this.probes = probes;
 		this.areaHalfTicks = areaHalfTicks;
 		this.excluded = excluded;
-		this.requireTransport = excluded.contains(Route.WALK);
-		this.wantSameBook = excluded.isEmpty();
+		this.onlyFirst = onlyFirst;
+		this.requireTransport = excluded.contains(Route.WALK) || onlyFirst != null && !Route.WALK.equals(onlyFirst);
+		this.wantSameBook = excluded.isEmpty() && onlyFirst == null;
 		this.nodes = ctx.nodeCount();
 		this.revertHalfTicks = ctx.startPending ? 2 * ctx.in.getRevertTicksLeft() : -1;
 		this.slots = new Label[legTargets.size() * nodes * STATES_PER_NODE * MAX_LABELS];
@@ -210,16 +225,22 @@ final class LabelSearch
 
 	private void arrive(Label from, int k)
 	{
+		if (ctx.stageNeedsBank(from.node, from.b))
+		{
+			return;
+		}
+		int[] staged = sortedUnion(from.withdrawn, ctx.stageWithdraw(from.node, from.b));
 		if (from.leg + 1 < legTargets.size())
 		{
-			offer(from, from.node, from.b, from.c, k, from.t, from.leg + 1, 0, 0, null, null, null, from.spent);
+			int half = PlanContext.WITHDRAW_HALF_TICKS * (staged.length - from.withdrawn.length);
+			offer(from, from.node, from.b, from.c, k, from.t, from.leg + 1, half, half, null, null, null, from.spent, staged);
 			return;
 		}
 		if (from.b == PlanContext.NOT_BANKED && !ctx.arrivesWithoutBank())
 		{
 			return;
 		}
-		int[] withdrawn = from.b == PlanContext.BANKED ? sortedUnion(from.withdrawn, ctx.requiredWithdraw) : from.withdrawn;
+		int[] withdrawn = from.b == PlanContext.BANKED ? sortedUnion(staged, ctx.requiredWithdraw) : staged;
 		int area = areaHalfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
 		Book end = endBook(k);
 		int strand = ctx.strandHalfTicks(end, from.b, capeUses(from.spent));
@@ -270,14 +291,20 @@ final class LabelSearch
 			return;
 		}
 		WalkTable table = ctx.table;
-		boolean onlyToBankUses = pointlessAfterBank(from, from.withdrawn);
+		WalkGates gates = ctx.gates(from.b);
 		for (int e = table.entriesFrom(from.node); e < table.entriesEnd(from.node); e++)
 		{
-			int cost = ctx.gates.cost(e);
+			int cost = gates.cost(e);
 			int to = table.entryTo(e);
-			if (cost != WalkTable.NO_PATH && !ctx.forbidden(to) && (!onlyToBankUses || ctx.usesBankItems(to)))
+			if (cost == WalkTable.NO_PATH || ctx.forbidden(to))
 			{
-				offer(from, to, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, null, null, from.spent);
+				continue;
+			}
+			int[] withdrawn = sortedUnion(from.withdrawn, gates.withdraw(e));
+			if (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(to))
+			{
+				int total = cost + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+				offer(from, to, from.b, from.c, k, from.t, from.leg, total, total, Leg.Kind.WALK, null, null, from.spent, withdrawn);
 			}
 		}
 	}
@@ -325,13 +352,13 @@ final class LabelSearch
 		{
 			int to = table.entryTo(e);
 			int full = table.entryFull(e);
-			boolean onFullWalk = ctx.gates.cost(e) == full;
+			boolean onFullWalk = ctx.gates(PlanContext.NOT_BANKED).cost(e) == full;
 			WorldPoint waypoint = onFullWalk && !ctx.forbidden(to) ? table.entryWaypoint(e) : null;
 			int toWaypoint = waypoint == null ? SceneBfs.UNREACHED : scene.cost(waypoint);
 			if (toWaypoint != SceneBfs.UNREACHED)
 			{
 				int cost = toWaypoint + full - WalkTable.WAYPOINT_TILES;
-				offer(from, to, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, null, null, from.spent);
+				offer(from, to, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, waypoint, node, from.spent);
 			}
 		}
 	}
@@ -464,11 +491,37 @@ final class LabelSearch
 		{
 			int half = ctx.bankStopHalfTicks;
 			offer(from, from.node, PlanContext.BANKED, from.c, k, from.t, from.leg, half, half, Leg.Kind.BANK, null, null, from.spent);
+			takeGateItems(from, k, half);
+		}
+	}
+
+	/**
+	 * A web's knife or sword, or a stage's gear, is used a few legs after the bank, where a stop that took nothing yet
+	 * only walks to bank-item uses; so a second stop takes them at once.
+	 */
+	private void takeGateItems(Label from, int k, int bankHalfTicks)
+	{
+		int[] withdrawn = sortedUnion(sortedUnion(from.withdrawn, ctx.gates(PlanContext.BANKED).storedGateItems()), ctx.stageWithdraw());
+		if (withdrawn.length > from.withdrawn.length)
+		{
+			int half = bankHalfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+			offer(from, from.node, PlanContext.BANKED, from.c, k, from.t, from.leg, half, half, Leg.Kind.BANK, null, null, from.spent, withdrawn);
 		}
 	}
 
 	private void transport(Label from, int node, int c, int k, int half, Leg.Kind kind, PlanContext.Teleport tele, Object second)
 	{
+		int t = 1;
+		if (onlyFirst != null && from.t == 0)
+		{
+			String key = kind == Leg.Kind.FAIRY_RING ? Route.fairyKey(((PlanContext.Teleport) second).row) : Route.teleportKey(tele.row);
+			boolean first = key.equals(onlyFirst);
+			if (Route.WALK.equals(onlyFirst) || !first && node != ctx.pohNode)
+			{
+				return;
+			}
+			t = first ? 1 : 0;
+		}
 		int[] spent = spend(from.spent, tele.res, tele.amounts, from.b);
 		int[] withdrawn = sortedUnion(from.withdrawn, tele.withdraw);
 		if (second instanceof PlanContext.Change)
@@ -487,7 +540,7 @@ final class LabelSearch
 		{
 			int total = half + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
 			int penalty = 2 * ctx.in.getSettings().getConsumablePenalty() * tele.consumed;
-			offer(from, node, from.b, c, k, 1, from.leg, total, total + penalty, kind, tele, second, spent, withdrawn);
+			offer(from, node, from.b, c, k, t, from.leg, total, total + penalty, kind, tele, second, spent, withdrawn);
 		}
 	}
 
@@ -507,7 +560,12 @@ final class LabelSearch
 	/** The same route without the bank stop would be faster. */
 	private boolean pointlessAfterBank(Label from, int[] withdrawn)
 	{
-		return from.b == PlanContext.BANKED && withdrawn.length == 0 && ctx.arrivesWithoutBank() && !ctx.in.isAtOpenBank();
+		return from.b == PlanContext.BANKED && withdrawn.length == 0 && bankStopsArePruned();
+	}
+
+	private boolean bankStopsArePruned()
+	{
+		return ctx.arrivesWithoutBank() && !ctx.in.isAtOpenBank();
 	}
 
 	private static int[] sortedUnion(int[] a, int[] b)
@@ -540,8 +598,17 @@ final class LabelSearch
 		return n == out.length ? out : Arrays.copyOf(out, n);
 	}
 
-	private static boolean dominates(int aRank, int aHalf, int[] aSpent, int[] aWithdrawn, int bRank, int bHalf, int[] bSpent, int[] bWithdrawn)
+	/**
+	 * Withdrawing later costs the same as now, except after a bank stop that took nothing: that one only walks to
+	 * bank-item uses, so it can't stand in for a stop that took something.
+	 */
+	private boolean dominates(int bankState, int aRank, int aHalf, int[] aSpent, int[] aWithdrawn, int bRank, int bHalf, int[] bSpent,
+		int[] bWithdrawn)
 	{
+		if (bankState == PlanContext.BANKED && aWithdrawn.length == 0 && bWithdrawn.length > 0 && bankStopsArePruned())
+		{
+			return false;
+		}
 		int withdrawLater = PlanContext.WITHDRAW_HALF_TICKS * countMissing(aWithdrawn, bWithdrawn);
 		return aRank + withdrawLater <= bRank && aHalf + withdrawLater <= bHalf && spendsNoMore(aSpent, bSpent);
 	}
@@ -586,14 +653,14 @@ final class LabelSearch
 		}
 		for (int lower = 0; lower < c; lower++)
 		{
-			if (dominatedAt(stateIndex(leg, node, b, lower, k, t) * MAX_LABELS, rank, half, spent, withdrawn))
+			if (dominatedAt(stateIndex(leg, node, b, lower, k, t) * MAX_LABELS, b, rank, half, spent, withdrawn))
 			{
 				return null;
 			}
 		}
 		for (int higher = c + 1; higher < CATEGORIES; higher++)
 		{
-			killDominated(stateIndex(leg, node, b, higher, k, t) * MAX_LABELS, rank, half, spent, withdrawn);
+			killDominated(stateIndex(leg, node, b, higher, k, t) * MAX_LABELS, b, rank, half, spent, withdrawn);
 		}
 		int base = stateIndex(leg, node, b, c, k, t) * MAX_LABELS;
 		int free = -1;
@@ -606,11 +673,11 @@ final class LabelSearch
 				free = free < 0 ? i : free;
 				continue;
 			}
-			if (dominates(old.rank, old.half, old.spent, old.withdrawn, rank, half, spent, withdrawn))
+			if (dominates(b, old.rank, old.half, old.spent, old.withdrawn, rank, half, spent, withdrawn))
 			{
 				return null;
 			}
-			if (dominates(rank, half, spent, withdrawn, old.rank, old.half, old.spent, old.withdrawn))
+			if (dominates(b, rank, half, spent, withdrawn, old.rank, old.half, old.spent, old.withdrawn))
 			{
 				old.dead = true;
 				slots[i] = null;
@@ -653,12 +720,12 @@ final class LabelSearch
 		return label;
 	}
 
-	private boolean dominatedAt(int base, int rank, int half, int[] spent, int[] withdrawn)
+	private boolean dominatedAt(int base, int b, int rank, int half, int[] spent, int[] withdrawn)
 	{
 		for (int i = base; i < base + MAX_LABELS; i++)
 		{
 			Label old = slots[i];
-			if (old != null && !old.dead && dominates(old.rank, old.half, old.spent, old.withdrawn, rank, half, spent, withdrawn))
+			if (old != null && !old.dead && dominates(b, old.rank, old.half, old.spent, old.withdrawn, rank, half, spent, withdrawn))
 			{
 				return true;
 			}
@@ -666,12 +733,12 @@ final class LabelSearch
 		return false;
 	}
 
-	private void killDominated(int base, int rank, int half, int[] spent, int[] withdrawn)
+	private void killDominated(int base, int b, int rank, int half, int[] spent, int[] withdrawn)
 	{
 		for (int i = base; i < base + MAX_LABELS; i++)
 		{
 			Label old = slots[i];
-			if (old != null && !old.dead && dominates(rank, half, spent, withdrawn, old.rank, old.half, old.spent, old.withdrawn))
+			if (old != null && !old.dead && dominates(b, rank, half, spent, withdrawn, old.rank, old.half, old.spent, old.withdrawn))
 			{
 				old.dead = true;
 				slots[i] = null;

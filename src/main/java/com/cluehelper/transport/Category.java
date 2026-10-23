@@ -10,7 +10,9 @@ public enum Category
 	/** In the house garden and out in the world. */
 	SPIRIT_TREE,
 	/** Renu at every quetzal site; the whistle is an ITEM row. */
-	QUETZAL;
+	QUETZAL,
+	// Rides boarded where they stand; Teleport to Boat is a SPELL, TABLET or CAPE row
+	BOAT, CHARTER, CANOE, CARPET, MINECART, LEVER, GLIDER, BALLOON, MUSHTREE, WILDERNESS_OBELISK;
 
 	static Category of(String cell)
 	{

@@ -3,6 +3,7 @@ package com.cluehelper;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.MenuLines;
+import com.cluehelper.guide.MenuTarget;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.hotcold.HotColdPlan;
 import com.cluehelper.hotcold.HotColdService;
@@ -10,6 +11,7 @@ import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.FairyRingMemory;
+import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.SpiritTreeMemory;
 import com.cluehelper.memory.StashMemory;
@@ -27,6 +29,7 @@ import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.FurnitureOverlay;
+import com.cluehelper.ui.WanderAreaOverlay;
 import com.cluehelper.ui.GuideBox;
 import com.cluehelper.ui.GuideOverlay;
 import com.cluehelper.ui.ItemHighlightOverlay;
@@ -106,6 +109,9 @@ public class ClueHelperPlugin extends Plugin
 	private SpiritTreeMemory spiritTrees;
 
 	@Inject
+	private GrownPatches grownPatches;
+
+	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private FairyRingMemory fairyRings;
 
@@ -170,6 +176,9 @@ public class ClueHelperPlugin extends Plugin
 	private FurnitureOverlay furnitureOverlay;
 
 	@Inject
+	private WanderAreaOverlay wanderAreaOverlay;
+
+	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private MenuLines menuLines;
 
@@ -212,6 +221,7 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.start();
 		poh.start();
 		clientThread.invokeLater(spiritTrees::publish);
+		clientThread.invokeLater(grownPatches::publish);
 		clientThread.invokeLater(fairyRings::publish);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
@@ -334,6 +344,10 @@ public class ClueHelperPlugin extends Plugin
 	public void onMenuOpened(MenuOpened event)
 	{
 		menuLines.colourMenu(guide.getMenuTarget(), config.highlightMenus());
+		for (MenuTarget pathObject : waypointOverlay.pathObjectTargets())
+		{
+			menuLines.colourMenu(pathObject, config.highlightMenus());
+		}
 		fairyRings.onMenuEntries(event.getMenuEntries());
 	}
 
@@ -355,6 +369,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.onMenuOptionClicked(event);
 		guide.onMenuOptionClicked(event);
 		checkLines.onMenuOptionClicked(event);
+		waypointOverlay.onMenuOptionClicked(event);
 	}
 
 	@Subscribe
@@ -396,6 +411,10 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
+		if (grownPatches.isOurs(event))
+		{
+			clientThread.invokeLater(grownPatches::publish);
+		}
 		if (!ClueHelperConfig.GROUP.equals(event.getGroup()))
 		{
 			return;
@@ -428,6 +447,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.onProfileChanged();
 		hotCold.onProfileChanged();
 		spiritTrees.publish();
+		grownPatches.publish();
 		fairyRings.publish();
 	}
 
@@ -444,7 +464,7 @@ public class ClueHelperPlugin extends Plugin
 
 	private Overlay[] overlays()
 	{
-		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
+		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, wanderAreaOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
 	}
 
 	private String dormantReason()

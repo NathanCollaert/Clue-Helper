@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -56,6 +57,7 @@ public class RoutePlanner
 	static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
+	private static final int POCKET_TILES = 3;
 	private static final int NO_TARGET_IN_SCENE = -1;
 	private static final long NO_SCENE = Long.MIN_VALUE;
 
@@ -74,6 +76,7 @@ public class RoutePlanner
 	private final StageTarget stageTarget;
 	private final SceneDoors doors;
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
+	private final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
 
 	private volatile WalkData.Loaded walk;
 	private volatile Catalog catalog;
@@ -120,6 +123,12 @@ public class RoutePlanner
 		this.config = config;
 	}
 
+	/** The guide takes such a scroll out at the bank as the plan does. */
+	public boolean keepsScrollBookOutOfWilderness()
+	{
+		return config.scrollBookOutOfWilderness();
+	}
+
 	public void start()
 	{
 		catalogData.get().thenAccept(loaded -> catalog = loaded);
@@ -149,6 +158,13 @@ public class RoutePlanner
 	{
 		listeners.add(listener);
 		return () -> listeners.remove(listener);
+	}
+
+	/** Like {@link #addListener}, with what each plan was planned from: the dev launcher records slow ones. */
+	public Runnable addInputListener(BiConsumer<Plan, PlanInput> listener)
+	{
+		inputListeners.add(listener);
+		return () -> inputListeners.remove(listener);
 	}
 
 	/** Call after the player model's and availability's GameTick handlers. */
@@ -190,7 +206,8 @@ public class RoutePlanner
 		}
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, data, loadedCatalog, settings, banked, required, atOpenBank, foreignHouse);
-		runner.submit(() -> Planner.plan(input), this::onPlanned);
+		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
+		runner.submit(() -> Planner.withoutAlternatives(followingInput), planned -> onPlanned(planned, followingInput));
 	}
 
 	/**
@@ -323,10 +340,11 @@ public class RoutePlanner
 		{
 			gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
 			rowOpen = gates.rowOpen();
+			doors.playerChanged(snapshot);
 			gatesVersion = snapshot.getVersion();
 		}
 		long started = System.nanoTime();
-		SceneBfs.Scene scene = doors.open(client, view, SceneBfs.Scene.capture(view));
+		SceneBfs.Scene scene = doors.open(client, view, SceneBfs.Scene.capture(view), table);
 		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, position.getTile(), table, rowOpen);
 		lastBfsNanos = System.nanoTime() - started;
 		// Collision flags still loading after a reload, or the player mid-obstacle on a blocked tile (stepping stones,
@@ -338,9 +356,19 @@ public class RoutePlanner
 			lastSceneBase = NO_SCENE;
 			return;
 		}
-		nearestNode = bfs == null ? WalkTable.NO_NODE : nearest(table, bfs);
+		int nearestHere = bfs == null ? WalkTable.NO_NODE : nearest(table, bfs);
 		int targetWalk = bfs == null ? SceneBfs.UNREACHED : step.getTargets().stream().mapToInt(bfs::cost).min().orElse(SceneBfs.UNREACHED);
 		boolean targetInScene = targetWalk != SceneBfs.UNREACHED;
+		// Mid-obstacle in a pocket with no node (south of Kaleb's, anim 741), a few tiles from a start that had nodes
+		boolean pocket = nearestHere == WalkTable.NO_NODE && !targetInScene && start != null && start.getKind() == PlanStart.Kind.SCENE
+			&& start.getTile() != null && start.getTile().distanceTo2D(position.getTile()) <= POCKET_TILES;
+		if (pocket)
+		{
+			lastTile = null;
+			lastSceneBase = NO_SCENE;
+			return;
+		}
+		nearestNode = nearestHere;
 		targetWalkBucket = targetInScene ? targetWalk / TARGET_WALK_BUCKET_TILES : NO_TARGET_IN_SCENE;
 		start = nearestNode != WalkTable.NO_NODE || targetInScene ? PlanStart.scene(position.getTile(), bfs)
 			: PlanStart.teleportOnly(position.getTile(), bfs);
@@ -369,12 +397,18 @@ public class RoutePlanner
 			: Math.max(PlanInput.NO_REVERT_WINDOW, SWAP_WINDOW_TICKS - (client.getTickCount() - since));
 	}
 
-	private void onPlanned(Plan planned)
+	private String followedFirstTransport(Step step)
+	{
+		return committed != null && step.getKey().equals(committedStep) ? committed.getFirstTransportKey() : null;
+	}
+
+	private void onPlanned(Plan planned, PlanInput input)
 	{
 		plan = planned;
 		committed = commit(planned);
 		committedStep = planned.getStepKey();
 		listeners.forEach(listener -> listener.accept(planned));
+		inputListeners.forEach(listener -> listener.accept(planned, input));
 	}
 
 	private Route commit(Plan planned)
@@ -424,6 +458,7 @@ public class RoutePlanner
 		routes.add(planned.getDirect());
 		routes.add(planned.getSameBook());
 		routes.addAll(planned.getAlternatives());
+		routes.add(planned.getFollowed());
 		planned.getCandidates().forEach(candidate -> routes.add(candidate.getRoute()));
 		return routes;
 	}

@@ -36,6 +36,10 @@ public final class SceneBfs
 	private static final int BORDER_HIGH = 5;
 	private static final int MAX_TILES_BESIDE_WAYPOINT = 2;
 	private static final int NO_DIRECTION = -1;
+	/** Opening a door on the way: the click and the stop it costs, in tiles of running. */
+	static final int DOOR_TILES = 3;
+	private static final int[] FROM_SIDES = {W, E, S, N, W | S, E | S, W | N, E | N};
+	private static final int[] TO_SIDES = {E, W, N, S, E | N, W | N, E | S, W | S};
 
 	@Value
 	public static class Scene
@@ -46,6 +50,40 @@ public final class SceneBfs
 		int sizeY;
 		/** [plane][x][y]; a null plane has no data. */
 		int[][][] flags;
+		/** [plane][x][y]: the sides (wall flags) of each tile that a closed door opens through; null when none are known. */
+		int[][][] doorSides;
+
+		public Scene(int baseX, int baseY, int sizeX, int sizeY, int[][][] flags)
+		{
+			this(baseX, baseY, sizeX, sizeY, flags, null);
+		}
+
+		public Scene(int baseX, int baseY, int sizeX, int sizeY, int[][][] flags, int[][][] doorSides)
+		{
+			this.baseX = baseX;
+			this.baseY = baseY;
+			this.sizeX = sizeX;
+			this.sizeY = sizeY;
+			this.flags = flags;
+			this.doorSides = doorSides;
+		}
+
+		public Scene withDoorSides(int[][][] sides)
+		{
+			return new Scene(baseX, baseY, sizeX, sizeY, flags, sides);
+		}
+
+		/** Tiles a step from ({@code x}, {@code y}) in direction {@code d} costs: one, plus a door's opening. */
+		int stepCost(int plane, int x, int y, int d)
+		{
+			int[][] sides = doorSides == null ? null : doorSides[plane];
+			if (sides == null)
+			{
+				return 1;
+			}
+			boolean throughDoor = (sides[x][y] & FROM_SIDES[d]) != 0 || (sides[x + DX[d]][y + DY[d]] & TO_SIDES[d]) != 0;
+			return throughDoor ? 1 + DOOR_TILES : 1;
+		}
 
 		/** Client thread only. Null for an instanced scene or one without collision data. */
 		public static Scene capture(WorldView view)
@@ -99,15 +137,17 @@ public final class SceneBfs
 	public static final class Result
 	{
 		private final Scene scene;
+		private final WorldPoint start;
 		private final int[] cost;
 		private final List<ExitReach> exits;
 
 		/** Each in-scene row by its destination index: {origin index, cost}. */
 		private final Map<Integer, List<int[]>> rowsInto;
 
-		private Result(Scene scene, int[] cost, List<ExitReach> exits, Map<Integer, List<int[]>> rowsInto)
+		private Result(Scene scene, WorldPoint start, int[] cost, List<ExitReach> exits, Map<Integer, List<int[]>> rowsInto)
 		{
 			this.scene = scene;
+			this.start = start;
 			this.cost = cost;
 			this.exits = exits;
 			this.rowsInto = rowsInto;
@@ -177,6 +217,11 @@ public final class SceneBfs
 			return from;
 		}
 
+		public WorldPoint getStart()
+		{
+			return start;
+		}
+
 		public Scene getScene()
 		{
 			return scene;
@@ -234,7 +279,7 @@ public final class SceneBfs
 				}
 				x -= DX[step];
 				y -= DY[step];
-				c--;
+				c -= scene.stepCost(plane, x, y, step);
 				onBlocked = false;
 				path.add(new WorldPoint(scene.getBaseX() + x, scene.getBaseY() + y, plane));
 			}
@@ -274,6 +319,31 @@ public final class SceneBfs
 			return best == null ? new ArrayList<>() : pathTo(best);
 		}
 
+		/** At least the walk to {@code goal}: through the scene, then straight on from where it ends; UNREACHED off its floors. */
+		public int walkAtLeast(WorldPoint goal)
+		{
+			int reached = costNear(goal);
+			int plane = goal.getPlane();
+			if (reached != UNREACHED || plane >= scene.getFlags().length || scene.getFlags()[plane] == null)
+			{
+				return reached;
+			}
+			int best = UNREACHED;
+			for (int x = 0; x < scene.getSizeX(); x++)
+			{
+				for (int y = 0; y < scene.getSizeY(); y++)
+				{
+					int c = cost[index(scene, x, y, plane)];
+					if (c != UNREACHED)
+					{
+						int straight = Math.max(Math.abs(scene.getBaseX() + x - goal.getX()), Math.abs(scene.getBaseY() + y - goal.getY()));
+						best = Math.min(best, c + straight);
+					}
+				}
+			}
+			return best;
+		}
+
 		private WorldPoint nearestReached(WorldPoint goal, int plane)
 		{
 			if (plane < 0 || plane >= scene.getFlags().length || scene.getFlags()[plane] == null)
@@ -305,10 +375,12 @@ public final class SceneBfs
 		}
 
 		/** Corners don't count: the game walks to a straight side to use an object. Null when no side is reached. */
+		/** A side with no wall between it and the object wins: stairs against a bank's outer wall face inwards. */
 		public WorldPoint cheapestBeside(WorldPoint southWest, int sizeX, int sizeY)
 		{
 			WorldPoint best = null;
 			int bestCost = UNREACHED;
+			boolean bestOpen = false;
 			for (int x = -1; x <= sizeX; x++)
 			{
 				for (int y = -1; y <= sizeY; y++)
@@ -317,10 +389,13 @@ public final class SceneBfs
 					boolean outsideY = y == -1 || y == sizeY;
 					WorldPoint tile = southWest.dx(x).dy(y);
 					int c = outsideX != outsideY ? cost(tile) : UNREACHED;
-					if (c < bestCost)
+					boolean open = c != UNREACHED
+						&& opensOnto(tile, southWest.dx(Math.max(0, Math.min(sizeX - 1, x))).dy(Math.max(0, Math.min(sizeY - 1, y))));
+					if (c != UNREACHED && (open && !bestOpen || open == bestOpen && c < bestCost))
 					{
 						best = tile;
 						bestCost = c;
+						bestOpen = open;
 					}
 				}
 			}
@@ -406,7 +481,7 @@ public final class SceneBfs
 				int px = x - DX[d];
 				int py = y - DY[d];
 				if (px >= 0 && py >= 0 && px < scene.getSizeX() && py < scene.getSizeY()
-					&& cost[index(scene, px, py, plane)] == c - 1 && canMove(flags, px, py, d))
+					&& canMove(flags, px, py, d) && cost[index(scene, px, py, plane)] == c - scene.stepCost(plane, px, py, d))
 				{
 					return d;
 				}
@@ -436,7 +511,7 @@ public final class SceneBfs
 		Arrays.fill(cost, UNREACHED);
 		if (!scene.contains(start))
 		{
-			return new Result(scene, cost, List.of(), Map.of());
+			return new Result(scene, start, cost, List.of(), Map.of());
 		}
 		Map<Integer, List<int[]>> rows = sceneRows(scene, table, rowOpen);
 		Map<Integer, List<Integer>> leaving = leavingRows(scene, table, rowOpen);
@@ -464,7 +539,7 @@ public final class SceneBfs
 			}
 			bucket.size = 0;
 		}
-		return new Result(scene, cost, exits(table, leaving, cost), reversed(rows));
+		return new Result(scene, start, cost, exits(table, leaving, cost), reversed(rows));
 	}
 
 	private static List<ExitReach> exits(WalkTable table, Map<Integer, List<Integer>> leaving, int[] cost)
@@ -503,7 +578,7 @@ public final class SceneBfs
 			int next = index(scene, nx, ny, plane);
 			boolean open = canMove(flags, x, y, d);
 			boolean ontoRowOrigin = !open && d < 4 && (flags[nx][ny] & FULL) != 0 && rows.containsKey(next);
-			if ((open || ontoRowOrigin) && push(next, c + 1, cost, buckets))
+			if ((open || ontoRowOrigin) && push(next, c + scene.stepCost(plane, x, y, d), cost, buckets))
 			{
 				pushed++;
 			}

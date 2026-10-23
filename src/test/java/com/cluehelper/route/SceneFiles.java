@@ -17,7 +17,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class SceneFiles
 {
 	@Value
-	static class Recorded
+	public static class Recorded
 	{
 		SceneBfs.Scene scene;
 		WorldPoint player;
@@ -58,7 +58,7 @@ public final class SceneFiles
 		}
 	}
 
-	static Recorded read(InputStream in) throws IOException
+	public static Recorded read(InputStream in) throws IOException
 	{
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(in), StandardCharsets.UTF_8)))
 		{

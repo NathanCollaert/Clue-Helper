@@ -27,7 +27,15 @@ public class SubStep
 		EQUIPPED,
 		URI_HERE,
 		/** A challenge scroll, puzzle box or light box arrives in the inventory. */
-		CHALLENGE_ITEM
+		CHALLENGE_ITEM,
+		/** An item named {@code carriedWhenDone} is in the inventory (a scroll taken out of its book). */
+		ITEM_CARRIED,
+		/** No item named {@code actItemNamed} is in the inventory any more (a book deposited). */
+		ITEM_GONE,
+		/** The way in's worn requirements (diving gear) are all worn. */
+		WAY_IN_WORN,
+		/** The needs named in {@code wornNeeds} are met by worn items alone. */
+		GEAR_WORN
 	}
 
 	public enum Kind
@@ -66,6 +74,9 @@ public class SubStep
 	StepIndex.WayIn wayIn;
 	/** An act that ends one stage of several; null for the step's own act. */
 	Stage stage;
+	/** Objects to outline and walk up to, from the stage: an anvil. */
+	@Builder.Default
+	Set<Integer> objectIds = Set.of();
 	/** NPCs to outline and walk up to, from the stage: the Grand Exchange clerks. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
@@ -83,6 +94,15 @@ public class SubStep
 	/** An act's item, used by its left click: the strange device for a feel. */
 	@Builder.Default
 	Set<Integer> actItems = Set.of();
+	/** A carried item to click, by the start of its name (puzzle boxes come in a form per tier); null for none. */
+	String actItemNamed;
+	/** The option the act takes on its item: filled when that is the item's left click, coloured in its menu. */
+	String actOption;
+	/** For {@link Done#GEAR_WORN}: the step's needs to wear, by name. */
+	@Builder.Default
+	List<String> wornNeeds = List.of();
+	/** For {@link Done#ITEM_CARRIED}: the start of the item's name, lower case. */
+	String carriedWhenDone;
 	/** The side tab the act is done in: Emotes for an emote, Music for a track. */
 	@Builder.Default
 	StepGuide.Tab tab = StepGuide.Tab.NONE;

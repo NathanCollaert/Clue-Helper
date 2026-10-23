@@ -30,7 +30,8 @@ public class CatalogRow
 	/**
 	 * How to find the row's line in the menu it opens: {@code nexus 466 Wilderness} (struct id, map region),
 	 * {@code box 10} (script 1688's index), {@code list Xeric's Inferno} (a 187 line), {@code op Karamja} (the
-	 * object's own option); null otherwise.
+	 * object's own option; {@code op Set Destination > Level 13 Wilderness} picks a 187 line after it),
+	 * {@code npc Charter} (the option of the NPC whose id is in objectId); null otherwise.
 	 */
 	String menu;
 	/** -1 when none. */

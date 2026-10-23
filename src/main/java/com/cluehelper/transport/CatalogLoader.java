@@ -18,7 +18,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class CatalogLoader
 {
 	static final List<String> TELEPORT_FILES = List.of("spells.tsv", "home_teleports.tsv", "minigames.tsv", "items.tsv",
-		"fairy_rings.tsv", "poh.tsv", "spirit_trees.tsv", "quetzals.tsv");
+		"fairy_rings.tsv", "poh.tsv", "spirit_trees.tsv", "quetzals.tsv", "rides.tsv", "sailing.tsv");
 	static final String SPELLBOOK_FILE = "spellbooks.tsv";
 
 	static final String CATEGORY = "Category";

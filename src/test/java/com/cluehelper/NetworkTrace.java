@@ -15,6 +15,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.DBTableID;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
@@ -25,6 +26,13 @@ final class NetworkTrace
 	static final String RING_TAG = "[CH-RING]";
 	static final String TIME_TAG = "[CH-TIME]";
 	static final String QUETZAL_TAG = "[CH-QUETZAL]";
+	static final String BOAT_TAG = "[CH-BOAT]";
+	private static final int[][] BOAT_SLOTS = {
+		{VarbitID.SAILING_BOAT_1_OWNED, VarbitID.SAILING_BOAT_1_PORT, VarbitID.SAILING_BOAT_1_TELEPORT_FOCUS},
+		{VarbitID.SAILING_BOAT_2_OWNED, VarbitID.SAILING_BOAT_2_PORT, VarbitID.SAILING_BOAT_2_TELEPORT_FOCUS},
+		{VarbitID.SAILING_BOAT_3_OWNED, VarbitID.SAILING_BOAT_3_PORT, VarbitID.SAILING_BOAT_3_TELEPORT_FOCUS},
+		{VarbitID.SAILING_BOAT_4_OWNED, VarbitID.SAILING_BOAT_4_PORT, VarbitID.SAILING_BOAT_4_TELEPORT_FOCUS},
+		{VarbitID.SAILING_BOAT_5_OWNED, VarbitID.SAILING_BOAT_5_PORT, VarbitID.SAILING_BOAT_5_TELEPORT_FOCUS}};
 	private static final int WATCH_TICKS = 30;
 	private static final int QUETZAL_MENU = InterfaceID.QuetzalMenu.ICONS >>> 16;
 	private static final int WHISTLE_MENU = InterfaceID.QuetzalwhistleMenu.ICONS >>> 16;
@@ -36,6 +44,7 @@ final class NetworkTrace
 	private WorldPoint lastTile;
 	private int lastAnimation = -2;
 	private int pendingQuetzal = -1;
+	private String lastBoats;
 
 	NetworkTrace(Client client, SpiritTreeMemory trees, FairyRingMemory rings, Consumer<File> saveFrame)
 	{
@@ -75,6 +84,10 @@ final class NetworkTrace
 			dumpQuetzalIcons(pendingQuetzal);
 			pendingQuetzal = -1;
 		}
+		if (!keypadOpen())
+		{
+			logBoats();
+		}
 		if (watching <= 0 || keypadOpen())
 		{
 			return;
@@ -97,6 +110,24 @@ final class NetworkTrace
 		if (event.getGroupId() == QUETZAL_MENU || event.getGroupId() == WHISTLE_MENU)
 		{
 			pendingQuetzal = event.getGroupId();
+		}
+	}
+
+	/** Each boat slot's owned, port (SailingDock id) and teleport focus varbits, whenever one changes. */
+	private void logBoats()
+	{
+		List<String> slots = new ArrayList<>();
+		for (int i = 0; i < BOAT_SLOTS.length; i++)
+		{
+			int[] vars = BOAT_SLOTS[i];
+			slots.add((i + 1) + ": owned " + client.getVarbitValue(vars[0]) + " port " + client.getVarbitValue(vars[1])
+				+ " focus " + client.getVarbitValue(vars[2]));
+		}
+		String boats = String.join("; ", slots);
+		if (!boats.equals(lastBoats) && client.getLocalPlayer() != null)
+		{
+			log.info("{} t{} {}", BOAT_TAG, client.getTickCount(), boats);
+			lastBoats = boats;
 		}
 	}
 

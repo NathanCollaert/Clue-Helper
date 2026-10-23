@@ -1,46 +1,85 @@
 package com.cluehelper.guide;
 
+import java.util.List;
 import java.util.Map;
-import net.runelite.api.gameval.InterfaceID;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import lombok.Value;
+import net.runelite.api.gameval.InterfaceID.Bookofscrolls;
 
 public final class ScrollBook
 {
 	static final String ROW_PREFIX = "Master scroll book: ";
 	public static final int NO_WIDGET = -1;
-	private static final Map<String, Integer> ENTRIES = Map.ofEntries(
-		Map.entry("Digsite teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_DIGSITE),
-		Map.entry("Feldip hills teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_FELDIP),
-		Map.entry("Iorwerth camp teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_ELF),
-		Map.entry("Key master teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_CERBERUS),
-		Map.entry("Lumberyard teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_LUMBERYARD),
-		Map.entry("Lunar isle teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_LUNARISLE),
-		Map.entry("Mort'ton teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_MORTTON),
-		Map.entry("Mos le'harmless teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_MOSLES),
-		Map.entry("Nardah teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_NARDAH),
-		Map.entry("Pest control teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_PESTCONTROL),
-		Map.entry("Piscatoris teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_PISCATORIS),
-		Map.entry("Revenant cave teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_REVENANTS),
-		Map.entry("Tai bwo wannai teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_TAIBWO),
-		Map.entry("Watson teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_WATSON),
-		Map.entry("Zul-andra teleport", InterfaceID.Bookofscrolls.TELEPORTSCROLL_ZULANDRA));
+
+	/** The book's widgets per scroll: later scrolls don't sit in entry, picture, charges, name order. */
+	@Value
+	private static class Scroll
+	{
+		String name;
+		int entry;
+		int picture;
+		int charges;
+		int title;
+	}
+
+	private static final List<Scroll> SCROLLS = List.of(
+		scroll("Ardeaglais teleport", Bookofscrolls.TELEPORTSCROLL_ARDEAGLAIS, Bookofscrolls.GFX_ARDEAGLAIS, Bookofscrolls.TEXT_ARDEAGLAIS, Bookofscrolls.TITLE_ARDEAGLAIS),
+		scroll("Chasm teleport scroll", Bookofscrolls.TELEPORTSCROLL_CHASMOFFIRE, Bookofscrolls.GFX_CHASMOFFIRE, Bookofscrolls.TEXT_CHASMOFFIRE, Bookofscrolls.TITLE_CHASMOFFIRE),
+		scroll("Colossal wyrm teleport scroll", Bookofscrolls.TELEPORTSCROLL_COLOSSAL_WYRM, Bookofscrolls.GFX_COLOSSAL_WYRM, Bookofscrolls.TEXT_COLOSSAL_WYRM, Bookofscrolls.TITLE_COLOSSAL_WYRM),
+		scroll("Digsite teleport", Bookofscrolls.TELEPORTSCROLL_DIGSITE, Bookofscrolls.GFX_DIGSITE, Bookofscrolls.TEXT_DIGSITE, Bookofscrolls.TITLE_DIGSITE),
+		scroll("Feldip hills teleport", Bookofscrolls.TELEPORTSCROLL_FELDIP, Bookofscrolls.GFX_FELDIP, Bookofscrolls.TEXT_FELDIP, Bookofscrolls.TITLE_FELDIP),
+		scroll("Guthixian temple teleport", Bookofscrolls.TELEPORTSCROLL_GUTHIXIAN_TEMPLE, Bookofscrolls.GFX_GUTHIXIAN_TEMPLE, Bookofscrolls.TEXT_GUTHIXIAN_TEMPLE, Bookofscrolls.TITLE_GUTHIXIAN_TEMPLE),
+		scroll("Iorwerth camp teleport", Bookofscrolls.TELEPORTSCROLL_ELF, Bookofscrolls.GFX_ELF, Bookofscrolls.TEXT_ELF, Bookofscrolls.TITLE_ELF),
+		scroll("Key master teleport", Bookofscrolls.TELEPORTSCROLL_CERBERUS, Bookofscrolls.GFX_CERBERUS, Bookofscrolls.TEXT_CERBERUS, Bookofscrolls.TITLE_CERBERUS),
+		scroll("Lumberyard teleport", Bookofscrolls.TELEPORTSCROLL_LUMBERYARD, Bookofscrolls.GFX_LUMBERYARD, Bookofscrolls.TEXT_LUMBERYARD, Bookofscrolls.TITLE_LUMBERYARD),
+		scroll("Lunar isle teleport", Bookofscrolls.TELEPORTSCROLL_LUNARISLE, Bookofscrolls.GFX_LUNARISLE, Bookofscrolls.TEXT_LUNARISLE, Bookofscrolls.TITLE_LUNAR),
+		scroll("Mort'ton teleport", Bookofscrolls.TELEPORTSCROLL_MORTTON, Bookofscrolls.GFX_MORTTON, Bookofscrolls.TEXT_MORTTON, Bookofscrolls.TITLE_MORTTON),
+		scroll("Mos le'harmless teleport", Bookofscrolls.TELEPORTSCROLL_MOSLES, Bookofscrolls.GFX_MOSLES, Bookofscrolls.TEXT_MOSLES, Bookofscrolls.TITLE_MOSLES),
+		scroll("Nardah teleport", Bookofscrolls.TELEPORTSCROLL_NARDAH, Bookofscrolls.GFX_NARDAH, Bookofscrolls.TEXT_NARDAH, Bookofscrolls.TITLE_NARDAH),
+		scroll("Pest control teleport", Bookofscrolls.TELEPORTSCROLL_PESTCONTROL, Bookofscrolls.GFX_PESTCONTROL, Bookofscrolls.TEXT_PESTCONTROL, Bookofscrolls.TITLE_PESTCONTROL),
+		scroll("Piscatoris teleport", Bookofscrolls.TELEPORTSCROLL_PISCATORIS, Bookofscrolls.GFX_PISCATORIS, Bookofscrolls.TEXT_PISCATORIS, Bookofscrolls.TITLE_PISCATORIS),
+		scroll("Revenant cave teleport", Bookofscrolls.TELEPORTSCROLL_REVENANTS, Bookofscrolls.GFX_REVENANTS, Bookofscrolls.TEXT_REVENANTS, Bookofscrolls.TITLE_REVENANTS),
+		scroll("Spider cave teleport", Bookofscrolls.TELEPORTSCROLL_SPIDERCAVE, Bookofscrolls.GFX_SPIDERCAVE, Bookofscrolls.TEXT_SPIDERCAVE, Bookofscrolls.TITLE_SPIDERCAVE),
+		scroll("Tai bwo wannai teleport", Bookofscrolls.TELEPORTSCROLL_TAIBWO, Bookofscrolls.GFX_TAIBWO, Bookofscrolls.TEXT_TAIBWO, Bookofscrolls.TITLE_TAIBWO),
+		scroll("Watson teleport", Bookofscrolls.TELEPORTSCROLL_WATSON, Bookofscrolls.GFX_WATSON, Bookofscrolls.TEXT_WATSON, Bookofscrolls.TITLE_WATSON),
+		scroll("Zul-andra teleport", Bookofscrolls.TELEPORTSCROLL_ZULANDRA, Bookofscrolls.GFX_ZULANDRA, Bookofscrolls.TEXT_ZULANDRA, Bookofscrolls.TITLE_ZULANDRA));
+	private static final Map<String, Scroll> BY_NAME = SCROLLS.stream().collect(Collectors.toUnmodifiableMap(Scroll::getName, Function.identity()));
+	private static final Map<Integer, Scroll> BY_ENTRY = SCROLLS.stream().collect(Collectors.toUnmodifiableMap(Scroll::getEntry, Function.identity()));
 
 	private ScrollBook()
 	{
 	}
 
-	/** Each scroll's picture, charges and name are the three widgets after its entry (gameval order, 1.13.2). */
 	public static int picture(int entry)
 	{
-		return entry + 1;
+		Scroll scroll = BY_ENTRY.get(entry);
+		return scroll == null ? NO_WIDGET : scroll.getPicture();
 	}
 
 	static int[] texts(int entry)
 	{
-		return new int[]{entry + 2, entry + 3};
+		Scroll scroll = BY_ENTRY.get(entry);
+		return scroll == null ? new int[0] : new int[]{scroll.getCharges(), scroll.getTitle()};
+	}
+
+	/** The scroll's entry, picture, charges and name, whose menus all offer its options. */
+	static Set<Integer> widgets(String rowName)
+	{
+		int entry = entry(rowName);
+		Scroll scroll = BY_ENTRY.get(entry);
+		return scroll == null ? Set.of() : Set.of(scroll.getEntry(), scroll.getPicture(), scroll.getCharges(), scroll.getTitle());
 	}
 
 	static int entry(String rowName)
 	{
-		return rowName.startsWith(ROW_PREFIX) ? ENTRIES.getOrDefault(rowName.substring(ROW_PREFIX.length()), NO_WIDGET) : NO_WIDGET;
+		Scroll scroll = rowName.startsWith(ROW_PREFIX) ? BY_NAME.get(rowName.substring(ROW_PREFIX.length())) : null;
+		return scroll == null ? NO_WIDGET : scroll.getEntry();
+	}
+
+	private static Scroll scroll(String name, int entry, int picture, int charges, int title)
+	{
+		return new Scroll(name, entry, picture, charges, title);
 	}
 }

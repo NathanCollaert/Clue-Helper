@@ -43,6 +43,7 @@ cryptic:in the place duke horacio calls home, talk to a man with a hat dropped b
 cryptic:near the open desert i reside, to get past me you must abide. go forward if you dare, for when you pass me, you'll be sweating by your hair.
   best      81t: Lumbridge Teleport → walk 77 {item:556=3, item:557=1, item:563=1}
   alt       101t: Lumbridge Home Teleport → walk 77 {cooldown:892=1}
+  alt       160t: Varrock Teleport → walk 156 {item:556=3, item:554=1, item:563=1}
 cryptic:talk to charlie the tramp in varrock.
   best      21t: Varrock Teleport → walk 17 {item:556=3, item:554=1, item:563=1}
 emote:blow a raspberry at aris in her tent. equip a gold ring and a gold necklace.
@@ -94,4 +95,4 @@ skill:CHARLIE:i need to give charlie a raw trout.
   best      85t: Varrock Teleport → walk 61 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}
   alt       148t: Falador Teleport → walk 79 → walk 66 {item:556=3, item:555=1, item:563=1}
 skill:CHARLIE:i need to give charlie one iron dagger.
-  best      39t: Varrock Teleport → walk 15 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}
+  best      36t: Varrock Teleport → walk 12 → Varrock Teleport → walk 16 {item:556=6, item:554=2, item:563=2}

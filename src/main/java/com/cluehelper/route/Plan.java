@@ -24,6 +24,8 @@ public class Plan
 	Route fasterUnqualified;
 	/** Each with a first transport no earlier route has. */
 	List<Route> alternatives;
+	/** The followed route's way, planned again when the best starts another way; null when that way isn't within the margin. */
+	Route followed;
 	List<Candidate> candidates;
 	/** PROBES steps only. */
 	Map<WorldPoint, Integer> probeTicks;

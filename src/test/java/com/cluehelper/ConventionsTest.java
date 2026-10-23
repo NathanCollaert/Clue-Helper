@@ -47,7 +47,7 @@ public class ConventionsTest
 	}
 
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
-		"consumablePenalty", "avoidWilderness",
+		"consumablePenalty", "avoidWilderness", "scrollBookOutOfWilderness",
 		"highlightItems", "highlightSpells", "highlightMenus",
 		"pathLine", "showNextStep",
 		"spellbookChanges", "capeUsePenalty", "strandPenalty",

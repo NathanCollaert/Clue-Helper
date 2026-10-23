@@ -1,7 +1,11 @@
 package com.cluehelper.route;
 
+import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.TargetKind;
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,6 +26,7 @@ public final class DriftSteps
 	/** Keeps the first var branch of each key. */
 	public static Map<String, Step> read() throws IOException
 	{
+		StepIndex index = StepIndex.read(new Gson());
 		Map<String, Step> read = new LinkedHashMap<>();
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(
 			DriftSteps.class.getResourceAsStream("/drift/core-steps.tsv"), StandardCharsets.UTF_8)))
@@ -44,9 +49,23 @@ public final class DriftSteps
 					: Arrays.stream(c[7].split("\\|")).map(Integer::parseInt).collect(Collectors.toList());
 				TargetKind kind = c[4].isEmpty() ? TargetKind.ANY_OF : TargetKind.valueOf(c[4]);
 				read.put(c[0], Step.builder().key(c[0]).type(c[2]).tier(c[3]).kind(kind).targets(targets).regions(regions)
-					.text(c[12]).known(true).build());
+					.stages(challengeStages(c[2], kind, targets, index.entry(c[0]))).text(c[12]).known(true).build());
 			}
 		}
 		return read;
+	}
+
+	/** A skill challenge's targets are its task's places, any one of them, then the hand-in, as the resolver builds it. */
+	private static List<Stage> challengeStages(String type, TargetKind kind, List<WorldPoint> targets, StepIndex.Entry entry)
+	{
+		if (!ClueTypes.SKILL.equals(type) || kind != TargetKind.SEQUENCE || targets.size() < 2)
+		{
+			return List.of();
+		}
+		List<WorldPoint> places = targets.subList(0, targets.size() - 1);
+		Map<WorldPoint, String> grownOnly = entry == null ? Map.of() : entry.getPlaces().stream().filter(place -> place.getGrown() != null)
+			.collect(Collectors.toMap(StepIndex.Place::getTile, StepIndex.Place::getGrown));
+		return List.of(Stage.builder().kind(Stage.Kind.TASK).tiles(List.copyOf(places)).grownOnly(grownOnly).takesStepItems(true).build(),
+			Stage.builder().kind(Stage.Kind.FINAL).tiles(List.of(targets.get(targets.size() - 1))).build());
 	}
 }

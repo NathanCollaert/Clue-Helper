@@ -45,6 +45,13 @@ public class Route
 	boolean pinIncluded;
 	/** Banked, but with no bank leg: the route starts with the withdraw list. */
 	boolean openBankStart;
+	/**
+	 * Where the start leg walks to through the loaded scene: its node's tile, or the waypoint where it joins a long walk;
+	 * null when the route doesn't start with a walk from the scene. The path line follows it, so it matches the plan.
+	 */
+	WorldPoint startVia;
+	/** When the start leg joins a long walk at its waypoint: that walk's first node's tile. */
+	WorldPoint startJoinedFrom;
 
 	public int getTicks()
 	{

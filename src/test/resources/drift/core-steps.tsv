@@ -101,7 +101,7 @@ anagram:rug deter	*	anagram	beginner	ANY_OF	3151,3412,0	Gertrude				none	1505	RU
 anagram:sir share red	*	anagram	beginner	ANY_OF	2944,3381,0	Hairdresser				none	1506	SIR SHARE RED
 anagram:slam duster grail	*	anagram	master	ANY_OF	1649,3498,0	Guildmaster Lars				none	1596	SLAM DUSTER GRAIL
 anagram:taunt roof	*	anagram	beginner	ANY_OF	3080,3250,0	Fortunato				none	1507	TAUNT ROOF
-anagram:ten wigs on	*	anagram	master	ANY_OF	3389,2877,0	Wingstone				none	1597	TEN WIGS ON
+anagram:ten wigs on	*	anagram	master	ANY_OF	3389,2877,0|3322,2868,0|3345,2895,0|3365,2868,0|3380,2898,0|3400,2872,0	Wingstone				none	1597	TEN WIGS ON
 anagram:twenty cure iron	*	anagram	master	ANY_OF	1503,3553,0	New Recruit Tony				none	1598	TWENTY CURE IRON
 cipher:19762	*	cipher	medium	ANY_OF	1625,3802,0	npc 7048				none	2268	The cipher reveals who to speak to next: QSPGFTTPS HSBDLMFCPOF
 cipher:19764	*	cipher	medium	ANY_OF	3112,3162,0	npc 5081				none	2267	The cipher reveals who to speak to next: XJABSE USBJCPSO
@@ -544,12 +544,12 @@ cryptic:the big high war god left his mark on this place.	*	cryptic	hard	ANY_OF	
 cryptic:the cheapest water for miles around, but they react badly to religious icons.	*	cryptic	hard	ANY_OF	3178,2987,0			354		none	1404	The cheapest water for miles around, but they react badly to religious icons.
 cryptic:the dead, red dragon watches over this chest. he must really dig the view.	*	cryptic	medium	SEQUENCE	3082,3419,0|3353,3332,0	Barbarian		375		none	2279	The dead, red dragon watches over this chest. He must really dig the view.
 cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	0	cryptic	master	ANY_OF	2878,3546,0	Ghommal				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
-cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	1,2,3,4,5,10,100	cryptic	master	ANY_OF	2878,3546,0	Laidee Gnonock				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
+cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	1,2,3,4,5,10,100	cryptic	master	ANY_OF	2878,3546,0	Laidee Gnonock|Ghommal				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
 cryptic:the effects of this fire are magnified.	*	cryptic	hard	ANY_OF	1179,3626,0					spade or dog	1423	The effects of this fire are magnified.
 cryptic:the far north eastern corner where 1 of 4 was defeated, the shadows still linger.	*	cryptic	master	ANY_OF	2744,5116,0					spade	1487	The far north eastern corner where 1 of 4 was defeated, the shadows still linger.
 cryptic:the hand ain't listening.	*	cryptic	easy	ANY_OF	3019,3232,0	The Face				none	1265	The hand ain't listening.
 cryptic:the keeper of melzars... spare? skeleton? anar?	*	cryptic	hard	ANY_OF	3068,3516,0	Oziach				none	1372	The keeper of Melzars... Spare? Skeleton? Anar?
-cryptic:the king's magic shouldn't be wasted by me.	*	cryptic	hard	ANY_OF	1930,4432,0	Guardian mummy				none	1382	The King's magic shouldn't be wasted by me.
+cryptic:the king's magic shouldn't be wasted by me.	*	cryptic	hard	ANY_OF	1934,4428,3	Guardian mummy				none	1382	The King's magic shouldn't be wasted by me.
 cryptic:the magic of 4 colours, an early experience you could learn. the large beast caged up top, rages, as his demised kin's loot now returns.	*	cryptic	hard	ANY_OF	3103,3163,2	Wizard Mizgog				none	1390	The magic of 4 colours, an early experience you could learn. The large beast caged up top, rages, as his demised kin's loot now returns.
 cryptic:the mother of the reptilian sacrifice.	*	cryptic	hard	ANY_OF	2204,3050,0	Zul-Cheray				none	1379	The mother of the reptilian sacrifice.
 cryptic:their bane awaits, but don't be going in there without permission.	*	cryptic	elite	ANY_OF	3176,2478,0	Shellbane gryphon				none	7046	Their bane awaits, but don't be going in there without permission.
@@ -810,7 +810,7 @@ skill:CHARLIE:i need to give charlie a leather body.	*	skill	beginner	SEQUENCE	3
 skill:CHARLIE:i need to give charlie a piece of iron ore.	*	skill	beginner	SEQUENCE	3285,3365,0|3209,3392,0	Charlie the Tramp				none	1815	i need to give charlie a piece of iron ore.
 skill:CHARLIE:i need to give charlie a raw herring.	*	skill	beginner	SEQUENCE	3014,3226,0|3209,3392,0	Charlie the Tramp				none	1813	i need to give charlie a raw herring.
 skill:CHARLIE:i need to give charlie a raw trout.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1814	i need to give charlie a raw trout.
-skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3188,3425,0|3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
+skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
 skill:CHARLIE:i need to give charlie some leather chaps.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1818	i need to give charlie some leather chaps.
 skill:SHERLOCK:activate the chivalry prayer.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				none	1841	activate the chivalry prayer.
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.	*	skill	master	SEQUENCE	1831,3772,0|2733,3415,0	Sherlock				3 item requirements	1863	angle for an anglerfish whilst sporting the finest fishing gear.
@@ -823,7 +823,7 @@ skill:SHERLOCK:catch a mottled eel with aerial fishing in lake molch.	*	skill	el
 skill:SHERLOCK:catch a raw shark.	*	skill	elite	SEQUENCE	2611,3392,0|2733,3415,0	Sherlock				1 item requirement	1834	catch a raw shark.
 skill:SHERLOCK:catch a red chinchompa.	*	skill	elite	SEQUENCE	2551,2915,0|2733,3415,0	Sherlock				1 item requirement	1831	catch a red chinchompa.
 skill:SHERLOCK:catch a tecu salamander.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	3502	catch a tecu salamander.
-skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.	*	skill	master	SEQUENCE	1657,3505,0|2733,3415,0	Sherlock				2 item requirements	1864	chop a redwood log whilst sporting the finest lumberjack gear.
+skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.	*	skill	master	SEQUENCE	1574,3493,1|1232,3755,1|2733,3415,0	Sherlock				2 item requirements	1864	chop a redwood log whilst sporting the finest lumberjack gear.
 skill:SHERLOCK:complete a lap of ape atoll agility course.	*	skill	elite	SEQUENCE	2755,2742,0|2733,3415,0	Sherlock				1 item requirement	1824	complete a lap of ape atoll agility course.
 skill:SHERLOCK:complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.	*	skill	master	SEQUENCE	2625,3677,0|2733,3415,0	Sherlock				1 item requirement	1852	complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.
 skill:SHERLOCK:cook a swordfish	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1838	cook a swordfish
@@ -855,9 +855,9 @@ skill:SHERLOCK:pickpocket an elf.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock		
 skill:SHERLOCK:plant a watermelon seed.	*	skill	elite	SEQUENCE	3055,3307,0|2733,3415,0	Sherlock				3 item requirements	1840	plant a watermelon seed.
 skill:SHERLOCK:score a goal in skullball.	*	skill	elite	SEQUENCE	3543,3463,0|2733,3415,0	Sherlock				1 item requirement	1823	score a goal in skullball.
 skill:SHERLOCK:slay a dust devil.	*	skill	elite	SEQUENCE	3180,9364,0|2733,3415,0	Sherlock				1 item requirement	1829	slay a dust devil.
-skill:SHERLOCK:slay a nechryael in the slayer tower.	*	skill	master	SEQUENCE	3428,3535,0|2733,3415,0	Sherlock				none	1847	slay a nechryael in the slayer tower.
-skill:SHERLOCK:smith a mithril 2h sword.	*	skill	elite	SEQUENCE	3188,3425,0|2733,3415,0	Sherlock				2 item requirements	1833	smith a mithril 2h sword.
-skill:SHERLOCK:smith a runite med helm.	*	skill	master	SEQUENCE	3188,3425,0|2733,3415,0	Sherlock				2 item requirements	1844	smith a runite med helm.
+skill:SHERLOCK:slay a nechryael in the slayer tower.	*	skill	master	SEQUENCE	3440,3568,2|2733,3415,0	Sherlock				none	1847	slay a nechryael in the slayer tower.
+skill:SHERLOCK:smith a mithril 2h sword.	*	skill	elite	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|2733,3415,0	Sherlock				2 item requirements	1833	smith a mithril 2h sword.
+skill:SHERLOCK:smith a runite med helm.	*	skill	master	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|2733,3415,0	Sherlock				2 item requirements	1844	smith a runite med helm.
 skill:SHERLOCK:smith a tier 2 or above shayzien platebody.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1842	smith a tier 2 or above shayzien platebody.
 skill:SHERLOCK:steal a gem from the ardougne market.	*	skill	master	SEQUENCE	2662,3302,0|2733,3415,0	Sherlock				none	1855	steal a gem from the ardougne market.
 skill:SHERLOCK:steal from a chest in ardougne castle.	*	skill	elite	SEQUENCE	2577,3298,0|2733,3415,0	Sherlock				none	1826	steal from a chest in ardougne castle.
