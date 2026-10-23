@@ -288,6 +288,9 @@ public class GoldenRoutesTest
 			checked(input(hcim, inAndOut, PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
 		lines.add(line("avoidWilderness, target outside: no Wilderness landing",
 			checked(input(hcim, step("emote:12021"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
+		lines.add(line("avoidWilderness, King Black Dragon's lair: outside it, but only reachable through it",
+			checked(input(maxed, step("emote:dance in the king black dragon's lair. beware of double agents! equip a black dragonhide body, black dragonhide vambraces and a black dragon mask."),
+				PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
 
 		PlayerSnapshot midBank = ready(Loadouts.load("mid-ironman").getBankedSnapshot());
 		lines.add(line("bank tipping point: mid-ironman, bank on, to Varrock bank crates",

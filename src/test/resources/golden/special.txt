@@ -60,6 +60,11 @@ avoidWilderness, target outside: no Wilderness landing
   best      51t: Necklace of passage: Wizards' Tower → walk 46 {charge:21146=1}
   alt       53t: Amulet of glory: Draynor Village → walk 48 {charge:1712=1}
   alt       67t: Lumbridge Teleport → walk 63 {item:556=3, item:557=1, item:563=1}
+avoidWilderness, King Black Dragon's lair: outside it, but only reachable through it
+  best      43t: Teleport to House → House obelisk: Level 44 Wilderness → walk 23 → Lever: King Black Dragon Lair {item:556=1, item:557=1, item:563=1}
+  alt       37t (rank 45): Max cape: Spellbook → ANCIENT → Ghorrock Teleport → walk 25 → Lever: King Black Dragon Lair {cape=1, item:563=2, item:555=8} leaves you on ANCIENT
+  alt       46t: Teleport to House → Portal nexus: Ghorrock → walk 25 → Lever: King Black Dragon Lair {item:556=1, item:557=1, item:563=1}
+  note      only reachable through the Wilderness
 bank tipping point: mid-ironman, bank on, to Varrock bank crates
   best      27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       37t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
