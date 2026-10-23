@@ -283,6 +283,9 @@ public class GoldenRoutesTest
 		Step wildTarget = step("coordinate:23168");
 		lines.add(line("avoidWilderness with a Wilderness target",
 			checked(input(hcim, wildTarget, PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
+		Step inAndOut = wildTarget.toBuilder().targets(List.of(wildTarget.getTargets().get(0), new WorldPoint(3213, 3424, 0))).build();
+		lines.add(line("avoidWilderness, targets in and out of it: to the one outside",
+			checked(input(hcim, inAndOut, PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
 		lines.add(line("avoidWilderness, target outside: no Wilderness landing",
 			checked(input(hcim, step("emote:12021"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
 

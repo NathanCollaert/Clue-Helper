@@ -8,7 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 
 /** Each route is null when no such route exists. */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Plan
 {
 	public static final Plan NONE = Plan.builder().alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())

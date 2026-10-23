@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
@@ -83,6 +84,7 @@ final class Acts
 		List<SubStep> acts = new ArrayList<>();
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
 		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
+		acts.addAll(items ? SubSteps.remove(EmptySlots.of(step.getRequirements().getItems())) : List.of());
 		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip()) : List.of());
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		if (stash != null && spot != null)

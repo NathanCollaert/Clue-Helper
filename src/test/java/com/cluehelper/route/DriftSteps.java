@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import com.cluehelper.player.Book;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
@@ -65,7 +66,9 @@ public final class DriftSteps
 		List<WorldPoint> places = targets.subList(0, targets.size() - 1);
 		Map<WorldPoint, String> grownOnly = entry == null ? Map.of() : entry.getPlaces().stream().filter(place -> place.getGrown() != null)
 			.collect(Collectors.toMap(StepIndex.Place::getTile, StepIndex.Place::getGrown));
-		return List.of(Stage.builder().kind(Stage.Kind.TASK).tiles(List.copyOf(places)).grownOnly(grownOnly).takesStepItems(true).build(),
+		Book book = entry == null || entry.getBook() == null ? null : Book.valueOf(entry.getBook());
+		return List.of(Stage.builder().kind(Stage.Kind.TASK).tiles(List.copyOf(places)).grownOnly(grownOnly).takesStepItems(true)
+				.book(book).build(),
 			Stage.builder().kind(Stage.Kind.FINAL).tiles(List.of(targets.get(targets.size() - 1))).build());
 	}
 }

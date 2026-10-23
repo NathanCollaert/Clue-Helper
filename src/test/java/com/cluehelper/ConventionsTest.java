@@ -53,7 +53,7 @@ public class ConventionsTest
 		"spellbookChanges", "capeUsePenalty", "strandPenalty",
 		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks",
 		"pohSource", "pohJewelleryBox", "pohMountedGlory", "pohGarden", "pohObelisk", "pohAltar", "pohMountedCape",
-		"pohMythicalCape", "pohPortals", "pohForget", "stashBuiltIsFilled", "hotColdPlanner", "hotColdWildernessPenalty"));
+		"pohMythicalCape", "pohPortals", "pohForget", "stashBuiltIsFilled", "hotColdPlanner"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 

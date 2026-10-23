@@ -241,21 +241,21 @@ skill:CHARLIE:i need to give charlie a cooked pike.
   alt       64t: Amulet of glory: Edgeville → walk 39 → Varrock Teleport → walk 16 {charge:1712=1, item:556=3, item:554=1, item:563=1}
   alt       87t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Monastery → walk 48 → Combat bracelet: Champions' Guild → walk 15 {charge:2552=1, charge:11972=2} withdraw [11972]
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      146t: Amulet of glory: Draynor Village → walk 34 → Ship: Port Piscarilius → walk 63 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
-  alt       166t: Kourend Castle Teleport → walk 124 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
-  alt       172t: Necklace of passage: Wizards' Tower → walk 60 → Ship: Port Piscarilius → walk 63 → Camelot Teleport → walk 34 {charge:21146=1, item:556=5, item:563=1}
+  best      144t: Amulet of glory: Draynor Village → walk 34 → Ship: Port Piscarilius → walk 61 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
+  alt       164t: Kourend Castle Teleport → walk 122 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
+  alt       170t: Necklace of passage: Wizards' Tower → walk 60 → Ship: Port Piscarilius → walk 61 → Camelot Teleport → walk 34 {charge:21146=1, item:556=5, item:563=1}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
   best      91t: Skills necklace: Woodcutting Guild → walk 48 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
   alt       105t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 1. Xeric's Lookout → walk 49 → Camelot Teleport → walk 34 {charge:2552=1, charge:13393=1, item:556=5, item:563=1} withdraw [13393]
   alt       144t: Amulet of glory: Draynor Village → walk 34 → Ship: Land's End → walk 61 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
-  best      54t: Amulet of glory: Edgeville → walk 12 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
-  alt       98t: Skills necklace: Cooking Guild → walk 55 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
-  alt       97t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Monastery → walk 41 → Camelot Teleport → walk 34 {charge:2552=1, charge:11972=1, item:556=5, item:563=1} withdraw [11972]
+  best      50t: Falador Teleport → walk 8 → Camelot Teleport → walk 34 {item:556=8, item:555=1, item:563=2}
+  alt       54t: Amulet of glory: Edgeville → walk 12 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
+  alt       63t: Amulet of glory: Al Kharid → walk 20 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
 skill:SHERLOCK:kill a lizardman shaman.
-  best      130t: Kourend Castle Teleport → walk 88 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
-  alt       146t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 4. Xeric's Heart → walk 90 → Camelot Teleport → walk 34 {charge:2552=1, charge:13393=1, item:556=5, item:563=1} withdraw [13393]
-  alt       149t: Amulet of glory: Edgeville → walk 5 → bank → Xeric's talisman: 3. Xeric's Inferno → walk 92 → Camelot Teleport → walk 34 {charge:1712=1, charge:13393=1, item:556=5, item:563=1} withdraw [13393]
+  best      125t: Kourend Castle Teleport → walk 84 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
+  alt       141t: Ring of dueling: Castle Wars → walk 4 → bank → Xeric's talisman: 4. Xeric's Heart → walk 85 → Camelot Teleport → walk 34 {charge:2552=1, charge:13393=1, item:556=5, item:563=1} withdraw [13393]
+  alt       144t: Amulet of glory: Edgeville → walk 5 → bank → Xeric's talisman: 3. Xeric's Inferno → walk 87 → Camelot Teleport → walk 34 {charge:1712=1, charge:13393=1, item:556=5, item:563=1} withdraw [13393]
 skill:SHERLOCK:score a goal in skullball.
   best      127t: Ring of dueling: Castle Wars → walk 4 → bank → Ectophial → walk 69 → Camelot Teleport → walk 34 {charge:2552=1, item:556=5, item:563=1} withdraw [4251]
   direct    217t: Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Arceuus Home Teleport → walk 7 → Tyss: Spellbook → STANDARD → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=4, item:557=1, item:566=1, cooldown:892=1, item:556=5}

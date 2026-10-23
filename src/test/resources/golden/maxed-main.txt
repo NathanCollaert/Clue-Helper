@@ -85,7 +85,7 @@ coordinate:28909
 coordinate:3556
   best      30t: Teleport to House → House obelisk: Level 35 Wilderness → walk 15 {item:556=1, item:557=1, item:563=1}
   alt       30t: Max cape: Other Teleports: Black chinchompa → walk 25 {daily:4819=1}
-  alt       37t: Teleport to House → House obelisk: Level 50 Wilderness → walk 1 → Obelisk: Level 35 Wilderness → walk 15 {item:556=1, item:557=1, item:563=1}
+  alt       37t: Teleport to House → House obelisk: Level 19 Wilderness → walk 1 → Obelisk: Level 35 Wilderness → walk 15 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 cryptic:'a bag belt only?', he asked his balding brothers.
   best      22t: Teleport to House → Jewellery box: C. Monastery → walk 5 {item:556=1, item:557=1, item:563=1}
@@ -251,19 +251,19 @@ skill:CHARLIE:i need to give charlie a cooked pike.
   alt       64t: Amulet of glory: Edgeville → walk 39 → Varrock Teleport → walk 16 {charge:1712=1, item:556=3, item:554=1, item:563=1}
   alt       65t: Teleport to House → Jewellery box: H. Cooking Guild → walk 28 → Varrock Teleport → walk 16 {item:556=4, item:557=1, item:563=2, item:554=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      37t: Book of the dead: The Fisher's Flute → walk 25 → Kandarin headgear 4: Teleport → walk 3 {charge:25818=1}
+  best      35t: Book of the dead: The Fisher's Flute → walk 23 → Kandarin headgear 4: Teleport → walk 3 {charge:25818=1}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
   best      61t: Skills necklace: Woodcutting Guild → walk 48 → Kandarin headgear 4: Teleport → walk 3 {charge:11968=1}
   alt       62t: Xeric's talisman: 1. Xeric's Lookout → walk 49 → Kandarin headgear 4: Teleport → walk 3 {charge:13393=1}
   alt       73t: Teleport to House → Mounted Xeric's talisman: 1. Lookout → walk 49 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
-  best      24t: Amulet of glory: Edgeville → walk 12 → Kandarin headgear 4: Teleport → walk 3 {charge:1712=1}
-  alt       32t: Teleport to House → Mounted glory: Edgeville → walk 12 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
-  alt       32t (rank 40): Max cape: Spellbook → ARCEUUS → Respawn Teleport → walk 18 → Kandarin headgear 4: Teleport → walk 3 {cape=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  best      20t: Falador Teleport → walk 8 → Kandarin headgear 4: Teleport → walk 3 {item:556=3, item:555=1, item:563=1}
+  alt       24t: Amulet of glory: Edgeville → walk 12 → Kandarin headgear 4: Teleport → walk 3 {charge:1712=1}
+  alt       25t: Fremennik sea boots: Teleport → walk 13 → Kandarin headgear 4: Teleport → walk 3
 skill:SHERLOCK:kill a lizardman shaman.
-  best      67t: Teleport to House → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 43 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
-  alt       100t: Kourend Castle Teleport → walk 88 → Kandarin headgear 4: Teleport → walk 3 {item:554=1, item:555=1, item:563=2}
-  alt       102t: Xeric's talisman: 4. Xeric's Heart → walk 90 → Kandarin headgear 4: Teleport → walk 3 {charge:13393=1}
+  best      63t: Teleport to House → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 38 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
+  alt       95t: Kourend Castle Teleport → walk 84 → Kandarin headgear 4: Teleport → walk 3 {item:554=1, item:555=1, item:563=2}
+  alt       98t: Xeric's talisman: 4. Xeric's Heart → walk 85 → Kandarin headgear 4: Teleport → walk 3 {charge:13393=1}
 skill:SHERLOCK:score a goal in skullball.
   best      53t: Teleport to House → Fairy ring ALQ: Morytania: Haunted Woods → walk 28 → Kandarin headgear 4: Teleport → walk 3 {item:556=1, item:557=1, item:563=1}
   alt       47t (rank 55): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Kandarin headgear 4: Teleport → walk 3 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS

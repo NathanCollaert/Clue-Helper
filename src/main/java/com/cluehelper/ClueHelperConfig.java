@@ -71,13 +71,13 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "avoidWilderness",
 		name = "Avoid Wilderness",
-		description = "Leave out routes through the Wilderness. Hardcore only applies to Hardcore Ironman and Hardcore Group Ironman accounts",
+		description = "Leave out routes through the Wilderness for steps outside it, unless it's the only way there, and prefer hot/cold feels outside it. Hardcore only applies to Hardcore Ironman and Hardcore Group Ironman accounts",
 		section = routesSection,
 		position = 2
 	)
 	default AvoidWilderness avoidWilderness()
 	{
-		return AvoidWilderness.HARDCORE_ONLY;
+		return AvoidWilderness.ALWAYS;
 	}
 
 	@ConfigItem(
@@ -382,18 +382,6 @@ public interface ClueHelperConfig extends Config
 		position = 0
 	)
 	default boolean hotColdPlanner()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "hotColdWildernessPenalty",
-		name = "Avoid Wilderness feels",
-		description = "Prefer feeling outside the Wilderness when a feel there would be only a little faster",
-		section = hotColdSection,
-		position = 1
-	)
-	default boolean hotColdWildernessPenalty()
 	{
 		return true;
 	}

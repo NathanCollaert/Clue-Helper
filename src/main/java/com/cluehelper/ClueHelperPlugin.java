@@ -85,7 +85,7 @@ public class ClueHelperPlugin extends Plugin
 	private static final int ULTIMATE_IRONMAN = 2;
 	private static final String FORGET_HOUSE_KEY = "pohForget";
 	private static final String HOUSE_KEY_PREFIX = "poh";
-	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "hotColdWildernessPenalty");
+	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -344,6 +344,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onMenuOpened(MenuOpened event)
 	{
 		menuLines.colourMenu(guide.getMenuTarget(), config.highlightMenus());
+		menuLines.colourMenu(guide.getOptionTarget(), config.highlightMenus());
 		for (MenuTarget pathObject : waypointOverlay.pathObjectTargets())
 		{
 			menuLines.colourMenu(pathObject, config.highlightMenus());

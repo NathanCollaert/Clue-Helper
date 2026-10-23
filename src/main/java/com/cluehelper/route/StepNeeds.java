@@ -5,7 +5,9 @@ import com.cluehelper.DiggingDog;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.SpadeNeed;
+import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepRequirements;
@@ -16,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
@@ -26,7 +29,6 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
-import net.runelite.client.plugins.cluescrolls.clues.item.SlotLimitationRequirement;
 
 /** Client thread only: reads varbits. */
 @Singleton
@@ -53,6 +55,7 @@ public class StepNeeds
 	private final AvailabilityService availability;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
+	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
 
 	@Inject
 	StepNeeds(Client client, StashMemory stash, ClueHelperConfig config, GearPieces gearPieces, AvailabilityService availability)
@@ -84,9 +87,11 @@ public class StepNeeds
 		boolean inCoreTag = ITEMS_IN_CORE_TAG.contains(step.getType());
 		for (ItemRequirement item : requirements.getItems())
 		{
-			if (!(item instanceof SlotLimitationRequirement))
+			boolean optional = step.getData() != null && isOptional(item.getCollectiveName(client), step.getData());
+			if (!EmptySlots.metByEmptySlots(item) && !optional)
 			{
-				needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, true, inCoreTag));
+				ItemRequirement need = withAlternatives(item, step.getData());
+				needs.add(new RequiredItems.Need(item.getCollectiveName(client), need, true, inCoreTag && need == item));
 			}
 		}
 		for (ItemRequirement item : requirements.getOwnItems())
@@ -95,7 +100,7 @@ public class StepNeeds
 		}
 		if (step.getData() != null)
 		{
-			for (StepIndex.Requires way : step.getData().getRequires())
+			for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
 			{
 				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
 			}
@@ -111,6 +116,40 @@ public class StepNeeds
 			.stash(stash(requirements))
 			.spadeAtLeprechaun(client.getVarbitValue(VarbitID.FARMING_TOOLS_SPADE) > 0)
 			.build();
+	}
+
+	private boolean isOptional(String name, StepIndex.Entry data)
+	{
+		List<StepIndex.Level> from = data.getOptionalFrom().get(name);
+		return data.getOptional().contains(name)
+			|| from != null && from.stream().allMatch(level -> client.getRealSkillLevel(level.getSkill()) >= level.getLevel());
+	}
+
+	/** Core's item, or the hand data's other way to the same thing; core's bank tag then lacks the other items. */
+	private ItemRequirement withAlternatives(ItemRequirement item, StepIndex.Entry data)
+	{
+		StepIndex.Alternative other = data == null ? null
+			: data.getAlternatives().stream().filter(alternative -> item.fulfilledBy(alternative.getInstead())).findFirst().orElse(null);
+		if (other == null)
+		{
+			return item;
+		}
+		return widened.computeIfAbsent(other, alternative -> new AlternativeRequirement(item, alternative.getAll().stream()
+			.map(this::part).collect(Collectors.toList())));
+	}
+
+	/** Any of these ids, named by them: "Grimy cadantine or Cadantine". */
+	private AlternativeRequirement.Part part(List<Integer> ids)
+	{
+		String name = ids.stream().map(id -> client.getItemDefinition(id).getName()).distinct().collect(Collectors.joining(" or "));
+		return new AlternativeRequirement.Part(name, ItemRequirements.any(name, ids.stream().map(ItemRequirements::item)
+			.toArray(ItemRequirement[]::new)));
+	}
+
+	/** A skill challenge whose task core marked done: the way to the task's place (a talisman for its ruins) isn't needed. */
+	private static boolean taskDone(Step step)
+	{
+		return ClueTypes.SKILL.equals(step.getType()) && step.getStages().stream().noneMatch(stage -> stage.getKind() == Stage.Kind.TASK);
 	}
 
 	/** Gear is picked from all of these, the bank only while banking counts. */

@@ -225,7 +225,8 @@ final class LabelSearch
 
 	private void arrive(Label from, int k)
 	{
-		if (ctx.stageNeedsBank(from.node, from.b))
+		Book needed = ctx.stageBook(from.node);
+		if (ctx.stageNeedsBank(from.node, from.b) || needed != null && bookOf(k) != needed)
 		{
 			return;
 		}

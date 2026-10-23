@@ -1,5 +1,6 @@
 package com.cluehelper.player;
 
+import com.cluehelper.memory.BankMemory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,6 +66,7 @@ public class PlayerModel
 	private static final int INVENTORY_SLOTS = 28;
 
 	private final Client client;
+	private final BankMemory bankMemory;
 	private final ChargeReader chargeReader;
 	private final CheckLines checkLines;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
@@ -94,8 +96,9 @@ public class PlayerModel
 	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	@Inject
-	PlayerModel(Client client, ChargeReader chargeReader, CheckLines checkLines)
+	PlayerModel(Client client, ChargeReader chargeReader, CheckLines checkLines, BankMemory bankMemory)
 	{
+		this.bankMemory = bankMemory;
 		this.client = client;
 		this.chargeReader = chargeReader;
 		this.checkLines = checkLines;
@@ -196,7 +199,8 @@ public class PlayerModel
 
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN)
+		if (event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN
+			|| event.getContainerId() == InventoryID.HUNTSMANS_KIT)
 		{
 			markDirty("items");
 		}
@@ -435,7 +439,7 @@ public class PlayerModel
 			.pvpWorld(WorldType.isPvpWorld(worldTypes))
 			.dormantReason(dormantReason(worldTypes))
 			.accountType(client.getVarbitValue(VarbitID.IRONMAN))
-			.inventory(inventory)
+			.inventory(bankMemory.withKit(inventory))
 			.worn(worn)
 			.weapon(weapon())
 			.pouchHeld(pouchHeld)

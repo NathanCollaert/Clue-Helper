@@ -4,13 +4,18 @@ import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.ScrollBook;
 import com.cluehelper.guide.StepGuide;
+import com.cluehelper.link.ClueLink;
+import com.cluehelper.step.Stages;
+import com.cluehelper.step.Step;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.Map;
 import javax.inject.Inject;
 import net.runelite.api.Client;
+import net.runelite.api.Prayer;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.util.Text;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -23,6 +28,8 @@ public class WidgetHighlightOverlay extends Overlay
 		StepGuide.Tab.MAGIC, InterfaceID.MagicSpellbook.UNIVERSE,
 		StepGuide.Tab.EMOTES, InterfaceID.Emote.UNIVERSE,
 		StepGuide.Tab.MUSIC, InterfaceID.Music.UNIVERSE);
+	private static final int[] PRAYER_STONES = {InterfaceID.Toplevel.STONE5, InterfaceID.ToplevelOsrsStretch.STONE5,
+		InterfaceID.ToplevelPreEoc.STONE5};
 	/** Per tab: its stone in the fixed, resizable classic and resizable modern layouts. */
 	private static final Map<StepGuide.Tab, int[]> TAB_STONES = Map.of(
 		StepGuide.Tab.INVENTORY, new int[]{InterfaceID.Toplevel.STONE3, InterfaceID.ToplevelOsrsStretch.STONE3, InterfaceID.ToplevelPreEoc.STONE3},
@@ -36,10 +43,13 @@ public class WidgetHighlightOverlay extends Overlay
 	private final ClueHelperConfig config;
 	private final MenuLines menuLines;
 	private final Highlighter highlighter;
+	private final ClueLink clueLink;
 
 	@Inject
-	WidgetHighlightOverlay(Client client, StepGuide guide, ClueHelperConfig config, MenuLines menuLines, Highlighter highlighter)
+	WidgetHighlightOverlay(Client client, StepGuide guide, ClueHelperConfig config, MenuLines menuLines, Highlighter highlighter,
+		ClueLink clueLink)
 	{
+		this.clueLink = clueLink;
 		this.menuLines = menuLines;
 		this.highlighter = highlighter;
 		this.client = client;
@@ -60,15 +70,68 @@ public class WidgetHighlightOverlay extends Overlay
 		{
 			outline(graphics, guide.getHighlightSpellWidget());
 		}
+		guide.getHighlightChoice().forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 		if (config.highlightMenus())
 		{
 			outlineEntry(graphics, guide.getHighlightMenuWidget());
+		}
+		if (config.highlightItems())
+		{
+			outlinePrayer(graphics);
 		}
 		StepGuide.Tab tab = guide.getHighlightTab();
 		boolean wanted = tab == StepGuide.Tab.MAGIC ? config.highlightSpells() : config.highlightItems();
 		if (tab != StepGuide.Tab.NONE && wanted && !shown(TAB_CONTENT.get(tab)))
 		{
 			outline(graphics, tabStone(TAB_STONES.get(tab)));
+		}
+		return null;
+	}
+
+	/** Sherlock's prayer task: the prayer to turn on while the task is left, and to turn off again while it is on. */
+	private void outlinePrayer(Graphics2D graphics)
+	{
+		Step step = clueLink.getCurrentStep();
+		Prayer prayer = Stages.prayerToActivate(step);
+		if (prayer == null || !Stages.taskLeft(step) && !client.isPrayerActive(prayer))
+		{
+			return;
+		}
+		if (!shown(InterfaceID.Prayerbook.UNIVERSE))
+		{
+			outline(graphics, tabStone(PRAYER_STONES));
+			return;
+		}
+		Widget widget = named(client.getWidget(InterfaceID.Prayerbook.UNIVERSE), prayer.name());
+		if (widget == null || widget.isHidden())
+		{
+			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
+			return;
+		}
+		highlighter.box(graphics, widget.getBounds());
+	}
+
+	/** The prayer's own button, found by its name: the book's component order isn't the prayers' order. */
+	private static Widget named(Widget parent, String name)
+	{
+		if (parent == null)
+		{
+			return null;
+		}
+		if (parent.getName() != null && Text.removeTags(parent.getName()).equalsIgnoreCase(name))
+		{
+			return parent;
+		}
+		for (Widget[] children : new Widget[][]{parent.getStaticChildren(), parent.getDynamicChildren(), parent.getNestedChildren()})
+		{
+			for (Widget child : children == null ? new Widget[0] : children)
+			{
+				Widget found = named(child, name);
+				if (found != null)
+				{
+					return found;
+				}
+			}
 		}
 		return null;
 	}

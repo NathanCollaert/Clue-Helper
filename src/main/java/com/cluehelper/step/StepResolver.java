@@ -103,7 +103,8 @@ public class StepResolver
 		if (clue instanceof SkillChallengeClue)
 		{
 			return Stages.challenge(entry, ((SkillChallengeClue) clue).getRawChallenge(), CoreClueReader.challengeCompleted(clue),
-				CoreClueReader.returnItem(clue), targets, tool -> toolRequirements.computeIfAbsent(tool, StepResolver::anyOf));
+				CoreClueReader.returnItem(clue), targets, tool -> toolRequirements.computeIfAbsent(tool, StepResolver::anyOf),
+				EmptySlots.of(CoreClueReader.itemRequirements(clue)));
 		}
 		return List.of();
 	}
@@ -290,7 +291,8 @@ public class StepResolver
 		SpadeNeed spade = !clue.isRequiresSpade() ? SpadeNeed.NONE
 			: SPADE_OR_DOG_TIERS.contains(tier) ? SpadeNeed.SPADE_OR_DIGGING_DOG : SpadeNeed.SPADE;
 		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
+		List<ItemRequirement> items = CoreClueReader.challengeCompleted(clue) ? List.of() : CoreClueReader.itemRequirements(clue);
 		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
-			CoreClueReader.lightSourceVarbitId(clue), CoreClueReader.itemRequirements(clue), stash == null ? NO_STASH : stash.getObjectId());
+			CoreClueReader.lightSourceVarbitId(clue), items, stash == null ? NO_STASH : stash.getObjectId());
 	}
 }

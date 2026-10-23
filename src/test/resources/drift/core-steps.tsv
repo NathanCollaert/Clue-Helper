@@ -813,56 +813,56 @@ skill:CHARLIE:i need to give charlie a raw trout.	*	skill	beginner	SEQUENCE	3104
 skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
 skill:CHARLIE:i need to give charlie some leather chaps.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1818	i need to give charlie some leather chaps.
 skill:SHERLOCK:activate the chivalry prayer.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				none	1841	activate the chivalry prayer.
-skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.	*	skill	master	SEQUENCE	1831,3772,0|2733,3415,0	Sherlock				3 item requirements	1863	angle for an anglerfish whilst sporting the finest fishing gear.
-skill:SHERLOCK:bind a blood rune at the blood altar.	*	skill	master	SEQUENCE	1716,3827,0|2733,3415,0	Sherlock				1 item requirement	1857	bind a blood rune at the blood altar.
+skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.	*	skill	master	SEQUENCE	1827,3771,0|1832,3771,0|2733,3415,0	Sherlock				3 item requirements	1863	angle for an anglerfish whilst sporting the finest fishing gear.
+skill:SHERLOCK:bind a blood rune at the blood altar.	*	skill	master	SEQUENCE	1717,3829,0|3231,4831,0|2733,3415,0	Sherlock				1 item requirement	1857	bind a blood rune at the blood altar.
 skill:SHERLOCK:burn a magic log.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1850	burn a magic log.
 skill:SHERLOCK:burn a redwood log.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1851	burn a redwood log.
 skill:SHERLOCK:burn a yew log.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1837	burn a yew log.
-skill:SHERLOCK:catch a black warlock.	*	skill	elite	SEQUENCE	2551,2915,0|2733,3415,0	Sherlock				1 item requirement	1830	catch a black warlock.
-skill:SHERLOCK:catch a mottled eel with aerial fishing in lake molch.	*	skill	elite	SEQUENCE	1384,3665,0|2733,3415,0	Sherlock				4 item requirements	1822	catch a mottled eel with aerial fishing in lake molch.
-skill:SHERLOCK:catch a raw shark.	*	skill	elite	SEQUENCE	2611,3392,0|2733,3415,0	Sherlock				1 item requirement	1834	catch a raw shark.
-skill:SHERLOCK:catch a red chinchompa.	*	skill	elite	SEQUENCE	2551,2915,0|2733,3415,0	Sherlock				1 item requirement	1831	catch a red chinchompa.
-skill:SHERLOCK:catch a tecu salamander.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	3502	catch a tecu salamander.
+skill:SHERLOCK:catch a black warlock.	*	skill	elite	SEQUENCE	2551,2915,0|2540,2898,0|1242,3760,0|1283,3025,0|2733,3415,0	Sherlock				1 item requirement	1830	catch a black warlock.
+skill:SHERLOCK:catch a mottled eel with aerial fishing in lake molch.	*	skill	elite	SEQUENCE	1369,3639,0|2733,3415,0	Sherlock				4 item requirements	1822	catch a mottled eel with aerial fishing in lake molch.
+skill:SHERLOCK:catch a raw shark.	*	skill	elite	SEQUENCE	2602,3415,0|2855,3423,0|3474,3193,0|2645,3708,0|2409,3780,0|1678,3492,0|2234,3442,0|1485,3433,0|2733,3415,0	Sherlock				1 item requirement	1834	catch a raw shark.
+skill:SHERLOCK:catch a red chinchompa.	*	skill	elite	SEQUENCE	2557,2932,0|2271,3411,0|1317,3168,0|2733,3415,0	Sherlock				1 item requirement	1831	catch a red chinchompa.
+skill:SHERLOCK:catch a tecu salamander.	*	skill	master	SEQUENCE	1472,3092,0|1476,3097,0|2733,3415,0	Sherlock				2 item requirements	3502	catch a tecu salamander.
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.	*	skill	master	SEQUENCE	1574,3493,1|1232,3755,1|2733,3415,0	Sherlock				2 item requirements	1864	chop a redwood log whilst sporting the finest lumberjack gear.
-skill:SHERLOCK:complete a lap of ape atoll agility course.	*	skill	elite	SEQUENCE	2755,2742,0|2733,3415,0	Sherlock				1 item requirement	1824	complete a lap of ape atoll agility course.
+skill:SHERLOCK:complete a lap of ape atoll agility course.	*	skill	elite	SEQUENCE	2754,2742,0|2733,3415,0	Sherlock				1 item requirement	1824	complete a lap of ape atoll agility course.
 skill:SHERLOCK:complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.	*	skill	master	SEQUENCE	2625,3677,0|2733,3415,0	Sherlock				1 item requirement	1852	complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace.
-skill:SHERLOCK:cook a swordfish	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1838	cook a swordfish
+skill:SHERLOCK:cook a swordfish	*	skill	elite	SEQUENCE	3212,3215,0|1677,3622,0|2342,3811,0|3433,2885,0|3106,3432,0|3096,3237,0|2728,3477,0|2661,3156,0|2733,3415,0	Sherlock				1 item requirement	1838	cook a swordfish
 skill:SHERLOCK:craft a green dragonhide body.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1827	craft a green dragonhide body.
 skill:SHERLOCK:craft a light orb in the dorgesh-kaan bank.	*	skill	master	SEQUENCE	2702,5350,0|2733,3415,0	Sherlock				2 item requirements	1865	craft a light orb in the dorgesh-kaan bank.
-skill:SHERLOCK:craft a nature rune.	*	skill	elite	SEQUENCE	2868,3018,0|2733,3415,0	Sherlock				1 item requirement	1821	craft a nature rune.
-skill:SHERLOCK:craft multiple cosmic runes from a single essence.	*	skill	elite	SEQUENCE	2407,4376,0|2733,3415,0	Sherlock				1 item requirement	1839	craft multiple cosmic runes from a single essence.
-skill:SHERLOCK:create a barrows teleport tablet.	*	skill	master	SEQUENCE	1858,7051,0|2733,3415,0	Sherlock				4 item requirements	1846	create a barrows teleport tablet.
+skill:SHERLOCK:craft a nature rune.	*	skill	elite	SEQUENCE	2399,4840,0|2733,3415,0	Sherlock				1 item requirement	1821	craft a nature rune.
+skill:SHERLOCK:craft multiple cosmic runes from a single essence.	*	skill	elite	SEQUENCE	2141,4832,0|2733,3415,0	Sherlock				1 item requirement	1839	craft multiple cosmic runes from a single essence.
+skill:SHERLOCK:create a barrows teleport tablet.	*	skill	master	SEQUENCE	1679,3765,0|2733,3415,0	Sherlock				4 item requirements	1846	create a barrows teleport tablet.
 skill:SHERLOCK:create a super defence potion.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1825	create a super defence potion.
-skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.	*	skill	master	SEQUENCE	3109,3499,0|2733,3415,0	Sherlock				3 item requirements	1849	create an unstrung dragonstone amulet at a furnace.
-skill:SHERLOCK:cremate a set of fiyr remains.	*	skill	master	SEQUENCE	3490,3290,0|2733,3415,0	Sherlock				3 item requirements	1860	cremate a set of fiyr remains.
-skill:SHERLOCK:cut a yew log.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1835	cut a yew log.
-skill:SHERLOCK:dissect a sacred eel.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				3 item requirements	1861	dissect a sacred eel.
+skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.	*	skill	master	SEQUENCE	3110,3499,0|2976,3369,0|3273,3187,0|3227,3257,0|3688,3480,0|2602,3312,0|2344,3811,0|1325,3807,0|2342,3678,0|1770,3112,0|1208,3112,0|1453,9584,0|3527,3209,0|1507,3773,0|2857,2967,0|3287,6052,0|2400,4473,0|3657,3336,0|2617,3667,0|1375,3371,0|1384,3828,0|1948,2755,0|2733,3415,0	Sherlock				3 item requirements	1849	create an unstrung dragonstone amulet at a furnace.
+skill:SHERLOCK:cremate a set of fiyr remains.	*	skill	master	SEQUENCE	3465,3294,0|3465,3282,0|3467,3270,0|3476,3268,0|3500,3268,0|3507,3275,0|2733,3415,0	Sherlock				3 item requirements	1860	cremate a set of fiyr remains.
+skill:SHERLOCK:cut a yew log.	*	skill	elite	SEQUENCE	2714,3459,0|2757,3433,0|3085,3480,0|3209,3499,0|3019,3315,0|2935,3229,0|3151,3230,0|1590,3486,0|2438,3435,0|1500,3581,0|1642,3662,0|3270,3470,0|3677,3444,0|2733,3415,0	Sherlock				1 item requirement	1835	cut a yew log.
+skill:SHERLOCK:dissect a sacred eel.	*	skill	master	SEQUENCE	2182,3067,0|2199,3066,0|2733,3415,0	Sherlock				3 item requirements	1861	dissect a sacred eel.
 skill:SHERLOCK:enchant a piece of dragonstone jewellery.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				4 item requirements	1820	enchant a piece of dragonstone jewellery.
 skill:SHERLOCK:equip a dragon scimitar.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	1819	equip a dragon scimitar.
-skill:SHERLOCK:equip an abyssal whip in front of the abyssal demons of the slayer tower.	*	skill	master	SEQUENCE	3428,3535,0|2733,3415,0	Sherlock				1 item requirement	1843	equip an abyssal whip in front of the abyssal demons of the slayer tower.
-skill:SHERLOCK:fix a magical lamp in dorgesh-kaan.	*	skill	elite	SEQUENCE	2702,5350,0|2733,3415,0	Sherlock	10834|10835		Broken lamp	1 item requirement	1836	fix a magical lamp in dorgesh-kaan.
+skill:SHERLOCK:equip an abyssal whip in front of the abyssal demons of the slayer tower.	*	skill	master	SEQUENCE	3418,3567,2|3411,3570,2|2733,3415,0	Sherlock				1 item requirement	1843	equip an abyssal whip in front of the abyssal demons of the slayer tower.
+skill:SHERLOCK:fix a magical lamp in dorgesh-kaan.	*	skill	elite	SEQUENCE	2723,5314,0|2735,5278,0|2733,3415,0	Sherlock	10834|10835		Broken lamp	1 item requirement	1836	fix a magical lamp in dorgesh-kaan.
 skill:SHERLOCK:fletch a rune dart.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1859	fletch a rune dart.
-skill:SHERLOCK:kill a fiyr shade inside mort'tons shade catacombs.	*	skill	master	SEQUENCE	3490,3290,0|2733,3415,0	Sherlock				1 item requirement	1867	kill a fiyr shade inside mort'tons shade catacombs.
-skill:SHERLOCK:kill a lizardman shaman.	*	skill	master	SEQUENCE	1424,3710,0|2733,3415,0	Sherlock				none	1862	kill a lizardman shaman.
-skill:SHERLOCK:kill a reanimated abyssal.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				4 item requirements	1866	kill a reanimated abyssal.
-skill:SHERLOCK:kill the spiritual, magic and godly whilst representing their own god.	*	skill	master	SEQUENCE	2882,5311,2|2733,3415,0	Sherlock				none	1848	kill the spiritual, magic and godly whilst representing their own god.
-skill:SHERLOCK:mine a mithril ore.	*	skill	elite	SEQUENCE	3019,3339,0|2733,3415,0	Sherlock				1 item requirement	1832	mine a mithril ore.
-skill:SHERLOCK:mine a piece of runite ore whilst sporting the finest mining gear.	*	skill	master	SEQUENCE	3019,3339,0|2733,3415,0	Sherlock				2 item requirements	1854	mine a piece of runite ore whilst sporting the finest mining gear.
-skill:SHERLOCK:mine some nickel.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				1 item requirement	7059	mine some nickel.
+skill:SHERLOCK:kill a fiyr shade inside mort'tons shade catacombs.	*	skill	master	SEQUENCE	3485,3321,0|3463,9709,0|3463,9697,0|2733,3415,0	Sherlock				1 item requirement	1867	kill a fiyr shade inside mort'tons shade catacombs.
+skill:SHERLOCK:kill a lizardman shaman.	*	skill	master	SEQUENCE	1424,3718,0|1434,3711,0|1424,3700,0|2733,3415,0	Sherlock				none	1862	kill a lizardman shaman.
+skill:SHERLOCK:kill a reanimated abyssal.	*	skill	master	SEQUENCE	1700,3882,0|1666,3880,0|1745,3890,0|2733,3415,0	Sherlock				4 item requirements	1866	kill a reanimated abyssal.
+skill:SHERLOCK:kill the spiritual, magic and godly whilst representing their own god.	*	skill	master	SEQUENCE	2882,5311,2|2898,5307,2|2733,3415,0	Sherlock				none	1848	kill the spiritual, magic and godly whilst representing their own god.
+skill:SHERLOCK:mine a mithril ore.	*	skill	elite	SEQUENCE	3039,9726,0|3304,3305,0|3035,9771,0|3144,3145,0|2629,3147,0|2652,3170,0|2851,3031,0|1477,3779,0|1601,3638,0|1758,3715,0|3770,3821,0|2918,9917,0|1214,3657,0|2727,3694,0|2733,3415,0	Sherlock				1 item requirement	1832	mine a mithril ore.
+skill:SHERLOCK:mine a piece of runite ore whilst sporting the finest mining gear.	*	skill	master	SEQUENCE	3055,9723,0|2939,9883,0|3059,3884,0|2375,3850,0|3780,3815,0|3285,12457,0|1938,9019,1|2279,3158,0|2152,9301,0|1581,9659,0|2733,3415,0	Sherlock				2 item requirements	1854	mine a piece of runite ore whilst sporting the finest mining gear.
+skill:SHERLOCK:mine some nickel.	*	skill	elite	SEQUENCE	1931,2795,0|2226,3475,0|2615,8593,0|2733,3415,0	Sherlock				1 item requirement	7059	mine some nickel.
 skill:SHERLOCK:mix a ranging mix potion.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1858	mix a ranging mix potion.
 skill:SHERLOCK:mix an anti-venom potion.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1853	mix an anti-venom potion.
-skill:SHERLOCK:pickpocket an elf.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1856	pickpocket an elf.
-skill:SHERLOCK:plant a watermelon seed.	*	skill	elite	SEQUENCE	3055,3307,0|2733,3415,0	Sherlock				3 item requirements	1840	plant a watermelon seed.
-skill:SHERLOCK:score a goal in skullball.	*	skill	elite	SEQUENCE	3543,3463,0|2733,3415,0	Sherlock				1 item requirement	1823	score a goal in skullball.
-skill:SHERLOCK:slay a dust devil.	*	skill	elite	SEQUENCE	3180,9364,0|2733,3415,0	Sherlock				1 item requirement	1829	slay a dust devil.
-skill:SHERLOCK:slay a nechryael in the slayer tower.	*	skill	master	SEQUENCE	3440,3568,2|2733,3415,0	Sherlock				none	1847	slay a nechryael in the slayer tower.
+skill:SHERLOCK:pickpocket an elf.	*	skill	master	SEQUENCE	2334,3175,0|2336,3161,0|2330,3167,0|3281,6072,0|3259,6051,0|3244,6115,0|3257,6086,0|3298,6101,0|3287,6132,0|2733,3415,0	Sherlock				none	1856	pickpocket an elf.
+skill:SHERLOCK:plant a watermelon seed.	*	skill	elite	SEQUENCE	3055,3308,0|2810,3464,0|2667,3375,0|3602,3526,0|1735,3555,0|1266,3730,0|3291,6100,0|1586,3099,0|2733,3415,0	Sherlock				3 item requirements	1840	plant a watermelon seed.
+skill:SHERLOCK:score a goal in skullball.	*	skill	elite	SEQUENCE	3543,3463,0|3549,9867,0|2733,3415,0	Sherlock				1 item requirement	1823	score a goal in skullball.
+skill:SHERLOCK:slay a dust devil.	*	skill	elite	SEQUENCE	3183,9364,0|1712,10016,0|2733,3415,0	Sherlock				1 item requirement	1829	slay a dust devil.
+skill:SHERLOCK:slay a nechryael in the slayer tower.	*	skill	master	SEQUENCE	3440,3568,2|3445,3563,2|2733,3415,0	Sherlock				none	1847	slay a nechryael in the slayer tower.
 skill:SHERLOCK:smith a mithril 2h sword.	*	skill	elite	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|2733,3415,0	Sherlock				2 item requirements	1833	smith a mithril 2h sword.
 skill:SHERLOCK:smith a runite med helm.	*	skill	master	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|2733,3415,0	Sherlock				2 item requirements	1844	smith a runite med helm.
-skill:SHERLOCK:smith a tier 2 or above shayzien platebody.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1842	smith a tier 2 or above shayzien platebody.
-skill:SHERLOCK:steal a gem from the ardougne market.	*	skill	master	SEQUENCE	2662,3302,0|2733,3415,0	Sherlock				none	1855	steal a gem from the ardougne market.
-skill:SHERLOCK:steal from a chest in ardougne castle.	*	skill	elite	SEQUENCE	2577,3298,0|2733,3415,0	Sherlock				none	1826	steal from a chest in ardougne castle.
+skill:SHERLOCK:smith a tier 2 or above shayzien platebody.	*	skill	elite	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|2733,3415,0	Sherlock				2 item requirements	1842	smith a tier 2 or above shayzien platebody.
+skill:SHERLOCK:steal a gem from the ardougne market.	*	skill	master	SEQUENCE	2668,3303,0|2733,3415,0	Sherlock				none	1855	steal a gem from the ardougne market.
+skill:SHERLOCK:steal from a chest in ardougne castle.	*	skill	elite	SEQUENCE	2588,3302,1|2588,3291,1|2733,3415,0	Sherlock				none	1826	steal from a chest in ardougne castle.
 skill:SHERLOCK:string a yew longbow.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1828	string a yew longbow.
-skill:SHERLOCK:teleport to a spirit tree you planted yourself.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				none	1845	teleport to a spirit tree you planted yourself.
+skill:SHERLOCK:teleport to a spirit tree you planted yourself.	*	skill	master	SEQUENCE	2542,3170,0|2461,3444,0|2555,3259,0|3185,3508,0|2488,2850,0|3274,6123,0|2339,3109,0|1858,7051,0|2733,3415,0	Sherlock				none	1845	teleport to a spirit tree you planted yourself.
 spot:ASGARNIA_WARRIORS	*	hotcold spot	master		2860,3562,0						690	North of the Warriors' Guild in Burthorpe.
 spot:ASGARNIA_JATIX	*	hotcold spot	master		2915,3425,0						691	East of Jatix's Herblore Shop in Taverley.
 spot:ASGARNIA_BARB	*	hotcold spot	master		3033,3438,0						692	West of Barbarian Village.

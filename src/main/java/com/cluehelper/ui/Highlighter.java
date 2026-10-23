@@ -7,8 +7,11 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.TileObject;
@@ -25,6 +28,7 @@ import net.runelite.client.util.ImageUtil;
  * player can't see them yet.
  */
 @Singleton
+@Slf4j
 public class Highlighter
 {
 	/** Wide enough to show on the nexus, which is cyan itself. */
@@ -36,6 +40,7 @@ public class Highlighter
 	private final Client client;
 	private final ModelOutlineRenderer outlines;
 	private final ItemManager itemManager;
+	private final Set<Integer> unmodelled = new HashSet<>();
 
 	@Inject
 	Highlighter(Client client, ModelOutlineRenderer outlines, ItemManager itemManager)
@@ -45,18 +50,32 @@ public class Highlighter
 		this.itemManager = itemManager;
 	}
 
+	/**
+	 * The client's own getModel throws a NullPointerException for some dynamic objects (seen at Trollheim and after
+	 * teleports), in our fill and in RuneLite's outline renderer alike; such an object goes unhighlighted that frame.
+	 */
 	public void object(Graphics2D graphics, TileObject object, boolean leftClick)
 	{
 		if (!onPlayersFloor(object.getPlane()))
 		{
 			return;
 		}
-		if (leftClick)
+		try
 		{
-			graphics.setColor(Markers.ONE_CLICK_FILL);
-			graphics.fill(ModelSilhouette.of(client, object));
+			if (leftClick)
+			{
+				graphics.setColor(Markers.ONE_CLICK_FILL);
+				graphics.fill(ModelSilhouette.of(client, object));
+			}
+			outlines.drawOutline(object, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
 		}
-		outlines.drawOutline(object, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
+		catch (NullPointerException e)
+		{
+			if (unmodelled.add(object.getId()))
+			{
+				log.warn("No model to highlight object {} at {}", object.getId(), object.getWorldLocation(), e);
+			}
+		}
 	}
 
 	public void npc(Graphics2D graphics, NPC npc, boolean leftClick)

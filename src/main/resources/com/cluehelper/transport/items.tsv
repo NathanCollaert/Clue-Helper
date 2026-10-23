@@ -334,3 +334,4 @@ scroll	Chasm teleport scroll		1439 10076 0			30775=1					20	4	0	T	item	any	Y				
 scroll	Master scroll book: Chasm teleport scroll		1439 10076 0			21389=1			16238>0		20	4	1	T	charge	any	Y				item:21389=BOOKOFSCROLLS_CHARGED varbit:16238=BOOKOFSCROLLS_CHASMOFFIRE
 scroll	Ardeaglais teleport		2542 2216 0			34033=1		Fallen From Grace			20	4	0	T	item	any	Y				item:34033=TELEPORTSCROLL_ARDEAGLAIS
 scroll	Master scroll book: Ardeaglais teleport		2542 2216 0			21389=1		Fallen From Grace	15749>0		20	4	1	T	charge	any	Y				item:21389=BOOKOFSCROLLS_CHARGED varbit:15749=BOOKOFSCROLLS_ARDEAGLAIS
+item	Ghommal's hilt: Trollheim		2899 3709 0			25926=1|25928=1|25930=1|25932=1|25934=1|25936=1					20	4	1	F	none	any	Y				item:25926=CA_OFFHAND_EASY item:25928=CA_OFFHAND_MEDIUM item:25930=CA_OFFHAND_HARD item:25932=CA_OFFHAND_ELITE item:25934=CA_OFFHAND_MASTER item:25936=CA_OFFHAND_GRANDMASTER

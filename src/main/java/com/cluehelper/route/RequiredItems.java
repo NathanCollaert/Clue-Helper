@@ -51,7 +51,7 @@ public class RequiredItems
 	@Value
 	public static class Verdict
 	{
-		public static final Verdict MET = new Verdict(true, true, List.of(), List.of());
+		public static final Verdict MET = new Verdict(true, true, List.of(), List.of(), Map.of());
 
 		/** A STASH known to be filled counts as carried. */
 		boolean carried;
@@ -59,6 +59,8 @@ public class RequiredItems
 		boolean banked;
 		List<ItemUse> withdraw;
 		List<Need> missing;
+		/** For a missing need with another way to it: the parts of that way also missing. */
+		Map<Need, List<String>> missingParts;
 	}
 
 	public boolean isEmpty()
@@ -81,13 +83,19 @@ public class RequiredItems
 		if (banked == null || !allMet(open, everything(carried, banked)))
 		{
 			Map<Integer, Integer> all = banked == null ? carried : everything(carried, banked);
-			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(items(all))).collect(Collectors.toList());
-			return new Verdict(false, false, List.of(), missing);
+			Item[] owned = items(all);
+			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(owned)).collect(Collectors.toList());
+			Map<Need, List<String>> parts = missing.stream().filter(need -> need.requirement instanceof AlternativeRequirement)
+				.collect(Collectors.toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
+			return new Verdict(false, false, List.of(), missing, parts);
 		}
-		return new Verdict(false, true, minimalWithdraw(open, player, carried, banked), List.of());
+		return new Verdict(false, true, minimalWithdraw(open, player, carried, banked), List.of(), Map.of());
 	}
 
-	/** Drops what isn't needed, trying the gear picker's own picks last so they are the ones kept. */
+	/**
+	 * Drops what isn't needed, trying the gear picker's own picks last so they are the ones kept, and before them the items
+	 * meeting the most needs alone: a made item (a net trap, an unfinished potion) is kept over its parts.
+	 */
 	private static List<ItemUse> minimalWithdraw(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried,
 		PlayerSnapshot banked)
 	{
@@ -101,7 +109,8 @@ public class RequiredItems
 			banked.getGroupStorage().forEach((id, qty) -> candidates.add(new ItemUse(Container.GROUP_STORAGE, id, qty)));
 		}
 		Set<Integer> picked = gearPicks(open, player, banked);
-		candidates.sort(Comparator.comparing(candidate -> picked.contains(candidate.getItemId())));
+		candidates.sort(Comparator.comparing((ItemUse candidate) -> picked.contains(candidate.getItemId()))
+			.thenComparingLong(candidate -> needsMetAlone(open, candidate.getItemId())));
 		List<ItemUse> kept = new ArrayList<>(candidates);
 		for (ItemUse candidate : candidates)
 		{
@@ -112,6 +121,12 @@ public class RequiredItems
 			}
 		}
 		return List.copyOf(kept);
+	}
+
+	private static long needsMetAlone(List<Need> open, int itemId)
+	{
+		return open.stream().filter(need -> need.requirement instanceof AlternativeRequirement
+			? ((AlternativeRequirement) need.requirement).wholeBy(itemId) : need.requirement.fulfilledBy(itemId)).count();
 	}
 
 	private static Set<Integer> gearPicks(List<Need> open, PlayerSnapshot player, PlayerSnapshot banked)

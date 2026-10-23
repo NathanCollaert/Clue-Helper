@@ -29,7 +29,7 @@ map:w346
 map:w347
   best      116t: Lumbridge Home Teleport → walk 92 {cooldown:892=1}
   alt       173t: Giant's Foundry Minigame Teleport → walk 147 {cooldown:888=1}
-  alt       174t: Clan Wars Minigame Teleport → walk 148 {cooldown:888=1}
+  alt       173t: Clan Wars Minigame Teleport → walk 147 {cooldown:888=1}
 map:w348
   best      94t: Lumbridge Home Teleport → walk 70 {cooldown:892=1}
 map:w351
@@ -116,7 +116,7 @@ emote:12080
   alt       424t: Giant's Foundry Minigame Teleport → walk 398 {cooldown:888=1}
 emote:19833
   best      148t: Lumbridge Home Teleport → walk 124 {cooldown:892=1}
-  alt       165t: Clan Wars Minigame Teleport → walk 139 {cooldown:888=1}
+  alt       164t: Clan Wars Minigame Teleport → walk 138 {cooldown:888=1}
   alt       217t: Giant's Foundry Minigame Teleport → walk 191 {cooldown:888=1}
 emote:clap in the magic axe hut. beware of double agents! equip only some flared trousers.
   best      none
@@ -234,15 +234,15 @@ skill:CHARLIE:i need to give charlie a cooked pike.
   alt       220t: Lumbridge Home Teleport → walk 130 → walk 66 {cooldown:892=1}
   alt       235t: Burthorpe Games Room Minigame Teleport → walk 144 → walk 66 {cooldown:888=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      391t: Lumbridge Home Teleport → walk 105 → Ship: Port Piscarilius → walk 63 → Nightmare Zone Minigame Teleport → walk 166 {cooldown:892=1, cooldown:888=1}
+  best      389t: Lumbridge Home Teleport → walk 105 → Ship: Port Piscarilius → walk 61 → Nightmare Zone Minigame Teleport → walk 166 {cooldown:892=1, cooldown:888=1}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
   best      389t: Lumbridge Home Teleport → walk 105 → Ship: Land's End → walk 61 → Nightmare Zone Minigame Teleport → walk 166 {cooldown:892=1, cooldown:888=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
-  best      237t: Clan Wars Minigame Teleport → walk 75 → walk 16 → Lever: Deserted Keep → walk 1 → Lever: Ardougne → walk 110 {cooldown:888=1}
-  alt       325t: Burthorpe Games Room Minigame Teleport → walk 163 → walk 16 → Lever: Deserted Keep → walk 1 → Lever: Ardougne → walk 110 {cooldown:888=1}
-  alt       333t: Lumbridge Home Teleport → walk 173 → walk 16 → Lever: Deserted Keep → walk 1 → Lever: Ardougne → walk 110 {cooldown:892=1}
+  best      229t: Nightmare Zone Minigame Teleport → walk 103 → walk 100 {cooldown:888=1}
+  alt       237t: Clan Wars Minigame Teleport → walk 75 → walk 16 → Lever: Deserted Keep → walk 1 → Lever: Ardougne → walk 110 {cooldown:888=1}
+  alt       280t: Castle Wars Minigame Teleport → walk 155 → walk 100 {cooldown:888=1}
 skill:SHERLOCK:kill a lizardman shaman.
-  best      511t: Lumbridge Home Teleport → walk 105 → Ship: Land's End → walk 184 → Nightmare Zone Minigame Teleport → walk 166 {cooldown:892=1, cooldown:888=1}
+  best      506t: Lumbridge Home Teleport → walk 105 → Ship: Land's End → walk 178 → Nightmare Zone Minigame Teleport → walk 166 {cooldown:892=1, cooldown:888=1}
 skill:SHERLOCK:score a goal in skullball.
   best      533t: Lumbridge Home Teleport → walk 317 → Nightmare Zone Minigame Teleport → walk 166 {cooldown:892=1, cooldown:888=1}
   alt       716t: Clan Wars Minigame Teleport → walk 274 → walk 296 → Lever: Deserted Keep → walk 1 → Lever: Ardougne → walk 110 {cooldown:888=1}

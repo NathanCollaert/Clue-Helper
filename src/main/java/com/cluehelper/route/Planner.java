@@ -3,6 +3,7 @@ package com.cluehelper.route;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.ItemUse;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
@@ -68,6 +69,11 @@ public final class Planner
 					? "choosing where to feel" : "no target tile for this step yet").build();
 		}
 		PlanContext ctx = new PlanContext(in);
+		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty()))
+		{
+			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
+				.why(List.of()).requirementNotes(requirementNotes(ctx)).build();
+		}
 		List<List<int[]>> orders = legOrders(ctx, step);
 		ctx.freezeNodes();
 		long contextNanos = System.nanoTime() - started;
@@ -78,6 +84,16 @@ public final class Planner
 		LabelSearch first = searches.bestOrder(orders, Set.of(), Integer.MAX_VALUE);
 		Plan.PlanBuilder plan = Plan.builder().stepKey(step.getKey());
 		Picks picks = new Picks(ctx, first);
+		if (picks.best == null && ctx.avoidsWilderness && !probes)
+		{
+			Plan throughWilderness = plan(wildernessAllowed(in), withAlternatives);
+			if (throughWilderness.getBest() != null)
+			{
+				return throughWilderness.toBuilder().note("only reachable through the Wilderness")
+					.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels())
+					.searches(searches.count + throughWilderness.getSearches()).build();
+			}
+		}
 		plan.best(picks.best).direct(picks.direct != picks.best ? picks.direct : null)
 			.sameBook(picks.best != null && picks.best.isChanged() ? picks.sameBook : null)
 			.fasterUnqualified(picks.fasterUnqualified)
@@ -87,10 +103,16 @@ public final class Planner
 		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
 		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
 		plan.why(probes ? List.of() : WhyList.of(ctx, orders.get(0).get(0)));
-		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.targetInWilderness ? "Wilderness target" : null);
+		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.onlyInWilderness ? "Wilderness target" : null);
 		plan.requirementNotes(requirementNotes(ctx));
 		return plan.searchNanos(System.nanoTime() - started).contextNanos(contextNanos).labels(searches.labels)
 			.searches(searches.count).build();
+	}
+
+	/** Avoiding the Wilderness never hides the only way to a step outside it, such as the King Black Dragon's lair. */
+	private static PlanInput wildernessAllowed(PlanInput in)
+	{
+		return in.toBuilder().settings(in.getSettings().toBuilder().avoidWilderness(false).build()).build();
 	}
 
 	private static List<List<int[]>> legOrders(PlanContext ctx, Step step)
@@ -139,11 +161,16 @@ public final class Planner
 		return orders;
 	}
 
-	/** A place that needs a grown patch (a Farming Guild redwood) counts only while the player has it grown. */
+	/**
+	 * A place that needs a grown patch (a Farming Guild redwood) counts only while the player has it grown, one in the
+	 * house (its spirit tree) only while the house has it.
+	 */
 	private static boolean isThere(PlanContext ctx, Stage stage, WorldPoint tile)
 	{
 		String patch = stage.getGrownOnly().get(tile);
-		return patch == null || ctx.in.getPlayer().getPlantedTrees().contains(patch);
+		boolean inHouse = PositionRules.POH_NODE.equals(tile);
+		return (patch == null || ctx.in.getPlayer().getPlantedTrees().contains(patch))
+			&& (!inHouse || ctx.in.getPlayer().getHouse().hasAny(stage.getHouseObjects())) && !ctx.lacksItems(tile);
 	}
 
 	private static void permute(List<int[]> items, int from, List<List<int[]>> out)
@@ -316,16 +343,42 @@ public final class Planner
 		return ticks;
 	}
 
+	/** One line per missing item; an item with another way to it lists that way's missing parts after an "or". */
+	private static List<String> missingList(List<RequiredItems.Verdict> verdicts)
+	{
+		List<String> lines = new ArrayList<>();
+		for (RequiredItems.Verdict verdict : verdicts)
+		{
+			for (RequiredItems.Need need : verdict.getMissing())
+			{
+				if (lines.contains("- " + need.getName()))
+				{
+					continue;
+				}
+				lines.add("- " + need.getName());
+				List<String> parts = verdict.getMissingParts().getOrDefault(need, List.of());
+				if (!parts.isEmpty())
+				{
+					lines.add("or");
+					parts.forEach(part -> lines.add("- " + part));
+				}
+			}
+		}
+		if (!lines.isEmpty())
+		{
+			lines.add(0, "Not found on you or in your bank:");
+		}
+		return List.copyOf(lines);
+	}
+
 	/** An unknown STASH never forces a bank stop silently: the note says a filled one would save it. */
 	static List<String> requirementNotes(PlanContext ctx)
 	{
 		RequiredItems required = ctx.in.getRequired();
 		List<String> notes = new ArrayList<>();
-		if (!ctx.required.getMissing().isEmpty())
-		{
-			notes.add("Not found on you or in your bank: " + ctx.required.getMissing().stream().map(RequiredItems.Need::getName)
-				.collect(Collectors.joining(", ")));
-		}
+		List<RequiredItems.Verdict> verdicts = new ArrayList<>(List.of(ctx.required));
+		verdicts.addAll(ctx.stageVerdicts());
+		notes.addAll(missingList(verdicts));
 		boolean stepItemsFromBank = !ctx.required.isCarried() && ctx.required.isBanked()
 			&& required.getNeeds().stream().anyMatch(RequiredItems.Need::isStepItem);
 		if (required.getStash() == RequiredItems.Stash.UNKNOWN && (stepItemsFromBank || !ctx.required.getMissing().isEmpty()))

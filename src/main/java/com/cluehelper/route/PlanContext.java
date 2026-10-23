@@ -10,6 +10,7 @@ import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.player.SpellbookState;
 import com.cluehelper.step.Stage;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
 import com.cluehelper.transport.HouseNeed;
@@ -23,11 +24,14 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 
 final class PlanContext
 {
@@ -68,6 +72,9 @@ final class PlanContext
 	final Book homeBook;
 	final boolean startPending;
 	final boolean targetInWilderness;
+	/** Every target of the step, or of one of its stages, is in the Wilderness: avoiding it would leave no way there. */
+	final boolean onlyInWilderness;
+	final boolean avoidsWilderness;
 	/** The master scroll book is carried and stays out of the Wilderness, where the target is: a bank stop comes first. */
 	final boolean depositsBookFirst;
 	final int bankStopHalfTicks;
@@ -75,6 +82,9 @@ final class PlanContext
 	final int[] requiredWithdraw;
 	/** By target node: what a part's act wants worn (Ghommal's +100 melee strength), on the player on arrival there. */
 	private final Map<Integer, RequiredItems.Verdict> stageNeeds = new HashMap<>();
+	private final List<RequiredItems.Verdict> missingEverywhere = new ArrayList<>();
+	/** Stage target nodes that must be reached on a given book (the Arceuus lectern). */
+	private final Map<Integer, Book> stageBooks = new HashMap<>();
 	private final int[] stageWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
@@ -95,6 +105,9 @@ final class PlanContext
 		startBook = book == null || book.getBook() == null ? Book.STANDARD : book.isPendingRevert() && !pending ? Book.LUNAR : book.getBook();
 		homeBook = book != null && book.isPendingRevert() ? Book.LUNAR : startBook;
 		targetInWilderness = in.getStep().getTargets().stream().anyMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
+		onlyInWilderness = allInWilderness(in.getStep().getTargets())
+			|| in.getStep().getStages().stream().anyMatch(stage -> allInWilderness(stage.getTiles()));
+		avoidsWilderness = in.getSettings().isAvoidWilderness() && !onlyInWilderness;
 		PlayerSnapshot carrier = in.getPlayer();
 		depositsBookFirst = in.getSettings().isScrollBookOutOfWilderness() && targetInWilderness
 			&& (carrier.getInventory().containsKey(BookScrolls.BOOK) || carrier.getWorn().containsKey(BookScrolls.BOOK));
@@ -125,29 +138,82 @@ final class PlanContext
 
 	/**
 	 * The needs some stage wants on arrival (a part's worn gear, Sherlock's task items); each such stage's verdict is kept
-	 * by its target nodes.
+	 * by its target nodes. A stage done anywhere has no node, so its needs stay the step's, carried from the start.
 	 */
 	private Set<RequiredItems.Need> judgeStageNeeds(PlayerSnapshot bankedPlayer)
 	{
 		Set<RequiredItems.Need> atStages = new HashSet<>();
 		for (Stage stage : in.getStep().getStages())
 		{
+			if (stage.getBook() != null)
+			{
+				stage.getTiles().forEach(tile -> stageBooks.put(nodeAt(tile), stage.getBook()));
+			}
 			List<RequiredItems.Need> wanted = in.getRequired().getNeeds().stream()
 				.filter(need -> stage.getWorn().contains(need.getName()) || stage.isTakesStepItems() && need.isStepItem())
 				.collect(Collectors.toList());
-			if (wanted.isEmpty())
+			if (wanted.isEmpty() || stage.getTiles().isEmpty())
 			{
 				continue;
 			}
 			atStages.addAll(wanted);
-			RequiredItems needs = in.getRequired().toBuilder().stash(RequiredItems.Stash.NONE).needs(wanted).build();
-			RequiredItems.Verdict verdict = needs.judge(in.getPlayer(), bankedPlayer);
-			stage.getTiles().forEach(tile -> stageNeeds.put(nodeAt(tile), verdict));
+			List<RequiredItems.Verdict> verdicts = new ArrayList<>();
+			for (WorldPoint tile : stage.getTiles())
+			{
+				List<RequiredItems.Need> here = withPlaceUses(wanted, stage.getUses().getOrDefault(tile, List.of()));
+				RequiredItems needs = in.getRequired().toBuilder().stash(RequiredItems.Stash.NONE).needs(here).build();
+				RequiredItems.Verdict verdict = needs.judge(in.getPlayer(), bankedPlayer);
+				stageNeeds.put(nodeAt(tile), verdict);
+				verdicts.add(verdict);
+			}
+			if (verdicts.stream().allMatch(verdict -> !verdict.getMissing().isEmpty()))
+			{
+				missingEverywhere.addAll(verdicts);
+			}
 		}
 		return atStages;
 	}
 
-	/** A stage whose gear is in the bank can't be done before a bank stop; one whose gear isn't owned at all can. */
+	/** A need a place takes another item for is that item there (pure essence for fragments). */
+	private static List<RequiredItems.Need> withPlaceUses(List<RequiredItems.Need> wanted, List<StepIndex.Alternative> uses)
+	{
+		List<RequiredItems.Need> here = new ArrayList<>();
+		for (RequiredItems.Need need : wanted)
+		{
+			StepIndex.Alternative use = uses.stream().filter(u -> need.getRequirement().fulfilledBy(u.getInstead())).findFirst().orElse(null);
+			if (use == null)
+			{
+				here.add(need);
+				continue;
+			}
+			ItemRequirement[] groups = use.getAll().stream()
+				.map(ids -> ItemRequirements.any(use.getName(), ids.stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new)))
+				.toArray(ItemRequirement[]::new);
+			here.add(new RequiredItems.Need(use.getName(), ItemRequirements.all(use.getName(), groups), need.isStepItem(), false));
+		}
+		return here;
+	}
+
+	/** A stage none of whose places has its items, by its places' verdicts, each once: noted, and the plan stops. */
+	List<RequiredItems.Verdict> stageVerdicts()
+	{
+		return List.copyOf(new LinkedHashSet<>(missingEverywhere));
+	}
+
+	/** The book a route must be on to arrive at this stage node, or null. */
+	Book stageBook(int node)
+	{
+		return stageBooks.get(node);
+	}
+
+	/** A stage tile whose items are owned nowhere while another place's are: routes skip it. */
+	boolean lacksItems(WorldPoint tile)
+	{
+		RequiredItems.Verdict verdict = stageNeeds.get(nodeAt(tile));
+		return verdict != null && !verdict.getMissing().isEmpty();
+	}
+
+	/** A stage whose gear is in the bank can't be done before a bank stop; gear owned nowhere stops the plan instead. */
 	boolean stageNeedsBank(int node, int bankState)
 	{
 		RequiredItems.Verdict verdict = stageNeeds.get(node);
@@ -290,7 +356,12 @@ final class PlanContext
 
 	boolean forbidden(int node)
 	{
-		return in.getSettings().isAvoidWilderness() && !targetInWilderness && classes[node].isWilderness();
+		return avoidsWilderness && classes[node].isWilderness();
+	}
+
+	private boolean allInWilderness(List<WorldPoint> tiles)
+	{
+		return !tiles.isEmpty() && tiles.stream().allMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
 	}
 
 	boolean changesAllowed(OriginClass origin)

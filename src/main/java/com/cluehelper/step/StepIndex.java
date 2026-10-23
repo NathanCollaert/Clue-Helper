@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -114,6 +115,17 @@ public final class StepIndex
 		private Reach reach;
 		private List<Place> places;
 		private List<Place> sources;
+		private List<String> wear;
+		private List<String> optional;
+		private Map<String, List<Level>> optionalFrom;
+		private List<Before> before;
+		private List<Integer> anywhereWith;
+		private boolean toPlantedTree;
+		private List<Alternative> alternatives;
+		private List<Making> making;
+		private Cast cast;
+		private String book;
+		private Choose choose;
 		private String floor;
 		private String note;
 		private boolean hidden;
@@ -244,6 +256,72 @@ public final class StepIndex
 		public List<Place> getSources()
 		{
 			return sources == null ? List.of() : sources;
+		}
+
+		/** Core's items the task can do without (a rake for a weeded patch), by core's names for them. */
+		public List<String> getOptional()
+		{
+			return optional == null ? List.of() : optional;
+		}
+
+		/** The task travels to one of the player's planted spirit trees, picked in the tree's list. */
+		public boolean isToPlantedTree()
+		{
+			return toPlantedTree;
+		}
+
+		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
+		public List<Integer> getAnywhereWith()
+		{
+			return anywhereWith == null ? List.of() : anywhereWith;
+		}
+
+		/** What is done at the place before the task, in order: Alry's bird, then king worms for aerial fishing. */
+		public List<Before> getBefore()
+		{
+			return before == null ? List.of() : before;
+		}
+
+		/** Core's items the task does without from these skill levels on (a harpoon, fishing barehanded), by core's names. */
+		public Map<String, List<Level>> getOptionalFrom()
+		{
+			return optionalFrom == null ? Map.of() : optionalFrom;
+		}
+
+		/** Sherlock's items worn for the task (the lumberjack outfit), by core's names for them. */
+		public List<String> getWear()
+		{
+			return wear == null ? List.of() : wear;
+		}
+
+		/** Other items that do what one of core's items does (a vial of water and a cadantine for the unfinished potion). */
+		public List<Alternative> getAlternatives()
+		{
+			return alternatives == null ? List.of() : alternatives;
+		}
+
+		/** The spellbook the task is done on (ARCEUUS for the Barrows tablet), or null for any. */
+		public String getBook()
+		{
+			return book;
+		}
+
+		/** The option the task picks in an interface (Barrows at the lectern), or null. */
+		public Choose getChoose()
+		{
+			return choose;
+		}
+
+		/** The spell the task casts (Lvl-5 Enchant), or null. */
+		public Cast getCast()
+		{
+			return cast;
+		}
+
+		/** How the task's item is made from what is carried, step by step (clean the herb, then make the potion). */
+		public List<Making> getMaking()
+		{
+			return making == null ? List.of() : making;
 		}
 
 		public String getFloor()
@@ -455,6 +533,145 @@ public final class StepIndex
 		}
 	}
 
+	/** An interface's option, found by its text since its slot varies, and the button that confirms it. */
+	/** An NPC's option or a ground item to pick up before the task, done once one of {@code held} is carried or worn. */
+	public static final class Before
+	{
+		private String text;
+		private List<Integer> npcs;
+		private String option;
+		private int groundItem = -1;
+		private List<Integer> held;
+
+		public String getText()
+		{
+			return text;
+		}
+
+		public List<Integer> getNpcs()
+		{
+			return npcs == null ? List.of() : npcs;
+		}
+
+		public String getOption()
+		{
+			return option;
+		}
+
+		public int getGroundItem()
+		{
+			return groundItem;
+		}
+
+		public List<Integer> getHeld()
+		{
+			return held == null ? List.of() : held;
+		}
+	}
+
+	public static final class Level
+	{
+		private Skill skill;
+		private int level;
+
+		public Skill getSkill()
+		{
+			return skill;
+		}
+
+		public int getLevel()
+		{
+			return level;
+		}
+	}
+
+	public static final class Choose
+	{
+		private int root;
+		private String text;
+		private int confirm;
+
+		public int getRoot()
+		{
+			return root;
+		}
+
+		public String getText()
+		{
+			return text;
+		}
+
+		public int getConfirm()
+		{
+			return confirm;
+		}
+	}
+
+	/** A spell cast on an item: its spellbook buttons in click order (a group, then the spell), and the items. */
+	public static final class Cast
+	{
+		private List<Integer> widgets;
+		private List<Integer> on;
+
+		public List<Integer> getWidgets()
+		{
+			return widgets == null ? List.of() : widgets;
+		}
+
+		public List<Integer> getOn()
+		{
+			return on == null ? List.of() : on;
+		}
+	}
+
+	/** One step of making: its text and the items used, each group any of its ids; the first group is what is worked on. */
+	public static final class Making
+	{
+		private String text;
+		private List<List<Integer>> items;
+		private int make = -1;
+
+		public String getText()
+		{
+			return text;
+		}
+
+		public List<List<Integer>> getItems()
+		{
+			return items == null ? List.of() : items;
+		}
+
+		/** The product to pick in the "How many do you wish to make?" box; -1 when the step has none. */
+		public int getMake()
+		{
+			return make;
+		}
+	}
+
+	/** Core's item {@code instead}, or one of each group of {@code all}. */
+	public static final class Alternative
+	{
+		private int instead;
+		private String name;
+		private List<List<Integer>> all;
+
+		/** What the replacement is called where it is listed as missing; null for an alternative to core's item. */
+		public String getName()
+		{
+			return name;
+		}
+
+		public int getInstead()
+		{
+			return instead;
+		}
+
+		public List<List<Integer>> getAll()
+		{
+			return all == null ? List.of() : all;
+		}
+	}
+
 	/** Worn gear adding up to at least {@code atLeast} of its bonus (Ghommal's +100 melee strength). */
 	public static final class Gear
 	{
@@ -648,7 +865,28 @@ public final class StepIndex
 		private String text;
 		private List<Requires> tools;
 		private List<Integer> objects;
+		private List<Integer> npcs;
+		private List<String> click;
+		private List<Alternative> uses;
 		private String grown;
+		/** The area the task works anywhere in, {west, south, east, north, plane} (the Dark Altar's reanimation ground). */
+		private int[] span;
+
+		public boolean hasSpan()
+		{
+			return span != null;
+		}
+
+		public boolean spans(WorldPoint at)
+		{
+			return WayIn.within(span, at);
+		}
+
+		/** {west, south, east, north, plane}; only for a place that {@link #hasSpan()}. */
+		public int[] getSpan()
+		{
+			return span.clone();
+		}
 
 		/** For an item source: what gathering it takes. */
 		public List<Requires> getTools()
@@ -676,6 +914,24 @@ public final class StepIndex
 		public List<Integer> getObjects()
 		{
 			return objects == null ? List.of() : objects;
+		}
+
+		/** The menu option that does the task on the place's objects or NPCs ("Chop down"), or null. */
+		public String getOption()
+		{
+			return click == null || click.size() < 2 ? null : click.get(0);
+		}
+
+		/** Core's items this place takes others in place of (pure essence for fragments at the True Blood Altar). */
+		public List<Alternative> getUses()
+		{
+			return uses == null ? List.of() : uses;
+		}
+
+		/** Who the task is done on there (a dust devil, a fishing spot), outlined. */
+		public List<Integer> getNpcs()
+		{
+			return npcs == null ? List.of() : npcs;
 		}
 	}
 

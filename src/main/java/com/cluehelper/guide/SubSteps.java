@@ -10,6 +10,7 @@ import com.cluehelper.route.BookScrolls;
 import com.cluehelper.route.Leg;
 import com.cluehelper.route.Route;
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
@@ -19,20 +20,27 @@ import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
 import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 public final class SubSteps
 {
 	public static final int ARRIVE_TILES = 3;
 	/** The Agility Pyramid's course spans its foot; a cave's way in is a tile. */
 	private static final int ON_WAY_IN_TILES = 40;
+	/** The walk from a landing to the place, a way in (a cave entrance) included. */
+	private static final Set<SubStep.Kind> WALKS_IN = EnumSet.of(SubStep.Kind.WALK, SubStep.Kind.EXIT, SubStep.Kind.ENTER,
+		SubStep.Kind.WALK_TO_CLUE);
 	/** Some teleports land anywhere in a small area, beyond the catalog's 0–2 tile spread. */
 	static final int LANDING_TILES = 10;
 	/** A wandering NPC: being in its area is enough. */
@@ -82,8 +90,8 @@ public final class SubSteps
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
 		Function<Leg, Exit> exits, boolean takeFromStash, boolean bookStaysOut, boolean carriesBook)
 	{
-		List<SubStep> steps = withWanderNote(withWayInEquipped(of(route, step, itemNames, house, exits, takeFromStash), step.getData()),
-			step.getData());
+		List<SubStep> steps = withWanderNote(withGearOnArrival(withWayInEquipped(of(route, step, itemNames, house, exits, takeFromStash),
+			step.getData())), step.getData());
 		boolean wildernessTarget = step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0);
 		return bookStaysOut ? withBookBanked(steps, carriesBook, wildernessTarget) : steps;
 	}
@@ -313,14 +321,14 @@ public final class SubSteps
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
 		return SubStep.builder().kind(SubStep.Kind.WALK).text(text).waypoint(leg.getTo()).goal(leg.getTo()).radius(radius)
-			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).build();
+			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
 	/** Ends when the stage is dropped from the step, which brings a new plan. */
 	static SubStep stageAct(Stage stage)
 	{
 		return SubStep.builder().kind(SubStep.Kind.ACT).text(stage.getAct()).detail(stage.getDetail()).stage(stage)
-			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).build();
+			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
 	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
@@ -336,7 +344,7 @@ public final class SubSteps
 			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
-	/** No amount: a required item's use carries the whole banked stack, not what the step needs. */
+	/** A required item's use carries the whole banked stack, so the amount still to take comes with the name. */
 	private static String itemLine(ItemUse use, IntFunction<String> itemNames)
 	{
 		String storage = use.getContainer() == Container.GROUP_STORAGE ? " (group storage)" : "";
@@ -425,13 +433,21 @@ public final class SubSteps
 	/** Gear the act wants worn goes on just before, so each part of a three-step can wear its own. */
 	static List<SubStep> stageActs(Stage stage)
 	{
-		if (stage.getWorn().isEmpty())
-		{
-			return List.of(stageAct(stage));
-		}
-		List<SubStep> acts = new ArrayList<>(equip(stage.getWorn()));
+		List<SubStep> acts = new ArrayList<>(remove(stage.getEmptied()));
+		stage.getBefore().forEach(before -> acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text(before.getText())
+			.npcIds(Set.copyOf(before.getNpcs())).option(before.getOption()).groundItem(before.getGroundItem())
+			.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()));
+		acts.addAll(stage.getWorn().isEmpty() ? List.of() : equip(stage.getWorn()));
 		acts.add(stageAct(stage));
 		return List.copyOf(acts);
+	}
+
+	/** Take off what core's empty-slot requirements forbid; none when there are none. */
+	static List<SubStep> remove(List<ItemRequirement> emptied)
+	{
+		return emptied.isEmpty() ? List.of() : List.of(SubStep.builder().kind(SubStep.Kind.ACT)
+			.text("Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
+			.tab(StepGuide.Tab.EQUIPMENT).build());
 	}
 
 	/** Put on the needs named, done once worn items alone meet them. */
@@ -451,6 +467,27 @@ public final class SubSteps
 		}
 		return steps.stream().map(sub -> sub.getKind() == SubStep.Kind.WALK_TO_CLUE ? sub.toBuilder().detail(wander.getText()).build() : sub)
 			.collect(Collectors.toUnmodifiableList());
+	}
+
+	/**
+	 * The act's gear goes on as soon as the route lands, before walking or going in: a course fails without its Graceful,
+	 * Ape Atoll's monkeys and a dust devil's cave hurt without theirs.
+	 */
+	static List<SubStep> withGearOnArrival(List<SubStep> steps)
+	{
+		int equip = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getDone() == SubStep.Done.GEAR_WORN).findFirst().orElse(-1);
+		if (equip < 0)
+		{
+			return steps;
+		}
+		int landed = equip;
+		while (landed > 0 && WALKS_IN.contains(steps.get(landed - 1).getKind()))
+		{
+			landed--;
+		}
+		List<SubStep> out = new ArrayList<>(steps);
+		out.add(landed, out.remove(equip));
+		return List.copyOf(out);
 	}
 
 	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data)

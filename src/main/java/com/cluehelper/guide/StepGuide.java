@@ -24,6 +24,7 @@ import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.StageTarget;
 import com.cluehelper.step.StepIndex;
@@ -36,6 +37,7 @@ import com.cluehelper.transport.HouseNeed;
 import com.cluehelper.transport.RowAvailability;
 import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Comparator;
@@ -51,6 +53,7 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Item;
 import net.runelite.api.WorldView;
 import net.runelite.api.Tile;
@@ -71,9 +74,11 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.NpcID;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.client.plugins.cluescrolls.clues.item.AllRequirementsCollection;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.util.Text;
 
@@ -92,7 +97,9 @@ public class StepGuide
 
 	private static final int NO_STASH = -1;
 	private static final String SEARCH_OPTION = "Search";
-	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip");
+	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
+	private static final String USE_OPTION = "Use";
+	private static final int MAX_STACK = Integer.MAX_VALUE / 2;
 
 	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
 	static final int JUMP_TILES = 4;
@@ -191,6 +198,8 @@ public class StepGuide
 	private int highlightMenuWidget = ScrollBook.NO_WIDGET;
 	private Tab highlightTab = Tab.NONE;
 	private MenuTarget menuTarget = MenuTarget.NONE;
+	/** The current sub-step's own object or NPC with its option ("Search for traps"), for colouring its menu line. */
+	private MenuTarget optionTarget = MenuTarget.NONE;
 	private List<WorldPoint> pickUpTiles = List.of();
 	/** The obelisk's list was open on the target's line: its closing means the destination is set. */
 	private boolean destinationListSeen;
@@ -368,6 +377,11 @@ public class StepGuide
 		return menuTarget;
 	}
 
+	public MenuTarget getOptionTarget()
+	{
+		return optionTarget;
+	}
+
 	public List<TileObject> getHighlightObjects()
 	{
 		return highlightObjects;
@@ -401,6 +415,83 @@ public class StepGuide
 	public int getHighlightSpellWidget()
 	{
 		return highlightSpellWidget;
+	}
+
+	/** An interface option the task picks and its confirm button, outlined while the interface is open. */
+	public List<Widget> getHighlightChoice()
+	{
+		Widget product = makeOption();
+		if (product != null)
+		{
+			return List.of(product);
+		}
+		StepIndex.Choose choose = taskChoose();
+		Widget root = choose == null ? null : client.getWidget(choose.getRoot());
+		if (root == null || root.isHidden())
+		{
+			return List.of();
+		}
+		Widget option = withText(root, choose.getText());
+		List<Widget> widgets = new ArrayList<>();
+		if (option != null)
+		{
+			widgets.add(option.getParent() != null ? option.getParent() : option);
+		}
+		Widget confirm = client.getWidget(choose.getConfirm());
+		if (confirm != null && !confirm.isHidden())
+		{
+			widgets.add(confirm);
+		}
+		return List.copyOf(widgets);
+	}
+
+	/** The making step's product in the "How many do you wish to make?" box: its option, A to R. */
+	private Widget makeOption()
+	{
+		Widget box = client.getWidget(InterfaceID.Skillmulti.UNIVERSE);
+		StepIndex.Making making = box == null || box.isHidden() || routeStep == null ? null : makingNow(carriedItemIds());
+		if (making == null || making.getMake() < 0)
+		{
+			return null;
+		}
+		for (int id = InterfaceID.Skillmulti.A; id <= InterfaceID.Skillmulti.R; id++)
+		{
+			Widget option = client.getWidget(id);
+			if (option != null && !option.isHidden()
+				&& MenuLines.descendants(option).stream().anyMatch(shown -> shown.getItemId() == making.getMake()))
+			{
+				return option;
+			}
+		}
+		return null;
+	}
+
+	private StepIndex.Choose taskChoose()
+	{
+		SubStep current = getCurrent();
+		boolean task = current != null && current.getKind() == SubStep.Kind.ACT && current.getStage() != null
+			&& current.getStage().getKind() == Stage.Kind.TASK;
+		return task && routeStep != null && routeStep.getData() != null ? routeStep.getData().getChoose() : null;
+	}
+
+	private static Widget withText(Widget parent, String text)
+	{
+		if (parent.getText() != null && Text.removeTags(parent.getText()).equalsIgnoreCase(text))
+		{
+			return parent;
+		}
+		for (Widget[] children : new Widget[][]{parent.getStaticChildren(), parent.getDynamicChildren(), parent.getNestedChildren()})
+		{
+			for (Widget child : children == null ? new Widget[0] : children)
+			{
+				Widget found = child.isHidden() ? null : withText(child, text);
+				if (found != null)
+				{
+					return found;
+				}
+			}
+		}
+		return null;
 	}
 
 	private void onPlan(Plan plan)
@@ -502,8 +593,11 @@ public class StepGuide
 		changed |= watchDestinationSet();
 		changed |= keyFromCharterList();
 		changed |= partWayIn(tile);
+		changed |= pickUpForAct(tile);
 		changed |= equipWhatIsCarried();
 		changed |= equipGear();
+		changed |= removeGear();
+		changed |= showMaking();
 		checkRefusal();
 		checkTeleportRefusal();
 		if (changed)
@@ -525,10 +619,12 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
-		MenuTarget target = current != null && !current.getNpcIds().isEmpty() ? MenuTarget.builder().npcIds(current.getNpcIds()).build()
-			: current != null && !current.getObjectIds().isEmpty() ? MenuTarget.builder().objectIds(current.getObjectIds()).build()
+		List<String> option = current == null || current.getOption() == null ? List.of() : List.of(current.getOption());
+		MenuTarget target = current != null && !current.getNpcIds().isEmpty() ? MenuTarget.builder().npcIds(current.getNpcIds()).path(option).build()
+			: current != null && !current.getObjectIds().isEmpty() ? MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build()
 			: isApproach() ? houseTarget(getNext().getRow()) : stashAhead() != NO_STASH ? MenuTarget.builder().objectIds(Set.of(stashAhead())).build()
 			: menuTarget;
+		optionTarget = option.isEmpty() || menuTarget != MenuTarget.NONE ? MenuTarget.NONE : target;
 		Set<Integer> ids = target.getObjectIds();
 		Set<Integer> npcIds = target.getNpcIds();
 		if (ids.isEmpty() && npcIds.isEmpty() && !bank)
@@ -645,6 +741,19 @@ public class StepGuide
 		steps = List.copyOf(updated);
 		updateHighlights();
 		return true;
+	}
+
+	/** An act's ground item (king worms): outlined where it lies, the nearest as the waypoint. */
+	private boolean pickUpForAct(WorldPoint tile)
+	{
+		SubStep current = getCurrent();
+		if (current == null || current.getKind() != SubStep.Kind.ACT || current.getGroundItem() < 0)
+		{
+			return false;
+		}
+		pickUpTiles = groundItemTiles(current.getGroundItem());
+		WorldPoint nearest = tile == null ? null : pickUpTiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile))).orElse(null);
+		return replaceCurrent(current.toBuilder().waypoint(nearest).build());
 	}
 
 	private int carriedCount(int itemId)
@@ -839,12 +948,13 @@ public class StepGuide
 		routeStep = step;
 		boolean atStep = step != null && (stillAtAct(step, tile) || arrived(step));
 		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
-			: SubSteps.of(committed, step, id -> client.getItemDefinition(id).getName(), house(), this::exitOf, takeFromStash(step),
+			: SubSteps.of(committed, step, this::withdrawLine, house(), this::exitOf, takeFromStash(step),
 				routes.keepsScrollBookOutOfWilderness(), carriesItemNamed(SCROLL_BOOK_NAME));
 		steps = withDeposit(base);
 		index = 0;
 		jumpedThisSubStep = false;
 		advance(tile);
+		showMaking();
 		updateHighlights();
 		refreshObjects();
 		notifyListeners();
@@ -1128,13 +1238,22 @@ public class StepGuide
 		return acting && local != null && local.getAnimation() != NO_ANIMATION;
 	}
 
+	/** A walk to NPCs ends once one of them is rendered close by (an elf in Prifddinas), not at the planned tile. */
+	private boolean stageNpcNearby(SubStep step, WorldPoint tile)
+	{
+		return !step.getNpcIds().isEmpty() && tile != null && highlightNpcs.stream()
+			.anyMatch(npc -> npc.getWorldLocation().getPlane() == tile.getPlane()
+				&& npc.getWorldLocation().distanceTo2D(tile) <= SubSteps.AREA_ARRIVE_TILES);
+	}
+
 	private boolean isComplete(SubStep step, WorldPoint tile)
 	{
 		switch (step.getKind())
 		{
 			case WALK:
 			case WALK_TO_CLUE:
-				return step.getDone() == SubStep.Done.STASH_DEPOSITED && depositAt == null || SubSteps.near(tile, step.getGoal(), step.getRadius());
+				return step.getDone() == SubStep.Done.STASH_DEPOSITED && depositAt == null || SubSteps.near(tile, step.getGoal(), step.getRadius())
+					|| step.getSpans().stream().anyMatch(place -> place.spans(tile)) || stageNpcNearby(step, tile);
 			case WILDERNESS_EXIT:
 				return tile != null && tile.getY() <= step.getGoal().getY();
 			case TELEPORT:
@@ -1176,6 +1295,10 @@ public class StepGuide
 				return wearsWayInGear(routeStep);
 			case GEAR_WORN:
 				return wearsGear(act);
+			case ITEM_HELD:
+				return act.getHeldWhenDone().stream().anyMatch(carriedItemIds()::contains);
+			case SLOTS_EMPTY:
+				return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
 			default:
 				return actWatcher.isDone(act.getDone(), stepSince);
 		}
@@ -1185,7 +1308,8 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		highlightItems = Set.of();
-		bankHighlightItems = current == null ? Set.of() : current.getBankItems();
+		bankHighlightItems = current == null ? Set.of() : current.getBankItems().stream()
+			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(Collectors.toUnmodifiableSet());
 		highlightSpellWidget = -1;
 		highlightMenuWidget = ScrollBook.NO_WIDGET;
 		highlightTab = Tab.NONE;
@@ -1197,7 +1321,7 @@ public class StepGuide
 		fillNpcs = List.of();
 		heldUses = List.of();
 		oneClickLabel = null;
-		objectOption = null;
+		objectOption = current == null ? null : current.getOption();
 		objectsFoundTick = NEVER;
 		if (current == null)
 		{
@@ -1226,8 +1350,13 @@ public class StepGuide
 			fillItems = equips
 				? current.getActItems().stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet())
 				: current.getActItems();
-			highlightTab = Tab.INVENTORY;
+			highlightTab = current.getDone() == SubStep.Done.SLOTS_EMPTY ? Tab.EQUIPMENT : Tab.INVENTORY;
 			return;
+		}
+		String planted = plantedTreeLine(current);
+		if (planted != null)
+		{
+			menuTarget = MenuTarget.builder().objectIds(current.getObjectIds()).path(List.of(TRAVEL_OPTION, TREE_OPTION, planted)).build();
 		}
 		if (current.getKind() == SubStep.Kind.EXIT)
 		{
@@ -1317,9 +1446,11 @@ public class StepGuide
 
 	private Set<Integer> oneClickItems(String label)
 	{
+		boolean signals = menuTarget.getLine() == MenuTarget.Line.QUETZAL;
 		boolean oneDestination = label == null && hasOneDestination(getCurrent());
 		return heldUses.stream()
-			.filter(use -> oneDestination ? OneClick.isOwnTeleport(leftClickOrFirstAction(use)) : OneClick.teleportsTo(leftClick(use), label))
+			.filter(use -> signals ? SIGNAL_OPTION.equalsIgnoreCase(leftClickOrFirstAction(use))
+				: oneDestination ? OneClick.isOwnTeleport(leftClickOrFirstAction(use)) : OneClick.teleportsTo(leftClick(use), label))
 			.map(ItemUse::getItemId)
 			.collect(Collectors.toUnmodifiableSet());
 	}
@@ -1426,16 +1557,7 @@ public class StepGuide
 			.map(need -> need.getIds().stream().filter(carried::contains).findFirst().orElse(need.getIds().get(0)))
 			.distinct().collect(Collectors.toList());
 		List<String> names = chosen.stream().map(id -> client.getItemDefinition(id).getName()).collect(Collectors.toList());
-		SubStep listed = current.toBuilder().text(EQUIP_TEXT).items(names).actItems(Set.copyOf(chosen)).build();
-		if (listed.equals(current))
-		{
-			return false;
-		}
-		List<SubStep> updated = new ArrayList<>(steps);
-		updated.set(index, listed);
-		steps = List.copyOf(updated);
-		updateHighlights();
-		return true;
+		return replaceCurrent(current.toBuilder().text(EQUIP_TEXT).items(names).actItems(Set.copyOf(chosen)).build());
 	}
 
 	/** The gear a part's act wants, from what is carried: the fewest pieces to put on, listed by name. */
@@ -1455,8 +1577,30 @@ public class StepGuide
 			return false;
 		}
 		List<String> names = chosen.stream().map(id -> client.getItemDefinition(id).getName()).collect(Collectors.toList());
-		SubStep listed = current.toBuilder().text(EQUIP_TEXT).items(names).actItems(Set.copyOf(chosen)).build();
-		if (listed.equals(current))
+		return replaceCurrent(current.toBuilder().text(EQUIP_TEXT).items(names).actItems(Set.copyOf(chosen)).build());
+	}
+
+	/** The worn items an act wants off, refreshed as each comes off. */
+	private boolean removeGear()
+	{
+		SubStep current = getCurrent();
+		if (current == null || current.getDone() != SubStep.Done.SLOTS_EMPTY)
+		{
+			return false;
+		}
+		Item[] worn = wornBySlot();
+		Set<Integer> off = Arrays.stream(EquipmentInventorySlot.values())
+			.filter(slot -> slot.getSlotIdx() < worn.length && worn[slot.getSlotIdx()].getId() != -1)
+			.filter(slot -> current.getEmptied().stream().anyMatch(requirement -> !EmptySlots.allows(requirement, slot,
+				worn[slot.getSlotIdx()].getId())))
+			.map(slot -> worn[slot.getSlotIdx()].getId())
+			.collect(Collectors.toUnmodifiableSet());
+		return replaceCurrent(current.toBuilder().actItems(off).build());
+	}
+
+	private boolean replaceCurrent(SubStep listed)
+	{
+		if (listed.equals(getCurrent()))
 		{
 			return false;
 		}
@@ -1467,11 +1611,17 @@ public class StepGuide
 		return true;
 	}
 
+	private Item[] wornBySlot()
+	{
+		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
+		return worn == null ? new Item[0] : worn.getItems();
+	}
+
 	private boolean wearsGear(SubStep act)
 	{
 		Set<Integer> worn = containerIds(InventoryID.WORN);
 		return routeStep != null && wornNeeds(act).stream().allMatch(need -> need.getRequirement() instanceof GearRequirement
-			? ((GearRequirement) need.getRequirement()).isWorn(worn) : worn.stream().anyMatch(need.getRequirement()::fulfilledBy));
+			? ((GearRequirement) need.getRequirement()).isWorn(worn) : need.getRequirement().fulfilledBy(asItems(worn)));
 	}
 
 	private List<RequiredItems.Need> wornNeeds(SubStep act)
@@ -1486,11 +1636,18 @@ public class StepGuide
 		{
 			return ((GearRequirement) requirement).choose(worn, inventory, Set.of()).map(GearPicker.Choice::getEquip).orElse(List.of());
 		}
-		if (worn.stream().anyMatch(requirement::fulfilledBy))
+		if (requirement.fulfilledBy(asItems(worn)))
 		{
 			return List.of();
 		}
-		return inventory.stream().filter(requirement::fulfilledBy).findFirst().map(List::of).orElse(List.of());
+		List<Integer> fitting = inventory.stream().filter(requirement::fulfilledBy).sorted().collect(Collectors.toList());
+		boolean outfit = requirement instanceof AllRequirementsCollection;
+		return outfit || fitting.isEmpty() ? fitting : List.of(fitting.get(0));
+	}
+
+	private static Item[] asItems(Set<Integer> ids)
+	{
+		return ids.stream().map(id -> new Item(id, 1)).toArray(Item[]::new);
 	}
 
 	private Set<Integer> containerIds(int inventoryId)
@@ -1587,11 +1744,136 @@ public class StepGuide
 		{
 			return;
 		}
-		highlightItems = carriedItemIds().stream()
-			.filter(id -> routeStep.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
+		Set<Integer> carried = carriedItemIds();
+		if (neededFromCarriedKit() != null)
+		{
+			highlightItems = Set.of(ItemID.HUNTSMANS_KIT);
+			highlightTab = Tab.INVENTORY;
+			return;
+		}
+		StepIndex.Cast cast = routeStep.getData() == null ? null : routeStep.getData().getCast();
+		if (cast != null && cast.getOn().stream().anyMatch(carried::contains))
+		{
+			highlightCast(cast, carried);
+			return;
+		}
+		if (current.getStage().getOption() != null && makingNow(carried) == null)
+		{
+			return;
+		}
+		StepIndex.Making making = makingNow(carried);
+		highlightItems = making != null
+			? carried.stream().filter(id -> making.getItems().stream().anyMatch(group -> group.contains(id))).collect(Collectors.toUnmodifiableSet())
+			: carried.stream().filter(id -> routeStep.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
 			.collect(Collectors.toUnmodifiableSet());
-		fillItems = Set.of();
+		fillItems = highlightItems.stream().filter(this::actsOnLeftClick).collect(Collectors.toUnmodifiableSet());
 		highlightTab = highlightItems.isEmpty() ? highlightTab : Tab.INVENTORY;
+	}
+
+	/** The book to switch to first, else the making step reached; null when the task needs neither. */
+	private String taskDetail()
+	{
+		String book = routeStep == null || routeStep.getData() == null ? null : routeStep.getData().getBook();
+		if (book != null && !book.equals(currentBook().name()))
+		{
+			return "Switch to the " + book.toLowerCase(Locale.ROOT) + " spellbook first";
+		}
+		String inKit = neededFromCarriedKit();
+		if (inKit != null)
+		{
+			return "Take the " + inKit + " out of the huntsman's kit";
+		}
+		StepIndex.Making making = makingNow(carriedItemIds());
+		return making == null ? null : making.getText();
+	}
+
+	/**
+	 * At a spirit tree for the planted-tree task: the player's first planted tree, as its line in the tree's list, reached
+	 * by Travel or, on the house's spiritual fairy tree, by Tree.
+	 */
+	private String plantedTreeLine(SubStep current)
+	{
+		boolean task = current.getKind() == SubStep.Kind.ACT && current.getStage() != null
+			&& current.getStage().getKind() == Stage.Kind.TASK;
+		PlayerSnapshot snapshot = player.getSnapshot();
+		if (!task || routeStep == null || routeStep.getData() == null || !routeStep.getData().isToPlantedTree() || snapshot == null)
+		{
+			return null;
+		}
+		return snapshot.getPlantedTrees().stream().sorted().findFirst().orElse(null);
+	}
+
+	/** The name of a step item only the carried huntsman's kit holds, or null. */
+	private String neededFromCarriedKit()
+	{
+		Set<Integer> carried = carriedItemIds();
+		BankMemory.Seen kit = carried.contains(ItemID.HUNTSMANS_KIT) ? bankMemory.getKit() : null;
+		if (kit == null || routeStep == null)
+		{
+			return null;
+		}
+		Item[] held = asItems(carried);
+		for (RequiredItems.Need need : stepNeeds.of(routeStep).getNeeds())
+		{
+			if (!need.getRequirement().fulfilledBy(held))
+			{
+				Integer stored = kit.items.keySet().stream().filter(need.getRequirement()::fulfilledBy).findFirst().orElse(null);
+				if (stored != null)
+				{
+					return client.getItemDefinition(stored).getName().toLowerCase(Locale.ROOT);
+				}
+			}
+		}
+		return null;
+	}
+
+	/** The spell's button until it is picked (the last of its buttons shown), then the items it is cast on. */
+	private void highlightCast(StepIndex.Cast cast, Set<Integer> carried)
+	{
+		boolean picked = client.isWidgetSelected();
+		highlightItems = picked ? carried.stream().filter(cast.getOn()::contains).collect(Collectors.toUnmodifiableSet()) : Set.of();
+		fillItems = highlightItems;
+		highlightSpellWidget = picked ? -1 : cast.getWidgets().stream().filter(this::widgetShown).reduce((first, last) -> last)
+			.orElse(cast.getWidgets().isEmpty() ? -1 : cast.getWidgets().get(0));
+		highlightTab = picked ? Tab.INVENTORY : Tab.MAGIC;
+	}
+
+	private boolean widgetShown(int widgetId)
+	{
+		Widget widget = client.getWidget(widgetId);
+		return widget != null && !widget.isHidden();
+	}
+
+	/** The furthest making step whose worked-on item is carried; null before any is, or for a task made of nothing. */
+	private StepIndex.Making makingNow(Set<Integer> carried)
+	{
+		List<StepIndex.Making> making = routeStep == null || routeStep.getData() == null ? List.of() : routeStep.getData().getMaking();
+		StepIndex.Making now = null;
+		for (StepIndex.Making step : making)
+		{
+			if (!step.getItems().isEmpty() && step.getItems().get(0).stream().anyMatch(carried::contains))
+			{
+				now = step;
+			}
+		}
+		return now;
+	}
+
+	/** A task act made in steps says the step it is at under the act. */
+	private boolean showMaking()
+	{
+		SubStep current = getCurrent();
+		boolean task = current != null && current.getKind() == SubStep.Kind.ACT && current.getStage() != null
+			&& current.getStage().getKind() == Stage.Kind.TASK;
+		String detail = task ? taskDetail() : null;
+		if (detail == null || detail.equals(current.getDetail()))
+		{
+			return false;
+		}
+		List<SubStep> updated = new ArrayList<>(steps);
+		updated.set(index, current.toBuilder().detail(detail).build());
+		steps = List.copyOf(updated);
+		return true;
 	}
 
 	private void refreshEquipItems()
@@ -1613,6 +1895,87 @@ public class StepGuide
 		}
 		highlightItems = Set.copyOf(wanted);
 		fillItems = wanted.stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet());
+	}
+
+	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
+	private String withdrawLine(int itemId)
+	{
+		String name = client.getItemDefinition(itemId).getName();
+		if (bankMemory.onlyInBankedKit(itemId))
+		{
+			return client.getItemDefinition(ItemID.HUNTSMANS_KIT).getName() + " (" + name + " inside)";
+		}
+		int more = stillToTake(itemId);
+		return more > 1 ? name + " x" + more : name;
+	}
+
+	/** The fewest of the item that, with what is carried, meet every step need it counts towards. */
+	private int stillToTake(int itemId)
+	{
+		Map<Integer, Integer> carried = new HashMap<>();
+		for (int container : new int[]{InventoryID.INV, InventoryID.WORN})
+		{
+			ItemContainer items = client.getItemContainer(container);
+			for (Item item : items == null ? new Item[0] : items.getItems())
+			{
+				if (item.getId() > 0)
+				{
+					carried.merge(item.getId(), item.getQuantity(), Integer::sum);
+				}
+			}
+		}
+		int most = 0;
+		for (RequiredItems.Need need : routeStep == null ? List.<RequiredItems.Need>of() : stepNeeds.of(routeStep).getNeeds())
+		{
+			ItemRequirement requirement = need.getRequirement();
+			if (requirement.fulfilledBy(itemId) && !requirement.fulfilledBy(withMore(carried, itemId, 0)))
+			{
+				most = Math.max(most, fewestMeeting(requirement, carried, itemId));
+			}
+		}
+		return most;
+	}
+
+	/** Doubles, then halves back: needs run from 1 to thousands (coins). 0 when this item alone can't meet it (an outfit). */
+	private static int fewestMeeting(ItemRequirement requirement, Map<Integer, Integer> carried, int itemId)
+	{
+		int high = 1;
+		while (high < MAX_STACK && !requirement.fulfilledBy(withMore(carried, itemId, high)))
+		{
+			high *= 2;
+		}
+		if (high >= MAX_STACK)
+		{
+			return 0;
+		}
+		int low = high / 2;
+		while (low + 1 < high)
+		{
+			int middle = (low + high) / 2;
+			if (requirement.fulfilledBy(withMore(carried, itemId, middle)))
+			{
+				high = middle;
+			}
+			else
+			{
+				low = middle;
+			}
+		}
+		return high;
+	}
+
+	private static Item[] withMore(Map<Integer, Integer> carried, int itemId, int more)
+	{
+		Map<Integer, Integer> items = new HashMap<>(carried);
+		items.merge(itemId, more, Integer::sum);
+		return items.entrySet().stream().map(e -> new Item(e.getKey(), e.getValue())).toArray(Item[]::new);
+	}
+
+	/** A task's item does the act on a left click when it is put on or used on another (a tinderbox, a herb). */
+	private boolean actsOnLeftClick(int itemId)
+	{
+		String click = itemLeftClick(itemId);
+		return click != null && (WEAR_OPTIONS.contains(click) || USE_OPTION.equals(click));
 	}
 
 	private boolean wearsOnLeftClick(int itemId)
@@ -1644,9 +2007,10 @@ public class StepGuide
 				.collect(Collectors.toUnmodifiableList());
 		}
 		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
+		String firstClick = menuTarget.getPath().isEmpty() ? null : menuTarget.getPath().get(0);
 		return objects.stream()
 			.filter(object -> ring ? ringGoesTo(leftClick(object), menuTarget.getLineKey())
-				: OneClick.teleportsTo(leftClick(object), oneClickLabel))
+				: OneClick.teleportsTo(leftClick(object), oneClickLabel) || firstClick != null && MenuLabels.matches(leftClick(object), firstClick))
 			.collect(Collectors.toUnmodifiableList());
 	}
 

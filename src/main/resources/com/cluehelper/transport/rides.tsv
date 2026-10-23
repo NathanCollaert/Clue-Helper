@@ -40,10 +40,10 @@ boat	Boat: Ruins of Unkah	3271 3144 0	3148 2843 0		Board Ferry 41311						-1	8	1
 boat	Boat: Al Kharid	3148 2843 0	3272 3143 0		Board Ferry 41311						-1	8	1	F	none	any	Y		op Board		object:41311=TEMPOROSS_LOBBY_BOAT
 boat	Boat: Mount Quidamortem	1229 3470 0	1194 3452 0		Travel Rowboat 48721			Desert Treasure II - The Fallen Empire			-1	7	1	F	none	any	Y		op Travel		object:48721=DT2_STRANGLEWOOD_BOAT_VIS
 boat	Boat: the Stranglewood	1194 3452 0	1229 3469 0		Travel Rowboat 48720			Desert Treasure II - The Fallen Empire			-1	7	1	F	none	any	Y		op Travel		object:48720=DT2_STRANGLEWOOD_BOAT_OUT
-boat	Boat: Molch Island	1384 3665 0	1369 3639 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board		object:33614=AERIAL_FISHING_BOAT
-boat	Boat: Molch	1384 3665 0	1341 3645 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board		object:33614=AERIAL_FISHING_BOAT
-boat	Boat: Shayzien	1384 3665 0	1408 3612 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board		object:33614=AERIAL_FISHING_BOAT
-boat	Boat: Battlefront	1342 3645 0	1384 3665 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Molch Island	1384 3665 0	1369 3639 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch Island		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Molch	1384 3665 0	1341 3645 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Shayzien	1384 3665 0	1408 3612 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Shayzien		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Battlefront	1342 3645 0	1384 3665 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Battlefront		object:33614=AERIAL_FISHING_BOAT
 boat	Boat: Meiyerditch	3525 3170 0	3605 3161 1		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Icyene Graveyard	3525 3170 0	3684 3176 0		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Slepe	3525 3170 0	3663 3277 0		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
@@ -848,7 +848,7 @@ minecart	Minecart: Northern Tundras	1413 3577 0	1648 3931 0		Travel Minecart 288
 minecart	Minecart: Port Piscarilius	1413 3577 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
 minecart	Minecart: Shayzien East	1413 3577 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
 lever	Lever: Deserted Keep	2561 3311 0	3154 3924 0		Pull Lever 1814						-1	5	0	F	none	any	Y		op Pull		object:1814=WILDINLEVER
-lever	Lever: Ardougne	3153 3923 0	2562 3311 0		Pull Lever 1815						-1	5	0	F	none	any	Y		op Pull		object:1815=WILDOUTLEVER
+lever	Lever: Ardougne	3153 3923 0	2562 3311 0		Ardougne Lever 1815						-1	5	0	F	none	any	Y		op Ardougne		object:1815=WILDOUTLEVER
 lever	Lever: King Black Dragon Lair	3067 10253 0	2271 4680 0		Pull Lever 1816						-1	5	0	F	none	any	Y		op Pull		object:1816=DRAGONKINGINLEVER
 lever	Lever: the King Black Dragon lever	2271 4680 0	3067 10254 0		Pull Lever 1817						-1	5	0	F	none	any	Y		op Pull		object:1817=DRAGONKINGOUTLEVER
 lever	Lever: Deserted Keep	3090 3475 0	3154 3924 0		Pull Lever 26761						-1	5	0	F	none	any	Y		op Pull		object:26761=EDGEVILLE_WILDY_LEVER

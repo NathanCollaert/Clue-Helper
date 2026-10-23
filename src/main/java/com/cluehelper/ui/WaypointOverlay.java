@@ -125,6 +125,10 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		boolean stepOrPartAct = current != null && (current.getStage() == null || current.getStage().getKind() == Stage.Kind.PART);
+		if (waypoint == null && current != null && current.isPreparation())
+		{
+			return null;
+		}
 		if (waypoint == null && current != null && current.getKind() == SubStep.Kind.ACT && stepOrPartAct
 			&& current.getActItemNamed() == null && guide.getHighlightObjects().isEmpty())
 		{
@@ -138,6 +142,12 @@ public class WaypointOverlay extends Overlay
 		if (!walkableWaypoint(waypoint, view) && view != null && !guide.getHighlightObjects().isEmpty())
 		{
 			drawPathToObject(graphics, view);
+			return null;
+		}
+		NPC target = waypoint == null && view != null && current != null && current.getKind() == SubStep.Kind.ACT ? nearestNpc() : null;
+		if (target != null && walkableWaypoint(target.getWorldLocation(), view))
+		{
+			drawApproach(graphics, view, scene, target);
 			return null;
 		}
 		if (waypoint == null || view == null)

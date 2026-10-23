@@ -135,42 +135,43 @@ id	Skills	Quests	Varbits	VarPlayers	Items
 133	60 Mining				
 134	60 Woodcutting				
 135	61 Agility				
-136	62 Agility				
-137	63 Agility				
-138	63 Agility		10449=1		
-139	63 Agility		10450=1		
-140	64 Agility				
-141	64 Agility	Shadows of Custodia			
-142	65 Agility				
-143	66 Agility				
-144	66 Magic				
-145	67 Agility				
-146	67 Agility		4464=1		
-147	68 Agility				
-148	68 Fishing				
-149	69 Agility				
-150	69 Agility		4441=2;5023=2		
-151	70 Agility				
-152	70 Hitpoints				
-153	71 Agility				
-154	71 Agility	Watchtower			
-155	72 Agility				
-156	73 Agility				
-157	74 Agility				
-158	76 Agility			328=15	
-159	77 Agility				
-160	78 Agility				
-161	79 Agility				
-162	79 Agility			139>49	
-163	80 Agility				
-164	81 Agility				
-165	81 Thieving				
-166	82 Agility				
-167	82 Agility	Cabin Fever			
-168	83 Agility				
-169	84 Agility				
-170	85 Agility				
-171	86 Agility				
-172	86 Agility		7255=138		
-173	93 Agility;78 Mining	Darkness of Hallowvale			
-174	96 Agility	Legends' Quest			
+136	61 Thieving				
+137	62 Agility				
+138	63 Agility				
+139	63 Agility		10449=1		
+140	63 Agility		10450=1		
+141	64 Agility				
+142	64 Agility	Shadows of Custodia			
+143	65 Agility				
+144	66 Agility				
+145	66 Magic				
+146	67 Agility				
+147	67 Agility		4464=1		
+148	68 Agility				
+149	68 Fishing				
+150	69 Agility				
+151	69 Agility		4441=2;5023=2		
+152	70 Agility				
+153	70 Hitpoints				
+154	71 Agility				
+155	71 Agility	Watchtower			
+156	72 Agility				
+157	73 Agility				
+158	74 Agility				
+159	76 Agility			328=15	
+160	77 Agility				
+161	78 Agility				
+162	79 Agility				
+163	79 Agility			139>49	
+164	80 Agility				
+165	81 Agility				
+166	81 Thieving				
+167	82 Agility				
+168	82 Agility	Cabin Fever			
+169	83 Agility				
+170	84 Agility				
+171	85 Agility				
+172	86 Agility				
+173	86 Agility		7255=138		
+174	93 Agility;78 Mining	Darkness of Hallowvale			
+175	96 Agility	Legends' Quest			

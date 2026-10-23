@@ -61,7 +61,7 @@ public class HotColdService
 	private static final String MASTER = "master";
 	private static final Map<String, String> DEVICE_NPC = Map.of(BEGINNER, "reldo", MASTER, "jorral");
 	private static final int NO_CHECK = -1;
-	/** Ranking-only ticks on a feel in the Wilderness, with {@code hotColdWildernessPenalty} on. */
+	/** Ranking-only ticks on a feel in the Wilderness while the Wilderness is avoided. */
 	static final int WILDERNESS_PENALTY_TICKS = 20;
 	/** Local probes: every second tile out to this, then every fourth out to {@link #LOCAL_FAR}. */
 	private static final int LOCAL_NEAR = 8;
@@ -335,7 +335,7 @@ public class HotColdService
 			.local(carried ? localProbes(walk) : List.of())
 			.landingSearch(landingSearch)
 			.costs(ProbePlanner.Costs.builder()
-				.wildernessPenaltyTicks(config.hotColdWildernessPenalty() ? WILDERNESS_PENALTY_TICKS : 0).build())
+				.wildernessPenaltyTicks(landingSearch.getSettings().isAvoidWilderness() ? WILDERNESS_PENALTY_TICKS : 0).build())
 			.avoidWilderness(landingSearch.getSettings().isAvoidWilderness())
 			.build();
 		trace("plan " + step.getKey() + " from " + job.getReadings().size() + " readings");

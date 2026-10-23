@@ -18,11 +18,13 @@ import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 
 /**
- * Client thread, except the getters. Saved to the profile only when the bank closes and at logout: each save costs
- * about 1 ms on the client thread and a bank visit fires one event per withdraw.
+ * The bank, group storage and huntsman's kit as last seen. Client thread, except the getters. Saved to the profile only
+ * when the bank closes, the kit is seen outside the bank, and at logout: each save costs about 1 ms on the client thread
+ * and a bank visit fires one event per withdraw.
  */
 @Slf4j
 @Singleton
@@ -31,6 +33,7 @@ public class BankMemory
 	static final String BANK_KEY = "bank";
 	static final String GROUP_STORAGE_KEY = "groupStorage";
 	static final String PIN_KEY = "bankPin";
+	static final String KIT_KEY = "huntsmansKit";
 	private static final Set<Integer> GROUP_IRONMAN = Set.of(4, 5, 6);
 	private static final int NO_PLACEHOLDER = -1;
 	private static final int NO_NOTE = -1;
@@ -40,11 +43,13 @@ public class BankMemory
 	private final MemorySlot<Seen> storedBank;
 	private final MemorySlot<Seen> storedGroup;
 	private final MemorySlot<Pin> pin;
+	private final MemorySlot<Seen> storedKit;
 	private final Map<Integer, Boolean> placeholders = new HashMap<>();
 	private final LateDeposits lateDeposits = new LateDeposits();
 
 	private volatile Seen liveBank;
 	private volatile Seen liveGroup;
+	private volatile Seen liveKit;
 	private boolean unsaved;
 	/** The PIN is asked once per login: a bank or PIN screen seen since then means it's done. */
 	private volatile boolean pinDoneThisSession;
@@ -59,6 +64,7 @@ public class BankMemory
 		this.storedBank = memory.slot(BANK_KEY, Seen.class, Seen::new);
 		this.storedGroup = memory.slot(GROUP_STORAGE_KEY, Seen.class, Seen::new);
 		this.pin = memory.slot(PIN_KEY, Pin.class, Pin::new);
+		this.storedKit = memory.slot(KIT_KEY, Seen.class, Seen::new);
 	}
 
 	/** Null when this profile has never opened it. Any thread. */
@@ -73,6 +79,38 @@ public class BankMemory
 	{
 		Seen live = liveGroup;
 		return live != null ? live : seenOrNull(storedGroup.get());
+	}
+
+	/** The huntsman's kit's traps and tools, as last sent when it was opened; null when never. Any thread. */
+	public Seen getKit()
+	{
+		Seen live = liveKit;
+		return live != null ? live : seenOrNull(storedKit.get());
+	}
+
+	/**
+	 * These items plus the huntsman's kit's contents when the kit is among them: a carried kit's traps count as carried, a
+	 * banked kit's as banked.
+	 */
+	public Map<Integer, Integer> withKit(Map<Integer, Integer> items)
+	{
+		Seen kit = items.containsKey(ItemID.HUNTSMANS_KIT) ? getKit() : null;
+		if (kit == null)
+		{
+			return items;
+		}
+		Map<Integer, Integer> all = new HashMap<>(items);
+		kit.items.forEach((id, quantity) -> all.merge(id, quantity, Integer::sum));
+		return all;
+	}
+
+	/** Whether the item is only in the huntsman's kit, not loose in the bank: the kit is withdrawn for it. */
+	public boolean onlyInBankedKit(int itemId)
+	{
+		Seen bank = getBank();
+		Seen kit = getKit();
+		return bank != null && kit != null && bank.items.containsKey(ItemID.HUNTSMANS_KIT) && !bank.items.containsKey(itemId)
+			&& kit.items.containsKey(itemId);
 	}
 
 	public boolean isPinPending()
@@ -111,6 +149,16 @@ public class BankMemory
 			liveGroup = seen(event.getItemContainer());
 			unsaved = true;
 			version++;
+		}
+		else if (event.getContainerId() == InventoryID.HUNTSMANS_KIT)
+		{
+			liveKit = seen(event.getItemContainer());
+			unsaved = true;
+			version++;
+			if (!bankOpen)
+			{
+				save();
+			}
 		}
 	}
 
@@ -192,6 +240,7 @@ public class BankMemory
 	{
 		liveBank = null;
 		liveGroup = null;
+		liveKit = null;
 		unsaved = false;
 		version++;
 	}
@@ -200,9 +249,11 @@ public class BankMemory
 	{
 		liveBank = null;
 		liveGroup = null;
+		liveKit = null;
 		unsaved = false;
 		storedBank.clear();
 		storedGroup.clear();
+		storedKit.clear();
 		version++;
 	}
 
@@ -221,6 +272,10 @@ public class BankMemory
 		if (liveGroup != null)
 		{
 			storedGroup.set(liveGroup);
+		}
+		if (liveKit != null)
+		{
+			storedKit.set(liveKit);
 		}
 		log.debug("bank memory saved in {} ms", (System.nanoTime() - started) / 1e6);
 	}

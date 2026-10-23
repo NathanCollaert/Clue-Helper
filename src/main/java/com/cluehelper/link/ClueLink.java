@@ -1,7 +1,10 @@
 package com.cluehelper.link;
 
+import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.step.Stages;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepResolver;
+import com.cluehelper.transport.AvailabilityService;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +16,8 @@ import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.ParamID;
+import net.runelite.api.Player;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
@@ -38,6 +43,7 @@ public class ClueLink
 	private final ClueScrollService service;
 	private final Client client;
 	private final StepResolver resolver;
+	private final AvailabilityService availability;
 	private final LinkState state = new LinkState();
 	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
@@ -48,8 +54,10 @@ public class ClueLink
 	private boolean inventoryHoldsClue;
 
 	@Inject
-	ClueLink(PluginManager pluginManager, ClueScrollService service, Client client, StepResolver resolver)
+	ClueLink(PluginManager pluginManager, ClueScrollService service, Client client, StepResolver resolver,
+		AvailabilityService availability)
 	{
+		this.availability = availability;
 		this.pluginManager = pluginManager;
 		this.service = service;
 		this.client = client;
@@ -142,7 +150,7 @@ public class ClueLink
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : resolve(clue);
+		Step step = clue == null ? null : Stages.underWayInSpan(Stages.doneAnywhereWhenOwned(resolve(clue), this::owns), playerTile());
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
 			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && carriesClue());
 		if (change != StepChange.UNCHANGED)
@@ -170,6 +178,25 @@ public class ClueLink
 			}
 			return StepResolver.unreadable(clue);
 		}
+	}
+
+	private WorldPoint playerTile()
+	{
+		Player local = client.getLocalPlayer();
+		return local == null ? null : local.getWorldLocation();
+	}
+
+	private boolean owns(int itemId)
+	{
+		PlayerSnapshot banked = availability.getBankedSnapshot();
+		return holds(InventoryID.INV, itemId) || holds(InventoryID.WORN, itemId)
+			|| banked != null && (banked.getBank().containsKey(itemId) || banked.getGroupStorage().containsKey(itemId));
+	}
+
+	private boolean holds(int containerId, int itemId)
+	{
+		ItemContainer items = client.getItemContainer(containerId);
+		return items != null && items.contains(itemId);
 	}
 
 	/** Client thread only. Whether the inventory holds a clue item, read or not. */

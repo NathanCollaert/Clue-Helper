@@ -224,20 +224,21 @@ skill:CHARLIE:i need to give charlie a cooked pike.
   alt       64t: Amulet of glory: Edgeville → walk 39 → Varrock Teleport → walk 16 {charge:1712=1, item:556=3, item:554=1, item:563=1}
   alt       104t: Falador Teleport → walk 79 → Varrock tablet → walk 16 {item:556=3, item:555=1, item:563=1, item:8007=1}
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.
-  best      146t: Amulet of glory: Draynor Village → walk 34 → Ship: Port Piscarilius → walk 63 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
-  alt       162t: Xeric's talisman: 2. Xeric's Glade → walk 120 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
-  alt       165t: Xeric's talisman: 4. Xeric's Heart → walk 123 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  best      144t: Amulet of glory: Draynor Village → walk 34 → Ship: Port Piscarilius → walk 61 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
+  alt       160t: Xeric's talisman: 2. Xeric's Glade → walk 118 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  alt       163t: Xeric's talisman: 4. Xeric's Heart → walk 121 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
 skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear.
   best      91t: Skills necklace: Woodcutting Guild → walk 48 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
   alt       92t: Xeric's talisman: 1. Xeric's Lookout → walk 49 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
   alt       144t: Xeric's talisman: 2. Xeric's Glade → walk 102 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
 skill:SHERLOCK:create an unstrung dragonstone amulet at a furnace.
-  best      54t: Amulet of glory: Edgeville → walk 12 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
-  alt       98t: Skills necklace: Cooking Guild → walk 55 → Camelot Teleport → walk 34 {charge:11968=1, item:556=5, item:563=1}
+  best      50t: Falador Teleport → walk 8 → Camelot Teleport → walk 34 {item:556=8, item:555=1, item:563=2}
+  alt       54t: Amulet of glory: Edgeville → walk 12 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
+  alt       63t: Amulet of glory: Al Kharid → walk 20 → Camelot Teleport → walk 34 {charge:1712=1, item:556=5, item:563=1}
 skill:SHERLOCK:kill a lizardman shaman.
-  best      130t: Kourend Castle Teleport → walk 88 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
-  alt       132t: Xeric's talisman: 4. Xeric's Heart → walk 90 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
-  alt       134t: Xeric's talisman: 3. Xeric's Inferno → walk 92 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  best      125t: Kourend Castle Teleport → walk 84 → Camelot Teleport → walk 34 {item:554=1, item:555=1, item:563=3, item:556=5}
+  alt       128t: Xeric's talisman: 4. Xeric's Heart → walk 85 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
+  alt       130t: Xeric's talisman: 3. Xeric's Inferno → walk 87 → Camelot Teleport → walk 34 {charge:13393=1, item:556=5, item:563=1}
 skill:SHERLOCK:score a goal in skullball.
   best      114t: Ectophial → walk 69 → Camelot Teleport → walk 34 {item:556=5, item:563=1}
   alt       185t (rank 215): Kourend Castle Teleport → walk 103 → Tyss: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 34 → Camelot tablet → walk 34 {item:554=1, item:555=1, item:563=3, item:557=1, item:566=1, item:8010=1} leaves you on ARCEUUS
