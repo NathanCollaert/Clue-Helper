@@ -1,7 +1,5 @@
 package com.cluehelper.route;
 
-import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.DiggingDog;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.ClueTypes;
@@ -50,7 +48,6 @@ public class StepNeeds
 
 	private final Client client;
 	private final StashMemory stash;
-	private final ClueHelperConfig config;
 	private final GearPieces gearPieces;
 	private final AvailabilityService availability;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
@@ -58,11 +55,10 @@ public class StepNeeds
 	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
 
 	@Inject
-	StepNeeds(Client client, StashMemory stash, ClueHelperConfig config, GearPieces gearPieces, AvailabilityService availability)
+	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability)
 	{
 		this.client = client;
 		this.stash = stash;
-		this.config = config;
 		this.gearPieces = gearPieces;
 		this.availability = availability;
 	}
@@ -75,8 +71,7 @@ public class StepNeeds
 			return RequiredItems.NONE;
 		}
 		List<RequiredItems.Need> needs = new ArrayList<>();
-		boolean dog = config.diggingDog() == DiggingDog.ALWAYS;
-		if (requirements.getSpade() == SpadeNeed.SPADE || requirements.getSpade() == SpadeNeed.SPADE_OR_DIGGING_DOG && !dog)
+		if (requirements.getSpade() == SpadeNeed.SPADE)
 		{
 			needs.add(new RequiredItems.Need("spade", SPADE, false, SPADE_IN_CORE_TAG.contains(step.getType())));
 		}

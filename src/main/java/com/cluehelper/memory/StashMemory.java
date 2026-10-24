@@ -1,6 +1,5 @@
 package com.cluehelper.memory;
 
-import com.cluehelper.ClueHelperConfig;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +17,15 @@ import net.runelite.client.util.Text;
 
 /**
  * Client thread. Filled state has no var: the Clue Scroll plugin's tick (script 1479) is built state too and stays 1
- * for an emptied unit. So it is learned from the two Search chat lines.
+ * for an emptied unit. So a built unit counts as filled, as that tick suggests, until one of the two Search chat lines
+ * says otherwise.
  */
 @Singleton
 public class StashMemory
 {
 	public enum State
 	{
-		NOT_BUILT, FILLED, EMPTY, UNKNOWN
+		NOT_BUILT, FILLED, EMPTY
 	}
 
 	static final String KEY = "stash";
@@ -41,17 +41,15 @@ public class StashMemory
 		.collect(Collectors.toUnmodifiableSet());
 
 	private final Client client;
-	private final ClueHelperConfig config;
 	private final MemorySlot<Units> remembered;
 	private final Map<Integer, Integer> builtVarbits = new HashMap<>();
 	private int lastSearchObject = NOT_SEEN;
 	private int lastSearchTick;
 
 	@Inject
-	StashMemory(Client client, MemoryStore memory, ClueHelperConfig config)
+	StashMemory(Client client, MemoryStore memory)
 	{
 		this.client = client;
-		this.config = config;
 		this.remembered = memory.slot(KEY, Units.class, Units::new);
 	}
 
@@ -62,11 +60,7 @@ public class StashMemory
 			return State.NOT_BUILT;
 		}
 		Seen seen = remembered.get().units.get(objectId);
-		if (seen == null)
-		{
-			return config.stashBuiltIsFilled() ? State.FILLED : State.UNKNOWN;
-		}
-		return seen.filled ? State.FILLED : State.EMPTY;
+		return seen == null || seen.filled ? State.FILLED : State.EMPTY;
 	}
 
 	/**

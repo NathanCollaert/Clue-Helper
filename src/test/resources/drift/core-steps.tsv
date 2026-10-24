@@ -122,178 +122,178 @@ cipher:23170	*	cipher	hard	ANY_OF	2329,3689,0	npc 4293				none	2277	The cipher r
 cipher:23172	*	cipher	hard	ANY_OF	2541,3548,0	npc 2153				none	2276	The cipher reveals who to speak to next: IWPPLQTP
 cipher:28916	*	cipher	hard	ANY_OF	1559,3045,0	npc 13135				none	3510	The cipher reveals who to speak to next: BXJA UNJMNA YRCAR
 cipher:30929	*	cipher	hard	ANY_OF	1376,3037,0	npc 14762				none	5183	The cipher reveals who to speak to next: YAROYGR
-coordinate:12033	*	coordinate	medium	ANY_OF	2594,2899,0					spade or dog	1946	Dig at 2594,2899,0
-coordinate:12035	*	coordinate	medium	ANY_OF	3510,3074,0					spade or dog	1932	Dig at 3510,3074,0
-coordinate:12037	*	coordinate	medium	ANY_OF	3548,3560,0					spade or dog	1957	Dig at 3548,3560,0
-coordinate:12039	*	coordinate	medium	ANY_OF	2681,3653,0					spade or dog	1960	Dig at 2681,3653,0
-coordinate:12041	*	coordinate	medium	ANY_OF	2322,3061,0					spade or dog	1935	Dig at 2322,3061,0
-coordinate:12043	*	coordinate	medium	ANY_OF	3121,3384,0					spade or dog	1943	Dig at 3121,3384,0
-coordinate:12045	*	coordinate	medium	ANY_OF	2381,3468,0					spade or dog	1949	Dig at 2381,3468,0
-coordinate:12047	*	coordinate	medium	ANY_OF	2363,3531,0					spade or dog	1955	Dig at 2363,3531,0
-coordinate:12049	*	coordinate	medium	ANY_OF	2585,3505,0					spade or dog	1951	Dig at 2585,3505,0
-coordinate:12051	*	coordinate	medium	ANY_OF	3312,3375,0					spade or dog	1942	Dig at 3312,3375,0
-coordinate:12053	*	coordinate	medium	ANY_OF	3429,3523,0					spade or dog	1954	Dig at 3429,3523,0
-coordinate:12085	*	coordinate	elite	ANY_OF	3822,3562,0					spade or dog	2031	Dig at 3822,3562,0
-coordinate:12086	*	coordinate	elite	ANY_OF	3811,3060,0					spade or dog, light (fire pit 6534), light varbit 6534	2021	Dig at 3811,3060,0
-coordinate:12087	*	coordinate	elite	ANY_OF	2700,3808,0					spade or dog	2039	Dig at 2700,3808,0
-coordinate:12088	*	coordinate	elite	ANY_OF	3828,2848,0					spade or dog	2028	Dig at 3828,2848,0
-coordinate:12089	*	coordinate	elite	ANY_OF	2357,3151,0					spade or dog	2018	Dig at 2357,3151,0
-coordinate:12090	*	coordinate	elite	ANY_OF	2827,3740,0					spade or dog	2036	Dig at 2827,3740,0
-coordinate:12091	*	coordinate	elite	ANY_OF	3587,3180,0					spade or dog	2019	Dig at 3587,3180,0
-coordinate:12092	*	coordinate	elite	ANY_OF	2065,3923,0					spade or dog	2042	Dig at 2065,3923,0
-coordinate:12093	*	coordinate	elite	ANY_OF	3380,3963,0					spade or dog	2045	Dig at 3380,3963,0
-coordinate:12094	*	coordinate	elite	ANY_OF	2359,3799,0					spade or dog	2037	Dig at 2359,3799,0
-coordinate:12095	*	coordinate	elite	ANY_OF	3188,3933,0					spade or dog	2043	Dig at 3188,3933,0
-coordinate:12096	*	coordinate	elite	ANY_OF	2697,2705,0					spade or dog	2034	Dig at 2697,2705,0
-coordinate:12097	*	coordinate	elite	ANY_OF	3043,3940,0					spade or dog	2044	Dig at 3043,3940,0
-coordinate:12098	*	coordinate	elite	ANY_OF	2511,2980,0					spade or dog	2025	Dig at 2511,2980,0
-coordinate:12099	*	coordinate	elite	ANY_OF	3225,2838,0					spade or dog	2029	Dig at 3225,2838,0
-coordinate:12100	*	coordinate	elite	ANY_OF	3302,2988,0					spade or dog	2024	Dig at 3302,2988,0
-coordinate:12101	*	coordinate	elite	ANY_OF	3369,3894,0					spade or dog	2041	Dig at 3369,3894,0
-coordinate:12102	*	coordinate	elite	ANY_OF	2732,3372,0					spade or dog	2026	Dig at 2732,3372,0
-coordinate:12103	*	coordinate	elite	ANY_OF	3573,3425,0					spade or dog	2027	Dig at 3573,3425,0
-coordinate:12104	*	coordinate	elite	ANY_OF	2778,3678,0					spade or dog	2035	Dig at 2778,3678,0
-coordinate:12105	*	coordinate	elite	ANY_OF	2194,3807,0					spade or dog	2038	Dig at 2194,3807,0
-coordinate:12106	*	coordinate	elite	ANY_OF	2936,2721,0					spade or dog	2033	Dig at 2936,2721,0
-coordinate:12107	*	coordinate	elite	ANY_OF	2870,2997,0					spade or dog	2023	Dig at 2870,2997,0
-coordinate:12108	*	coordinate	elite	ANY_OF	3603,3564,0					spade or dog	2032	Dig at 3603,3564,0
-coordinate:12109	*	coordinate	elite	ANY_OF	3215,3835,0					spade or dog	2040	Dig at 3215,3835,0
-coordinate:12110	*	coordinate	elite	ANY_OF	2820,3078,0					spade or dog	2020	Dig at 2820,3078,0
-coordinate:12111	*	coordinate	elite	ANY_OF	2180,3282,0					spade or dog	2022	Dig at 2180,3282,0
+coordinate:12033	*	coordinate	medium	ANY_OF	2594,2899,0					spade	1946	Dig at 2594,2899,0
+coordinate:12035	*	coordinate	medium	ANY_OF	3510,3074,0					spade	1932	Dig at 3510,3074,0
+coordinate:12037	*	coordinate	medium	ANY_OF	3548,3560,0					spade	1957	Dig at 3548,3560,0
+coordinate:12039	*	coordinate	medium	ANY_OF	2681,3653,0					spade	1960	Dig at 2681,3653,0
+coordinate:12041	*	coordinate	medium	ANY_OF	2322,3061,0					spade	1935	Dig at 2322,3061,0
+coordinate:12043	*	coordinate	medium	ANY_OF	3121,3384,0					spade	1943	Dig at 3121,3384,0
+coordinate:12045	*	coordinate	medium	ANY_OF	2381,3468,0					spade	1949	Dig at 2381,3468,0
+coordinate:12047	*	coordinate	medium	ANY_OF	2363,3531,0					spade	1955	Dig at 2363,3531,0
+coordinate:12049	*	coordinate	medium	ANY_OF	2585,3505,0					spade	1951	Dig at 2585,3505,0
+coordinate:12051	*	coordinate	medium	ANY_OF	3312,3375,0					spade	1942	Dig at 3312,3375,0
+coordinate:12053	*	coordinate	medium	ANY_OF	3429,3523,0					spade	1954	Dig at 3429,3523,0
+coordinate:12085	*	coordinate	elite	ANY_OF	3822,3562,0					spade	2031	Dig at 3822,3562,0
+coordinate:12086	*	coordinate	elite	ANY_OF	3811,3060,0					spade, light (fire pit 6534), light varbit 6534	2021	Dig at 3811,3060,0
+coordinate:12087	*	coordinate	elite	ANY_OF	2700,3808,0					spade	2039	Dig at 2700,3808,0
+coordinate:12088	*	coordinate	elite	ANY_OF	3828,2848,0					spade	2028	Dig at 3828,2848,0
+coordinate:12089	*	coordinate	elite	ANY_OF	2357,3151,0					spade	2018	Dig at 2357,3151,0
+coordinate:12090	*	coordinate	elite	ANY_OF	2827,3740,0					spade	2036	Dig at 2827,3740,0
+coordinate:12091	*	coordinate	elite	ANY_OF	3587,3180,0					spade	2019	Dig at 3587,3180,0
+coordinate:12092	*	coordinate	elite	ANY_OF	2065,3923,0					spade	2042	Dig at 2065,3923,0
+coordinate:12093	*	coordinate	elite	ANY_OF	3380,3963,0					spade	2045	Dig at 3380,3963,0
+coordinate:12094	*	coordinate	elite	ANY_OF	2359,3799,0					spade	2037	Dig at 2359,3799,0
+coordinate:12095	*	coordinate	elite	ANY_OF	3188,3933,0					spade	2043	Dig at 3188,3933,0
+coordinate:12096	*	coordinate	elite	ANY_OF	2697,2705,0					spade	2034	Dig at 2697,2705,0
+coordinate:12097	*	coordinate	elite	ANY_OF	3043,3940,0					spade	2044	Dig at 3043,3940,0
+coordinate:12098	*	coordinate	elite	ANY_OF	2511,2980,0					spade	2025	Dig at 2511,2980,0
+coordinate:12099	*	coordinate	elite	ANY_OF	3225,2838,0					spade	2029	Dig at 3225,2838,0
+coordinate:12100	*	coordinate	elite	ANY_OF	3302,2988,0					spade	2024	Dig at 3302,2988,0
+coordinate:12101	*	coordinate	elite	ANY_OF	3369,3894,0					spade	2041	Dig at 3369,3894,0
+coordinate:12102	*	coordinate	elite	ANY_OF	2732,3372,0					spade	2026	Dig at 2732,3372,0
+coordinate:12103	*	coordinate	elite	ANY_OF	3573,3425,0					spade	2027	Dig at 3573,3425,0
+coordinate:12104	*	coordinate	elite	ANY_OF	2778,3678,0					spade	2035	Dig at 2778,3678,0
+coordinate:12105	*	coordinate	elite	ANY_OF	2194,3807,0					spade	2038	Dig at 2194,3807,0
+coordinate:12106	*	coordinate	elite	ANY_OF	2936,2721,0					spade	2033	Dig at 2936,2721,0
+coordinate:12107	*	coordinate	elite	ANY_OF	2870,2997,0					spade	2023	Dig at 2870,2997,0
+coordinate:12108	*	coordinate	elite	ANY_OF	3603,3564,0					spade	2032	Dig at 3603,3564,0
+coordinate:12109	*	coordinate	elite	ANY_OF	3215,3835,0					spade	2040	Dig at 3215,3835,0
+coordinate:12110	*	coordinate	elite	ANY_OF	2820,3078,0					spade	2020	Dig at 2820,3078,0
+coordinate:12111	*	coordinate	elite	ANY_OF	2180,3282,0					spade	2022	Dig at 2180,3282,0
 coordinate:1248,3751,0	*	coordinate	master	ANY_OF	1248,3751,0					spade	2071	Dig at 1248,3751,0
-coordinate:12554	*	coordinate	hard	ANY_OF	3081,3209,0					spade or dog	1967	Dig at 3081,3209,0
-coordinate:12556	*	coordinate	hard	ANY_OF	2505,3899,0					spade or dog	2007	Dig at 2505,3899,0
-coordinate:12558	*	coordinate	hard	ANY_OF	2699,3251,0					spade or dog	1969	Dig at 2699,3251,0
-coordinate:12560	*	coordinate	hard	ANY_OF	2841,3267,0					spade or dog	1972	Dig at 2841,3267,0
-coordinate:12562	*	coordinate	hard	ANY_OF	3544,3255,0					spade or dog	1971	Dig at 3544,3255,0
-coordinate:12564	*	coordinate	hard	ANY_OF	3302,3696,0					spade or dog	1992	Dig at 3302,3696,0
-coordinate:1410,3611,0	*	coordinate	hard	ANY_OF	1410,3611,0					spade or dog	2016	Dig at 1410,3611,0
+coordinate:12554	*	coordinate	hard	ANY_OF	3081,3209,0					spade	1967	Dig at 3081,3209,0
+coordinate:12556	*	coordinate	hard	ANY_OF	2505,3899,0					spade	2007	Dig at 2505,3899,0
+coordinate:12558	*	coordinate	hard	ANY_OF	2699,3251,0					spade	1969	Dig at 2699,3251,0
+coordinate:12560	*	coordinate	hard	ANY_OF	2841,3267,0					spade	1972	Dig at 2841,3267,0
+coordinate:12562	*	coordinate	hard	ANY_OF	3544,3255,0					spade	1971	Dig at 3544,3255,0
+coordinate:12564	*	coordinate	hard	ANY_OF	3302,3696,0					spade	1992	Dig at 3302,3696,0
+coordinate:1410,3611,0	*	coordinate	hard	ANY_OF	1410,3611,0					spade	2016	Dig at 1410,3611,0
 coordinate:1442,3878,0	*	coordinate	master	ANY_OF	1442,3878,0					spade	2077	Dig at 1442,3878,0
 coordinate:1451,3695,0	*	coordinate	master	ANY_OF	1451,3695,0					spade	2069	Dig at 1451,3695,0
 coordinate:1698,3792,0	*	coordinate	master	ANY_OF	1698,3792,0					spade	2072	Dig at 1698,3792,0
 coordinate:1761,3853,0	*	coordinate	master	ANY_OF	1761,3853,0					spade	2075	Dig at 1761,3853,0
 coordinate:1769,3418,0	*	coordinate	master	ANY_OF	1769,3418,0					spade	2082	Dig at 1769,3418,0
-coordinate:19774	*	coordinate	medium	ANY_OF	1476,3566,0					spade or dog	1958	Dig at 1476,3566,0
-coordinate:19813	*	coordinate	elite	ANY_OF	1773,3510,0					spade or dog	2030	Dig at 1773,3510,0
-coordinate:19840	*	coordinate	hard	ANY_OF	1479,3699,0					spade or dog	1993	Dig at 1479,3699,0
-coordinate:19842	*	coordinate	hard	ANY_OF	1460,3782,0					spade or dog	1998	Dig at 1460,3782,0
-coordinate:19844	*	coordinate	hard	ANY_OF	3546,3251,0					spade or dog	1970	Dig at 3546,3251,0
+coordinate:19774	*	coordinate	medium	ANY_OF	1476,3566,0					spade	1958	Dig at 1476,3566,0
+coordinate:19813	*	coordinate	elite	ANY_OF	1773,3510,0					spade	2030	Dig at 1773,3510,0
+coordinate:19840	*	coordinate	hard	ANY_OF	1479,3699,0					spade	1993	Dig at 1479,3699,0
+coordinate:19842	*	coordinate	hard	ANY_OF	1460,3782,0					spade	1998	Dig at 1460,3782,0
+coordinate:19844	*	coordinate	hard	ANY_OF	3546,3251,0					spade	1970	Dig at 3546,3251,0
 coordinate:2090,3863,0	*	coordinate	master	ANY_OF	2090,3863,0					spade	2076	Dig at 2090,3863,0
-coordinate:21526	*	coordinate	hard	ANY_OF	3771,3825,0					spade or dog	2002	Dig at 3771,3825,0
-coordinate:21527	*	coordinate	hard	ANY_OF	3765,3899,0					spade or dog	2006	Dig at 3765,3899,0
+coordinate:21526	*	coordinate	hard	ANY_OF	3771,3825,0					spade	2002	Dig at 3771,3825,0
+coordinate:21527	*	coordinate	hard	ANY_OF	3765,3899,0					spade	2006	Dig at 3765,3899,0
 coordinate:2155,3100,0	*	coordinate	master	ANY_OF	2155,3100,0					spade	2057	Dig at 2155,3100,0
 coordinate:2178,3209,0	*	coordinate	master	ANY_OF	2178,3209,0					spade	2056	Dig at 2178,3209,0
-coordinate:22000	*	coordinate	elite	ANY_OF	3560,3987,0					spade or dog	2051	Dig at 3560,3987,0
+coordinate:22000	*	coordinate	elite	ANY_OF	3560,3987,0					spade	2051	Dig at 3560,3987,0
 coordinate:2202,3825,0	*	coordinate	master	ANY_OF	2202,3825,0					spade	2074	Dig at 2202,3825,0
 coordinate:2217,3092,0	*	coordinate	master	ANY_OF	2217,3092,0					spade	2058	Dig at 2217,3092,0
 coordinate:2303,3328,0	*	coordinate	master	ANY_OF	2303,3328,0					spade	2063	Dig at 2303,3328,0
-coordinate:23135	*	coordinate	medium	ANY_OF	1247,3726,0					spade or dog	1963	Dig at 1247,3726,0
-coordinate:23136	*	coordinate	medium	ANY_OF	2828,3234,0					spade or dog	1962	Dig at 2828,3234,0
-coordinate:23137	*	coordinate	medium	ANY_OF	3764,3900,0					spade or dog	1964	Dig at 3764,3900,0
-coordinate:23146	*	coordinate	elite	ANY_OF	3051,3736,0					spade or dog	2046	Dig at 3051,3736,0
-coordinate:23147	*	coordinate	elite	ANY_OF	2872,3937,0					spade or dog	2048	Dig at 2872,3937,0
-coordinate:23148	*	coordinate	elite	ANY_OF	2316,3814,0					spade or dog	2047	Dig at 2316,3814,0
-coordinate:23167	*	coordinate	hard	ANY_OF	2341,3697,0					spade or dog	2013	Dig at 2341,3697,0
-coordinate:23168	*	coordinate	hard	ANY_OF	3143,3774,0					spade or dog	2014	Dig at 3143,3774,0
-coordinate:23169	*	coordinate	hard	ANY_OF	2970,3913,0					spade or dog	2015	Dig at 2970,3913,0
-coordinate:23770	*	coordinate	elite	ANY_OF	3246,6083,0					spade or dog	2050	Dig at 2222,3331,0
-coordinate:24253	*	coordinate	elite	ANY_OF	2484,4016,0					spade or dog	2049	Dig at 2484,4016,0
+coordinate:23135	*	coordinate	medium	ANY_OF	1247,3726,0					spade	1963	Dig at 1247,3726,0
+coordinate:23136	*	coordinate	medium	ANY_OF	2828,3234,0					spade	1962	Dig at 2828,3234,0
+coordinate:23137	*	coordinate	medium	ANY_OF	3764,3900,0					spade	1964	Dig at 3764,3900,0
+coordinate:23146	*	coordinate	elite	ANY_OF	3051,3736,0					spade	2046	Dig at 3051,3736,0
+coordinate:23147	*	coordinate	elite	ANY_OF	2872,3937,0					spade	2048	Dig at 2872,3937,0
+coordinate:23148	*	coordinate	elite	ANY_OF	2316,3814,0					spade	2047	Dig at 2316,3814,0
+coordinate:23167	*	coordinate	hard	ANY_OF	2341,3697,0					spade	2013	Dig at 2341,3697,0
+coordinate:23168	*	coordinate	hard	ANY_OF	3143,3774,0					spade	2014	Dig at 3143,3774,0
+coordinate:23169	*	coordinate	hard	ANY_OF	2970,3913,0					spade	2015	Dig at 2970,3913,0
+coordinate:23770	*	coordinate	elite	ANY_OF	3246,6083,0					spade	2050	Dig at 2222,3331,0
+coordinate:24253	*	coordinate	elite	ANY_OF	2484,4016,0					spade	2049	Dig at 2484,4016,0
 coordinate:2538,3739,0	*	coordinate	master	ANY_OF	2538,3739,0					spade	2070	Dig at 2538,3739,0
-coordinate:25498	*	coordinate	elite	ANY_OF	2094,2889,0					spade or dog	2053	Dig at 2094,2889,0
-coordinate:25499	*	coordinate	elite	ANY_OF	2318,2954,0					spade or dog	2052	Dig at 2318,2954,0
-coordinate:25787	*	coordinate	elite	ANY_OF	1451,3509,0					spade or dog	2054	Dig at 1451,3509,0
-coordinate:25790	*	coordinate	hard	ANY_OF	1409,3483,0					spade or dog	2017	Dig at 1409,3483,0
-coordinate:26944	*	coordinate	elite	ANY_OF	3318,2706,0					spade or dog	2055	Dig at 3318,2706,0
-coordinate:2723	*	coordinate	hard	ANY_OF	3058,3884,0					spade or dog	2004	Dig at 3058,3884,0
-coordinate:2725	*	coordinate	hard	ANY_OF	2987,3963,0					spade or dog	2011	Dig at 2987,3963,0
-coordinate:2727	*	coordinate	hard	ANY_OF	3159,3959,0					spade or dog	2009	Dig at 3159,3959,0
-coordinate:2729	*	coordinate	hard	ANY_OF	3189,3963,0					spade or dog	2012	Dig at 3189,3963,0
-coordinate:2731	*	coordinate	hard	ANY_OF	3290,3889,0					spade or dog	2005	Dig at 3290,3889,0
+coordinate:25498	*	coordinate	elite	ANY_OF	2094,2889,0					spade	2053	Dig at 2094,2889,0
+coordinate:25499	*	coordinate	elite	ANY_OF	2318,2954,0					spade	2052	Dig at 2318,2954,0
+coordinate:25787	*	coordinate	elite	ANY_OF	1451,3509,0					spade	2054	Dig at 1451,3509,0
+coordinate:25790	*	coordinate	hard	ANY_OF	1409,3483,0					spade	2017	Dig at 1409,3483,0
+coordinate:26944	*	coordinate	elite	ANY_OF	3318,2706,0					spade	2055	Dig at 3318,2706,0
+coordinate:2723	*	coordinate	hard	ANY_OF	3058,3884,0					spade	2004	Dig at 3058,3884,0
+coordinate:2725	*	coordinate	hard	ANY_OF	2987,3963,0					spade	2011	Dig at 2987,3963,0
+coordinate:2727	*	coordinate	hard	ANY_OF	3159,3959,0					spade	2009	Dig at 3159,3959,0
+coordinate:2729	*	coordinate	hard	ANY_OF	3189,3963,0					spade	2012	Dig at 3189,3963,0
+coordinate:2731	*	coordinate	hard	ANY_OF	3290,3889,0					spade	2005	Dig at 3290,3889,0
 coordinate:2732,3284,0	*	coordinate	master	ANY_OF	2732,3284,0					spade	2061	Dig at 2732,3284,0
-coordinate:2733	*	coordinate	hard	ANY_OF	3140,3804,0					spade or dog	2000	Dig at 3140,3804,0
-coordinate:2735	*	coordinate	hard	ANY_OF	2946,3819,0					spade or dog	2001	Dig at 2946,3819,0
-coordinate:2737	*	coordinate	hard	ANY_OF	3013,3846,0					spade or dog	2003	Dig at 3013,3846,0
-coordinate:2739	*	coordinate	hard	ANY_OF	3039,3960,0					spade or dog	2010	Dig at 3039,3960,0
-coordinate:2741	*	coordinate	hard	ANY_OF	3244,3792,0					spade or dog	1999	Dig at 3244,3792,0
-coordinate:2743	*	coordinate	hard	ANY_OF	3168,3677,0					spade or dog	1988	Dig at 3168,3677,0
-coordinate:2745	*	coordinate	hard	ANY_OF	3055,3696,0					spade or dog	1991	Dig at 3055,3696,0
-coordinate:2747	*	coordinate	hard	ANY_OF	3311,3769,0					spade or dog	1997	Dig at 3311,3769,0
-coordinate:2801	*	coordinate	medium	ANY_OF	3160,3251,0					spade or dog	1933	Dig at 3160,3251,0
-coordinate:2803	*	coordinate	medium	ANY_OF	2679,3110,0					spade or dog	1931	Dig at 2679,3110,0
-coordinate:2805	*	coordinate	medium	ANY_OF	2697,3207,0					spade or dog	1930	Dig at 2697,3207,0
-coordinate:2807	*	coordinate	medium	ANY_OF	2383,3370,0					spade or dog	1941	Dig at 2383,3370,0
-coordinate:2809	*	coordinate	medium	ANY_OF	2479,3158,0					spade or dog	1923	Dig at 2479,3158,0
-coordinate:2811	*	coordinate	medium	ANY_OF	2512,3467,0					spade or dog	1948	Dig at 2512,3467,0
-coordinate:2813	*	coordinate	medium	ANY_OF	2643,3252,0					spade or dog	1934	Dig at 2643,3252,0
-coordinate:2815	*	coordinate	medium	ANY_OF	2848,3296,0					spade or dog	1938	Dig at 2848,3296,0
-coordinate:2817	*	coordinate	medium	ANY_OF	2849,3033,0					spade or dog	1937	Dig at 2849,3033,0
-coordinate:2819	*	coordinate	medium	ANY_OF	3007,3144,0					spade or dog	1928	Dig at 3007,3144,0
-coordinate:2821	*	coordinate	medium	ANY_OF	2920,3403,0					spade or dog	1945	Dig at 2920,3403,0
-coordinate:2823	*	coordinate	medium	ANY_OF	3217,3177,0					spade or dog	1927	Dig at 3217,3177,0
-coordinate:2825	*	coordinate	medium	ANY_OF	3179,3344,0					spade or dog	1940	Dig at 3179,3344,0
+coordinate:2733	*	coordinate	hard	ANY_OF	3140,3804,0					spade	2000	Dig at 3140,3804,0
+coordinate:2735	*	coordinate	hard	ANY_OF	2946,3819,0					spade	2001	Dig at 2946,3819,0
+coordinate:2737	*	coordinate	hard	ANY_OF	3013,3846,0					spade	2003	Dig at 3013,3846,0
+coordinate:2739	*	coordinate	hard	ANY_OF	3039,3960,0					spade	2010	Dig at 3039,3960,0
+coordinate:2741	*	coordinate	hard	ANY_OF	3244,3792,0					spade	1999	Dig at 3244,3792,0
+coordinate:2743	*	coordinate	hard	ANY_OF	3168,3677,0					spade	1988	Dig at 3168,3677,0
+coordinate:2745	*	coordinate	hard	ANY_OF	3055,3696,0					spade	1991	Dig at 3055,3696,0
+coordinate:2747	*	coordinate	hard	ANY_OF	3311,3769,0					spade	1997	Dig at 3311,3769,0
+coordinate:2801	*	coordinate	medium	ANY_OF	3160,3251,0					spade	1933	Dig at 3160,3251,0
+coordinate:2803	*	coordinate	medium	ANY_OF	2679,3110,0					spade	1931	Dig at 2679,3110,0
+coordinate:2805	*	coordinate	medium	ANY_OF	2697,3207,0					spade	1930	Dig at 2697,3207,0
+coordinate:2807	*	coordinate	medium	ANY_OF	2383,3370,0					spade	1941	Dig at 2383,3370,0
+coordinate:2809	*	coordinate	medium	ANY_OF	2479,3158,0					spade	1923	Dig at 2479,3158,0
+coordinate:2811	*	coordinate	medium	ANY_OF	2512,3467,0					spade	1948	Dig at 2512,3467,0
+coordinate:2813	*	coordinate	medium	ANY_OF	2643,3252,0					spade	1934	Dig at 2643,3252,0
+coordinate:2815	*	coordinate	medium	ANY_OF	2848,3296,0					spade	1938	Dig at 2848,3296,0
+coordinate:2817	*	coordinate	medium	ANY_OF	2849,3033,0					spade	1937	Dig at 2849,3033,0
+coordinate:2819	*	coordinate	medium	ANY_OF	3007,3144,0					spade	1928	Dig at 3007,3144,0
+coordinate:2821	*	coordinate	medium	ANY_OF	2920,3403,0					spade	1945	Dig at 2920,3403,0
+coordinate:2823	*	coordinate	medium	ANY_OF	3217,3177,0					spade	1927	Dig at 3217,3177,0
+coordinate:2825	*	coordinate	medium	ANY_OF	3179,3344,0					spade	1940	Dig at 3179,3344,0
 coordinate:2834,3271,0	*	coordinate	master	ANY_OF	2834,3271,0					spade	2060	Dig at 2834,3271,0
 coordinate:2840,3423,0	*	coordinate	master	ANY_OF	2840,3423,0					spade	2065	Dig at 2840,3423,0
-coordinate:28909	*	coordinate	medium	ANY_OF	1659,3111,0					spade or dog	3505	Dig at 1659,3111,0
-coordinate:28912	*	coordinate	elite	ANY_OF	1557,3183,0					spade or dog	3506	Dig at 1557,3183,0
+coordinate:28909	*	coordinate	medium	ANY_OF	1659,3111,0					spade	3505	Dig at 1659,3111,0
+coordinate:28912	*	coordinate	elite	ANY_OF	1557,3183,0					spade	3506	Dig at 1557,3183,0
 coordinate:2934,2727,0	*	coordinate	master	ANY_OF	2934,2727,0					spade	2068	Dig at 2934,2727,0
 coordinate:2951,3820,0	*	coordinate	master	ANY_OF	2951,3820,0					spade	2073	Dig at 2951,3820,0
-coordinate:29855	*	coordinate	elite	ANY_OF	1571,3245,0					spade or dog	3697	Dig at 1571,3245,0
+coordinate:29855	*	coordinate	elite	ANY_OF	1571,3245,0					spade	3697	Dig at 1571,3245,0
 coordinate:3028,3928,0	*	coordinate	master	ANY_OF	3028,3928,0					spade	2081	Dig at 3028,3928,0
 coordinate:3085,3569,0	*	coordinate	master	ANY_OF	3085,3569,0					spade	2067	Dig at 3085,3569,0
-coordinate:30931	*	coordinate	hard	ANY_OF	1321,3323,0					spade or dog	5171	Dig at 1321,3323,0
-coordinate:31271	*	coordinate	elite	ANY_OF	2081,3184,0					spade or dog	7044	Dig at 2081,3184,0
-coordinate:31273	*	coordinate	hard	ANY_OF	1193,2774,0					spade or dog	7043	Dig at 1193,2774,0
-coordinate:31275	*	coordinate	medium	ANY_OF	3183,2453,0					spade or dog	7042	Dig at 3183,2453,0
+coordinate:30931	*	coordinate	hard	ANY_OF	1321,3323,0					spade	5171	Dig at 1321,3323,0
+coordinate:31271	*	coordinate	elite	ANY_OF	2081,3184,0					spade	7044	Dig at 2081,3184,0
+coordinate:31273	*	coordinate	hard	ANY_OF	1193,2774,0					spade	7043	Dig at 1193,2774,0
+coordinate:31275	*	coordinate	medium	ANY_OF	3183,2453,0					spade	7042	Dig at 3183,2453,0
 coordinate:3188,3939,0	*	coordinate	master	ANY_OF	3188,3939,0					spade	2079	Dig at 3188,3939,0
 coordinate:3304,3941,0	*	coordinate	master	ANY_OF	3304,3941,0					spade	2080	Dig at 3304,3941,0
 coordinate:3380,3929,0	*	coordinate	master	ANY_OF	3380,3929,0					spade	2078	Dig at 3380,3929,0
-coordinate:3526	*	coordinate	hard	ANY_OF	2892,3675,0					spade or dog	1987	Dig at 2892,3675,0
-coordinate:3528	*	coordinate	hard	ANY_OF	2853,3690,0					spade or dog	1989	Dig at 2853,3690,0
-coordinate:3530	*	coordinate	hard	ANY_OF	2763,2974,0					spade or dog	1979	Dig at 2763,2974,0
-coordinate:3532	*	coordinate	hard	ANY_OF	2775,2891,0					spade or dog	1985	Dig at 2775,2891,0
-coordinate:3534	*	coordinate	hard	ANY_OF	2838,2914,0					spade or dog	1982	Dig at 2838,2914,0
-coordinate:3536	*	coordinate	hard	ANY_OF	2950,2902,0					spade or dog	1984	Dig at 2950,2902,0
-coordinate:3538	*	coordinate	hard	ANY_OF	2961,3024,0					spade or dog	1976	Dig at 2961,3024,0
-coordinate:3540	*	coordinate	hard	ANY_OF	2924,2963,0					spade or dog	1981	Dig at 2924,2963,0
-coordinate:3542	*	coordinate	hard	ANY_OF	3440,3341,0					spade or dog	1978	Dig at 3440,3341,0
-coordinate:3544	*	coordinate	hard	ANY_OF	3441,3419,0					spade or dog	1983	Dig at 3441,3419,0
-coordinate:3546	*	coordinate	hard	ANY_OF	2542,3031,0					spade or dog	1974	Dig at 2542,3031,0
-coordinate:3548	*	coordinate	hard	ANY_OF	2581,3030,0					spade or dog	1975	Dig at 2581,3030,0
-coordinate:3552	*	coordinate	hard	ANY_OF	3168,3041,0					spade or dog	1973	Dig at 3168,3041,0
-coordinate:3554	*	coordinate	hard	ANY_OF	3399,3246,0					spade or dog	1968	Dig at 3399,3246,0
-coordinate:3556	*	coordinate	hard	ANY_OF	3094,3764,0					spade or dog	1996	Dig at 3094,3764,0
-coordinate:3558	*	coordinate	hard	ANY_OF	3285,3942,0					spade or dog	2008	Dig at 3285,3942,0
-coordinate:3560	*	coordinate	hard	ANY_OF	2209,3161,0					spade or dog	1965	Dig at 2209,3161,0
-coordinate:3562	*	coordinate	hard	ANY_OF	2181,3206,0					spade or dog	1966	Dig at 2181,3206,0
+coordinate:3526	*	coordinate	hard	ANY_OF	2892,3675,0					spade	1987	Dig at 2892,3675,0
+coordinate:3528	*	coordinate	hard	ANY_OF	2853,3690,0					spade	1989	Dig at 2853,3690,0
+coordinate:3530	*	coordinate	hard	ANY_OF	2763,2974,0					spade	1979	Dig at 2763,2974,0
+coordinate:3532	*	coordinate	hard	ANY_OF	2775,2891,0					spade	1985	Dig at 2775,2891,0
+coordinate:3534	*	coordinate	hard	ANY_OF	2838,2914,0					spade	1982	Dig at 2838,2914,0
+coordinate:3536	*	coordinate	hard	ANY_OF	2950,2902,0					spade	1984	Dig at 2950,2902,0
+coordinate:3538	*	coordinate	hard	ANY_OF	2961,3024,0					spade	1976	Dig at 2961,3024,0
+coordinate:3540	*	coordinate	hard	ANY_OF	2924,2963,0					spade	1981	Dig at 2924,2963,0
+coordinate:3542	*	coordinate	hard	ANY_OF	3440,3341,0					spade	1978	Dig at 3440,3341,0
+coordinate:3544	*	coordinate	hard	ANY_OF	3441,3419,0					spade	1983	Dig at 3441,3419,0
+coordinate:3546	*	coordinate	hard	ANY_OF	2542,3031,0					spade	1974	Dig at 2542,3031,0
+coordinate:3548	*	coordinate	hard	ANY_OF	2581,3030,0					spade	1975	Dig at 2581,3030,0
+coordinate:3552	*	coordinate	hard	ANY_OF	3168,3041,0					spade	1973	Dig at 3168,3041,0
+coordinate:3554	*	coordinate	hard	ANY_OF	3399,3246,0					spade	1968	Dig at 3399,3246,0
+coordinate:3556	*	coordinate	hard	ANY_OF	3094,3764,0					spade	1996	Dig at 3094,3764,0
+coordinate:3558	*	coordinate	hard	ANY_OF	3285,3942,0					spade	2008	Dig at 3285,3942,0
+coordinate:3560	*	coordinate	hard	ANY_OF	2209,3161,0					spade	1965	Dig at 2209,3161,0
+coordinate:3562	*	coordinate	hard	ANY_OF	2181,3206,0					spade	1966	Dig at 2181,3206,0
 coordinate:3570,3405,0	*	coordinate	master	ANY_OF	3570,3405,0					spade	2064	Dig at 3570,3405,0
-coordinate:3582	*	coordinate	medium	ANY_OF	3443,3515,0					spade or dog	1952	Dig at 3443,3515,0
-coordinate:3584	*	coordinate	medium	ANY_OF	3430,3388,0					spade or dog	1944	Dig at 3430,3388,0
-coordinate:3586	*	coordinate	medium	ANY_OF	2919,3535,0					spade or dog	1956	Dig at 2919,3535,0
-coordinate:3588	*	coordinate	medium	ANY_OF	2887,3154,0					spade or dog	1924	Dig at 2887,3154,0
-coordinate:3590	*	coordinate	medium	ANY_OF	2743,3151,0					spade or dog	1925	Dig at 2743,3151,0
-coordinate:3592	*	coordinate	medium	ANY_OF	2387,3435,0					spade or dog	1947	Dig at 2387,3435,0
-coordinate:3594	*	coordinate	medium	ANY_OF	2416,3516,0					spade or dog	1953	Dig at 2416,3516,0
+coordinate:3582	*	coordinate	medium	ANY_OF	3443,3515,0					spade	1952	Dig at 3443,3515,0
+coordinate:3584	*	coordinate	medium	ANY_OF	3430,3388,0					spade	1944	Dig at 3430,3388,0
+coordinate:3586	*	coordinate	medium	ANY_OF	2919,3535,0					spade	1956	Dig at 2919,3535,0
+coordinate:3588	*	coordinate	medium	ANY_OF	2887,3154,0					spade	1924	Dig at 2887,3154,0
+coordinate:3590	*	coordinate	medium	ANY_OF	2743,3151,0					spade	1925	Dig at 2743,3151,0
+coordinate:3592	*	coordinate	medium	ANY_OF	2387,3435,0					spade	1947	Dig at 2387,3435,0
+coordinate:3594	*	coordinate	medium	ANY_OF	2416,3516,0					spade	1953	Dig at 2416,3516,0
 coordinate:3604,3564,0	*	coordinate	master	ANY_OF	3604,3564,0					spade	2066	Dig at 3604,3564,0
 coordinate:3622,3320,0	*	coordinate	master	ANY_OF	3622,3320,0					spade	2062	Dig at 3622,3320,0
 coordinate:3830,3060,0	*	coordinate	master	ANY_OF	3830,3060,0					spade, light (fire pit 6534), light varbit 6534	2059	Dig at 3830,3060,0
-coordinate:7256	*	coordinate	hard	ANY_OF	2339,3311,0					spade or dog	1977	Dig at 2339,3311,0
-coordinate:7258	*	coordinate	hard	ANY_OF	3138,2969,0					spade or dog	1980	Dig at 3138,2969,0
-coordinate:7260	*	coordinate	hard	ANY_OF	2970,3749,0					spade or dog	1995	Dig at 2970,3749,0
-coordinate:7262	*	coordinate	hard	ANY_OF	3113,3602,0					spade or dog	1986	Dig at 3113,3602,0
-coordinate:7264	*	coordinate	hard	ANY_OF	3305,3692,0					spade or dog	1990	Dig at 3305,3692,0
-coordinate:7266	*	coordinate	hard	ANY_OF	2712,3732,0					spade or dog	1994	Dig at 2712,3732,0
-coordinate:7305	*	coordinate	medium	ANY_OF	2537,3881,0					spade or dog	1961	Dig at 2537,3881,0
-coordinate:7307	*	coordinate	medium	ANY_OF	2583,2990,0					spade or dog	1939	Dig at 2583,2990,0
-coordinate:7309	*	coordinate	medium	ANY_OF	2896,3119,0					spade or dog	1929	Dig at 2896,3119,0
-coordinate:7311	*	coordinate	medium	ANY_OF	3005,3475,0					spade or dog	1950	Dig at 3005,3475,0
-coordinate:7313	*	coordinate	medium	ANY_OF	3184,3150,0					spade or dog	1926	Dig at 3184,3150,0
-coordinate:7315	*	coordinate	medium	ANY_OF	2735,3638,0					spade or dog	1959	Dig at 2735,3638,0
-coordinate:7317	*	coordinate	medium	ANY_OF	2875,3046,0					spade or dog	1936	Dig at 2875,3046,0
+coordinate:7256	*	coordinate	hard	ANY_OF	2339,3311,0					spade	1977	Dig at 2339,3311,0
+coordinate:7258	*	coordinate	hard	ANY_OF	3138,2969,0					spade	1980	Dig at 3138,2969,0
+coordinate:7260	*	coordinate	hard	ANY_OF	2970,3749,0					spade	1995	Dig at 2970,3749,0
+coordinate:7262	*	coordinate	hard	ANY_OF	3113,3602,0					spade	1986	Dig at 3113,3602,0
+coordinate:7264	*	coordinate	hard	ANY_OF	3305,3692,0					spade	1990	Dig at 3305,3692,0
+coordinate:7266	*	coordinate	hard	ANY_OF	2712,3732,0					spade	1994	Dig at 2712,3732,0
+coordinate:7305	*	coordinate	medium	ANY_OF	2537,3881,0					spade	1961	Dig at 2537,3881,0
+coordinate:7307	*	coordinate	medium	ANY_OF	2583,2990,0					spade	1939	Dig at 2583,2990,0
+coordinate:7309	*	coordinate	medium	ANY_OF	2896,3119,0					spade	1929	Dig at 2896,3119,0
+coordinate:7311	*	coordinate	medium	ANY_OF	3005,3475,0					spade	1950	Dig at 3005,3475,0
+coordinate:7313	*	coordinate	medium	ANY_OF	3184,3150,0					spade	1926	Dig at 3184,3150,0
+coordinate:7315	*	coordinate	medium	ANY_OF	2735,3638,0					spade	1959	Dig at 2735,3638,0
+coordinate:7317	*	coordinate	medium	ANY_OF	2875,3046,0					spade	1936	Dig at 2875,3046,0
 cryptic:'a bag belt only?', he asked his balding brothers.	*	cryptic	hard	ANY_OF	3058,3487,0	Abbot Langley				none	1391	'A bag belt only?', he asked his balding brothers.
 cryptic:'see you in your dreams' said the vegetable man.	*	cryptic	elite	ANY_OF	2608,3116,0	Dominic Onion				none	1433	'See you in your dreams' said the vegetable man.
 cryptic:'small shoe.' often found with rod on mushroom.	*	cryptic	hard	ANY_OF	2476,3428,0	Gnome trainer				none	1381	'Small shoe.' Often found with rod on mushroom.
 cryptic:2 musical birds. dig in front of the spinning light.	*	cryptic	master	ANY_OF	2671,10396,0					spade	1490	2 musical birds. Dig in front of the spinning light.
-cryptic:46 is my number. my body is the colour of burnt orange and crawls among those with eight. three mouths i have, yet i cannot eat. my blinking blue eye hides my grave.	*	cryptic	hard	ANY_OF	3170,3885,0					spade or dog	1417	46 is my number. My body is the colour of burnt orange and crawls among those with eight. Three mouths I have, yet I cannot eat. My blinking blue eye hides my grave.
+cryptic:46 is my number. my body is the colour of burnt orange and crawls among those with eight. three mouths i have, yet i cannot eat. my blinking blue eye hides my grave.	*	cryptic	hard	ANY_OF	3170,3885,0					spade	1417	46 is my number. My body is the colour of burnt orange and crawls among those with eight. Three mouths I have, yet I cannot eat. My blinking blue eye hides my grave.
 cryptic:a chisel and hammer reside in his home, strange for one of magic. impress him with your magical equipment.	*	cryptic	master	ANY_OF	2682,3325,0	Wizard Cromperty				none	1477	A chisel and hammer reside in his home, strange for one of magic. Impress him with your magical equipment.
 cryptic:a crate found in the tower of a church is your next location.	*	cryptic	easy	ANY_OF	2612,3304,1			357		none	1294	A crate found in the tower of a church is your next location.
 cryptic:a demon's best friend holds the next step of this clue.	*	cryptic	elite	AREA	2855,9844,0					none	1464	A demon's best friend holds the next step of this clue.
@@ -304,11 +304,11 @@ cryptic:a great view - watch the rapidly drying hides get splashed. check the bo
 cryptic:a guthixian ring lies between two peaks. search the stones and you'll find what you seek.	*	cryptic	elite	ANY_OF	2922,3484,0			26633		none	1440	A Guthixian ring lies between two peaks. Search the stones and you'll find what you seek.
 cryptic:a massive battle rages beneath so be careful when you dig by the large broken crossbow.	*	cryptic	master	ANY_OF	2927,3761,0					spade	1492	A massive battle rages beneath so be careful when you dig by the large broken crossbow.
 cryptic:a reck you say; let's pray there aren't any ghosts.	*	cryptic	elite	ANY_OF	3242,3207,0	Father Aereck				none	1427	A reck you say; let's pray there aren't any ghosts.
-cryptic:a ring of water surrounds 4 powerful rings, dig above the ladder located there.	*	cryptic	elite	ANY_OF	1910,4367,0					spade or dog	1446	A ring of water surrounds 4 powerful rings, dig above the ladder located there.
+cryptic:a ring of water surrounds 4 powerful rings, dig above the ladder located there.	*	cryptic	elite	ANY_OF	1910,4367,0					spade	1446	A ring of water surrounds 4 powerful rings, dig above the ladder located there.
 cryptic:a town with a different sort of night-life is your destination. search for some crates in one of the houses.	*	cryptic	medium	ANY_OF	3498,3507,0			24344		none	1363	A town with a different sort of night-life is your destination. Search for some crates in one of the houses.
-cryptic:aggie i see. lonely and southern i feel. i am neither inside nor outside the house, yet no home would be complete without me. the treasure lies beneath me!	*	cryptic	hard	ANY_OF	3085,3255,0					spade or dog	1421	Aggie I see. Lonely and southern I feel. I am neither inside nor outside the house, yet no home would be complete without me. The treasure lies beneath me!
+cryptic:aggie i see. lonely and southern i feel. i am neither inside nor outside the house, yet no home would be complete without me. the treasure lies beneath me!	*	cryptic	hard	ANY_OF	3085,3255,0					spade	1421	Aggie I see. Lonely and southern I feel. I am neither inside nor outside the house, yet no home would be complete without me. The treasure lies beneath me!
 cryptic:always walking around the castle grounds and somehow knows everyone's age.	*	cryptic	beginner	ANY_OF	3221,3218,0	Hans				none	1233	Always walking around the castle grounds and somehow knows everyone's age.
-cryptic:and so on, and so on, and so on. walking from the land of many unimportant things leads to a choice of paths.	*	cryptic	hard	ANY_OF	2591,3879,0					spade or dog	1415	And so on, and so on, and so on. Walking from the land of many unimportant things leads to a choice of paths.
+cryptic:and so on, and so on, and so on. walking from the land of many unimportant things leads to a choice of paths.	*	cryptic	hard	ANY_OF	2591,3879,0					spade	1415	And so on, and so on, and so on. Walking from the land of many unimportant things leads to a choice of paths.
 cryptic:anger abbot langley.	*	cryptic	master	ANY_OF	3058,3487,0	Abbot Langley				none	1469	Anger Abbot Langley.
 cryptic:anger those who adhere to saradomin's edicts to prevent travel.	*	cryptic	master	AREA	3042,3236,0	Monk of Entrana	12082			none	1474	Anger those who adhere to Saradomin's edicts to prevent travel.
 cryptic:are you somewhat entertained?	*	cryptic	medium	ANY_OF	1802,9504,0	Gloria				none	3496	Are you somewhat entertained?
@@ -320,26 +320,26 @@ cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an
 cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an old god you desire.	2	cryptic	master	ANY_OF	3447,3547,1	Viggora				none	1495	Come brave adventurer, your sense is on fire. If you talk to me, it's an old god you desire.
 cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an old god you desire.	3	cryptic	master	ANY_OF	3121,9995,0	Viggora				none	1495	Come brave adventurer, your sense is on fire. If you talk to me, it's an old god you desire.
 cryptic:come have a cip with this great soot covered denizen.	*	cryptic	hard	ANY_OF	2527,3891,0	Miner Magnus				none	1370	Come have a cip with this great soot covered denizen.
-cryptic:come to the evil ledge, yew know yew want to. try not to get stung.	*	cryptic	hard	ANY_OF	3089,3468,0					spade or dog	1410	Come to the evil ledge, Yew know yew want to. Try not to get stung.
-cryptic:covered in shadows, the centre of the circle is where you will find the answer.	*	cryptic	hard	ANY_OF	3488,3289,0					spade or dog	1412	Covered in shadows, the centre of the circle is where you will find the answer.
+cryptic:come to the evil ledge, yew know yew want to. try not to get stung.	*	cryptic	hard	ANY_OF	3089,3468,0					spade	1410	Come to the evil ledge, Yew know yew want to. Try not to get stung.
+cryptic:covered in shadows, the centre of the circle is where you will find the answer.	*	cryptic	hard	ANY_OF	3488,3289,0					spade	1412	Covered in shadows, the centre of the circle is where you will find the answer.
 cryptic:crush the spirited earth.	*	cryptic	elite	AREA	1389,9313,0	Earthen Nagua				none	5180	Crush the spirited earth.
 cryptic:darkness wanders around me, but fills my mind with knowledge.	*	cryptic	master	ANY_OF	1633,3825,2	Biblia				none	1479	Darkness wanders around me, but fills my mind with knowledge.
-cryptic:desert insects is what i see. taking care of them was my responsibility. your solution is found by digging near me.	*	cryptic	elite	ANY_OF	3307,9505,0					spade or dog	1449	Desert insects is what I see. Taking care of them was my responsibility. Your solution is found by digging near me.
-cryptic:dig at a waterfall by the pines in the serpent's shadow.	*	cryptic	easy	ANY_OF	1490,3257,0					spade or dog	3695	Dig at a waterfall by the pines in the serpent's shadow.
-cryptic:dig between some ominous stones in falador.	*	cryptic	easy	ANY_OF	3040,3399,0					spade or dog	1349	Dig between some ominous stones in Falador.
-cryptic:dig by the giant's den entrance, looking out over lake molch.	*	cryptic	easy	ANY_OF	1418,3591,0					spade or dog	1354	Dig by the Giant's Den entrance, looking out over Lake Molch.
+cryptic:desert insects is what i see. taking care of them was my responsibility. your solution is found by digging near me.	*	cryptic	elite	ANY_OF	3307,9505,0					spade	1449	Desert insects is what I see. Taking care of them was my responsibility. Your solution is found by digging near me.
+cryptic:dig at a waterfall by the pines in the serpent's shadow.	*	cryptic	easy	ANY_OF	1490,3257,0					spade	3695	Dig at a waterfall by the pines in the serpent's shadow.
+cryptic:dig between some ominous stones in falador.	*	cryptic	easy	ANY_OF	3040,3399,0					spade	1349	Dig between some ominous stones in Falador.
+cryptic:dig by the giant's den entrance, looking out over lake molch.	*	cryptic	easy	ANY_OF	1418,3591,0					spade	1354	Dig by the Giant's Den entrance, looking out over Lake Molch.
 cryptic:dig in front of the icy arena where 1 of 4 was fought.	*	cryptic	master	ANY_OF	2874,3757,0					spade	1486	Dig in front of the icy arena where 1 of 4 was fought.
-cryptic:dig in the centre of a great kingdom of 5 cities.	*	cryptic	easy	ANY_OF	1639,3673,0					spade or dog	1352	Dig in the centre of a great kingdom of 5 cities.
-cryptic:dig in the lair of red wings, within the temple of the sun and moon.	*	cryptic	hard	ANY_OF	1820,9935,0					spade or dog	1424	Dig in the lair of red wings, within the temple of the Sun and Moon.
-cryptic:dig near some giant mushrooms, behind the grand tree.	*	cryptic	easy	ANY_OF	2458,3504,0					spade or dog	1350	Dig near some giant mushrooms, behind the Grand Tree.
-cryptic:dig outside the bank on aldarin.	*	cryptic	easy	ANY_OF	1390,2926,0					spade or dog	3812	Dig outside the bank on Aldarin.
-cryptic:dig under ithoi's cabin.	*	cryptic	easy	ANY_OF	2529,2838,0					spade or dog	1353	Dig under Ithoi's cabin.
-cryptic:dig under razorlor's toad batta.	*	cryptic	elite	ANY_OF	3139,4554,0					spade or dog	1447	Dig under Razorlor's toad batta.
-cryptic:dig where 4 siblings and i all live with our evil overlord.	*	cryptic	hard	ANY_OF	3195,3357,0					spade or dog	1416	Dig where 4 siblings and I all live with our evil overlord.
-cryptic:dig where only the skilled, the wealthy, or the brave can choose not to visit again.	*	cryptic	easy	ANY_OF	3221,3219,0					spade or dog	1351	Dig where only the skilled, the wealthy, or the brave can choose not to visit again.
-cryptic:dig where the forces of zamorak and saradomin collide.	*	cryptic	elite	ANY_OF	3049,4839,0					spade or dog	1444	Dig where the forces of Zamorak and Saradomin collide.
+cryptic:dig in the centre of a great kingdom of 5 cities.	*	cryptic	easy	ANY_OF	1639,3673,0					spade	1352	Dig in the centre of a great kingdom of 5 cities.
+cryptic:dig in the lair of red wings, within the temple of the sun and moon.	*	cryptic	hard	ANY_OF	1820,9935,0					spade	1424	Dig in the lair of red wings, within the temple of the Sun and Moon.
+cryptic:dig near some giant mushrooms, behind the grand tree.	*	cryptic	easy	ANY_OF	2458,3504,0					spade	1350	Dig near some giant mushrooms, behind the Grand Tree.
+cryptic:dig outside the bank on aldarin.	*	cryptic	easy	ANY_OF	1390,2926,0					spade	3812	Dig outside the bank on Aldarin.
+cryptic:dig under ithoi's cabin.	*	cryptic	easy	ANY_OF	2529,2838,0					spade	1353	Dig under Ithoi's cabin.
+cryptic:dig under razorlor's toad batta.	*	cryptic	elite	ANY_OF	3139,4554,0					spade	1447	Dig under Razorlor's toad batta.
+cryptic:dig where 4 siblings and i all live with our evil overlord.	*	cryptic	hard	ANY_OF	3195,3357,0					spade	1416	Dig where 4 siblings and I all live with our evil overlord.
+cryptic:dig where only the skilled, the wealthy, or the brave can choose not to visit again.	*	cryptic	easy	ANY_OF	3221,3219,0					spade	1351	Dig where only the skilled, the wealthy, or the brave can choose not to visit again.
+cryptic:dig where the forces of zamorak and saradomin collide.	*	cryptic	elite	ANY_OF	3049,4839,0					spade	1444	Dig where the forces of Zamorak and Saradomin collide.
 cryptic:dobson is my last name, and with gardening i seek fame.	*	cryptic	elite	ANY_OF	2635,3310,0	Horacio				none	1434	Dobson is my last name, and with gardening I seek fame.
-cryptic:does one really need a fire to stay warm here?	*	cryptic	elite	ANY_OF	3816,3810,0					spade or dog	1451	Does one really need a fire to stay warm here?
+cryptic:does one really need a fire to stay warm here?	*	cryptic	elite	ANY_OF	3816,3810,0					spade	1451	Does one really need a fire to stay warm here?
 cryptic:elvish onions.	*	cryptic	master	ANY_OF	3303,6092,0					spade	1493	Elvish onions.
 cryptic:even the seers say this clue goes right over their heads.	*	cryptic	elite	ANY_OF	2707,3488,2			14934		none	1441	Even the seers say this clue goes right over their heads.
 cryptic:faint sounds of 'arr', fire giants found deep, the eastern tip of a lake, are the rewards you could reap.	*	cryptic	master	ANY_OF	3055,10338,0					spade	1484	Faint sounds of 'Arr', fire giants found deep, the eastern tip of a lake, are the rewards you could reap.
@@ -353,7 +353,7 @@ cryptic:go to the village being attacked by trolls, search the drawers in one of
 cryptic:go to this building to be illuminated, and check the drawers while you are there.	*	cryptic	medium	SEQUENCE	2643,3677,0|2512,3641,1	Market Guard	10553	350		none	2283	Go to this building to be illuminated, and check the drawers while you are there.
 cryptic:gold i see, yet gold i require. give me 875 if death you desire.	*	cryptic	hard	ANY_OF	2745,3151,0	Saniboch				none	1375	Gold I see, yet gold I require. Give me 875 if death you desire.
 cryptic:great demons, dragons and spiders protect this blue rock, beneath which, you may find what you seek.	*	cryptic	master	ANY_OF	3045,10265,0					spade	1483	Great demons, dragons and spiders protect this blue rock, beneath which, you may find what you seek.
-cryptic:green is the colour of my death as the winter-guise, i swoop towards the ground.	*	cryptic	elite	ANY_OF	2780,3783,0					spade or dog	1443	Green is the colour of my death as the winter-guise, I swoop towards the ground.
+cryptic:green is the colour of my death as the winter-guise, i swoop towards the ground.	*	cryptic	elite	ANY_OF	2780,3783,0					spade	1443	Green is the colour of my death as the winter-guise, I swoop towards the ground.
 cryptic:guthix left his mark in a fiery lake, dig at the tip of it.	*	cryptic	master	ANY_OF	3069,3935,0					spade	1491	Guthix left his mark in a fiery lake, dig at the tip of it.
 cryptic:has no one told you it is rude to ask a lady her age?	*	cryptic	elite	ANY_OF	2333,3165,0	Mawrth				none	1438	Has no one told you it is rude to ask a lady her age?
 cryptic:he knows just how easy it is to lose track of time.	*	cryptic	hard	ANY_OF	2570,3250,0	Brother Kojo				none	1369	He knows just how easy it is to lose track of time.
@@ -362,14 +362,14 @@ cryptic:here, there are tears, but nobody is crying. speak to the guardian and s
 cryptic:his bark is worse than his bite.	*	cryptic	elite	ANY_OF	3499,3503,0	Barker				none	1429	His bark is worse than his bite.
 cryptic:his head might be hollow, but the crates nearby are filled with surprises.	*	cryptic	hard	ANY_OF	3478,3091,0			354		none	1394	His head might be hollow, but the crates nearby are filled with surprises.
 cryptic:hopefully this set of armour will help you to keep surviving.	*	cryptic	master	ANY_OF	2982,3336,2	Sir Vyvin				none	1478	Hopefully this set of armour will help you to keep surviving.
-cryptic:i am a token of the greatest love. i have no beginning or end. my eye is red, i can fit like a glove. go to the place where it's money they lend, and dig by the gate to be my friend.	*	cryptic	hard	ANY_OF	3191,9825,0					spade or dog	1418	I am a token of the greatest love. I have no beginning or end. My eye is red, I can fit like a glove. Go to the place where it's money they lend, And dig by the gate to be my friend.
+cryptic:i am a token of the greatest love. i have no beginning or end. my eye is red, i can fit like a glove. go to the place where it's money they lend, and dig by the gate to be my friend.	*	cryptic	hard	ANY_OF	3191,9825,0					spade	1418	I am a token of the greatest love. I have no beginning or end. My eye is red, I can fit like a glove. Go to the place where it's money they lend, And dig by the gate to be my friend.
 cryptic:i am the one who watches the giants. the giants in turn watch me. i watch with two while they watch with one. come seek where i may be.	*	cryptic	elite	ANY_OF	2840,3538,0	Kamfreena				none	1431	I am the one who watches the giants. The giants in turn watch me. I watch with two while they watch with one. Come seek where I may be.
 cryptic:i burn between heroes and legends.	*	cryptic	elite	ANY_OF	2799,3438,0	Candle maker				none	1428	I burn between heroes and legends.
 cryptic:i have many arms but legs, i have just one. i have little family but my seed you can grow on, i am not dead, yet i am but a spirit, and my power, on your quests, you will earn the right to free it.	*	cryptic	hard	ANY_OF	2544,3170,0			1293		none	1371	I have many arms but legs, I have just one. I have little family but my seed you can grow on, I am not dead, yet I am but a spirit, and my power, on your quests, you will earn the right to free it.
 cryptic:i lie beneath the first descent to the holy encampment.	*	cryptic	master	ANY_OF	2914,5300,1					spade	1488	I lie beneath the first descent to the holy encampment.
-cryptic:i lie lonely and forgotten in mid wilderness, where the dead rise from their beds. feel free to quarrel and wind me up, and dig while you shoot their heads.	*	cryptic	hard	ANY_OF	3174,3663,0					spade or dog	1413	I lie lonely and forgotten in mid wilderness, where the dead rise from their beds. Feel free to quarrel and wind me up, and dig while you shoot their heads.
+cryptic:i lie lonely and forgotten in mid wilderness, where the dead rise from their beds. feel free to quarrel and wind me up, and dig while you shoot their heads.	*	cryptic	hard	ANY_OF	3174,3663,0					spade	1413	I lie lonely and forgotten in mid wilderness, where the dead rise from their beds. Feel free to quarrel and wind me up, and dig while you shoot their heads.
 cryptic:i live in a deserted crack collecting soles.	*	cryptic	elite	AREA	3371,9320,0	Genie	13457			light	1439	I live in a deserted crack collecting soles.
-cryptic:i sit on the beach and cry for those that have passed on.	*	cryptic	hard	ANY_OF	2324,2772,0					spade or dog	7045	I sit on the beach and cry for those that have passed on.
+cryptic:i sit on the beach and cry for those that have passed on.	*	cryptic	hard	ANY_OF	2324,2772,0					spade	7045	I sit on the beach and cry for those that have passed on.
 cryptic:i watch the sea. i watch you fish. i watch your tree.	*	cryptic	hard	ANY_OF	2860,3431,0	Ellena				none	1380	I watch the sea. I watch you fish. I watch your tree.
 cryptic:i wonder how many bronze swords he has handed out.	*	cryptic	easy	ANY_OF	3146,9913,0	Vannaka				none	1252	I wonder how many bronze swords he has handed out.
 cryptic:i would make a chemistry joke, but i'm afraid i wouldn't get a reaction.	*	cryptic	easy	ANY_OF	2932,3212,0	Chemist				none	1272	I would make a chemistry joke, but I'm afraid I wouldn't get a reaction.
@@ -391,17 +391,17 @@ cryptic:it seems to have reached the end of the line, and it's still empty.	*	cr
 cryptic:leader of the yak city.	*	cryptic	hard	ANY_OF	2336,3799,0	Mawnis Burowgar				none	1389	Leader of the Yak City.
 cryptic:let's hope you don't meet a watery death when you encounter this fiend.	*	cryptic	elite	AREA	1738,5348,0					none	1456	Let's hope you don't meet a watery death when you encounter this fiend.
 cryptic:look in the ground floor crates of houses in falador.	*	cryptic	easy	ANY_OF	3029,3355,0			24088		none	1288	Look in the ground floor crates of houses in Falador.
-cryptic:mine was the strangest birth under the sun. i left the crimson sack, yet life had not begun. entered the world, and yet was seen by none.	*	cryptic	hard	ANY_OF	2832,9586,0					spade or dog	1414	Mine was the strangest birth under the sun. I left the crimson sack, yet life had not begun. Entered the world, and yet was seen by none.
+cryptic:mine was the strangest birth under the sun. i left the crimson sack, yet life had not begun. entered the world, and yet was seen by none.	*	cryptic	hard	ANY_OF	2832,9586,0					spade	1414	Mine was the strangest birth under the sun. I left the crimson sack, yet life had not begun. Entered the world, and yet was seen by none.
 cryptic:mix yellow with blue and add heat, make sure you bring protection.	*	cryptic	elite	AREA	2977,3616,0					none	1462	Mix yellow with blue and add heat, make sure you bring protection.
 cryptic:monk's residence in the far west. see robe storage device.	*	cryptic	easy	ANY_OF	1746,3490,0			350		none	1331	Monk's residence in the far west. See robe storage device.
-cryptic:more resources than i can handle, but in a very dangerous area. can't wait to strike gold!	*	cryptic	elite	ANY_OF	3183,3941,0					spade or dog	1452	More resources than I can handle, but in a very dangerous area. Can't wait to strike gold!
+cryptic:more resources than i can handle, but in a very dangerous area. can't wait to strike gold!	*	cryptic	elite	ANY_OF	3183,3941,0					spade	1452	More resources than I can handle, but in a very dangerous area. Can't wait to strike gold!
 cryptic:must be full of railings.	*	cryptic	hard	ANY_OF	2576,3464,0			6176		none	1400	Must be full of railings.
-cryptic:my giant guardians below the market streets would be fans of rock and roll, if only they could grab hold of it. dig near my green bubbles!	*	cryptic	hard	ANY_OF	3161,9904,0					spade or dog	1422	My giant guardians below the market streets would be fans of rock and roll, if only they could grab hold of it. Dig near my green bubbles!
+cryptic:my giant guardians below the market streets would be fans of rock and roll, if only they could grab hold of it. dig near my green bubbles!	*	cryptic	hard	ANY_OF	3161,9904,0					spade	1422	My giant guardians below the market streets would be fans of rock and roll, if only they could grab hold of it. Dig near my green bubbles!
 cryptic:my home is grey, and made of stone; a castle with a search for a meal. hidden in some drawers i am, across from a wooden wheel.	*	cryptic	hard	ANY_OF	3213,3216,1			5618		none	1393	My home is grey, and made of stone; A castle with a search for a meal. Hidden in some drawers I am, across from a wooden wheel.
 cryptic:my life was spared but these voices remain, now guarding these iron gates is my bane.	*	cryptic	master	ANY_OF	1310,1251,0	Key Master				none	1466	My life was spared but these voices remain, now guarding these iron gates is my bane.
 cryptic:my name is like a tree, yet it is spelt with a 'g'. come see the fur which is right near me.	*	cryptic	hard	ANY_OF	3221,3435,0	Wilough				none	1384	My name is like a tree, yet it is spelt with a 'g'. Come see the fur which is right near me.
 cryptic:near the open desert i reside, to get past me you must abide. go forward if you dare, for when you pass me, you'll be sweating by your hair.	*	cryptic	beginner	ANY_OF	3303,3123,0	Shantay				none	1237	Near the open desert I reside, to get past me you must abide. Go forward if you dare, for when you pass me, you'll be sweating by your hair.
-cryptic:observing someone in a swamp, under the telescope lies treasure.	*	cryptic	elite	ANY_OF	2221,3091,0					spade or dog	1453	Observing someone in a swamp, under the telescope lies treasure.
+cryptic:observing someone in a swamp, under the telescope lies treasure.	*	cryptic	elite	ANY_OF	2221,3091,0					spade	1453	Observing someone in a swamp, under the telescope lies treasure.
 cryptic:often sought out by scholars of histories past, find me where words of wisdom speak volumes.	*	cryptic	hard	ANY_OF	3362,3341,0	Examiner				none	1386	Often sought out by scholars of histories past, find me where words of wisdom speak volumes.
 cryptic:one of several rhyming brothers, in business attire with an obsession for paper work.	*	cryptic	master	ANY_OF	3186,3936,0	Piles				none	1467	One of several rhyming brothers, in business attire with an obsession for paper work.
 cryptic:one of the sailors in port sarim is your next destination.	*	cryptic	easy	ANY_OF	3026,3216,0	Captain Tobias				none	1244	One of the sailors in Port Sarim is your next destination.
@@ -410,9 +410,9 @@ cryptic:probably filled with books on magic.	*	cryptic	hard	ANY_OF	3096,9572,0		
 cryptic:probably filled with wizards socks.	*	cryptic	medium	SEQUENCE	3109,3164,0|3116,9562,0	Wizard	12337|12437	350		none	2281	Probably filled with wizards socks.
 cryptic:read 'how to breed scorpions.' by o.w.thathurt.	*	cryptic	hard	ANY_OF	2703,3409,1			380		none	1401	Read 'How to breed scorpions.' By O.W.Thathurt.
 cryptic:reflection is the weakness for these eyes of evil.	*	cryptic	elite	AREA	2740,10008,0					none	1457	Reflection is the weakness for these eyes of evil.
-cryptic:right on the blessed border, cursed by the evil ones. on the spot inaccessible by both; i will be waiting. the bugs' imminent possession holds the answer.	*	cryptic	elite	ANY_OF	3410,3324,0					spade or dog	1442	Right on the blessed border, cursed by the evil ones. On the spot inaccessible by both; I will be waiting. The bugs' imminent possession holds the answer.
+cryptic:right on the blessed border, cursed by the evil ones. on the spot inaccessible by both; i will be waiting. the bugs' imminent possession holds the answer.	*	cryptic	elite	ANY_OF	3410,3324,0					spade	1442	Right on the blessed border, cursed by the evil ones. On the spot inaccessible by both; I will be waiting. The bugs' imminent possession holds the answer.
 cryptic:robin wishes to see your finest ranged equipment.	*	cryptic	master	ANY_OF	3673,3492,0	Robin				none	1468	Robin wishes to see your finest ranged equipment.
-cryptic:rotting next to a ditch. dig next to the fish.	*	cryptic	hard	ANY_OF	3547,3183,0					spade or dog	1419	Rotting next to a ditch. Dig next to the fish.
+cryptic:rotting next to a ditch. dig next to the fish.	*	cryptic	hard	ANY_OF	3547,3183,0					spade	1419	Rotting next to a ditch. Dig next to the fish.
 cryptic:salty peter.	*	cryptic	easy	ANY_OF	1703,3524,0	Konoo				none	1269	Salty peter.
 cryptic:scattered coins and gems fill the floor. the chest you seek is in the north east.	*	cryptic	elite	SEQUENCE	2273,4695,0|2288,4702,0	King Black Dragon		375		none	2289	Scattered coins and gems fill the floor. The chest you seek is in the north east.
 cryptic:search a bookcase in lumbridge swamp.	*	cryptic	easy	ANY_OF	3146,3177,0			9523		none	1312	Search a bookcase in Lumbridge Swamp.
@@ -538,14 +538,14 @@ cryptic:talk to the squire in the white knights' castle in falador.	*	cryptic	ea
 cryptic:talk to wayne at wayne's chains in falador.	*	cryptic	easy	ANY_OF	2972,3312,0	Wayne				none	1277	Talk to Wayne at Wayne's Chains in Falador.
 cryptic:talk to zeke in al kharid.	*	cryptic	easy	ANY_OF	3287,3190,0	Zeke				none	1270	Talk to Zeke in Al Kharid.
 cryptic:thanks, grandma!	*	cryptic	easy	ANY_OF	1836,3786,0	Tynan				none	1267	Thanks, Grandma!
-cryptic:the beasts retreat, for their queen is gone; the song of this town still plays on. dig near the birthplace of a blade, be careful not to melt your spade.	*	cryptic	elite	ANY_OF	2342,3677,0					spade or dog	1450	The beasts retreat, for their Queen is gone; the song of this town still plays on. Dig near the birthplace of a blade, be careful not to melt your spade.
-cryptic:the beasts to my east snap claws and tails, the rest to my west can slide and eat fish. the force to my north will jump and they'll wail, come dig by my fire and make a wish.	*	cryptic	hard	ANY_OF	2598,3267,0					spade or dog	1409	The beasts to my east snap claws and tails, The rest to my west can slide and eat fish. The force to my north will jump and they'll wail, Come dig by my fire and make a wish.
-cryptic:the big high war god left his mark on this place.	*	cryptic	hard	ANY_OF	3572,4372,0					spade or dog	1425	The Big High War God left his mark on this place.
+cryptic:the beasts retreat, for their queen is gone; the song of this town still plays on. dig near the birthplace of a blade, be careful not to melt your spade.	*	cryptic	elite	ANY_OF	2342,3677,0					spade	1450	The beasts retreat, for their Queen is gone; the song of this town still plays on. Dig near the birthplace of a blade, be careful not to melt your spade.
+cryptic:the beasts to my east snap claws and tails, the rest to my west can slide and eat fish. the force to my north will jump and they'll wail, come dig by my fire and make a wish.	*	cryptic	hard	ANY_OF	2598,3267,0					spade	1409	The beasts to my east snap claws and tails, The rest to my west can slide and eat fish. The force to my north will jump and they'll wail, Come dig by my fire and make a wish.
+cryptic:the big high war god left his mark on this place.	*	cryptic	hard	ANY_OF	3572,4372,0					spade	1425	The Big High War God left his mark on this place.
 cryptic:the cheapest water for miles around, but they react badly to religious icons.	*	cryptic	hard	ANY_OF	3178,2987,0			354		none	1404	The cheapest water for miles around, but they react badly to religious icons.
 cryptic:the dead, red dragon watches over this chest. he must really dig the view.	*	cryptic	medium	SEQUENCE	3082,3419,0|3353,3332,0	Barbarian		375		none	2279	The dead, red dragon watches over this chest. He must really dig the view.
 cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	0	cryptic	master	ANY_OF	2878,3546,0	Ghommal				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
 cryptic:the doorman of the warriors' guild wishes to be impressed by how strong your equipment is.	1,2,3,4,5,10,100	cryptic	master	ANY_OF	2878,3546,0	Laidee Gnonock|Ghommal				none	1475	The doorman of the Warriors' Guild wishes to be impressed by how strong your equipment is.
-cryptic:the effects of this fire are magnified.	*	cryptic	hard	ANY_OF	1179,3626,0					spade or dog	1423	The effects of this fire are magnified.
+cryptic:the effects of this fire are magnified.	*	cryptic	hard	ANY_OF	1179,3626,0					spade	1423	The effects of this fire are magnified.
 cryptic:the far north eastern corner where 1 of 4 was defeated, the shadows still linger.	*	cryptic	master	ANY_OF	2744,5116,0					spade	1487	The far north eastern corner where 1 of 4 was defeated, the shadows still linger.
 cryptic:the hand ain't listening.	*	cryptic	easy	ANY_OF	3019,3232,0	The Face				none	1265	The hand ain't listening.
 cryptic:the keeper of melzars... spare? skeleton? anar?	*	cryptic	hard	ANY_OF	3068,3516,0	Oziach				none	1372	The keeper of Melzars... Spare? Skeleton? Anar?
@@ -553,22 +553,22 @@ cryptic:the king's magic shouldn't be wasted by me.	*	cryptic	hard	ANY_OF	1934,4
 cryptic:the magic of 4 colours, an early experience you could learn. the large beast caged up top, rages, as his demised kin's loot now returns.	*	cryptic	hard	ANY_OF	3103,3163,2	Wizard Mizgog				none	1390	The magic of 4 colours, an early experience you could learn. The large beast caged up top, rages, as his demised kin's loot now returns.
 cryptic:the mother of the reptilian sacrifice.	*	cryptic	hard	ANY_OF	2204,3050,0	Zul-Cheray				none	1379	The mother of the reptilian sacrifice.
 cryptic:their bane awaits, but don't be going in there without permission.	*	cryptic	elite	ANY_OF	3176,2478,0	Shellbane gryphon				none	7046	Their bane awaits, but don't be going in there without permission.
-cryptic:they're everywhere!!!! but they were here first. dig for treasure where the ground is rich with ore.	*	cryptic	hard	ANY_OF	3081,3421,0					spade or dog	1411	THEY'RE EVERYWHERE!!!! But they were here first. Dig for treasure where the ground is rich with ore.
+cryptic:they're everywhere!!!! but they were here first. dig for treasure where the ground is rich with ore.	*	cryptic	hard	ANY_OF	3081,3421,0					spade	1411	THEY'RE EVERYWHERE!!!! But they were here first. Dig for treasure where the ground is rich with ore.
 cryptic:this aviator is at the peak of his profession.	*	cryptic	hard	ANY_OF	2847,3499,0	Captain Bleemadge				none	1377	This aviator is at the peak of his profession.
 cryptic:this crate holds a better reward than a broken arrow.	*	cryptic	medium	ANY_OF	2671,3437,0			356		none	1367	This crate holds a better reward than a broken arrow.
 cryptic:this crate is mine, all mine, even if it is in the middle of the desert.	*	cryptic	medium	ANY_OF	3289,3022,0			18889		none	1365	This crate is mine, all mine, even if it is in the middle of the desert.
 cryptic:this place sure is a mess.	*	cryptic	master	ANY_OF	1646,3631,0	Ewesey				none	1470	This place sure is a mess.
 cryptic:this village has a problem with cartloads of the undead. try checking the bookcase to find an answer.	*	cryptic	hard	ANY_OF	2833,2992,0			394		none	1405	This village has a problem with cartloads of the undead. Try checking the bookcase to find an answer.
-cryptic:three rule below and three sit at top. come dig at my entrance.	*	cryptic	elite	ANY_OF	2523,3739,0					spade or dog	1448	Three rule below and three sit at top. Come dig at my entrance.
+cryptic:three rule below and three sit at top. come dig at my entrance.	*	cryptic	elite	ANY_OF	2523,3739,0					spade	1448	Three rule below and three sit at top. Come dig at my entrance.
 cryptic:try not to let yourself be dazzled when you search these drawers.	*	cryptic	hard	ANY_OF	2561,3323,0			350		none	1408	Try not to let yourself be dazzled when you search these drawers.
 cryptic:try not to step on any aquatic nasties while searching this crate.	*	cryptic	medium	ANY_OF	2764,3273,0			18204		none	1366	Try not to step on any aquatic nasties while searching this crate.
 cryptic:under a giant robotic bird that cannot fly.	*	cryptic	master	ANY_OF	1756,4940,0					spade	1482	Under a giant robotic bird that cannot fly.
 cryptic:varrock is where i reside, not the land of the dead, but i am so old, i should be there instead. let's hope your reward is as good as it says, just 1 gold one and you can have it read.	*	cryptic	elite	ANY_OF	3203,3424,0	Aris				none	1435	Varrock is where I reside, not the land of the dead, but I am so old, I should be there instead. Let's hope your reward is as good as it says, just 1 gold one and you can have it read.
-cryptic:w marks the spot.	*	cryptic	elite	ANY_OF	2867,3546,0					spade or dog	1445	W marks the spot.
+cryptic:w marks the spot.	*	cryptic	elite	ANY_OF	2867,3546,0					spade	1445	W marks the spot.
 cryptic:when no weapons are at hand, then is the time to reflect. in saradomin's name, redemption draws closer...	*	cryptic	hard	ANY_OF	2818,3351,0			350		none	1399	When no weapons are at hand, then is the time to reflect. In Saradomin's name, redemption draws closer...
 cryptic:when you get tired of fighting, go deep, deep down until you need an antidote.	*	cryptic	hard	ANY_OF	2576,9583,0			357		none	1403	When you get tired of fighting, go deep, deep down until you need an antidote.
 cryptic:where safe to speak, the man who offers the pouch of smallest size wishes to see your alignment.	*	cryptic	master	AREA	3260,3385,0	Mage of Zamorak	12852			none	1472	Where safe to speak, the man who offers the pouch of smallest size wishes to see your alignment.
-cryptic:where the best are commemorated, and a celebratory cup, not just for beer.	*	cryptic	hard	ANY_OF	3388,3152,0					spade or dog	1420	Where the best are commemorated, and a celebratory cup, not just for beer.
+cryptic:where the best are commemorated, and a celebratory cup, not just for beer.	*	cryptic	hard	ANY_OF	3388,3152,0					spade	1420	Where the best are commemorated, and a celebratory cup, not just for beer.
 cryptic:with a name like that, you'd expect a little more than just a few scimitars.	*	cryptic	elite	ANY_OF	2759,2775,0	Daga				none	1436	With a name like that, you'd expect a little more than just a few scimitars.
 cryptic:with drinks and dwarves i make my way, upon my head a glass will stay.	*	cryptic	elite	ANY_OF	1432,9584,1	Funbo				none	3497	With drinks and dwarves I make my way, upon my head a glass will stay.
 cryptic:within the town of lumbridge lives a man named bob. he walks out of his door and takes 1 step east, 7 steps north, 5 steps west and 1 step south. once he arrives, he digs a hole and buries his treasure.	*	cryptic	quest	ANY_OF	3230,3209,0					spade	2298	Within the town of Lumbridge lives a man named Bob. He walks out of his door and takes 1 step east, 7 steps north, 5 steps west and 1 step south. Once he arrives, he digs a hole and buries his treasure.
@@ -707,17 +707,17 @@ emote:swing a bullroarer at the top of the watchtower. beware of double agents! 
 emote:think on the western coast of salvager overlook. beware of double agents! equip a hueycoatl hide coif and some hueycoatl hide vambraces.	*	emote	master	ANY_OF	1610,3302,0					2 item requirements	3693	Think on the western coast of Salvager Overlook. Beware of double agents! Equip a Hueycoatl hide coif and some Hueycoatl hide vambraces.
 emote:wave on the northern wall of castle drakan. beware of double agents! wear a dragon sq shield, splitbark body and any boater.	*	emote	master	ANY_OF	3562,3379,0					3 item requirements	2197	Wave on the northern wall of Castle Drakan. Beware of double agents! Wear a dragon sq shield, splitbark body and any boater.
 emote:yawn in the 7th room of pyramid plunder. beware of double agents! equip a pharaoh sceptre and a full set of menaphite robes.	*	emote	master	ANY_OF	1944,4427,0					2 item requirements	2198	Yawn in the 7th room of Pyramid Plunder. Beware of double agents! Equip a pharaoh sceptre and a full set of menaphite robes.
-fairyring:a i q 0 4 4 0	*	fairyring	hard	ANY_OF	3000,3110,0					spade or dog	1902	A I Q 0 4 4 0
-fairyring:a i r 2 3 3 1	*	fairyring	hard	ANY_OF	2702,3246,0					spade or dog	1901	A I R 2 3 3 1
-fairyring:a j p 3 0 1 5	*	fairyring	hard	ANY_OF	1646,3012,0					spade or dog	3504	A J P 3 0 1 5
-fairyring:a l p 1 1 4 0	*	fairyring	hard	ANY_OF	2504,3633,0					spade or dog	1903	A L P 1 1 4 0
-fairyring:b i p 7 0 1 3	*	fairyring	hard	ANY_OF	3407,3330,0					spade or dog	1906	B I P 7 0 1 3
-fairyring:b j r 1 1 2 3	*	fairyring	hard	ANY_OF	2648,4729,0					spade or dog	1905	B J R 1 1 2 3
-fairyring:b l p 6 2 0 0	*	fairyring	hard	ANY_OF	2439,5132,0					spade or dog	1904	B L P 6 2 0 0
-fairyring:c i s 0 0 0 9	*	fairyring	hard	ANY_OF	1630,3868,0					spade or dog	1907	C I S 0 0 0 9
-fairyring:c k p 0 2 2 4	*	fairyring	hard	ANY_OF	2073,4846,0					spade or dog	1908	C K P 0 2 2 4
-fairyring:d i p 8 5 1 1	*	fairyring	hard	ANY_OF	3041,4770,0					spade or dog	1909	D I P 8 5 1 1
-fairyring:d k s 2 3 1 0	*	fairyring	hard	ANY_OF	2747,3720,0					spade or dog	1910	D K S 2 3 1 0
+fairyring:a i q 0 4 4 0	*	fairyring	hard	ANY_OF	3000,3110,0					spade	1902	A I Q 0 4 4 0
+fairyring:a i r 2 3 3 1	*	fairyring	hard	ANY_OF	2702,3246,0					spade	1901	A I R 2 3 3 1
+fairyring:a j p 3 0 1 5	*	fairyring	hard	ANY_OF	1646,3012,0					spade	3504	A J P 3 0 1 5
+fairyring:a l p 1 1 4 0	*	fairyring	hard	ANY_OF	2504,3633,0					spade	1903	A L P 1 1 4 0
+fairyring:b i p 7 0 1 3	*	fairyring	hard	ANY_OF	3407,3330,0					spade	1906	B I P 7 0 1 3
+fairyring:b j r 1 1 2 3	*	fairyring	hard	ANY_OF	2648,4729,0					spade	1905	B J R 1 1 2 3
+fairyring:b l p 6 2 0 0	*	fairyring	hard	ANY_OF	2439,5132,0					spade	1904	B L P 6 2 0 0
+fairyring:c i s 0 0 0 9	*	fairyring	hard	ANY_OF	1630,3868,0					spade	1907	C I S 0 0 0 9
+fairyring:c k p 0 2 2 4	*	fairyring	hard	ANY_OF	2073,4846,0					spade	1908	C K P 0 2 2 4
+fairyring:d i p 8 5 1 1	*	fairyring	hard	ANY_OF	3041,4770,0					spade	1909	D I P 8 5 1 1
+fairyring:d k s 2 3 1 0	*	fairyring	hard	ANY_OF	2747,3720,0					spade	1910	D K S 2 3 1 0
 falo:a blood red weapon, a strong curved sword, found on the island of primate lords.	*	falo	master	ANY_OF	2689,3550,0	Falo the Bard				1 item requirement	1722	A blood red weapon, a strong curved sword, found on the island of primate lords.
 falo:a book that preaches of some great figure, lending strength, might and vigour.	*	falo	master	ANY_OF	2689,3550,0	Falo the Bard				1 item requirement	1723	A book that preaches of some great figure, lending strength, might and vigour.
 falo:a bow of elven craft was made, it shimmers bright, but will soon fade.	*	falo	master	ANY_OF	2689,3550,0	Falo the Bard				1 item requirement	1724	A bow of elven craft was made, it shimmers bright, but will soon fade.
@@ -738,48 +738,48 @@ falo:they come from some time ago, from a land unto the east. fossilised they ha
 falo:to slay a dragon you must first do, before this chest piece can be put on you.	*	falo	master	ANY_OF	2689,3550,0	Falo the Bard				1 item requirement	1739	To slay a dragon you must first do, before this chest piece can be put on you.
 falo:vampyres are agile opponents, damaged best with a weapon of many components.	*	falo	master	ANY_OF	2689,3550,0	Falo the Bard				1 item requirement	1740	Vampyres are agile opponents, damaged best with a weapon of many components.
 falo:you won't bring me to heel, unless you have a bright red keel.	*	falo	master	ANY_OF	2689,3550,0	Falo the Bard				1 item requirement	7050	You won't bring me to heel, unless you have a bright red keel.
-hotcold:beginner:leagues tutor	*	hotcold	beginner	PROBES	1500,5596,0	Leagues Tutor				spade or dog		Buried beneath the ground, who knows where it's found. The League Tutor may have a strange device lying around.
-hotcold:beginner:reldo	*	hotcold	beginner	PROBES	3211,3494,0	Reldo				spade or dog	1238	Buried beneath the ground, who knows where it's found. Lucky for you, A man called Reldo may have a clue.
+hotcold:beginner:leagues tutor	*	hotcold	beginner	PROBES	1500,5596,0	Leagues Tutor				spade		Buried beneath the ground, who knows where it's found. The League Tutor may have a strange device lying around.
+hotcold:beginner:reldo	*	hotcold	beginner	PROBES	3211,3494,0	Reldo				spade	1238	Buried beneath the ground, who knows where it's found. Lucky for you, A man called Reldo may have a clue.
 hotcold:master:jorral	*	hotcold	master	PROBES	2436,3347,0	Jorral				spade	1496	Buried beneath the ground, who knows where it's found. Lucky for you, A man called Jorral may have a clue.
 hotcold:master:leagues tutor	*	hotcold	master	PROBES	1500,5596,0	Leagues Tutor				spade		Buried beneath the ground, who knows where it's found. The League Tutor may have a strange device lying around.
-map:12130	*	map	elite	ANY_OF	2449,3130,0					spade or dog	2254	South-west of Tree Gnome Village.
-map:12179	*	map	easy	ANY_OF	3300,3291,0					spade or dog	2228	Al Kharid mine
-map:19782	*	map	elite	ANY_OF	2953,9523,1					spade or dog	2255	In the Mogre Camp, near Port Khazard. You require a Diving Apparatus and a Fishbowl Helmet
-map:19783	*	map	elite	ANY_OF	2202,3062,0					spade or dog	2256	Zul-Andra. Fairy ring BJS
-map:19784	*	map	elite	ANY_OF	1815,3852,0					spade or dog	2257	At the Soul Altar, north-east of the Arceuus essence mine.
-map:19785	*	map	elite	ANY_OF	3538,3208,0					spade or dog	2258	East of Burgh de Rott.
+map:12130	*	map	elite	ANY_OF	2449,3130,0					spade	2254	South-west of Tree Gnome Village.
+map:12179	*	map	easy	ANY_OF	3300,3291,0					spade	2228	Al Kharid mine
+map:19782	*	map	elite	ANY_OF	2953,9523,1					spade	2255	In the Mogre Camp, near Port Khazard. You require a Diving Apparatus and a Fishbowl Helmet
+map:19783	*	map	elite	ANY_OF	2202,3062,0					spade	2256	Zul-Andra. Fairy ring BJS
+map:19784	*	map	elite	ANY_OF	1815,3852,0					spade	2257	At the Soul Altar, north-east of the Arceuus essence mine.
+map:19785	*	map	elite	ANY_OF	3538,3208,0					spade	2258	East of Burgh de Rott.
 map:19786	*	map	elite	ANY_OF	2703,2716,0			6616		none	2259	The crate in south-western Ape Atoll
 map:23068	*	map	quest	ANY_OF	3203,3213,0					spade	2303	Behind Lumbridge Castle, just outside the kitchen door
-map:23069	*	map	easy	ANY_OF	3108,3262,0					spade or dog	2261	South-west of the wheat field east of Draynor Village.
-map:2713	*	map	easy	ANY_OF	3166,3361,0					spade or dog	2229	West of the Champions' Guild
-map:2716	*	map	easy	ANY_OF	3290,3374,0					spade or dog	2230	Outside Varrock East Mine
-map:2719	*	map	easy	ANY_OF	3043,3398,0					spade or dog	2231	At the standing stones north of Falador
+map:23069	*	map	easy	ANY_OF	3108,3262,0					spade	2261	South-west of the wheat field east of Draynor Village.
+map:2713	*	map	easy	ANY_OF	3166,3361,0					spade	2229	West of the Champions' Guild
+map:2716	*	map	easy	ANY_OF	3290,3374,0					spade	2230	Outside Varrock East Mine
+map:2719	*	map	easy	ANY_OF	3043,3398,0					spade	2231	At the standing stones north of Falador
 map:2722	*	map	hard	ANY_OF	3309,3503,0			2620		none	2247	A crate in the Lumber Yard, north-east of Varrock.
-map:2827	*	map	medium	ANY_OF	3091,3227,0					spade or dog	2235	South of Draynor Village Bank
-map:3516	*	map	easy	ANY_OF	2612,3482,0					spade or dog	2232	Brother Galahad's house, West of McGrubor's Wood.
-map:3518	*	map	easy	ANY_OF	3110,3152,0					spade or dog	2233	On the south side of the Wizards' Tower (DIS)
-map:3520	*	map	hard	ANY_OF	2615,3078,0					spade or dog	2248	Yanille anvils, south of the bank. You can dig from inside the building.
-map:3522	*	map	hard	ANY_OF	2488,3308,0					spade or dog	2249	In the western section of West Ardougne.
+map:2827	*	map	medium	ANY_OF	3091,3227,0					spade	2235	South of Draynor Village Bank
+map:3516	*	map	easy	ANY_OF	2612,3482,0					spade	2232	Brother Galahad's house, West of McGrubor's Wood.
+map:3518	*	map	easy	ANY_OF	3110,3152,0					spade	2233	On the south side of the Wizards' Tower (DIS)
+map:3520	*	map	hard	ANY_OF	2615,3078,0					spade	2248	Yanille anvils, south of the bank. You can dig from inside the building.
+map:3522	*	map	hard	ANY_OF	2488,3308,0					spade	2249	In the western section of West Ardougne.
 map:3524	*	map	hard	ANY_OF	2457,3182,0			18506		none	2250	In a crate by the stairs to the Observatory Dungeon.
 map:3525	*	map	hard	ANY_OF	3026,3628,0			354		none	2251	In a crate at the Dark Warriors' Fortress in level 14 Wilderness.
-map:3596	*	map	medium	ANY_OF	2907,3295,0					spade or dog	2236	West of the Crafting Guild
+map:3596	*	map	medium	ANY_OF	2907,3295,0					spade	2236	West of the Crafting Guild
 map:3598	*	map	medium	ANY_OF	2658,3488,0			357		none	2237	The crate in McGrubor's Wood. Fairy ring ALS
-map:3599	*	map	medium	ANY_OF	2651,3231,0					spade or dog	2238	North of the Tower of Life. Fairy ring DJP
+map:3599	*	map	medium	ANY_OF	2651,3231,0					spade	2238	North of the Tower of Life. Fairy ring DJP
 map:3601	*	map	medium	ANY_OF	2565,3248,0			354		none	2239	The crate west of the Clocktower.
-map:3602	*	map	medium	ANY_OF	2924,3210,0					spade or dog	2240	Behind the Chemist's house in Rimmington.
-map:7236	*	map	easy	ANY_OF	2970,3415,0					spade or dog	2234	North of Falador.
-map:7239	*	map	hard	ANY_OF	3021,3912,0					spade or dog	2252	South-east of the Wilderness Agility Course in level 50 Wilderness.
-map:7241	*	map	hard	ANY_OF	2722,3338,0					spade or dog	2253	South of the Legends' Guild. Fairy ring BLR
-map:7286	*	map	medium	ANY_OF	2536,3865,0					spade or dog	2241	Miscellania. Fairy ring CIP
-map:7288	*	map	medium	ANY_OF	3434,3265,0					spade or dog	2242	Mort Myre Swamp, west of Mort'ton. Fairy ring BIP
-map:7290	*	map	medium	ANY_OF	2454,3230,0					spade or dog	2243	At the entrance to the Ourania Cave.
-map:7292	*	map	medium	ANY_OF	2578,3597,0					spade or dog	2244	South-east of the Lighthouse. Fairy ring ALP
-map:7294	*	map	medium	ANY_OF	2666,3562,0					spade or dog	2245	Between Seers' Village and Rellekka. South-west of Fairy ring CJR
-map:w346	*	beginnermap	beginner	ANY_OF	3167,3360,0					spade or dog	2223	West of the Champions' Guild
-map:w347	*	beginnermap	beginner	ANY_OF	3290,3373,0					spade or dog	2224	Outside Varrock East Mine
-map:w348	*	beginnermap	beginner	ANY_OF	3092,3226,0					spade or dog	2225	South of Draynor Village Bank
-map:w351	*	beginnermap	beginner	ANY_OF	3043,3399,0					spade or dog	2226	At the standing stones north of Falador
-map:w356	*	beginnermap	beginner	ANY_OF	3109,3153,0					spade or dog	2227	On the south side of the Wizards' Tower (DIS)
+map:3602	*	map	medium	ANY_OF	2924,3210,0					spade	2240	Behind the Chemist's house in Rimmington.
+map:7236	*	map	easy	ANY_OF	2970,3415,0					spade	2234	North of Falador.
+map:7239	*	map	hard	ANY_OF	3021,3912,0					spade	2252	South-east of the Wilderness Agility Course in level 50 Wilderness.
+map:7241	*	map	hard	ANY_OF	2722,3338,0					spade	2253	South of the Legends' Guild. Fairy ring BLR
+map:7286	*	map	medium	ANY_OF	2536,3865,0					spade	2241	Miscellania. Fairy ring CIP
+map:7288	*	map	medium	ANY_OF	3434,3265,0					spade	2242	Mort Myre Swamp, west of Mort'ton. Fairy ring BIP
+map:7290	*	map	medium	ANY_OF	2454,3230,0					spade	2243	At the entrance to the Ourania Cave.
+map:7292	*	map	medium	ANY_OF	2578,3597,0					spade	2244	South-east of the Lighthouse. Fairy ring ALP
+map:7294	*	map	medium	ANY_OF	2666,3562,0					spade	2245	Between Seers' Village and Rellekka. South-west of Fairy ring CJR
+map:w346	*	beginnermap	beginner	ANY_OF	3167,3360,0					spade	2223	West of the Champions' Guild
+map:w347	*	beginnermap	beginner	ANY_OF	3290,3373,0					spade	2224	Outside Varrock East Mine
+map:w348	*	beginnermap	beginner	ANY_OF	3092,3226,0					spade	2225	South of Draynor Village Bank
+map:w351	*	beginnermap	beginner	ANY_OF	3043,3399,0					spade	2226	At the standing stones north of Falador
+map:w356	*	beginnermap	beginner	ANY_OF	3109,3153,0					spade	2227	On the south side of the Wizards' Tower (DIS)
 music:23138	*	music	medium	ANY_OF	2990,3384,0	Cecilia				none	1887	Play Karamja Jam
 music:23139	*	music	medium	ANY_OF	2990,3384,0	Cecilia				none	1885	Play Faerie
 music:23140	*	music	medium	ANY_OF	2990,3384,0	Cecilia				none	1886	Play Forgotten

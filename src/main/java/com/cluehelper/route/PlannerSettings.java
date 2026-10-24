@@ -6,7 +6,7 @@ import com.cluehelper.SpellbookChanges;
 import lombok.Builder;
 import lombok.Value;
 
-/** Copied on the client thread. Penalties are in ticks and affect ranking only. */
+/** Copied on the client thread. */
 @Value
 @Builder(toBuilder = true)
 public class PlannerSettings
@@ -19,14 +19,8 @@ public class PlannerSettings
 	@Builder.Default
 	SpellbookChanges spellbookChanges = SpellbookChanges.ALL;
 	boolean avoidWilderness;
-	int consumablePenalty;
-	@Builder.Default
-	int capeUsePenalty = 3;
-	@Builder.Default
-	int strandPenalty = 30;
 	@Builder.Default
 	boolean bankEdge = true;
-	int bankStopExtraTicks;
 	boolean scrollBookOutOfWilderness;
 
 	public static PlannerSettings from(ClueHelperConfig config, int accountType)
@@ -37,11 +31,7 @@ public class PlannerSettings
 		return PlannerSettings.builder()
 			.spellbookChanges(config.spellbookChanges())
 			.avoidWilderness(avoid)
-			.consumablePenalty(config.consumablePenalty())
-			.capeUsePenalty(config.capeUsePenalty())
-			.strandPenalty(config.strandPenalty())
 			.bankEdge(config.useBank())
-			.bankStopExtraTicks(config.bankStopExtraTicks())
 			.scrollBookOutOfWilderness(config.scrollBookOutOfWilderness())
 			.build();
 	}

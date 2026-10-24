@@ -59,6 +59,8 @@ public final class PlayerSnapshot
 	private final HouseState house;
 	/** Patch names of spirit trees known to be grown. */
 	private final Set<String> plantedTrees;
+	/** Account unlocks seen in play, named as the catalog's {@code UNLOCK_} tokens name them (without the prefix). */
+	private final Set<String> unlocks;
 	/** A code like "CKS", where a ring's Last-destination goes; null when unknown. */
 	private final String lastFairyRing;
 
@@ -70,7 +72,7 @@ public final class PlayerSnapshot
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
 		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
 		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house,
-		Set<String> plantedTrees, String lastFairyRing)
+		Set<String> plantedTrees, Set<String> unlocks, String lastFairyRing)
 	{
 		this.version = version;
 		this.tick = tick;
@@ -102,6 +104,7 @@ public final class PlayerSnapshot
 		this.groupStorage = copy(groupStorage);
 		this.house = house == null ? HouseState.NONE : house;
 		this.plantedTrees = plantedTrees == null ? Set.of() : Set.copyOf(plantedTrees);
+		this.unlocks = unlocks == null ? Set.of() : Set.copyOf(unlocks);
 		this.lastFairyRing = lastFairyRing;
 	}
 

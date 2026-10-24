@@ -1,7 +1,5 @@
 package com.cluehelper.poh;
 
-import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.PohSource;
 import com.cluehelper.memory.MemorySlot;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.player.HouseState;
@@ -43,6 +41,7 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
 /** Client thread only, except {@link #getHouse()}. */
@@ -72,10 +71,15 @@ public class PohService
 	private static final int NEXUS_ARG_LINE_NUMBER = 4;
 	static final int[] SETTINGS = {VarbitID.POH_NEXUS_XERIC, VarbitID.POH_NEXUS_DIGSITE, VarbitID.POH_JEWELLERYBOX_MULTI,
 		VarbitID.POH_HOUSE_LOCATION, VarbitID.POH_TELE_TOGGLE};
+	private static final int[] BOXES = {ObjectID.POH_JEWELLERY_BOX_1, ObjectID.POH_JEWELLERY_BOX_2, ObjectID.POH_JEWELLERY_BOX_3};
+	/** Box lines 1–9 are on every box, A–J from the fancy one, K–R only on the ornate one; varbit 2308 is 1-based. */
+	private static final int FANCY_FIRST_LINE = 10;
+	private static final int ORNATE_FIRST_LINE = 20;
+	private static final int XERIC_FIRST = ObjectID.POH_AMULET_XERIC_LOOKOUT;
+	private static final int DIGSITE_FIRST = ObjectID.POH_AMULET_DIG_DIGSITE;
 
 	private final Client client;
 	private final PlayerModel player;
-	private final ClueHelperConfig config;
 	private final CatalogData catalogData;
 	private final MemorySlot<Profile> stored;
 	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
@@ -83,7 +87,6 @@ public class PohService
 	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile Set<Integer> pieces = Set.of();
-	private volatile Map<String, List<Integer>> portalsByName = Map.of();
 	private volatile HouseState house = HouseState.NONE;
 	@Getter
 	private volatile long version;
@@ -91,15 +94,14 @@ public class PohService
 	private boolean wasInside;
 	private int scanAtTick = -1;
 	private boolean varsDirty = true;
-	private boolean overridesDirty = true;
+	private boolean houseDirty = true;
 	private boolean nexusLinesDirty;
 
 	@Inject
-	PohService(Client client, PlayerModel player, ClueHelperConfig config, CatalogData catalogData, MemoryStore memory)
+	PohService(Client client, PlayerModel player, CatalogData catalogData, MemoryStore memory)
 	{
 		this.client = client;
 		this.player = player;
-		this.config = config;
 		this.catalogData = catalogData;
 		this.stored = memory.slot(PROFILE_KEY, Profile.class, Profile::new);
 		for (int id : NEXUS_SLOTS)
@@ -119,7 +121,7 @@ public class PohService
 		seenATick = false;
 		wasInside = false;
 		varsDirty = true;
-		overridesDirty = true;
+		houseDirty = true;
 	}
 
 	public void stop()
@@ -196,23 +198,18 @@ public class PohService
 		}
 	}
 
-	public void onConfigChanged()
-	{
-		overridesDirty = true;
-	}
-
 	/** Call on {@code RuneScapeProfileChanged}, after the store reloads. */
 	public void onProfileChanged()
 	{
 		varsDirty = true;
-		overridesDirty = true;
+		houseDirty = true;
 	}
 
 	public void forget()
 	{
 		stored.clear();
 		varsDirty = true;
-		overridesDirty = true;
+		houseDirty = true;
 		tell("forgot the learned house");
 	}
 
@@ -272,7 +269,7 @@ public class PohService
 		{
 			nexusLinesDirty = false;
 			stored.set(stored.get());
-			overridesDirty = true;
+			houseDirty = true;
 			tell("nexus hotkeys learned: " + stored.get().nexusLines.size() + " lines");
 		}
 		publish();
@@ -281,17 +278,12 @@ public class PohService
 	private void learnPieces(Catalog catalog)
 	{
 		Set<Integer> ids = new HashSet<>(HouseState.NEXUS_OBJECTS);
-		Map<String, List<Integer>> portals = new HashMap<>();
 		for (CatalogRow row : catalog.getTeleports())
 		{
 			HouseNeed need = row.getRequirements().getHouse();
 			if (need != null && need.getKind() == HouseNeed.Kind.FURNITURE)
 			{
 				ids.addAll(need.getIds());
-				if (row.getName().startsWith(PORTAL_PREFIX))
-				{
-					portals.put(PohOverrides.normalise(row.getName().substring(PORTAL_PREFIX.length())), need.getIds());
-				}
 			}
 		}
 		for (SpellbookChange change : catalog.getSpellbookChanges())
@@ -301,12 +293,9 @@ public class PohService
 				ids.add(change.getObjectId());
 			}
 		}
-		portalsByName = Map.copyOf(portals);
 		pieces = Set.copyOf(ids);
-		overridesDirty = true;
+		houseDirty = true;
 	}
-
-	private static final String PORTAL_PREFIX = "Portal chamber: ";
 
 	/** POH varbits read 0 during a world hop, so an all-zero read is ignored. */
 	private void readVars()
@@ -367,7 +356,7 @@ public class PohService
 		profile.walkTicks = ticks;
 		profile.scannedAt = System.currentTimeMillis();
 		stored.set(profile);
-		overridesDirty = true;
+		houseDirty = true;
 		Set<Integer> added = new HashSet<>(found.keySet());
 		added.removeAll(before);
 		before.removeAll(found.keySet());
@@ -438,11 +427,11 @@ public class PohService
 
 	private void publish()
 	{
-		if (!overridesDirty && house.getNexusKeys().equals(nexusKeys(stored.get())))
+		if (!houseDirty && house.getNexusKeys().equals(nexusKeys(stored.get())))
 		{
 			return;
 		}
-		overridesDirty = false;
+		houseDirty = false;
 		HouseState next = compose(stored.get());
 		if (!next.equals(house))
 		{
@@ -463,26 +452,42 @@ public class PohService
 		HouseState.HouseStateBuilder state = HouseState.builder().xericLeftClick(xeric).digsiteLeftClick(digsite).boxLeftClick(box)
 			.walkTicks(Map.copyOf(profile.walkTicks)).scannedAt(profile.scannedAt);
 		Set<Integer> furniture;
-		if (config.pohSource() == PohSource.MANUAL)
-		{
-			furniture = PohOverrides.furniture(config, portalsByName);
-			state.source(HouseState.Source.MANUAL);
-		}
-		else if (profile.scannedAt > 0)
+		if (profile.scannedAt > 0)
 		{
 			furniture = new HashSet<>(profile.furniture);
 			state.source(HouseState.Source.SCAN);
 		}
 		else
 		{
-			furniture = PohOverrides.fromVarbits(xeric, digsite, box);
+			furniture = fromVarbits(xeric, digsite, box);
 			state.source(HouseState.Source.VARBITS);
 		}
 		Set<Integer> keys = nexusKeys(profile);
-		boolean scannedWithoutNexus = profile.scannedAt > 0 && config.pohSource() != PohSource.MANUAL
-			&& HouseState.NEXUS_OBJECTS.stream().noneMatch(furniture::contains);
+		boolean scannedWithoutNexus = profile.scannedAt > 0 && HouseState.NEXUS_OBJECTS.stream().noneMatch(furniture::contains);
 		return state.furniture(Set.copyOf(furniture)).nexusKeys(scannedWithoutNexus ? Set.of() : keys)
 			.nexusLines(Map.copyOf(profile.nexusLines)).build();
+	}
+
+	/**
+	 * The mounted Xeric's talisman and digsite pendant follow from their left-click settings, and the jewellery box from
+	 * its left-click line, which needs at least the tier that has that line.
+	 */
+	private static Set<Integer> fromVarbits(int xeric, int digsite, int boxLine)
+	{
+		Set<Integer> ids = new HashSet<>();
+		if (xeric > 0)
+		{
+			ids.add(XERIC_FIRST + xeric - 1);
+		}
+		if (digsite > 0)
+		{
+			ids.add(DIGSITE_FIRST + digsite - 1);
+		}
+		if (boxLine > 0)
+		{
+			ids.add(BOXES[boxLine >= ORNATE_FIRST_LINE ? 2 : boxLine >= FANCY_FIRST_LINE ? 1 : 0]);
+		}
+		return ids;
 	}
 
 	private static Set<Integer> nexusKeys(Profile profile)

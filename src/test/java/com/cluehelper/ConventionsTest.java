@@ -47,13 +47,11 @@ public class ConventionsTest
 	}
 
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
-		"consumablePenalty", "avoidWilderness", "scrollBookOutOfWilderness",
+		"avoidWilderness", "scrollBookOutOfWilderness",
 		"highlightItems", "highlightSpells", "highlightMenus",
 		"pathLine", "showNextStep",
-		"spellbookChanges", "capeUsePenalty", "strandPenalty",
-		"diggingDog", "xericsHonourUnlocked", "useBank", "bankStopExtraTicks",
-		"pohSource", "pohJewelleryBox", "pohMountedGlory", "pohGarden", "pohObelisk", "pohAltar", "pohMountedCape",
-		"pohMythicalCape", "pohPortals", "pohForget", "stashBuiltIsFilled", "hotColdPlanner"));
+		"spellbookChanges", "useBank",
+		"hotColdPlanner"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 
@@ -140,7 +138,7 @@ public class ConventionsTest
 			assertTrue(type + " is declared 'public enum'", Files.readString(source).contains("public enum " + type));
 			enums++;
 		}
-		assertEquals("avoidWilderness, spellbookChanges, diggingDog and five house settings", 8, enums);
+		assertEquals("avoidWilderness and spellbookChanges", 2, enums);
 	}
 
 	@Test

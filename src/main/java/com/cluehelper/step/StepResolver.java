@@ -26,7 +26,6 @@ import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 public class StepResolver
 {
 	private static final int NO_STASH = -1;
-	private static final Set<String> SPADE_OR_DOG_TIERS = Set.of("beginner", "easy", "medium", "hard", "elite");
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
 
@@ -76,7 +75,7 @@ public class StepResolver
 			.regions(CoreClueReader.regions(clue))
 			.objectIds(CoreClueReader.objectIds(clue))
 			.objectNames(CoreClueReader.objectNames(clue))
-			.requirements(requirements(clue, tier))
+			.requirements(requirements(clue))
 			.cacheRows(entry == null ? List.of() : List.copyOf(entry.getRows()))
 			.known(entry != null)
 			.stages(stages)
@@ -286,10 +285,9 @@ public class StepResolver
 		return facts.getTier() != null ? facts.getTier() : UNKNOWN_TIER;
 	}
 
-	private static StepRequirements requirements(ClueScroll clue, String tier)
+	private static StepRequirements requirements(ClueScroll clue)
 	{
-		SpadeNeed spade = !clue.isRequiresSpade() ? SpadeNeed.NONE
-			: SPADE_OR_DOG_TIERS.contains(tier) ? SpadeNeed.SPADE_OR_DIGGING_DOG : SpadeNeed.SPADE;
+		SpadeNeed spade = clue.isRequiresSpade() ? SpadeNeed.SPADE : SpadeNeed.NONE;
 		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
 		List<ItemRequirement> items = CoreClueReader.challengeCompleted(clue) ? List.of() : CoreClueReader.itemRequirements(clue);
 		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),

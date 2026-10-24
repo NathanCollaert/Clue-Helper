@@ -73,11 +73,8 @@ class BuiltInSelfTests
 
 	private void checkConfig(SelfTestRun run)
 	{
-		run.check(config.consumablePenalty() >= 0 && config.capeUsePenalty() >= 0 && config.strandPenalty() >= 0,
-			"penalties are not negative");
-		run.check(config.avoidWilderness() != null && config.spellbookChanges() != null && config.diggingDog() != null,
-			"enum keys read through the config proxy: " + config.avoidWilderness() + ", "
-				+ config.spellbookChanges() + ", " + config.diggingDog());
+		run.check(config.avoidWilderness() != null && config.spellbookChanges() != null,
+			"enum keys read through the config proxy: " + config.avoidWilderness() + ", " + config.spellbookChanges());
 	}
 
 	private void checkCoreLink(SelfTestRun run)

@@ -540,8 +540,7 @@ final class LabelSearch
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
 			int total = half + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
-			int penalty = 2 * ctx.in.getSettings().getConsumablePenalty() * tele.consumed;
-			offer(from, node, from.b, c, k, t, from.leg, total, total + penalty, kind, tele, second, spent, withdrawn);
+			offer(from, node, from.b, c, k, t, from.leg, total, total, kind, tele, second, spent, withdrawn);
 		}
 	}
 
@@ -552,7 +551,7 @@ final class LabelSearch
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
 			int total = change.halfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
-			int penalty = change.capeUse ? 2 * ctx.in.getSettings().getCapeUsePenalty() : 0;
+			int penalty = change.capeUse ? PlanContext.CAPE_USE_PENALTY_HALF_TICKS : 0;
 			offer(from, node, from.b, c, k, from.t, from.leg, total, total + penalty, Leg.Kind.SPELLBOOK_CHANGE,
 				change, null, spent, withdrawn);
 		}

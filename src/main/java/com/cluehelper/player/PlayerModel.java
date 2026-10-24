@@ -83,6 +83,7 @@ public class PlayerModel
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
 	private Set<String> plantedTrees = Set.of();
+	private Set<String> unlocks = Set.of();
 	/** Grown patches other than spirit trees (a Farming Guild redwood), named as the step data names them. */
 	private Set<String> grownPatches = Set.of();
 	private String lastFairyRing;
@@ -229,6 +230,13 @@ public class PlayerModel
 	{
 		plantedTrees = Set.copyOf(next);
 		markDirty("spirit trees");
+	}
+
+	/** Client thread. */
+	public void setUnlocks(Set<String> next)
+	{
+		unlocks = Set.copyOf(next);
+		markDirty("unlocks");
 	}
 
 	/** Client thread. */
@@ -460,6 +468,7 @@ public class PlayerModel
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
 			.plantedTrees(grownPatches.isEmpty() ? plantedTrees : union(plantedTrees, grownPatches))
+			.unlocks(unlocks)
 			.lastFairyRing(lastFairyRing)
 			.build();
 	}

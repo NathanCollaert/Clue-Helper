@@ -14,6 +14,7 @@ import com.cluehelper.memory.FairyRingMemory;
 import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.SpiritTreeMemory;
+import com.cluehelper.memory.XericsHonourMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.CheckLines;
@@ -83,8 +84,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class ClueHelperPlugin extends Plugin
 {
 	private static final int ULTIMATE_IRONMAN = 2;
-	private static final String FORGET_HOUSE_KEY = "pohForget";
-	private static final String HOUSE_KEY_PREFIX = "poh";
 	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
 
 	@Inject
@@ -112,15 +111,15 @@ public class ClueHelperPlugin extends Plugin
 	private GrownPatches grownPatches;
 
 	@Inject
+	private XericsHonourMemory xericsHonour;
+
+	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private FairyRingMemory fairyRings;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private PohService poh;
-
-	@Inject
-	private ConfigManager configManager;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -223,6 +222,7 @@ public class ClueHelperPlugin extends Plugin
 		clientThread.invokeLater(spiritTrees::publish);
 		clientThread.invokeLater(grownPatches::publish);
 		clientThread.invokeLater(fairyRings::publish);
+		clientThread.invokeLater(xericsHonour::publish);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
@@ -285,6 +285,7 @@ public class ClueHelperPlugin extends Plugin
 		menuLines.takeFreshList(spiritTrees::onListMenu);
 		spiritTrees.onGameTick();
 		fairyRings.onGameTick();
+		xericsHonour.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
@@ -392,6 +393,7 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.onGameStateChanged(event);
 		bankMemory.onGameStateChanged(event);
 		poh.onGameStateChanged(event);
+		xericsHonour.onGameStateChanged(event);
 		guide.onGameStateChanged(event);
 	}
 
@@ -402,6 +404,7 @@ public class ClueHelperPlugin extends Plugin
 		actWatcher.onChatMessage(event);
 		guide.onChatMessage(event);
 		stashMemory.onChatMessage(event);
+		xericsHonour.onChatMessage(event);
 		sceneDoors.onChatMessage(event);
 		if (checkLines.onChatMessage(event))
 		{
@@ -421,16 +424,7 @@ public class ClueHelperPlugin extends Plugin
 			return;
 		}
 		clientThread.invokeLater(this::showBox);
-		if (FORGET_HOUSE_KEY.equals(event.getKey()) && config.pohForget())
-		{
-			configManager.setConfiguration(ClueHelperConfig.GROUP, FORGET_HOUSE_KEY, false);
-			clientThread.invokeLater(poh::forget);
-		}
-		else if (event.getKey().startsWith(HOUSE_KEY_PREFIX))
-		{
-			clientThread.invokeLater(poh::onConfigChanged);
-		}
-		else if (HOT_COLD_KEYS.contains(event.getKey()))
+		if (HOT_COLD_KEYS.contains(event.getKey()))
 		{
 			clientThread.invokeLater(() ->
 			{
@@ -450,6 +444,7 @@ public class ClueHelperPlugin extends Plugin
 		spiritTrees.publish();
 		grownPatches.publish();
 		fairyRings.publish();
+		xericsHonour.publish();
 	}
 
 	@Subscribe

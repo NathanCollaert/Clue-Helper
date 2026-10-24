@@ -28,7 +28,7 @@ public class RequiredItems
 
 	public enum Stash
 	{
-		NONE, NOT_BUILT, FILLED, EMPTY, UNKNOWN
+		NONE, NOT_BUILT, FILLED, EMPTY
 	}
 
 	@Builder.Default

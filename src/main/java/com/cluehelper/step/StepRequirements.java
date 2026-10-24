@@ -131,7 +131,7 @@ public final class StepRequirements
 		StringBuilder text = new StringBuilder();
 		if (spade != SpadeNeed.NONE)
 		{
-			text.append(spade == SpadeNeed.SPADE ? "spade" : "spade or dog");
+			text.append("spade");
 		}
 		if (light)
 		{

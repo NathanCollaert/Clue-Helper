@@ -346,12 +346,9 @@ public class GoldenRoutesTest
 		Step emote = step("emote:12021");
 		PlayerSnapshot emoteItemBanked = midBank.toBuilder().bank(merged(midBank.getBank(), ItemID.BRONZE_FULL_HELM)).build();
 		RequiredItems.Need helm = need("Bronze full helm", ItemRequirements.item(ItemID.BRONZE_FULL_HELM), true);
-		for (RequiredItems.Stash stash : List.of(RequiredItems.Stash.FILLED, RequiredItems.Stash.UNKNOWN))
-		{
-			lines.add(line("emote item in the bank, STASH " + stash.name().toLowerCase(),
-				checked(input(mid, emote, PlanStart.teleportOnly(ANYWHERE), bankOn).required(required(stash, helm))
-					.banked(emoteItemBanked).build())));
-		}
+		lines.add(line("emote item in the bank, STASH filled",
+			checked(input(mid, emote, PlanStart.teleportOnly(ANYWHERE), bankOn).required(required(RequiredItems.Stash.FILLED, helm))
+				.banked(emoteItemBanked).build())));
 
 		Set<Integer> capes = Set.of(ItemID.SKILLCAPE_MAX, ItemID.SKILLCAPE_MAX_WORN, ItemID.SKILLCAPE_CONSTRUCTION,
 			ItemID.SKILLCAPE_CONSTRUCTION_TRIMMED);

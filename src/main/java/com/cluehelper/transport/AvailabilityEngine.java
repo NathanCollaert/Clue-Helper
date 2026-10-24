@@ -228,7 +228,8 @@ public final class AvailabilityEngine
 	{
 		if (branch.isUnlock())
 		{
-			return Paid.unread("unlock " + branch.getUnlock() + " isn't tracked");
+			return player.getUnlocks().contains(branch.getUnlock()) ? Paid.with(List.of(), false)
+				: Paid.unread("unlock " + branch.getUnlock() + " not seen yet");
 		}
 		List<Integer> ids = branch.getIds();
 		if (ids.size() == 1 && runes.isRune(ids.get(0)) && !mustBeWorn)

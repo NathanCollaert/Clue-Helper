@@ -19,8 +19,7 @@ public class HouseState
 	{
 		/** Nothing scanned: only what the varbits say. */
 		VARBITS,
-		SCAN,
-		MANUAL
+		SCAN
 	}
 
 	/** Enum 1377 keys set in the nexus slots. */

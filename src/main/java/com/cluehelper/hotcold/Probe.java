@@ -21,7 +21,7 @@ public class Probe
 	Kind kind;
 	/** The route's shown ticks. */
 	int ticks;
-	/** The route's ranking ticks: its ticks plus penalties such as {@code capeUsePenalty}. */
+	/** The route's ranking ticks: its ticks plus penalties such as a Magic cape use. */
 	int rankTicks;
 	boolean wilderness;
 }

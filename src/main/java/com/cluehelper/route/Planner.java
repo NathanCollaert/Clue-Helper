@@ -371,7 +371,6 @@ public final class Planner
 		return List.copyOf(lines);
 	}
 
-	/** An unknown STASH never forces a bank stop silently: the note says a filled one would save it. */
 	static List<String> requirementNotes(PlanContext ctx)
 	{
 		RequiredItems required = ctx.in.getRequired();
@@ -379,12 +378,6 @@ public final class Planner
 		List<RequiredItems.Verdict> verdicts = new ArrayList<>(List.of(ctx.required));
 		verdicts.addAll(ctx.stageVerdicts());
 		notes.addAll(missingList(verdicts));
-		boolean stepItemsFromBank = !ctx.required.isCarried() && ctx.required.isBanked()
-			&& required.getNeeds().stream().anyMatch(RequiredItems.Need::isStepItem);
-		if (required.getStash() == RequiredItems.Stash.UNKNOWN && (stepItemsFromBank || !ctx.required.getMissing().isEmpty()))
-		{
-			notes.add("STASH unknown — search it once. If it's filled, skip the bank");
-		}
 		if (required.isSpadeAtLeprechaun() && ctx.required.getMissing().stream().anyMatch(need -> need.getName().equalsIgnoreCase("spade")))
 		{
 			notes.add("Your spade is with a tool leprechaun");

@@ -119,11 +119,6 @@ emote item in the bank, STASH filled
   best      51t: Necklace of passage: Wizards' Tower → walk 46 {charge:21146=1}
   alt       53t: Amulet of glory: Draynor Village → walk 48 {charge:1712=1}
   alt       67t: Lumbridge Teleport → walk 63 {item:556=3, item:557=1, item:563=1}
-emote item in the bank, STASH unknown
-  best      65t: Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: Wizards' Tower → walk 46 {charge:2552=1, charge:21146=1} withdraw [1155]
-  alt       67t: Amulet of glory: Edgeville → walk 5 → bank → Amulet of glory: Draynor Village → walk 48 {charge:1712=2} withdraw [1155]
-  alt       85t: Games necklace: Barbarian Outpost → walk 8 → bank → Lumbridge Teleport → walk 63 {charge:3853=1, item:556=3, item:557=1, item:563=1} withdraw [1155]
-  needs     STASH unknown — search it once. If it's filled, skip the bank
 Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley shop boxes
   best      20t: (at the open bank) Max cape: POH Portals: Taverley → walk 12 withdraw [13280] deposit first
 scroll book kept out of the Wilderness: carried, to the Lava Maze

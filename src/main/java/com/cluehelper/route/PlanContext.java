@@ -44,6 +44,10 @@ final class PlanContext
 	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
 	static final int PIN_HALF_TICKS = 8;
+	/** Ranking only: Magic and Max cape changes are limited per day. */
+	static final int CAPE_USE_PENALTY_HALF_TICKS = 6;
+	/** Ranking only: the route leaves you on another book with no way back left today. */
+	static final int STRAND_PENALTY_HALF_TICKS = 60;
 	/** One more click when the withdraw list needs more slots than are free. */
 	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
 	static final int SWAP_DURATION_TICKS = 4;
@@ -118,7 +122,7 @@ final class PlanContext
 			gates[BANKED] = new WalkGates(table, in.getBanked(), in.getEngine(), in.getNowMinutes());
 		}
 		gates[NOT_BANKED] = new WalkGates(table, in.getPlayer(), in.getEngine(), in.getNowMinutes());
-		bankStopHalfTicks = 2 * in.getSettings().getBankStopExtraTicks() + BANK_STOP_HALF_TICKS + (in.isPinPending() ? PIN_HALF_TICKS : 0);
+		bankStopHalfTicks = BANK_STOP_HALF_TICKS + (in.isPinPending() ? PIN_HALF_TICKS : 0);
 		PlayerSnapshot bankedPlayer = options[BANKED] == null ? null : in.getBanked();
 		Set<RequiredItems.Need> atStages = judgeStageNeeds(bankedPlayer);
 		required = in.getRequired().toBuilder()
@@ -393,9 +397,9 @@ final class PlanContext
 		int usesLeft = state == null ? 0 : state.getCapeChangesLeft();
 		if (cape != null && capeUsesSpent + 1 <= usesLeft)
 		{
-			return cape.halfTicks + 2 * in.getSettings().getCapeUsePenalty();
+			return cape.halfTicks + CAPE_USE_PENALTY_HALF_TICKS;
 		}
-		return 2 * in.getSettings().getStrandPenalty();
+		return STRAND_PENALTY_HALF_TICKS;
 	}
 
 	private void expandBooks()
@@ -456,7 +460,6 @@ final class PlanContext
 		Book book;
 		int[] res;
 		int[] amounts;
-		int consumed;
 		int[] withdraw;
 		List<ItemUse> withdrawUses;
 		RowAvailability.Confidence confidence;
@@ -606,7 +609,6 @@ final class PlanContext
 			Spending spending = spending(row.getSpends(), judged.getWitness(), player, bankState);
 			tele.res = spending.res;
 			tele.amounts = spending.amounts;
-			tele.consumed = spending.consumed;
 			tele.withdrawUses = withdrawUses(judged.getWitness());
 			tele.withdraw = ids(tele.withdrawUses);
 			return tele;
@@ -680,13 +682,11 @@ final class PlanContext
 	{
 		int[] res;
 		int[] amounts;
-		int consumed;
 	}
 
 	private Spending spending(List<Spend> spends, List<ItemUse> witness, PlayerSnapshot player, int bankState)
 	{
 		Map<Integer, Integer> units = new LinkedHashMap<>();
-		int consumed = 0;
 		for (Spend spend : spends)
 		{
 			switch (spend.getKind())
@@ -699,7 +699,6 @@ final class PlanContext
 						{
 							int r = resources.item(use.getItemId(), player, bankState);
 							units.merge(r, use.getQuantity(), Integer::sum);
-							consumed += spend.getKind() == Spend.Kind.ITEM ? use.getQuantity() : 0;
 						}
 					}
 					break;
@@ -707,7 +706,6 @@ final class PlanContext
 					for (ItemUse use : witness)
 					{
 						units.merge(resources.charge(use.getItemId(), player, bankState), 1, Integer::sum);
-						consumed++;
 					}
 					break;
 				case COOLDOWN:
@@ -725,7 +723,6 @@ final class PlanContext
 		Spending s = new Spending();
 		s.res = units.keySet().stream().mapToInt(Integer::intValue).toArray();
 		s.amounts = units.values().stream().mapToInt(Integer::intValue).toArray();
-		s.consumed = consumed;
 		return s;
 	}
 
