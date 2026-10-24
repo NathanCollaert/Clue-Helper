@@ -28,6 +28,7 @@ public final class MenuLabels
 	private static final Pattern NOT_WORD = Pattern.compile("[^a-z0-9]+");
 	private static final int SHORTEST_PARTIAL = 4;
 	private static final String TELEPORT_SUFFIX = " teleport";
+	private static final String RING_PREFIX = "ring ";
 
 	private MenuLabels()
 	{
@@ -104,6 +105,14 @@ public final class MenuLabels
 	static boolean isOpener(String option)
 	{
 		return TELEPORT_LIST_OPENERS.contains(normalise(option));
+	}
+
+	/** Rings also offer Zanaris as an option of its own: "Zanaris", or "Ring-Zanaris" on the house's spiritual fairy tree. */
+	static boolean isRingDestination(String option, String code)
+	{
+		String plain = normalise(option);
+		String place = code.toLowerCase(Locale.ROOT);
+		return isLastDestination(option, code) || plain.equals(place) || plain.equals(RING_PREFIX + place);
 	}
 
 	static boolean isLastDestination(String option, String code)

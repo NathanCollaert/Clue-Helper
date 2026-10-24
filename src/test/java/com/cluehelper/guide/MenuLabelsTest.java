@@ -30,5 +30,7 @@ public class MenuLabelsTest
 		assertFalse(MenuLabels.matches("Ardougne", "West Ardougne Teleport"));
 		assertTrue(MenuLabels.isLastDestination("Last-destination (BKS)", "BKS"));
 		assertFalse(MenuLabels.isLastDestination("Last-destination (CKS)", "BKS"));
+		assertTrue(MenuLabels.isRingDestination("<col=40d0ff>Ring-Zanaris</col>", "ZANARIS"));
+		assertFalse(MenuLabels.isRingDestination("<col=40d0ff>Ring-configure</col>", "ZANARIS"));
 	}
 }

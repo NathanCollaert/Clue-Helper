@@ -2026,7 +2026,7 @@ public class StepGuide
 	/** Menu Entry Swapper's "Last-destination" carries no code, so the remembered last ring stands in for it. */
 	private boolean ringGoesTo(String leftClick, String code)
 	{
-		if (MenuLabels.isLastDestination(leftClick, code))
+		if (MenuLabels.isRingDestination(leftClick, code))
 		{
 			return true;
 		}

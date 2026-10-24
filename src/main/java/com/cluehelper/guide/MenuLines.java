@@ -657,7 +657,7 @@ public class MenuLines
 	{
 		if (target.getLine() == MenuTarget.Line.FAIRY_CODE && target.getLineKey() != null)
 		{
-			return MenuLabels.isLastDestination(entry.getOption(), target.getLineKey());
+			return MenuLabels.isRingDestination(entry.getOption(), target.getLineKey());
 		}
 		return destination != null && MenuLabels.matches(entry.getOption(), destination);
 	}
