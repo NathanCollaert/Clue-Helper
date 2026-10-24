@@ -68,10 +68,6 @@ public final class SceneBfs
 			this.doorSides = doorSides;
 		}
 
-		public Scene withDoorSides(int[][][] sides)
-		{
-			return new Scene(baseX, baseY, sizeX, sizeY, flags, sides);
-		}
 
 		/** Tiles a step from ({@code x}, {@code y}) in direction {@code d} costs: one, plus a door's opening. */
 		int stepCost(int plane, int x, int y, int d)

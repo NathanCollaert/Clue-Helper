@@ -580,6 +580,10 @@ public class StepGuide
 		{
 			List<TileObject> objects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, ids);
 			List<NPC> npcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : npcsFor(target);
+			if (!bank)
+			{
+				colourCrewMenus(target, npcs);
+			}
 			String npcOption = bank || target.getPath().isEmpty() ? null : target.getPath().get(0);
 			scene = SceneHighlights.builder().foundTick(tick)
 				.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
@@ -602,16 +606,20 @@ public class StepGuide
 			return named;
 		}
 		String name = client.getNpcDefinition(target.getNpcIds().iterator().next()).getName();
-		List<NPC> crew = SceneObjects.npcsNear(client, boarding, RIDE_NPC_TILES, target.getPath().get(0)).stream()
-			.filter(npc -> npc.getName() != null && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
+		return SceneObjects.npcsNear(client, boarding, RIDE_NPC_TILES, target.getPath().get(0)).stream()
+			.filter(npc -> npc.getName() != null && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toUnmodifiableList());
+	}
+
+	/** NPCs found by name rather than id stand in for the named one in its menu too: their ids join the target's. */
+	private void colourCrewMenus(MenuTarget target, List<NPC> npcs)
+	{
 		MenuTarget menuTarget = highlights.getMenuTarget();
-		if (!crew.isEmpty() && menuTarget.getNpcIds().equals(target.getNpcIds()))
+		Set<Integer> ids = new HashSet<>(target.getNpcIds());
+		npcs.forEach(npc -> ids.add(npc.getId()));
+		if (ids.size() > target.getNpcIds().size() && menuTarget.getNpcIds().equals(target.getNpcIds()))
 		{
-			Set<Integer> ids = new HashSet<>(target.getNpcIds());
-			crew.forEach(npc -> ids.add(npc.getId()));
 			highlights = highlights.toBuilder().menuTarget(menuTarget.toBuilder().npcIds(Set.copyOf(ids)).build()).build();
 		}
-		return crew;
 	}
 
 	private static boolean isInsideWayIn(Step step, WorldPoint at)

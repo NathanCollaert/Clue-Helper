@@ -195,6 +195,7 @@ public class RoutePlanner
 		{
 			return;
 		}
+		forgetCapeRefusalOnceCheckMoved(snapshot);
 		snapshot = withRefusals(snapshot);
 		updateStart(data, snapshot, runes, step);
 		PlannerSettings settings = PlannerSettings.from(config, snapshot.getAccountType());
@@ -288,17 +289,21 @@ public class RoutePlanner
 		}
 	}
 
-	/** After a cape refusal, no cape uses are left until SB_SWAP_CHECK moves. */
+	/** The refused cape change counts until SB_SWAP_CHECK moves: the day's limit has reset by then. */
+	private void forgetCapeRefusalOnceCheckMoved(PlayerSnapshot snapshot)
+	{
+		Integer used = snapshot.varbit(VarbitID.SB_SWAP_CHECK);
+		if (swapCheckAtCapeRefusal != NOT_REFUSED && used != null && used != swapCheckAtCapeRefusal)
+		{
+			swapCheckAtCapeRefusal = NOT_REFUSED;
+		}
+	}
+
+	/** After a cape refusal, no cape uses are left. */
 	private PlayerSnapshot withRefusals(PlayerSnapshot snapshot)
 	{
 		if (swapCheckAtCapeRefusal == NOT_REFUSED)
 		{
-			return snapshot;
-		}
-		Integer used = snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		if (used != null && used != swapCheckAtCapeRefusal)
-		{
-			swapCheckAtCapeRefusal = NOT_REFUSED;
 			return snapshot;
 		}
 		Map<Integer, Integer> varbits = new HashMap<>(snapshot.getVarbits());
@@ -344,7 +349,7 @@ public class RoutePlanner
 			gatesVersion = snapshot.getVersion();
 		}
 		long started = System.nanoTime();
-		SceneBfs.Scene scene = doors.open(client, view, SceneBfs.Scene.capture(view), table);
+		SceneBfs.Scene scene = doors.withDoorsOpen(view, SceneBfs.Scene.capture(view), table);
 		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, position.getTile(), table, rowOpen);
 		lastBfsNanos = System.nanoTime() - started;
 		// Collision flags still loading after a reload, or the player mid-obstacle on a blocked tile (stepping stones,

@@ -275,6 +275,7 @@ public class PlayerModel
 	/** Client thread. Also answers for items that aren't held, such as the remembered bank's. */
 	public Map<Integer, Charge> charges(Collection<Integer> itemIds)
 	{
+		chargeReader.rememberVarbitCharges(itemIds);
 		Map<Integer, Charge> charges = new HashMap<>(chargeReader.read(itemIds));
 		for (int id : itemIds)
 		{

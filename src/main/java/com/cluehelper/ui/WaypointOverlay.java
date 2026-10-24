@@ -103,6 +103,7 @@ public class WaypointOverlay extends Overlay
 		}
 		SubStep current = guide.getCurrent();
 		WorldView view = client.getTopLevelWorldView();
+		expireCrossing();
 		if (view != null && isCrossing())
 		{
 			drawLine(graphics, view, ahead(path));
@@ -359,7 +360,7 @@ public class WaypointOverlay extends Overlay
 		WorldPoint at = local == null ? null : local.getWorldLocation();
 		if (at != null && !at.equals(instanceTile))
 		{
-			SceneBfs.Scene scene = doors.open(client, view, SceneBfs.Scene.captureLoaded(view), null);
+			SceneBfs.Scene scene = doors.withDoorsOpen(view, SceneBfs.Scene.captureLoaded(view), null);
 			instanceTile = at;
 			instanceWalk = scene == null ? null : SceneBfs.run(scene, at, null, null);
 		}
@@ -499,23 +500,27 @@ public class WaypointOverlay extends Overlay
 		return targets;
 	}
 
-	private boolean isCrossing()
+	/** A crossing ends once its time is up, or once the player has had a tick to step in and stands idle: the line then picks its walk again. */
+	private void expireCrossing()
 	{
+		if (crossingFrom == NOT_CROSSING)
+		{
+			return;
+		}
 		Player local = client.getLocalPlayer();
 		int since = client.getTickCount() - crossingFrom;
 		boolean idle = local != null && local.getAnimation() == NO_ANIMATION && local.getPoseAnimation() == local.getIdlePoseAnimation();
-		if (crossingFrom == NOT_CROSSING)
-		{
-			return false;
-		}
 		if (since > CROSSING_TICKS || since >= CROSSING_START_TICKS && idle)
 		{
 			crossingFrom = NOT_CROSSING;
 			scenePath.forget();
 			pathScene = null;
-			return false;
 		}
-		return true;
+	}
+
+	private boolean isCrossing()
+	{
+		return crossingFrom != NOT_CROSSING;
 	}
 
 	private void drawLine(Graphics2D graphics, WorldView view, List<WorldPoint> ahead)

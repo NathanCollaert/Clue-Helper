@@ -15,7 +15,10 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 
-/** Client thread only. The {@code CHARGES_*_QUANTITY} varbits are never a source: they always read 0. */
+/**
+ * Client thread only. The {@code CHARGES_*_QUANTITY} varbits are never a source: they always read 0. The charges a varbit
+ * gives are remembered in the profile, so a banked item keeps its last count.
+ */
 @Singleton
 public class ChargeReader
 {
@@ -50,12 +53,26 @@ public class ChargeReader
 		return CHARGE_VARBITS.values();
 	}
 
+	/** Writes the varbit-backed charges of the held items to the profile. */
+	void rememberVarbitCharges(Collection<Integer> heldIds)
+	{
+		for (int id : heldIds)
+		{
+			Integer varbit = CHARGE_VARBITS.get(id);
+			if (varbit != null)
+			{
+				remember(id, client.getVarbitValue(varbit));
+			}
+		}
+	}
+
 	Map<Integer, Charge> read(Collection<Integer> heldIds)
 	{
+		Map<Integer, Integer> seen = seen();
 		Map<Integer, Charge> charges = new HashMap<>();
 		for (int id : heldIds)
 		{
-			Charge charge = read(id);
+			Charge charge = read(id, seen);
 			if (charge != null)
 			{
 				charges.put(id, charge);
@@ -64,7 +81,7 @@ public class ChargeReader
 		return charges;
 	}
 
-	private Charge read(int id)
+	private Charge read(int id, Map<Integer, Integer> seen)
 	{
 		int inName = chargesInName.computeIfAbsent(id, this::chargesInName);
 		if (inName != NOT_IN_NAME)
@@ -74,14 +91,12 @@ public class ChargeReader
 		Integer varbit = CHARGE_VARBITS.get(id);
 		if (varbit != null)
 		{
-			int value = client.getVarbitValue(varbit);
-			remember(id, value);
-			return new Charge(value, Charge.Source.VARBIT);
+			return new Charge(client.getVarbitValue(varbit), Charge.Source.VARBIT);
 		}
-		Integer seen = seen().get(id);
-		if (seen != null)
+		Integer remembered = seen.get(id);
+		if (remembered != null)
 		{
-			return new Charge(seen, Charge.Source.REMEMBERED);
+			return new Charge(remembered, Charge.Source.REMEMBERED);
 		}
 		String key = ITEM_CHARGES_KEYS.get(id);
 		Integer fromPlugin = key == null ? null : configManager.getRSProfileConfiguration(ITEM_CHARGES_GROUP, key, Integer.class);

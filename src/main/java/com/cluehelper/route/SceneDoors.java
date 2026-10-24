@@ -54,10 +54,12 @@ public final class SceneDoors
 	private final Set<Integer> lockedIds = new HashSet<>();
 	private int lastOpened = NOTHING_OPENED;
 	private volatile boolean canSlash;
+	private final Client client;
 
 	@Inject
-	public SceneDoors()
+	public SceneDoors(Client client)
 	{
+		this.client = client;
 	}
 
 	/** From each new snapshot: a web opens only to a player carrying or wielding something that slashes. */
@@ -81,18 +83,18 @@ public final class SceneDoors
 	}
 
 	/**
-	 * Client thread only. Clears the walls of closed doors in {@code scene}, a capture of {@code view}. A door that
-	 * {@code table} crosses by a row (one that shuts behind the player, its opening animated) stays shut, so its
-	 * row's time counts.
+	 * Client thread only. A copy of {@code scene}, a capture of {@code view}, with the walls of closed doors cleared and
+	 * the sides they open through recorded. A door that {@code table} crosses by a row (one that shuts behind the
+	 * player, its opening animated) stays shut, so its row's time counts.
 	 */
-	public SceneBfs.Scene open(Client client, WorldView view, SceneBfs.Scene scene, WalkTable table)
+	public SceneBfs.Scene withDoorsOpen(WorldView view, SceneBfs.Scene scene, WalkTable table)
 	{
 		if (scene == null)
 		{
 			return null;
 		}
 		Tile[][][] tiles = view.getScene().getTiles();
-		int[][][] flags = scene.getFlags();
+		int[][][] flags = copyOf(scene.getFlags());
 		int[][][] doorSides = new int[flags.length][][];
 		for (int plane = 0; plane < Math.min(tiles.length, flags.length); plane++)
 		{
@@ -107,11 +109,11 @@ public final class SceneDoors
 				{
 					Tile tile = tiles[plane][x][y];
 					WallObject wall = tile == null ? null : tile.getWallObject();
-					if (wall != null && opens(client, wall.getId()) && !passedByRow(table, wall.getId(), view, x, y, plane))
+					if (wall != null && opens(wall.getId()) && !passedByRow(table, wall.getId(), view, x, y, plane))
 					{
 						clearWall(flags[plane], doorSides[plane], x, y, wall.getOrientationA());
 					}
-					if (diagonalDoor(client, tile) != null)
+					if (diagonalDoor(tile) != null)
 					{
 						clear(flags[plane], x, y, CollisionDataFlag.BLOCK_MOVEMENT_OBJECT);
 						doorSides[plane][x][y] |= ALL_SIDES;
@@ -119,17 +121,35 @@ public final class SceneDoors
 				}
 			}
 		}
-		return scene.withDoorSides(doorSides);
+		return new SceneBfs.Scene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides);
+	}
+
+	private static int[][][] copyOf(int[][][] flags)
+	{
+		int[][][] copy = new int[flags.length][][];
+		for (int plane = 0; plane < flags.length; plane++)
+		{
+			if (flags[plane] != null)
+			{
+				copy[plane] = new int[flags[plane].length][];
+				for (int x = 0; x < flags[plane].length; x++)
+				{
+					copy[plane][x] = flags[plane][x].clone();
+				}
+			}
+		}
+		return copy;
 	}
 
 	/** Client thread only. */
-	public boolean isClosed(Client client, WallObject wall)
+	/** A door or web the path can go through with one click. */
+	public boolean opensOnClick(WallObject wall)
 	{
-		return opens(client, wall.getId());
+		return opens(wall.getId());
 	}
 
 	/** Client thread only. The closed door standing across {@code tile}'s diagonal, or null. */
-	public GameObject diagonalDoor(Client client, Tile tile)
+	public GameObject diagonalDoor(Tile tile)
 	{
 		if (tile == null)
 		{
@@ -137,7 +157,7 @@ public final class SceneDoors
 		}
 		for (GameObject object : tile.getGameObjects())
 		{
-			if (object != null && (object.getConfig() & OBJECT_TYPE_MASK) == DIAGONAL_WALL && opens(client, object.getId()))
+			if (object != null && (object.getConfig() & OBJECT_TYPE_MASK) == DIAGONAL_WALL && opens(object.getId()))
 			{
 				return object;
 			}
@@ -150,14 +170,14 @@ public final class SceneDoors
 		return table != null && table.isRowObjectAt(id, new WorldPoint(view.getBaseX() + sceneX, view.getBaseY() + sceneY, plane));
 	}
 
-	private boolean opens(Client client, int id)
+	private boolean opens(int id)
 	{
-		String option = openOption(client, id);
+		String option = openOption(id);
 		return !lockedIds.contains(id) && (OPEN.equals(option) || SLASH.equals(option) && canSlash);
 	}
 
 	/** Client thread only. The option that opens a door or web, or "" for anything else. */
-	public String openOption(Client client, int id)
+	public String openOption(int id)
 	{
 		return openOptions.computeIfAbsent(id, key ->
 		{

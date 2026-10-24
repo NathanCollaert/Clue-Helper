@@ -171,21 +171,21 @@ final class PathObjects
 		int dy = Integer.signum(to.getY() - from.getY());
 		int fromSides = (dx > 0 ? EAST : dx < 0 ? WEST : 0) | (dy > 0 ? NORTH : dy < 0 ? SOUTH : 0);
 		int toSides = (dx > 0 ? WEST : dx < 0 ? EAST : 0) | (dy > 0 ? SOUTH : dy < 0 ? NORTH : 0);
-		for (TileObject door : new TileObject[]{closedDoorFacing(client, view, doors, from, fromSides),
-			closedDoorFacing(client, view, doors, to, toSides), doors.diagonalDoor(client, tile(view, to))})
+		for (TileObject door : new TileObject[]{closedDoorFacing(view, doors, from, fromSides),
+			closedDoorFacing(view, doors, to, toSides), doors.diagonalDoor(tile(view, to))})
 		{
 			if (door != null)
 			{
-				objects.putIfAbsent(door, doors.openOption(client, door.getId()));
+				objects.putIfAbsent(door, doors.openOption(door.getId()));
 			}
 		}
 	}
 
-	private static WallObject closedDoorFacing(Client client, WorldView view, SceneDoors doors, WorldPoint at, int sides)
+	private static WallObject closedDoorFacing(WorldView view, SceneDoors doors, WorldPoint at, int sides)
 	{
 		Tile tile = tile(view, at);
 		WallObject wall = tile == null ? null : tile.getWallObject();
-		return wall != null && (wall.getOrientationA() & sides) != 0 && doors.isClosed(client, wall) ? wall : null;
+		return wall != null && (wall.getOrientationA() & sides) != 0 && doors.opensOnClick(wall) ? wall : null;
 	}
 
 	private static Tile tile(WorldView view, WorldPoint at)
