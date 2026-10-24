@@ -24,7 +24,6 @@ import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 @Singleton
 public class StageTarget
 {
-	private static final int REGULAR_ACCOUNT = 0;
 	/** The Grand Exchange's bank node, a walk table node. */
 	private static final WorldPoint GRAND_EXCHANGE = new WorldPoint(3162, 3489, 0);
 	private static final String BUY_TEXT = "Buy it on the Grand Exchange";
@@ -109,11 +108,10 @@ public class StageTarget
 		return out;
 	}
 
-	/** Ironmen of every kind gather it themselves: only a regular account buys it on the Grand Exchange. */
 	private boolean canTrade()
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot != null && snapshot.getAccountType() == REGULAR_ACCOUNT;
+		return snapshot != null && snapshot.getAccountType().canTrade();
 	}
 
 	/** Charlie's item already in the bank is withdrawn there, not fetched: a needed item brings a bank stop. */

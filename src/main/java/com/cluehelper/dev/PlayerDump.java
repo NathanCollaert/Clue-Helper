@@ -118,7 +118,7 @@ final class PlayerDump
 		List<String> lines = new ArrayList<>();
 		Position p = s.getPosition();
 		Position now = model.getPosition();
-		lines.add(String.format("Snapshot v%d (t%d): %s %s, now %s, wild %d, %s world%s, account type %d", s.getVersion(),
+		lines.add(String.format("Snapshot v%d (t%d): %s %s, now %s, wild %d, %s world%s, account %s", s.getVersion(),
 			s.getTick(), p.getKind(), tile(p.getTile()), tile(now.getTile()) + (now.getMapped() != null
 				&& !now.getMapped().equals(now.getTile()) ? " (mapped " + tile(now.getMapped()) + ")" : ""),
 			s.getWildernessLevel(), s.isMembersWorld() ? "members" : "F2P", s.isPvpWorld() ? ", PvP" : "",

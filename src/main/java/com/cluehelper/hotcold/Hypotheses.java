@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public final class Hypotheses
 		this.misses = misses;
 	}
 
-	public static Hypotheses filter(List<Spot> spots, boolean beginner, List<Reading> readings)
+	public static Hypotheses filter(List<Spot> spots, HotColdTier tier, List<Reading> readings)
 	{
 		List<List<WorldPoint>> tiles = new ArrayList<>();
 		for (Reading reading : readings)
@@ -52,7 +53,7 @@ public final class Hypotheses
 				{
 					int hx = candidate.getX() + dx;
 					int hy = candidate.getY() + dy;
-					int missed = misses(hx, hy, readings, tiles, beginner, fewest);
+					int missed = misses(hx, hy, readings, tiles, tier, fewest);
 					if (missed < fewest)
 					{
 						fewest = missed;
@@ -82,13 +83,13 @@ public final class Hypotheses
 	}
 
 	/** Counting stops past {@code enough}: such a tile is dropped anyway. */
-	private static int misses(int hx, int hy, List<Reading> readings, List<List<WorldPoint>> tiles, boolean beginner, int enough)
+	private static int misses(int hx, int hy, List<Reading> readings, List<List<WorldPoint>> tiles, HotColdTier tier, int enough)
 	{
 		int missed = 0;
 		for (int i = 0; i < readings.size() && missed <= enough; i++)
 		{
 			Reading reading = readings.get(i);
-			if (!reading.isAnchor() && !fitsBand(hx, hy, reading.getBand(), tiles.get(i), beginner))
+			if (!reading.isAnchor() && !fitsBand(hx, hy, reading.getBand(), tiles.get(i), tier))
 			{
 				missed++;
 			}
@@ -100,11 +101,11 @@ public final class Hypotheses
 		return missed;
 	}
 
-	private static boolean fitsBand(int hx, int hy, Band band, List<WorldPoint> at, boolean beginner)
+	private static boolean fitsBand(int hx, int hy, Band band, List<WorldPoint> at, HotColdTier tier)
 	{
 		for (WorldPoint tile : at)
 		{
-			if (Band.of(distance(tile, hx, hy), beginner) == band)
+			if (Band.of(distance(tile, hx, hy), tier) == band)
 			{
 				return true;
 			}

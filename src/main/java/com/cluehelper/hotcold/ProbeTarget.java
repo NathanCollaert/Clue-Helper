@@ -1,6 +1,7 @@
 package com.cluehelper.hotcold;
 
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.HotColdTier;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
@@ -28,8 +29,6 @@ public class ProbeTarget
 		/** Feel where you stand: the tile is where the plan was made, not a place to walk to. */
 		boolean here;
 	}
-
-	private static final String BEGINNER = "beginner";
 
 	private volatile Target target;
 	private volatile boolean enabled;
@@ -75,13 +74,13 @@ public class ProbeTarget
 		{
 			return step.toBuilder().kind(TargetKind.ANY_OF).targets(List.of()).build();
 		}
-		boolean beginner = BEGINNER.equals(step.getTier());
+		HotColdTier tier = HotColdTier.of(step.getTier());
 		return step.toBuilder()
 			.kind(TargetKind.ANY_OF)
 			.targets(List.of(chosen.getTile()))
-			.requirements(step.getRequirements().plus(Device.requirement(beginner)))
+			.requirements(step.getRequirements().plus(tier.getDevice()))
 			.waypointAct(chosen.getAct())
-			.actItems(chosen.isDig() ? Set.of() : Set.of(Device.itemId(beginner)))
+			.actItems(chosen.isDig() ? Set.of() : Set.of(tier.getDeviceItemId()))
 			.actAnywhere(chosen.isHere())
 			.build();
 	}

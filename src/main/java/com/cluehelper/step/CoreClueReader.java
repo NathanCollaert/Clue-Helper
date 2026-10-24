@@ -106,7 +106,7 @@ public final class CoreClueReader
 		if (clue instanceof HotColdClue)
 		{
 			HotColdClue hotCold = (HotColdClue) clue;
-			return ClueFacts.of(ClueTypes.HOT_COLD).tier(hotCold.isBeginner() ? "beginner" : "master")
+			return ClueFacts.of(ClueTypes.HOT_COLD).tier((hotCold.isBeginner() ? HotColdTier.BEGINNER : HotColdTier.MASTER).getTierName())
 				.npc(hotCold.getNpc()).text(hotCold.getText());
 		}
 		return ClueFacts.of(clue.getClass().getSimpleName());

@@ -4,6 +4,7 @@ import com.cluehelper.route.OriginClass;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.Planner;
+import com.cluehelper.step.HotColdTier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class ProbeJob
 	static final int SAMPLES_PER_SPOT = 9;
 
 	String stepKey;
-	boolean beginner;
+	HotColdTier tier;
 	List<Spot> spots;
 	List<Reading> readings;
 	WorldPoint here;
@@ -49,16 +50,16 @@ public class ProbeJob
 		boolean needsProbes = readings.isEmpty() || readings.get(readings.size() - 1).getBand() != Band.SHAKING;
 		int landings = needsProbes ? addLandings(probes) : 0;
 		long landingNanos = System.nanoTime() - started;
-		return decide(stepKey, spots, beginner, readings, probes, costs).toBuilder()
+		return decide(stepKey, spots, tier, readings, probes, costs).toBuilder()
 			.landings(landings).landingNanos(landingNanos).considered(List.copyOf(probes)).nanos(System.nanoTime() - started).build();
 	}
 
 	/** The rules after the probes are in, shared with the simulator. */
-	public static HotColdPlan decide(String stepKey, List<Spot> spots, boolean beginner, List<Reading> readings, List<Probe> probes,
+	public static HotColdPlan decide(String stepKey, List<Spot> spots, HotColdTier tier, List<Reading> readings, List<Probe> probes,
 		ProbePlanner.Costs costs)
 	{
-		Hypotheses grid = Hypotheses.filter(spots, beginner, readings);
-		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).kept(grid.spotShares())
+		Hypotheses grid = Hypotheses.filter(spots, tier, readings);
+		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares())
 			.exact(grid.isExact()).readings(FeelLogs.feels(readings)).probes(probes.size());
 		Reading last = readings.isEmpty() ? null : readings.get(readings.size() - 1);
 		if (last != null && last.getBand() == Band.SHAKING)
@@ -70,7 +71,7 @@ public class ProbeJob
 		{
 			return plan.action(HotColdPlan.Action.DIG_SPOT).tile(grid.digTile(kept.get(0).getName())).build();
 		}
-		ProbePlanner.Choice choice = ProbePlanner.choose(grid.sample(SAMPLES_PER_SPOT), beginner, last, probes, costs);
+		ProbePlanner.Choice choice = ProbePlanner.choose(grid.sample(SAMPLES_PER_SPOT), tier, last, probes, costs);
 		if (choice == null)
 		{
 			return plan.action(HotColdPlan.Action.NONE).build();

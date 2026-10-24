@@ -9,6 +9,8 @@ import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.Position;
 import com.cluehelper.player.PositionRules;
+import com.cluehelper.step.HotColdTier;
+import com.cluehelper.step.StepKey;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.route.OriginClass;
 import com.cluehelper.route.PlanInput;
@@ -26,7 +28,6 @@ import com.cluehelper.step.TargetKind;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
@@ -57,10 +58,6 @@ import net.runelite.client.util.Text;
 public class HotColdService
 {
 	static final String KEY = "hotColdLogs";
-	private static final String KEY_PREFIX = "hotcold:";
-	private static final String BEGINNER = "beginner";
-	private static final String MASTER = "master";
-	private static final Map<String, String> DEVICE_NPC = Map.of(BEGINNER, "reldo", MASTER, "jorral");
 	private static final int NO_CHECK = -1;
 	/** Ranking-only ticks on a feel in the Wilderness while the Wilderness is avoided. */
 	static final int WILDERNESS_PENALTY_TICKS = 20;
@@ -287,7 +284,7 @@ public class HotColdService
 		WorldPoint tile = player.getPosition().getTile();
 		boolean dig = last != null && (last.getAction() == HotColdPlan.Action.DIG_HERE || last.getAction() == HotColdPlan.Action.DIG_SPOT);
 		if (dig && tile != null && tile.getPlane() == last.getTile().getPlane()
-			&& tile.distanceTo2D(last.getTile()) <= Band.digRadius(last.getStepKey().startsWith(KEY_PREFIX + BEGINNER)))
+			&& tile.distanceTo2D(last.getTile()) <= Band.digRadius(last.getTier()))
 		{
 			logs.set(logs.get().solved(last.getStepKey()));
 			trace("dug at " + tile + ": log of " + last.getStepKey() + " cleared, last reading kept as the anchor");
@@ -323,12 +320,12 @@ public class HotColdService
 			return;
 		}
 		planPending = false;
-		boolean beginner = BEGINNER.equals(step.getTier());
-		boolean carried = carries(beginner);
+		HotColdTier tier = HotColdTier.of(step.getTier());
+		boolean carried = carries(tier);
 		ProbeJob job = ProbeJob.builder()
 			.stepKey(step.getKey())
-			.beginner(beginner)
-			.spots(spots(beginner))
+			.tier(tier)
+			.spots(spots(tier))
 			.readings(logs.get().get(step.getKey()))
 			.here(carried && player.getPosition().getKind() == Position.Kind.WORLD ? player.getPosition().getTile() : null)
 			.local(carried ? localProbes(walk) : List.of())
@@ -390,7 +387,7 @@ public class HotColdService
 			landingTiles = List.copyOf(tiles);
 		}
 		return step.toBuilder().kind(TargetKind.PROBES).targets(landingTiles)
-			.requirements(step.getRequirements().plus(Device.requirement(BEGINNER.equals(step.getTier())))).build();
+			.requirements(step.getRequirements().plus(HotColdTier.of(step.getTier()).getDevice())).build();
 	}
 
 	private List<Probe> localProbes(WalkData.Loaded walk)
@@ -425,14 +422,14 @@ public class HotColdService
 		return probes;
 	}
 
-	private List<Spot> spots(boolean beginner)
+	private List<Spot> spots(HotColdTier tier)
 	{
 		if (beginnerSpots == null)
 		{
-			beginnerSpots = Spots.of(stepData.index(), true);
-			masterSpots = Spots.of(stepData.index(), false);
+			beginnerSpots = Spots.of(stepData.index(), HotColdTier.BEGINNER);
+			masterSpots = Spots.of(stepData.index(), HotColdTier.MASTER);
 		}
-		return beginner ? beginnerSpots : masterSpots;
+		return tier == HotColdTier.BEGINNER ? beginnerSpots : masterSpots;
 	}
 
 	/**
@@ -446,15 +443,15 @@ public class HotColdService
 		{
 			return step.getKey();
 		}
-		boolean beginner = carries(true);
-		boolean master = carries(false);
+		boolean beginner = carries(HotColdTier.BEGINNER);
+		boolean master = carries(HotColdTier.MASTER);
 		if (beginner == master)
 		{
-			return master ? logs.get().latestKey(KEY_PREFIX) : null;
+			return master ? logs.get().latestKey(StepKey.HOT_COLD_PREFIX) : null;
 		}
-		String tier = beginner ? BEGINNER : MASTER;
-		String latest = logs.get().latestKey(KEY_PREFIX + tier + ":");
-		return latest != null ? latest : KEY_PREFIX + tier + ":" + DEVICE_NPC.get(tier);
+		HotColdTier tier = beginner ? HotColdTier.BEGINNER : HotColdTier.MASTER;
+		String latest = logs.get().latestKey(StepKey.hotColdPrefix(tier));
+		return latest != null ? latest : StepKey.hotCold(tier, tier.getDeviceNpc());
 	}
 
 	private Reading reading(DeviceLine line)
@@ -471,19 +468,19 @@ public class HotColdService
 	/** Carried, or in the remembered bank: the probe routes then start with a bank stop for it. */
 	private boolean ownsDevice(Step step)
 	{
-		boolean beginner = BEGINNER.equals(step.getTier());
-		if (carries(beginner))
+		HotColdTier tier = HotColdTier.of(step.getTier());
+		if (carries(tier))
 		{
 			return true;
 		}
 		PlayerSnapshot banked = availability.getBankedSnapshot();
-		return banked != null && banked.getBank().containsKey(Device.itemId(beginner));
+		return banked != null && banked.getBank().containsKey(tier.getDeviceItemId());
 	}
 
-	private boolean carries(boolean beginner)
+	private boolean carries(HotColdTier tier)
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot != null && snapshot.getInventory().containsKey(Device.itemId(beginner));
+		return snapshot != null && snapshot.getInventory().containsKey(tier.getDeviceItemId());
 	}
 
 	private static boolean isHotCold(Step step)
@@ -536,9 +533,9 @@ public class HotColdService
 		return client.getBoostedSkillLevel(Skill.HITPOINTS);
 	}
 
-	public List<Spot> spotsOf(boolean beginner)
+	public List<Spot> spotsOf(HotColdTier tier)
 	{
-		return spots(beginner);
+		return spots(tier);
 	}
 
 	/** For the verdict "did the grid keep a spot core dropped". */

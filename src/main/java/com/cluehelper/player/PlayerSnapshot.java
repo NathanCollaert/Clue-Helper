@@ -33,8 +33,7 @@ public final class PlayerSnapshot
 	private final boolean pvpWorld;
 	/** Null on a normal world. */
 	private final String dormantReason;
-	/** Varbit 1777: 0 normal, 1 Ironman, 2 Ultimate, 3 Hardcore, 4 Group, 5 Hardcore Group, 6 Unranked Group. */
-	private final int accountType;
+	private final AccountType accountType;
 	private final Map<Integer, Integer> inventory;
 	private final Map<Integer, Integer> worn;
 	/** -1 when nothing is wielded. */
@@ -70,7 +69,7 @@ public final class PlayerSnapshot
 
 	@Builder(toBuilder = true)
 	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
-		boolean pvpWorld, String dormantReason, int accountType, Map<Integer, Integer> inventory,
+		boolean pvpWorld, String dormantReason, AccountType accountType, Map<Integer, Integer> inventory,
 		Map<Integer, Integer> worn, int weapon, boolean pouchHeld, Map<Integer, Integer> pouch,
 		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,

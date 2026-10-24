@@ -1,5 +1,7 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
+
 /** Core's bands, measured exact for both tiers: Chebyshev distance to the spot's centre. */
 public enum Band
 {
@@ -28,11 +30,11 @@ public enum Band
 		return text;
 	}
 
-	public static Band of(int distance, boolean beginner)
+	public static Band of(int distance, HotColdTier tier)
 	{
 		for (Band band : values())
 		{
-			if (distance <= (beginner ? band.beginnerMax : band.masterMax))
+			if (distance <= (tier == HotColdTier.BEGINNER ? band.beginnerMax : band.masterMax))
 			{
 				return band;
 			}
@@ -41,9 +43,9 @@ public enum Band
 	}
 
 	/** Tiles from the centre within which a dig finds the casket or the master's enemy. */
-	public static int digRadius(boolean beginner)
+	public static int digRadius(HotColdTier tier)
 	{
-		return beginner ? SHAKING.beginnerMax : SHAKING.masterMax;
+		return tier == HotColdTier.BEGINNER ? SHAKING.beginnerMax : SHAKING.masterMax;
 	}
 
 	/** Null unless the clause is exactly one band's text. */

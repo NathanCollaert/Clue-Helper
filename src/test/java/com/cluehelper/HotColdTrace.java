@@ -5,6 +5,7 @@ import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.hotcold.Probe;
 import com.cluehelper.hotcold.ProbeJob;
 import com.cluehelper.hotcold.Reading;
+import com.cluehelper.step.HotColdTier;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
@@ -70,7 +71,7 @@ final class HotColdTrace
 		}
 		ProbeJob job = planned.getJob();
 		HotColdPlan plan = planned.getPlan();
-		Decision decision = new Decision(job.getStepKey(), job.isBeginner(), job.getReadings(), plan.getConsidered(),
+		Decision decision = new Decision(job.getStepKey(), job.getTier() == HotColdTier.BEGINNER, job.getReadings(), plan.getConsidered(),
 			job.getCosts().getWildernessPenaltyTicks(), plan.getAction().name(),
 			plan.getTile() == null ? null : new int[]{plan.getTile().getX(), plan.getTile().getY(), plan.getTile().getPlane()});
 		try (Writer out = new FileWriter(DECISIONS, StandardCharsets.UTF_8, true))

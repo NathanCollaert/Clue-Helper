@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,7 +67,7 @@ public final class ProbePlanner
 	 * @param previous the log's last reading, or null; the next reading is compared against it
 	 * @return null when no probe tells the spots apart
 	 */
-	public static Choice choose(Hypotheses.Samples samples, boolean beginner, Reading previous, List<Probe> probes, Costs costs)
+	public static Choice choose(Hypotheses.Samples samples, HotColdTier tier, Reading previous, List<Probe> probes, Costs costs)
 	{
 		WorldPoint before = previous == null ? null : previous.tiles().get(0);
 		double prior = entropy(spotMasses(samples));
@@ -80,7 +81,7 @@ public final class ProbePlanner
 		int bestCost = 0;
 		for (Probe probe : probes)
 		{
-			double bits = prior - conditionalEntropy(table, touched, outcomeMass, samples, beginner, before, probe.getTile());
+			double bits = prior - conditionalEntropy(table, touched, outcomeMass, samples, tier, before, probe.getTile());
 			if (bits < MIN_BITS)
 			{
 				continue;
@@ -99,7 +100,7 @@ public final class ProbePlanner
 		{
 			return null;
 		}
-		return new Choice(best, bestBits, bestCost, branches(samples, beginner, before, best.getTile()));
+		return new Choice(best, bestBits, bestCost, branches(samples, tier, before, best.getTile()));
 	}
 
 	static int cost(Probe probe, Costs costs)
@@ -161,13 +162,13 @@ public final class ProbePlanner
 
 	/** {@code table} must be all zeros, and is again on return; {@code touched} holds at least one slot per sample. */
 	private static double conditionalEntropy(double[] table, int[] touched, double[] outcomeMass, Hypotheses.Samples samples,
-		boolean beginner, WorldPoint before, WorldPoint at)
+		HotColdTier tier, WorldPoint before, WorldPoint at)
 	{
 		int spots = samples.spotCount();
 		int n = 0;
 		for (int i = 0; i < samples.x.length; i++)
 		{
-			int cell = outcome(samples.x[i], samples.y[i], beginner, before, at) * spots + samples.spot[i];
+			int cell = outcome(samples.x[i], samples.y[i], tier, before, at) * spots + samples.spot[i];
 			if (table[cell] == 0)
 			{
 				touched[n++] = cell;
@@ -195,10 +196,10 @@ public final class ProbePlanner
 		return sum / LOG2;
 	}
 
-	static int outcome(int hx, int hy, boolean beginner, WorldPoint before, WorldPoint at)
+	static int outcome(int hx, int hy, HotColdTier tier, WorldPoint before, WorldPoint at)
 	{
 		int distance = Hypotheses.distance(at, hx, hy);
-		Band band = Band.of(distance, beginner);
+		Band band = Band.of(distance, tier);
 		if (before == null || band == Band.SHAKING)
 		{
 			return band.ordinal() * COMPARISONS;
@@ -206,13 +207,13 @@ public final class ProbePlanner
 		return band.ordinal() * COMPARISONS + 1 + Comparison.of(distance, Hypotheses.distance(before, hx, hy)).ordinal();
 	}
 
-	private static List<Branch> branches(Hypotheses.Samples samples, boolean beginner, WorldPoint before, WorldPoint at)
+	private static List<Branch> branches(Hypotheses.Samples samples, HotColdTier tier, WorldPoint before, WorldPoint at)
 	{
 		int spots = samples.spotCount();
 		double[] table = new double[OUTCOMES * spots];
 		for (int i = 0; i < samples.x.length; i++)
 		{
-			table[outcome(samples.x[i], samples.y[i], beginner, before, at) * spots + samples.spot[i]] += samples.weight[i];
+			table[outcome(samples.x[i], samples.y[i], tier, before, at) * spots + samples.spot[i]] += samples.weight[i];
 		}
 		List<Branch> branches = new ArrayList<>();
 		for (int o = 0; o < OUTCOMES; o++)

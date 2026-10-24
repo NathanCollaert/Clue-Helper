@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -37,11 +38,11 @@ public class HotColdDecisionReplayTest
 			for (String line = in.readLine(); line != null; line = in.readLine())
 			{
 				JsonObject recorded = gson.fromJson(line, JsonObject.class);
-				boolean beginner = recorded.get("beginner").getAsBoolean();
+				HotColdTier tier = recorded.get("beginner").getAsBoolean() ? HotColdTier.BEGINNER : HotColdTier.MASTER;
 				List<Reading> readings = Arrays.asList(gson.fromJson(recorded.get("readings"), Reading[].class));
 				ProbePlanner.Costs costs = ProbePlanner.Costs.builder()
 					.wildernessPenaltyTicks(recorded.get("wildernessPenaltyTicks").getAsInt()).build();
-				HotColdPlan plan = ProbeJob.decide(recorded.get("stepKey").getAsString(), Spots.of(index, beginner), beginner, readings,
+				HotColdPlan plan = ProbeJob.decide(recorded.get("stepKey").getAsString(), Spots.of(index, tier), tier, readings,
 					probes(recorded.getAsJsonArray("probes")), costs);
 				String expected = recorded.get("action").getAsString() + " " + tile(recorded.getAsJsonArray("tile"));
 				String replayed = plan.getAction() + " " + plan.getTile();

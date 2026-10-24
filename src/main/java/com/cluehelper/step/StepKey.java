@@ -8,8 +8,22 @@ import net.runelite.api.gameval.ItemID;
  */
 public final class StepKey
 {
+	public static final String HOT_COLD_PREFIX = "hotcold:";
+
 	private StepKey()
 	{
+	}
+
+	/** The keys of one tier's hot/cold steps start with this. */
+	public static String hotColdPrefix(HotColdTier tier)
+	{
+		return HOT_COLD_PREFIX + tier.getTierName() + ":";
+	}
+
+	/** @param npc the NPC the clue names, as core gives it or as a key already names him */
+	public static String hotCold(HotColdTier tier, String npc)
+	{
+		return hotColdPrefix(tier) + ClueFacts.normalise(npc);
 	}
 
 	public static String of(ClueFacts f)
@@ -25,7 +39,7 @@ public final class StepKey
 			case ClueTypes.SKILL:
 				return "skill:" + f.getChallengeType() + ":" + ClueFacts.normalise(f.getRawChallenge());
 			case ClueTypes.HOT_COLD:
-				return "hotcold:" + f.getTier() + ":" + ClueFacts.normalise(f.getNpc());
+				return hotCold(HotColdTier.of(f.getTier()), f.getNpc());
 			case ClueTypes.BEGINNER_MAP:
 				return "map:w" + f.getWidgetGroupId();
 			case ClueTypes.COORDINATE:

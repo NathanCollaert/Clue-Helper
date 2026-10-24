@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +56,8 @@ public class HotColdSimulationTest
 
 	private static double meanFeels(boolean beginner, WorldPoint start, StepIndex index, List<WorldPoint> landings, List<String> rows)
 	{
-		List<Spot> spots = Spots.of(index, beginner);
+		HotColdTier tier = beginner ? HotColdTier.BEGINNER : HotColdTier.MASTER;
+		List<Spot> spots = Spots.of(index, tier);
 		ProbePlanner.Costs costs = ProbePlanner.Costs.builder()
 			.wildernessPenaltyTicks(HotColdService.WILDERNESS_PENALTY_TICKS).build();
 		int total = 0;
@@ -66,7 +68,7 @@ public class HotColdSimulationTest
 			{
 				continue;
 			}
-			int[] result = solve(truth, beginner, start, spots, landings, costs);
+			int[] result = solve(truth, tier, start, spots, landings, costs);
 			total += result[0];
 			String outcome = result[2] == 1 ? "dug" : "FAILED";
 			rows.add((beginner ? "beginner" : "master") + "\t" + truth.name() + "\t" + result[0] + "\t" + result[1] + "\t" + outcome);
@@ -80,7 +82,7 @@ public class HotColdSimulationTest
 	}
 
 	/** @return feels, ticks, 1 when the dig found the spot */
-	private static int[] solve(HotColdLocation truth, boolean beginner, WorldPoint start, List<Spot> spots, List<WorldPoint> landings,
+	private static int[] solve(HotColdLocation truth, HotColdTier tier, WorldPoint start, List<Spot> spots, List<WorldPoint> landings,
 		ProbePlanner.Costs costs)
 	{
 		WorldPoint centre = truth.getWorldPoint();
@@ -89,10 +91,10 @@ public class HotColdSimulationTest
 		int ticks = 0;
 		for (int feels = 0; feels <= MOST_FEELS; feels++)
 		{
-			HotColdPlan plan = ProbeJob.decide("sim", spots, beginner, readings, probes(at, landings), costs);
+			HotColdPlan plan = ProbeJob.decide("sim", spots, tier, readings, probes(at, landings), costs);
 			if (plan.getAction() == HotColdPlan.Action.DIG_HERE || plan.getAction() == HotColdPlan.Action.DIG_SPOT)
 			{
-				boolean found = plan.getTile().distanceTo2D(centre) <= Band.digRadius(beginner);
+				boolean found = plan.getTile().distanceTo2D(centre) <= Band.digRadius(tier);
 				int digTrip = Math.min((at.distanceTo2D(plan.getTile()) + 1) / 2, LANDING_TICKS);
 				return new int[]{feels, ticks + digTrip, found ? 1 : 0};
 			}
@@ -103,15 +105,15 @@ public class HotColdSimulationTest
 			Probe probe = plan.getChoice().getProbe();
 			ticks += probe.getTicks() + ProbePlanner.FEEL_TICKS;
 			at = probe.getTile();
-			readings.add(feel(at, centre, beginner, readings));
+			readings.add(feel(at, centre, tier, readings));
 		}
 		return new int[]{MOST_FEELS, ticks, 0};
 	}
 
-	private static Reading feel(WorldPoint at, WorldPoint centre, boolean beginner, List<Reading> before)
+	private static Reading feel(WorldPoint at, WorldPoint centre, HotColdTier tier, List<Reading> before)
 	{
 		int distance = at.distanceTo2D(centre);
-		Band band = Band.of(distance, beginner);
+		Band band = Band.of(distance, tier);
 		Reading previous = before.isEmpty() ? null : before.get(before.size() - 1);
 		Comparison comparison = previous == null || band == Band.SHAKING ? null
 			: Comparison.of(distance, new WorldPoint(previous.getX(), previous.getY(), 0).distanceTo2D(centre));

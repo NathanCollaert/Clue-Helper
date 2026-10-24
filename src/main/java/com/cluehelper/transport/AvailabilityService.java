@@ -24,8 +24,6 @@ public class AvailabilityService
 {
 	private static final long MILLIS_PER_MINUTE = 60_000L;
 
-	private static final int ULTIMATE_IRONMAN = 2;
-
 	private final PlayerModel player;
 	private final Client client;
 	private final BankMemory bankMemory;
@@ -119,10 +117,16 @@ public class AvailabilityService
 	}
 
 	/** Null when no bank counts. */
+	/** The bank is part of planning while the setting is on and the account has one. */
+	public boolean bankCounts(PlayerSnapshot snapshot)
+	{
+		return config.useBank() && snapshot.getAccountType().hasBank();
+	}
+
 	private PlayerSnapshot withBank(PlayerSnapshot snapshot)
 	{
 		BankMemory.Seen bank = bankMemory.getBank();
-		if (bank == null || !config.useBank() || snapshot.getAccountType() == ULTIMATE_IRONMAN)
+		if (bank == null || !bankCounts(snapshot))
 		{
 			return null;
 		}

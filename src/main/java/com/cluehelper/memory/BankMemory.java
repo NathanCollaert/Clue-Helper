@@ -1,8 +1,8 @@
 package com.cluehelper.memory;
 
+import com.cluehelper.player.AccountType;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,6 @@ public class BankMemory
 	static final String GROUP_STORAGE_KEY = "groupStorage";
 	static final String PIN_KEY = "bankPin";
 	static final String KIT_KEY = "huntsmansKit";
-	private static final Set<Integer> GROUP_IRONMAN = Set.of(4, 5, 6);
 	private static final int NO_PLACEHOLDER = -1;
 	private static final int NO_NOTE = -1;
 	private static final String DEPOSIT = "Deposit";
@@ -143,7 +142,7 @@ public class BankMemory
 			unsaved = true;
 			version++;
 		}
-		else if (event.getContainerId() == InventoryID.INV_GROUP_TEMP && GROUP_IRONMAN.contains(client.getVarbitValue(VarbitID.IRONMAN))
+		else if (event.getContainerId() == InventoryID.INV_GROUP_TEMP && AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)).isGroup()
 			&& client.getVarbitValue(VarbitID.GIM_SHARED_BANK_HASEDITED) != 1)
 		{
 			liveGroup = seen(event.getItemContainer());

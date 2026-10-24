@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import com.cluehelper.step.StepIndex;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,21 +18,26 @@ public final class Spots
 	{
 	}
 
-	public static List<Spot> of(StepIndex index, boolean beginner)
+	public static List<Spot> of(StepIndex index, HotColdTier tier)
 	{
 		Map<String, StepIndex.Spot> cache = index.getHotColdSpots();
 		List<Spot> spots = new ArrayList<>();
 		for (HotColdLocation location : HotColdLocation.values())
 		{
-			if (location.isBeginnerClue() == beginner)
+			if (tierOf(location) == tier)
 			{
-				spots.add(spot(location, cache.get(location.name())));
+				spots.add(spot(location, tier, cache.get(location.name())));
 			}
 		}
 		return List.copyOf(spots);
 	}
 
-	private static Spot spot(HotColdLocation location, StepIndex.Spot cached)
+	private static HotColdTier tierOf(HotColdLocation location)
+	{
+		return location.isBeginnerClue() ? HotColdTier.BEGINNER : HotColdTier.MASTER;
+	}
+
+	private static Spot spot(HotColdLocation location, HotColdTier tier, StepIndex.Spot cached)
 	{
 		WorldPoint core = location.getWorldPoint();
 		int[] tile = cached == null ? null : cached.getTile();
@@ -43,7 +49,7 @@ public final class Spots
 		{
 			description = description.substring(0, description.length() - 1);
 		}
-		return new Spot(location.name(), location.isBeginnerClue(), x, y, radius, description,
+		return new Spot(location.name(), tier, x, y, radius, description,
 			location.getHotColdArea().getName(), location.getEnemy() == Enemy.BRASSICAN_OR_WIZARDS);
 	}
 }

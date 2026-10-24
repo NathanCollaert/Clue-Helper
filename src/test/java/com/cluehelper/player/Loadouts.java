@@ -1,5 +1,6 @@
 package com.cluehelper.player;
 
+import com.cluehelper.player.AccountType;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -73,12 +74,12 @@ public final class Loadouts
 	private static final List<Integer> RUNES = List.of(ItemID.AIRRUNE, ItemID.WATERRUNE, ItemID.EARTHRUNE, ItemID.FIRERUNE,
 		ItemID.MINDRUNE, ItemID.BODYRUNE, ItemID.COSMICRUNE, ItemID.CHAOSRUNE, ItemID.NATURERUNE, ItemID.LAWRUNE,
 		ItemID.DEATHRUNE, ItemID.ASTRALRUNE, ItemID.BLOODRUNE, ItemID.SOULRUNE, ItemID.WRATHRUNE);
-	private static final Map<String, Integer> ACCOUNT_TYPES = Map.of("mid-ironman", 1, "uim", 2, "hcim", 3, "gim", 4);
+	private static final Map<String, AccountType> ACCOUNT_TYPES = Map.of("mid-ironman", AccountType.IRONMAN, "uim", AccountType.ULTIMATE_IRONMAN,
+		"hcim", AccountType.HARDCORE_IRONMAN, "gim", AccountType.GROUP_IRONMAN);
 	private static final int MAX_QUEST_POINTS = 300;
 	/** Runes are taken to sit in a rune pouch, so only the carried items fill slots. */
 	private static final int INVENTORY_SLOTS = 28;
 	private static final int BANKED_TABLETS = 5;
-	private static final int GROUP_IRONMAN = 4;
 	private static final int NEXUS_SLOTS = 41;
 
 	private Loadouts()
@@ -134,7 +135,7 @@ public final class Loadouts
 		PlayerSnapshot snapshot = PlayerSnapshot.builder()
 			.version(1)
 			.membersWorld(f.get("members").getAsBoolean())
-			.accountType(ACCOUNT_TYPES.getOrDefault(name, 0))
+			.accountType(ACCOUNT_TYPES.getOrDefault(name, AccountType.NORMAL))
 			.inventory(inventory)
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - carriedItems))
 			.weapon(-1)
@@ -178,7 +179,7 @@ public final class Loadouts
 				charges.put(id, new Charge(known, Charge.Source.ITEM_ID));
 			}
 		}
-		boolean group = carried.getAccountType() == GROUP_IRONMAN;
+		boolean group = carried.getAccountType().isGroup();
 		return carried.toBuilder().bank(group ? Map.of() : stored).groupStorage(group ? stored : Map.of()).charges(charges).build();
 	}
 

@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -37,7 +38,7 @@ public class HotColdView
 		Set<String> coreSpots;
 		boolean coreReset;
 		List<Spot> spots;
-		boolean beginner;
+		HotColdTier tier;
 		int hitpoints;
 	}
 
@@ -73,7 +74,7 @@ public class HotColdView
 			default:
 				throw new IllegalArgumentException("unhandled action " + plan.getAction());
 		}
-		if (!in.isBeginner() && plan.getAction() == HotColdPlan.Action.FEEL && in.getHitpoints() <= MOST_FEEL_DAMAGE)
+		if (in.getTier() == HotColdTier.MASTER && plan.getAction() == HotColdPlan.Action.FEEL && in.getHitpoints() <= MOST_FEEL_DAMAGE)
 		{
 			warnings.add("HP " + in.getHitpoints() + ": the next feel can kill you (master feels deal 4–8)");
 		}

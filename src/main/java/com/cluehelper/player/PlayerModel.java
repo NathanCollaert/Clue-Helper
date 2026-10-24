@@ -447,7 +447,7 @@ public class PlayerModel
 			.membersWorld(worldTypes.contains(WorldType.MEMBERS))
 			.pvpWorld(WorldType.isPvpWorld(worldTypes))
 			.dormantReason(dormantReason(worldTypes))
-			.accountType(client.getVarbitValue(VarbitID.IRONMAN))
+			.accountType(AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)))
 			.inventory(bankMemory.withKit(inventory))
 			.worn(worn)
 			.weapon(weapon())

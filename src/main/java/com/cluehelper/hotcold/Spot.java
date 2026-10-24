@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import lombok.Value;
 
 @Value
@@ -7,7 +8,7 @@ public class Spot
 {
 	/** Core's {@code HotColdLocation} name. */
 	String name;
-	boolean beginner;
+	HotColdTier tier;
 	/** The cache's centre, or core's where the cache has none. */
 	int x;
 	int y;

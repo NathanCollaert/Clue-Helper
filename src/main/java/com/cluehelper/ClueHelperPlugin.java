@@ -26,6 +26,7 @@ import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneDoors;
 import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.HotColdTier;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
@@ -83,7 +84,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDependency(ClueScrollPlugin.class)
 public class ClueHelperPlugin extends Plugin
 {
-	private static final int ULTIMATE_IRONMAN = 2;
 	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
 
 	@Inject
@@ -495,15 +495,15 @@ public class ClueHelperPlugin extends Plugin
 		{
 			return null;
 		}
-		boolean beginner = "beginner".equals(step.getTier());
+		HotColdTier tier = HotColdTier.of(step.getTier());
 		return HotColdView.of(new HotColdView.Inputs(plan, hotCold.getCoreSpots(), hotCold.isCoreReset(),
-			hotCold.spotsOf(beginner), beginner, hotCold.hitpoints()));
+			hotCold.spotsOf(tier), tier, hotCold.hitpoints()));
 	}
 
 	private GuideBox.Prompts prompts()
 	{
 		PlayerSnapshot snapshot = playerModel.getSnapshot();
-		boolean bankCounts = config.useBank() && snapshot != null && snapshot.getAccountType() != ULTIMATE_IRONMAN;
+		boolean bankCounts = snapshot != null && availability.bankCounts(snapshot);
 		HouseState house = poh.getHouse();
 		boolean houseKnown = !house.getNexusKeys().isEmpty() || !house.getFurniture().isEmpty();
 		boolean onlyNexusVarbitsKnown = houseKnown && house.getSource() == HouseState.Source.VARBITS;

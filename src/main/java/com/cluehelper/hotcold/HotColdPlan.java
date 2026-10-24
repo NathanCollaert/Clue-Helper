@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class HotColdPlan
 	}
 
 	String stepKey;
+	HotColdTier tier;
 	Action action;
 	/** The probe tile or the dig tile; null for {@link Action#NONE}. */
 	WorldPoint tile;

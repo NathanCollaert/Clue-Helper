@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.step.HotColdTier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -77,7 +78,7 @@ public class HotColdReplayTest
 			core.signal(new WorldPoint(last.getX(), last.getY(), last.getPlane()), HotColdTemperature.getFromTemperatureSet(
 				tier.equals("beginner") ? HotColdTemperature.BEGINNER_HOT_COLD_TEMPERATURES : HotColdTemperature.MASTER_HOT_COLD_TEMPERATURES,
 				row[6]), HotColdTemperatureChange.of(row[6]));
-			Hypotheses grid = Hypotheses.filter(Spots.of(index, tier.equals("beginner")), tier.equals("beginner"), log);
+			Hypotheses grid = Hypotheses.filter(Spots.of(index, HotColdTier.of(tier)), HotColdTier.of(tier), log);
 			assertTrue("tick " + row[0] + ": every reading fits the true spot", grid.isExact());
 			assertTrue("tick " + row[0] + ": the true spot is kept", grid.spotShares().containsKey(TRUE_SPOT.get(tier)));
 			Set<String> coreSpots = new HashSet<>();
