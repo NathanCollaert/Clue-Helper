@@ -57,7 +57,7 @@ public class WanderAreaOverlay extends Overlay
 		graphics.setColor(Markers.COLOUR);
 		graphics.setStroke(EDGE);
 		Step step = clueLink.getCurrentStep();
-		StepIndex.Wander range = step == null || step.getData() == null ? null : step.getData().getWander();
+		StepIndex.Wander range = step == null ? null : step.getData().getWander();
 		if (range != null && view.getPlane() == range.getPlane())
 		{
 			drawBox(graphics, view, range.getWest(), range.getSouth(), range.getEast(), range.getNorth());

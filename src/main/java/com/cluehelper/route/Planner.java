@@ -57,7 +57,7 @@ public final class Planner
 	{
 		long started = System.nanoTime();
 		Step step = in.getStep();
-		if (step != null && step.getData() != null && step.getData().isHidden())
+		if (step != null && step.getData().isHidden())
 		{
 			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
 				.note("not guided: a Leagues step").build();
@@ -388,7 +388,7 @@ public final class Planner
 	private static String noRouteNote(PlanContext ctx, List<List<int[]>> orders)
 	{
 		Step step = ctx.in.getStep();
-		if (step.getData() != null && step.getData().getReach() != null)
+		if (step.getData().getReach() != null)
 		{
 			return step.getData().getReach();
 		}
@@ -587,8 +587,7 @@ public final class Planner
 				stageReached = false;
 				if (merge)
 				{
-					legs.set(legs.size() - 1, new Leg(Leg.Kind.WALK, last.getFrom(), leg.getTo(), last.getHalfTicks() + leg.getHalfTicks(),
-						null, null, null, leg.getBookAfter()));
+					legs.set(legs.size() - 1, Leg.walk(last.getFrom(), leg.getTo(), last.getHalfTicks() + leg.getHalfTicks(), leg.getBookAfter()));
 				}
 				else
 				{
@@ -740,28 +739,19 @@ public final class Planner
 			switch (label.kind)
 			{
 				case TELEPORT:
+					return Leg.teleport(at, ((PlanContext.Teleport) label.ref).row, label.edgeHalf, book);
 				case SWAP_TELEPORT:
-				{
-					PlanContext.Teleport tele = (PlanContext.Teleport) label.ref;
-					PlanContext.Change swap = (PlanContext.Change) label.ref2;
-					return new Leg(label.kind, at, tele.row.getDestination(), label.edgeHalf, tele.row, null,
-						swap == null ? null : swap.change, book);
-				}
+					return Leg.swapTeleport(at, ((PlanContext.Teleport) label.ref).row, ((PlanContext.Change) label.ref2).change, label.edgeHalf, book);
 				case FAIRY_RING:
-				{
-					PlanContext.Teleport entry = (PlanContext.Teleport) label.ref;
-					PlanContext.Teleport landing = (PlanContext.Teleport) label.ref2;
-					return new Leg(label.kind, at, landing.row.getDestination(), label.edgeHalf, entry.row, landing.row, null, book);
-				}
+					return Leg.fairyRing(at, ((PlanContext.Teleport) label.ref).row, ((PlanContext.Teleport) label.ref2).row, label.edgeHalf, book);
 				case SPELLBOOK_CHANGE:
-					return new Leg(label.kind, at, at, label.edgeHalf, null, null, ((PlanContext.Change) label.ref).change, book);
+					return Leg.spellbookChange(at, ((PlanContext.Change) label.ref).change, label.edgeHalf, book);
 				case BANK:
-					return new Leg(label.kind, at, at, label.edgeHalf, null, null, null, book);
+					return Leg.bank(at, label.edgeHalf, book);
 				case WILDERNESS_EXIT:
-					return new Leg(label.kind, at, new WorldPoint(at.getX(), at.getY() - label.edgeHalf, at.getPlane()), label.edgeHalf,
-						null, null, null, book);
+					return Leg.wildernessExit(at, label.edgeHalf, book);
 				case WALK:
-					return new Leg(Leg.Kind.WALK, at, ctx.tile(label.node), label.edgeHalf, null, null, null, book);
+					return Leg.walk(at, ctx.tile(label.node), label.edgeHalf, book);
 				default:
 					throw new IllegalArgumentException("unhandled leg kind " + label.kind);
 			}

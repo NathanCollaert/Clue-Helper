@@ -289,7 +289,7 @@ public class StepGuide
 	/** The step's hand-written way in that this exit row is, or null. */
 	private StepIndex.WayIn wayInOf(WorldPoint origin, WorldPoint destination)
 	{
-		StepIndex.WayIn way = routeStep == null || routeStep.getData() == null ? null : routeStep.getData().getEntry();
+		StepIndex.WayIn way = routeStep == null ? null : routeStep.getData().getEntry();
 		return way != null && origin.equals(way.getTile()) && destination.equals(way.getTo()) ? way : null;
 	}
 
@@ -418,7 +418,7 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean task = current != null && current.isTask();
-		return task && routeStep != null && routeStep.getData() != null ? routeStep.getData().getChoose() : null;
+		return task && routeStep != null ? routeStep.getData().getChoose() : null;
 	}
 
 	private static Widget withText(Widget parent, String text)
@@ -446,7 +446,7 @@ public class StepGuide
 		PlanStart start = routes.getStart();
 		Step step = routes.travelStep();
 		boolean noWalk = start != null && start.getKind() == PlanStart.Kind.TELEPORT_ONLY;
-		boolean partWay = start != null && step != null && step.getData() != null && step.getData().getEntry() != null
+		boolean partWay = start != null && step != null && step.getData().getEntry() != null
 			&& step.getData().getEntry().isPartWay(start.getTile());
 		SubStep goIn = noWalk || partWay ? SubSteps.goingIn(step, start.getTile()) : null;
 		boolean inside = noWalk && goIn == null && isInsideWayIn(step, start.getTile());
@@ -616,7 +616,7 @@ public class StepGuide
 
 	private static boolean isInsideWayIn(Step step, WorldPoint at)
 	{
-		StepIndex.WayIn way = step == null || step.getData() == null ? null : step.getData().getEntry();
+		StepIndex.WayIn way = step == null ? null : step.getData().getEntry();
 		return way != null && way.isInside(at);
 	}
 
@@ -871,8 +871,7 @@ public class StepGuide
 
 	private void noteDeposit(Step ended, Step next)
 	{
-		boolean emote = ended != null && ClueTypes.EMOTE.equals(ended.getType()) && ended.getData() != null
-			&& ended.getData().getStash() != null;
+		boolean emote = ended != null && ClueTypes.EMOTE.equals(ended.getType()) && ended.getData().getStash() != null;
 		boolean takenFromStash = actWatcher.holdsStashItems(stepSince);
 		if (!emote || !takenFromStash || next != null && ended.getKey().equals(next.getKey()))
 		{
@@ -930,7 +929,7 @@ public class StepGuide
 	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
 	private boolean takeFromStash(Step step)
 	{
-		if (step == null || step.getData() == null || step.getData().getStash() == null || step.getRequirements() == null)
+		if (step == null || step.getData().getStash() == null || step.getRequirements() == null)
 		{
 			return false;
 		}
@@ -1218,7 +1217,7 @@ public class StepGuide
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory() == Category.MINIGAME)
 		{
 			shown.spellWidget(MINIGAME_SPELLS.getOrDefault(currentBook(), InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD)).tab(Tab.MAGIC)
-				.menuTarget(MenuTarget.builder().line(MenuTarget.Line.MINIGAME).lineName(SubSteps.minigameName(current.getRow())).build());
+				.menuTarget(MenuTarget.minigame(SubSteps.minigameName(current.getRow())));
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().isLocated())
 		{
@@ -1234,15 +1233,15 @@ public class StepGuide
 		{
 			CatalogRow row = current.getRow();
 			Set<Integer> held = withHeld(shown, row);
-			MenuTarget.MenuTargetBuilder target = MenuTarget.builder().itemIds(held).itemNames(names(held)).alternatives(sameLanding(current));
-			shown.menuWidget(ScrollBook.entry(row.getName())).menuTarget(SubSteps.isQuetzalMap(row)
-				? target.path(List.of(SIGNAL_OPTION)).line(MenuTarget.Line.QUETZAL).lineId(SubSteps.quetzalTableId(row)).build()
-				: target.path(optionPath(row.getName())).build());
+			MenuTarget.MenuTargetBuilder target = SubSteps.isQuetzalMap(row)
+				? MenuTarget.quetzal(SubSteps.quetzalTableId(row)).toBuilder().path(List.of(SIGNAL_OPTION))
+				: MenuTarget.builder().path(optionPath(row.getName()));
+			shown.menuWidget(ScrollBook.entry(row.getName()))
+				.menuTarget(target.itemIds(held).itemNames(names(held)).alternatives(sameLanding(current)).build());
 		}
 		else if (current.getKind() == SubStep.Kind.FAIRY_RING && current.getRow().getCode() != null)
 		{
-			shown.menuTarget(MenuTarget.builder().objectIds(FAIRY_RING_OBJECTS).line(MenuTarget.Line.FAIRY_CODE)
-				.lineKey(current.getRow().getCode()).build());
+			shown.menuTarget(MenuTarget.fairyCode(current.getRow().getCode()).toBuilder().objectIds(FAIRY_RING_OBJECTS).build());
 		}
 		else if (current.getKind() == SubStep.Kind.CHANGE_BOOK && current.getChange().isAnywhere())
 		{
@@ -1372,7 +1371,7 @@ public class StepGuide
 	private boolean equipWhatIsCarried()
 	{
 		SubStep current = getCurrent();
-		if (current == null || current.getDone() != SubStep.Done.WAY_IN_WORN || routeStep == null || routeStep.getData() == null)
+		if (current == null || current.getDone() != SubStep.Done.WAY_IN_WORN || routeStep == null)
 		{
 			return false;
 		}
@@ -1480,7 +1479,7 @@ public class StepGuide
 
 	private boolean wearsWayInGear(Step step)
 	{
-		if (step == null || step.getData() == null)
+		if (step == null)
 		{
 			return true;
 		}
@@ -1540,7 +1539,7 @@ public class StepGuide
 		{
 			return shown.toBuilder().items(Set.of(ItemID.HUNTSMANS_KIT)).tab(Tab.INVENTORY).build();
 		}
-		StepIndex.Cast cast = routeStep.getData() == null ? null : routeStep.getData().getCast();
+		StepIndex.Cast cast = routeStep.getData().getCast();
 		if (cast != null && cast.getOn().stream().anyMatch(carried::contains))
 		{
 			return withCast(shown, cast, carried);
@@ -1561,7 +1560,7 @@ public class StepGuide
 	/** The book to switch to first, else the making step reached; null when the task needs neither. */
 	private String taskDetail()
 	{
-		String book = routeStep == null || routeStep.getData() == null ? null : routeStep.getData().getBook();
+		String book = routeStep == null ? null : routeStep.getData().getBook();
 		if (book != null && !book.equals(currentBook().name()))
 		{
 			return "Switch to the " + book.toLowerCase(Locale.ROOT) + " spellbook first";
@@ -1582,7 +1581,7 @@ public class StepGuide
 	private String plantedTreeLine(SubStep current)
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
-		if (!current.isTask() || routeStep == null || routeStep.getData() == null || !routeStep.getData().isToPlantedTree() || snapshot == null)
+		if (!current.isTask() || routeStep == null || !routeStep.getData().isToPlantedTree() || snapshot == null)
 		{
 			return null;
 		}
@@ -1632,7 +1631,7 @@ public class StepGuide
 	/** The furthest making step whose worked-on item is carried; null before any is, or for a task made of nothing. */
 	private StepIndex.Making makingNow(Set<Integer> carried)
 	{
-		List<StepIndex.Making> making = routeStep == null || routeStep.getData() == null ? List.of() : routeStep.getData().getMaking();
+		List<StepIndex.Making> making = routeStep == null ? List.of() : routeStep.getData().getMaking();
 		StepIndex.Making now = null;
 		for (StepIndex.Making step : making)
 		{
@@ -1847,18 +1846,18 @@ public class StepGuide
 		switch (parts[0])
 		{
 			case "quetzal":
-				return target.npcIds(Set.of(NpcID.QUETZAL_CHILD_GREEN)).path(List.of(TRAVEL_OPTION)).line(MenuTarget.Line.QUETZAL)
-					.lineId(SubSteps.quetzalTableId(row)).build();
+				return MenuTarget.quetzal(SubSteps.quetzalTableId(row)).toBuilder().objectIds(objectsOf(row))
+					.npcIds(Set.of(NpcID.QUETZAL_CHILD_GREEN)).path(List.of(TRAVEL_OPTION)).build();
 			case "list":
 				return target.path(listPath(row, outside, parts[1])).build();
 			case "nexus":
 			{
 				String[] nexus = parts[1].split(" ", 2);
-				return target.line(MenuTarget.Line.NEXUS).lineId(Integer.parseInt(nexus[0])).lineKey(nexus[1])
-					.lineName(SubSteps.nexusPlace(row.getName())).build();
+				return MenuTarget.nexus(Integer.parseInt(nexus[0]), nexus[1], SubSteps.nexusPlace(row.getName())).toBuilder()
+					.objectIds(objectsOf(row)).build();
 			}
 			case "box":
-				return target.line(MenuTarget.Line.BOX).lineId(Integer.parseInt(parts[1])).build();
+				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objectsOf(row)).build();
 			case "npc":
 				return MenuTarget.builder().npcIds(Set.of(row.getObjectId())).path(List.of(parts[1].split(MENU_STEP))).build();
 			default:

@@ -222,7 +222,7 @@ final class PlanContext
 	boolean stageNeedsBank(int node, int bankState)
 	{
 		RequiredItems.Verdict verdict = stageNeeds.get(node);
-		return verdict != null && !verdict.isCarried() && verdict.isBanked() && bankState != BANKED;
+		return verdict != null && verdict.isFromBank() && bankState != BANKED;
 	}
 
 	int[] stageWithdraw(int node, int bankState)
@@ -241,7 +241,7 @@ final class PlanContext
 	boolean arrivesWithoutBank()
 	{
 		boolean depositsBook = depositsBookFirst && options[BANKED] != null;
-		return !depositsBook && (required.isCarried() || !required.isBanked());
+		return !depositsBook && !required.isFromBank();
 	}
 
 	/** After a bank stop with nothing withdrawn yet, these are the only nodes worth walking to. */

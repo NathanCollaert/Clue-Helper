@@ -394,10 +394,9 @@ public class PlayerModel
 		{
 			WorldEntity boat = topLevel.worldEntities().byIndex(view.getId());
 			WorldPoint boatTile = boat == null ? null : WorldPoint.fromLocalInstance(client, boat.getLocalLocation());
-			return PositionRules.classify(true, boatTile, null, topLevel.isInstance());
+			return PositionRules.onBoat(boatTile);
 		}
-		return PositionRules.classify(false, null, WorldPoint.fromLocalInstance(client, player.getLocalLocation()),
-			topLevel.isInstance());
+		return PositionRules.onFoot(WorldPoint.fromLocalInstance(client, player.getLocalLocation()), topLevel.isInstance());
 	}
 
 	private static int wildernessLevel(Position position)

@@ -126,7 +126,7 @@ public final class PlanReplay
 		List<WorldPoint> targets = recording.targets.stream().map(PlanReplay::point).collect(Collectors.toList());
 		List<Stage> stages = recording.stages == null ? List.of() : recording.stages.stream().map(PlanReplay::stage).collect(Collectors.toList());
 		return Step.builder().key(recording.stepKey).type(recording.stepType).tier(recording.tier).kind(TargetKind.valueOf(recording.kind))
-			.targets(targets).stages(stages).regions(List.of()).known(true).build();
+			.targets(targets).stages(stages).regions(List.of()).build();
 	}
 
 	private static Stage stage(PlanTrace.RecordedStage recorded)

@@ -92,7 +92,7 @@ public class HotColdSimulationTest
 		for (int feels = 0; feels <= MOST_FEELS; feels++)
 		{
 			HotColdPlan plan = ProbeJob.decide("sim", spots, tier, readings, probes(at, landings), costs);
-			if (plan.getAction() == HotColdPlan.Action.DIG_HERE || plan.getAction() == HotColdPlan.Action.DIG_SPOT)
+			if (plan.isDig())
 			{
 				boolean found = plan.getTile().distanceTo2D(centre) <= Band.digRadius(tier);
 				int digTrip = Math.min((at.distanceTo2D(plan.getTile()) + 1) / 2, LANDING_TICKS);

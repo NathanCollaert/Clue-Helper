@@ -50,7 +50,7 @@ public final class DriftSteps
 					: Arrays.stream(c[7].split("\\|")).map(Integer::parseInt).collect(Collectors.toList());
 				TargetKind kind = c[4].isEmpty() ? TargetKind.ANY_OF : TargetKind.valueOf(c[4]);
 				read.put(c[0], Step.builder().key(c[0]).type(c[2]).tier(c[3]).kind(kind).targets(targets).regions(regions)
-					.stages(challengeStages(c[2], kind, targets, index.entry(c[0]))).text(c[12]).known(true).build());
+					.stages(challengeStages(c[2], kind, targets, index.entry(c[0]))).text(c[12]).build());
 			}
 		}
 		return read;

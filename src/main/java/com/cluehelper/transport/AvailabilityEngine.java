@@ -68,23 +68,7 @@ public final class AvailabilityEngine
 
 	private static void checkLevel(LevelNeed need, PlayerSnapshot player, Verdict v)
 	{
-		int have;
-		if (need.getSkill() != null)
-		{
-			have = player.boosted(need.getSkill());
-		}
-		else if (need.getAggregate() == LevelNeed.Aggregate.TOTAL)
-		{
-			have = player.getTotalLevel();
-		}
-		else if (need.getAggregate() == LevelNeed.Aggregate.COMBAT)
-		{
-			have = player.getCombatLevel();
-		}
-		else
-		{
-			have = player.getQuestPoints();
-		}
+		int have = need.have(player);
 		if (have < need.getLevel())
 		{
 			v.no("needs " + need.describe() + " (has " + have + ")");

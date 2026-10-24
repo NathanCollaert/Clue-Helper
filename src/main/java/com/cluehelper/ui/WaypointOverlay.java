@@ -213,7 +213,7 @@ public class WaypointOverlay extends Overlay
 	private WorldPoint wandererOr(WorldView view, WorldPoint goal)
 	{
 		Step step = clueLink.getCurrentStep();
-		StepIndex.Wander range = step == null || step.getData() == null ? null : step.getData().getWander();
+		StepIndex.Wander range = step == null ? null : step.getData().getWander();
 		WorldPoint npc = step == null ? null : nearestNamedNpc(view, step.getNpcs(), goal);
 		boolean npcThere = npc != null && npc.getPlane() == goal.getPlane()
 			&& (range != null ? range.contains(npc) : npc.distanceTo2D(goal) <= WANDER_TILES);

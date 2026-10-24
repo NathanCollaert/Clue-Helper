@@ -74,10 +74,8 @@ public class StepResolver
 			.objectIds(CoreClueReader.objectIds(clue))
 			.objectNames(CoreClueReader.objectNames(clue))
 			.requirements(requirements(clue))
-			.cacheRows(entry == null ? List.of() : List.copyOf(entry.getRows()))
-			.known(entry != null)
 			.stages(stages)
-			.data(entry)
+			.data(entry == null ? StepIndex.Entry.NONE : entry)
 			.otherTiles(otherTiles(entry, targets))
 			.emotes(CoreClueReader.emotes(clue))
 			.build();
@@ -145,8 +143,6 @@ public class StepResolver
 			.objectIds(List.of())
 			.objectNames(List.of())
 			.requirements(new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), StepRequirements.NO_STASH))
-			.cacheRows(List.of())
-			.known(false)
 			.build();
 	}
 

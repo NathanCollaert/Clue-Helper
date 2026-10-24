@@ -24,9 +24,6 @@ public class Step
 	List<Integer> objectIds;
 	List<String> objectNames;
 	StepRequirements requirements;
-	List<CacheRow> cacheRows;
-	/** False when the step data lacks this key; the step still has core's targets. */
-	boolean known;
 	/**
 	 * Set on a hot/cold step rewritten to one probe tile of our own: what to do there. The target is then our waypoint,
 	 * not core's.
@@ -40,12 +37,24 @@ public class Step
 	/** Places visited in turn, each with its own act; empty for a step done in one place. */
 	@Builder.Default
 	List<Stage> stages = List.of();
-	/** The step data's entry; null for a key the data lacks. */
-	StepIndex.Entry data;
+	/** The step data's entry; {@link StepIndex.Entry#NONE} for a key the data lacks. */
+	@Builder.Default
+	StepIndex.Entry data = StepIndex.Entry.NONE;
 	/** Tiles core doesn't give but the step is done at too (Brimstail inside his cave): arriving there is arriving. */
 	@Builder.Default
 	List<WorldPoint> otherTiles = List.of();
 	/** An emote step's emotes in order, by core's names. */
 	@Builder.Default
 	List<String> emotes = List.of();
+
+	/** False when the step data lacks this key; the step still has core's targets. */
+	public boolean isKnown()
+	{
+		return data != StepIndex.Entry.NONE;
+	}
+
+	public List<CacheRow> getCacheRows()
+	{
+		return List.copyOf(data.getRows());
+	}
 }

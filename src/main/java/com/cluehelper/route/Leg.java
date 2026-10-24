@@ -31,6 +31,56 @@ public class Leg
 	/** For a pending Spellbook Swap, the temporary book. */
 	Book bookAfter;
 
+	private Leg(Kind kind, WorldPoint from, WorldPoint to, int halfTicks, CatalogRow row, CatalogRow landing, SpellbookChange change,
+		Book bookAfter)
+	{
+		this.kind = kind;
+		this.from = from;
+		this.to = to;
+		this.halfTicks = halfTicks;
+		this.row = row;
+		this.landing = landing;
+		this.change = change;
+		this.bookAfter = bookAfter;
+	}
+
+	public static Leg walk(WorldPoint from, WorldPoint to, int halfTicks, Book book)
+	{
+		return new Leg(Kind.WALK, from, to, halfTicks, null, null, null, book);
+	}
+
+	/** Due south until out of the Wilderness, a tile per half-tick. */
+	public static Leg wildernessExit(WorldPoint from, int halfTicks, Book book)
+	{
+		return new Leg(Kind.WILDERNESS_EXIT, from, new WorldPoint(from.getX(), from.getY() - halfTicks, from.getPlane()), halfTicks, null, null, null, book);
+	}
+
+	public static Leg teleport(WorldPoint from, CatalogRow row, int halfTicks, Book book)
+	{
+		return new Leg(Kind.TELEPORT, from, row.getDestination(), halfTicks, row, null, null, book);
+	}
+
+	/** A Spellbook Swap cast, then the teleport it enables. */
+	public static Leg swapTeleport(WorldPoint from, CatalogRow row, SpellbookChange swap, int halfTicks, Book book)
+	{
+		return new Leg(Kind.SWAP_TELEPORT, from, row.getDestination(), halfTicks, row, null, swap, book);
+	}
+
+	public static Leg fairyRing(WorldPoint from, CatalogRow entry, CatalogRow landing, int halfTicks, Book book)
+	{
+		return new Leg(Kind.FAIRY_RING, from, landing.getDestination(), halfTicks, entry, landing, null, book);
+	}
+
+	public static Leg spellbookChange(WorldPoint at, SpellbookChange change, int halfTicks, Book bookAfter)
+	{
+		return new Leg(Kind.SPELLBOOK_CHANGE, at, at, halfTicks, null, null, change, bookAfter);
+	}
+
+	public static Leg bank(WorldPoint at, int halfTicks, Book book)
+	{
+		return new Leg(Kind.BANK, at, at, halfTicks, null, null, null, book);
+	}
+
 	public int getTicks()
 	{
 		return (halfTicks + 1) / 2;
@@ -57,8 +107,10 @@ public class Leg
 				return landing.getName();
 			case SPELLBOOK_CHANGE:
 				return change.getName() + " → " + bookAfter;
-			default:
+			case BANK:
 				return "bank";
+			default:
+				throw new IllegalArgumentException("unhandled leg kind " + kind);
 		}
 	}
 }

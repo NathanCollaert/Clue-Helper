@@ -153,7 +153,7 @@ final class FairyDialTrace extends Overlay
 
 	private MenuTarget target()
 	{
-		return MenuTarget.builder().line(MenuTarget.Line.FAIRY_CODE).lineKey(code).build();
+		return MenuTarget.fairyCode(code);
 	}
 
 	private void dumpWidgets()

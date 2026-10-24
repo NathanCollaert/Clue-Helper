@@ -64,19 +64,19 @@ public class ProbeJob
 		Reading last = readings.isEmpty() ? null : readings.get(readings.size() - 1);
 		if (last != null && last.getBand() == Band.SHAKING)
 		{
-			return plan.action(HotColdPlan.Action.DIG_HERE).tile(new WorldPoint(last.getX(), last.getY(), last.getPlane())).build();
+			return HotColdPlan.digHere(plan, new WorldPoint(last.getX(), last.getY(), last.getPlane()));
 		}
 		List<Spot> kept = grid.keptSpots();
 		if (kept.size() == 1)
 		{
-			return plan.action(HotColdPlan.Action.DIG_SPOT).tile(grid.digTile(kept.get(0).getName())).build();
+			return HotColdPlan.digSpot(plan, grid.digTile(kept.get(0).getName()));
 		}
 		ProbePlanner.Choice choice = ProbePlanner.choose(grid.sample(SAMPLES_PER_SPOT), tier, last, probes, costs);
 		if (choice == null)
 		{
-			return plan.action(HotColdPlan.Action.NONE).build();
+			return HotColdPlan.none(plan);
 		}
-		return plan.action(HotColdPlan.Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
+		return HotColdPlan.feel(plan, choice);
 	}
 
 	private int addLandings(List<Probe> probes)

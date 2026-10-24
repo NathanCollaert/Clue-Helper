@@ -58,6 +58,33 @@ public class RequiredItems
 		List<Need> missing;
 		/** For a missing need with another way to it: the parts of that way also missing. */
 		Map<Need, List<String>> missingParts;
+
+		private Verdict(boolean carried, boolean banked, List<ItemUse> withdraw, List<Need> missing, Map<Need, List<String>> missingParts)
+		{
+			this.carried = carried;
+			this.banked = banked;
+			this.withdraw = withdraw;
+			this.missing = missing;
+			this.missingParts = missingParts;
+		}
+
+		/** Not met even with the bank: these needs are owned nowhere. */
+		static Verdict missing(List<Need> missing, Map<Need, List<String>> missingParts)
+		{
+			return new Verdict(false, false, List.of(), missing, missingParts);
+		}
+
+		/** Met once these are withdrawn at a bank stop. */
+		static Verdict fromBank(List<ItemUse> withdraw)
+		{
+			return new Verdict(false, true, withdraw, List.of(), Map.of());
+		}
+
+		/** Met only with a bank stop. */
+		public boolean isFromBank()
+		{
+			return !carried && banked;
+		}
 	}
 
 	public boolean isEmpty()
@@ -84,9 +111,9 @@ public class RequiredItems
 			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(owned)).collect(Collectors.toList());
 			Map<Need, List<String>> parts = missing.stream().filter(need -> need.requirement instanceof AlternativeRequirement)
 				.collect(Collectors.toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
-			return new Verdict(false, false, List.of(), missing, parts);
+			return Verdict.missing(missing, parts);
 		}
-		return new Verdict(false, true, minimalWithdraw(open, player, carried, banked), List.of(), Map.of());
+		return Verdict.fromBank(minimalWithdraw(open, player, carried, banked));
 	}
 
 	/**

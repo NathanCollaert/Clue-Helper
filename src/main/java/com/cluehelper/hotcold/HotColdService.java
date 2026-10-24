@@ -282,7 +282,7 @@ public class HotColdService
 	private void forgetIfDug(HotColdPlan last)
 	{
 		WorldPoint tile = player.getPosition().getTile();
-		boolean dig = last != null && (last.getAction() == HotColdPlan.Action.DIG_HERE || last.getAction() == HotColdPlan.Action.DIG_SPOT);
+		boolean dig = last != null && last.isDig();
 		if (dig && tile != null && tile.getPlane() == last.getTile().getPlane()
 			&& tile.distanceTo2D(last.getTile()) <= Band.digRadius(last.getTier()))
 		{

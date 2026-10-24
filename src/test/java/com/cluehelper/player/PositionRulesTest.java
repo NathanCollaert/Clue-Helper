@@ -34,7 +34,7 @@ public class PositionRulesTest
 				Matcher m = reading(event.get("reading").getAsString());
 				boolean onBoat = !m.group(3).equals("0");
 				WorldPoint norm = tile(m.group(5));
-				Position p = PositionRules.classify(onBoat, tile(m.group(6)), onBoat ? null : norm, Boolean.parseBoolean(m.group(4)));
+				Position p = onBoat ? PositionRules.onBoat(tile(m.group(6))) : PositionRules.onFoot(norm, Boolean.parseBoolean(m.group(4)));
 				seen.merge(p.getKind(), 1, Integer::sum);
 				Position.Kind expected = onBoat ? Position.Kind.BOAT : Boolean.parseBoolean(m.group(7)) ? Position.Kind.POH
 					: m.group(1).equals("instance") ? Position.Kind.INSTANCE : Position.Kind.WORLD;

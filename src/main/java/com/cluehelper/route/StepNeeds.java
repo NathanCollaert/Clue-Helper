@@ -82,7 +82,7 @@ public class StepNeeds
 		boolean inCoreTag = ITEMS_IN_CORE_TAG.contains(step.getType());
 		for (ItemRequirement item : requirements.getItems())
 		{
-			boolean optional = step.getData() != null && isOptional(item.getCollectiveName(client), step.getData());
+			boolean optional = isOptional(item.getCollectiveName(client), step.getData());
 			if (!EmptySlots.metByEmptySlots(item) && !optional)
 			{
 				ItemRequirement need = withAlternatives(item, step.getData());
@@ -93,18 +93,15 @@ public class StepNeeds
 		{
 			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, false));
 		}
-		if (step.getData() != null)
+		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
 		{
-			for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
-			{
-				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
-			}
-			Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds();
-			for (StepIndex.Gear gear : step.getData().getGear())
-			{
-				GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.of(gear.getBonus(), owned));
-				needs.add(new RequiredItems.Need(gear.getName(), worn, false, false));
-			}
+			needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
+		}
+		Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds();
+		for (StepIndex.Gear gear : step.getData().getGear())
+		{
+			GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.of(gear.getBonus(), owned));
+			needs.add(new RequiredItems.Need(gear.getName(), worn, false, false));
 		}
 		return RequiredItems.builder()
 			.needs(List.copyOf(needs))

@@ -37,15 +37,45 @@ public class MenuTarget
 	List<String> path = List.of();
 	@Builder.Default
 	Line line = Line.LABEL;
-	/** NEXUS: struct id; BOX: jewellery box line index; QUETZAL: the site's Quetzal table id. */
+	/** Set by the line factories below: a struct id, a box line index or a Quetzal table id. */
 	int lineId;
-	/** NEXUS: the map region shield; FAIRY_CODE: the code. */
+	/** Set by the line factories below: a map region shield or a fairy ring code. */
 	String lineKey;
-	/** NEXUS: the cache's name of the destination, as the map icon shows it before its alias; MINIGAME: the minigame. */
+	/** Set by the line factories below: the cache's name of a nexus destination, or a minigame. */
 	String lineName;
 	/** The same landing through another house menu (the jewellery box for the glory), so its lines are coloured too. */
 	@Builder.Default
 	List<MenuTarget> alternatives = List.of();
+
+	/** A nexus line: its struct id, the map region shield, and the cache's name of the destination. */
+	public static MenuTarget nexus(int structId, String region, String placeName)
+	{
+		return builder().line(Line.NEXUS).lineId(structId).lineKey(region).lineName(placeName).build();
+	}
+
+	/** A jewellery box line by its index. */
+	public static MenuTarget box(int lineIndex)
+	{
+		return builder().line(Line.BOX).lineId(lineIndex).build();
+	}
+
+	/** The fairy ring dials on a code. */
+	public static MenuTarget fairyCode(String code)
+	{
+		return builder().line(Line.FAIRY_CODE).lineKey(code).build();
+	}
+
+	/** A minigame's card by its name. */
+	public static MenuTarget minigame(String name)
+	{
+		return builder().line(Line.MINIGAME).lineName(name).build();
+	}
+
+	/** A quetzal map site by its Quetzal table id. */
+	public static MenuTarget quetzal(int tableId)
+	{
+		return builder().line(Line.QUETZAL).lineId(tableId).build();
+	}
 
 	public boolean isEmpty()
 	{

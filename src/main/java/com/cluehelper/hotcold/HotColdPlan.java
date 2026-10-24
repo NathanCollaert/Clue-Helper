@@ -3,12 +3,13 @@ package com.cluehelper.hotcold;
 import com.cluehelper.step.HotColdTier;
 import java.util.List;
 import java.util.Map;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
 @Value
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, access = AccessLevel.PACKAGE)
 public class HotColdPlan
 {
 	public enum Action
@@ -40,6 +41,32 @@ public class HotColdPlan
 	/** Every probe the choice weighed, for replays. */
 	@Builder.Default
 	List<Probe> considered = List.of();
+
+	/** The next feel, at the probe the choice picked. */
+	static HotColdPlan feel(HotColdPlanBuilder base, ProbePlanner.Choice choice)
+	{
+		return base.action(Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
+	}
+
+	static HotColdPlan digHere(HotColdPlanBuilder base, WorldPoint tile)
+	{
+		return base.action(Action.DIG_HERE).tile(tile).build();
+	}
+
+	static HotColdPlan digSpot(HotColdPlanBuilder base, WorldPoint tile)
+	{
+		return base.action(Action.DIG_SPOT).tile(tile).build();
+	}
+
+	static HotColdPlan none(HotColdPlanBuilder base)
+	{
+		return base.action(Action.NONE).build();
+	}
+
+	public boolean isDig()
+	{
+		return action == Action.DIG_HERE || action == Action.DIG_SPOT;
+	}
 
 	public List<ProbePlanner.Branch> branches()
 	{

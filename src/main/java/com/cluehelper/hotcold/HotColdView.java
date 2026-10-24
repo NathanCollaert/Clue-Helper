@@ -96,7 +96,7 @@ public class HotColdView
 
 	private static Optional<String> borderNote(HotColdPlan plan, Map<String, Spot> spots)
 	{
-		boolean digging = plan.getAction() == HotColdPlan.Action.DIG_HERE || plan.getAction() == HotColdPlan.Action.DIG_SPOT;
+		boolean digging = plan.isDig();
 		if (!digging || plan.getKept().isEmpty())
 		{
 			return Optional.empty();

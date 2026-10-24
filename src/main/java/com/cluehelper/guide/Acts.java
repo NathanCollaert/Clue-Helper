@@ -28,7 +28,7 @@ final class Acts
 	 */
 	static List<SubStep> of(Step step, boolean takeFromStash)
 	{
-		List<String> worn = step.getData() == null || !step.getStages().isEmpty() ? List.of() : step.getData().getWornNeeds();
+		List<String> worn = !step.getStages().isEmpty() ? List.of() : step.getData().getWornNeeds();
 		List<SubStep> acts = actsOf(step, takeFromStash);
 		if (worn.isEmpty())
 		{
@@ -115,7 +115,7 @@ final class Acts
 
 	private static SubStep music(Step step)
 	{
-		StepIndex.Music music = step.getData() == null ? null : step.getData().getMusic();
+		StepIndex.Music music = step.getData().getMusic();
 		String track = music != null && music.getTrack() != null ? music.getTrack() : step.getText();
 		String unlock = music == null || music.getUnlock() == null ? null : "Unlocked: " + music.getUnlock();
 		return act("Talk to Cecilia, then play " + track, unlock == null ? "Music tab" : "Music tab. " + unlock).toBuilder()
@@ -153,12 +153,12 @@ final class Acts
 
 	private static boolean fightsFor(Step step)
 	{
-		return step.getData() != null && !step.getData().getCombat().isEmpty();
+		return !step.getData().getCombat().isEmpty();
 	}
 
 	private static String note(Step step)
 	{
-		return step.getData() == null ? null : step.getData().getNote();
+		return step.getData().getNote();
 	}
 
 	private static String area(StepIndex.Entry data)
@@ -172,7 +172,7 @@ final class Acts
 	 */
 	static String withFloor(Step step, String detail)
 	{
-		String floor = step.getData() == null ? null : step.getData().getFloor();
+		String floor = step.getData().getFloor();
 		if (floor == null && !step.getTargets().isEmpty())
 		{
 			int corePlane = step.getTargets().get(0).getPlane();

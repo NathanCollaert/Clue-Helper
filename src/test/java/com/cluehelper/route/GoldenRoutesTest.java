@@ -838,7 +838,7 @@ public class GoldenRoutesTest
 			parts.add(steps.get(key).getTargets().get(0));
 		}
 		return Step.builder().key("threestep:test").type(ClueTypes.THREE_STEP).tier("master").kind(TargetKind.SEQUENCE)
-			.targets(parts).regions(List.of()).known(true).build();
+			.targets(parts).regions(List.of()).build();
 	}
 
 	private static Step probes()
@@ -846,7 +846,7 @@ public class GoldenRoutesTest
 		List<WorldPoint> spots = steps.values().stream().filter(s -> s.getType().equals("hotcold spot")).limit(8)
 			.map(s -> s.getTargets().get(0)).collect(Collectors.toList());
 		return Step.builder().key("hotcold:test").type("hotcold").tier("master").kind(TargetKind.PROBES).targets(spots)
-			.regions(List.of()).known(true).build();
+			.regions(List.of()).build();
 	}
 
 }

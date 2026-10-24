@@ -365,7 +365,7 @@ public final class SubSteps
 	/** The step's way in, when the player is on it: near its start, any floor, and not yet inside. */
 	public static SubStep goingIn(Step step, WorldPoint at)
 	{
-		StepIndex.WayIn way = step == null || step.getData() == null ? null : step.getData().getEntry();
+		StepIndex.WayIn way = step == null ? null : step.getData().getEntry();
 		boolean byStart = way != null && at != null && way.getTile() != null && at.distanceTo2D(way.getTile()) <= ON_WAY_IN_TILES;
 		boolean onIt = way != null && (byStart || way.isPartWay(at)) && !way.isInside(at);
 		return onIt ? enter(step.getData()) : null;
@@ -390,26 +390,26 @@ public final class SubSteps
 	private static boolean stashOutsideWayIn(Step step)
 	{
 		WorldPoint stash = stashTile(step);
-		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
+		StepIndex.WayIn way = step.getData().getEntry();
 		return stash != null && way != null && !way.isInside(stash);
 	}
 
 	/** An exit leg that is the step's own hand-written way in, named by its text instead of "Take the exit". */
 	private static boolean isWayIn(Exit exit, Step step)
 	{
-		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
+		StepIndex.WayIn way = step.getData().getEntry();
 		return way != null && exit.getOrigin().equals(way.getTile()) && exit.getDestination().equals(way.getTo());
 	}
 
 	static WorldPoint stashTile(Step step)
 	{
-		return step.getData() == null || step.getData().getStash() == null ? null : step.getData().getStash().getTile();
+		return step.getData().getStash() == null ? null : step.getData().getStash().getTile();
 	}
 
 	/** The last walk to the step starts outside its hand-written way in. */
 	private static boolean entersStepArea(Leg leg, Step step)
 	{
-		StepIndex.WayIn way = step.getData() == null ? null : step.getData().getEntry();
+		StepIndex.WayIn way = step.getData().getEntry();
 		return way != null && step.getTargets().contains(leg.getTo()) && !way.isInside(leg.getFrom());
 	}
 

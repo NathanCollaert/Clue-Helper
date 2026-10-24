@@ -91,6 +91,9 @@ public final class StepIndex
 
 	public static final class Entry
 	{
+		/** A key the data lacks: every getter answers empty. */
+		public static final Entry NONE = new Entry();
+
 		private String tier;
 		private List<CacheRow> rows;
 		private List<int[]> tiles;

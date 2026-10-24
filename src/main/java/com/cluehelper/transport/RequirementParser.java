@@ -198,21 +198,21 @@ public final class RequirementParser
 		{
 			if (skill.getName().equalsIgnoreCase(name))
 			{
-				return new LevelNeed(skill, null, max ? MAX_SKILL_LEVEL : required);
+				return LevelNeed.ofSkill(skill, max ? MAX_SKILL_LEVEL : required);
 			}
 		}
 		String lower = name.toLowerCase(Locale.ROOT);
 		if (lower.startsWith("total"))
 		{
-			return new LevelNeed(null, LevelNeed.Aggregate.TOTAL, max ? MAX_SKILL_LEVEL * Skill.values().length : required);
+			return LevelNeed.ofAggregate(LevelNeed.Aggregate.TOTAL, max ? MAX_SKILL_LEVEL * Skill.values().length : required);
 		}
 		if (lower.startsWith("combat"))
 		{
-			return new LevelNeed(null, LevelNeed.Aggregate.COMBAT, max ? MAX_COMBAT_LEVEL : required);
+			return LevelNeed.ofAggregate(LevelNeed.Aggregate.COMBAT, max ? MAX_COMBAT_LEVEL : required);
 		}
 		if (lower.startsWith("quest") && !max)
 		{
-			return new LevelNeed(null, LevelNeed.Aggregate.QUEST_POINTS, required);
+			return LevelNeed.ofAggregate(LevelNeed.Aggregate.QUEST_POINTS, required);
 		}
 		return null;
 	}

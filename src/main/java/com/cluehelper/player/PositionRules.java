@@ -44,15 +44,18 @@ public final class PositionRules
 	/**
 	 * @param boatTile the boat entity's tile through {@code fromLocalInstance}; never the player's raw
 	 *     location, which on a boat is the deck's own frozen coordinates
+	 */
+	public static Position onBoat(WorldPoint boatTile)
+	{
+		return boatTile == null ? Position.NONE : new Position(boatTile, Position.Kind.BOAT, boatTile);
+	}
+
+	/**
 	 * @param mappedTile the player's local location through {@code fromLocalInstance}, which also maps
 	 *     instances to their template
 	 */
-	public static Position classify(boolean onBoat, WorldPoint boatTile, WorldPoint mappedTile, boolean topLevelInstance)
+	public static Position onFoot(WorldPoint mappedTile, boolean topLevelInstance)
 	{
-		if (onBoat)
-		{
-			return boatTile == null ? Position.NONE : new Position(boatTile, Position.Kind.BOAT, boatTile);
-		}
 		if (mappedTile == null)
 		{
 			return Position.NONE;
