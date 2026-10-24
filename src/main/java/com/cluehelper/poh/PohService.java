@@ -217,6 +217,16 @@ public class PohService
 		{
 			return;
 		}
+		followHouseEntry();
+		scanWhenDue();
+		readVarsWhenDirty();
+		saveNexusLinesWhenLearned();
+		publish();
+	}
+
+	/** Whose house the player is in follows the entry, the exit and build mode. */
+	private void followHouseEntry()
+	{
 		boolean buildMode = client.getVarbitValue(VarbitID.POH_BUILDING_MODE) == 1;
 		boolean inside = player.getPosition().getKind() == Position.Kind.POH;
 		if (inside && !wasInside)
@@ -245,23 +255,37 @@ public class PohService
 		}
 		wasInside = inside;
 		seenATick = true;
-		if (scanAtTick >= 0 && client.getTickCount() >= scanAtTick)
+	}
+
+	/** The scan waits for the furniture to load, and only the player's own house is scanned. */
+	private void scanWhenDue()
+	{
+		if (scanAtTick < 0 || client.getTickCount() < scanAtTick)
 		{
-			scanAtTick = -1;
-			if (ownership.getOwnership() == HouseOwnership.Ownership.OWNED)
-			{
-				scan();
-			}
-			else
-			{
-				tell("no scan: " + ownership.getOwnership() + " house");
-			}
+			return;
 		}
+		scanAtTick = -1;
+		if (ownership.getOwnership() == HouseOwnership.Ownership.OWNED)
+		{
+			scan();
+		}
+		else
+		{
+			tell("no scan: " + ownership.getOwnership() + " house");
+		}
+	}
+
+	private void readVarsWhenDirty()
+	{
 		if (varsDirty)
 		{
 			varsDirty = false;
 			readVars();
 		}
+	}
+
+	private void saveNexusLinesWhenLearned()
+	{
 		if (nexusLinesDirty)
 		{
 			nexusLinesDirty = false;
@@ -269,7 +293,6 @@ public class PohService
 			houseDirty = true;
 			tell("nexus hotkeys learned: " + stored.get().nexusLines.size() + " lines");
 		}
-		publish();
 	}
 
 	private void learnPieces(Catalog catalog)

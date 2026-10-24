@@ -5,9 +5,7 @@ import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.MenuTarget;
 import com.cluehelper.guide.StepGuide;
-import com.cluehelper.hotcold.HotColdPlan;
 import com.cluehelper.hotcold.HotColdService;
-import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.FairyRingMemory;
@@ -16,21 +14,16 @@ import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.SpiritTreeMemory;
 import com.cluehelper.memory.XericsHonourMemory;
 import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.Book;
 import com.cluehelper.player.CheckLines;
-import com.cluehelper.player.HouseState;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.poh.PohService;
-import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneDoors;
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.HotColdTier;
-import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.FurnitureOverlay;
+import com.cluehelper.ui.GuideBoxPresenter;
 import com.cluehelper.ui.WanderAreaOverlay;
 import com.cluehelper.ui.GuideBox;
 import com.cluehelper.ui.GuideOverlay;
@@ -187,6 +180,8 @@ public class ClueHelperPlugin extends Plugin
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private GuideOverlay guideOverlay;
+	@Inject
+	private GuideBoxPresenter box;
 
 	@Inject
 	private SceneDoors sceneDoors;
@@ -455,7 +450,7 @@ public class ClueHelperPlugin extends Plugin
 
 	BoxState boxState()
 	{
-		return BoxState.of(dormantReason() != null, clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
+		return box.boxState();
 	}
 
 	private Overlay[] overlays()
@@ -463,62 +458,10 @@ public class ClueHelperPlugin extends Plugin
 		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, wanderAreaOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
 	}
 
-	private String dormantReason()
-	{
-		PlayerSnapshot snapshot = playerModel.getSnapshot();
-		return snapshot == null ? null : snapshot.getDormantReason();
-	}
 
 	/** Client thread only: reads the guide's state into one value for the overlay. */
 	private void showBox()
 	{
-		GuideBox box = GuideBox.of(boxState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
-			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
-		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
-		GuideBox.GuideBoxBuilder shown = atStep.toBuilder().carryingClue(clueLink.carriesClue());
-		if (atStep.getState().showsRoutes())
-		{
-			shown.hotCold(hotColdView());
-		}
-		guideOverlay.show(shown.build());
-	}
-
-	private HotColdView hotColdView()
-	{
-		Step step = clueLink.getCurrentStep();
-		if (step == null || !ClueTypes.HOT_COLD.equals(step.getType()) || !config.hotColdPlanner())
-		{
-			return null;
-		}
-		HotColdPlan plan = hotCold.getPlan();
-		if (plan == null || !plan.getStepKey().equals(step.getKey()))
-		{
-			return null;
-		}
-		HotColdTier tier = HotColdTier.of(step.getTier());
-		return HotColdView.of(new HotColdView.Inputs(plan, hotCold.getCoreSpots(), hotCold.isCoreReset(),
-			hotCold.spotsOf(tier), tier, hotCold.hitpoints()));
-	}
-
-	private GuideBox.Prompts prompts()
-	{
-		PlayerSnapshot snapshot = playerModel.getSnapshot();
-		boolean bankCounts = snapshot != null && availability.bankCounts(snapshot);
-		HouseState house = poh.getHouse();
-		boolean houseKnown = !house.getNexusKeys().isEmpty() || !house.getFurniture().isEmpty();
-		boolean onlyNexusVarbitsKnown = houseKnown && house.getSource() == HouseState.Source.VARBITS;
-		return new GuideBox.Prompts(bankMemory.getBank() == null && bankCounts, onlyNexusVarbitsKnown);
-	}
-
-	/** Members keep their book on an F2P world, where no book can be changed and only Standard has teleports. */
-	private Book stuckBookOnF2p()
-	{
-		PlayerSnapshot snapshot = playerModel.getSnapshot();
-		if (snapshot == null || snapshot.isMembersWorld() || snapshot.getSpellbook() == null)
-		{
-			return null;
-		}
-		Book book = snapshot.getSpellbook().getBook();
-		return book == null || book == Book.STANDARD ? null : book;
+		box.refresh();
 	}
 }

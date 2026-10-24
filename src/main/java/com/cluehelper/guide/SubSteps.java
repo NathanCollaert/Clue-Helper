@@ -88,48 +88,72 @@ public final class SubSteps
 	private static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
 		Function<Leg, Exit> exits, boolean takeFromStash)
 	{
-		List<SubStep> steps = new ArrayList<>();
-		List<Leg> legs = route.getLegs();
-		boolean stashFirst = takeFromStash && stashOutsideWayIn(step);
-		if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
+		return new RouteSteps(route, step, itemNames, house, takeFromStash).build(exits);
+	}
+
+	/** The sub-steps of one route, built leg by leg: each stage's walk and act in turn, then the step's own acts. */
+	private static final class RouteSteps
+	{
+		private final List<SubStep> steps = new ArrayList<>();
+		private final Route route;
+		private final Step step;
+		private final IntFunction<String> itemNames;
+		private final HouseState house;
+		private final boolean takeFromStash;
+		/** The STASH unit stands outside the step's way in: its items come before going in. */
+		private final boolean stashFirst;
+
+		RouteSteps(Route route, Step step, IntFunction<String> itemNames, HouseState house, boolean takeFromStash)
 		{
-			steps.add(withdraw(route, itemNames));
+			this.route = route;
+			this.step = step;
+			this.itemNames = itemNames;
+			this.house = house;
+			this.takeFromStash = takeFromStash;
+			this.stashFirst = takeFromStash && stashOutsideWayIn(step);
 		}
-		List<Stage> stages = step.getStages().stream().filter(stage -> !stage.getTiles().isEmpty()).collect(Collectors.toList());
-		int stage = 0;
-		for (int i = 0; i < legs.size(); i++)
+
+		List<SubStep> build(Function<Leg, Exit> exits)
 		{
-			Leg leg = legs.get(i);
-			Leg next = i + 1 < legs.size() ? legs.get(i + 1) : null;
-			Exit exit = leg.getKind() == Leg.Kind.WALK ? exits.apply(leg) : null;
-			Stage reached = stage < stages.size() - 1 && stages.get(stage).getTiles().contains(leg.getTo()) ? stages.get(stage) : null;
-			if (reached != null && leg.getKind() == Leg.Kind.WALK && exit == null)
+			if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 			{
-				steps.add(walkToStage(leg, reached));
-				addStageAct(steps, reached);
-				stage++;
-				continue;
+				steps.add(withdraw(route, itemNames));
 			}
+			List<Stage> stages = step.getStages().stream().filter(stage -> !stage.getTiles().isEmpty()).collect(Collectors.toList());
+			List<Leg> legs = route.getLegs();
+			int stage = 0;
+			for (int i = 0; i < legs.size(); i++)
+			{
+				Leg leg = legs.get(i);
+				Leg next = i + 1 < legs.size() ? legs.get(i + 1) : null;
+				Exit exit = leg.getKind() == Leg.Kind.WALK ? exits.apply(leg) : null;
+				Stage reached = stage < stages.size() - 1 && stages.get(stage).getTiles().contains(leg.getTo()) ? stages.get(stage) : null;
+				if (reached != null && leg.getKind() == Leg.Kind.WALK && exit == null)
+				{
+					steps.add(walkToStage(leg, reached));
+				}
+				else
+				{
+					addLeg(leg, next, exit);
+				}
+				if (reached != null)
+				{
+					addStageAct(steps, reached);
+					stage++;
+				}
+			}
+			addLastActs(stages);
+			addActsDoneAnywhere(steps, step);
+			return steps;
+		}
+
+		private void addLeg(Leg leg, Leg next, Exit exit)
+		{
 			switch (leg.getKind())
 			{
 				case WALK:
-				{
-					boolean wayIn = exit != null && isWayIn(exit, step);
-					if ((exit == null || wayIn) && entersStepArea(leg, step))
-					{
-						if (stashFirst)
-						{
-							steps.add(stashWalk(stashTile(step)));
-							steps.addAll(Acts.fromStash(step));
-						}
-						steps.add(enter(step.getData()));
-					}
-					if (exit != null || wayIn || !boardedThere(next))
-					{
-						steps.add(exit != null && !wayIn ? exit(leg, exit) : walk(leg, next, step, takeFromStash && !stashFirst));
-					}
+					addWalk(leg, next, exit);
 					break;
-				}
 				case WILDERNESS_EXIT:
 					steps.add(SubStep.builder().kind(SubStep.Kind.WILDERNESS_EXIT).text("Walk south out of deep Wilderness")
 						.detail("Teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
@@ -147,29 +171,48 @@ public final class SubSteps
 				case SPELLBOOK_CHANGE:
 					steps.add(change(leg));
 					break;
-				default:
+				case BANK:
 					steps.add(SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank")
 						.detail(route.isPinIncluded() ? "Your PIN comes first" : null).waypoint(leg.getTo()).build());
 					steps.add(withdraw(route, itemNames));
 					break;
+				default:
+					throw new IllegalArgumentException("unhandled leg kind " + leg.getKind());
 			}
-			if (reached != null)
+		}
+
+		/** A walk into the step's area goes in by its way in, with the STASH items first when the unit stands outside. */
+		private void addWalk(Leg leg, Leg next, Exit exit)
+		{
+			boolean wayIn = exit != null && isWayIn(exit, step);
+			if ((exit == null || wayIn) && entersStepArea(leg, step))
 			{
-				addStageAct(steps, reached);
-				stage++;
+				if (stashFirst)
+				{
+					steps.add(stashWalk(stashTile(step)));
+					steps.addAll(Acts.fromStash(step));
+				}
+				steps.add(enter(step.getData()));
+			}
+			if (exit != null || wayIn || !boardedThere(next))
+			{
+				steps.add(exit != null && !wayIn ? exit(leg, exit) : walk(leg, next, step, takeFromStash && !stashFirst));
 			}
 		}
-		Stage last = stages.isEmpty() ? null : stages.get(stages.size() - 1);
-		if (last != null && last.getKind() != Stage.Kind.FINAL)
+
+		/** The last stage's act, or the step's own acts once every stage is done. */
+		private void addLastActs(List<Stage> stages)
 		{
-			addStageAct(steps, last);
+			Stage last = stages.isEmpty() ? null : stages.get(stages.size() - 1);
+			if (last != null && last.getKind() != Stage.Kind.FINAL)
+			{
+				addStageAct(steps, last);
+			}
+			else
+			{
+				steps.addAll(Acts.of(step, takeFromStash && !stashFirst));
+			}
 		}
-		else
-		{
-			steps.addAll(Acts.of(step, takeFromStash && !stashFirst));
-		}
-		addActsDoneAnywhere(steps, step);
-		return steps;
 	}
 
 	/**

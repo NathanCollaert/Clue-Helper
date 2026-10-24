@@ -493,9 +493,19 @@ final class PlanContext
 		Change cape;
 		Change swap;
 
+		/** A row the scroll book rules keep until a bank stop. */
+		private static final int AFTER_BANK_ONLY = -1;
+
 		Options(PlayerSnapshot player, int bankState)
 		{
 			PlayerSnapshot judgedAt = player.toBuilder().wildernessLevel(0).build();
+			addTeleports(player, judgedAt, bankState);
+			addChanges(player, judgedAt, bankState);
+		}
+
+		/** Every available teleport row, placed by where it is used from; of a home or minigame row's variants, the longest. */
+		private void addTeleports(PlayerSnapshot player, PlayerSnapshot judgedAt, int bankState)
+		{
 			boolean carriesBook = player.carried(BookScrolls.BOOK) > 0;
 			Map<String, Teleport> longestVariant = new LinkedHashMap<>();
 			for (CatalogRow row : in.getCatalog().getTeleports())
@@ -509,38 +519,63 @@ final class PlanContext
 				{
 					continue;
 				}
-				boolean bookStaysOut = in.getSettings().isScrollBookOutOfWilderness();
-				boolean takenOut = BookScrolls.isTakenOutAtBank(row, bookStaysOut);
-				boolean bankedFirst = !takenOut && bookStaysOut && carriesBook && BookScrolls.intoWilderness(row);
-				if ((takenOut || bankedFirst) && bankState != BANKED)
+				int bookStop = scrollBookHalfTicks(row, carriesBook, bankState);
+				if (bookStop == AFTER_BANK_ONLY)
 				{
 					continue;
 				}
 				Teleport tele = teleport(judged, player, bankState);
-				tele.halfTicks += takenOut ? 2 * BookScrolls.TAKE_OUT_TICKS : bankedFirst ? 2 * BookScrolls.DEPOSIT_TICKS : 0;
-				if (row.getOrigin() != null && row.getCategory() == Category.FAIRY_RING)
-				{
-					tele.node = nodeAt(row.getOrigin());
-					tele.halfTicks += houseWalkHalfTicks(row.getRequirements(), player);
-					fairyEntries.merge(tele.node, tele, (a, b) -> a.halfTicks <= b.halfTicks ? a : b);
-				}
-				else if (row.getOrigin() != null)
-				{
-					int from = nodeAt(row.getOrigin());
-					tele.halfTicks += from == pohNode ? houseWalkHalfTicks(row.getRequirements(), player) : 0;
-					located.computeIfAbsent(from, k -> new ArrayList<>()).add(tele);
-				}
-				else if (row.getCode() != null)
-				{
-					fairyLandings.add(tele);
-				}
-				else
-				{
-					longestVariant.merge(variantKey(row), tele, (a, b) -> a.halfTicks >= b.halfTicks ? a : b);
-				}
+				tele.halfTicks += bookStop;
+				place(row, tele, player, longestVariant);
 			}
 			teleports.addAll(longestVariant.values());
 			keepMostVersatileWithdraws(teleports);
+		}
+
+		/**
+		 * The master scroll book's own Wilderness teleport reads a scroll taken out at the bank, and any Wilderness teleport
+		 * banks a carried book first: the half-ticks that costs, or {@link #AFTER_BANK_ONLY} before the bank stop.
+		 */
+		private int scrollBookHalfTicks(CatalogRow row, boolean carriesBook, int bankState)
+		{
+			boolean bookStaysOut = in.getSettings().isScrollBookOutOfWilderness();
+			boolean takenOut = BookScrolls.isTakenOutAtBank(row, bookStaysOut);
+			boolean bankedFirst = !takenOut && bookStaysOut && carriesBook && BookScrolls.intoWilderness(row);
+			if ((takenOut || bankedFirst) && bankState != BANKED)
+			{
+				return AFTER_BANK_ONLY;
+			}
+			return takenOut ? 2 * BookScrolls.TAKE_OUT_TICKS : bankedFirst ? 2 * BookScrolls.DEPOSIT_TICKS : 0;
+		}
+
+		/** A fairy ring entry, a transport used where it stands, a fairy ring landing, or a plain teleport by its variant. */
+		private void place(CatalogRow row, Teleport tele, PlayerSnapshot player, Map<String, Teleport> longestVariant)
+		{
+			if (row.getOrigin() != null && row.getCategory() == Category.FAIRY_RING)
+			{
+				tele.node = nodeAt(row.getOrigin());
+				tele.halfTicks += houseWalkHalfTicks(row.getRequirements(), player);
+				fairyEntries.merge(tele.node, tele, (a, b) -> a.halfTicks <= b.halfTicks ? a : b);
+			}
+			else if (row.getOrigin() != null)
+			{
+				int from = nodeAt(row.getOrigin());
+				tele.halfTicks += from == pohNode ? houseWalkHalfTicks(row.getRequirements(), player) : 0;
+				located.computeIfAbsent(from, k -> new ArrayList<>()).add(tele);
+			}
+			else if (row.getCode() != null)
+			{
+				fairyLandings.add(tele);
+			}
+			else
+			{
+				longestVariant.merge(variantKey(row), tele, (a, b) -> a.halfTicks >= b.halfTicks ? a : b);
+			}
+		}
+
+		/** Every available spellbook change: the Swap, the first cape, and the altars and Tyss where they stand. */
+		private void addChanges(PlayerSnapshot player, PlayerSnapshot judgedAt, int bankState)
+		{
 			for (SpellbookChange change : in.getCatalog().getSpellbookChanges())
 			{
 				if (change.isInHouse() && pohNode == WalkTable.NO_NODE || in.getRefusedChanges().contains(change.getName()))

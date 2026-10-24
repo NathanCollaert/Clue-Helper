@@ -560,16 +560,11 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
-		MenuTarget menuTarget = highlights.getMenuTarget();
 		List<String> option = current == null || current.getOption() == null ? List.of() : List.of(current.getOption());
-		MenuTarget target = current != null && !current.getNpcIds().isEmpty() ? MenuTarget.builder().npcIds(current.getNpcIds()).path(option).build()
-			: current != null && !current.getObjectIds().isEmpty() ? MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build()
-			: isApproach() ? houseTarget(getNext().getRow()) : stashAhead() != StepRequirements.NO_STASH ? MenuTarget.builder().objectIds(Set.of(stashAhead())).build()
-			: menuTarget;
-		highlights = highlights.toBuilder().optionTarget(option.isEmpty() || menuTarget != MenuTarget.NONE ? MenuTarget.NONE : target).build();
-		Set<Integer> ids = target.getObjectIds();
-		Set<Integer> npcIds = target.getNpcIds();
-		if (ids.isEmpty() && npcIds.isEmpty() && !bank)
+		MenuTarget target = outlineTarget(current, option);
+		boolean ownOption = !option.isEmpty() && highlights.getMenuTarget() == MenuTarget.NONE;
+		highlights = highlights.toBuilder().optionTarget(ownOption ? target : MenuTarget.NONE).build();
+		if (target.getObjectIds().isEmpty() && target.getNpcIds().isEmpty() && !bank)
 		{
 			scene = scene.toBuilder().objects(List.of()).npcs(List.of()).fillObjects(List.of()).fillNpcs(List.of()).build();
 			return;
@@ -578,18 +573,46 @@ public class StepGuide
 		boolean nothingYet = scene.isEmpty() && scene.getEmptySearches() < OBJECT_REFRESH_TICKS;
 		if (scene.getFoundTick() == ActWatcher.NEVER || nothingYet || tick - scene.getFoundTick() >= OBJECT_REFRESH_TICKS)
 		{
-			List<TileObject> objects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, ids);
-			List<NPC> npcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : npcsFor(target);
-			if (!bank)
-			{
-				colourCrewMenus(target, npcs);
-			}
-			String npcOption = bank || target.getPath().isEmpty() ? null : target.getPath().get(0);
-			scene = SceneHighlights.builder().foundTick(tick)
-				.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
-				.objects(objects).npcs(npcs).fillObjects(bank ? List.of() : oneClickObjects(objects))
-				.npcOption(npcOption).fillNpcs(oneClickNpcs(npcs, npcOption)).build();
+			scene = searchScene(current, target, bank, tick);
 		}
+	}
+
+	/**
+	 * What the scene is searched for: the sub-step's own NPCs or objects with its option, the furniture a walk leads to,
+	 * the STASH unit the next act searches, else the menu target's objects.
+	 */
+	private MenuTarget outlineTarget(SubStep current, List<String> option)
+	{
+		if (current != null && !current.getNpcIds().isEmpty())
+		{
+			return MenuTarget.builder().npcIds(current.getNpcIds()).path(option).build();
+		}
+		if (current != null && !current.getObjectIds().isEmpty())
+		{
+			return MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build();
+		}
+		if (isApproach())
+		{
+			return houseTarget(getNext().getRow());
+		}
+		int stash = stashAhead();
+		return stash != StepRequirements.NO_STASH ? MenuTarget.builder().objectIds(Set.of(stash)).build() : highlights.getMenuTarget();
+	}
+
+	/** The objects and NPCs found now, with the ones a left click uses filled. */
+	private SceneHighlights searchScene(SubStep current, MenuTarget target, boolean bank, int tick)
+	{
+		List<TileObject> objects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, target.getObjectIds());
+		List<NPC> npcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : npcsFor(target);
+		if (!bank)
+		{
+			colourCrewMenus(target, npcs);
+		}
+		String npcOption = bank || target.getPath().isEmpty() ? null : target.getPath().get(0);
+		return SceneHighlights.builder().foundTick(tick)
+			.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
+			.objects(objects).npcs(npcs).fillObjects(bank ? List.of() : oneClickObjects(objects))
+			.npcOption(npcOption).fillNpcs(oneClickNpcs(npcs, npcOption)).build();
 	}
 
 	/**
@@ -1176,20 +1199,50 @@ public class StepGuide
 		}
 		Highlights.HighlightsBuilder shown = Highlights.builder().objectOption(current.getOption()).bankItems(current.getBankItems().stream()
 			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(Collectors.toUnmodifiableSet()));
-		if (current.getKind() == SubStep.Kind.ACT)
+		switch (current.getKind())
 		{
-			shown.tab(current.getTab());
-			int stash = stashOf(current);
-			if (stash != StepRequirements.NO_STASH)
-			{
-				return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(stash)).build()).objectOption(SEARCH_OPTION).build();
-			}
-			if (current.getDone() == SubStep.Done.EQUIPPED)
-			{
-				return withEquipItems(shown.build());
-			}
+			case ACT:
+				return actHighlights(shown, current);
+			case EXIT:
+				Exit exit = current.getExit();
+				return shown.menuTarget(withDialogue(wayTarget(exit.getObjectId(), exit.getOption()), wayInOf(exit.getOrigin(), exit.getDestination()))).build();
+			case ENTER:
+				return shown.menuTarget(enterTarget(current)).build();
+			case SPELLBOOK_SWAP:
+				shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(Tab.MAGIC);
+				break;
+			case TELEPORT:
+				teleportHighlights(shown, current);
+				break;
+			case FAIRY_RING:
+				if (current.getRow().getCode() != null)
+				{
+					shown.menuTarget(MenuTarget.fairyCode(current.getRow().getCode()).toBuilder().objectIds(FAIRY_RING_OBJECTS).build());
+				}
+				break;
+			case CHANGE_BOOK:
+				changeBookHighlights(shown, current);
+				break;
+			default:
+				break;
 		}
-		if (current.getKind() == SubStep.Kind.ACT && !current.getActItems().isEmpty())
+		return withOneClick(shown.build(), current);
+	}
+
+	/** An act's own items, its STASH unit, the gear to put on, or a planted tree's line; else only its one-click fill. */
+	private Highlights actHighlights(Highlights.HighlightsBuilder shown, SubStep current)
+	{
+		shown.tab(current.getTab());
+		int stash = stashOf(current);
+		if (stash != StepRequirements.NO_STASH)
+		{
+			return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(stash)).build()).objectOption(SEARCH_OPTION).build();
+		}
+		if (current.getDone() == SubStep.Done.EQUIPPED)
+		{
+			return withEquipItems(shown.build());
+		}
+		if (!current.getActItems().isEmpty())
 		{
 			boolean equips = current.getDone() == SubStep.Done.WAY_IN_WORN || current.getDone() == SubStep.Done.GEAR_WORN;
 			return shown.items(current.getActItems())
@@ -1202,44 +1255,43 @@ public class StepGuide
 		{
 			shown.menuTarget(MenuTarget.builder().objectIds(current.getObjectIds()).path(List.of(TRAVEL_OPTION, TREE_OPTION, planted)).build());
 		}
-		if (current.getKind() == SubStep.Kind.EXIT)
+		return withOneClick(shown.build(), current);
+	}
+
+	/** The way in's object with its option and dialogue; once its items are picked up, the object they are used on. */
+	private static MenuTarget enterTarget(SubStep current)
+	{
+		StepIndex.PickUp pickUp = current.getWayIn().getPickUp();
+		boolean pickedUp = pickUp != null && current.getText().startsWith(KEEP_GOING);
+		return pickedUp ? MenuTarget.builder().objectIds(Set.copyOf(pickUp.getObjects())).path(List.of(pickUp.getOption())).build()
+			: withDialogue(wayTarget(current.getWayIn().getObject(), current.getWayIn().getOption()), current.getWayIn());
+	}
+
+	/** A spell, the Minigame Teleport spell, house furniture or a spirit tree, a named item, or the held item with its menu. */
+	private void teleportHighlights(Highlights.HighlightsBuilder shown, SubStep current)
+	{
+		CatalogRow row = current.getRow();
+		if (isSpell(row))
 		{
-			Exit exit = current.getExit();
-			return shown.menuTarget(withDialogue(wayTarget(exit.getObjectId(), exit.getOption()), wayInOf(exit.getOrigin(), exit.getDestination()))).build();
+			shown.spellWidget(spellWidget(row)).tab(Tab.MAGIC);
 		}
-		if (current.getKind() == SubStep.Kind.ENTER)
-		{
-			StepIndex.PickUp pickUp = current.getWayIn().getPickUp();
-			boolean pickedUp = pickUp != null && current.getText().startsWith(KEEP_GOING);
-			return shown.menuTarget(pickedUp ? MenuTarget.builder().objectIds(Set.copyOf(pickUp.getObjects())).path(List.of(pickUp.getOption())).build()
-				: withDialogue(wayTarget(current.getWayIn().getObject(), current.getWayIn().getOption()), current.getWayIn())).build();
-		}
-		if (current.getKind() == SubStep.Kind.SPELLBOOK_SWAP)
-		{
-			shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(Tab.MAGIC);
-		}
-		else if (current.getKind() == SubStep.Kind.TELEPORT && isSpell(current.getRow()))
-		{
-			shown.spellWidget(spellWidget(current.getRow())).tab(Tab.MAGIC);
-		}
-		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory() == Category.MINIGAME)
+		else if (row.getCategory() == Category.MINIGAME)
 		{
 			shown.spellWidget(MINIGAME_SPELLS.getOrDefault(currentBook(), InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD)).tab(Tab.MAGIC)
-				.menuTarget(MenuTarget.minigame(SubSteps.minigameName(current.getRow())));
+				.menuTarget(MenuTarget.minigame(SubSteps.minigameName(row)));
 		}
-		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().isLocated())
+		else if (row.isLocated())
 		{
-			MenuTarget target = houseTarget(current.getRow()).toBuilder().alternatives(sameLanding(current)).build();
-			boolean set = obelisk.isSetFor(current.getRow().getName());
+			MenuTarget target = houseTarget(row).toBuilder().alternatives(sameLanding(current)).build();
+			boolean set = obelisk.isSetFor(row.getName());
 			shown.menuTarget(set ? target.toBuilder().path(List.of(TELEPORT_TO_DESTINATION)).build() : target);
 		}
-		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getActItemNamed() != null)
+		else if (current.getActItemNamed() != null)
 		{
 			shown.tab(Tab.INVENTORY);
 		}
-		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory() != Category.MINIGAME)
+		else
 		{
-			CatalogRow row = current.getRow();
 			Set<Integer> held = withHeld(shown, row);
 			MenuTarget.MenuTargetBuilder target = SubSteps.isQuetzalMap(row)
 				? MenuTarget.quetzal(SubSteps.quetzalTableId(row)).toBuilder().path(List.of(SIGNAL_OPTION))
@@ -1247,22 +1299,27 @@ public class StepGuide
 			shown.menuWidget(ScrollBook.entry(row.getName()))
 				.menuTarget(target.itemIds(held).itemNames(names(held)).alternatives(sameLanding(current)).build());
 		}
-		else if (current.getKind() == SubStep.Kind.FAIRY_RING && current.getRow().getCode() != null)
-		{
-			shown.menuTarget(MenuTarget.fairyCode(current.getRow().getCode()).toBuilder().objectIds(FAIRY_RING_OBJECTS).build());
-		}
-		else if (current.getKind() == SubStep.Kind.CHANGE_BOOK && current.getChange().isAnywhere())
+	}
+
+	/** An item that changes the book anywhere (a cape), or house furniture that does. */
+	private void changeBookHighlights(Highlights.HighlightsBuilder shown, SubStep current)
+	{
+		if (current.getChange().isAnywhere())
 		{
 			Set<Integer> held = withHeld(shown, asRow(current.getChange()));
 			shown.menuTarget(MenuTarget.builder().itemIds(held).itemNames(names(held))
 				.path(List.of(SPELLBOOK_OPTION, bookLabel(current.getBook()))).build());
 		}
-		else if (current.getKind() == SubStep.Kind.CHANGE_BOOK && current.getChange().isInHouse())
+		else if (current.getChange().isInHouse())
 		{
 			shown.menuTarget(MenuTarget.builder().objectIds(Set.of(current.getChange().getObjectId()))
 				.path(List.of(SPELLBOOK_OPTION, bookLabel(current.getBook()))).build());
 		}
-		Highlights built = shown.build();
+	}
+
+	/** The one-click fill: the items whose left click goes where the menu target does. */
+	private Highlights withOneClick(Highlights built, SubStep current)
+	{
 		String label = directLabel(built.getMenuTarget(), current);
 		return built.toBuilder().oneClickLabel(label).fillItems(oneClickItems(built, label)).build();
 	}

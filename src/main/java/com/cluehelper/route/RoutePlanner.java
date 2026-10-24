@@ -80,7 +80,6 @@ public class RoutePlanner
 
 	private volatile WalkData.Loaded walk;
 	private volatile Catalog catalog;
-	private WalkGates gates;
 	private long gatesVersion = -1;
 	private boolean[] rowOpen;
 	private WorldPoint lastTile;
@@ -333,7 +332,7 @@ public class RoutePlanner
 			return;
 		}
 		WorldView view = client.getTopLevelWorldView();
-		long sceneBase = view == null ? NO_SCENE : (long) view.getBaseX() << 32 | view.getBaseY() & 0xFFFFFFFFL;
+		long sceneBase = sceneBase(view);
 		boolean sceneReloaded = sceneBase != lastSceneBase;
 		if (position.getTile().equals(lastTile) && start != null && !sceneReloaded)
 		{
@@ -341,42 +340,76 @@ public class RoutePlanner
 		}
 		lastTile = position.getTile();
 		lastSceneBase = sceneBase;
-		if (gatesVersion != snapshot.getVersion())
+		refreshGates(table, snapshot, runes);
+		SceneBfs.Result bfs = walkTheScene(view, position.getTile(), table);
+		if (isMidObstacle(bfs) && start != null)
 		{
-			gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
-			rowOpen = gates.rowOpen();
-			doors.playerChanged(snapshot);
-			gatesVersion = snapshot.getVersion();
-		}
-		long started = System.nanoTime();
-		SceneBfs.Scene scene = doors.withDoorsOpen(view, SceneBfs.Scene.capture(view), table);
-		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, position.getTile(), table, rowOpen);
-		lastBfsNanos = System.nanoTime() - started;
-		// Collision flags still loading after a reload, or the player mid-obstacle on a blocked tile (stepping stones,
-		// a log): the BFS reaches only the player's tile, so the last start stands until the next tick.
-		boolean onlyOwnTile = bfs != null && bfs.reachedTiles() <= 1;
-		if (onlyOwnTile && start != null)
-		{
-			lastTile = null;
-			lastSceneBase = NO_SCENE;
+			retryNextTick();
 			return;
 		}
 		int nearestHere = bfs == null ? WalkTable.NO_NODE : nearest(table, bfs);
 		int targetWalk = bfs == null ? SceneBfs.UNREACHED : step.getTargets().stream().mapToInt(bfs::cost).min().orElse(SceneBfs.UNREACHED);
 		boolean targetInScene = targetWalk != SceneBfs.UNREACHED;
-		// Mid-obstacle in a pocket with no node (south of Kaleb's, anim 741), a few tiles from a start that had nodes
-		boolean pocket = nearestHere == WalkTable.NO_NODE && !targetInScene && start != null && start.getKind() == PlanStart.Kind.SCENE
-			&& start.getTile() != null && start.getTile().distanceTo2D(position.getTile()) <= POCKET_TILES;
-		if (pocket)
+		if (isInPocket(nearestHere, targetInScene, position.getTile()))
 		{
-			lastTile = null;
-			lastSceneBase = NO_SCENE;
+			retryNextTick();
 			return;
 		}
 		nearestNode = nearestHere;
 		targetWalkBucket = targetInScene ? targetWalk / TARGET_WALK_BUCKET_TILES : NO_TARGET_IN_SCENE;
 		start = nearestNode != WalkTable.NO_NODE || targetInScene ? PlanStart.scene(position.getTile(), bfs)
 			: PlanStart.teleportOnly(position.getTile(), bfs);
+	}
+
+	private static long sceneBase(WorldView view)
+	{
+		return view == null ? NO_SCENE : (long) view.getBaseX() << 32 | view.getBaseY() & 0xFFFFFFFFL;
+	}
+
+	/** Each new snapshot judges the walk gates and the webs again. */
+	private void refreshGates(WalkTable table, PlayerSnapshot snapshot, RuneModel runes)
+	{
+		if (gatesVersion == snapshot.getVersion())
+		{
+			return;
+		}
+		WalkGates gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
+		rowOpen = gates.rowOpen();
+		doors.playerChanged(snapshot);
+		gatesVersion = snapshot.getVersion();
+	}
+
+	/** Null when the scene can't be walked (an instance, or no collision data). */
+	private SceneBfs.Result walkTheScene(WorldView view, WorldPoint from, WalkTable table)
+	{
+		long started = System.nanoTime();
+		SceneBfs.Scene scene = doors.withDoorsOpen(view, SceneBfs.Scene.capture(view), table);
+		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, from, table, rowOpen);
+		lastBfsNanos = System.nanoTime() - started;
+		return bfs;
+	}
+
+	/**
+	 * Collision flags still loading after a reload, or the player mid-obstacle on a blocked tile (stepping stones, a
+	 * log): the BFS reaches only the player's tile.
+	 */
+	private static boolean isMidObstacle(SceneBfs.Result bfs)
+	{
+		return bfs != null && bfs.reachedTiles() <= 1;
+	}
+
+	/** Mid-obstacle in a pocket with no node (south of Kaleb's, anim 741), a few tiles from a start that had nodes. */
+	private boolean isInPocket(int nearestHere, boolean targetInScene, WorldPoint tile)
+	{
+		return nearestHere == WalkTable.NO_NODE && !targetInScene && start != null && start.getKind() == PlanStart.Kind.SCENE
+			&& start.getTile() != null && start.getTile().distanceTo2D(tile) <= POCKET_TILES;
+	}
+
+	/** The last start stands until the next tick looks again. */
+	private void retryNextTick()
+	{
+		lastTile = null;
+		lastSceneBase = NO_SCENE;
 	}
 
 	private static int nearest(WalkTable table, SceneBfs.Result bfs)
