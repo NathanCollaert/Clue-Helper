@@ -11,9 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.NpcID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
@@ -138,7 +136,7 @@ public class StageTarget
 
 	private Item[] carried()
 	{
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		return inventory == null ? new Item[0] : inventory.getItems();
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? new Item[0] : PlayerSnapshot.items(snapshot.getInventory());
 	}
 }

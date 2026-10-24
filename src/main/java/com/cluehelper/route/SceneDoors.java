@@ -63,8 +63,7 @@ public final class SceneDoors
 	/** From each new snapshot: a web opens only to a player carrying or wielding something that slashes. */
 	public void playerChanged(PlayerSnapshot player)
 	{
-		canSlash = player.getInventory().keySet().stream().anyMatch(SLASH_ITEMS::contains)
-			|| player.getWorn().keySet().stream().anyMatch(SLASH_ITEMS::contains);
+		canSlash = player.carriedIds().stream().anyMatch(SLASH_ITEMS::contains);
 	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)

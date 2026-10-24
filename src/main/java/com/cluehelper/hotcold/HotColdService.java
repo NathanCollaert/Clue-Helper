@@ -8,6 +8,7 @@ import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.Position;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.route.OriginClass;
 import com.cluehelper.route.PlanInput;
@@ -68,8 +69,6 @@ public class HotColdService
 	private static final int LOCAL_FAR = 32;
 	/** Above this the overworld ends; the device is unmeasured underground. */
 	private static final int OVERWORLD_MAX_Y = 4500;
-	/** Farther than running moves in a tick: a teleport. */
-	private static final int JUMP_TILES = 4;
 	private static final int NEAR_PROBE_TILES = 3;
 	/** A feel this close to where "feel where you stand" was planned tells about the same. */
 	private static final int HERE_DRIFT_TILES = 2;
@@ -231,7 +230,7 @@ public class HotColdService
 		}
 		readCore();
 		WorldPoint tile = player.getPosition().getTile();
-		boolean jumped = tile != null && lastTile != null && (tile.getPlane() != lastTile.getPlane() || tile.distanceTo2D(lastTile) > JUMP_TILES);
+		boolean jumped = PositionRules.teleported(lastTile, tile);
 		lastTile = tile;
 		HotColdPlan current = plan;
 		boolean stale = current == null || !current.getStepKey().equals(step.getKey());

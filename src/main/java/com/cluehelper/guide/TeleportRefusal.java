@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.player.PositionRules;
 import net.runelite.api.coords.WorldPoint;
 
 /** Client thread only. A game message right after a teleport click, with no animation, means the game refused it. */
@@ -40,7 +41,7 @@ final class TeleportRefusal
 			return null;
 		}
 		boolean sameStep = row.equals(currentRow);
-		boolean stayed = tile != null && clickTile != null && SubSteps.near(tile, clickTile, StepGuide.JUMP_TILES);
+		boolean stayed = tile != null && clickTile != null && !PositionRules.teleported(clickTile, tile);
 		String refused = sameStep && stayed && standingStill ? row : null;
 		row = null;
 		clickTick = ActWatcher.NEVER;

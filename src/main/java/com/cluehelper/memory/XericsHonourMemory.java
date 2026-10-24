@@ -1,6 +1,7 @@
 package com.cluehelper.memory;
 
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.player.PositionRules;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,8 +31,6 @@ public class XericsHonourMemory
 	static final String TABLET_USED = "As the talisman and tablet are held together, a surge of power connects the two.";
 	/** The real landing is 3 tiles north of the catalog's (1254 3563); a little more allows for a spread. */
 	private static final int LANDING_TILES = 5;
-	/** Further than this in one tick is a teleport, not a step. */
-	private static final int JUMP_TILES = 4;
 
 	private final Client client;
 	private final PlayerModel player;
@@ -57,7 +56,7 @@ public class XericsHonourMemory
 	{
 		Player local = client.getLocalPlayer();
 		WorldPoint tile = local == null ? null : WorldPoint.fromLocalInstance(client, local.getLocalLocation());
-		if (teleported(lastTile, tile) && tile.distanceTo(LANDING) <= LANDING_TILES)
+		if (PositionRules.teleported(lastTile, tile) && tile.distanceTo(LANDING) <= LANDING_TILES)
 		{
 			learn();
 		}
@@ -96,11 +95,6 @@ public class XericsHonourMemory
 		seen.learnedAt = System.currentTimeMillis();
 		remembered.set(seen);
 		publish();
-	}
-
-	private static boolean teleported(WorldPoint from, WorldPoint to)
-	{
-		return from != null && to != null && (from.getPlane() != to.getPlane() || from.distanceTo2D(to) > JUMP_TILES);
 	}
 
 	static final class Seen

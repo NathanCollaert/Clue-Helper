@@ -1,9 +1,13 @@
 package com.cluehelper.player;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
+import net.runelite.api.Item;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
@@ -132,6 +136,57 @@ public final class PlayerSnapshot
 			return groupStorage.getOrDefault(itemId, 0);
 		}
 		return container == Container.RUNE_POUCH ? pouch.getOrDefault(itemId, 0) : 0;
+	}
+
+	/** The item's count in the inventory and worn together. */
+	public int carried(int itemId)
+	{
+		return inventory.getOrDefault(itemId, 0) + worn.getOrDefault(itemId, 0);
+	}
+
+	/** The item's count in the bank and the group storage together; 0 outside a banked snapshot. */
+	public int stored(int itemId)
+	{
+		return bank.getOrDefault(itemId, 0) + groupStorage.getOrDefault(itemId, 0);
+	}
+
+	public Set<Integer> carriedIds()
+	{
+		Set<Integer> ids = new HashSet<>(inventory.keySet());
+		ids.addAll(worn.keySet());
+		return Collections.unmodifiableSet(ids);
+	}
+
+	public Set<Integer> storedIds()
+	{
+		Set<Integer> ids = new HashSet<>(bank.keySet());
+		ids.addAll(groupStorage.keySet());
+		return Collections.unmodifiableSet(ids);
+	}
+
+	/** Inventory and worn items by id, their counts summed. */
+	public Map<Integer, Integer> carriedItems()
+	{
+		return summed(inventory, worn);
+	}
+
+	/** Bank and group storage items by id, their counts summed; empty outside a banked snapshot. */
+	public Map<Integer, Integer> storedItems()
+	{
+		return summed(bank, groupStorage);
+	}
+
+	private static Map<Integer, Integer> summed(Map<Integer, Integer> first, Map<Integer, Integer> second)
+	{
+		Map<Integer, Integer> items = new LinkedHashMap<>(first);
+		second.forEach((id, quantity) -> items.merge(id, quantity, Integer::sum));
+		return Collections.unmodifiableMap(items);
+	}
+
+	/** Item counts as core's requirements test them. */
+	public static Item[] items(Map<Integer, Integer> counts)
+	{
+		return counts.entrySet().stream().map(e -> new Item(e.getKey(), e.getValue())).toArray(Item[]::new);
 	}
 
 	public boolean finished(Quest quest)

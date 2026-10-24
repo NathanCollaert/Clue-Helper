@@ -115,7 +115,7 @@ final class PlanContext
 		avoidsWilderness = in.getSettings().isAvoidWilderness() && !onlyInWilderness;
 		PlayerSnapshot carrier = in.getPlayer();
 		depositsBookFirst = in.getSettings().isScrollBookOutOfWilderness() && targetInWilderness
-			&& (carrier.getInventory().containsKey(BookScrolls.BOOK) || carrier.getWorn().containsKey(BookScrolls.BOOK));
+			&& (carrier.carried(BookScrolls.BOOK) > 0);
 		options[NOT_BANKED] = new Options(in.getPlayer(), NOT_BANKED);
 		if (in.getSettings().isBankEdge() && in.getBanked() != null)
 		{
@@ -496,7 +496,7 @@ final class PlanContext
 		Options(PlayerSnapshot player, int bankState)
 		{
 			PlayerSnapshot judgedAt = player.toBuilder().wildernessLevel(0).build();
-			boolean carriesBook = player.getInventory().containsKey(BookScrolls.BOOK) || player.getWorn().containsKey(BookScrolls.BOOK);
+			boolean carriesBook = player.carried(BookScrolls.BOOK) > 0;
 			Map<String, Teleport> longestVariant = new LinkedHashMap<>();
 			for (CatalogRow row : in.getCatalog().getTeleports())
 			{
@@ -667,7 +667,7 @@ final class PlanContext
 		List<ItemUse> stored = new ArrayList<>();
 		for (ItemUse use : witness)
 		{
-			if (use.getContainer() == Container.BANK || use.getContainer() == Container.GROUP_STORAGE)
+			if (use.getContainer().isStored())
 			{
 				stored.add(use);
 			}
@@ -755,8 +755,7 @@ final class PlanContext
 		{
 			Charge charge = player.getCharges().get(itemId);
 			int perItem = charge == null ? 1 : Math.max(0, charge.getCharges());
-			int held = player.count(Container.INVENTORY, itemId) + player.count(Container.WORN, itemId)
-				+ player.count(Container.BANK, itemId) + player.count(Container.GROUP_STORAGE, itemId);
+			int held = player.carried(itemId) + player.stored(itemId);
 			return set("charge:" + itemId, bankState, Math.max(1, held) * perItem);
 		}
 

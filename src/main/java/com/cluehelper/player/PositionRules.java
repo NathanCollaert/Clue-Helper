@@ -32,6 +32,15 @@ public final class PositionRules
 	{
 	}
 
+	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
+	public static final int JUMP_TILES = 4;
+
+	/** Whether getting from {@code from} to {@code to} within a tick took a teleport, a ladder or a boat; false while either is unknown. */
+	public static boolean teleported(WorldPoint from, WorldPoint to)
+	{
+		return from != null && to != null && (from.getPlane() != to.getPlane() || from.distanceTo2D(to) > JUMP_TILES);
+	}
+
 	/**
 	 * @param boatTile the boat entity's tile through {@code fromLocalInstance}; never the player's raw
 	 *     location, which on a boat is the deck's own frozen coordinates

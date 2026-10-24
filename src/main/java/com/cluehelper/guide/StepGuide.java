@@ -10,6 +10,7 @@ import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.player.RuneModel;
 import com.cluehelper.player.Spell;
 import com.cluehelper.route.Exit;
@@ -103,8 +104,6 @@ public class StepGuide
 	private static final String USE_OPTION = "Use";
 	private static final int MAX_STACK = Integer.MAX_VALUE / 2;
 
-	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
-	static final int JUMP_TILES = 4;
 	private static final int PARAM_SPELL_WIDGET = 596;
 	private static final String CAPE_LIMIT_TEXT = "five times per day";
 	private static final int NO_ANIMATION = -1;
@@ -513,8 +512,7 @@ public class StepGuide
 	public void onGameTick()
 	{
 		WorldPoint tile = player.getPosition().getTile();
-		boolean jumped = tile != null && lastTile != null
-			&& (tile.getPlane() != lastTile.getPlane() || tile.distanceTo2D(lastTile) > JUMP_TILES);
+		boolean jumped = PositionRules.teleported(lastTile, tile);
 		lastTile = tile;
 		jumpedThisSubStep |= jumped;
 		if (jumped)
@@ -525,7 +523,7 @@ public class StepGuide
 		if (waiting != null && !isTravelling())
 		{
 			Waiting next = waiting;
-			boolean stale = next.getFrom() != null && tile != null && !SubSteps.near(tile, next.getFrom(), JUMP_TILES);
+			boolean stale = PositionRules.teleported(next.getFrom(), tile);
 			waiting = null;
 			if (!stale)
 			{
@@ -706,8 +704,8 @@ public class StepGuide
 
 	private int carriedCount(int itemId)
 	{
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		return inventory == null ? 0 : inventory.count(itemId);
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? 0 : snapshot.count(Container.INVENTORY, itemId);
 	}
 
 	/** Client thread. Every loaded tile on the player's floor with that item on the ground. */
@@ -930,9 +928,26 @@ public class StepGuide
 
 	private Set<Integer> carriedItemIds()
 	{
-		Set<Integer> ids = containerIds(InventoryID.INV);
-		ids.addAll(containerIds(InventoryID.WORN));
-		return ids;
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? Set.of() : snapshot.carriedIds();
+	}
+
+	private Set<Integer> inventoryIds()
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? Set.of() : snapshot.getInventory().keySet();
+	}
+
+	private Set<Integer> wornIds()
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? Set.of() : snapshot.getWorn().keySet();
+	}
+
+	private Map<Integer, Integer> carriedItems()
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? Map.of() : snapshot.carriedItems();
 	}
 
 	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
@@ -942,24 +957,15 @@ public class StepGuide
 		{
 			return false;
 		}
-		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		List<Item> carried = new ArrayList<>();
-		for (ItemContainer container : new ItemContainer[]{worn, inventory})
-		{
-			if (container != null)
-			{
-				carried.addAll(List.of(container.getItems()));
-			}
-		}
 		return stepNeeds.of(step).getStash() == StashMemory.State.FILLED
-			&& !step.getRequirements().itemsFulfilledBy(carried.toArray(new Item[0]));
+			&& !step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(carriedItems()));
 	}
 
 	private boolean equipped(Step step)
 	{
-		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
-		return step != null && step.getRequirements() != null && worn != null && step.getRequirements().itemsFulfilledBy(worn.getItems());
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return step != null && step.getRequirements() != null && snapshot != null
+			&& step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(snapshot.getWorn()));
 	}
 
 	/** The exit a start leg leaves the planned scene by, or null for any other walk. */
@@ -1368,10 +1374,9 @@ public class StepGuide
 
 	private String carriedBox()
 	{
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		for (Item item : inventory == null ? new Item[0] : inventory.getItems())
+		for (int id : inventoryIds())
 		{
-			String name = item.getId() < 0 ? "" : client.getItemDefinition(item.getId()).getName().toLowerCase(Locale.ROOT);
+			String name = client.getItemDefinition(id).getName().toLowerCase(Locale.ROOT);
 			for (String box : BOXES)
 			{
 				if (name.startsWith(box))
@@ -1414,8 +1419,8 @@ public class StepGuide
 		{
 			return false;
 		}
-		Set<Integer> worn = containerIds(InventoryID.WORN);
-		Set<Integer> inventory = containerIds(InventoryID.INV);
+		Set<Integer> worn = wornIds();
+		Set<Integer> inventory = inventoryIds();
 		List<Integer> chosen = wornNeeds(current).stream().flatMap(need -> toEquip(need.getRequirement(), worn, inventory).stream())
 			.distinct().collect(Collectors.toList());
 		if (chosen.isEmpty())
@@ -1465,7 +1470,7 @@ public class StepGuide
 
 	private boolean wearsGear(SubStep act)
 	{
-		Set<Integer> worn = containerIds(InventoryID.WORN);
+		Set<Integer> worn = wornIds();
 		return routeStep != null && wornNeeds(act).stream().allMatch(need -> need.getRequirement() instanceof GearRequirement
 			? ((GearRequirement) need.getRequirement()).isWorn(worn) : need.getRequirement().fulfilledBy(asItems(worn)));
 	}
@@ -1496,47 +1501,20 @@ public class StepGuide
 		return ids.stream().map(id -> new Item(id, 1)).toArray(Item[]::new);
 	}
 
-	private Set<Integer> containerIds(int inventoryId)
-	{
-		ItemContainer items = client.getItemContainer(inventoryId);
-		Set<Integer> ids = new HashSet<>();
-		for (Item item : items == null ? new Item[0] : items.getItems())
-		{
-			if (item.getId() > 0)
-			{
-				ids.add(item.getId());
-			}
-		}
-		return ids;
-	}
-
 	private boolean wearsWayInGear(Step step)
 	{
 		if (step == null || step.getData() == null)
 		{
 			return true;
 		}
-		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
-		Set<Integer> on = new HashSet<>();
-		for (Item item : worn == null ? new Item[0] : worn.getItems())
-		{
-			on.add(item.getId());
-		}
+		Set<Integer> on = wornIds();
 		return step.getData().getRequires().stream().filter(StepIndex.Requires::isWear)
 			.allMatch(need -> need.getIds().stream().anyMatch(on::contains));
 	}
 
 	private boolean carriesItemNamed(String nameStart)
 	{
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		for (Item item : inventory == null ? new Item[0] : inventory.getItems())
-		{
-			if (item.getId() > 0 && client.getItemDefinition(item.getId()).getName().toLowerCase().startsWith(nameStart))
-			{
-				return true;
-			}
-		}
-		return false;
+		return inventoryIds().stream().anyMatch(id -> client.getItemDefinition(id).getName().toLowerCase().startsWith(nameStart));
 	}
 
 	/** The carried item the act names, refreshed every tick as it arrives (the puzzle box, after the talk). */
@@ -1548,17 +1526,10 @@ public class StepGuide
 		{
 			return shown;
 		}
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		Set<Integer> named = new HashSet<>();
-		for (Item item : inventory == null ? new Item[0] : inventory.getItems())
-		{
-			String name = item.getId() < 0 ? null : client.getItemDefinition(item.getId()).getName();
-			if (name != null && name.toLowerCase().startsWith(current.getActItemNamed()))
-			{
-				named.add(item.getId());
-			}
-		}
-		Set<Integer> items = Set.copyOf(named);
+		Set<Integer> named = inventoryIds().stream()
+			.filter(id -> client.getItemDefinition(id).getName().toLowerCase().startsWith(current.getActItemNamed()))
+			.collect(Collectors.toUnmodifiableSet());
+		Set<Integer> items = named;
 		String option = current.getActOption();
 		Highlights.HighlightsBuilder next = shown.toBuilder().items(items)
 			.fillItems(option == null ? items : items.stream().filter(id -> option.equalsIgnoreCase(itemLeftClick(id))).collect(Collectors.toUnmodifiableSet()))
@@ -1726,16 +1697,10 @@ public class StepGuide
 		{
 			return shown;
 		}
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		Set<Integer> wanted = new HashSet<>();
-		for (Item item : inventory == null ? new Item[0] : inventory.getItems())
-		{
-			if (routeStep.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(item.getId())))
-			{
-				wanted.add(item.getId());
-			}
-		}
-		return shown.toBuilder().items(Set.copyOf(wanted))
+		Set<Integer> wanted = inventoryIds().stream()
+			.filter(id -> routeStep.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
+			.collect(Collectors.toUnmodifiableSet());
+		return shown.toBuilder().items(wanted)
 			.fillItems(wanted.stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
@@ -1754,18 +1719,7 @@ public class StepGuide
 	/** The fewest of the item that, with what is carried, meet every step need it counts towards. */
 	private int stillToTake(int itemId)
 	{
-		Map<Integer, Integer> carried = new HashMap<>();
-		for (int container : new int[]{InventoryID.INV, InventoryID.WORN})
-		{
-			ItemContainer items = client.getItemContainer(container);
-			for (Item item : items == null ? new Item[0] : items.getItems())
-			{
-				if (item.getId() > 0)
-				{
-					carried.merge(item.getId(), item.getQuantity(), Integer::sum);
-				}
-			}
-		}
+		Map<Integer, Integer> carried = carriedItems();
 		int most = 0;
 		for (RequiredItems.Need need : routeStep == null ? List.<RequiredItems.Need>of() : stepNeeds.of(routeStep).getNeeds())
 		{
@@ -1810,7 +1764,7 @@ public class StepGuide
 	{
 		Map<Integer, Integer> items = new HashMap<>(carried);
 		items.merge(itemId, more, Integer::sum);
-		return items.entrySet().stream().map(e -> new Item(e.getKey(), e.getValue())).toArray(Item[]::new);
+		return PlayerSnapshot.items(items);
 	}
 
 	/** A task's item does the act on a left click when it is put on or used on another (a tinderbox, a herb). */
@@ -2060,7 +2014,7 @@ public class StepGuide
 		}
 		RowAvailability judged = new AvailabilityEngine(runes, id -> "").judge(row, snapshot, AvailabilityService.nowMinutes());
 		List<ItemUse> held = judged.getWitness().stream()
-			.filter(use -> use.getContainer() == Container.INVENTORY || use.getContainer() == Container.WORN)
+			.filter(use -> use.getContainer().isCarried())
 			.filter(use -> !runes.isRune(use.getItemId()))
 			.collect(Collectors.toUnmodifiableList());
 		Set<Integer> items = held.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet());

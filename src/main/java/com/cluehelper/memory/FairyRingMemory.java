@@ -1,6 +1,7 @@
 package com.cluehelper.memory;
 
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.player.PositionRules;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -32,7 +33,6 @@ public class FairyRingMemory
 	private static final Pattern LAST_DESTINATION = Pattern.compile("last-destination \\(([A-Z]{3})\\)", Pattern.CASE_INSENSITIVE);
 	/** A ring teleport lands about 7 ticks after the confirm, arrival lock included. */
 	private static final int LANDING_WITHIN_TICKS = 12;
-	private static final int JUMP_TILES = 4;
 
 	private final Client client;
 	private final PlayerModel player;
@@ -105,8 +105,7 @@ public class FairyRingMemory
 			return;
 		}
 		WorldPoint at = position();
-		boolean jumped = at != null && pendingFrom != null
-			&& (at.getPlane() != pendingFrom.getPlane() || at.distanceTo2D(pendingFrom) > JUMP_TILES);
+		boolean jumped = PositionRules.teleported(pendingFrom, at);
 		if (jumped)
 		{
 			remember(pending, "travel");

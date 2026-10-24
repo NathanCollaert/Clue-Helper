@@ -131,7 +131,7 @@ public final class WalkGates
 	{
 		for (int sword : WILDERNESS_SWORDS)
 		{
-			if (player.count(Container.BANK, sword) + player.count(Container.GROUP_STORAGE, sword) > 0)
+			if (player.stored(sword) > 0)
 			{
 				return sword;
 			}
@@ -142,7 +142,7 @@ public final class WalkGates
 	private static int[] storedIds(RowAvailability judged)
 	{
 		return judged.getWitness().stream()
-			.filter(use -> use.getContainer() == Container.BANK || use.getContainer() == Container.GROUP_STORAGE)
+			.filter(use -> use.getContainer().isStored())
 			.mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
 	}
 }

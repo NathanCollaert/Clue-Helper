@@ -1,6 +1,7 @@
 package com.cluehelper.route;
 
 import com.cluehelper.memory.StashMemory;
+import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
@@ -20,9 +21,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
@@ -50,17 +48,19 @@ public class StepNeeds
 	private final StashMemory stash;
 	private final GearPieces gearPieces;
 	private final AvailabilityService availability;
+	private final PlayerModel player;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
 
 	@Inject
-	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability)
+	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)
 	{
 		this.client = client;
 		this.stash = stash;
 		this.gearPieces = gearPieces;
 		this.availability = availability;
+		this.player = player;
 	}
 
 	public RequiredItems of(Step step)
@@ -150,23 +150,12 @@ public class StepNeeds
 	/** Gear is picked from all of these, the bank only while banking counts. */
 	private Set<Integer> ownedItemIds()
 	{
-		Set<Integer> ids = new HashSet<>();
-		for (int container : new int[]{InventoryID.INV, InventoryID.WORN})
-		{
-			ItemContainer items = client.getItemContainer(container);
-			for (Item item : items == null ? new Item[0] : items.getItems())
-			{
-				if (item.getId() > 0)
-				{
-					ids.add(item.getId());
-				}
-			}
-		}
+		PlayerSnapshot snapshot = player.getSnapshot();
+		Set<Integer> ids = new HashSet<>(snapshot == null ? Set.of() : snapshot.carriedIds());
 		PlayerSnapshot banked = availability.getBankedSnapshot();
 		if (banked != null)
 		{
-			ids.addAll(banked.getBank().keySet());
-			ids.addAll(banked.getGroupStorage().keySet());
+			ids.addAll(banked.storedIds());
 		}
 		return ids;
 	}

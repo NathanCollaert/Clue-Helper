@@ -205,7 +205,7 @@ public final class AvailabilityEngine
 
 	private static int fromStorage(List<ItemUse> witness)
 	{
-		return (int) witness.stream().filter(use -> use.getContainer() == Container.BANK || use.getContainer() == Container.GROUP_STORAGE).count();
+		return (int) witness.stream().filter(use -> use.getContainer().isStored()).count();
 	}
 
 	/** Unknown counts as more than any known total. */

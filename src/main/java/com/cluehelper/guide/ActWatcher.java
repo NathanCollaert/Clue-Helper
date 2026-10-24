@@ -1,5 +1,7 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.player.PlayerModel;
+import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import java.util.HashSet;
@@ -8,8 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
@@ -31,6 +31,7 @@ public class ActWatcher
 	private static final Set<String> CHALLENGE_ITEMS = Set.of("challenge scroll", "puzzle box", "light box");
 
 	private final Client client;
+	private final PlayerModel player;
 	private int withdrawTick = NEVER;
 	private int depositTick = NEVER;
 	private int uriTick = NEVER;
@@ -41,9 +42,10 @@ public class ActWatcher
 	private boolean challengeCarried;
 
 	@Inject
-	ActWatcher(Client client)
+	ActWatcher(Client client, PlayerModel player)
 	{
 		this.client = client;
+		this.player = player;
 	}
 
 	public void onChatMessage(ChatMessage message)
@@ -170,18 +172,8 @@ public class ActWatcher
 
 	private boolean carriesChallengeItem()
 	{
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		if (inventory == null)
-		{
-			return false;
-		}
-		for (Item item : inventory.getItems())
-		{
-			if (item.getId() > 0 && CHALLENGE_ITEMS.contains(client.getItemDefinition(item.getId()).getName().toLowerCase()))
-			{
-				return true;
-			}
-		}
-		return false;
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot != null && snapshot.getInventory().keySet().stream()
+			.anyMatch(id -> CHALLENGE_ITEMS.contains(client.getItemDefinition(id).getName().toLowerCase()));
 	}
 }

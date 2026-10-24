@@ -72,7 +72,7 @@ public class RequiredItems
 		{
 			return Verdict.MET;
 		}
-		Map<Integer, Integer> carried = carried(player);
+		Map<Integer, Integer> carried = player.carriedItems();
 		if (allMet(open, carried))
 		{
 			return Verdict.MET;
@@ -80,7 +80,7 @@ public class RequiredItems
 		if (banked == null || !allMet(open, everything(carried, banked)))
 		{
 			Map<Integer, Integer> all = banked == null ? carried : everything(carried, banked);
-			Item[] owned = items(all);
+			Item[] owned = PlayerSnapshot.items(all);
 			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(owned)).collect(Collectors.toList());
 			Map<Need, List<String>> parts = missing.stream().filter(need -> need.requirement instanceof AlternativeRequirement)
 				.collect(Collectors.toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
@@ -128,8 +128,7 @@ public class RequiredItems
 
 	private static Set<Integer> gearPicks(List<Need> open, PlayerSnapshot player, PlayerSnapshot banked)
 	{
-		Set<Integer> stored = new HashSet<>(banked.getBank().keySet());
-		stored.addAll(banked.getGroupStorage().keySet());
+		Set<Integer> stored = banked.storedIds();
 		Set<Integer> picked = new HashSet<>();
 		for (Need need : open)
 		{
@@ -152,22 +151,14 @@ public class RequiredItems
 
 	private static boolean allMet(List<Need> open, Map<Integer, Integer> items)
 	{
-		Item[] array = items(items);
+		Item[] array = PlayerSnapshot.items(items);
 		return open.stream().allMatch(need -> need.requirement.fulfilledBy(array));
-	}
-
-	private static Map<Integer, Integer> carried(PlayerSnapshot player)
-	{
-		Map<Integer, Integer> items = new LinkedHashMap<>(player.getInventory());
-		player.getWorn().forEach((id, qty) -> items.merge(id, qty, Integer::sum));
-		return items;
 	}
 
 	private static Map<Integer, Integer> everything(Map<Integer, Integer> carried, PlayerSnapshot banked)
 	{
 		Map<Integer, Integer> items = new LinkedHashMap<>(carried);
-		banked.getBank().forEach((id, qty) -> items.merge(id, qty, Integer::sum));
-		banked.getGroupStorage().forEach((id, qty) -> items.merge(id, qty, Integer::sum));
+		banked.storedItems().forEach((id, qty) -> items.merge(id, qty, Integer::sum));
 		return items;
 	}
 
@@ -178,8 +169,4 @@ public class RequiredItems
 		return items;
 	}
 
-	private static Item[] items(Map<Integer, Integer> items)
-	{
-		return items.entrySet().stream().map(e -> new Item(e.getKey(), e.getValue())).toArray(Item[]::new);
-	}
 }

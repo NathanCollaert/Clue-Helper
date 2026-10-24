@@ -6,6 +6,7 @@ import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.player.Position;
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.transport.CatalogData;
@@ -89,8 +90,6 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final String CHALLENGE_COMPLETED = "Skill challenge completed.";
 	private static final int MOST_LIVE_FRAMES = 200;
 	private static final int MOST_SCENES = 12;
-	/** Farther than a run tick can carry you: a teleport, a ladder or a boat. */
-	private static final int LANDING_JUMP_TILES = 4;
 	private static final int LANDING_CANDIDATES = 2;
 	private static final int FRAME_NAME_KEY_CHARS = 50;
 	private static final int PLUGIN_DELAY_MS = 2000;
@@ -377,8 +376,7 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		Position position = clueHelper.getPlayerModel().getPosition();
 		WorldPoint tile = position.getTile();
-		if (tile != null && lastTile != null
-			&& (tile.getPlane() != lastTile.getPlane() || tile.distanceTo2D(lastTile) > LANDING_JUMP_TILES))
+		if (PositionRules.teleported(lastTile, tile))
 		{
 			logLanding(lastTile, tile, position.getKind());
 		}
