@@ -51,6 +51,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -96,7 +97,7 @@ public class StepGuide
 		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC
 	}
 
-	private static final int NO_STASH = -1;
+	static final int NO_STASH = -1;
 	private static final String SEARCH_OPTION = "Search";
 	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
 	private static final String USE_OPTION = "Use";
@@ -104,14 +105,9 @@ public class StepGuide
 
 	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
 	static final int JUMP_TILES = 4;
-	/** A refused book change leaves the book as it was; the next tick shows whether it changed. */
-	static final int REFUSAL_CHECK_TICKS = 2;
-	/** A teleport animates on its click's tick or within two: three ticks without one means it was refused. */
-	static final int TELEPORT_REFUSAL_TICKS = 3;
 	private static final int PARAM_SPELL_WIDGET = 596;
 	private static final String CAPE_LIMIT_TEXT = "five times per day";
 	private static final int NO_ANIMATION = -1;
-	private static final int NEVER = Integer.MIN_VALUE;
 	private static final int OBJECT_REFRESH_TICKS = 5;
 	/** A bank node sits on the walkable tile in front of its booth, chest or banker. */
 	private static final int BANK_TILES = 3;
@@ -142,7 +138,6 @@ public class StepGuide
 	static final int STAY_AT_ACT_TILES = 20;
 	/** In scene-walk tiles: 20 ticks of running. */
 	static final int ARRIVED_WALK_TILES = 40;
-	private static final int DEPOSIT_TILES = 15;
 
 	private final Client client;
 	private final ClueLink clueLink;
@@ -156,72 +151,36 @@ public class StepGuide
 	private final ActWatcher actWatcher;
 	private final StepNeeds stepNeeds;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
-	/** When the guided step began: an act's event counts from then. */
-	private int stepSince = ActWatcher.NEVER;
 	private static final String TALK_TO = "Talk to ";
 	private static final List<String> BOXES = List.of("puzzle box", "light box");
-	private SubStep fightView;
-	/** After a talk that hands over a puzzle or light box: open it (core solves it), then talk again. */
-	private SubStep boxView;
-	private SubStep afterFight;
-	/** The STASH unit to put the last emote step's items back into; null once done or walked away from. */
-	private WorldPoint depositAt;
-	private boolean depositBeenNear;
-	private int depositSince = ActWatcher.NEVER;
-	private int depositStashId = NO_STASH;
-	/** The STASH items the player still carries, to put back. */
-	private List<String> depositItems = List.of();
 	private final Map<String, Integer> spellWidgets = new HashMap<>();
+	private final LeftClicks leftClicks = new LeftClicks();
+	private final SwapperClicks swapperClicks;
+	private final DepositReminder deposit;
+	private final ChangeRefusal changeRefusal = new ChangeRefusal();
+	private final TeleportRefusal teleportRefusal = new TeleportRefusal();
+	private final ObeliskDestination obelisk = new ObeliskDestination();
 
 	private Runnable unregister;
 	private Route route;
 	private Step routeStep;
+	/** When the guided step began: an act's event counts from then. */
+	private int stepSince = ActWatcher.NEVER;
 	private String actReachedStepKey;
 	private List<SubStep> steps = List.of();
 	private int index;
-	private Route waiting;
-	private WorldPoint waitingFrom;
 	private boolean jumpedThisSubStep;
 	private WorldPoint lastTile;
-	private String refusalCandidate;
-	private Book refusalBook;
-	private int refusalCheckTick;
-	private Set<Integer> highlightItems = Set.of();
-	private Set<Integer> fillItems = Set.of();
-	private final LeftClicks leftClicks = new LeftClicks();
-	private final SwapperClicks swapperClicks;
-	private List<ItemUse> heldUses = List.of();
-	private String oneClickLabel;
-	/** An outlined object is filled when its left click is this option (a STASH unit's "Search"); null for teleports. */
-	private String objectOption;
-	private Set<Integer> bankHighlightItems = Set.of();
-	private int highlightSpellWidget = -1;
-	private int highlightMenuWidget = ScrollBook.NO_WIDGET;
-	private Tab highlightTab = Tab.NONE;
-	private MenuTarget menuTarget = MenuTarget.NONE;
-	/** The current sub-step's own object or NPC with its option ("Search for traps"), for colouring its menu line. */
-	private MenuTarget optionTarget = MenuTarget.NONE;
+	/** A route that came while a teleport was under way, followed once it lands. */
+	private Waiting waiting;
+	/** While an enemy attacks during a dig or an emote. */
+	private Fight fight;
+	/** After a talk that hands over a puzzle or light box: open it (core solves it), then talk again. */
+	private SubStep boxView;
+	/** Ground items to pick up now, by tile. */
 	private List<WorldPoint> pickUpTiles = List.of();
-	/** The obelisk's list was open on the target's line: its closing means the destination is set. */
-	private boolean destinationListSeen;
-	private String destinationSetFor;
-	private List<TileObject> highlightObjects = List.of();
-	private List<NPC> highlightNpcs = List.of();
-	private List<TileObject> fillObjects = List.of();
-	private List<NPC> fillNpcs = List.of();
-	/** The option an outlined NPC is filled for when it is its left click (the Guardian mummy's Start-minigame). */
-	private String npcOption;
-	private int objectsFoundTick = NEVER;
-	/**
-	 * A house's furniture appears a tick or two after the load, so empty searches repeat every tick at first, then every
-	 * {@link #OBJECT_REFRESH_TICKS}.
-	 */
-	private int emptySearches;
-	/** A game message right after a teleport click, with no animation, means the game refused it. */
-	private int teleportClickTick = NEVER;
-	private String teleportRefusal;
-	private int teleportCheckTick = NEVER;
-	private WorldPoint teleportClickTile;
+	private Highlights highlights = Highlights.NONE;
+	private SceneHighlights scene = SceneHighlights.NONE;
 
 	@Inject
 	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
@@ -229,6 +188,7 @@ public class StepGuide
 		ActWatcher actWatcher, StepNeeds stepNeeds)
 	{
 		this.actWatcher = actWatcher;
+		this.deposit = new DepositReminder(actWatcher);
 		this.stepNeeds = stepNeeds;
 		this.stageTarget = stageTarget;
 		this.probeTarget = probeTarget;
@@ -272,9 +232,9 @@ public class StepGuide
 	/** While an enemy attacks during a dig or an emote, the fight; after it, the act again. */
 	public SubStep getCurrent()
 	{
-		if (fightView != null)
+		if (fight != null)
 		{
-			return fightView;
+			return fight.getView();
 		}
 		if (boxView != null)
 		{
@@ -286,9 +246,9 @@ public class StepGuide
 	/** During a fight, the act to do again. */
 	public SubStep getNext()
 	{
-		if (afterFight != null)
+		if (fight != null && fight.getAgain() != null)
 		{
-			return afterFight;
+			return fight.getAgain();
 		}
 		return index + 1 < steps.size() ? steps.get(index + 1) : null;
 	}
@@ -354,62 +314,62 @@ public class StepGuide
 
 	public Set<Integer> getHighlightItems()
 	{
-		return highlightItems;
+		return highlights.getItems();
 	}
 
 	public Set<Integer> getBankHighlightItems()
 	{
-		return bankHighlightItems;
+		return highlights.getBankItems();
 	}
 
 	public Tab getHighlightTab()
 	{
-		return highlightTab;
+		return highlights.getTab();
 	}
 
 	public int getHighlightMenuWidget()
 	{
-		return highlightMenuWidget;
+		return highlights.getMenuWidget();
 	}
 
 	public MenuTarget getMenuTarget()
 	{
-		return menuTarget;
+		return highlights.getMenuTarget();
 	}
 
 	public MenuTarget getOptionTarget()
 	{
-		return optionTarget;
+		return highlights.getOptionTarget();
 	}
 
 	public List<TileObject> getHighlightObjects()
 	{
-		return highlightObjects;
+		return scene.getObjects();
 	}
 
 	public Set<Integer> getFillItems()
 	{
-		return fillItems;
+		return highlights.getFillItems();
 	}
 
 	public List<TileObject> getFillObjects()
 	{
-		return fillObjects;
+		return scene.getFillObjects();
 	}
 
 	public List<NPC> getFillNpcs()
 	{
-		return fillNpcs;
+		return scene.getFillNpcs();
 	}
 
 	public List<NPC> getHighlightNpcs()
 	{
-		return highlightNpcs;
+		return scene.getNpcs();
 	}
 
 	public int getHighlightSpellWidget()
 	{
-		return highlightSpellWidget;
+		return highlights.getSpellWidget();
 	}
 
 	/** An interface option the task picks and its confirm button, outlined while the interface is open. */
@@ -516,8 +476,7 @@ public class StepGuide
 		Route committed = routes.getCommitted();
 		if (isTravelling())
 		{
-			waiting = committed;
-			waitingFrom = player.getPosition().getTile();
+			waiting = new Waiting(committed, player.getPosition().getTile());
 			return;
 		}
 		follow(committed);
@@ -533,22 +492,21 @@ public class StepGuide
 		MenuEntry[] entries = client.getMenu().getMenuEntries();
 		if (entries.length > 0 && leftClicks.learn(entries[entries.length - 1]))
 		{
-			refreshItemFill();
-			fillObjects = oneClickObjects(highlightObjects);
-			fillNpcs = oneClickNpcs(highlightNpcs);
+			highlights = withItemFill(highlights);
+			scene = scene.toBuilder().fillObjects(oneClickObjects(scene.getObjects()))
+				.fillNpcs(oneClickNpcs(scene.getNpcs(), scene.getNpcOption())).build();
 		}
 	}
 
 	/** An act's items are filled by what it asks for (equip on a left click, its own items), not by a teleport's left click. */
-	private void refreshItemFill()
+	private Highlights withItemFill(Highlights shown)
 	{
 		SubStep current = getCurrent();
 		if (current != null && current.getKind() == SubStep.Kind.ACT)
 		{
-			refreshEquipItems();
-			return;
+			return withEquipItems(shown);
 		}
-		fillItems = oneClickItems(oneClickLabel);
+		return shown.toBuilder().fillItems(oneClickItems(shown, shown.getOneClickLabel())).build();
 	}
 
 	/** Call from a GameTick handler that runs after the planner's. */
@@ -566,12 +524,12 @@ public class StepGuide
 		boolean changed = false;
 		if (waiting != null && !isTravelling())
 		{
-			Route next = waiting;
-			boolean stale = waitingFrom != null && tile != null && !SubSteps.near(tile, waitingFrom, JUMP_TILES);
+			Waiting next = waiting;
+			boolean stale = next.getFrom() != null && tile != null && !SubSteps.near(tile, next.getFrom(), JUMP_TILES);
 			waiting = null;
 			if (!stale)
 			{
-				follow(next);
+				follow(next.getRoute());
 				return;
 			}
 		}
@@ -581,7 +539,7 @@ public class StepGuide
 			return;
 		}
 		actWatcher.onGameTick(routeStep);
-		checkDeposit(tile);
+		deposit.onGameTick(tile);
 		changed |= advance(tile);
 		changed |= refreshFight();
 		changed |= refreshBox();
@@ -600,9 +558,7 @@ public class StepGuide
 			updateHighlights();
 		}
 		refreshObjects();
-		refreshEquipItems();
-		refreshTaskItems();
-		refreshNamedItems();
+		highlights = withNamedItems(withTaskItems(withEquipItems(highlights)));
 		if (changed)
 		{
 			notifyListeners();
@@ -613,33 +569,31 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
+		MenuTarget menuTarget = highlights.getMenuTarget();
 		List<String> option = current == null || current.getOption() == null ? List.of() : List.of(current.getOption());
 		MenuTarget target = current != null && !current.getNpcIds().isEmpty() ? MenuTarget.builder().npcIds(current.getNpcIds()).path(option).build()
 			: current != null && !current.getObjectIds().isEmpty() ? MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build()
 			: isApproach() ? houseTarget(getNext().getRow()) : stashAhead() != NO_STASH ? MenuTarget.builder().objectIds(Set.of(stashAhead())).build()
 			: menuTarget;
-		optionTarget = option.isEmpty() || menuTarget != MenuTarget.NONE ? MenuTarget.NONE : target;
+		highlights = highlights.toBuilder().optionTarget(option.isEmpty() || menuTarget != MenuTarget.NONE ? MenuTarget.NONE : target).build();
 		Set<Integer> ids = target.getObjectIds();
 		Set<Integer> npcIds = target.getNpcIds();
 		if (ids.isEmpty() && npcIds.isEmpty() && !bank)
 		{
-			highlightObjects = List.of();
-			highlightNpcs = List.of();
-			fillObjects = List.of();
-			fillNpcs = List.of();
+			scene = scene.toBuilder().objects(List.of()).npcs(List.of()).fillObjects(List.of()).fillNpcs(List.of()).build();
 			return;
 		}
 		int tick = client.getTickCount();
-		boolean nothingYet = highlightObjects.isEmpty() && highlightNpcs.isEmpty() && emptySearches < OBJECT_REFRESH_TICKS;
-		if (objectsFoundTick == NEVER || nothingYet || tick - objectsFoundTick >= OBJECT_REFRESH_TICKS)
+		boolean nothingYet = scene.isEmpty() && scene.getEmptySearches() < OBJECT_REFRESH_TICKS;
+		if (scene.getFoundTick() == ActWatcher.NEVER || nothingYet || tick - scene.getFoundTick() >= OBJECT_REFRESH_TICKS)
 		{
-			emptySearches = objectsFoundTick == NEVER ? 0 : emptySearches + 1;
-			objectsFoundTick = tick;
-			highlightObjects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, ids);
-			highlightNpcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : npcsFor(target);
-			fillObjects = bank ? List.of() : oneClickObjects(highlightObjects);
-			npcOption = bank || target.getPath().isEmpty() ? null : target.getPath().get(0);
-			fillNpcs = oneClickNpcs(highlightNpcs);
+			List<TileObject> objects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, ids);
+			List<NPC> npcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : npcsFor(target);
+			String npcOption = bank || target.getPath().isEmpty() ? null : target.getPath().get(0);
+			scene = SceneHighlights.builder().foundTick(tick)
+				.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
+				.objects(objects).npcs(npcs).fillObjects(bank ? List.of() : oneClickObjects(objects))
+				.npcOption(npcOption).fillNpcs(oneClickNpcs(npcs, npcOption)).build();
 		}
 	}
 
@@ -659,11 +613,12 @@ public class StepGuide
 		String name = client.getNpcDefinition(target.getNpcIds().iterator().next()).getName();
 		List<NPC> crew = SceneObjects.npcsNear(client, boarding, RIDE_NPC_TILES, target.getPath().get(0)).stream()
 			.filter(npc -> npc.getName() != null && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
+		MenuTarget menuTarget = highlights.getMenuTarget();
 		if (!crew.isEmpty() && menuTarget.getNpcIds().equals(target.getNpcIds()))
 		{
 			Set<Integer> ids = new HashSet<>(target.getNpcIds());
 			crew.forEach(npc -> ids.add(npc.getId()));
-			menuTarget = menuTarget.toBuilder().npcIds(Set.copyOf(ids)).build();
+			highlights = highlights.toBuilder().menuTarget(menuTarget.toBuilder().npcIds(Set.copyOf(ids)).build()).build();
 		}
 		return crew;
 	}
@@ -779,7 +734,6 @@ public class StepGuide
 		return List.copyOf(found);
 	}
 
-	/** Ground items to pick up now, by tile. */
 	public List<WorldPoint> getPickUpTiles()
 	{
 		return pickUpTiles;
@@ -788,7 +742,7 @@ public class StepGuide
 	/** The charter list's key for the port is known only once it is open: the step's text names it from then on. */
 	private boolean keyFromCharterList()
 	{
-		char key = menuLines.charterKey(menuTarget);
+		char key = menuLines.charterKey(highlights.getMenuTarget());
 		SubStep current = getCurrent();
 		if (key == 0 || current == null || current.getText().contains(MenuLines.keyText(key)))
 		{
@@ -800,44 +754,29 @@ public class StepGuide
 		return true;
 	}
 
-	/** An obelisk takes two clicks: Set Destination and its list line, then Teleport to Destination. */
 	private boolean watchDestinationSet()
 	{
+		MenuTarget menuTarget = highlights.getMenuTarget();
 		List<String> path = menuTarget.getPath();
 		SubStep current = getCurrent();
-		if (current == null || current.getRow() == null || path.size() != 2 || !SET_DESTINATION.equals(path.get(0)))
+		boolean watching = current != null && current.getRow() != null && path.size() == 2 && SET_DESTINATION.equals(path.get(0));
+		boolean set = obelisk.onGameTick(watching, watching && menuLines.showing(menuTarget), watching ? current.getRow().getName() : null);
+		if (set)
 		{
-			destinationListSeen = false;
-			return false;
+			updateHighlights();
 		}
-		if (menuLines.showing(menuTarget))
-		{
-			destinationListSeen = true;
-			return false;
-		}
-		if (!destinationListSeen)
-		{
-			return false;
-		}
-		destinationListSeen = false;
-		destinationSetFor = current.getRow().getName();
-		updateHighlights();
-		return true;
+		return set;
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
 	{
 		if (event.getGameState() == GameState.LOADING || event.getGameState() == GameState.HOPPING)
 		{
-			highlightObjects = List.of();
-			highlightNpcs = List.of();
-			fillObjects = List.of();
-			fillNpcs = List.of();
-			objectsFoundTick = NEVER;
+			scene = SceneHighlights.NONE;
 		}
 		else if (event.getGameState() == GameState.LOGGED_IN)
 		{
-			objectsFoundTick = NEVER;
+			scene = scene.toBuilder().foundTick(ActWatcher.NEVER).build();
 			refreshObjects();
 		}
 	}
@@ -849,13 +788,13 @@ public class StepGuide
 		{
 			return;
 		}
+		MenuTarget menuTarget = highlights.getMenuTarget();
 		boolean onItem = menuTarget.getItemIds().contains(event.getItemId())
 			|| menuTarget.getItemNames().contains(MenuLabels.normalise(event.getMenuTarget()));
 		boolean onObject = menuTarget.getObjectIds().contains(event.getId());
 		if (onItem || onObject)
 		{
-			teleportClickTick = client.getTickCount();
-			teleportClickTile = player.getPosition().getTile();
+			teleportRefusal.clicked(client.getTickCount(), player.getPosition().getTile());
 		}
 	}
 
@@ -864,11 +803,9 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean gameLine = message.getType() == ChatMessageType.GAMEMESSAGE || message.getType() == ChatMessageType.MESBOX;
-		if (gameLine && current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
-			&& teleportClickTick != NEVER && client.getTickCount() - teleportClickTick <= 1)
+		if (gameLine && current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null)
 		{
-			teleportRefusal = current.getRow().getName();
-			teleportCheckTick = client.getTickCount() + TELEPORT_REFUSAL_TICKS;
+			teleportRefusal.onGameLine(current.getRow().getName(), client.getTickCount());
 		}
 		if (message.getType() != ChatMessageType.MESBOX || current == null || current.getChange() == null)
 		{
@@ -880,42 +817,30 @@ public class StepGuide
 			routes.onCapeChangesRefused();
 			return;
 		}
-		refusalCandidate = current.getChange().getName();
-		refusalBook = current.getBook();
-		refusalCheckTick = client.getTickCount() + REFUSAL_CHECK_TICKS;
+		changeRefusal.suspect(current.getChange().getName(), current.getBook(), client.getTickCount());
 	}
 
 	private void checkTeleportRefusal()
 	{
-		if (teleportRefusal == null || client.getTickCount() < teleportCheckTick)
-		{
-			return;
-		}
 		Player local = client.getLocalPlayer();
 		SubStep current = getCurrent();
-		WorldPoint tile = player.getPosition().getTile();
-		boolean sameStep = current != null && current.getRow() != null && teleportRefusal.equals(current.getRow().getName());
-		boolean stayed = tile != null && teleportClickTile != null && SubSteps.near(tile, teleportClickTile, JUMP_TILES);
-		if (sameStep && stayed && local != null && local.getAnimation() == NO_ANIMATION)
+		String currentRow = current == null || current.getRow() == null ? null : current.getRow().getName();
+		boolean standingStill = local != null && local.getAnimation() == NO_ANIMATION;
+		String refused = teleportRefusal.refused(client.getTickCount(), currentRow, player.getPosition().getTile(), standingStill);
+		if (refused != null)
 		{
-			log.debug("teleport refused: {}", teleportRefusal);
-			routes.onRowRefused(teleportRefusal);
+			log.debug("teleport refused: {}", refused);
+			routes.onRowRefused(refused);
 		}
-		teleportRefusal = null;
-		teleportClickTick = NEVER;
 	}
 
 	private void checkRefusal()
 	{
-		if (refusalCandidate == null || client.getTickCount() < refusalCheckTick)
+		String refused = changeRefusal.refused(client.getTickCount(), client.getVarbitValue(VarbitID.SPELLBOOK));
+		if (refused != null)
 		{
-			return;
+			routes.onRowRefused(refused);
 		}
-		if (client.getVarbitValue(VarbitID.SPELLBOOK) != refusalBook.ordinal())
-		{
-			routes.onRowRefused(refusalCandidate);
-		}
-		refusalCandidate = null;
 	}
 
 	private void follow(Route committed)
@@ -933,7 +858,7 @@ public class StepGuide
 		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
 			: SubSteps.of(committed, step, this::withdrawLine, house(), this::exitOf, takeFromStash(step),
 				routes.keepsScrollBookOutOfWilderness(), carriesItemNamed(SCROLL_BOOK_NAME));
-		steps = withDeposit(base);
+		steps = deposit.before(base, tile);
 		index = 0;
 		jumpedThisSubStep = false;
 		advance(tile);
@@ -963,26 +888,10 @@ public class StepGuide
 				view = act.toBuilder().text(act.getAgain()).build();
 			}
 		}
-		boolean changed = !Objects.equals(view, fightView);
-		fightView = view;
-		afterFight = again;
+		Fight next = view == null ? null : new Fight(view, again);
+		boolean changed = !Objects.equals(next, fight);
+		fight = next;
 		return changed;
-	}
-
-	/**
-	 * After an emote step whose items came out of its STASH unit, they go back before moving on; the reminder
-	 * outlives the step and ends on the deposit line, or 15 tiles away once the player has been back by the unit (the
-	 * Agility Pyramid's emote is done on top, its unit stands at the foot).
-	 */
-	private void checkDeposit(WorldPoint tile)
-	{
-		boolean deposited = actWatcher.isDone(SubStep.Done.STASH_DEPOSITED, depositSince);
-		boolean near = tile != null && depositAt != null && SubSteps.near(tile, depositAt, DEPOSIT_TILES);
-		depositBeenNear |= near;
-		if (depositAt != null && tile != null && (deposited || depositBeenNear && !near))
-		{
-			depositAt = null;
-		}
 	}
 
 	private void noteDeposit(Step ended, Step next)
@@ -998,11 +907,8 @@ public class StepGuide
 		List<String> back = itemsToPutBack(ended);
 		if ((stash == StashMemory.State.FILLED || stash == StashMemory.State.EMPTY) && !back.isEmpty())
 		{
-			depositItems = back;
-			depositAt = ended.getData().getStash().getTile();
-			depositSince = client.getTickCount();
-			depositBeenNear = false;
-			depositStashId = ended.getRequirements() == null ? NO_STASH : ended.getRequirements().getStashObjectId();
+			int stashId = ended.getRequirements() == null ? NO_STASH : ended.getRequirements().getStashObjectId();
+			deposit.start(ended.getData().getStash().getTile(), stashId, back, client.getTickCount());
 		}
 	}
 
@@ -1027,22 +933,6 @@ public class StepGuide
 		Set<Integer> ids = containerIds(InventoryID.INV);
 		ids.addAll(containerIds(InventoryID.WORN));
 		return ids;
-	}
-
-	private List<SubStep> withDeposit(List<SubStep> base)
-	{
-		WorldPoint tile = player.getPosition().getTile();
-		if (depositAt == null || tile == null)
-		{
-			return base;
-		}
-		List<SubStep> all = new ArrayList<>();
-		all.add(SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the STASH unit").waypoint(depositAt).goal(depositAt)
-			.radius(SubSteps.ARRIVE_TILES).done(SubStep.Done.STASH_DEPOSITED).build());
-		all.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Search the STASH unit: put back the " + String.join(" and ", depositItems))
-			.detail("Before moving on").done(SubStep.Done.STASH_DEPOSITED).build());
-		all.addAll(base);
-		return List.copyOf(all);
 	}
 
 	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
@@ -1188,22 +1078,22 @@ public class StepGuide
 	{
 		route = null;
 		routeStep = null;
+		stepSince = ActWatcher.NEVER;
 		actReachedStepKey = null;
 		steps = List.of();
 		index = 0;
+		jumpedThisSubStep = false;
+		lastTile = null;
 		waiting = null;
-		refusalCandidate = null;
-		highlightItems = Set.of();
-		bankHighlightItems = Set.of();
-		highlightSpellWidget = -1;
-		highlightMenuWidget = ScrollBook.NO_WIDGET;
-		highlightTab = Tab.NONE;
-		menuTarget = MenuTarget.NONE;
-		destinationSetFor = null;
-		highlightObjects = List.of();
-		fillItems = Set.of();
-		fillObjects = List.of();
-		fillNpcs = List.of();
+		fight = null;
+		boxView = null;
+		pickUpTiles = List.of();
+		deposit.clear();
+		changeRefusal.clear();
+		teleportRefusal.clear();
+		obelisk.clear();
+		highlights = Highlights.NONE;
+		scene = SceneHighlights.NONE;
 	}
 
 	/** A teleport or book change is animating: its item, spell and tab are already used. */
@@ -1218,7 +1108,7 @@ public class StepGuide
 	/** A walk to NPCs ends once one of them is rendered close by (an elf in Prifddinas), not at the planned tile. */
 	private boolean stageNpcNearby(SubStep step, WorldPoint tile)
 	{
-		return !step.getNpcIds().isEmpty() && tile != null && highlightNpcs.stream()
+		return !step.getNpcIds().isEmpty() && tile != null && scene.getNpcs().stream()
 			.anyMatch(npc -> npc.getWorldLocation().getPlane() == tile.getPlane()
 				&& npc.getWorldLocation().distanceTo2D(tile) <= SubSteps.AREA_ARRIVE_TILES);
 	}
@@ -1229,7 +1119,7 @@ public class StepGuide
 		{
 			case WALK:
 			case WALK_TO_CLUE:
-				return step.getDone() == SubStep.Done.STASH_DEPOSITED && depositAt == null || SubSteps.near(tile, step.getGoal(), step.getRadius())
+				return step.getDone() == SubStep.Done.STASH_DEPOSITED && deposit.getAt() == null || SubSteps.near(tile, step.getGoal(), step.getRadius())
 					|| step.getSpans().stream().anyMatch(place -> place.spans(tile)) || stageNpcNearby(step, tile);
 			case WILDERNESS_EXIT:
 				return tile != null && tile.getY() <= step.getGoal().getY();
@@ -1261,7 +1151,7 @@ public class StepGuide
 			case EQUIPPED:
 				return equipped(routeStep);
 			case STASH_DEPOSITED:
-				return depositAt == null || actWatcher.isDone(act.getDone(), stepSince);
+				return deposit.getAt() == null || actWatcher.isDone(act.getDone(), stepSince);
 			case STASH_WITHDRAWN:
 				return actWatcher.isDone(act.getDone(), stepSince) || !takeFromStash(routeStep);
 			case ITEM_CARRIED:
@@ -1281,133 +1171,114 @@ public class StepGuide
 		}
 	}
 
+	/** The scene is searched again for the new sub-step's objects and NPCs. */
 	private void updateHighlights()
 	{
-		SubStep current = getCurrent();
-		highlightItems = Set.of();
-		bankHighlightItems = current == null ? Set.of() : current.getBankItems().stream()
-			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(Collectors.toUnmodifiableSet());
-		highlightSpellWidget = -1;
-		highlightMenuWidget = ScrollBook.NO_WIDGET;
-		highlightTab = Tab.NONE;
-		menuTarget = MenuTarget.NONE;
-		highlightObjects = List.of();
-		highlightNpcs = List.of();
-		fillItems = Set.of();
-		fillObjects = List.of();
-		fillNpcs = List.of();
-		heldUses = List.of();
-		oneClickLabel = null;
-		objectOption = current == null ? null : current.getOption();
-		objectsFoundTick = NEVER;
+		scene = SceneHighlights.NONE;
+		highlights = highlightsFor(getCurrent());
+	}
+
+	private Highlights highlightsFor(SubStep current)
+	{
 		if (current == null)
 		{
-			return;
+			return Highlights.NONE;
 		}
+		Highlights.HighlightsBuilder shown = Highlights.builder().objectOption(current.getOption()).bankItems(current.getBankItems().stream()
+			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(Collectors.toUnmodifiableSet()));
 		if (current.getKind() == SubStep.Kind.ACT)
 		{
-			highlightTab = current.getTab();
+			shown.tab(current.getTab());
 			int stash = stashOf(current);
 			if (stash != NO_STASH)
 			{
-				menuTarget = MenuTarget.builder().objectIds(Set.of(stash)).build();
-				objectOption = SEARCH_OPTION;
-				return;
+				return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(stash)).build()).objectOption(SEARCH_OPTION).build();
 			}
 			if (current.getDone() == SubStep.Done.EQUIPPED)
 			{
-				refreshEquipItems();
-				return;
+				return withEquipItems(shown.build());
 			}
 		}
 		if (current.getKind() == SubStep.Kind.ACT && !current.getActItems().isEmpty())
 		{
-			highlightItems = current.getActItems();
 			boolean equips = current.getDone() == SubStep.Done.WAY_IN_WORN || current.getDone() == SubStep.Done.GEAR_WORN;
-			fillItems = equips
-				? current.getActItems().stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet())
-				: current.getActItems();
-			highlightTab = current.getDone() == SubStep.Done.SLOTS_EMPTY ? Tab.EQUIPMENT : Tab.INVENTORY;
-			return;
+			return shown.items(current.getActItems())
+				.fillItems(equips ? current.getActItems().stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet())
+					: current.getActItems())
+				.tab(current.getDone() == SubStep.Done.SLOTS_EMPTY ? Tab.EQUIPMENT : Tab.INVENTORY).build();
 		}
 		String planted = plantedTreeLine(current);
 		if (planted != null)
 		{
-			menuTarget = MenuTarget.builder().objectIds(current.getObjectIds()).path(List.of(TRAVEL_OPTION, TREE_OPTION, planted)).build();
+			shown.menuTarget(MenuTarget.builder().objectIds(current.getObjectIds()).path(List.of(TRAVEL_OPTION, TREE_OPTION, planted)).build());
 		}
 		if (current.getKind() == SubStep.Kind.EXIT)
 		{
 			Exit exit = current.getExit();
-			menuTarget = withDialogue(wayTarget(exit.getObjectId(), exit.getOption()), wayInOf(exit.getOrigin(), exit.getDestination()));
-			return;
+			return shown.menuTarget(withDialogue(wayTarget(exit.getObjectId(), exit.getOption()), wayInOf(exit.getOrigin(), exit.getDestination()))).build();
 		}
 		if (current.getKind() == SubStep.Kind.ENTER)
 		{
 			StepIndex.PickUp pickUp = current.getWayIn().getPickUp();
 			boolean pickedUp = pickUp != null && current.getText().startsWith(KEEP_GOING);
-			menuTarget = pickedUp ? MenuTarget.builder().objectIds(Set.copyOf(pickUp.getObjects())).path(List.of(pickUp.getOption())).build()
-				: withDialogue(wayTarget(current.getWayIn().getObject(), current.getWayIn().getOption()), current.getWayIn());
-			return;
+			return shown.menuTarget(pickedUp ? MenuTarget.builder().objectIds(Set.copyOf(pickUp.getObjects())).path(List.of(pickUp.getOption())).build()
+				: withDialogue(wayTarget(current.getWayIn().getObject(), current.getWayIn().getOption()), current.getWayIn())).build();
 		}
 		if (current.getKind() == SubStep.Kind.SPELLBOOK_SWAP)
 		{
-			highlightSpellWidget = InterfaceID.MagicSpellbook.SPELLBOOK_SWAP;
-			highlightTab = Tab.MAGIC;
+			shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(Tab.MAGIC);
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && isSpell(current.getRow()))
 		{
-			highlightSpellWidget = spellWidget(current.getRow());
-			highlightTab = Tab.MAGIC;
+			shown.spellWidget(spellWidget(current.getRow())).tab(Tab.MAGIC);
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory() == Category.MINIGAME)
 		{
-			highlightSpellWidget = MINIGAME_SPELLS.getOrDefault(currentBook(), InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD);
-			highlightTab = Tab.MAGIC;
-			menuTarget = MenuTarget.builder().line(MenuTarget.Line.MINIGAME).lineName(SubSteps.minigameName(current.getRow())).build();
+			shown.spellWidget(MINIGAME_SPELLS.getOrDefault(currentBook(), InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD)).tab(Tab.MAGIC)
+				.menuTarget(MenuTarget.builder().line(MenuTarget.Line.MINIGAME).lineName(SubSteps.minigameName(current.getRow())).build());
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().isLocated())
 		{
 			MenuTarget target = houseTarget(current.getRow()).toBuilder().alternatives(sameLanding(current)).build();
-			boolean set = current.getRow().getName().equals(destinationSetFor);
-			menuTarget = set ? target.toBuilder().path(List.of(TELEPORT_TO_DESTINATION)).build() : target;
+			boolean set = obelisk.isSetFor(current.getRow().getName());
+			shown.menuTarget(set ? target.toBuilder().path(List.of(TELEPORT_TO_DESTINATION)).build() : target);
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getActItemNamed() != null)
 		{
-			highlightTab = Tab.INVENTORY;
+			shown.tab(Tab.INVENTORY);
 		}
 		else if (current.getKind() == SubStep.Kind.TELEPORT && current.getRow().getCategory() != Category.MINIGAME)
 		{
 			CatalogRow row = current.getRow();
-			highlightHeld(row);
-			highlightMenuWidget = ScrollBook.entry(row.getName());
-			MenuTarget.MenuTargetBuilder target = MenuTarget.builder().itemIds(highlightItems).itemNames(names(highlightItems))
-				.alternatives(sameLanding(current));
-			menuTarget = SubSteps.isQuetzalMap(row)
+			Set<Integer> held = withHeld(shown, row);
+			MenuTarget.MenuTargetBuilder target = MenuTarget.builder().itemIds(held).itemNames(names(held)).alternatives(sameLanding(current));
+			shown.menuWidget(ScrollBook.entry(row.getName())).menuTarget(SubSteps.isQuetzalMap(row)
 				? target.path(List.of(SIGNAL_OPTION)).line(MenuTarget.Line.QUETZAL).lineId(SubSteps.quetzalTableId(row)).build()
-				: target.path(optionPath(row.getName())).build();
+				: target.path(optionPath(row.getName())).build());
 		}
 		else if (current.getKind() == SubStep.Kind.FAIRY_RING && current.getRow().getCode() != null)
 		{
-			menuTarget = MenuTarget.builder().objectIds(FAIRY_RING_OBJECTS).line(MenuTarget.Line.FAIRY_CODE)
-				.lineKey(current.getRow().getCode()).build();
+			shown.menuTarget(MenuTarget.builder().objectIds(FAIRY_RING_OBJECTS).line(MenuTarget.Line.FAIRY_CODE)
+				.lineKey(current.getRow().getCode()).build());
 		}
 		else if (current.getKind() == SubStep.Kind.CHANGE_BOOK && current.getChange().isAnywhere())
 		{
-			highlightHeld(asRow(current.getChange()));
-			menuTarget = MenuTarget.builder().itemIds(highlightItems).itemNames(names(highlightItems))
-				.path(List.of(SPELLBOOK_OPTION, bookLabel(current.getBook()))).build();
+			Set<Integer> held = withHeld(shown, asRow(current.getChange()));
+			shown.menuTarget(MenuTarget.builder().itemIds(held).itemNames(names(held))
+				.path(List.of(SPELLBOOK_OPTION, bookLabel(current.getBook()))).build());
 		}
 		else if (current.getKind() == SubStep.Kind.CHANGE_BOOK && current.getChange().isInHouse())
 		{
-			menuTarget = MenuTarget.builder().objectIds(Set.of(current.getChange().getObjectId()))
-				.path(List.of(SPELLBOOK_OPTION, bookLabel(current.getBook()))).build();
+			shown.menuTarget(MenuTarget.builder().objectIds(Set.of(current.getChange().getObjectId()))
+				.path(List.of(SPELLBOOK_OPTION, bookLabel(current.getBook()))).build());
 		}
-		oneClickLabel = directLabel(current);
-		fillItems = oneClickItems(oneClickLabel);
+		Highlights built = shown.build();
+		String label = directLabel(built.getMenuTarget(), current);
+		return built.toBuilder().oneClickLabel(label).fillItems(oneClickItems(built, label)).build();
 	}
 
 	/** None for a quetzal: its option only opens the map. */
-	private String directLabel(SubStep current)
+	private static String directLabel(MenuTarget menuTarget, SubStep current)
 	{
 		if (menuTarget.getLine() == MenuTarget.Line.QUETZAL)
 		{
@@ -1421,11 +1292,11 @@ public class StepGuide
 		return path.isEmpty() ? null : path.get(path.size() - 1);
 	}
 
-	private Set<Integer> oneClickItems(String label)
+	private Set<Integer> oneClickItems(Highlights shown, String label)
 	{
-		boolean signals = menuTarget.getLine() == MenuTarget.Line.QUETZAL;
+		boolean signals = shown.getMenuTarget().getLine() == MenuTarget.Line.QUETZAL;
 		boolean oneDestination = label == null && hasOneDestination(getCurrent());
-		return heldUses.stream()
+		return shown.getHeldUses().stream()
 			.filter(use -> signals ? SIGNAL_OPTION.equalsIgnoreCase(leftClickOrFirstAction(use))
 				: oneDestination ? OneClick.isOwnTeleport(leftClickOrFirstAction(use)) : OneClick.teleportsTo(leftClick(use), label))
 			.map(ItemUse::getItemId)
@@ -1474,7 +1345,7 @@ public class StepGuide
 	{
 		if (act.getDone() == SubStep.Done.STASH_DEPOSITED)
 		{
-			return depositStashId;
+			return deposit.getStashId();
 		}
 		boolean taking = act.getDone() == SubStep.Done.STASH_WITHDRAWN && routeStep != null && routeStep.getRequirements() != null;
 		return taking ? routeStep.getRequirements().getStashObjectId() : NO_STASH;
@@ -1669,13 +1540,13 @@ public class StepGuide
 	}
 
 	/** The carried item the act names, refreshed every tick as it arrives (the puzzle box, after the talk). */
-	private void refreshNamedItems()
+	private Highlights withNamedItems(Highlights shown)
 	{
 		SubStep current = getCurrent();
 		boolean clicksItem = current != null && (current.getKind() == SubStep.Kind.ACT || current.getKind() == SubStep.Kind.TELEPORT);
 		if (!clicksItem || current.getActItemNamed() == null)
 		{
-			return;
+			return shown;
 		}
 		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
 		Set<Integer> named = new HashSet<>();
@@ -1687,63 +1558,58 @@ public class StepGuide
 				named.add(item.getId());
 			}
 		}
-		highlightItems = Set.copyOf(named);
+		Set<Integer> items = Set.copyOf(named);
 		String option = current.getActOption();
-		fillItems = option == null ? highlightItems
-			: highlightItems.stream().filter(id -> option.equalsIgnoreCase(itemLeftClick(id))).collect(Collectors.toUnmodifiableSet());
-		highlightTab = named.isEmpty() ? highlightTab : Tab.INVENTORY;
-		if (option != null)
-		{
-			takeOutFromBook(current, option);
-		}
+		Highlights.HighlightsBuilder next = shown.toBuilder().items(items)
+			.fillItems(option == null ? items : items.stream().filter(id -> option.equalsIgnoreCase(itemLeftClick(id))).collect(Collectors.toUnmodifiableSet()))
+			.tab(named.isEmpty() ? shown.getTab() : Tab.INVENTORY);
+		return option == null ? next.build() : takeOutFromBook(next, items, current, option);
 	}
 
 	/** The book's entry for the scroll, outlined once the book is open, and its Remove option coloured. */
-	private void takeOutFromBook(SubStep current, String option)
+	private Highlights takeOutFromBook(Highlights.HighlightsBuilder shown, Set<Integer> items, SubStep current, String option)
 	{
 		boolean fromBook = current.getDone() == SubStep.Done.ITEM_CARRIED && current.getRow() != null;
 		Widget book = fromBook ? client.getWidget(InterfaceID.Bookofscrolls.CONTENTS) : null;
 		boolean bookOpen = book != null && !book.isHidden();
-		highlightMenuWidget = fromBook ? ScrollBook.entry(current.getRow().getName()) : ScrollBook.NO_WIDGET;
-		menuTarget = bookOpen
-			? MenuTarget.builder().widgetIds(ScrollBook.widgets(current.getRow().getName())).path(List.of(SubSteps.REMOVE_OPTION)).build()
-			: MenuTarget.builder().itemIds(highlightItems).itemNames(names(highlightItems)).path(List.of(option)).build();
+		return shown.menuWidget(fromBook ? ScrollBook.entry(current.getRow().getName()) : ScrollBook.NO_WIDGET)
+			.menuTarget(bookOpen
+				? MenuTarget.builder().widgetIds(ScrollBook.widgets(current.getRow().getName())).path(List.of(SubSteps.REMOVE_OPTION)).build()
+				: MenuTarget.builder().itemIds(items).itemNames(names(items)).path(List.of(option)).build())
+			.build();
 	}
 
 	/** A skill challenge's task: the items it needs that the player carries, outlined (used on each other, not clicked once). */
-	private void refreshTaskItems()
+	private Highlights withTaskItems(Highlights shown)
 	{
 		SubStep current = getCurrent();
 		boolean task = current != null && current.getKind() == SubStep.Kind.ACT && current.getStage() != null
 			&& current.getStage().getKind() == Stage.Kind.TASK;
 		if (!task || routeStep == null || routeStep.getRequirements() == null)
 		{
-			return;
+			return shown;
 		}
 		Set<Integer> carried = carriedItemIds();
 		if (neededFromCarriedKit() != null)
 		{
-			highlightItems = Set.of(ItemID.HUNTSMANS_KIT);
-			highlightTab = Tab.INVENTORY;
-			return;
+			return shown.toBuilder().items(Set.of(ItemID.HUNTSMANS_KIT)).tab(Tab.INVENTORY).build();
 		}
 		StepIndex.Cast cast = routeStep.getData() == null ? null : routeStep.getData().getCast();
 		if (cast != null && cast.getOn().stream().anyMatch(carried::contains))
 		{
-			highlightCast(cast, carried);
-			return;
+			return withCast(shown, cast, carried);
 		}
 		if (current.getStage().getOption() != null && makingNow(carried) == null)
 		{
-			return;
+			return shown;
 		}
 		StepIndex.Making making = makingNow(carried);
-		highlightItems = making != null
+		Set<Integer> items = making != null
 			? carried.stream().filter(id -> making.getItems().stream().anyMatch(group -> group.contains(id))).collect(Collectors.toUnmodifiableSet())
 			: carried.stream().filter(id -> routeStep.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
 			.collect(Collectors.toUnmodifiableSet());
-		fillItems = highlightItems.stream().filter(this::actsOnLeftClick).collect(Collectors.toUnmodifiableSet());
-		highlightTab = highlightItems.isEmpty() ? highlightTab : Tab.INVENTORY;
+		return shown.toBuilder().items(items).fillItems(items.stream().filter(this::actsOnLeftClick).collect(Collectors.toUnmodifiableSet()))
+			.tab(items.isEmpty() ? shown.getTab() : Tab.INVENTORY).build();
 	}
 
 	/** The book to switch to first, else the making step reached; null when the task needs neither. */
@@ -1804,14 +1670,13 @@ public class StepGuide
 	}
 
 	/** The spell's button until it is picked (the last of its buttons shown), then the items it is cast on. */
-	private void highlightCast(StepIndex.Cast cast, Set<Integer> carried)
+	private Highlights withCast(Highlights shown, StepIndex.Cast cast, Set<Integer> carried)
 	{
 		boolean picked = client.isWidgetSelected();
-		highlightItems = picked ? carried.stream().filter(cast.getOn()::contains).collect(Collectors.toUnmodifiableSet()) : Set.of();
-		fillItems = highlightItems;
-		highlightSpellWidget = picked ? -1 : cast.getWidgets().stream().filter(this::widgetShown).reduce((first, last) -> last)
+		Set<Integer> items = picked ? carried.stream().filter(cast.getOn()::contains).collect(Collectors.toUnmodifiableSet()) : Set.of();
+		int spellWidget = picked ? -1 : cast.getWidgets().stream().filter(this::widgetShown).reduce((first, last) -> last)
 			.orElse(cast.getWidgets().isEmpty() ? -1 : cast.getWidgets().get(0));
-		highlightTab = picked ? Tab.INVENTORY : Tab.MAGIC;
+		return shown.toBuilder().items(items).fillItems(items).spellWidget(spellWidget).tab(picked ? Tab.INVENTORY : Tab.MAGIC).build();
 	}
 
 	private boolean widgetShown(int widgetId)
@@ -1853,13 +1718,13 @@ public class StepGuide
 	}
 
 	/** The carried items the emote step wants on, refreshed every tick as they are put on. */
-	private void refreshEquipItems()
+	private Highlights withEquipItems(Highlights shown)
 	{
 		SubStep current = getCurrent();
 		if (current == null || current.getKind() != SubStep.Kind.ACT || current.getDone() != SubStep.Done.EQUIPPED
 			|| routeStep == null || routeStep.getRequirements() == null)
 		{
-			return;
+			return shown;
 		}
 		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
 		Set<Integer> wanted = new HashSet<>();
@@ -1870,8 +1735,8 @@ public class StepGuide
 				wanted.add(item.getId());
 			}
 		}
-		highlightItems = Set.copyOf(wanted);
-		fillItems = wanted.stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet());
+		return shown.toBuilder().items(Set.copyOf(wanted))
+			.fillItems(wanted.stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
 	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
@@ -1978,20 +1843,23 @@ public class StepGuide
 
 	private List<TileObject> oneClickObjects(List<TileObject> objects)
 	{
+		String objectOption = highlights.getObjectOption();
 		if (objectOption != null)
 		{
 			return objects.stream().filter(object -> objectOption.equalsIgnoreCase(leftClick(object)))
 				.collect(Collectors.toUnmodifiableList());
 		}
+		MenuTarget menuTarget = highlights.getMenuTarget();
 		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
 		String firstClick = menuTarget.getPath().isEmpty() ? null : menuTarget.getPath().get(0);
+		String label = highlights.getOneClickLabel();
 		return objects.stream()
 			.filter(object -> ring ? ringGoesTo(leftClick(object), menuTarget.getLineKey())
-				: OneClick.teleportsTo(leftClick(object), oneClickLabel) || firstClick != null && MenuLabels.matches(leftClick(object), firstClick))
+				: OneClick.teleportsTo(leftClick(object), label) || firstClick != null && MenuLabels.matches(leftClick(object), firstClick))
 			.collect(Collectors.toUnmodifiableList());
 	}
 
-	private List<NPC> oneClickNpcs(List<NPC> npcs)
+	private List<NPC> oneClickNpcs(List<NPC> npcs, String npcOption)
 	{
 		return npcOption == null ? List.of()
 			: npcs.stream().filter(npc -> npcOption.equalsIgnoreCase(leftClick(npc))).collect(Collectors.toUnmodifiableList());
@@ -2176,24 +2044,29 @@ public class StepGuide
 		return row.getCategory() == Category.SPELL || row.getCategory() == Category.HOME;
 	}
 
-	/** Runes are left out: the spell widget covers those. */
-	private void highlightHeld(CatalogRow row)
+	/**
+	 * The row's held items go on {@code shown}, outlined in the tab they are in; runes are left out, as the spell
+	 * widget covers those.
+	 *
+	 * @return the items' ids
+	 */
+	private Set<Integer> withHeld(Highlights.HighlightsBuilder shown, CatalogRow row)
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		if (snapshot == null || runes == null)
 		{
-			return;
+			return Set.of();
 		}
 		RowAvailability judged = new AvailabilityEngine(runes, id -> "").judge(row, snapshot, AvailabilityService.nowMinutes());
 		List<ItemUse> held = judged.getWitness().stream()
 			.filter(use -> use.getContainer() == Container.INVENTORY || use.getContainer() == Container.WORN)
 			.filter(use -> !runes.isRune(use.getItemId()))
-			.collect(Collectors.toList());
-		heldUses = List.copyOf(held);
-		highlightItems = held.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet());
-		boolean highlightWorn = !held.isEmpty() && held.stream().allMatch(use -> use.getContainer() == Container.WORN);
-		highlightTab = held.isEmpty() ? Tab.NONE : highlightWorn ? Tab.EQUIPMENT : Tab.INVENTORY;
+			.collect(Collectors.toUnmodifiableList());
+		Set<Integer> items = held.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet());
+		boolean worn = !held.isEmpty() && held.stream().allMatch(use -> use.getContainer() == Container.WORN);
+		shown.heldUses(held).items(items).tab(held.isEmpty() ? Tab.NONE : worn ? Tab.EQUIPMENT : Tab.INVENTORY);
+		return items;
 	}
 
 	private static CatalogRow asRow(SpellbookChange change)
@@ -2240,5 +2113,21 @@ public class StepGuide
 	private void notifyListeners()
 	{
 		listeners.forEach(Runnable::run);
+	}
+
+	@Value
+	private static class Waiting
+	{
+		Route route;
+		/** Where the player stood when it came: a route from farther away than a step is stale. */
+		WorldPoint from;
+	}
+
+	/** The fight shown while an enemy attacks, and the act to do again after it. */
+	@Value
+	private static class Fight
+	{
+		SubStep view;
+		SubStep again;
 	}
 }
