@@ -1,6 +1,5 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.StashMemory;
@@ -28,9 +27,9 @@ import com.cluehelper.route.WalkData;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.Stage;
-import com.cluehelper.step.StageTarget;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepRequirements;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogRow;
@@ -98,7 +97,6 @@ public class StepGuide
 		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC
 	}
 
-	static final int NO_STASH = -1;
 	private static final String SEARCH_OPTION = "Search";
 	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
 	private static final String USE_OPTION = "Use";
@@ -145,8 +143,6 @@ public class StepGuide
 	private final BankMemory bankMemory;
 	private final MenuLines menuLines;
 	private final AvailabilityService availability;
-	private final ProbeTarget probeTarget;
-	private final StageTarget stageTarget;
 	private final ActWatcher actWatcher;
 	private final StepNeeds stepNeeds;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
@@ -183,14 +179,12 @@ public class StepGuide
 
 	@Inject
 	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
-		AvailabilityService availability, SwapperClicks swapperClicks, ProbeTarget probeTarget, StageTarget stageTarget,
+		AvailabilityService availability, SwapperClicks swapperClicks,
 		ActWatcher actWatcher, StepNeeds stepNeeds)
 	{
 		this.actWatcher = actWatcher;
 		this.deposit = new DepositReminder(actWatcher);
 		this.stepNeeds = stepNeeds;
-		this.stageTarget = stageTarget;
-		this.probeTarget = probeTarget;
 		this.swapperClicks = swapperClicks;
 		this.menuLines = menuLines;
 		this.availability = availability;
@@ -423,8 +417,7 @@ public class StepGuide
 	private StepIndex.Choose taskChoose()
 	{
 		SubStep current = getCurrent();
-		boolean task = current != null && current.getKind() == SubStep.Kind.ACT && current.getStage() != null
-			&& current.getStage().getKind() == Stage.Kind.TASK;
+		boolean task = current != null && current.isTask();
 		return task && routeStep != null && routeStep.getData() != null ? routeStep.getData().getChoose() : null;
 	}
 
@@ -451,7 +444,7 @@ public class StepGuide
 	private void onPlan(Plan plan)
 	{
 		PlanStart start = routes.getStart();
-		Step step = stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
+		Step step = routes.travelStep();
 		boolean noWalk = start != null && start.getKind() == PlanStart.Kind.TELEPORT_ONLY;
 		boolean partWay = start != null && step != null && step.getData() != null && step.getData().getEntry() != null
 			&& step.getData().getEntry().isPartWay(start.getTile());
@@ -571,7 +564,7 @@ public class StepGuide
 		List<String> option = current == null || current.getOption() == null ? List.of() : List.of(current.getOption());
 		MenuTarget target = current != null && !current.getNpcIds().isEmpty() ? MenuTarget.builder().npcIds(current.getNpcIds()).path(option).build()
 			: current != null && !current.getObjectIds().isEmpty() ? MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build()
-			: isApproach() ? houseTarget(getNext().getRow()) : stashAhead() != NO_STASH ? MenuTarget.builder().objectIds(Set.of(stashAhead())).build()
+			: isApproach() ? houseTarget(getNext().getRow()) : stashAhead() != StepRequirements.NO_STASH ? MenuTarget.builder().objectIds(Set.of(stashAhead())).build()
 			: menuTarget;
 		highlights = highlights.toBuilder().optionTarget(option.isEmpty() || menuTarget != MenuTarget.NONE ? MenuTarget.NONE : target).build();
 		Set<Integer> ids = target.getObjectIds();
@@ -662,10 +655,7 @@ public class StepGuide
 		WorldPoint to = current.getWayIn().getTo();
 		boolean toNearby = !current.getWayIn().isNoLine() && to != null && tile != null && to.getPlane() == tile.getPlane()
 			&& to.distanceTo2D(tile) <= PART_WAY_LINE_TILES;
-		List<SubStep> onward = new ArrayList<>(steps);
-		onward.set(index, current.toBuilder().text(KEEP_GOING + current.getWayIn().getText()).waypoint(toNearby ? to : null).build());
-		steps = List.copyOf(onward);
-		return true;
+		return replaceCurrent(current.toBuilder().text(KEEP_GOING + current.getWayIn().getText()).waypoint(toNearby ? to : null).build());
 	}
 
 	/** Part way in, the ground items to pick up first (the Mogre Camp's rocks): to the nearest, then on through the way. */
@@ -674,19 +664,9 @@ public class StepGuide
 		int counted = pickUp.getVarbit() < 0 ? 0 : client.getVarbitValue(pickUp.getVarbit());
 		int carried = Math.min(pickUp.getCount(), Math.max(counted, carriedCount(pickUp.getId())));
 		boolean done = carried >= pickUp.getCount();
-		WorldPoint nearest = tile == null ? null : pickUpTiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile))).orElse(null);
-		SubStep onward = current.toBuilder()
+		return replaceCurrent(current.toBuilder()
 			.text(done ? KEEP_GOING + pickUp.getThen() : "Pick up " + pickUp.getCount() + " " + pickUp.getName() + " (" + carried + "/" + pickUp.getCount() + ")")
-			.detail(null).waypoint(done ? current.getWayIn().getTo() : nearest).build();
-		if (onward.equals(current))
-		{
-			return false;
-		}
-		List<SubStep> updated = new ArrayList<>(steps);
-		updated.set(index, onward);
-		steps = List.copyOf(updated);
-		updateHighlights();
-		return true;
+			.detail(null).waypoint(done ? current.getWayIn().getTo() : nearest(tile)).build());
 	}
 
 	/** An act's ground item (king worms): outlined where it lies, the nearest as the waypoint. */
@@ -698,8 +678,13 @@ public class StepGuide
 			return false;
 		}
 		pickUpTiles = groundItemTiles(current.getGroundItem());
-		WorldPoint nearest = tile == null ? null : pickUpTiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile))).orElse(null);
-		return replaceCurrent(current.toBuilder().waypoint(nearest).build());
+		return replaceCurrent(current.toBuilder().waypoint(nearest(tile)).build());
+	}
+
+	/** The pick-up tile nearest the player; null with no tile or none to pick up. */
+	private WorldPoint nearest(WorldPoint tile)
+	{
+		return tile == null ? null : pickUpTiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile))).orElse(null);
 	}
 
 	private int carriedCount(int itemId)
@@ -746,10 +731,7 @@ public class StepGuide
 		{
 			return false;
 		}
-		List<SubStep> keyed = new ArrayList<>(steps);
-		keyed.set(index, current.toBuilder().text(SubSteps.withKey(current.getText(), key)).build());
-		steps = List.copyOf(keyed);
-		return true;
+		return replaceCurrent(current.toBuilder().text(SubSteps.withKey(current.getText(), key)).build());
 	}
 
 	private boolean watchDestinationSet()
@@ -758,12 +740,7 @@ public class StepGuide
 		List<String> path = menuTarget.getPath();
 		SubStep current = getCurrent();
 		boolean watching = current != null && current.getRow() != null && path.size() == 2 && SET_DESTINATION.equals(path.get(0));
-		boolean set = obelisk.onGameTick(watching, watching && menuLines.showing(menuTarget), watching ? current.getRow().getName() : null);
-		if (set)
-		{
-			updateHighlights();
-		}
-		return set;
+		return obelisk.onGameTick(watching, watching && menuLines.showing(menuTarget), watching ? current.getRow().getName() : null);
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
@@ -843,7 +820,7 @@ public class StepGuide
 
 	private void follow(Route committed)
 	{
-		Step step = stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
+		Step step = routes.travelStep();
 		WorldPoint tile = player.getPosition().getTile();
 		noteDeposit(routeStep, step);
 		if (routeStep == null || step == null || !routeStep.getKey().equals(step.getKey()))
@@ -905,7 +882,7 @@ public class StepGuide
 		List<String> back = itemsToPutBack(ended);
 		if ((stash == StashMemory.State.FILLED || stash == StashMemory.State.EMPTY) && !back.isEmpty())
 		{
-			int stashId = ended.getRequirements() == null ? NO_STASH : ended.getRequirements().getStashObjectId();
+			int stashId = ended.getRequirements() == null ? StepRequirements.NO_STASH : ended.getRequirements().getStashObjectId();
 			deposit.start(ended.getData().getStash().getTile(), stashId, back, client.getTickCount());
 		}
 	}
@@ -1196,7 +1173,7 @@ public class StepGuide
 		{
 			shown.tab(current.getTab());
 			int stash = stashOf(current);
-			if (stash != NO_STASH)
+			if (stash != StepRequirements.NO_STASH)
 			{
 				return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(stash)).build()).objectOption(SEARCH_OPTION).build();
 			}
@@ -1344,7 +1321,7 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		SubStep next = getNext();
-		return current != null && current.getKind() == SubStep.Kind.WALK && next != null ? stashOf(next) : NO_STASH;
+		return current != null && current.getKind() == SubStep.Kind.WALK && next != null ? stashOf(next) : StepRequirements.NO_STASH;
 	}
 
 	private int stashOf(SubStep act)
@@ -1354,7 +1331,7 @@ public class StepGuide
 			return deposit.getStashId();
 		}
 		boolean taking = act.getDone() == SubStep.Done.STASH_WITHDRAWN && routeStep != null && routeStep.getRequirements() != null;
-		return taking ? routeStep.getRequirements().getStashObjectId() : NO_STASH;
+		return taking ? routeStep.getRequirements().getStashObjectId() : StepRequirements.NO_STASH;
 	}
 
 	private boolean refreshBox()
@@ -1449,6 +1426,7 @@ public class StepGuide
 		return replaceCurrent(current.toBuilder().actItems(off).build());
 	}
 
+	/** The current sub-step rewritten; the caller's tick updates the highlights once for every change. */
 	private boolean replaceCurrent(SubStep listed)
 	{
 		if (listed.equals(getCurrent()))
@@ -1458,7 +1436,6 @@ public class StepGuide
 		List<SubStep> updated = new ArrayList<>(steps);
 		updated.set(index, listed);
 		steps = List.copyOf(updated);
-		updateHighlights();
 		return true;
 	}
 
@@ -1554,9 +1531,7 @@ public class StepGuide
 	private Highlights withTaskItems(Highlights shown)
 	{
 		SubStep current = getCurrent();
-		boolean task = current != null && current.getKind() == SubStep.Kind.ACT && current.getStage() != null
-			&& current.getStage().getKind() == Stage.Kind.TASK;
-		if (!task || routeStep == null || routeStep.getRequirements() == null)
+		if (current == null || !current.isTask() || routeStep == null || routeStep.getRequirements() == null)
 		{
 			return shown;
 		}
@@ -1606,10 +1581,8 @@ public class StepGuide
 	 */
 	private String plantedTreeLine(SubStep current)
 	{
-		boolean task = current.getKind() == SubStep.Kind.ACT && current.getStage() != null
-			&& current.getStage().getKind() == Stage.Kind.TASK;
 		PlayerSnapshot snapshot = player.getSnapshot();
-		if (!task || routeStep == null || routeStep.getData() == null || !routeStep.getData().isToPlantedTree() || snapshot == null)
+		if (!current.isTask() || routeStep == null || routeStep.getData() == null || !routeStep.getData().isToPlantedTree() || snapshot == null)
 		{
 			return null;
 		}
@@ -1675,17 +1648,8 @@ public class StepGuide
 	private boolean showMaking()
 	{
 		SubStep current = getCurrent();
-		boolean task = current != null && current.getKind() == SubStep.Kind.ACT && current.getStage() != null
-			&& current.getStage().getKind() == Stage.Kind.TASK;
-		String detail = task ? taskDetail() : null;
-		if (detail == null || detail.equals(current.getDetail()))
-		{
-			return false;
-		}
-		List<SubStep> updated = new ArrayList<>(steps);
-		updated.set(index, current.toBuilder().detail(detail).build());
-		steps = List.copyOf(updated);
-		return true;
+		String detail = current != null && current.isTask() ? taskDetail() : null;
+		return detail != null && replaceCurrent(current.toBuilder().detail(detail).build());
 	}
 
 	/** The carried items the emote step wants on, refreshed every tick as they are put on. */

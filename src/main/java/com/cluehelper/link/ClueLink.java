@@ -150,7 +150,7 @@ public class ClueLink
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : Stages.underWayInSpan(Stages.doneAnywhereWhenOwned(resolve(clue), this::owns), playerTile());
+		Step step = clue == null ? null : Stages.adjusted(resolve(clue), this::owns, playerTile());
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
 			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && carriesClue());
 		if (change != StepChange.UNCHANGED)

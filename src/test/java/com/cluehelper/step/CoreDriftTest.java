@@ -155,11 +155,11 @@ public class CoreDriftTest
 			}
 			for (StepIndex.Target target : entry.getTargets())
 			{
-				if ("key".equals(target.getKind()) && (target.getKey() < 0 || target.getKeyTile() == null || target.getTile() == null))
+				if (target.getKind() == StepIndex.Target.Kind.KEY && (target.getKey() < 0 || target.getKeyTile() == null || target.getTile() == null))
 				{
 					broken.add(key + ": key target without key, kill tile or chest tile");
 				}
-				if ("kill".equals(target.getKind()) && entry.getArea() == null && entry.getReach() == null)
+				if (target.getKind() == StepIndex.Target.Kind.KILL && entry.getArea() == null && entry.getReach() == null)
 				{
 					broken.add(key + ": kill target without an area or a reach note");
 				}

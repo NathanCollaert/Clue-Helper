@@ -2,6 +2,7 @@ package com.cluehelper.step;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -332,17 +333,32 @@ public final class StepIndex
 		}
 	}
 
-	/** A cache target: coord, npc, loc, key (kill an NPC for a key, then search) or kill. */
+	/** A cache target: a tile, an NPC, an object, an NPC killed for a key before a search, or a kill. */
 	public static final class Target
 	{
-		private String kind;
+		public enum Kind
+		{
+			@SerializedName("coord")
+			COORD,
+			@SerializedName("npc")
+			NPC,
+			@SerializedName("loc")
+			LOC,
+			/** Kill an NPC for a key, then search. */
+			@SerializedName("key")
+			KEY,
+			@SerializedName("kill")
+			KILL
+		}
+
+		private Kind kind;
 		private int[] tile;
 		private List<Integer> npcs;
 		private Integer key;
 		private int[] keyTile;
 		private String text;
 
-		public String getKind()
+		public Kind getKind()
 		{
 			return kind;
 		}

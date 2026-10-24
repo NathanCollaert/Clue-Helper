@@ -167,7 +167,7 @@ public class StepNeeds
 
 	private StashMemory.State stash(StepRequirements requirements)
 	{
-		return requirements.getStashObjectId() == -1 ? StashMemory.State.NONE : stash.state(requirements.getStashObjectId());
+		return requirements.hasStash() ? stash.state(requirements.getStashObjectId()) : StashMemory.State.NONE;
 	}
 
 	private static ItemRequirement anyOf(StepIndex.Requires way)

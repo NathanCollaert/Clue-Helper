@@ -136,4 +136,10 @@ public class SubStep
 	{
 		return kind == Kind.TELEPORT || kind == Kind.FAIRY_RING;
 	}
+
+	/** An act that is a skill challenge's task, at its place or anywhere. */
+	public boolean isTask()
+	{
+		return kind == Kind.ACT && stage != null && stage.getKind() == Stage.Kind.TASK;
+	}
 }

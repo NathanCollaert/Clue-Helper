@@ -167,10 +167,16 @@ public class RoutePlanner
 		return () -> inputListeners.remove(listener);
 	}
 
+	/** The step to travel to now: the clue's step, with a hot/cold probe as its target and the stages already done dropped. */
+	public Step travelStep()
+	{
+		return stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
+	}
+
 	/** Call after the player model's and availability's GameTick handlers. */
 	public void onGameTick()
 	{
-		Step step = stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
+		Step step = travelStep();
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		WalkData.Loaded data = walk;

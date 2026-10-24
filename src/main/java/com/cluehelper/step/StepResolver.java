@@ -25,11 +25,9 @@ import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 @Singleton
 public class StepResolver
 {
-	private static final int NO_STASH = -1;
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
 
-	private static final String KEY_TARGET = "key";
 
 	private final Supplier<StepIndex> index;
 	private final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
@@ -93,7 +91,7 @@ public class StepResolver
 			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::wornFor);
 		}
 		StepIndex.Target key = entry == null ? null : entry.getTargets().stream()
-			.filter(target -> KEY_TARGET.equals(target.getKind()) && target.getKeyTile() != null).findFirst().orElse(null);
+			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
 		if (key != null)
 		{
 			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
@@ -146,7 +144,7 @@ public class StepResolver
 			.regions(List.of())
 			.objectIds(List.of())
 			.objectNames(List.of())
-			.requirements(new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), NO_STASH))
+			.requirements(new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), StepRequirements.NO_STASH))
 			.cacheRows(List.of())
 			.known(false)
 			.build();
@@ -291,6 +289,6 @@ public class StepResolver
 		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
 		List<ItemRequirement> items = CoreClueReader.challengeCompleted(clue) ? List.of() : CoreClueReader.itemRequirements(clue);
 		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
-			CoreClueReader.lightSourceVarbitId(clue), items, stash == null ? NO_STASH : stash.getObjectId());
+			CoreClueReader.lightSourceVarbitId(clue), items, stash == null ? StepRequirements.NO_STASH : stash.getObjectId());
 	}
 }

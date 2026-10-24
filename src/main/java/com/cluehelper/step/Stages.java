@@ -76,7 +76,13 @@ public final class Stages
 	}
 
 	/** The task's places drop once the player owns one of the entry's {@code anywhereWith} items (a sacred eel). */
-	public static Step doneAnywhereWhenOwned(Step step, Predicate<Integer> owns)
+	/** The step as the player's state leaves it: a task done anywhere once an item is owned, or under way inside its area. */
+	public static Step adjusted(Step step, Predicate<Integer> owns, WorldPoint at)
+	{
+		return underWayInSpan(doneAnywhereWhenOwned(step, owns), at);
+	}
+
+	private static Step doneAnywhereWhenOwned(Step step, Predicate<Integer> owns)
 	{
 		StepIndex.Entry entry = step.getData();
 		if (entry == null || entry.getAnywhereWith().stream().noneMatch(owns))
@@ -93,7 +99,7 @@ public final class Stages
 	}
 
 	/** Inside a task's area (on a rooftop course) the task is under way: done where the player is, not from its start. */
-	public static Step underWayInSpan(Step step, WorldPoint at)
+	private static Step underWayInSpan(Step step, WorldPoint at)
 	{
 		Stage task = step.getStages().stream().filter(stage -> stage.getKind() == Stage.Kind.TASK && !stage.getTiles().isEmpty()
 			&& stage.getSpans().stream().anyMatch(place -> place.spans(at))).findFirst().orElse(null);

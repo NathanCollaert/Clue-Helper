@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.step.StepRequirements;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Value;
@@ -31,7 +32,7 @@ final class DepositReminder
 
 	int getStashId()
 	{
-		return pending == null ? StepGuide.NO_STASH : pending.getStashId();
+		return pending == null ? StepRequirements.NO_STASH : pending.getStashId();
 	}
 
 	void start(WorldPoint at, int stashId, List<String> items, int tick)

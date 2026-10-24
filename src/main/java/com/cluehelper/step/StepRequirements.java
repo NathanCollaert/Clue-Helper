@@ -35,9 +35,12 @@ public final class StepRequirements
 		this.stashObjectId = stashObjectId;
 	}
 
+	/** The {@code stashObjectId} of a step without a STASH unit. */
+	public static final int NO_STASH = -1;
+
 	public static StepRequirements none()
 	{
-		return new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), -1);
+		return new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), NO_STASH);
 	}
 
 	public StepRequirements plus(ItemRequirement item)
@@ -60,10 +63,15 @@ public final class StepRequirements
 		return ownItems;
 	}
 
-	/** The emote step's STASH unit object, or -1. */
+	/** The emote step's STASH unit object, or {@link #NO_STASH}. */
 	public int getStashObjectId()
 	{
 		return stashObjectId;
+	}
+
+	public boolean hasStash()
+	{
+		return stashObjectId != NO_STASH;
 	}
 
 	public SpadeNeed getSpade()

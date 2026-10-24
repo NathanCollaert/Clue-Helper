@@ -16,7 +16,6 @@ import net.runelite.api.coords.WorldPoint;
 final class Acts
 {
 	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
-	private static final String KILL_TARGET = "kill";
 
 	private Acts()
 	{
@@ -63,7 +62,7 @@ final class Acts
 		}
 		StepIndex.Entry data = step.getData();
 		StepIndex.Target kill = data == null ? null : data.getTargets().stream()
-			.filter(target -> KILL_TARGET.equals(target.getKind())).findFirst().orElse(null);
+			.filter(target -> target.getKind() == StepIndex.Target.Kind.KILL).findFirst().orElse(null);
 		if (kill != null)
 		{
 			return List.of(act(kill.getText() != null ? kill.getText() : "Kill the monster", area(data)));
