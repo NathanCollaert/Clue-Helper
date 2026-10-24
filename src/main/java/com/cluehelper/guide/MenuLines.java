@@ -47,8 +47,6 @@ public class MenuLines
 	private static final String LINE_BREAK = "<br>";
 	private static final int NEXUS_GROUP = 17;
 	private static final int BOX_GROUP = 590;
-	private static final int MENU_ROW_HEIGHT = 15;
-	private static final int MENU_BOTTOM_BORDER = 3;
 	private static final int LOG_FIRST_CODE = 12;
 	/** Each code in the travel log is followed by its favourite star. */
 	private static final int LOG_COMPONENTS_PER_CODE = 2;
@@ -117,7 +115,7 @@ public class MenuLines
 				int[] ints = intTail(8);
 				if (ints != null)
 				{
-					nexusLines.put(ints[3], new int[]{ints[7], ints[0], ints[4]});
+					nexusLines.put(ints[3], new int[]{ints[7], ints[0]});
 				}
 				break;
 			}
@@ -196,13 +194,11 @@ public class MenuLines
 		return out;
 	}
 
-	/** Call every client tick: it also puts back the colour of lines no longer wanted. */
-	public void colourLines(MenuTarget target, boolean enabled)
-	{
-		colourLines(target, ScrollBook.NO_WIDGET, enabled);
-	}
-
-	/** @param entryWidget a scroll book entry whose name and charges are coloured too, or -1 */
+	/**
+	 * Call every client tick: it also puts back the colour of lines no longer wanted.
+	 *
+	 * @param entryWidget a scroll book entry whose name and charges are coloured too, or -1
+	 */
 	public void colourLines(MenuTarget target, int entryWidget, boolean enabled)
 	{
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -381,22 +377,6 @@ public class MenuLines
 		{
 			find(alternative, out);
 		}
-	}
-
-	public List<Rectangle> menuRows(MenuTarget target)
-	{
-		List<Rectangle> out = new ArrayList<>();
-		if (target == null || target == MenuTarget.NONE || !client.isMenuOpen())
-		{
-			return out;
-		}
-		Menu menu = client.getMenu();
-		MenuEntry[] entries = menu.getMenuEntries();
-		for (int pick : pickRows(entries, target))
-		{
-			out.add(row(menu, entries.length, pick));
-		}
-		return out;
 	}
 
 	private int[] pickRows(MenuEntry[] entries, MenuTarget target)
@@ -725,13 +705,6 @@ public class MenuLines
 		NPC npc = entry.getNpc();
 		return npc != null && (target.getNpcIds().contains(npc.getId())
 			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId()));
-	}
-
-	/** Entries run bottom-up: the last one is the top row. */
-	private static Rectangle row(Menu menu, int count, int index)
-	{
-		int top = menu.getMenuY() + menu.getMenuHeight() - MENU_BOTTOM_BORDER - count * MENU_ROW_HEIGHT;
-		return new Rectangle(menu.getMenuX(), top + (count - 1 - index) * MENU_ROW_HEIGHT, menu.getMenuWidth(), MENU_ROW_HEIGHT);
 	}
 
 	private Widget child(int[] at)

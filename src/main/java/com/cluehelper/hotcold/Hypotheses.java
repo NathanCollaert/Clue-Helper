@@ -13,21 +13,19 @@ import net.runelite.api.coords.WorldPoint;
  */
 public final class Hypotheses
 {
-	/** B01: 133 of 140 cache centres equal core's, so a spot's prior sits mostly on its centre. */
+	/** 133 of 140 cache centres equal core's, so a spot's prior sits mostly on its centre. */
 	static final double CENTRE_SHARE = 0.5;
 
 	private final List<Spot> spots;
-	private final boolean beginner;
 	private final int[] x;
 	private final int[] y;
 	private final int[] spot;
 	private final double[] weight;
 	private final int misses;
 
-	private Hypotheses(List<Spot> spots, boolean beginner, int[] x, int[] y, int[] spot, double[] weight, int misses)
+	private Hypotheses(List<Spot> spots, int[] x, int[] y, int[] spot, double[] weight, int misses)
 	{
 		this.spots = spots;
-		this.beginner = beginner;
 		this.x = x;
 		this.y = y;
 		this.spot = spot;
@@ -80,7 +78,7 @@ public final class Hypotheses
 			spot[i] = h[2];
 			weight[i] = priorWeight(spots.get(h[2]), h[3] == 1);
 		}
-		return new Hypotheses(spots, beginner, x, y, spot, weight, fewest == Integer.MAX_VALUE ? 0 : fewest);
+		return new Hypotheses(spots, x, y, spot, weight, fewest == Integer.MAX_VALUE ? 0 : fewest);
 	}
 
 	/** Counting stops past {@code enough}: such a tile is dropped anyway. */
@@ -143,22 +141,6 @@ public final class Hypotheses
 	public boolean isExact()
 	{
 		return misses == 0;
-	}
-
-	/** Readings the kept tiles fail; 0 when the grid explains every reading. */
-	public int getMisses()
-	{
-		return misses;
-	}
-
-	public boolean isBeginner()
-	{
-		return beginner;
-	}
-
-	public int size()
-	{
-		return x.length;
 	}
 
 	/** Each kept spot's share of the posterior, largest first. */

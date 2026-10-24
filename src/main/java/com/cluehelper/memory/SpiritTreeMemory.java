@@ -47,7 +47,6 @@ public class SpiritTreeMemory
 	private Set<String> published;
 	private int lastRegion = -1;
 	private int lastRegionTick = -1;
-	private int settledRegion = -1;
 
 	@Inject
 	SpiritTreeMemory(Client client, MemoryStore memory, PlayerModel player)
@@ -110,7 +109,7 @@ public class SpiritTreeMemory
 		WorldPoint at = local == null ? null : WorldPoint.fromLocalInstance(client, local.getLocalLocation());
 		int region = at == null ? -1 : at.getRegionID();
 		int tick = client.getTickCount();
-		settledRegion = region != -1 && region == lastRegion && tick == lastRegionTick + 1 ? region : -1;
+		int settledRegion = region != -1 && region == lastRegion && tick == lastRegionTick + 1 ? region : -1;
 		lastRegion = region;
 		lastRegionTick = tick;
 		if (settledRegion == -1 || modalOpen())

@@ -14,14 +14,13 @@ final class LinkState
 	private String lastKey;
 	private Object lastTargets;
 
-	/** @return whether the active flag changed */
-	boolean start(boolean coreActive)
+	void start(boolean coreActive)
 	{
 		hasStep = false;
 		needsRead = false;
 		lastKey = null;
 		lastTargets = null;
-		return setActive(coreActive);
+		setActive(coreActive);
 	}
 
 	/** Swing thread. @return whether the active flag changed */

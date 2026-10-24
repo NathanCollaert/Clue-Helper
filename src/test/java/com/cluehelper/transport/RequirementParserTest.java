@@ -13,7 +13,6 @@ public class RequirementParserTest
 	private static final String[][] CASES = {
 		{"Items", "AIR_RUNE=3&&FIRE_RUNE=1&&LAW_RUNE=1", "items 556x3 & 554x1 & 563x1"},
 		{"Items", "1706=1||1708=1||1710=1", "items 1706x1|1708x1|1710x1"},
-		{"Items", "SHANTAY_PASS=1|COINS=5", "items 1854x1|995x5"},
 		{"Items", "13393=1&UNLOCK_XERICS_HONOUR=1", "items 13393x1 & unlock XERICS_HONOUR"},
 		{"Items", "aether_rune=2 & sunfire_rune=1", "items 30843x2 & 28929x1"},
 		{"Items", "SPADE=1", "error Items: unknown item 'SPADE'"},
@@ -41,8 +40,7 @@ public class RequirementParserTest
 		{"Consumable", "T", "spends charges"},
 	};
 
-	private final RequirementParser parser = new RequirementParser(name ->
-		name.equals("SHANTAY_PASS") ? List.of(1854) : name.equals("COINS") ? List.of(995) : null);
+	private final RequirementParser parser = new RequirementParser();
 
 	@Test
 	public void parsesEveryCaseOfTheShortestPathSyntax()

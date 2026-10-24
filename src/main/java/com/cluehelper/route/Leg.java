@@ -24,7 +24,7 @@ public class Leg
 	WorldPoint from;
 	WorldPoint to;
 	int halfTicks;
-	/** For a fairy ring, the entry ring; null for walks, spellbook changes and bank stops. */
+	/** The teleport's row, or a fairy ring's entry ring; null for walks, exits, spellbook changes and bank stops. */
 	CatalogRow row;
 	CatalogRow landing;
 	SpellbookChange change;

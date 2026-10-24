@@ -78,18 +78,6 @@ public class StashMemory
 		return UNIT_OBJECTS;
 	}
 
-	public boolean built(int objectId)
-	{
-		return isBuilt(objectId);
-	}
-
-	/** Epoch millis, or 0 when never seen. */
-	public long seenAt(int objectId)
-	{
-		Seen seen = remembered.get().units.get(objectId);
-		return seen == null ? 0 : seen.seenAt;
-	}
-
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		if (SEARCH.equals(Text.removeTags(event.getMenuOption())) && UNIT_OBJECTS.contains(event.getId()))
@@ -126,7 +114,7 @@ public class StashMemory
 	}
 
 	/** The unit object is a multiloc on its own {@code HH_CONSTRUCTED_*} varbit, readable at login. */
-	private boolean isBuilt(int objectId)
+	public boolean isBuilt(int objectId)
 	{
 		int varbit = builtVarbits.computeIfAbsent(objectId, id ->
 		{

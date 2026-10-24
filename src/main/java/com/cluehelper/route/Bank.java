@@ -11,7 +11,6 @@ public class Bank
 	String name;
 	String kind;
 	Requirements requirements;
-	boolean groupStorage;
 
 	public boolean isDepositOnly()
 	{

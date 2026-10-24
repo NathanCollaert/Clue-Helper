@@ -56,11 +56,6 @@ public class ProbeTarget
 		target = new Target(stepKey, null, null, false, false);
 	}
 
-	public Target get()
-	{
-		return target;
-	}
-
 	/**
 	 * The step to route and guide: a hot/cold step goes to the chosen tile, or, before a choice, to the nearest of
 	 * core's tiles (the NPC who gives the device, before the first feel). Any other step is returned as it is.

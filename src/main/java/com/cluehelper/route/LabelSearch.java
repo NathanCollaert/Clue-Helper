@@ -57,11 +57,6 @@ final class LabelSearch
 	int labels;
 
 	/** @param excluded first-transport keys to leave out; {@link Route#WALK} leaves out routes with no transport */
-	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded)
-	{
-		this(ctx, legTargets, probes, areaHalfTicks, excluded, Integer.MAX_VALUE);
-	}
-
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded, int rankLimit)
 	{
 		this(ctx, legTargets, probes, areaHalfTicks, excluded, null, rankLimit);
@@ -426,7 +421,7 @@ final class LabelSearch
 	private void expandCape(Label from, OriginClass origin, int k)
 	{
 		PlanContext.Change cape = ctx.options[from.b].cape;
-		if (cape == null || ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.ALL || !ctx.changesAllowed(origin))
+		if (cape == null || !ctx.changesAllowed(origin))
 		{
 			return;
 		}
@@ -446,7 +441,7 @@ final class LabelSearch
 	private void expandLocatedChanges(Label from, OriginClass origin, int k)
 	{
 		List<PlanContext.Change> here = ctx.options[from.b].changes.get(from.node);
-		if (here == null || ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.ALL || !ctx.changesAllowed(origin))
+		if (here == null || !ctx.changesAllowed(origin))
 		{
 			return;
 		}

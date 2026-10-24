@@ -23,7 +23,7 @@ public final class FeelLogs
 		return readings == null ? List.of() : List.copyOf(readings);
 	}
 
-	/** A reading without a comparison is a step's first, so it starts the step's log afresh (B18). */
+	/** A reading without a comparison is a step's first, so it starts the step's log afresh. */
 	public FeelLogs with(String stepKey, Reading reading)
 	{
 		FeelLogs next = copy();

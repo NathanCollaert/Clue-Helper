@@ -30,7 +30,6 @@ public final class StepIndex
 	static final List<String> FILES = List.of("anagram", "cipher", "coordinate", "cryptic", "emote", "fairyring", "falo",
 		"hotcold", "map", "music", "skill");
 
-	private String dump;
 	private Map<String, Entry> steps = Map.of();
 	private Map<String, Spot> hotColdSpots = Map.of();
 
@@ -52,7 +51,6 @@ public final class StepIndex
 				StepIndex part = read(gson, new InputStreamReader(in, StandardCharsets.UTF_8));
 				steps.putAll(part.getSteps());
 				spots.putAll(part.getHotColdSpots());
-				all.dump = part.dump;
 			}
 			catch (IOException | JsonParseException e)
 			{
@@ -90,12 +88,6 @@ public final class StepIndex
 		return hotColdSpots == null ? Map.of() : hotColdSpots;
 	}
 
-	/** The cache dump the data was generated from, e.g. "2026-10-18". */
-	public String getDump()
-	{
-		return dump;
-	}
-
 	public static final class Entry
 	{
 		private String tier;
@@ -129,7 +121,6 @@ public final class StepIndex
 		private String floor;
 		private String note;
 		private boolean hidden;
-		private List<String> manual;
 
 		static Entry of(String tier, List<CacheRow> rows)
 		{
@@ -339,12 +330,6 @@ public final class StepIndex
 		{
 			return hidden;
 		}
-
-		/** The fields hand data set; empty for a fully generated entry. */
-		public List<String> getManual()
-		{
-			return manual == null ? List.of() : manual;
-		}
 	}
 
 	/** A cache target: coord, npc, loc, key (kill an NPC for a key, then search) or kill. */
@@ -353,7 +338,6 @@ public final class StepIndex
 		private String kind;
 		private int[] tile;
 		private List<Integer> npcs;
-		private Integer loc;
 		private Integer key;
 		private int[] keyTile;
 		private String text;
@@ -371,11 +355,6 @@ public final class StepIndex
 		public List<Integer> getNpcs()
 		{
 			return npcs == null ? List.of() : npcs;
-		}
-
-		public int getLoc()
-		{
-			return loc == null ? -1 : loc;
 		}
 
 		public int getKey()
@@ -411,16 +390,10 @@ public final class StepIndex
 		}
 	}
 
-	/** Either a question with its answer, or a puzzle or light box. */
+	/** The puzzle or light box a challenge hands over; {@code box} is null for a question, whose answer core shows. */
 	public static final class Challenge
 	{
-		private String question;
 		private String box;
-
-		public String getQuestion()
-		{
-			return question;
-		}
 
 		public String getBox()
 		{
@@ -483,7 +456,6 @@ public final class StepIndex
 		}
 	}
 
-	/** Items the way in needs; any one of {@link #getIds()} does. */
 	/** An NPC's wander range: the box it walks in, and tiles across it that routes may end on. */
 	public static final class Wander
 	{
@@ -533,7 +505,6 @@ public final class StepIndex
 		}
 	}
 
-	/** An interface's option, found by its text since its slot varies, and the button that confirms it. */
 	/** An NPC's option or a ground item to pick up before the task, done once one of {@code held} is carried or worn. */
 	public static final class Before
 	{
@@ -585,6 +556,7 @@ public final class StepIndex
 		}
 	}
 
+	/** An interface's option, found by its text since its slot varies, and the button that confirms it. */
 	public static final class Choose
 	{
 		private int root;
@@ -695,6 +667,7 @@ public final class StepIndex
 		}
 	}
 
+	/** Items the way in needs; any one of {@link #getIds()} does. */
 	public static final class Requires
 	{
 		private List<Integer> ids;
@@ -941,7 +914,7 @@ public final class StepIndex
 		private String name;
 		private int[] tile;
 
-		/** The row's centre as x, y, plane; null in data generated before B19. */
+		/** The row's centre as x, y, plane; null in older generated data. */
 		public int[] getTile()
 		{
 			return tile;

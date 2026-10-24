@@ -1,6 +1,6 @@
 package com.cluehelper.hotcold;
 
-/** Core's bands, which B18 measured exact for both tiers: Chebyshev distance to the spot's centre. */
+/** Core's bands, measured exact for both tiers: Chebyshev distance to the spot's centre. */
 public enum Band
 {
 	SHAKING("visibly shaking", 3, 4),

@@ -44,7 +44,6 @@ final class PohTrace
 	private final Runnable unregister;
 	private int pendingInterface = -1;
 	private static final int TREE_CHILDREN = 80;
-	private boolean pendingMenu;
 	private int frames;
 	private String lastTarget;
 
@@ -80,11 +79,6 @@ final class PohTrace
 			log.info("{} t{} target {}", MENU_TAG, client.getTickCount(), now);
 		}
 		lastTarget = now;
-		if (pendingMenu && client.isMenuOpen())
-		{
-			log.info("{} t{} menu rows outlined {}", MENU_TAG, client.getTickCount(), rects(lines.menuRows(target)));
-		}
-		pendingMenu = false;
 		if (pendingInterface >= 0)
 		{
 			log.info("{} t{} interface {} lines {}", MENU_TAG, client.getTickCount(), pendingInterface,
@@ -178,7 +172,6 @@ final class PohTrace
 		Menu menu = client.getMenu();
 		log.info("{} t{} menu at {},{} {}x{} entries {}", MENU_TAG, client.getTickCount(), menu.getMenuX(), menu.getMenuY(),
 			menu.getMenuWidth(), menu.getMenuHeight(), entries);
-		pendingMenu = true;
 		frame("menu");
 	}
 

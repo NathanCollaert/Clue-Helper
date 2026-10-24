@@ -46,7 +46,7 @@ public final class SceneDoors
 		| CollisionDataFlag.BLOCK_MOVEMENT_EAST | CollisionDataFlag.BLOCK_MOVEMENT_SOUTH;
 
 	private static final String NONE = "";
-	/** Shortest Path's SLASH items (knives, axes, blades), written by tools/catalog/seed.py. */
+	/** Shortest Path's SLASH items (knives, axes, blades), as the catalog generator writes them. */
 	private static final Set<Integer> SLASH_ITEMS = slashItems();
 
 	/** The option that opens each object: Open, Slash, or NONE. */

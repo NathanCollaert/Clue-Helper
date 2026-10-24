@@ -13,7 +13,6 @@ final class LowerBound
 	static final int UNREACHABLE = Integer.MAX_VALUE / 4;
 
 	private final int[] bound;
-	private final int viaTeleport;
 
 	LowerBound(PlanContext ctx, int[] targets)
 	{
@@ -42,11 +41,10 @@ final class LowerBound
 				cheapest = Math.min(cheapest, fairy + walk[landing.node]);
 			}
 		}
-		viaTeleport = cheapest;
 		bound = walk;
 		for (int node = 0; node < bound.length; node++)
 		{
-			bound[node] = Math.min(bound[node], viaTeleport);
+			bound[node] = Math.min(bound[node], cheapest);
 		}
 		bound[ctx.start] = 0;
 		bound[ctx.goal] = 0;

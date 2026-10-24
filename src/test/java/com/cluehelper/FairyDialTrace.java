@@ -3,6 +3,7 @@ package com.cluehelper;
 import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.MenuTarget;
+import com.cluehelper.guide.ScrollBook;
 import java.awt.Color;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
@@ -75,7 +76,7 @@ final class FairyDialTrace extends Overlay
 	{
 		if (code != null)
 		{
-			lines.colourLines(target(), true);
+			lines.colourLines(target(), ScrollBook.NO_WIDGET, true);
 		}
 	}
 

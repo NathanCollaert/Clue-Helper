@@ -17,8 +17,9 @@ import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /**
- * Each need is core's own {@link ItemRequirement}, tested only through {@code fulfilledBy}. Built on the client
- * thread; judging is pure.
+ * Each need is core's own {@link ItemRequirement}, tested through {@code fulfilledBy}; only our own
+ * {@link AlternativeRequirement} and {@link GearRequirement} are taken apart, for their other ways and gear picks. Built
+ * on the client thread; judging is pure.
  */
 @Value
 @Builder(toBuilder = true)

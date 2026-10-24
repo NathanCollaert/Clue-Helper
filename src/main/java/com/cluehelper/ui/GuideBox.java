@@ -41,8 +41,6 @@ public class GuideBox
 	@Value
 	public static class Prompts
 	{
-		public static final Prompts NONE = new Prompts(false, false);
-
 		boolean openBank;
 		/** The house is known only from the nexus varbits. */
 		boolean visitHouse;
@@ -77,7 +75,7 @@ public class GuideBox
 	}
 
 	/**
-	 * @param committed the route the guide follows, which the arrows and highlights show
+	 * @param committed the route the guide follows, which the highlights show
 	 * @param next null unless the next sub-step is wanted
 	 * @param f2pBook the book a member is stuck on while on an F2P world, or null
 	 */

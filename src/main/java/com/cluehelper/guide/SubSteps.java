@@ -72,19 +72,8 @@ public final class SubSteps
 	{
 	}
 
-	/** Client thread only, for the {@code itemNames} lookups. */
-	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames)
-	{
-		return of(route, step, itemNames, HouseState.NONE);
-	}
-
-	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house)
-	{
-		return of(route, step, itemNames, house, leg -> null, false);
-	}
-
 	/**
-	 * {@code house} gives the nexus hotkeys, which follow the player's own slot order; {@code exits} names the exit a
+	 * Client thread only, for the {@code itemNames} lookups. {@code house} gives the nexus hotkeys, which follow the player's own slot order; {@code exits} names the exit a
 	 * start leg leaves the scene by, or null; {@code takeFromStash} when the step's items wait in its STASH unit.
 	 */
 	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,

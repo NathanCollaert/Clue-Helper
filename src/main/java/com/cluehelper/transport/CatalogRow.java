@@ -48,9 +48,4 @@ public class CatalogRow
 	{
 		return origin != null && category != Category.FAIRY_RING;
 	}
-
-	public boolean isGlobal()
-	{
-		return origin == null && code == null;
-	}
 }

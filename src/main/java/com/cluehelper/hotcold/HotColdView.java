@@ -20,7 +20,7 @@ public class HotColdView
 {
 	static final int MOST_BRANCHES = 3;
 	static final int NAMED_SPOTS = 2;
-	/** The most a master feel dealt in B18's 13. */
+	/** The most a master feel dealt in 13 recorded feels. */
 	static final int MOST_FEEL_DAMAGE = 8;
 	private static final int NAMED_AREAS = 2;
 

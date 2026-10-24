@@ -1,6 +1,6 @@
 package com.cluehelper.hotcold;
 
-/** "Than last time": the exact Chebyshev distance against the step's previous reading (B18, 93 of 93). */
+/** "Than last time": the exact Chebyshev distance against the step's previous reading (exact in 93 of 93 recorded readings). */
 public enum Comparison
 {
 	WARMER("warmer"),

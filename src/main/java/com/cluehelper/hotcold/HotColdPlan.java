@@ -13,7 +13,7 @@ public class HotColdPlan
 	public enum Action
 	{
 		FEEL,
-		/** The last reading shook: any shaking tile is a dig tile (B18). */
+		/** The last reading shook: any shaking tile is a dig tile. */
 		DIG_HERE,
 		/** One spot is left, and one dig covers every tile of it the grid keeps. */
 		DIG_SPOT,

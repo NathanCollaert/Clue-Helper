@@ -20,10 +20,9 @@ import net.runelite.api.coords.WorldPoint;
 /** Immutable once loaded; any thread. Costs are tiles, which are half-ticks when running. */
 public final class WalkTable
 {
-	public static final WalkTable EMPTY = new WalkTable();
 	public static final int NO_NODE = -1;
 	public static final int NO_PATH = -1;
-	/** The spacing of each walk's waypoints (tools/walk/WalkGen.java). */
+	/** The spacing of each walk's waypoints, as the walk generator writes them. */
 	public static final int WAYPOINT_TILES = 40;
 	static final String DIRECTORY = "walk/";
 
@@ -389,7 +388,7 @@ public final class WalkTable
 			cells.put(RequirementParser.QUESTS, cell(c, 5));
 			cells.put(RequirementParser.VARBITS, cell(c, 6));
 			cells.put(RequirementParser.VARPS, cell(c, 7));
-			Bank bank = new Bank(c[1], c[2], parser.parse(cells), "Y".equals(cell(c, 8)));
+			Bank bank = new Bank(c[1], c[2], parser.parse(cells));
 			byNode.computeIfAbsent(node, n -> new ArrayList<>()).add(bank);
 		}
 		banks = byNode;

@@ -2,7 +2,7 @@ package com.cluehelper.hotcold;
 
 import lombok.Value;
 
-/** The strange device's game messages, verbatim as B18 recorded them. */
+/** The strange device's game messages, verbatim as recorded in play. */
 @Value
 public class DeviceLine
 {

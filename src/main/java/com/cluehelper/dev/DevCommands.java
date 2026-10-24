@@ -25,16 +25,13 @@ public class DevCommands
 		commands.put(nameWithoutPrefix.toLowerCase(Locale.ROOT), new Command(usage, action));
 	}
 
-	/**
-	 * @param command as typed after "::"
-	 * @return whether the command was one of ours, known or not
-	 */
-	public boolean dispatch(String command, String[] args)
+	/** @param command as typed after "::" */
+	public void dispatch(String command, String[] args)
 	{
 		String typed = command.toLowerCase(Locale.ROOT);
 		if (!typed.startsWith(PREFIX))
 		{
-			return false;
+			return;
 		}
 		Command found;
 		synchronized (this)
@@ -49,7 +46,6 @@ public class DevCommands
 		{
 			found.action.accept(args);
 		}
-		return true;
 	}
 
 	synchronized List<String> lines()

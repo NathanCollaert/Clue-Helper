@@ -75,10 +75,6 @@ public final class Stages
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
 	}
 
-	/**
-	 * Sherlock: the task (at its places, or anywhere when the data has none) until core marks it completed, then
-	 * Sherlock. Charlie: the item's sources while the data has any, then Charlie. Empty when only the hand-in is left.
-	 */
 	/** The task's places drop once the player owns one of the entry's {@code anywhereWith} items (a sacred eel). */
 	public static Step doneAnywhereWhenOwned(Step step, Predicate<Integer> owns)
 	{
@@ -126,6 +122,10 @@ public final class Stages
 		return List.copyOf(spans);
 	}
 
+	/**
+	 * Sherlock: the task (at its places, or anywhere when the data has none) until core marks it completed, then
+	 * Sherlock. Charlie: the item's sources while the data has any, then Charlie. Empty when only the hand-in is left.
+	 */
 	static List<Stage> challenge(StepIndex.Entry entry, String task, boolean completed, ItemRequirement returnItem,
 		List<WorldPoint> targets, Function<StepIndex.Requires, ItemRequirement> tools, List<ItemRequirement> emptied)
 	{

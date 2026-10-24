@@ -320,7 +320,6 @@ public class StepGuide
 		return current != null && (current.getKind() == SubStep.Kind.EXIT || current.getKind() == SubStep.Kind.ENTER);
 	}
 
-	/** Shortest Path names objects and NPCs alike by id, so the id is looked for as both. */
 	/** A conversation's chat options follow its option, so each menu's pick is coloured in turn. */
 	private static MenuTarget withDialogue(MenuTarget target, StepIndex.WayIn way)
 	{
@@ -340,6 +339,7 @@ public class StepGuide
 		return way != null && origin.equals(way.getTile()) && destination.equals(way.getTo()) ? way : null;
 	}
 
+	/** Shortest Path names objects and NPCs alike by id, so the id is looked for as both. */
 	private static MenuTarget wayTarget(int id, String option)
 	{
 		Set<Integer> ids = id < 0 ? Set.of() : Set.of(id);
@@ -513,7 +513,7 @@ public class StepGuide
 			return;
 		}
 		Route committed = routes.getCommitted();
-		if (isUnderWay())
+		if (isTravelling())
 		{
 			waiting = committed;
 			waitingFrom = player.getPosition().getTile();
@@ -563,7 +563,7 @@ public class StepGuide
 			actReachedStepKey = null;
 		}
 		boolean changed = false;
-		if (waiting != null && !isUnderWay())
+		if (waiting != null && !isTravelling())
 		{
 			Route next = waiting;
 			boolean stale = waitingFrom != null && tile != null && !SubSteps.near(tile, waitingFrom, JUMP_TILES);
@@ -625,7 +625,6 @@ public class StepGuide
 			highlightObjects = List.of();
 			highlightNpcs = List.of();
 			fillObjects = List.of();
-		fillNpcs = List.of();
 			fillNpcs = List.of();
 			return;
 		}
@@ -832,7 +831,6 @@ public class StepGuide
 			highlightObjects = List.of();
 			highlightNpcs = List.of();
 			fillObjects = List.of();
-		fillNpcs = List.of();
 			fillNpcs = List.of();
 			objectsFoundTick = NEVER;
 		}
@@ -900,7 +898,7 @@ public class StepGuide
 		if (sameStep && stayed && local != null && local.getAnimation() == NO_ANIMATION)
 		{
 			log.debug("teleport refused: {}", teleportRefusal);
-			routes.onTeleportRefused(teleportRefusal);
+			routes.onRowRefused(teleportRefusal);
 		}
 		teleportRefusal = null;
 		teleportClickTick = NEVER;
@@ -914,7 +912,7 @@ public class StepGuide
 		}
 		if (client.getVarbitValue(VarbitID.SPELLBOOK) != refusalBook.ordinal())
 		{
-			routes.onChangeRefused(refusalCandidate);
+			routes.onRowRefused(refusalCandidate);
 		}
 		refusalCandidate = null;
 	}
@@ -1210,11 +1208,6 @@ public class StepGuide
 	/** A teleport or book change is animating: its item, spell and tab are already used. */
 	public boolean isTravelling()
 	{
-		return isUnderWay();
-	}
-
-	private boolean isUnderWay()
-	{
 		SubStep current = getCurrent();
 		Player local = client.getLocalPlayer();
 		boolean acting = current != null && (current.isTravel() || current.getChange() != null);
@@ -1486,7 +1479,6 @@ public class StepGuide
 		return taking ? routeStep.getRequirements().getStashObjectId() : NO_STASH;
 	}
 
-	/** The carried items the emote step wants on, refreshed every tick as they are put on. */
 	private boolean refreshBox()
 	{
 		SubStep act = index < steps.size() ? steps.get(index) : null;
@@ -1519,7 +1511,6 @@ public class StepGuide
 		return null;
 	}
 
-	/** The carried item the act names, refreshed every tick as it arrives (the puzzle box, after the talk). */
 	/**
 	 * The way in's gear as carried: one item that covers every requirement (the Medallion of the Deep) when the player
 	 * has it, else per requirement the item they carry.
@@ -1676,6 +1667,7 @@ public class StepGuide
 		return false;
 	}
 
+	/** The carried item the act names, refreshed every tick as it arrives (the puzzle box, after the talk). */
 	private void refreshNamedItems()
 	{
 		SubStep current = getCurrent();
@@ -1859,6 +1851,7 @@ public class StepGuide
 		return true;
 	}
 
+	/** The carried items the emote step wants on, refreshed every tick as they are put on. */
 	private void refreshEquipItems()
 	{
 		SubStep current = getCurrent();

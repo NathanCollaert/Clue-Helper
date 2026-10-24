@@ -87,7 +87,7 @@ public class DevHarness
 	{
 		DevCommands c = new DevCommands(this::reply);
 		c.register("selftest", "run the in-client self-tests", args -> runSelfTests());
-		c.register("steplog", "[clear] show or clear this profile's S12 step log", this::stepLog);
+		c.register("steplog", "[clear] show or clear this profile's step log", this::stepLog);
 		c.register("step", "show the current step and log it as a replay fixture line", args -> dumpStep());
 		c.register("player", "show the player snapshot, castable spells and A_carried", args ->
 			playerDump.describe(this::reply, line -> log.info("{}   {}", PlayerDump.TAG, line)));
@@ -265,7 +265,7 @@ public class DevHarness
 		int core = 0;
 		for (int unit : StashMemory.unitObjects())
 		{
-			boolean isBuilt = stash.built(unit);
+			boolean isBuilt = stash.isBuilt(unit);
 			int check = stash.coreCheck(unit);
 			built += isBuilt ? 1 : 0;
 			core += check == 1 ? 1 : 0;

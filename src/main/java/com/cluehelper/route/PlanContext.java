@@ -368,9 +368,10 @@ final class PlanContext
 		return !tiles.isEmpty() && tiles.stream().allMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
 	}
 
+	/** Changes are a setting, and a teleport must be able to follow. */
 	boolean changesAllowed(OriginClass origin)
 	{
-		return origin.allowsTeleports();
+		return in.getSettings().getSpellbookChanges() == SpellbookChanges.ALL && origin.allowsTeleports();
 	}
 
 	/** Not while the route is still in someone else's house: the furniture judged is the player's own. */

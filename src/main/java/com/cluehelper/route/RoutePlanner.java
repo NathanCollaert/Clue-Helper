@@ -273,18 +273,12 @@ public class RoutePlanner
 	 * Client thread. No var tells of some refusals (the Music cape's "untrimmed cape" rule), so the row isn't offered
 	 * again this session.
 	 */
-	public void onTeleportRefused(String row)
+	public void onRowRefused(String row)
 	{
-		onChangeRefused(row);
-	}
-
-	/** Client thread. */
-	public void onChangeRefused(String change)
-	{
-		if (refusedChanges.add(change))
+		if (refusedChanges.add(row))
 		{
 			lastTrigger = null;
-			log.debug("spellbook change refused: {}", change);
+			log.debug("refused this session: {}", row);
 		}
 	}
 

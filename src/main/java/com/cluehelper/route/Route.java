@@ -26,8 +26,6 @@ public class Route
 	boolean banked;
 	/** Spellbook Swap included. */
 	boolean changed;
-	/** Walks to an altar or Tyss; rests on estimated costs, so it needs the margin. */
-	boolean walkedChange;
 	/** Lunar while a Spellbook Swap is pending. */
 	Book startBook;
 	Book endBook;

@@ -11,7 +11,7 @@ public class Spot
 	/** The cache's centre, or core's where the cache has none. */
 	int x;
 	int y;
-	/** The hypothesis grid's half-width: max(1, core-to-cache distance), B01. */
+	/** The hypothesis grid's half-width: max(1, core-to-cache distance). */
 	int radius;
 	/** Core's description, without its full stop. */
 	String description;

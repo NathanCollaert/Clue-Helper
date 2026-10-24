@@ -24,7 +24,7 @@ import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdTemperatureC
 import org.junit.Test;
 
 /**
- * B18's recorded run, both tiers: a reading's tile from 3544, the logs across logins (each one a round trip through
+ * A recorded run, both tiers: a reading's tile from 3544, the logs across logins (each one a round trip through
  * the stored JSON) and a new step, a run and a walk across an edge. The true spot must stay in every grid, exactly.
  * Core's solver runs alongside on the same tiles, to count where our grid keeps a spot core has dropped.
  */
@@ -90,7 +90,7 @@ public class HotColdReplayTest
 		assertEquals(104, readings);
 		assertEquals(17, otherLines);
 		assertEquals("a log starts at the session's first beginner reading and at the master's first", List.of("19", "3259"), firstReadings);
-		System.out.println("B18 replay: " + readings + " readings; our grid kept a spot core had dropped after " + coreDropped);
+		System.out.println("Replay: " + readings + " readings; our grid kept a spot core had dropped after " + coreDropped);
 	}
 
 	/** Core's own solver, fed the exact tile; it never resets on a re-read here. */

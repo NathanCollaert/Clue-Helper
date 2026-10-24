@@ -16,7 +16,7 @@ import net.runelite.api.coords.WorldPoint;
 @Builder
 public class ProbeJob
 {
-	/** Kept tiles per spot that the scoring sees; B01's k ≤ 3 gives up to 49. */
+	/** Kept tiles per spot that the scoring sees; a radius of at most 3 gives up to 49. */
 	static final int SAMPLES_PER_SPOT = 9;
 
 	String stepKey;

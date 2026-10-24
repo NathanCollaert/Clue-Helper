@@ -245,18 +245,6 @@ public class BankMemory
 		version++;
 	}
 
-	public void clear()
-	{
-		liveBank = null;
-		liveGroup = null;
-		liveKit = null;
-		unsaved = false;
-		storedBank.clear();
-		storedGroup.clear();
-		storedKit.clear();
-		version++;
-	}
-
 	private void save()
 	{
 		if (!unsaved)

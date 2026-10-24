@@ -374,8 +374,10 @@ public final class SceneBfs
 			return best;
 		}
 
-		/** Corners don't count: the game walks to a straight side to use an object. Null when no side is reached. */
-		/** A side with no wall between it and the object wins: stairs against a bank's outer wall face inwards. */
+		/**
+		 * Corners don't count: the game walks to a straight side to use an object. A side with no wall between it and
+		 * the object wins: stairs against a bank's outer wall face inwards. Null when no side is reached.
+		 */
 		public WorldPoint cheapestBeside(WorldPoint southWest, int sizeX, int sizeY)
 		{
 			WorldPoint best = null;

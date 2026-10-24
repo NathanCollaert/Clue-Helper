@@ -12,7 +12,7 @@ import net.runelite.api.coords.WorldPoint;
 public class Plan
 {
 	public static final Plan NONE = Plan.builder().alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-		.why(List.of()).note("no step").build();
+		.note("no step").build();
 
 	String stepKey;
 	Route best;
@@ -32,7 +32,6 @@ public class Plan
 	/** PROBES steps only: each tile's ranking ticks, penalties included. */
 	@Builder.Default
 	Map<WorldPoint, Integer> probeRanks = Map.of();
-	List<Option> why;
 	String note;
 	@Builder.Default
 	List<String> requirementNotes = List.of();
@@ -41,15 +40,6 @@ public class Plan
 	long contextNanos;
 	int labels;
 	int searches;
-
-	@Value
-	public static class Option
-	{
-		String name;
-		int ticks;
-		/** The walk to the nearest ring comes on top of the ticks. */
-		boolean fairyRing;
-	}
 
 	@Value
 	public static class Candidate

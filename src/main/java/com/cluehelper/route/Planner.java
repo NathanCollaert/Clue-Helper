@@ -60,19 +60,19 @@ public final class Planner
 		if (step != null && step.getData() != null && step.getData().isHidden())
 		{
 			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-				.why(List.of()).note("not guided: a Leagues step").build();
+				.note("not guided: a Leagues step").build();
 		}
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
 			return Plan.builder().stepKey(step == null ? null : step.getKey()).alternatives(List.of()).candidates(List.of())
-				.probeTicks(Map.of()).why(List.of()).note(step == null ? "no step" : ClueTypes.HOT_COLD.equals(step.getType())
+				.probeTicks(Map.of()).note(step == null ? "no step" : ClueTypes.HOT_COLD.equals(step.getType())
 					? "choosing where to feel" : "no target tile for this step yet").build();
 		}
 		PlanContext ctx = new PlanContext(in);
 		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty()))
 		{
 			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-				.why(List.of()).requirementNotes(requirementNotes(ctx)).build();
+				.requirementNotes(requirementNotes(ctx)).build();
 		}
 		List<List<int[]>> orders = legOrders(ctx, step);
 		ctx.freezeNodes();
@@ -102,7 +102,6 @@ public final class Planner
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
 		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
 		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
-		plan.why(probes ? List.of() : WhyList.of(ctx, orders.get(0).get(0)));
 		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.onlyInWilderness ? "Wilderness target" : null);
 		plan.requirementNotes(requirementNotes(ctx));
 		return plan.searchNanos(System.nanoTime() - started).contextNanos(contextNanos).labels(searches.labels)
@@ -620,7 +619,6 @@ public final class Planner
 				.pinIncluded(bankLeg && ctx.in.isPinPending())
 				.openBankStart(banked && !bankLeg)
 				.changed(goal.c != LabelSearch.NONE)
-				.walkedChange(goal.c == LabelSearch.WALKED)
 				.startBook(ctx.homeBook)
 				.endBook(goal.endBook != null ? goal.endBook : LabelSearch.endBook(goal.k))
 				.spent(spent)

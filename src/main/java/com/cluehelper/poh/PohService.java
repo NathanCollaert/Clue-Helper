@@ -21,7 +21,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.CollisionData;
@@ -88,8 +87,6 @@ public class PohService
 
 	private volatile Set<Integer> pieces = Set.of();
 	private volatile HouseState house = HouseState.NONE;
-	@Getter
-	private volatile long version;
 	private boolean seenATick;
 	private boolean wasInside;
 	private int scanAtTick = -1;
@@ -322,7 +319,6 @@ public class PohService
 		if (!values.equals(profile.vars))
 		{
 			profile.vars = values;
-			profile.varsSeenAt = System.currentTimeMillis();
 			stored.set(profile);
 			tell("house varbits: " + nexusKeys(profile).size() + " nexus destinations, Xeric " + values.get(VarbitID.POH_NEXUS_XERIC)
 				+ ", digsite " + values.get(VarbitID.POH_NEXUS_DIGSITE) + ", box " + values.get(VarbitID.POH_JEWELLERYBOX_MULTI));
@@ -436,7 +432,6 @@ public class PohService
 		if (!next.equals(house))
 		{
 			house = next;
-			version++;
 			player.setHouse(next);
 			tell("house: " + next.getSource() + ", " + next.getFurniture().size() + " pieces, " + next.getNexusKeys().size()
 				+ " nexus destinations");
@@ -514,7 +509,6 @@ public class PohService
 	{
 		/** By varbit id, as last read with a house present. */
 		Map<Integer, Integer> vars = new HashMap<>();
-		long varsSeenAt;
 		/** Base ids from the last own-house scan. */
 		List<Integer> furniture = new ArrayList<>();
 		Map<Integer, Integer> walkTicks = new HashMap<>();

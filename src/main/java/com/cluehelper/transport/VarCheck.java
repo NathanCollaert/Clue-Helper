@@ -23,11 +23,6 @@ public class VarCheck
 			this.code = code;
 		}
 
-		public String code()
-		{
-			return code;
-		}
-
 		static Op of(char code)
 		{
 			for (Op op : values())

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.runelite.api.Quest;
@@ -41,20 +40,6 @@ public final class RequirementParser
 	private static final Pattern ITEM_BRANCH = Pattern.compile("([A-Z0-9_]+)=(\\d+)");
 	private static final Map<String, Integer> RUNE_NAMES = runeNames();
 	private static final Map<String, Quest> QUESTS_BY_NAME = questsByName();
-
-	private final Function<String, List<Integer>> itemNames;
-
-	/** @param itemNames resolves Shortest Path's ItemVariations names; returns null for an unknown name */
-	public RequirementParser(Function<String, List<Integer>> itemNames)
-	{
-		this.itemNames = itemNames;
-	}
-
-	/** Knows only rune names and numeric ids. */
-	public RequirementParser()
-	{
-		this(name -> null);
-	}
 
 	public Requirements parse(Map<String, String> cells)
 	{
@@ -177,7 +162,7 @@ public final class RequirementParser
 			return Collections.singletonList(Integer.parseInt(name));
 		}
 		Integer rune = RUNE_NAMES.get(name);
-		return rune != null ? Collections.singletonList(rune) : itemNames.apply(name);
+		return rune != null ? Collections.singletonList(rune) : null;
 	}
 
 	private static void parseLevels(String cell, Parsed out)

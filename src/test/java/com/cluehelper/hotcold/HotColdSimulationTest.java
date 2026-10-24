@@ -19,8 +19,8 @@ import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdLocation;
 import org.junit.Test;
 
 /**
- * R06's simulation on the live planner's own rules: every spot solved from the tier's NPC, the truth on core's centre
- * (B01's disputed spots then sit k tiles off the cache's), with R06's crude costs: any walk-table node 10 ticks away,
+ * A simulation on the live planner's own rules: every spot solved from the tier's NPC, the truth on core's centre
+ * (the disputed spots then sit k tiles off the cache's), with crude costs: any walk-table node 10 ticks away,
  * scene tiles at a run's pace. Counts feels until a dig and ticks until the dig tile; a dig on the wrong spot or no
  * decision is a failure.
  */
