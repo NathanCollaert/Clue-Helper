@@ -760,8 +760,10 @@ public final class Planner
 				case WILDERNESS_EXIT:
 					return new Leg(label.kind, at, new WorldPoint(at.getX(), at.getY() - label.edgeHalf, at.getPlane()), label.edgeHalf,
 						null, null, null, book);
-				default:
+				case WALK:
 					return new Leg(Leg.Kind.WALK, at, ctx.tile(label.node), label.edgeHalf, null, null, null, book);
+				default:
+					throw new IllegalArgumentException("unhandled leg kind " + label.kind);
 			}
 		}
 	}

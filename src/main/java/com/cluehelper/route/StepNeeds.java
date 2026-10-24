@@ -176,13 +176,9 @@ public class StepNeeds
 		return requirements.getFirePitVarbitId() != -1 && client.getVarbitValue(requirements.getFirePitVarbitId()) == LIT;
 	}
 
-	private RequiredItems.Stash stash(StepRequirements requirements)
+	private StashMemory.State stash(StepRequirements requirements)
 	{
-		if (requirements.getStashObjectId() == -1)
-		{
-			return RequiredItems.Stash.NONE;
-		}
-		return RequiredItems.Stash.valueOf(stash.state(requirements.getStashObjectId()).name());
+		return requirements.getStashObjectId() == -1 ? StashMemory.State.NONE : stash.state(requirements.getStashObjectId());
 	}
 
 	private static ItemRequirement anyOf(StepIndex.Requires way)

@@ -1,5 +1,6 @@
 package com.cluehelper;
 
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Loadouts;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.DriftSteps;
@@ -139,7 +140,7 @@ public final class PlanReplay
 		List<RequiredItems.Need> needs = recording.needs.stream()
 			.map(need -> new RequiredItems.Need(need.name, requirement(need), need.stepItem, need.inCoreTag))
 			.collect(Collectors.toList());
-		return RequiredItems.builder().needs(needs).stash(RequiredItems.Stash.valueOf(recording.stash)).build();
+		return RequiredItems.builder().needs(needs).stash(StashMemory.State.valueOf(recording.stash)).build();
 	}
 
 	private static ItemRequirement requirement(PlanTrace.RecordedNeed need)

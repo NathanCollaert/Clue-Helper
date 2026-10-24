@@ -70,8 +70,10 @@ public class GearPieces
 				return isGuthix(name(itemId)) ? 1 : 0;
 			case ZAMORAK_ITEMS:
 				return isZamorak(name(itemId)) ? 1 : 0;
-			default:
+			case ANY_EQUIPMENT:
 				return equipment.getSlot() != AMMO ? 1 : 0;
+			default:
+				throw new IllegalArgumentException("unhandled gear bonus " + bonus);
 		}
 	}
 

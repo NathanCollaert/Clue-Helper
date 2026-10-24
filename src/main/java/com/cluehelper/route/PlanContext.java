@@ -1,6 +1,7 @@
 package com.cluehelper.route;
 
 import com.cluehelper.SpellbookChanges;
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Charge;
 import com.cluehelper.player.Container;
@@ -165,7 +166,7 @@ final class PlanContext
 			for (WorldPoint tile : stage.getTiles())
 			{
 				List<RequiredItems.Need> here = withPlaceUses(wanted, stage.getUses().getOrDefault(tile, List.of()));
-				RequiredItems needs = in.getRequired().toBuilder().stash(RequiredItems.Stash.NONE).needs(here).build();
+				RequiredItems needs = in.getRequired().toBuilder().stash(StashMemory.State.NONE).needs(here).build();
 				RequiredItems.Verdict verdict = needs.judge(in.getPlayer(), bankedPlayer);
 				stageNeeds.put(nodeAt(tile), verdict);
 				verdicts.add(verdict);
@@ -715,9 +716,12 @@ final class PlanContext
 				case DAILY:
 					units.merge(resources.once("daily:" + spend.getVar(), bankState), 1, Integer::sum);
 					break;
-				default:
+				case CAPE_USE:
 					SpellbookState state = player.getSpellbook();
 					units.merge(resources.capeUses(state == null ? 0 : state.getCapeChangesLeft(), bankState), 1, Integer::sum);
+					break;
+				default:
+					throw new IllegalArgumentException("unhandled spend " + spend.getKind());
 			}
 		}
 		units.forEach(resources::used);

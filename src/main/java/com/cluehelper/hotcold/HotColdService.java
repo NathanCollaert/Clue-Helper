@@ -258,6 +258,12 @@ public class HotColdService
 
 	private void onStepChange(StepChange change, Step step)
 	{
+		if (change == StepChange.CLEARED || change == StepChange.NEW)
+		{
+			forgetIfDug(plan);
+			probeTarget.clear();
+			plan = null;
+		}
 		if (change == StepChange.NEW && isHotCold(step))
 		{
 			planPending = true;
@@ -265,12 +271,6 @@ public class HotColdService
 			{
 				probeTarget.choosing(step.getKey());
 			}
-		}
-		else if (change == StepChange.CLEARED || change == StepChange.NEW)
-		{
-			forgetIfDug(plan);
-			probeTarget.clear();
-			plan = null;
 		}
 		if (change == StepChange.UPDATED && isHotCold(step))
 		{
@@ -367,8 +367,10 @@ public class HotColdService
 			case DIG_HERE:
 			case DIG_SPOT:
 				return new ProbeTarget.Target(planned.getStepKey(), planned.getTile(), "Dig here", true, false);
-			default:
+			case NONE:
 				return null;
+			default:
+				throw new IllegalArgumentException("unhandled action " + planned.getAction());
 		}
 	}
 

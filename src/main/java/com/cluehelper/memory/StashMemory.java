@@ -25,6 +25,8 @@ public class StashMemory
 {
 	public enum State
 	{
+		/** The step has no STASH unit; never a unit's own state. */
+		NONE,
 		NOT_BUILT, FILLED, EMPTY
 	}
 

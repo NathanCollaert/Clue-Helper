@@ -43,23 +43,21 @@ public class VarCheck
 
 	public boolean test(int current, long nowMinutes)
 	{
-		if (op == Op.EQUAL)
+		switch (op)
 		{
-			return current == value;
+			case EQUAL:
+				return current == value;
+			case GREATER:
+				return current > value;
+			case SMALLER:
+				return current < value;
+			case BIT_SET:
+				return (current & value) != 0;
+			case COOLDOWN_MINUTES:
+				return nowMinutes - current > value;
+			default:
+				throw new IllegalArgumentException("unhandled op " + op);
 		}
-		if (op == Op.GREATER)
-		{
-			return current > value;
-		}
-		if (op == Op.SMALLER)
-		{
-			return current < value;
-		}
-		if (op == Op.BIT_SET)
-		{
-			return (current & value) != 0;
-		}
-		return nowMinutes - current > value;
 	}
 
 	/** The first epoch minute a failing cooldown passes; {@link Long#MAX_VALUE} for every other clause. */

@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerSnapshot;
@@ -27,15 +28,10 @@ public class RequiredItems
 {
 	public static final RequiredItems NONE = RequiredItems.builder().build();
 
-	public enum Stash
-	{
-		NONE, NOT_BUILT, FILLED, EMPTY
-	}
-
 	@Builder.Default
 	List<Need> needs = List.of();
 	@Builder.Default
-	Stash stash = Stash.NONE;
+	StashMemory.State stash = StashMemory.State.NONE;
 	/** The planner doesn't route to the tool leprechaun, it only notes it. */
 	boolean spadeAtLeprechaun;
 
@@ -71,7 +67,7 @@ public class RequiredItems
 
 	Verdict judge(PlayerSnapshot player, PlayerSnapshot banked)
 	{
-		List<Need> open = needs.stream().filter(need -> !(need.stepItem && stash == Stash.FILLED)).collect(Collectors.toList());
+		List<Need> open = needs.stream().filter(need -> !(need.stepItem && stash == StashMemory.State.FILLED)).collect(Collectors.toList());
 		if (open.isEmpty())
 		{
 			return Verdict.MET;

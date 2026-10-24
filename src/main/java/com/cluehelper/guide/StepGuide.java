@@ -3,6 +3,7 @@ package com.cluehelper.guide;
 import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.HouseState;
@@ -993,9 +994,9 @@ public class StepGuide
 		{
 			return;
 		}
-		RequiredItems.Stash stash = stepNeeds.of(ended).getStash();
+		StashMemory.State stash = stepNeeds.of(ended).getStash();
 		List<String> back = itemsToPutBack(ended);
-		if ((stash == RequiredItems.Stash.FILLED || stash == RequiredItems.Stash.EMPTY) && !back.isEmpty())
+		if ((stash == StashMemory.State.FILLED || stash == StashMemory.State.EMPTY) && !back.isEmpty())
 		{
 			depositItems = back;
 			depositAt = ended.getData().getStash().getTile();
@@ -1061,7 +1062,7 @@ public class StepGuide
 				carried.addAll(List.of(container.getItems()));
 			}
 		}
-		return stepNeeds.of(step).getStash() == RequiredItems.Stash.FILLED
+		return stepNeeds.of(step).getStash() == StashMemory.State.FILLED
 			&& !step.getRequirements().itemsFulfilledBy(carried.toArray(new Item[0]));
 	}
 
@@ -1249,7 +1250,7 @@ public class StepGuide
 			case ACT:
 				return isActDone(step);
 			default:
-				return false;
+				throw new IllegalArgumentException("unhandled sub-step kind " + step.getKind());
 		}
 	}
 

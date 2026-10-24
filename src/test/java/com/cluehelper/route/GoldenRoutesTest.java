@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import com.cluehelper.memory.StashMemory;
 import static org.junit.Assert.assertTrue;
 
 import com.cluehelper.SpellbookChanges;
@@ -330,7 +331,7 @@ public class GoldenRoutesTest
 		}
 
 		Step draynorDig = step("map:w348");
-		RequiredItems spade = required(RequiredItems.Stash.NONE, need("spade", ItemRequirements.item(ItemID.SPADE), false));
+		RequiredItems spade = required(StashMemory.State.NONE, need("spade", ItemRequirements.item(ItemID.SPADE), false));
 		PlayerSnapshot glory1 = mid.toBuilder().inventory(Map.of(itemId("AMULET_OF_GLORY_1"), 1)).charges(Map.of(
 			itemId("AMULET_OF_GLORY_1"), new Charge(1, Charge.Source.ITEM_ID))).build();
 		lines.add(line("required spade: glory(1) carried, a spade in the bank, to Draynor (dig)",
@@ -347,7 +348,7 @@ public class GoldenRoutesTest
 		PlayerSnapshot emoteItemBanked = midBank.toBuilder().bank(merged(midBank.getBank(), ItemID.BRONZE_FULL_HELM)).build();
 		RequiredItems.Need helm = need("Bronze full helm", ItemRequirements.item(ItemID.BRONZE_FULL_HELM), true);
 		lines.add(line("emote item in the bank, STASH filled",
-			checked(input(mid, emote, PlanStart.teleportOnly(ANYWHERE), bankOn).required(required(RequiredItems.Stash.FILLED, helm))
+			checked(input(mid, emote, PlanStart.teleportOnly(ANYWHERE), bankOn).required(required(StashMemory.State.FILLED, helm))
 				.banked(emoteItemBanked).build())));
 
 		Set<Integer> capes = Set.of(ItemID.SKILLCAPE_MAX, ItemID.SKILLCAPE_MAX_WORN, ItemID.SKILLCAPE_CONSTRUCTION,
@@ -520,7 +521,7 @@ public class GoldenRoutesTest
 		return new RequiredItems.Need(name, requirement, stepItem, false);
 	}
 
-	private static RequiredItems required(RequiredItems.Stash stash, RequiredItems.Need... needs)
+	private static RequiredItems required(StashMemory.State stash, RequiredItems.Need... needs)
 	{
 		return RequiredItems.builder().needs(List.of(needs)).stash(stash).build();
 	}

@@ -118,6 +118,7 @@ public class ActWatcher
 		return withdrawTick >= since && withdrawTick > depositTick;
 	}
 
+	/** Only the ends this watcher sees as events; the guide checks the others against what the player carries. */
 	boolean isDone(SubStep.Done done, int since)
 	{
 		switch (done)
@@ -130,8 +131,17 @@ public class ActWatcher
 				return uriTick >= since;
 			case CHALLENGE_ITEM:
 				return challengeTick >= since || challengeCarried;
-			default:
+			case STEP_CHANGES:
+			case EQUIPPED:
+			case ITEM_CARRIED:
+			case ITEM_GONE:
+			case WAY_IN_WORN:
+			case GEAR_WORN:
+			case SLOTS_EMPTY:
+			case ITEM_HELD:
 				return false;
+			default:
+				throw new IllegalArgumentException("unhandled act end " + done);
 		}
 	}
 

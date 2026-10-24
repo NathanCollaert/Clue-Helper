@@ -64,12 +64,14 @@ public class HotColdView
 			case NONE:
 				title = kept + " spots fit, and no feel tells them apart";
 				break;
-			default:
+			case FEEL:
 				title = plan.getReadings() == 0 ? "No feels yet: " + kept + " spots" : kept + " spots fit your " + plan.getReadings() + feels(plan.getReadings());
 				Probe probe = plan.getChoice().getProbe();
 				lines.add(probe.getKind() == Probe.Kind.HERE ? "Feel where you stand:" : "Next feel:");
 				lines.addAll(branchLines(plan, in.getCoreSpots(), spots));
 				break;
+			default:
+				throw new IllegalArgumentException("unhandled action " + plan.getAction());
 		}
 		if (!in.isBeginner() && plan.getAction() == HotColdPlan.Action.FEEL && in.getHitpoints() <= MOST_FEEL_DAMAGE)
 		{
