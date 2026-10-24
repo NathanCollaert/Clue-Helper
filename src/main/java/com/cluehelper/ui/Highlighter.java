@@ -42,10 +42,13 @@ public class Highlighter
 	private final ItemManager itemManager;
 	private final Set<Integer> unmodelled = new HashSet<>();
 
+	private final ModelSilhouette silhouette;
+
 	@Inject
-	Highlighter(Client client, ModelOutlineRenderer outlines, ItemManager itemManager)
+	Highlighter(Client client, ModelOutlineRenderer outlines, ItemManager itemManager, ModelSilhouette silhouette)
 	{
 		this.client = client;
+		this.silhouette = silhouette;
 		this.outlines = outlines;
 		this.itemManager = itemManager;
 	}
@@ -65,7 +68,7 @@ public class Highlighter
 			if (leftClick)
 			{
 				graphics.setColor(Markers.ONE_CLICK_FILL);
-				graphics.fill(ModelSilhouette.of(client, object));
+				graphics.fill(silhouette.of(object));
 			}
 			outlines.drawOutline(object, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
 		}
@@ -86,7 +89,7 @@ public class Highlighter
 			if (leftClick)
 			{
 				graphics.setColor(Markers.ONE_CLICK_FILL);
-				graphics.fill(ModelSilhouette.of(client, npc));
+				graphics.fill(silhouette.of(npc));
 			}
 			outlines.drawOutline(npc, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
 		}

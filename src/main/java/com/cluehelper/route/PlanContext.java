@@ -39,22 +39,20 @@ final class PlanContext
 	static final int NOT_BANKED = 0;
 	static final int BANKED = 1;
 	/** Arrival to the next transport's first click: open 1 tick, leave 2. */
-	static final int BANK_STOP_HALF_TICKS = 6;
-	/** Shortest Path's Duration already runs from click to landing. */
-	static final int LEG_OVERHEAD_TICKS = 0;
+	private static final int BANK_STOP_HALF_TICKS = 6;
 	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
-	static final int PIN_HALF_TICKS = 8;
+	private static final int PIN_HALF_TICKS = 8;
 	/** Ranking only: Magic and Max cape changes are limited per day. */
 	static final int CAPE_USE_PENALTY_HALF_TICKS = 6;
 	/** Ranking only: the route leaves you on another book with no way back left today. */
-	static final int STRAND_PENALTY_HALF_TICKS = 60;
+	private static final int STRAND_PENALTY_HALF_TICKS = 60;
 	/** One more click when the withdraw list needs more slots than are free. */
 	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
-	static final int SWAP_DURATION_TICKS = 4;
-	static final int SWAP_MENU_TICKS = 1;
+	private static final int SWAP_DURATION_TICKS = 4;
+	private static final int SWAP_MENU_TICKS = 1;
 	/** The house scene loads about a tick after the transport's own landing. */
-	static final int HOUSE_LOAD_HALF_TICKS = 2;
+	private static final int HOUSE_LOAD_HALF_TICKS = 2;
 	private static final OriginClass[] ABSTRACT_CLASSES = {OriginClass.WILD0, OriginClass.WILD20, OriginClass.WILD30, OriginClass.POH};
 
 	final PlanInput in;
@@ -76,12 +74,12 @@ final class PlanContext
 	final Book startBook;
 	final Book homeBook;
 	final boolean startPending;
-	final boolean targetInWilderness;
+	private final boolean targetInWilderness;
 	/** Every target of the step, or of one of its stages, is in the Wilderness: avoiding it would leave no way there. */
 	final boolean onlyInWilderness;
 	final boolean avoidsWilderness;
 	/** The master scroll book is carried and stays out of the Wilderness, where the target is: a bank stop comes first. */
-	final boolean depositsBookFirst;
+	private final boolean depositsBookFirst;
 	final int bankStopHalfTicks;
 	final RequiredItems.Verdict required;
 	final int[] requiredWithdraw;
@@ -637,7 +635,7 @@ final class PlanContext
 			Teleport tele = new Teleport();
 			tele.row = row;
 			tele.node = row.getDestination() == null ? WalkTable.NO_NODE : nodeAt(row.getDestination());
-			tele.halfTicks = 2 * (row.getDuration() + row.getMenuTicks() + LEG_OVERHEAD_TICKS)
+			tele.halfTicks = 2 * (row.getDuration() + row.getMenuTicks())
 				+ (tele.node != WalkTable.NO_NODE && tele.node == pohNode ? HOUSE_LOAD_HALF_TICKS : 0);
 			tele.book = row.getRequirements().getBook();
 			tele.confidence = judged.getConfidence();

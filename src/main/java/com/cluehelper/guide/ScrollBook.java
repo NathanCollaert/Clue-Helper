@@ -10,7 +10,7 @@ import net.runelite.api.gameval.InterfaceID.Bookofscrolls;
 
 public final class ScrollBook
 {
-	static final String ROW_PREFIX = "Master scroll book: ";
+	private static final String ROW_PREFIX = "Master scroll book: ";
 	public static final int NO_WIDGET = -1;
 
 	/** The book's widgets per scroll: later scrolls don't sit in entry, picture, charges, name order. */

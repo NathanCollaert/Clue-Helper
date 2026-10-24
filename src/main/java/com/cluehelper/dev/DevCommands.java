@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class DevCommands
 {
-	static final String PREFIX = "ch-";
+	private static final String PREFIX = "ch-";
 
 	private final Map<String, Command> commands = new TreeMap<>();
 	private final Consumer<String> reply;
@@ -65,7 +65,7 @@ public class DevCommands
 
 	private static final class Command
 	{
-		final String usage;
+		private final String usage;
 		final Consumer<String[]> action;
 
 		Command(String usage, Consumer<String[]> action)

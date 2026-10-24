@@ -19,10 +19,10 @@ import lombok.Value;
 @Value
 public class HotColdView
 {
-	static final int MOST_BRANCHES = 3;
-	static final int NAMED_SPOTS = 2;
+	private static final int MOST_BRANCHES = 3;
+	private static final int NAMED_SPOTS = 2;
 	/** The most a master feel dealt in 13 recorded feels. */
-	static final int MOST_FEEL_DAMAGE = 8;
+	private static final int MOST_FEEL_DAMAGE = 8;
 	private static final int NAMED_AREAS = 2;
 
 	String title;
@@ -108,7 +108,7 @@ public class HotColdView
 	}
 
 	/** Each core candidate goes to the reading it most likely gives; hotter readings first. */
-	static List<String> branchLines(HotColdPlan plan, Set<String> coreSpots, Map<String, Spot> spots)
+	private static List<String> branchLines(HotColdPlan plan, Set<String> coreSpots, Map<String, Spot> spots)
 	{
 		List<ProbePlanner.Branch> branches = plan.branches();
 		Map<ProbePlanner.Branch, List<String>> grouped = new LinkedHashMap<>();

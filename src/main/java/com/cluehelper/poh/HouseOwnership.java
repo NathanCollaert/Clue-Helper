@@ -12,7 +12,7 @@ import lombok.Getter;
 public final class HouseOwnership
 {
 	/** Far longer than a click-to-load (1.6–5.9 s), far shorter than any other way into a house. */
-	static final long ENTRY_TTL_MILLIS = 15_000;
+	private static final long ENTRY_TTL_MILLIS = 15_000;
 
 	public enum Ownership
 	{
@@ -58,7 +58,7 @@ public final class HouseOwnership
 		}
 	}
 
-	static Entry classify(String option, String target)
+	private static Entry classify(String option, String target)
 	{
 		String op = strip(option).toLowerCase(Locale.ROOT);
 		String on = strip(target).toLowerCase(Locale.ROOT);

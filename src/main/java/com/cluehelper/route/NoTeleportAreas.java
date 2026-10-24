@@ -12,7 +12,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class NoTeleportAreas
 {
 	public static final NoTeleportAreas NONE = new NoTeleportAreas(List.of());
-	static final String RESOURCE = "no-teleport.tsv";
+	private static final String RESOURCE = "no-teleport.tsv";
 	private static final int ANY_PLANE = -1;
 
 	private final List<int[]> boxes;

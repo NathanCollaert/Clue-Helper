@@ -19,12 +19,12 @@ public final class ProbePlanner
 	/** A feel doesn't stop movement; the click and the chat line take about a tick. */
 	public static final int FEEL_TICKS = 1;
 	/** Below this a probe can't tell any two spots apart. */
-	static final double MIN_BITS = 1e-6;
+	private static final double MIN_BITS = 1e-6;
 	private static final int COMPARISONS = Comparison.values().length + 1;
 	private static final int OUTCOMES = Band.values().length * COMPARISONS;
 	private static final double LOG2 = Math.log(2);
 	/** With this few spots left the next feel can end the solve, so the trip from the probe to the dig counts too. */
-	static final int ONWARD_SPOTS = 3;
+	private static final int ONWARD_SPOTS = 3;
 
 	private ProbePlanner()
 	{

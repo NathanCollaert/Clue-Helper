@@ -13,7 +13,7 @@ import java.util.Map;
 public final class FeelLogs
 {
 	/** A beginner and a master step held at once, each possibly with a League Tutor twin. */
-	static final int MOST_STEPS = 4;
+	private static final int MOST_STEPS = 4;
 
 	private Map<String, List<Reading>> steps = new LinkedHashMap<>();
 

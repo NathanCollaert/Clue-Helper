@@ -34,12 +34,12 @@ import net.runelite.client.util.Text;
 @Singleton
 public class MenuLines
 {
-	static final int LIST_TITLE = 219;
-	static final int LIST_TITLE_ALT = 9142;
-	static final int LIST_LINE = 218;
-	static final int LIST_LINE_ALT = 9143;
-	static final int NEXUS_LINE = 2675;
-	static final int BOX_LINE = 1688;
+	private static final int LIST_TITLE = 219;
+	private static final int LIST_TITLE_ALT = 9142;
+	private static final int LIST_LINE = 218;
+	private static final int LIST_LINE_ALT = 9143;
+	private static final int NEXUS_LINE = 2675;
+	private static final int BOX_LINE = 1688;
 	static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int LIST_GROUP = 187;
 	private static final Pattern MINIGAME_PLACE_NUMBER = Pattern.compile("^\\d+\\. ");

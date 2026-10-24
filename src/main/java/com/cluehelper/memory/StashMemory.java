@@ -31,10 +31,10 @@ public class StashMemory
 	}
 
 	static final String KEY = "stash";
-	static final String WITHDRAWN = "You withdraw your items from the STASH unit.";
-	static final String DEPOSITED = "You deposit your items into the STASH unit.";
+	private static final String WITHDRAWN = "You withdraw your items from the STASH unit.";
+	private static final String DEPOSITED = "You deposit your items into the STASH unit.";
 	/** A Search line lands 0–3 ticks after the click, or 8 when the first Search of a session asks for the PIN. */
-	static final int SEARCH_LINE_TICKS = 8;
+	private static final int SEARCH_LINE_TICKS = 8;
 	private static final String SEARCH = "Search";
 	private static final int CORE_STASH_SCRIPT = 1479;
 	private static final int BUILT = 1;

@@ -15,7 +15,7 @@ import net.runelite.client.events.ConfigChanged;
 @Singleton
 public class GrownPatches
 {
-	public static final String FARMING_GUILD_REDWOOD = "Farming Guild redwood";
+	private static final String FARMING_GUILD_REDWOOD = "Farming Guild redwood";
 	private static final String TIME_TRACKING = "timetracking";
 	private static final String REDWOOD_KEY = "4922." + VarbitID.FARMING_TRANSMIT_I;
 	private static final int HARVESTABLE = 18;
@@ -45,7 +45,7 @@ public class GrownPatches
 	}
 
 	/** Core's redwood patch values: chopping, or grown with its health check due first. */
-	static boolean isGrownRedwood(int value)
+	private static boolean isGrownRedwood(int value)
 	{
 		return value == HARVESTABLE || value == CHECK_HEALTH || value >= REGROWN_FIRST && value <= REGROWN_LAST;
 	}

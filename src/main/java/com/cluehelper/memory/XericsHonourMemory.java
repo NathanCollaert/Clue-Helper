@@ -25,10 +25,10 @@ public class XericsHonourMemory
 {
 	static final String KEY = "xericsHonour";
 	/** The catalog's {@code UNLOCK_XERICS_HONOUR} token. */
-	public static final String UNLOCK = "XERICS_HONOUR";
+	private static final String UNLOCK = "XERICS_HONOUR";
 	/** The landing of the talisman's and the mounted talisman's Honour teleports in items.tsv and poh.tsv. */
 	static final WorldPoint LANDING = new WorldPoint(1254, 3560, 0);
-	static final String TABLET_USED = "As the talisman and tablet are held together, a surge of power connects the two.";
+	private static final String TABLET_USED = "As the talisman and tablet are held together, a surge of power connects the two.";
 	/** The real landing is 3 tiles north of the catalog's (1254 3563); a little more allows for a spread. */
 	private static final int LANDING_TILES = 5;
 

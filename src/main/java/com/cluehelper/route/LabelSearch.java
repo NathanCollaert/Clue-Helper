@@ -840,7 +840,7 @@ final class LabelSearch
 		return book == Book.ARCEUUS ? FIRST_PENDING + 2 : FIRST_PENDING + book.ordinal();
 	}
 
-	static Book pendingBook(int k)
+	private static Book pendingBook(int k)
 	{
 		return k == FIRST_PENDING + 2 ? Book.ARCEUUS : Book.values()[k - FIRST_PENDING];
 	}

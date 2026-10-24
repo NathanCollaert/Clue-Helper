@@ -12,7 +12,7 @@ import net.runelite.api.widgets.Widget;
 @Singleton
 public class QuetzalIcons
 {
-	static final int MOST_PIXELS_OFF = 24;
+	private static final int MOST_PIXELS_OFF = 24;
 
 	private final Client client;
 	private Map<Integer, int[]> positions;

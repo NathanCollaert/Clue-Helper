@@ -15,7 +15,6 @@ import com.cluehelper.player.Spell;
 import com.cluehelper.route.Exit;
 import com.cluehelper.route.GearPicker;
 import com.cluehelper.route.GearRequirement;
-import com.cluehelper.route.Leg;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.RequiredItems;
@@ -23,7 +22,6 @@ import com.cluehelper.route.StepNeeds;
 import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneBfs;
-import com.cluehelper.route.WalkData;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.Stage;
@@ -100,7 +98,6 @@ public class StepGuide
 	private static final String SEARCH_OPTION = "Search";
 	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
 	private static final String USE_OPTION = "Use";
-	private static final int MAX_STACK = Integer.MAX_VALUE / 2;
 
 	private static final int PARAM_SPELL_WIDGET = 596;
 	private static final String CAPE_LIMIT_TEXT = "five times per day";
@@ -132,9 +129,9 @@ public class StepGuide
 	 * Core's tile can be on another floor than its NPC (Donovan stands upstairs, his tile is on the ground floor), so a
 	 * reached act stays while the player is this close to a target on any plane.
 	 */
-	static final int STAY_AT_ACT_TILES = 20;
+	private static final int STAY_AT_ACT_TILES = 20;
 	/** In scene-walk tiles: 20 ticks of running. */
-	static final int ARRIVED_WALK_TILES = 40;
+	private static final int ARRIVED_WALK_TILES = 40;
 
 	private final Client client;
 	private final ClueLink clueLink;
@@ -145,6 +142,8 @@ public class StepGuide
 	private final AvailabilityService availability;
 	private final ActWatcher actWatcher;
 	private final StepNeeds stepNeeds;
+	private final SubSteps subSteps;
+	private final SceneObjects sceneObjects;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private static final String TALK_TO = "Talk to ";
 	private static final List<String> BOXES = List.of("puzzle box", "light box");
@@ -180,8 +179,10 @@ public class StepGuide
 	@Inject
 	StepGuide(Client client, ClueLink clueLink, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
 		AvailabilityService availability, SwapperClicks swapperClicks,
-		ActWatcher actWatcher, StepNeeds stepNeeds)
+		ActWatcher actWatcher, StepNeeds stepNeeds, SubSteps subSteps, SceneObjects sceneObjects)
 	{
+		this.subSteps = subSteps;
+		this.sceneObjects = sceneObjects;
 		this.actWatcher = actWatcher;
 		this.deposit = new DepositReminder(actWatcher);
 		this.stepNeeds = stepNeeds;
@@ -246,7 +247,7 @@ public class StepGuide
 		return index + 1 < steps.size() ? steps.get(index + 1) : null;
 	}
 
-	public boolean isBankStop()
+	private boolean isBankStop()
 	{
 		SubStep current = getCurrent();
 		SubStep next = getNext();
@@ -602,8 +603,8 @@ public class StepGuide
 	/** The objects and NPCs found now, with the ones a left click uses filled. */
 	private SceneHighlights searchScene(SubStep current, MenuTarget target, boolean bank, int tick)
 	{
-		List<TileObject> objects = bank ? SceneObjects.banksNear(client, current.getWaypoint(), BANK_TILES) : SceneObjects.find(client, target.getObjectIds());
-		List<NPC> npcs = bank ? SceneObjects.bankersNear(client, current.getWaypoint(), BANK_TILES) : npcsFor(target);
+		List<TileObject> objects = bank ? sceneObjects.banksNear(current.getWaypoint(), BANK_TILES) : sceneObjects.find(target.getObjectIds());
+		List<NPC> npcs = bank ? sceneObjects.bankersNear(current.getWaypoint(), BANK_TILES) : npcsFor(target);
 		if (!bank)
 		{
 			colourCrewMenus(target, npcs);
@@ -622,14 +623,14 @@ public class StepGuide
 	 */
 	private List<NPC> npcsFor(MenuTarget target)
 	{
-		List<NPC> named = SceneObjects.npcs(client, target.getNpcIds());
+		List<NPC> named = sceneObjects.npcs(target.getNpcIds());
 		WorldPoint boarding = isApproach() ? getNext().getWaypoint() : getCurrent().getWaypoint();
 		if (!named.isEmpty() || target.getNpcIds().isEmpty() || target.getPath().isEmpty() || boarding == null)
 		{
 			return named;
 		}
 		String name = client.getNpcDefinition(target.getNpcIds().iterator().next()).getName();
-		return SceneObjects.npcsNear(client, boarding, RIDE_NPC_TILES, target.getPath().get(0)).stream()
+		return sceneObjects.npcsNear(boarding, RIDE_NPC_TILES, target.getPath().get(0)).stream()
 			.filter(npc -> npc.getName() != null && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -664,7 +665,7 @@ public class StepGuide
 			rest.add(SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue").goal(step.getTargets().get(0))
 				.radius(SubSteps.ARRIVE_TILES).build());
 		}
-		rest.addAll(Acts.of(step, takeFromStash(step)));
+		rest.addAll(subSteps.acts(step));
 		return SubSteps.withWayInEquipped(rest, step.getData());
 	}
 
@@ -862,8 +863,7 @@ public class StepGuide
 		routeStep = step;
 		boolean atStep = step != null && (stillAtAct(step, tile) || arrived(step));
 		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
-			: SubSteps.of(committed, step, this::withdrawLine, house(), this::exitOf, takeFromStash(step),
-				routes.keepsScrollBookOutOfWilderness(), carriesItemNamed(SCROLL_BOOK_NAME));
+			: subSteps.of(committed, step);
 		steps = deposit.before(base, tile);
 		index = 0;
 		jumpedThisSubStep = false;
@@ -951,22 +951,7 @@ public class StepGuide
 		return snapshot == null ? Set.of() : snapshot.getWorn().keySet();
 	}
 
-	private Map<Integer, Integer> carriedItems()
-	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot == null ? Map.of() : snapshot.carriedItems();
-	}
 
-	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
-	private boolean takeFromStash(Step step)
-	{
-		if (step == null || step.getData().getStash() == null || step.getRequirements() == null)
-		{
-			return false;
-		}
-		return stepNeeds.of(step).getStash() == StashMemory.State.FILLED
-			&& !step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(carriedItems()));
-	}
 
 	private boolean equipped(Step step)
 	{
@@ -975,19 +960,6 @@ public class StepGuide
 			&& step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(snapshot.getWorn()));
 	}
 
-	/** The exit a start leg leaves the planned scene by, or null for any other walk. */
-	private Exit exitOf(Leg leg)
-	{
-		PlanStart start = routes.getStart();
-		WalkData.Loaded walk = routes.getWalk();
-		if (start == null || walk == null || start.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(start.getTile())
-			|| start.getScene().getScene().contains(leg.getTo()))
-		{
-			return null;
-		}
-		SceneBfs.ExitReach reach = start.getScene().exitTo(leg.getTo());
-		return reach == null ? null : walk.getTable().exit(reach.getOrigin(), reach.getDestination());
-	}
 
 	private boolean advance(WorldPoint tile)
 	{
@@ -1052,7 +1024,7 @@ public class StepGuide
 	private List<SubStep> actsHere(Step step, WorldPoint tile)
 	{
 		SubStep stageAct = actHere(step, tile);
-		return stageAct.getStage() != null ? SubSteps.stageActs(stageAct.getStage()) : Acts.of(step, takeFromStash(step));
+		return stageAct.getStage() != null ? SubSteps.stageActs(stageAct.getStage()) : subSteps.acts(step);
 	}
 
 	/** At a step of several places, the act of the stage nearest to the player. */
@@ -1166,11 +1138,11 @@ public class StepGuide
 			case STASH_DEPOSITED:
 				return deposit.getAt() == null || actWatcher.isDone(act.getDone(), stepSince);
 			case STASH_WITHDRAWN:
-				return actWatcher.isDone(act.getDone(), stepSince) || !takeFromStash(routeStep);
+				return actWatcher.isDone(act.getDone(), stepSince) || !subSteps.takeFromStash(routeStep);
 			case ITEM_CARRIED:
-				return carriesItemNamed(act.getCarriedWhenDone());
+				return player.carriesItemNamed(act.getCarriedWhenDone());
 			case ITEM_GONE:
-				return !carriesItemNamed(act.getActItemNamed());
+				return !player.carriesItemNamed(act.getActItemNamed());
 			case WAY_IN_WORN:
 				return wearsWayInGear(routeStep);
 			case GEAR_WORN:
@@ -1553,10 +1525,6 @@ public class StepGuide
 			.allMatch(need -> need.getIds().stream().anyMatch(on::contains));
 	}
 
-	private boolean carriesItemNamed(String nameStart)
-	{
-		return inventoryIds().stream().anyMatch(id -> client.getItemDefinition(id).getName().toLowerCase().startsWith(nameStart));
-	}
 
 	/** The carried item the act names, refreshed every tick as it arrives (the puzzle box, after the talk). */
 	private Highlights withNamedItems(Highlights shown)
@@ -1732,68 +1700,9 @@ public class StepGuide
 			.fillItems(wanted.stream().filter(this::wearsOnLeftClick).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
-	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
-	private String withdrawLine(int itemId)
-	{
-		String name = client.getItemDefinition(itemId).getName();
-		if (bankMemory.onlyInBankedKit(itemId))
-		{
-			return client.getItemDefinition(ItemID.HUNTSMANS_KIT).getName() + " (" + name + " inside)";
-		}
-		int more = stillToTake(itemId);
-		return more > 1 ? name + " x" + more : name;
-	}
 
-	/** The fewest of the item that, with what is carried, meet every step need it counts towards. */
-	private int stillToTake(int itemId)
-	{
-		Map<Integer, Integer> carried = carriedItems();
-		int most = 0;
-		for (RequiredItems.Need need : routeStep == null ? List.<RequiredItems.Need>of() : stepNeeds.of(routeStep).getNeeds())
-		{
-			ItemRequirement requirement = need.getRequirement();
-			if (requirement.fulfilledBy(itemId) && !requirement.fulfilledBy(withMore(carried, itemId, 0)))
-			{
-				most = Math.max(most, fewestMeeting(requirement, carried, itemId));
-			}
-		}
-		return most;
-	}
 
-	/** Doubles, then halves back: needs run from 1 to thousands (coins). 0 when this item alone can't meet it (an outfit). */
-	private static int fewestMeeting(ItemRequirement requirement, Map<Integer, Integer> carried, int itemId)
-	{
-		int high = 1;
-		while (high < MAX_STACK && !requirement.fulfilledBy(withMore(carried, itemId, high)))
-		{
-			high *= 2;
-		}
-		if (high >= MAX_STACK)
-		{
-			return 0;
-		}
-		int low = high / 2;
-		while (low + 1 < high)
-		{
-			int middle = (low + high) / 2;
-			if (requirement.fulfilledBy(withMore(carried, itemId, middle)))
-			{
-				high = middle;
-			}
-			else
-			{
-				low = middle;
-			}
-		}
-		return high;
-	}
 
-	private static Item[] withMore(Map<Integer, Integer> carried, int itemId, int more)
-	{
-		Map<Integer, Integer> items = new HashMap<>(carried);
-		items.merge(itemId, more, Integer::sum);
-		return PlayerSnapshot.items(items);
-	}
 
 	/** A task's item does the act on a left click when it is put on or used on another (a tinderbox, a herb). */
 	private boolean actsOnLeftClick(int itemId)
@@ -1898,7 +1807,7 @@ public class StepGuide
 		return swapped != null ? swapped : OneClick.defaultClick(definition);
 	}
 
-	static MenuTarget houseTarget(CatalogRow row)
+	private static MenuTarget houseTarget(CatalogRow row)
 	{
 		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objectsOf(row));
 		String menu = row.getMenu();
@@ -1935,7 +1844,6 @@ public class StepGuide
 	/** Part way in, the line leads on to where the way ends when that is this close on this floor (the cavern, not the pyramid's top). */
 	private static final int PART_WAY_LINE_TILES = 60;
 	private static final String EQUIP_TEXT = "Equip:";
-	private static final String SCROLL_BOOK_NAME = "master scroll book";
 	private static final String SET_DESTINATION = "Set Destination";
 	private static final String TELEPORT_TO_DESTINATION = "Teleport to Destination";
 
@@ -1991,7 +1899,7 @@ public class StepGuide
 			&& optionPath(current.getRow().getName()).isEmpty();
 	}
 
-	static List<String> optionPath(String rowName)
+	private static List<String> optionPath(String rowName)
 	{
 		String[] parts = rowName.split(": ");
 		return parts.length < 2 ? List.of() : List.of(parts).subList(1, parts.length);
@@ -2009,11 +1917,6 @@ public class StepGuide
 		return name.charAt(0) + name.substring(1).toLowerCase();
 	}
 
-	private HouseState house()
-	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot == null ? HouseState.NONE : snapshot.getHouse();
-	}
 
 	private Book currentBook()
 	{
@@ -2080,7 +1983,7 @@ public class StepGuide
 		});
 	}
 
-	static String spellName(String rowName)
+	private static String spellName(String rowName)
 	{
 		String name = rowName;
 		int colon = name.indexOf(':');

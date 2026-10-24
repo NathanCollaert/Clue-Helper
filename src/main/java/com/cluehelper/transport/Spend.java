@@ -13,7 +13,7 @@ public class Spend
 		RUNES, ITEM, CHARGE, COOLDOWN, DAILY, CAPE_USE
 	}
 
-	public static final int NO_VAR = -1;
+	private static final int NO_VAR = -1;
 	private static final String NONE = "none";
 
 	Kind kind;

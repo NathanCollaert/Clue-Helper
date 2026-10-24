@@ -30,10 +30,10 @@ import net.runelite.api.gameval.VarbitID;
 @Singleton
 public class BankMemory
 {
-	static final String BANK_KEY = "bank";
-	static final String GROUP_STORAGE_KEY = "groupStorage";
-	static final String PIN_KEY = "bankPin";
-	static final String KIT_KEY = "huntsmansKit";
+	private static final String BANK_KEY = "bank";
+	private static final String GROUP_STORAGE_KEY = "groupStorage";
+	private static final String PIN_KEY = "bankPin";
+	private static final String KIT_KEY = "huntsmansKit";
 	private static final int NO_PLACEHOLDER = -1;
 	private static final int NO_NOTE = -1;
 	private static final String DEPOSIT = "Deposit";

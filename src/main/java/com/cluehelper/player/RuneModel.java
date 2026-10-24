@@ -122,7 +122,7 @@ public final class RuneModel
 		return payersByRune.containsKey(itemId);
 	}
 
-	public String runeName(int rune)
+	private String runeName(int rune)
 	{
 		return runeNames.getOrDefault(rune, "rune " + rune);
 	}

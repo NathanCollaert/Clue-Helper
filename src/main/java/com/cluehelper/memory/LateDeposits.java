@@ -16,7 +16,7 @@ final class LateDeposits
 	 * The bank's update comes in the same server cycle as the inventory's, before the next game tick; BankMemory runs
 	 * before the planner on that tick, so the plan never sees the item missing.
 	 */
-	static final int CONFIRM_TICKS = 1;
+	private static final int CONFIRM_TICKS = 1;
 	private static final int NEVER = Integer.MIN_VALUE;
 
 	private Map<Integer, Integer> carried = Map.of();

@@ -33,7 +33,7 @@ public final class PositionRules
 	}
 
 	/** Farther than running moves in a tick: a teleport, a ladder, a boat. */
-	public static final int JUMP_TILES = 4;
+	private static final int JUMP_TILES = 4;
 
 	/** Whether getting from {@code from} to {@code to} within a tick took a teleport, a ladder or a boat; false while either is unknown. */
 	public static boolean teleported(WorldPoint from, WorldPoint to)

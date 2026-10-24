@@ -80,11 +80,14 @@ public class WaypointOverlay extends Overlay
 	private Map<TileObject, String> pathObjects = Map.of();
 	private int pathObjectsTick = -1;
 
+	private final PathObjects paths;
+
 	@Inject
 	WaypointOverlay(Client client, StepGuide guide, RoutePlanner routes, ClueHelperConfig config, Highlighter highlighter,
-		ClueLink clueLink, SceneDoors doors)
+		ClueLink clueLink, SceneDoors doors, PathObjects paths)
 	{
 		this.clueLink = clueLink;
+		this.paths = paths;
 		this.doors = doors;
 		this.client = client;
 		this.guide = guide;
@@ -485,7 +488,7 @@ public class WaypointOverlay extends Overlay
 		if (moved || pathObjectsTick != client.getTickCount())
 		{
 			pathObjectsTick = client.getTickCount();
-			pathObjects = PathObjects.along(client, view, table, scene, doors, ahead);
+			pathObjects = paths.along(view, table, scene, ahead);
 		}
 		drawLine(graphics, view, toUseFirst(view, scene, ahead));
 	}
@@ -590,7 +593,7 @@ public class WaypointOverlay extends Overlay
 			return new Goal(Kind.APPROACH, null, npc, false);
 		}
 
-		static Goal toObject()
+		private static Goal toObject()
 		{
 			return new Goal(Kind.TO_OBJECT, null, null, false);
 		}

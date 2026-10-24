@@ -3,6 +3,8 @@ package com.cluehelper.guide;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
@@ -14,17 +16,23 @@ import net.runelite.api.TileObject;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
+/** Client thread only. */
+@Singleton
 final class SceneObjects
 {
 	private static final String BANK = "Bank";
 	/** Some bank chests (the Crafting Guild's) open with Use. */
 	private static final String USE = "Use";
 
-	private SceneObjects()
+	private final Client client;
+
+	@Inject
+	SceneObjects(Client client)
 	{
+		this.client = client;
 	}
 
-	static List<TileObject> banksNear(Client client, WorldPoint at, int radius)
+	List<TileObject> banksNear(WorldPoint at, int radius)
 	{
 		List<TileObject> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
@@ -53,13 +61,13 @@ final class SceneObjects
 		return found;
 	}
 
-	static List<NPC> bankersNear(Client client, WorldPoint at, int radius)
+	List<NPC> bankersNear(WorldPoint at, int radius)
 	{
-		return npcsNear(client, at, radius, BANK);
+		return npcsNear(at, radius, BANK);
 	}
 
 	/** The NPCs within {@code radius} of {@code at} that have {@code option}. */
-	static List<NPC> npcsNear(Client client, WorldPoint at, int radius, String option)
+	List<NPC> npcsNear(WorldPoint at, int radius, String option)
 	{
 		List<NPC> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
@@ -78,7 +86,7 @@ final class SceneObjects
 		return found;
 	}
 
-	static List<NPC> npcs(Client client, Set<Integer> ids)
+	List<NPC> npcs(Set<Integer> ids)
 	{
 		List<NPC> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
@@ -130,7 +138,7 @@ final class SceneObjects
 	}
 
 	/** A house entry lands on one floor and moves up the next tick, so every floor is searched. */
-	static List<TileObject> find(Client client, Set<Integer> ids)
+	List<TileObject> find(Set<Integer> ids)
 	{
 		List<TileObject> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();

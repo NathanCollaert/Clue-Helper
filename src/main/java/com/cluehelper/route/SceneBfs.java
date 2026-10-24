@@ -37,7 +37,7 @@ public final class SceneBfs
 	private static final int MAX_TILES_BESIDE_WAYPOINT = 2;
 	private static final int NO_DIRECTION = -1;
 	/** Opening a door on the way: the click and the stop it costs, in tiles of running. */
-	static final int DOOR_TILES = 3;
+	private static final int DOOR_TILES = 3;
 	private static final int[] FROM_SIDES = {W, E, S, N, W | S, E | S, W | N, E | N};
 	private static final int[] TO_SIDES = {E, W, N, S, E | N, W | N, E | S, W | S};
 
@@ -603,7 +603,7 @@ public final class SceneBfs
 	}
 
 	/** The game's movement rule; {@code d} indexes DX and DY. */
-	static boolean canMove(int[][] f, int x, int y, int d)
+	private static boolean canMove(int[][] f, int x, int y, int d)
 	{
 		switch (d)
 		{

@@ -8,7 +8,7 @@ import java.util.Locale;
  */
 public final class ClueFacts
 {
-	static final int NO_ITEM = -1;
+	private static final int NO_ITEM = -1;
 
 	private String type;
 	private int itemId = NO_ITEM;

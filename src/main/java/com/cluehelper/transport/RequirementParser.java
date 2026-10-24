@@ -29,7 +29,7 @@ public final class RequirementParser
 	public static final String MEMBERS = "Members";
 	public static final String CONSUMABLE = "Consumable";
 	public static final String HOUSE = "House";
-	public static final String PLANTED = "Planted";
+	private static final String PLANTED = "Planted";
 
 	private static final int MAX_SKILL_LEVEL = 99;
 	private static final int MAX_COMBAT_LEVEL = 126;

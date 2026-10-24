@@ -11,7 +11,7 @@ import lombok.Value;
 public class HouseState
 {
 	public static final HouseState NONE = HouseState.builder().build();
-	public static final int UNLEARNED_WALK_TICKS = 4;
+	private static final int UNLEARNED_WALK_TICKS = 4;
 	/** Base ids of the three nexus tiers and the Leagues one. */
 	public static final List<Integer> NEXUS_OBJECTS = List.of(33408, 33409, 33410, 56075);
 

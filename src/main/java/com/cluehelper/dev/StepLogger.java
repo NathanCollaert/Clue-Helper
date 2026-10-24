@@ -14,7 +14,7 @@ public class StepLogger
 {
 	static final String KEY = "devStepLog";
 	/** Over 150 steps per tier many times over, while keeping the profile's config small. */
-	static final int MAX_ENTRIES = 5000;
+	private static final int MAX_ENTRIES = 5000;
 
 	private final MemorySlot<StepLog> slot;
 	private volatile boolean enabled;

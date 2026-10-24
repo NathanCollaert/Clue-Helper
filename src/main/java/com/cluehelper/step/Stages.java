@@ -22,7 +22,7 @@ import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 public final class Stages
 {
 	/** Key NPCs wander over a camp, a floor or a field. */
-	static final int KEY_AREA_TILES = 15;
+	private static final int KEY_AREA_TILES = 15;
 	private static final String ANYWHERE = "Anywhere, with what it needs";
 	private static final Pattern ACTIVATE_PRAYER = Pattern.compile("activate the (\\w+) prayer\\.?");
 

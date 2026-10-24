@@ -25,14 +25,14 @@ public final class CatalogLoader
 	static final String NAME = "Display info";
 	static final String ORIGIN = "Origin";
 	static final String DESTINATION = "Destination";
-	static final String CODE = "Code";
+	private static final String CODE = "Code";
 	static final String DURATION = "Duration";
 	static final String MENU_TICKS = "Menu ticks";
 	static final String SPENDS = "Spends";
-	static final String KIND = "Kind";
+	private static final String KIND = "Kind";
 	static final String WHERE = "Where";
-	static final String FROM = "From";
-	static final String TO = "To";
+	private static final String FROM = "From";
+	private static final String TO = "To";
 	static final String MENU = "Menu";
 	static final String OBJECT = "menuOption menuTarget objectID";
 

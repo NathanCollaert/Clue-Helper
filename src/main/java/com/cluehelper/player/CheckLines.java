@@ -95,7 +95,7 @@ public class CheckLines
 	public static final class Checked
 	{
 		public int charges;
-		public long checkedAt;
+		private long checkedAt;
 	}
 
 	static final class Remembered

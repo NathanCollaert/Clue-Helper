@@ -6,7 +6,7 @@ import lombok.Value;
 @Value
 public class Bank
 {
-	public static final String KIND_DEPOSIT = "deposit";
+	private static final String KIND_DEPOSIT = "deposit";
 
 	String name;
 	String kind;

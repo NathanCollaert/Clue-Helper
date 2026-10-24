@@ -170,7 +170,7 @@ final class Acts
 	 * Core's tile can be on another floor than the NPC (Donovan upstairs, the cache's tile on floor 1): hand data says
 	 * so, else the cache's plane does.
 	 */
-	static String withFloor(Step step, String detail)
+	private static String withFloor(Step step, String detail)
 	{
 		String floor = step.getData().getFloor();
 		if (floor == null && !step.getTargets().isEmpty())

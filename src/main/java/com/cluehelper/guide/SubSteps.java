@@ -1,14 +1,24 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.memory.BankMemory;
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.HouseState;
 import com.cluehelper.player.ItemUse;
+import com.cluehelper.player.PlayerModel;
+import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.Exit;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.route.BookScrolls;
 import com.cluehelper.route.Leg;
+import com.cluehelper.route.PlanStart;
+import com.cluehelper.route.RequiredItems;
 import com.cluehelper.route.Route;
+import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.StepNeeds;
+import com.cluehelper.route.WalkData;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.SpadeNeed;
@@ -21,6 +31,7 @@ import com.cluehelper.transport.Category;
 import com.cluehelper.transport.SpellbookChange;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +41,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import net.runelite.api.Client;
+import net.runelite.api.Item;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
+@Singleton
 public final class SubSteps
 {
 	public static final int ARRIVE_TILES = 3;
@@ -46,7 +63,7 @@ public final class SubSteps
 	/** A wandering NPC: being in its area is enough. */
 	static final int AREA_ARRIVE_TILES = 15;
 	/** A feel's information depends on its exact tile, so the walk ends on the marker. */
-	static final int PROBE_ARRIVE_TILES = 0;
+	private static final int PROBE_ARRIVE_TILES = 0;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
 	private static final String TALK_TO = "Talk to";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
@@ -68,27 +85,139 @@ public final class SubSteps
 		"Astral altar", "Aggressive suqahs nearby",
 		"Tyss", "Right-click Tyss: Spellbook");
 
-	private SubSteps()
+	private static final int MAX_STACK = Integer.MAX_VALUE / 2;
+	private static final String SCROLL_BOOK_NAME = "master scroll book";
+
+	private final Client client;
+	private final PlayerModel player;
+	private final BankMemory bankMemory;
+	private final StepNeeds stepNeeds;
+	private final RoutePlanner routes;
+
+	@Inject
+	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes)
 	{
+		this.client = client;
+		this.player = player;
+		this.bankMemory = bankMemory;
+		this.stepNeeds = stepNeeds;
+		this.routes = routes;
 	}
 
-	/**
-	 * Client thread only, for the {@code itemNames} lookups. {@code house} gives the nexus hotkeys, which follow the player's own slot order; {@code exits} names the exit a
-	 * start leg leaves the scene by, or null; {@code takeFromStash} when the step's items wait in its STASH unit.
-	 */
-	public static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
-		Function<Leg, Exit> exits, boolean takeFromStash, boolean bookStaysOut, boolean carriesBook)
+	/** Client thread only. The route's legs as sub-steps, then the step's own acts. */
+	public List<SubStep> of(Route route, Step step)
 	{
-		List<SubStep> steps = withWanderNote(withGearOnArrival(withWayInEquipped(of(route, step, itemNames, house, exits, takeFromStash),
-			step.getData())), step.getData());
+		boolean takeFromStash = takeFromStash(step);
+		List<SubStep> legs = new RouteSteps(route, step, id -> withdrawLine(step, id), house(), takeFromStash).build(this::exitOf);
+		List<SubStep> steps = withWanderNote(withGearOnArrival(withWayInEquipped(legs, step.getData())), step.getData());
 		boolean wildernessTarget = step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0);
-		return bookStaysOut ? withBookBanked(steps, carriesBook, wildernessTarget) : steps;
+		return routes.keepsScrollBookOutOfWilderness() ? withBookBanked(steps, player.carriesItemNamed(SCROLL_BOOK_NAME), wildernessTarget) : steps;
 	}
 
-	private static List<SubStep> of(Route route, Step step, IntFunction<String> itemNames, HouseState house,
-		Function<Leg, Exit> exits, boolean takeFromStash)
+	/** What to do at the step once there, its STASH items taken out first when they wait there. */
+	public List<SubStep> acts(Step step)
 	{
-		return new RouteSteps(route, step, itemNames, house, takeFromStash).build(exits);
+		return Acts.of(step, takeFromStash(step));
+	}
+
+	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
+	public boolean takeFromStash(Step step)
+	{
+		if (step == null || step.getData().getStash() == null || step.getRequirements() == null)
+		{
+			return false;
+		}
+		return stepNeeds.of(step).getStash() == StashMemory.State.FILLED
+			&& !step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(carriedItems()));
+	}
+
+	private HouseState house()
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? HouseState.NONE : snapshot.getHouse();
+	}
+
+	private Map<Integer, Integer> carriedItems()
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		return snapshot == null ? Map.of() : snapshot.carriedItems();
+	}
+
+	/** The exit a start leg leaves the planned scene by, or null for any other walk. */
+	private Exit exitOf(Leg leg)
+	{
+		PlanStart start = routes.getStart();
+		WalkData.Loaded walk = routes.getWalk();
+		if (start == null || walk == null || start.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(start.getTile())
+			|| start.getScene().getScene().contains(leg.getTo()))
+		{
+			return null;
+		}
+		SceneBfs.ExitReach reach = start.getScene().exitTo(leg.getTo());
+		return reach == null ? null : walk.getTable().exit(reach.getOrigin(), reach.getDestination());
+	}
+
+	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
+	private String withdrawLine(Step step, int itemId)
+	{
+		String name = client.getItemDefinition(itemId).getName();
+		if (bankMemory.onlyInBankedKit(itemId))
+		{
+			return client.getItemDefinition(ItemID.HUNTSMANS_KIT).getName() + " (" + name + " inside)";
+		}
+		int more = stillToTake(step, itemId);
+		return more > 1 ? name + " x" + more : name;
+	}
+
+	/** The fewest of the item that, with what is carried, meet every step need it counts towards. */
+	private int stillToTake(Step step, int itemId)
+	{
+		Map<Integer, Integer> carried = carriedItems();
+		int most = 0;
+		for (RequiredItems.Need need : stepNeeds.of(step).getNeeds())
+		{
+			ItemRequirement requirement = need.getRequirement();
+			if (requirement.fulfilledBy(itemId) && !requirement.fulfilledBy(withMore(carried, itemId, 0)))
+			{
+				most = Math.max(most, fewestMeeting(requirement, carried, itemId));
+			}
+		}
+		return most;
+	}
+
+	/** Doubles, then halves back: needs run from 1 to thousands (coins). 0 when this item alone can't meet it (an outfit). */
+	private static int fewestMeeting(ItemRequirement requirement, Map<Integer, Integer> carried, int itemId)
+	{
+		int high = 1;
+		while (high < MAX_STACK && !requirement.fulfilledBy(withMore(carried, itemId, high)))
+		{
+			high *= 2;
+		}
+		if (high >= MAX_STACK)
+		{
+			return 0;
+		}
+		int low = high / 2;
+		while (low + 1 < high)
+		{
+			int middle = (low + high) / 2;
+			if (requirement.fulfilledBy(withMore(carried, itemId, middle)))
+			{
+				high = middle;
+			}
+			else
+			{
+				low = middle;
+			}
+		}
+		return high;
+	}
+
+	private static Item[] withMore(Map<Integer, Integer> carried, int itemId, int more)
+	{
+		Map<Integer, Integer> items = new HashMap<>(carried);
+		items.merge(itemId, more, Integer::sum);
+		return PlayerSnapshot.items(items);
 	}
 
 	/** The sub-steps of one route, built leg by leg: each stage's walk and act in turn, then the step's own acts. */
@@ -505,7 +634,7 @@ public final class SubSteps
 	 * The act's gear goes on as soon as the route lands, before walking or going in: a course fails without its Graceful,
 	 * Ape Atoll's monkeys and a dust devil's cave hurt without theirs.
 	 */
-	static List<SubStep> withGearOnArrival(List<SubStep> steps)
+	private static List<SubStep> withGearOnArrival(List<SubStep> steps)
 	{
 		int equip = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getDone() == SubStep.Done.GEAR_WORN).findFirst().orElse(-1);
 		if (equip < 0)
@@ -562,7 +691,7 @@ public final class SubSteps
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(LANDING_TILES).exit(exit).build();
 	}
 
-	static String exitText(Exit exit)
+	private static String exitText(Exit exit)
 	{
 		String target = exit.getTarget().isEmpty() ? "exit" : exit.getTarget().toLowerCase();
 		String option = exit.getOption().replace('-', ' ');
@@ -623,7 +752,7 @@ public final class SubSteps
 			.waypoint(standsAt).goal(leg.getTo()).radius(LANDING_TILES).row(row).build();
 	}
 
-	static String teleportText(CatalogRow row)
+	private static String teleportText(CatalogRow row)
 	{
 		String name = row.getName();
 		if (row.isLocated() || isQuetzalMap(row))
@@ -729,7 +858,7 @@ public final class SubSteps
 			+ text.substring(colon + 2);
 	}
 
-	static String houseText(CatalogRow row)
+	private static String houseText(CatalogRow row)
 	{
 		String name = CLICK_NOTE.matcher(row.getName()).replaceFirst("");
 		int colon = name.indexOf(": ");

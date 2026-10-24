@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public final class MenuLabels
 {
-	static final Set<String> TELEPORT_LIST_OPENERS = Set.of("rub", "open", "teleport", "teleports", "teleport menu", "operate",
+	private static final Set<String> TELEPORT_LIST_OPENERS = Set.of("rub", "open", "teleport", "teleports", "teleport menu", "operate",
 		"travel", "tree", "activate", "configure", "ring configure", "perks", "spellbook", "commune");
 	/** Catalog (Shortest Path) labels that the worn Max cape's options name differently. */
 	private static final Map<String, String> GAME_NAMES = Map.of(

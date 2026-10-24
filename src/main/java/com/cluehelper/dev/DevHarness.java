@@ -139,7 +139,7 @@ public class DevHarness
 		return selfTests;
 	}
 
-	public StepLogger getStepLogger()
+	private StepLogger getStepLogger()
 	{
 		return stepLogger;
 	}

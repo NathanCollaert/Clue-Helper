@@ -2,6 +2,8 @@ package com.cluehelper.ui;
 
 import java.awt.Shape;
 import java.awt.geom.Path2D;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.DecorativeObject;
 import net.runelite.api.GameObject;
@@ -20,6 +22,7 @@ import net.runelite.api.coords.LocalPoint;
  * (Xeric's talisman, fairy rings, spirit trees) would fill as a box. Positions follow core's ModelOutlineRenderer, so
  * the fill sits inside the outline.
  */
+@Singleton
 final class ModelSilhouette
 {
 	private static final int OFF_SCREEN = Integer.MIN_VALUE;
@@ -27,38 +30,42 @@ final class ModelSilhouette
 	private static final int SEE_THROUGH = 254;
 	private static final int NO_ROTATION = 0;
 
-	private ModelSilhouette()
+	private final Client client;
+
+	@Inject
+	ModelSilhouette(Client client)
 	{
+		this.client = client;
 	}
 
-	static Shape of(Client client, TileObject object)
+	Shape of(TileObject object)
 	{
 		Path2D.Float shape = new Path2D.Float(Path2D.WIND_NON_ZERO);
 		if (object instanceof GameObject)
 		{
 			GameObject game = (GameObject) object;
-			addFaces(shape, client, object, game.getRenderable(), 0, 0, game.getModelOrientation());
+			addFaces(shape, object, game.getRenderable(), 0, 0, game.getModelOrientation());
 		}
 		else if (object instanceof DecorativeObject)
 		{
 			DecorativeObject decoration = (DecorativeObject) object;
-			addFaces(shape, client, object, decoration.getRenderable(), decoration.getXOffset(), decoration.getYOffset(), NO_ROTATION);
-			addFaces(shape, client, object, decoration.getRenderable2(), decoration.getXOffset2(), decoration.getYOffset2(), NO_ROTATION);
+			addFaces(shape, object, decoration.getRenderable(), decoration.getXOffset(), decoration.getYOffset(), NO_ROTATION);
+			addFaces(shape, object, decoration.getRenderable2(), decoration.getXOffset2(), decoration.getYOffset2(), NO_ROTATION);
 		}
 		else if (object instanceof WallObject)
 		{
 			WallObject wall = (WallObject) object;
-			addFaces(shape, client, object, wall.getRenderable1(), 0, 0, NO_ROTATION);
-			addFaces(shape, client, object, wall.getRenderable2(), 0, 0, NO_ROTATION);
+			addFaces(shape, object, wall.getRenderable1(), 0, 0, NO_ROTATION);
+			addFaces(shape, object, wall.getRenderable2(), 0, 0, NO_ROTATION);
 		}
 		else if (object instanceof GroundObject)
 		{
-			addFaces(shape, client, object, ((GroundObject) object).getRenderable(), 0, 0, NO_ROTATION);
+			addFaces(shape, object, ((GroundObject) object).getRenderable(), 0, 0, NO_ROTATION);
 		}
 		return shape;
 	}
 
-	static Shape of(Client client, NPC npc)
+	Shape of(NPC npc)
 	{
 		Path2D.Float shape = new Path2D.Float(Path2D.WIND_NON_ZERO);
 		LocalPoint at = npc.getLocalLocation();
@@ -66,23 +73,23 @@ final class ModelSilhouette
 		if (at != null && view != null)
 		{
 			int z = Perspective.getTileHeight(client, at, view.getPlane()) - npc.getAnimationHeightOffset();
-			addFaces(shape, client, view, npc, at.getX(), at.getY(), z, npc.getCurrentOrientation());
+			addFaces(shape, view, npc, at.getX(), at.getY(), z, npc.getCurrentOrientation());
 		}
 		return shape;
 	}
 
-	private static void addFaces(Path2D shape, Client client, TileObject object, Renderable renderable, int xOffset, int yOffset,
+	private void addFaces(Path2D shape, TileObject object, Renderable renderable, int xOffset, int yOffset,
 		int orientation)
 	{
 		if (renderable != null)
 		{
-			addFaces(shape, client, object.getWorldView(), renderable, object.getX() + xOffset, object.getY() + yOffset,
+			addFaces(shape, object.getWorldView(), renderable, object.getX() + xOffset, object.getY() + yOffset,
 				object.getZ() - renderable.getAnimationHeightOffset(), orientation);
 		}
 	}
 
 	/** Back faces are left out, so every face added winds the same way and overlaps fill once. */
-	private static void addFaces(Path2D shape, Client client, WorldView view, Renderable renderable, int localX, int localY, int z,
+	private void addFaces(Path2D shape, WorldView view, Renderable renderable, int localX, int localY, int z,
 		int orientation)
 	{
 		Model model = renderable instanceof Model ? (Model) renderable : renderable.getModel();

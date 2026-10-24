@@ -7,6 +7,8 @@ import com.cluehelper.route.WalkTable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
@@ -18,6 +20,7 @@ import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
 /** The objects a path line leads through: each walk row it takes (a ladder, stairs, a shortcut) and each closed door. */
+@Singleton
 final class PathObjects
 {
 	/** A large staircase stands a few tiles from the row's origin tile. */
@@ -41,13 +44,18 @@ final class PathObjects
 	private static final int EAST = 4;
 	private static final int SOUTH = 8;
 
-	private PathObjects()
+	private final Client client;
+	private final SceneDoors doors;
+
+	@Inject
+	PathObjects(Client client, SceneDoors doors)
 	{
+		this.client = client;
+		this.doors = doors;
 	}
 
 	/** Client thread only. Each object with the menu option that takes the path through it. */
-	static Map<TileObject, String> along(Client client, WorldView view, WalkTable table, SceneBfs.Result scene, SceneDoors doors,
-		List<WorldPoint> path)
+	Map<TileObject, String> along(WorldView view, WalkTable table, SceneBfs.Result scene, List<WorldPoint> path)
 	{
 		Map<TileObject, String> objects = new LinkedHashMap<>();
 		for (int i = 0; i + 1 < path.size(); i++)
@@ -56,13 +64,13 @@ final class PathObjects
 			WorldPoint to = path.get(i + 1);
 			if (isJump(from, to))
 			{
-				addRowObject(objects, client, view, table == null ? null : table.rowObject(from, to), from);
+				addRowObject(objects, view, table == null ? null : table.rowObject(from, to), from);
 			}
 			else
 			{
-				addClosedDoor(objects, client, view, doors, from, to);
-				addRowObject(objects, client, view, table == null ? null : table.rowObject(from, to), from);
-				addWalkedOverRow(objects, client, view, table, path, i);
+				addClosedDoor(objects, view, from, to);
+				addRowObject(objects, view, table == null ? null : table.rowObject(from, to), from);
+				addWalkedOverRow(objects, view, table, path, i);
 			}
 		}
 		if (!path.isEmpty() && table != null)
@@ -70,7 +78,7 @@ final class PathObjects
 			WorldPoint last = path.get(path.size() - 1);
 			for (SceneBfs.ExitReach exit : scene.exitsFrom(last))
 			{
-				addRowObject(objects, client, view, table.rowObject(exit.getOrigin(), exit.getDestination()), last);
+				addRowObject(objects, view, table.rowObject(exit.getOrigin(), exit.getDestination()), last);
 			}
 		}
 		return objects;
@@ -80,12 +88,12 @@ final class PathObjects
 	 * A row across tiles the collision map leaves open (the Isafdar sticks, a trap stepped on otherwise): the line walks
 	 * it tile by tile.
 	 */
-	private static void addWalkedOverRow(Map<TileObject, String> objects, Client client, WorldView view, WalkTable table,
+	private void addWalkedOverRow(Map<TileObject, String> objects, WorldView view, WalkTable table,
 		List<WorldPoint> path, int origin)
 	{
 		for (int j = origin + 2; table != null && j < Math.min(path.size(), origin + 1 + ROW_OBJECT_TILES + 2); j++)
 		{
-			addRowObject(objects, client, view, table.rowObject(path.get(origin), path.get(j)), path.get(origin));
+			addRowObject(objects, view, table.rowObject(path.get(origin), path.get(j)), path.get(origin));
 		}
 	}
 
@@ -94,32 +102,32 @@ final class PathObjects
 		return from.getPlane() != to.getPlane() || Math.max(Math.abs(from.getX() - to.getX()), Math.abs(from.getY() - to.getY())) > 1;
 	}
 
-	private static void addRowObject(Map<TileObject, String> objects, Client client, WorldView view, Exit row, WorldPoint origin)
+	private void addRowObject(Map<TileObject, String> objects, WorldView view, Exit row, WorldPoint origin)
 	{
 		if (row == null || row.getObjectId() < 0)
 		{
 			return;
 		}
 		Prerequisite first = FIRST.get(row.getObjectId());
-		TileObject before = first == null ? null : objectNear(client, view, first.getObjectId(), origin);
+		TileObject before = first == null ? null : objectNear(view, first.getObjectId(), origin);
 		if (before != null)
 		{
 			objects.putIfAbsent(before, first.getOption());
 		}
-		TileObject object = objectNear(client, view, row.getObjectId(), origin);
+		TileObject object = objectNear(view, row.getObjectId(), origin);
 		if (object != null)
 		{
 			objects.putIfAbsent(object, row.getOption());
 		}
 	}
 
-	private static TileObject objectNear(Client client, WorldView view, int id, WorldPoint origin)
+	private TileObject objectNear(WorldView view, int id, WorldPoint origin)
 	{
 		for (int dx = -ROW_OBJECT_TILES; dx <= ROW_OBJECT_TILES; dx++)
 		{
 			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
 			{
-				TileObject object = objectOn(client, tile(view, origin.dx(dx).dy(dy)), id);
+				TileObject object = objectOn(tile(view, origin.dx(dx).dy(dy)), id);
 				if (object != null)
 				{
 					return object;
@@ -129,7 +137,7 @@ final class PathObjects
 		return null;
 	}
 
-	private static TileObject objectOn(Client client, Tile tile, int id)
+	private TileObject objectOn(Tile tile, int id)
 	{
 		if (tile == null)
 		{
@@ -137,14 +145,14 @@ final class PathObjects
 		}
 		for (GameObject object : tile.getGameObjects())
 		{
-			if (object != null && isObject(client, object, id))
+			if (object != null && isObject(object, id))
 			{
 				return object;
 			}
 		}
 		for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject()})
 		{
-			if (object != null && isObject(client, object, id))
+			if (object != null && isObject(object, id))
 			{
 				return object;
 			}
@@ -153,7 +161,7 @@ final class PathObjects
 	}
 
 	/** Shortest Path names a multiloc by the form it shows (the Kharazi broken cart: 28931, placed as 2216). */
-	private static boolean isObject(Client client, TileObject object, int id)
+	private boolean isObject(TileObject object, int id)
 	{
 		if (object.getId() == id)
 		{
@@ -164,15 +172,14 @@ final class PathObjects
 		return shown != null && shown.getId() == id;
 	}
 
-	private static void addClosedDoor(Map<TileObject, String> objects, Client client, WorldView view, SceneDoors doors, WorldPoint from,
-		WorldPoint to)
+	private void addClosedDoor(Map<TileObject, String> objects, WorldView view, WorldPoint from, WorldPoint to)
 	{
 		int dx = Integer.signum(to.getX() - from.getX());
 		int dy = Integer.signum(to.getY() - from.getY());
 		int fromSides = (dx > 0 ? EAST : dx < 0 ? WEST : 0) | (dy > 0 ? NORTH : dy < 0 ? SOUTH : 0);
 		int toSides = (dx > 0 ? WEST : dx < 0 ? EAST : 0) | (dy > 0 ? SOUTH : dy < 0 ? NORTH : 0);
-		for (TileObject door : new TileObject[]{closedDoorFacing(view, doors, from, fromSides),
-			closedDoorFacing(view, doors, to, toSides), doors.diagonalDoor(tile(view, to))})
+		for (TileObject door : new TileObject[]{closedDoorFacing(view, from, fromSides),
+			closedDoorFacing(view, to, toSides), doors.diagonalDoor(tile(view, to))})
 		{
 			if (door != null)
 			{
@@ -181,7 +188,7 @@ final class PathObjects
 		}
 	}
 
-	private static WallObject closedDoorFacing(WorldView view, SceneDoors doors, WorldPoint at, int sides)
+	private WallObject closedDoorFacing(WorldView view, WorldPoint at, int sides)
 	{
 		Tile tile = tile(view, at);
 		WallObject wall = tile == null ? null : tile.getWallObject();

@@ -30,11 +30,11 @@ public final class WalkTable
 	public static final int KIND_ORIGIN = 1 << 1;
 	public static final int KIND_BANK = 1 << 2;
 	public static final int KIND_TARGET = 1 << 3;
-	public static final int KIND_POH = 1 << 4;
+	private static final int KIND_POH = 1 << 4;
 	public static final int KIND_CHANGE = 1 << 5;
-	public static final int KIND_ENTRY = 1 << 6;
+	private static final int KIND_ENTRY = 1 << 6;
 	/** Where a far walk row lands: only start legs walk from it, nothing walks to it. */
-	public static final int KIND_EXIT = 1 << 7;
+	private static final int KIND_EXIT = 1 << 7;
 	private static final Map<String, Integer> KIND_BITS = Map.of("landing", KIND_LANDING, "origin", KIND_ORIGIN,
 		"bank", KIND_BANK, "target", KIND_TARGET, "poh", KIND_POH, "change", KIND_CHANGE, "entry", KIND_ENTRY, "exit", KIND_EXIT);
 
@@ -329,7 +329,7 @@ public final class WalkTable
 		return new WorldPoint(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
 	}
 
-	static WorldPoint unpack(int packed)
+	private static WorldPoint unpack(int packed)
 	{
 		return new WorldPoint(packed & 0x3FFF, packed >>> 14 & 0x3FFF, packed >>> 28);
 	}

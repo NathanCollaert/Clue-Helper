@@ -48,7 +48,7 @@ public class RequiredItems
 	@Value
 	public static class Verdict
 	{
-		public static final Verdict MET = new Verdict(true, true, List.of(), List.of(), Map.of());
+		private static final Verdict MET = new Verdict(true, true, List.of(), List.of(), Map.of());
 
 		/** A STASH known to be filled counts as carried. */
 		boolean carried;

@@ -27,9 +27,9 @@ import net.runelite.client.util.Text;
 public class SpiritTreeMemory
 {
 	static final String KEY = "spiritTrees";
-	public static final String MENU_TITLE = "Spirit Tree Locations";
+	private static final String MENU_TITLE = "Spirit Tree Locations";
 	/** As core's farming tracker reads the varbit: 8-19 is growing, 21 and up diseased or dead. */
-	static final int GROWN = 20;
+	private static final int GROWN = 20;
 	private static final String GREYED = "5f5f5f";
 
 	/** Patch name → {region, transmit varbit}; the varbit describes the patch only inside its region. */
@@ -127,7 +127,7 @@ public class SpiritTreeMemory
 	}
 
 	/** "<col=735a28>7</col>: Port Sarim" → "Port Sarim". */
-	static String placeOf(String raw)
+	private static String placeOf(String raw)
 	{
 		String text = Text.removeTags(raw).trim();
 		int colon = text.lastIndexOf(": ");

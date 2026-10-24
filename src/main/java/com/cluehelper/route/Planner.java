@@ -26,14 +26,14 @@ import net.runelite.api.coords.WorldPoint;
 public final class Planner
 {
 	/** A route with a bank stop or a walked change must beat its reference by this margin. */
-	static final int MARGIN_MIN_HALF_TICKS = 10;
-	static final int MARGIN_PERCENT = 10;
+	private static final int MARGIN_MIN_HALF_TICKS = 10;
+	private static final int MARGIN_PERCENT = 10;
 	private static final int REGION_SIZE = 64;
-	static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
+	private static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
 	/** Catalog landings of one place spread 0–2 tiles. */
 	private static final int SAME_LANDING_TILES = 2;
 	/** Rejected repeats and round trips count against this too. */
-	static final int MOST_ALTERNATIVE_SEARCHES = 12;
+	private static final int MOST_ALTERNATIVE_SEARCHES = 12;
 
 	private Planner()
 	{
@@ -271,7 +271,7 @@ public final class Planner
 	 * Leaving the shown routes' transports out can leave a round trip as the cheapest route with a transport ("walk to
 	 * ring BIP, ring to DIP, ring back to BIP, walk 35").
 	 */
-	static boolean loops(Route route)
+	private static boolean loops(Route route)
 	{
 		List<WorldPoint> places = new ArrayList<>();
 		for (Leg leg : route.getLegs())
@@ -546,7 +546,7 @@ public final class Planner
 			return a == null ? b : b == null ? a : b.getRankHalfTicks() < a.getRankHalfTicks() ? b : a;
 		}
 
-		static boolean qualifies(Route route, Route reference)
+		private static boolean qualifies(Route route, Route reference)
 		{
 			if (route == null)
 			{
@@ -658,7 +658,7 @@ public final class Planner
 		}
 
 		/** A start leg through an {@link Exit} stays a leg of its own, so the guide can name the exit. */
-		static boolean leavesStartScene(PlanContext ctx, Leg leg)
+		private static boolean leavesStartScene(PlanContext ctx, Leg leg)
 		{
 			PlanStart start = ctx.in.getStart();
 			return start.getKind() == PlanStart.Kind.SCENE && leg.getFrom() != null && leg.getFrom().equals(start.getTile())

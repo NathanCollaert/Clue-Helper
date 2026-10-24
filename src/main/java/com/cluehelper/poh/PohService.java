@@ -48,9 +48,9 @@ import net.runelite.api.gameval.VarbitID;
 @Singleton
 public class PohService
 {
-	static final String PROFILE_KEY = "poh";
+	private static final String PROFILE_KEY = "poh";
 	/** Every piece has loaded two ticks after entering; later scans never found more. */
-	static final int SCAN_DELAY_TICKS = 2;
+	private static final int SCAN_DELAY_TICKS = 2;
 	static final int[] NEXUS_SLOTS = {VarbitID.POH_NEXUS_TELE_1, VarbitID.POH_NEXUS_TELE_2, VarbitID.POH_NEXUS_TELE_3,
 		VarbitID.POH_NEXUS_TELE_4, VarbitID.POH_NEXUS_TELE_5, VarbitID.POH_NEXUS_TELE_6, VarbitID.POH_NEXUS_TELE_7,
 		VarbitID.POH_NEXUS_TELE_8, VarbitID.POH_NEXUS_TELE_9, VarbitID.POH_NEXUS_TELE_10, VarbitID.POH_NEXUS_TELE_11,
@@ -63,12 +63,12 @@ public class PohService
 		VarbitID.POH_NEXUS_TELE_36, VarbitID.POH_NEXUS_TELE_37, VarbitID.POH_NEXUS_TELE_38, VarbitID.POH_NEXUS_TELE_39,
 		VarbitID.POH_NEXUS_TELE_40, VarbitID.POH_NEXUS_TELE_41, VarbitID.POH_NEXUS_TELE_42, VarbitID.POH_NEXUS_TELE_43,
 		VarbitID.POH_NEXUS_TELE_44, VarbitID.POH_NEXUS_TELE_45};
-	static final int NEXUS_LINE_SCRIPT = 2675;
+	private static final int NEXUS_LINE_SCRIPT = 2675;
 	/** The script's int arguments: [index, 10, y, struct id, line number, 1, parity, component]. */
-	static final int NEXUS_LINE_ARGS = 8;
+	private static final int NEXUS_LINE_ARGS = 8;
 	private static final int NEXUS_ARG_STRUCT = 3;
 	private static final int NEXUS_ARG_LINE_NUMBER = 4;
-	static final int[] SETTINGS = {VarbitID.POH_NEXUS_XERIC, VarbitID.POH_NEXUS_DIGSITE, VarbitID.POH_JEWELLERYBOX_MULTI,
+	private static final int[] SETTINGS = {VarbitID.POH_NEXUS_XERIC, VarbitID.POH_NEXUS_DIGSITE, VarbitID.POH_JEWELLERYBOX_MULTI,
 		VarbitID.POH_HOUSE_LOCATION, VarbitID.POH_TELE_TOGGLE};
 	private static final int[] BOXES = {ObjectID.POH_JEWELLERY_BOX_1, ObjectID.POH_JEWELLERY_BOX_2, ObjectID.POH_JEWELLERY_BOX_3};
 	/** Box lines 1–9 are on every box, A–J from the fancy one, K–R only on the ornate one; varbit 2308 is 1-based. */
@@ -82,7 +82,8 @@ public class PohService
 	private final CatalogData catalogData;
 	private final MemorySlot<Profile> stored;
 	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
-	private final Set<Integer> watched = new HashSet<>();
+	/** The varbits a house is read from. */
+	private static final Set<Integer> WATCHED = watched();
 	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile Set<Integer> pieces = Set.of();
@@ -101,6 +102,11 @@ public class PohService
 		this.player = player;
 		this.catalogData = catalogData;
 		this.stored = memory.slot(PROFILE_KEY, Profile.class, Profile::new);
+	}
+
+	private static Set<Integer> watched()
+	{
+		Set<Integer> watched = new HashSet<>();
 		for (int id : NEXUS_SLOTS)
 		{
 			watched.add(id);
@@ -110,6 +116,7 @@ public class PohService
 			watched.add(id);
 		}
 		watched.add(VarbitID.POH_BUILDING_MODE);
+		return Set.copyOf(watched);
 	}
 
 	public void start()
@@ -175,7 +182,7 @@ public class PohService
 
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		if (watched.contains(event.getVarbitId()))
+		if (WATCHED.contains(event.getVarbitId()))
 		{
 			varsDirty = true;
 		}

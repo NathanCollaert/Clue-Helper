@@ -56,7 +56,7 @@ public final class StepKey
 	}
 
 	/** Beginner and master clues of every type share one item each, so their item says nothing. */
-	static boolean hasOwnItem(ClueFacts f)
+	private static boolean hasOwnItem(ClueFacts f)
 	{
 		int item = f.getItemId();
 		return item > 0 && item != ItemID.TRAIL_CLUE_BEGINNER && item != ItemID.TRAIL_CLUE_MASTER;

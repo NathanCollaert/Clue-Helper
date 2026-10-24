@@ -15,7 +15,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class Hypotheses
 {
 	/** 133 of 140 cache centres equal core's, so a spot's prior sits mostly on its centre. */
-	static final double CENTRE_SHARE = 0.5;
+	private static final double CENTRE_SHARE = 0.5;
 
 	private final List<Spot> spots;
 	private final int[] x;

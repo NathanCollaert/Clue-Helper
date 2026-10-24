@@ -52,9 +52,9 @@ public class RoutePlanner
 {
 	static final int COMMIT_MARGIN_TICKS = 5;
 	/** A Spellbook Swap's free cast stays pending this long after varbit 3617 turns 1. */
-	static final int SWAP_WINDOW_TICKS = 200;
+	private static final int SWAP_WINDOW_TICKS = 200;
 	private static final int NOT_REFUSED = -1;
-	static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
+	private static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
 	private static final int POCKET_TILES = 3;

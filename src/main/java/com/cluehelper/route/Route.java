@@ -123,7 +123,7 @@ public class Route
 		return null;
 	}
 
-	static String transportKey(Leg leg)
+	private static String transportKey(Leg leg)
 	{
 		return leg.getKind() == Leg.Kind.FAIRY_RING ? fairyKey(leg.getLanding()) : teleportKey(leg.getRow());
 	}

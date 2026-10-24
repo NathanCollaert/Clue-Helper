@@ -544,4 +544,11 @@ public class PlayerModel
 		stats.recordRead(what, System.nanoTime() - started);
 		return value;
 	}
+	/** Client thread. Whether an inventory item's name starts with {@code nameStart}, lower case. */
+	public boolean carriesItemNamed(String nameStart)
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot != null && snapshot.getInventory().keySet().stream()
+			.anyMatch(id -> client.getItemDefinition(id).getName().toLowerCase().startsWith(nameStart));
+	}
 }

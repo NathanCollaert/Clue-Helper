@@ -28,7 +28,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class StepIndex
 {
 	static final String DIRECTORY = "steps/";
-	static final List<String> FILES = List.of("anagram", "cipher", "coordinate", "cryptic", "emote", "fairyring", "falo",
+	private static final List<String> FILES = List.of("anagram", "cipher", "coordinate", "cryptic", "emote", "fairyring", "falo",
 		"hotcold", "map", "music", "skill");
 
 	private Map<String, Entry> steps = Map.of();
