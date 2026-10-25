@@ -713,6 +713,7 @@ public class StepGuide
 		index = 0;
 		jumpedThisSubStep = false;
 		advance(tile);
+		refreshGear();
 		showMaking();
 		updateHighlights();
 		refreshObjects();
