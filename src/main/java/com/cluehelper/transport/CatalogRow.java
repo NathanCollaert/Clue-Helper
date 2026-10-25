@@ -14,6 +14,9 @@ import net.runelite.api.coords.WorldPoint;
 @Builder
 public class CatalogRow
 {
+	private static final String QUETZAL_MENU = "quetzal ";
+	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
+
 	String name;
 	Category category;
 	/** Null for a teleport and for a fairy-ring landing. */
@@ -47,5 +50,30 @@ public class CatalogRow
 	public boolean isLocated()
 	{
 		return origin != null && category != Category.FAIRY_RING;
+	}
+
+	/** Its menu is the quetzal map: {@code quetzal <table id>}. */
+	public boolean isQuetzalMap()
+	{
+		return menu != null && menu.startsWith(QUETZAL_MENU);
+	}
+
+	/** -1 when the row isn't the quetzal map. */
+	public int quetzalTableId()
+	{
+		return isQuetzalMap() ? Integer.parseInt(menu.substring(QUETZAL_MENU.length())) : -1;
+	}
+
+	public String minigameName()
+	{
+		return name.replace(MINIGAME_SUFFIX, "");
+	}
+
+	/** The place after the row name's colon, without its bracketed note. */
+	public String nexusPlace()
+	{
+		String place = name.substring(name.indexOf(": ") + 2);
+		int bracket = place.indexOf(" (");
+		return bracket < 0 ? place : place.substring(0, bracket);
 	}
 }

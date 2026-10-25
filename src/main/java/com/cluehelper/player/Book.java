@@ -9,4 +9,10 @@ public enum Book
 	{
 		return varbit4070 >= 0 && varbit4070 < values().length ? values()[varbit4070] : null;
 	}
+
+	/** As the game names it: "Ancient". */
+	public String label()
+	{
+		return name().charAt(0) + name().substring(1).toLowerCase();
+	}
 }

@@ -41,6 +41,12 @@ public final class PositionRules
 		return from != null && to != null && (from.getPlane() != to.getPlane() || from.distanceTo2D(to) > JUMP_TILES);
 	}
 
+	/** On the same floor and within {@code radius}; false while either is unknown. */
+	public static boolean near(WorldPoint tile, WorldPoint goal, int radius)
+	{
+		return tile != null && goal != null && tile.getPlane() == goal.getPlane() && tile.distanceTo2D(goal) <= radius;
+	}
+
 	/**
 	 * @param boatTile the boat entity's tile through {@code fromLocalInstance}; never the player's raw
 	 *     location, which on a boat is the deck's own frozen coordinates

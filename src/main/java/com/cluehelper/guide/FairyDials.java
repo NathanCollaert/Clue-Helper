@@ -44,7 +44,7 @@ public class FairyDials
 		{
 			char letter = letters.charAt(dial);
 			Widget hub = client.getWidget(InterfaceID.Fairyrings.A + LETTERS.indexOf(letter));
-			if (visible(hub))
+			if (Widgets.visible(hub))
 			{
 				out.add(mushroom(hub.getBounds(), turnsToFront(dial, letter)));
 			}
@@ -113,10 +113,5 @@ public class FairyDials
 		Point offset = MUSHROOM_OFFSETS[turnsToFront];
 		int radius = MUSHROOM_RADII[turnsToFront];
 		return new Ellipse2D.Double(hub.getCenterX() + offset.x - radius, hub.getCenterY() + offset.y - radius, 2 * radius, 2 * radius);
-	}
-
-	private static boolean visible(Widget widget)
-	{
-		return widget != null && !widget.isHidden() && widget.getBounds() != null && widget.getBounds().width > 0;
 	}
 }

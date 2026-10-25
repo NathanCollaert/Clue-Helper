@@ -4,6 +4,7 @@ import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.ScrollBook;
 import com.cluehelper.guide.StepGuide;
+import com.cluehelper.guide.Widgets;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.step.Stages;
 import com.cluehelper.step.Step;
@@ -114,26 +115,9 @@ public class WidgetHighlightOverlay extends Overlay
 	/** The prayer's own button, found by its name: the book's component order isn't the prayers' order. */
 	private static Widget named(Widget parent, String name)
 	{
-		if (parent == null)
-		{
-			return null;
-		}
-		if (parent.getName() != null && Text.removeTags(parent.getName()).equalsIgnoreCase(name))
-		{
-			return parent;
-		}
-		for (Widget[] children : new Widget[][]{parent.getStaticChildren(), parent.getDynamicChildren(), parent.getNestedChildren()})
-		{
-			for (Widget child : children == null ? new Widget[0] : children)
-			{
-				Widget found = named(child, name);
-				if (found != null)
-				{
-					return found;
-				}
-			}
-		}
-		return null;
+		return Widgets.descendants(parent).stream()
+			.filter(widget -> widget.getName() != null && Text.removeTags(widget.getName()).equalsIgnoreCase(name))
+			.findFirst().orElse(null);
 	}
 
 	private boolean shown(int widgetId)

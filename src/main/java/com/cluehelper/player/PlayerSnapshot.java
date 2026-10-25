@@ -195,6 +195,11 @@ public final class PlayerSnapshot
 		return counts.entrySet().stream().map(e -> new Item(e.getKey(), e.getValue())).toArray(Item[]::new);
 	}
 
+	public static Item[] oneOfEach(Set<Integer> itemIds)
+	{
+		return itemIds.stream().map(id -> new Item(id, 1)).toArray(Item[]::new);
+	}
+
 	public boolean finished(Quest quest)
 	{
 		return quests.get(quest) == QuestState.FINISHED;

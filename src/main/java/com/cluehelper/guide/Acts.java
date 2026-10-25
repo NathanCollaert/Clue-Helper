@@ -39,9 +39,78 @@ final class Acts
 		return List.copyOf(equipped);
 	}
 
+	/** The step's one act: its marker's act, a key search, or what its type does. */
+	static SubStep act(Step step)
+	{
+		if (step.getWaypointAct() != null)
+		{
+			return SubStep.builder().kind(SubStep.Kind.ACT).text(step.getWaypointAct())
+				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
+				.actItems(step.getActItems()).build();
+		}
+		if (needsItemFromNpc(step))
+		{
+			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
+			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what + " with the key")
+				.detail("The key comes from " + step.getNpcs().get(0)).build();
+		}
+		return SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step)).build();
+	}
+
+	/**
+	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to
+	 * the guardian".
+	 */
+	private static boolean needsItemFromNpc(Step step)
+	{
+		boolean talk = step.getText() != null && step.getText().toLowerCase().contains("speak");
+		return ClueTypes.CRYPTIC.equals(step.getType()) && !talk && hasAny(step.getNpcs())
+			&& (hasAny(step.getObjectNames()) || hasAny(step.getObjectIds()));
+	}
+
+	private static boolean hasAny(List<?> list)
+	{
+		return list != null && !list.isEmpty();
+	}
+
+	private static String actText(Step step)
+	{
+		String type = step.getType() == null ? "" : step.getType();
+		switch (type)
+		{
+			case ClueTypes.EMOTE:
+				return "Perform the emote";
+			case ClueTypes.MUSIC:
+				return "Talk to Cecilia";
+			case ClueTypes.HOT_COLD:
+				return "Feel the device, then dig";
+			case ClueTypes.SKILL:
+				return "Do the challenge";
+			default:
+				break;
+		}
+		if (isDig(step))
+		{
+			return "Dig";
+		}
+		if (hasAny(step.getNpcs()))
+		{
+			return "Talk to " + step.getNpcs().get(0);
+		}
+		if (hasAny(step.getObjectNames()))
+		{
+			return "Search the " + step.getObjectNames().get(0).toLowerCase();
+		}
+		if (hasAny(step.getObjectIds()))
+		{
+			return "Search it";
+		}
+		return "Do the clue step";
+	}
+
 	private static List<SubStep> actsOf(Step step, boolean takeFromStash)
 	{
-		SubStep main = SubSteps.act(step);
+		SubStep main = act(step);
 		if (step.getWaypointAct() != null)
 		{
 			return List.of(main);

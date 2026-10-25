@@ -550,4 +550,30 @@ public class PlayerModel
 		PlayerSnapshot snapshot = getSnapshot();
 		return snapshot != null && snapshot.carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
+
+	/** Inventory and worn; empty while logged out. */
+	public Set<Integer> carriedIds()
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot == null ? Set.of() : snapshot.carriedIds();
+	}
+
+	public Set<Integer> inventoryIds()
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot == null ? Set.of() : snapshot.getInventory().keySet();
+	}
+
+	public Set<Integer> wornIds()
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot == null ? Set.of() : snapshot.getWorn().keySet();
+	}
+
+	/** The standard book until the spellbook is read. */
+	public Book currentBook()
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot == null || snapshot.getSpellbook() == null ? Book.STANDARD : snapshot.getSpellbook().getBook();
+	}
 }

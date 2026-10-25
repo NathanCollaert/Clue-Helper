@@ -18,25 +18,25 @@ final class LowerBound
 	{
 		int[] walk = walkToTargets(ctx, targets);
 		int cheapest = UNREACHABLE;
-		for (PlanContext.Options options : ctx.options)
+		for (TransportOptions options : ctx.options)
 		{
 			if (options == null)
 			{
 				continue;
 			}
-			for (PlanContext.Teleport tele : options.teleports)
+			for (TransportOptions.Teleport tele : options.teleports)
 			{
 				cheapest = Math.min(cheapest, tele.halfTicks + walk[tele.node]);
 			}
-			for (List<PlanContext.Teleport> here : options.located.values())
+			for (List<TransportOptions.Teleport> here : options.located.values())
 			{
-				for (PlanContext.Teleport tele : here)
+				for (TransportOptions.Teleport tele : here)
 				{
 					cheapest = Math.min(cheapest, tele.halfTicks + walk[tele.node]);
 				}
 			}
 			int fairy = options.fairyEntries.values().stream().mapToInt(e -> e.halfTicks).min().orElse(UNREACHABLE);
-			for (PlanContext.Teleport landing : options.fairyLandings)
+			for (TransportOptions.Teleport landing : options.fairyLandings)
 			{
 				cheapest = Math.min(cheapest, fairy + walk[landing.node]);
 			}

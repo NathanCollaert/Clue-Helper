@@ -185,7 +185,7 @@ public class MenuLines
 		List<Rectangle> out = new ArrayList<>();
 		for (Widget widget : lineWidgets(target))
 		{
-			Rectangle shown = hasTextInside(widget) ? null : clipped(widget);
+			Rectangle shown = Widgets.hasTextInside(widget) ? null : Widgets.clipped(widget);
 			if (shown != null && !shown.isEmpty())
 			{
 				out.add(shown);
@@ -204,13 +204,13 @@ public class MenuLines
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
 		if (enabled)
 		{
-			lineWidgets(target).stream().flatMap(line -> descendants(line).stream()).filter(MenuLines::hasText).forEach(wanted::add);
+			lineWidgets(target).stream().flatMap(line -> Widgets.descendants(line).stream()).filter(Widgets::hasText).forEach(wanted::add);
 			if (entryWidget != ScrollBook.NO_WIDGET)
 			{
 				for (int text : ScrollBook.texts(entryWidget))
 				{
 					Widget line = client.getWidget(text);
-					if (visible(line) && hasText(line))
+					if (Widgets.visible(line) && Widgets.hasText(line))
 					{
 						wanted.add(line);
 					}
@@ -295,7 +295,7 @@ public class MenuLines
 		for (int i = 0; destination != null && i + 1 < rows.length; i++)
 		{
 			String text = rows[i + 1] == null ? null : Text.removeTags(rows[i + 1].getText()).trim();
-			if (visible(rows[i]) && namesPort(rows[i], destination) && text != null && !text.isEmpty())
+			if (Widgets.visible(rows[i]) && namesPort(rows[i], destination) && text != null && !text.isEmpty())
 			{
 				return text.charAt(0);
 			}
@@ -309,7 +309,7 @@ public class MenuLines
 		boolean found = false;
 		for (Widget marker : dynamicChildren(InterfaceID.SailingMenu.CONTENT))
 		{
-			if (visible(marker) && namesPort(marker, destination))
+			if (Widgets.visible(marker) && namesPort(marker, destination))
 			{
 				out.add(marker);
 				found = true;
@@ -318,7 +318,7 @@ public class MenuLines
 		Widget[] rows = dynamicChildren(InterfaceID.CharteringMenuSide.LIST_CONTENT);
 		for (int i = 0; i + 1 < rows.length; i++)
 		{
-			if (visible(rows[i]) && namesPort(rows[i], destination))
+			if (Widgets.visible(rows[i]) && namesPort(rows[i], destination))
 			{
 				out.add(rows[i + 1]);
 				found = true;
@@ -398,7 +398,7 @@ public class MenuLines
 	{
 		int[] at = nexusLines.get(target.getLineId());
 		Widget line = child(at);
-		if (visible(line))
+		if (Widgets.visible(line))
 		{
 			out.add(labelOf(line));
 			return;
@@ -412,16 +412,16 @@ public class MenuLines
 		Widget region = null;
 		for (Widget icon : icons)
 		{
-			if (!visible(icon) || icon.getActions() == null)
+			if (!Widgets.visible(icon) || icon.getActions() == null)
 			{
 				continue;
 			}
-			if (hasAction(icon, MAP_TELEPORT) && MenuLabels.matches(icon.getName(), target.getLineName()))
+			if (Widgets.hasAction(icon, MAP_TELEPORT) && MenuLabels.matches(icon.getName(), target.getLineName()))
 			{
 				out.add(icon);
 				return;
 			}
-			if (hasAction(icon, MAP_REGION) && MenuLabels.matches(icon.getName(), target.getLineKey()))
+			if (Widgets.hasAction(icon, MAP_REGION) && MenuLabels.matches(icon.getName(), target.getLineKey()))
 			{
 				region = icon;
 			}
@@ -446,7 +446,7 @@ public class MenuLines
 
 	private void minigame(String name, Found out)
 	{
-		if (visible(client.getWidget(InterfaceID.Minigames.MINIGAMES)))
+		if (Widgets.visible(client.getWidget(InterfaceID.Minigames.MINIGAMES)))
 		{
 			minigameCard(name, out);
 			return;
@@ -456,7 +456,7 @@ public class MenuLines
 			return;
 		}
 		Widget current = client.getWidget(InterfaceID.Grouping.CURRENTGAME);
-		if (!visible(current))
+		if (!Widgets.visible(current))
 		{
 			return;
 		}
@@ -466,12 +466,12 @@ public class MenuLines
 			return;
 		}
 		Widget contents = client.getWidget(InterfaceID.Grouping.DROPDOWN_CONTENTS);
-		Widget[] lines = visible(contents) ? contents.getDynamicChildren() : null;
+		Widget[] lines = Widgets.visible(contents) ? contents.getDynamicChildren() : null;
 		if (lines != null)
 		{
 			for (Widget line : lines)
 			{
-				if (visible(line) && MenuLabels.matches(line.getText(), name))
+				if (Widgets.visible(line) && MenuLabels.matches(line.getText(), name))
 				{
 					out.add(line);
 					return;
@@ -491,7 +491,7 @@ public class MenuLines
 		for (int card = InterfaceID.Minigames.MINIGAME_21; card <= InterfaceID.Minigames.MINIGAME_1; card++)
 		{
 			Widget widget = client.getWidget(card);
-			if (visible(widget) && hasTextMatching(widget, game))
+			if (Widgets.visible(widget) && hasTextMatching(widget, game))
 			{
 				out.add(widget);
 				return;
@@ -504,7 +504,7 @@ public class MenuLines
 	{
 		String[] parts = name.split(": ", 2);
 		Widget options = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
-		Widget[] lines = parts.length < 2 || !visible(options) ? null : options.getDynamicChildren();
+		Widget[] lines = parts.length < 2 || !Widgets.visible(options) ? null : options.getDynamicChildren();
 		if (lines == null)
 		{
 			return false;
@@ -512,7 +512,7 @@ public class MenuLines
 		String place = MenuLabels.normalise(MINIGAME_PLACE_NUMBER.matcher(parts[1]).replaceFirst(""));
 		for (Widget line : lines)
 		{
-			if (visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
+			if (Widgets.visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
 			{
 				out.add(line);
 				return true;
@@ -521,28 +521,9 @@ public class MenuLines
 		return false;
 	}
 
-	/** The widget and everything under it. */
-	public static List<Widget> descendants(Widget widget)
-	{
-		List<Widget> out = new ArrayList<>();
-		if (widget == null)
-		{
-			return out;
-		}
-		out.add(widget);
-		for (Widget[] children : new Widget[][]{widget.getStaticChildren(), widget.getDynamicChildren(), widget.getNestedChildren()})
-		{
-			for (int i = 0; children != null && i < children.length; i++)
-			{
-				out.addAll(descendants(children[i]));
-			}
-		}
-		return out;
-	}
-
 	private static boolean hasTextMatching(Widget widget, String label)
 	{
-		for (Widget part : descendants(widget))
+		for (Widget part : Widgets.descendants(widget))
 		{
 			String text = part.getText();
 			if (text != null && MenuLabels.matches(text.split(LINE_BREAK, 2)[0], label))
@@ -561,11 +542,11 @@ public class MenuLines
 			return;
 		}
 		Widget icons = client.getWidget(InterfaceID.QuetzalMenu.ICONS);
-		if (!visible(icons))
+		if (!Widgets.visible(icons))
 		{
 			icons = client.getWidget(InterfaceID.QuetzalwhistleMenu.ICONS);
 		}
-		if (!visible(icons))
+		if (!Widgets.visible(icons))
 		{
 			return;
 		}
@@ -584,7 +565,7 @@ public class MenuLines
 			if (MenuLabels.matches(line.getKey(), destination))
 			{
 				Widget listLine = child(line.getValue());
-				out.add(visible(listLine) ? listLine : drawnOverList(line.getValue(), destination));
+				out.add(Widgets.visible(listLine) ? listLine : drawnOverList(line.getValue(), destination));
 				return;
 			}
 		}
@@ -608,7 +589,7 @@ public class MenuLines
 		{
 			for (Widget option : lines)
 			{
-				if (visible(option) && MenuLabels.matches(option.getText(), labels.get(i)))
+				if (Widgets.visible(option) && MenuLabels.matches(option.getText(), labels.get(i)))
 				{
 					out.add(option);
 					return;
@@ -623,9 +604,9 @@ public class MenuLines
 	 */
 	private Widget drawnOverList(int[] listLine, String destination)
 	{
-		for (Widget widget : descendants(client.getWidget(listLine[0] >>> 16, 0)))
+		for (Widget widget : Widgets.descendants(client.getWidget(listLine[0] >>> 16, 0)))
 		{
-			if (visible(widget) && widget.getActions() != null && MenuLabels.matches(widget.getName(), destination))
+			if (Widgets.visible(widget) && widget.getActions() != null && MenuLabels.matches(widget.getName(), destination))
 			{
 				return widget;
 			}
@@ -717,23 +698,6 @@ public class MenuLines
 		return parent == null ? null : parent.getChild(at[1]);
 	}
 
-	private static boolean visible(Widget widget)
-	{
-		return widget != null && !widget.isHidden() && widget.getBounds() != null && widget.getBounds().width > 0;
-	}
-
-	private static boolean hasAction(Widget widget, String action)
-	{
-		for (String a : widget.getActions())
-		{
-			if (action.equalsIgnoreCase(a))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/** The target's lines. */
 	private static final class Found
 	{
@@ -741,51 +705,17 @@ public class MenuLines
 
 		void add(Widget widget)
 		{
-			if (visible(widget))
+			if (Widgets.visible(widget))
 			{
 				widgets.add(widget);
 			}
 		}
 	}
 
-	private static boolean hasText(Widget widget)
-	{
-		return widget.getText() != null && !Text.removeTags(widget.getText()).isBlank();
-	}
-
-	/** A nexus row is a container whose text sits in its children: the text is recoloured, so no box is drawn. */
-	private static boolean hasTextInside(Widget widget)
-	{
-		return descendants(widget).stream().anyMatch(MenuLines::hasText);
-	}
-
-	/**
-	 * Rows scrolled out of view keep {@code hidden = false} and their bounds, and the list's layer is as tall as all its
-	 * rows, so only clipping to every ancestor leaves the visible part.
-	 */
-	private static Rectangle clipped(Widget widget)
-	{
-		return widget.getBounds().intersection(insideParents(widget));
-	}
-
-	private static Rectangle insideParents(Widget widget)
-	{
-		Rectangle area = new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
-		for (Widget parent = widget.getParent(); parent != null && !area.isEmpty(); parent = parent.getParent())
-		{
-			Rectangle outer = parent.getBounds();
-			if (outer != null && outer.width > 0)
-			{
-				area = area.intersection(outer);
-			}
-		}
-		return area;
-	}
-
 	/** A nexus row ({@code ROWS1}) has no text; its label sits at the same height in the {@code TEXT1} layer. */
 	private Widget labelOf(Widget row)
 	{
-		if (hasText(row))
+		if (Widgets.hasText(row))
 		{
 			return row;
 		}
@@ -796,7 +726,7 @@ public class MenuLines
 		for (Widget label : labels == null ? new Widget[0] : labels)
 		{
 			int middle = label == null ? -1 : label.getRelativeY() + label.getHeight() / 2;
-			if (label != null && hasText(label) && middle >= top && middle < bottom)
+			if (label != null && Widgets.hasText(label) && middle >= top && middle < bottom)
 			{
 				return label;
 			}

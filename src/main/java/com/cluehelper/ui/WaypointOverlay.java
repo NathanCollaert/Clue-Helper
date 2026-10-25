@@ -1,6 +1,7 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.guide.LeftClicks;
 import com.cluehelper.guide.MenuTarget;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.guide.SubSteps;
@@ -73,11 +74,13 @@ public class WaypointOverlay extends Overlay
 	private final WalkLine walkLine;
 	private final LineTargets targets;
 	private final WorldWalk walker;
+	private final LeftClicks leftClicks;
 
 	@Inject
 	WaypointOverlay(Client client, StepGuide guide, RoutePlanner routes, ClueHelperConfig config, Highlighter highlighter,
-		ClueLink clueLink, PathObjects paths, WalkLine walkLine, LineTargets targets, WorldWalk walker)
+		ClueLink clueLink, PathObjects paths, WalkLine walkLine, LineTargets targets, WorldWalk walker, LeftClicks leftClicks)
 	{
+		this.leftClicks = leftClicks;
 		this.clueLink = clueLink;
 		this.paths = paths;
 		this.walkLine = walkLine;
@@ -441,7 +444,7 @@ public class WaypointOverlay extends Overlay
 
 	private void drawLine(Graphics2D graphics, WorldView view, List<WorldPoint> ahead)
 	{
-		pathObjects.forEach((object, option) -> highlighter.object(graphics, object, guide.isLeftClick(object, option)));
+		pathObjects.forEach((object, option) -> highlighter.object(graphics, object, leftClicks.isLeftClick(object, option)));
 		graphics.setColor(Markers.COLOUR);
 		graphics.setStroke(new BasicStroke(PATH_STROKE));
 		Point previous = null;

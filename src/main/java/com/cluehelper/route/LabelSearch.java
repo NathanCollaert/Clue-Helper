@@ -204,12 +204,12 @@ final class LabelSearch
 
 	private void expandLocatedTeleports(Label from, int k)
 	{
-		List<PlanContext.Teleport> here = ctx.options[from.b].located.get(from.node);
+		List<TransportOptions.Teleport> here = ctx.options[from.b].located.get(from.node);
 		if (here == null)
 		{
 			return;
 		}
-		for (PlanContext.Teleport tele : here)
+		for (TransportOptions.Teleport tele : here)
 		{
 			if (tele.node != from.node && !ctx.forbidden(tele.node) && !excluded.contains(Route.teleportKey(tele.row)))
 			{
@@ -359,9 +359,9 @@ final class LabelSearch
 
 	private void expandTeleports(Label from, OriginClass origin, int k)
 	{
-		PlanContext.Options options = ctx.options[from.b];
-		PlanContext.Change swap = ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.OFF ? options.swap : null;
-		for (PlanContext.Teleport tele : options.teleports)
+		TransportOptions options = ctx.options[from.b];
+		TransportOptions.Change swap = ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.OFF ? options.swap : null;
+		for (TransportOptions.Teleport tele : options.teleports)
 		{
 			if (!origin.allows(tele.maxWilderness) || origin == OriginClass.POH && tele.minigame || ctx.forbidden(tele.node)
 				|| excluded.contains(Route.teleportKey(tele.row)))
@@ -396,7 +396,7 @@ final class LabelSearch
 	/** The Magic or Max cape changes to any expanded book wherever teleports work, which also ends a pending revert. */
 	private void expandCape(Label from, OriginClass origin, int k)
 	{
-		PlanContext.Change cape = ctx.options[from.b].cape;
+		TransportOptions.Change cape = ctx.options[from.b].cape;
 		if (cape == null || !ctx.changesAllowed(origin))
 		{
 			return;
@@ -416,13 +416,13 @@ final class LabelSearch
 	 */
 	private void expandLocatedChanges(Label from, OriginClass origin, int k)
 	{
-		List<PlanContext.Change> here = ctx.options[from.b].changes.get(from.node);
+		List<TransportOptions.Change> here = ctx.options[from.b].changes.get(from.node);
 		if (here == null || !ctx.changesAllowed(origin))
 		{
 			return;
 		}
 		Book current = bookOf(k);
-		for (PlanContext.Change change : here)
+		for (TransportOptions.Change change : here)
 		{
 			Book toggles = change.change.getToggles();
 			for (Book next : toggles == null ? ctx.expanded : Set.of(current == toggles ? Book.STANDARD : toggles))
@@ -437,13 +437,13 @@ final class LabelSearch
 
 	private void expandFairyRing(Label from, int k)
 	{
-		PlanContext.Options options = ctx.options[from.b];
-		PlanContext.Teleport entry = options.fairyEntries.get(from.node);
+		TransportOptions options = ctx.options[from.b];
+		TransportOptions.Teleport entry = options.fairyEntries.get(from.node);
 		if (entry == null)
 		{
 			return;
 		}
-		for (PlanContext.Teleport landing : options.fairyLandings)
+		for (TransportOptions.Teleport landing : options.fairyLandings)
 		{
 			if (landing.node != from.node && !ctx.forbidden(landing.node) && !excluded.contains(Route.fairyKey(landing.row)))
 			{
@@ -481,12 +481,12 @@ final class LabelSearch
 		}
 	}
 
-	private void transport(Label from, int node, int c, int k, int half, Leg.Kind kind, PlanContext.Teleport tele, Object second)
+	private void transport(Label from, int node, int c, int k, int half, Leg.Kind kind, TransportOptions.Teleport tele, Object second)
 	{
 		int t = 1;
 		if (onlyFirst != null && from.t == 0)
 		{
-			String key = kind == Leg.Kind.FAIRY_RING ? Route.fairyKey(((PlanContext.Teleport) second).row) : Route.teleportKey(tele.row);
+			String key = kind == Leg.Kind.FAIRY_RING ? Route.fairyKey(((TransportOptions.Teleport) second).row) : Route.teleportKey(tele.row);
 			boolean first = key.equals(onlyFirst);
 			if (Route.WALK.equals(onlyFirst) || !first && node != ctx.pohNode)
 			{
@@ -496,15 +496,15 @@ final class LabelSearch
 		}
 		int[] spent = spend(from.spent, tele.res, tele.amounts, from.b);
 		int[] withdrawn = sortedUnion(from.withdrawn, tele.withdraw);
-		if (second instanceof PlanContext.Change)
+		if (second instanceof TransportOptions.Change)
 		{
-			PlanContext.Change swap = (PlanContext.Change) second;
+			TransportOptions.Change swap = (TransportOptions.Change) second;
 			spent = spend(spent, swap.res, swap.amounts, from.b);
 			withdrawn = sortedUnion(withdrawn, swap.withdraw);
 		}
-		else if (second instanceof PlanContext.Teleport)
+		else if (second instanceof TransportOptions.Teleport)
 		{
-			PlanContext.Teleport landing = (PlanContext.Teleport) second;
+			TransportOptions.Teleport landing = (TransportOptions.Teleport) second;
 			spent = spend(spent, landing.res, landing.amounts, from.b);
 			withdrawn = sortedUnion(withdrawn, landing.withdraw);
 		}
@@ -515,7 +515,7 @@ final class LabelSearch
 		}
 	}
 
-	private void change(Label from, int node, int c, int k, PlanContext.Change change)
+	private void change(Label from, int node, int c, int k, TransportOptions.Change change)
 	{
 		int[] spent = spend(from.spent, change.res, change.amounts, from.b);
 		int[] withdrawn = sortedUnion(from.withdrawn, change.withdraw);
@@ -864,8 +864,8 @@ final class LabelSearch
 			RowAvailability.Confidence worst = RowAvailability.Confidence.SURE;
 			for (Label l = this; l != null; l = l.parent)
 			{
-				RowAvailability.Confidence c = l.ref instanceof PlanContext.Teleport ? ((PlanContext.Teleport) l.ref).confidence
-					: l.ref instanceof PlanContext.Change ? ((PlanContext.Change) l.ref).confidence : null;
+				RowAvailability.Confidence c = l.ref instanceof TransportOptions.Teleport ? ((TransportOptions.Teleport) l.ref).confidence
+					: l.ref instanceof TransportOptions.Change ? ((TransportOptions.Change) l.ref).confidence : null;
 				if (c != null && c.ordinal() > worst.ordinal())
 				{
 					worst = c;

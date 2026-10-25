@@ -1,8 +1,11 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.player.PositionRules;
 import com.cluehelper.step.StepRequirements;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
@@ -11,6 +14,7 @@ import net.runelite.api.coords.WorldPoint;
  * reminder outlives the step and ends on the deposit line, or 15 tiles away once the player has been back by the unit
  * (the Agility Pyramid's emote is done on top, its unit stands at the foot).
  */
+@Singleton
 final class DepositReminder
 {
 	private static final int DEPOSIT_TILES = 15;
@@ -19,6 +23,7 @@ final class DepositReminder
 	private Pending pending;
 	private boolean beenNear;
 
+	@Inject
 	DepositReminder(ActWatcher actWatcher)
 	{
 		this.actWatcher = actWatcher;
@@ -48,7 +53,7 @@ final class DepositReminder
 			return;
 		}
 		boolean deposited = actWatcher.isDone(SubStep.Done.STASH_DEPOSITED, pending.getSince());
-		boolean near = SubSteps.near(tile, pending.getAt(), DEPOSIT_TILES);
+		boolean near = PositionRules.near(tile, pending.getAt(), DEPOSIT_TILES);
 		beenNear |= near;
 		if (deposited || beenNear && !near)
 		{
