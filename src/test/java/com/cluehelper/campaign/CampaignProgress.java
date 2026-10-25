@@ -31,6 +31,8 @@ final class CampaignProgress
 	/** Every step key, by tier and then a walk from each to the nearest next. */
 	List<String> order = new ArrayList<>();
 	String current;
+	/** The untested step the walk through the order reached last: after the retests, the untested go on from there. */
+	String untestedFrom;
 	/** Steps not in it are untested. */
 	Map<String, Status> statuses = new HashMap<>();
 	Map<String, String> notes = new HashMap<>();

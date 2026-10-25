@@ -123,8 +123,8 @@ Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley s
   best      20t: (at the open bank) Max cape: POH Portals: Taverley → walk 12 withdraw [13280] deposit first
 scroll book kept out of the Wilderness: carried, to the Lava Maze
   best      80t: Camelot Teleport: Seers' → walk 3 → bank → Master scroll book: Revenant cave teleport → walk 58 {item:556=5, item:563=1, charge:21389=1} withdraw []
-  alt       105t: Crafting cape: Teleport → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {item:556=1, item:557=1, item:563=1} withdraw []
-  alt       106t: Ring of dueling: Castle Wars → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 77 {charge:2552=1} withdraw []
+  alt       105t: Ring of dueling: Castle Wars → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {charge:2552=1, item:556=1, item:557=1, item:563=1} withdraw []
+  alt       106t: Crafting cape: Teleport → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 77 withdraw []
   note      Wilderness target
 scroll book kept out of the Wilderness: banked, to the Lava Maze
   best      92t: Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {item:556=1, item:557=1, item:563=1}
@@ -137,13 +137,13 @@ at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade requ
   alt       32t: (at the open bank) Varrock tablet → walk 23 {item:8007=1} withdraw [8007, 952]
   alt       37t: (at the open bank) walk 35 withdraw [952]
 house: Burthorpe castle steps (Eohric), no games necklace, a fully built house
-  best      23t: Teleport to House → Jewellery box: 5. Burthorpe → walk 6 {item:556=1, item:557=1, item:563=1}
-  alt       31t: Max cape: Warriors' Guild → walk 26
-  alt       32t: Burthorpe Games Room Minigame Teleport → walk 6 {cooldown:888=1}
+  best      28t: Teleport to House → Jewellery box: 5. Burthorpe → walk 11 {item:556=1, item:557=1, item:563=1}
+  alt       36t: Max cape: Warriors' Guild → walk 31
+  alt       37t: Burthorpe Games Room Minigame Teleport → walk 11 {cooldown:888=1}
 house: Burthorpe castle steps (Eohric), no games necklace, no house
-  best      31t: Max cape: Warriors' Guild → walk 26
-  alt       32t: Burthorpe Games Room Minigame Teleport → walk 6 {cooldown:888=1}
-  alt       57t: Construction cape: Taverley → walk 52
+  best      36t: Max cape: Warriors' Guild → walk 31
+  alt       37t: Burthorpe Games Room Minigame Teleport → walk 11 {cooldown:888=1}
+  alt       62t: Construction cape: Taverley → walk 57
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      68t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 52
   alt       72t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 55
@@ -161,13 +161,13 @@ house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet:
   alt       78t: Construction cape: Tele to POH → Portal nexus: Ghorrock → walk 4 → Obelisk: Level 50 Wilderness → walk 52
   note      Wilderness target
 house: standing in the own house, Burthorpe castle steps
-  best      11t: Games necklace: Burthorpe → walk 6 {charge:3853=1}
-  alt       18t: Jewellery box: 5. Burthorpe → walk 6
-  alt       29t: Jewellery box: A. Warriors' Guild → walk 17
+  best      16t: Games necklace: Burthorpe → walk 11 {charge:3853=1}
+  alt       23t: Jewellery box: 5. Burthorpe → walk 11
+  alt       34t: Jewellery box: A. Warriors' Guild → walk 22
 house: standing in a stranger's house, Burthorpe castle steps
-  best      11t: Games necklace: Burthorpe → walk 6 {charge:3853=1}
-  alt       23t: Teleport to House → Jewellery box: 5. Burthorpe → walk 6 {item:556=1, item:557=1, item:563=1}
-  alt       31t: Max cape: Warriors' Guild → walk 26
+  best      16t: Games necklace: Burthorpe → walk 11 {charge:3853=1}
+  alt       28t: Teleport to House → Jewellery box: 5. Burthorpe → walk 11 {item:556=1, item:557=1, item:563=1}
+  alt       36t: Max cape: Warriors' Guild → walk 31
 house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelisk
   best      65t: Teleport to House → Portal chamber: Annakarl → walk 55 {item:556=1, item:557=1, item:563=1}
   alt       62t (rank 70): Max cape: Spellbook → ANCIENT → Annakarl Teleport → walk 55 {cape=1, item:563=2, item:565=2} leaves you on ANCIENT
@@ -178,8 +178,8 @@ house: Yanille upstairs house, the Yanille twin of the Watchtower slot, no law r
   alt       38t: Construction cape: Yanille → walk 27 → walk 6
   alt       49t: Nightmare Zone Minigame Teleport → walk 17 → walk 6 {cooldown:888=1}
 house: standing at the house portal in Hosidius with house tabs only, Burthorpe castle steps
-  best      24t: House portal: Home → Jewellery box: 5. Burthorpe → walk 6
-  alt       35t: House portal: Home → Jewellery box: A. Warriors' Guild → walk 17
+  best      29t: House portal: Home → Jewellery box: 5. Burthorpe → walk 11
+  alt       40t: House portal: Home → Jewellery box: A. Warriors' Guild → walk 22
 house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)
   best      38t: Teleport to House → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 22 {item:556=1, item:557=1, item:563=1}
   alt       57t: Desert amulet 4: Kalphite cave → walk 52

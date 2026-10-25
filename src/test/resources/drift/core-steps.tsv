@@ -8,7 +8,7 @@ anagram:12063	*	anagram	medium	ANY_OF	2940,3223,0	Taria				none	1546	RATAI
 anagram:12065	*	anagram	medium	ANY_OF	2957,3370,0	Kaylee				none	1536	LEAKEY
 anagram:12067	*	anagram	medium	ANY_OF	2822,3442,0	Hickton				none	1550	THICKNO
 anagram:12069	*	anagram	medium	ANY_OF	2760,3496,0	Sir Kay				none	1534	KAY SIR
-anagram:12071	*	anagram	medium	ANY_OF	2897,3565,0	Eohric				none	1527	HEORIC
+anagram:12071	*	anagram	medium	ANY_OF	2900,3565,1	Eohric				none	1527	HEORIC
 anagram:12132	*	anagram	elite	ANY_OF	2150,3866,0	Oneiromancer				none	1572	CAREER IN MOON
 anagram:12133	*	anagram	elite	ANY_OF	2736,5351,1	Ambassador Alvijar				none	1577	MAJORS LAVA BADS AIR
 anagram:12134	*	anagram	elite	ANY_OF	3182,3946,0	Mandrith				none	1574	DR HITMAN
@@ -104,7 +104,7 @@ anagram:taunt roof	*	anagram	beginner	ANY_OF	3080,3250,0	Fortunato				none	1507	
 anagram:ten wigs on	*	anagram	master	ANY_OF	3389,2877,0|3322,2868,0|3345,2895,0|3365,2868,0|3380,2898,0|3400,2872,0	Wingstone				none	1597	TEN WIGS ON
 anagram:twenty cure iron	*	anagram	master	ANY_OF	1503,3553,0	New Recruit Tony				none	1598	TWENTY CURE IRON
 cipher:19762	*	cipher	medium	ANY_OF	1625,3802,0	npc 7048				none	2268	The cipher reveals who to speak to next: QSPGFTTPS HSBDLMFCPOF
-cipher:19764	*	cipher	medium	ANY_OF	3112,3162,0	npc 5081				none	2267	The cipher reveals who to speak to next: XJABSE USBJCPSO
+cipher:19764	*	cipher	medium	ANY_OF	3112,3162,1	npc 5081				none	2267	The cipher reveals who to speak to next: XJABSE USBJCPSO
 cipher:19766	*	cipher	medium	ANY_OF	1845,3754,0	npc 6971				none	2266	The cipher reveals who to speak to next: ECRVCKP MJCNGF
 cipher:19768	*	cipher	medium	ANY_OF	3354,2974,0	npc 11875				none	2263	The cipher reveals who to speak to next: BMJ UIF LFCBC TFMMFS
 cipher:19770	*	cipher	medium	ANY_OF	3227,3227,0	npc 311				none	2265	The cipher reveals who to speak to next: HQNM LZM STSNQ
@@ -363,7 +363,7 @@ cryptic:his bark is worse than his bite.	*	cryptic	elite	ANY_OF	3499,3503,0	Bark
 cryptic:his head might be hollow, but the crates nearby are filled with surprises.	*	cryptic	hard	ANY_OF	3478,3091,0			354		none	1394	His head might be hollow, but the crates nearby are filled with surprises.
 cryptic:hopefully this set of armour will help you to keep surviving.	*	cryptic	master	ANY_OF	2982,3336,2	Sir Vyvin				none	1478	Hopefully this set of armour will help you to keep surviving.
 cryptic:i am a token of the greatest love. i have no beginning or end. my eye is red, i can fit like a glove. go to the place where it's money they lend, and dig by the gate to be my friend.	*	cryptic	hard	ANY_OF	3191,9825,0					spade	1418	I am a token of the greatest love. I have no beginning or end. My eye is red, I can fit like a glove. Go to the place where it's money they lend, And dig by the gate to be my friend.
-cryptic:i am the one who watches the giants. the giants in turn watch me. i watch with two while they watch with one. come seek where i may be.	*	cryptic	elite	ANY_OF	2840,3538,0	Kamfreena				none	1431	I am the one who watches the giants. The giants in turn watch me. I watch with two while they watch with one. Come seek where I may be.
+cryptic:i am the one who watches the giants. the giants in turn watch me. i watch with two while they watch with one. come seek where i may be.	*	cryptic	elite	ANY_OF	2845,3539,2	Kamfreena				none	1431	I am the one who watches the giants. The giants in turn watch me. I watch with two while they watch with one. Come seek where I may be.
 cryptic:i burn between heroes and legends.	*	cryptic	elite	ANY_OF	2799,3438,0	Candle maker				none	1428	I burn between heroes and legends.
 cryptic:i have many arms but legs, i have just one. i have little family but my seed you can grow on, i am not dead, yet i am but a spirit, and my power, on your quests, you will earn the right to free it.	*	cryptic	hard	ANY_OF	2544,3170,0			1293		none	1371	I have many arms but legs, I have just one. I have little family but my seed you can grow on, I am not dead, yet I am but a spirit, and my power, on your quests, you will earn the right to free it.
 cryptic:i lie beneath the first descent to the holy encampment.	*	cryptic	master	ANY_OF	2914,5300,1					spade	1488	I lie beneath the first descent to the holy encampment.
@@ -496,7 +496,7 @@ cryptic:south of a river in a town surrounded by the undead, what lies beneath t
 cryptic:speak to a referee.	*	cryptic	medium	ANY_OF	2386,3487,0	Gnome ball referee				none	1356	Speak to a referee.
 cryptic:speak to a wyse man.	*	cryptic	elite	ANY_OF	3026,3378,0	Wyson the gardener				none	1432	Speak to a Wyse man.
 cryptic:speak to arhein in catherby.	*	cryptic	easy	ANY_OF	2803,3430,0	Arhein				none	1258	Speak to Arhein in Catherby.
-cryptic:speak to donovan, the family handyman.	*	cryptic	medium	ANY_OF	2737,3580,0	Donovan the Family Handyman				none	1358	Speak to Donovan, the Family Handyman.
+cryptic:speak to donovan, the family handyman.	*	cryptic	medium	ANY_OF	2743,3578,1	Donovan the Family Handyman				none	1358	Speak to Donovan, the Family Handyman.
 cryptic:speak to doric, who lives north of falador.	*	cryptic	easy	ANY_OF	2951,3451,0	Doric				none	1259	Speak to Doric, who lives north of Falador.
 cryptic:speak to ellis in al kharid.	*	cryptic	easy	ANY_OF	3276,3191,0	Ellis				none	1271	Speak to Ellis in Al Kharid.
 cryptic:speak to gaius in taverley.	*	cryptic	easy	ANY_OF	2884,3450,0	Gaius				none	1255	Speak to Gaius in Taverley.

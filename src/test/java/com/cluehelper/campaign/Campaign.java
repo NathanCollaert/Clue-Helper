@@ -285,12 +285,19 @@ public final class Campaign
 		{
 			progress.history.add(progress.current);
 		}
+		if (progress.status(next) == CampaignProgress.Status.UNTESTED)
+		{
+			progress.untestedFrom = next;
+		}
 		progress.current = next;
 		saveProgress();
 		mockCurrent();
 	}
 
-	/** Steps to retest first, then the next untested one after {@code from}, wrapping round; never {@code from} itself. */
+	/**
+	 * Steps to retest first, then the next untested one after the untested step reached last (else after {@code from}),
+	 * wrapping round; never {@code from} itself. A retest further down the order doesn't move where the untested go on.
+	 */
 	private String next(String from)
 	{
 		List<String> order = progress.order;
@@ -301,7 +308,8 @@ public final class Campaign
 				return key;
 			}
 		}
-		int at = from == null ? -1 : order.indexOf(from);
+		String resume = progress.untestedFrom != null ? progress.untestedFrom : from;
+		int at = resume == null ? -1 : order.indexOf(resume);
 		for (int i = 1; i <= order.size(); i++)
 		{
 			String key = order.get(Math.floorMod(at + i, order.size()));
