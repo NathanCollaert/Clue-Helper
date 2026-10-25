@@ -91,8 +91,7 @@ public final class CampaignReplay
 		ClientTape tape = ClientTape.replaying(recording.client);
 		Client client = tape.client();
 		PlayerSnapshot player = recording.player;
-		Step travel = StageTarget.travelStep(resolve(recording, client), PlayerSnapshot.items(player.getInventory()),
-			recording.stageBank, player.getAccountType().canTrade());
+		Step travel = StageTarget.travelStep(resolve(recording, client), PlayerSnapshot.items(player.getInventory()));
 		StepNeeds needs = new StepNeeds(client, id -> stashState(recording, id), (bonus, owned) -> gearPieces(recording, bonus.name(), owned),
 			() -> StepNeeds.ownedItemIds(player, recording.banked));
 		AvailabilityEngine engine = new AvailabilityEngine(runes, id -> "item " + id);

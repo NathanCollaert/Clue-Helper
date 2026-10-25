@@ -804,13 +804,13 @@ music:24773	*	music	elite	ANY_OF	2990,3384,0	Cecilia				none	1898	Play Lament fo
 music:25792	*	music	hard	ANY_OF	2990,3384,0	Cecilia				none	1894	Play Regal Pomp
 music:26943	*	music	elite	ANY_OF	2990,3384,0	Cecilia				none	1899	Play The Pharaoh
 music:28918	*	music	hard	ANY_OF	2990,3384,0	Cecilia				none	3503	Play The Moons of Ruin
-skill:CHARLIE:i need to give charlie a cooked pike.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1812	i need to give charlie a cooked pike.
-skill:CHARLIE:i need to give charlie a cooked trout.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1811	i need to give charlie a cooked trout.
+skill:CHARLIE:i need to give charlie a cooked pike.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1812	i need to give charlie a cooked pike.
+skill:CHARLIE:i need to give charlie a cooked trout.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1811	i need to give charlie a cooked trout.
 skill:CHARLIE:i need to give charlie a leather body.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1817	i need to give charlie a leather body.
-skill:CHARLIE:i need to give charlie a piece of iron ore.	*	skill	beginner	SEQUENCE	3285,3365,0|3209,3392,0	Charlie the Tramp				none	1815	i need to give charlie a piece of iron ore.
-skill:CHARLIE:i need to give charlie a raw herring.	*	skill	beginner	SEQUENCE	3014,3226,0|3209,3392,0	Charlie the Tramp				none	1813	i need to give charlie a raw herring.
-skill:CHARLIE:i need to give charlie a raw trout.	*	skill	beginner	SEQUENCE	3104,3424,0|3209,3392,0	Charlie the Tramp				none	1814	i need to give charlie a raw trout.
-skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3188,3425,0|3247,3404,0|3228,3435,0|3287,6055,0|2651,3164,0|3178,2427,0|1949,2761,0|2651,2658,0|2614,3081,0|1403,3341,0|2958,5803,0|2397,3805,0|1446,9584,1|2828,10201,0|1401,2863,0|1214,3110,0|2713,3493,0|1596,3664,0|2066,2719,0|3409,2921,0|1529,3830,0|1401,3756,0|3360,3155,0|2918,3573,0|2999,3144,0|2637,3418,0|3112,9689,0|1778,3058,0|2218,2784,0|3012,9812,0|2551,3898,0|2710,5273,0|2620,3663,0|1766,10158,0|1962,9072,0|3665,3362,0|2500,3331,0|3754,3319,0|3406,2834,0|2790,3101,0|3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
+skill:CHARLIE:i need to give charlie a piece of iron ore.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1815	i need to give charlie a piece of iron ore.
+skill:CHARLIE:i need to give charlie a raw herring.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1813	i need to give charlie a raw herring.
+skill:CHARLIE:i need to give charlie a raw trout.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1814	i need to give charlie a raw trout.
+skill:CHARLIE:i need to give charlie one iron dagger.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1816	i need to give charlie one iron dagger.
 skill:CHARLIE:i need to give charlie some leather chaps.	*	skill	beginner	SEQUENCE	3209,3392,0	Charlie the Tramp				none	1818	i need to give charlie some leather chaps.
 skill:SHERLOCK:activate the chivalry prayer.	*	skill	elite	SEQUENCE	2733,3415,0	Sherlock				none	1841	activate the chivalry prayer.
 skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.	*	skill	master	SEQUENCE	1827,3771,0|1832,3771,0|2733,3415,0	Sherlock				3 item requirements	1863	angle for an anglerfish whilst sporting the finest fishing gear.

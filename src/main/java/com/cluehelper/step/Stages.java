@@ -130,10 +130,11 @@ public final class Stages
 
 	/**
 	 * Sherlock: the task (at its places, or anywhere when the data has none) until core marks it completed, then
-	 * Sherlock. Charlie: the item's sources while the data has any, then Charlie. Empty when only the hand-in is left.
+	 * Sherlock. Empty when only the hand-in is left, and for Charlie, whose item is a need of the step like Sherlock's
+	 * items: the player brings it.
 	 */
 	static List<Stage> challenge(StepIndex.Entry entry, String task, boolean completed, ItemRequirement returnItem,
-		List<WorldPoint> targets, Function<StepIndex.Requires, ItemRequirement> tools, List<ItemRequirement> emptied)
+		List<WorldPoint> targets, List<ItemRequirement> emptied)
 	{
 		List<Stage> stages = new ArrayList<>();
 		if (returnItem == null && !completed)
@@ -153,14 +154,6 @@ public final class Stages
 					.flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet()))
 				.uses(entry == null ? Map.of() : usesByTile(entry.getPlaces()))
 				.book(entry == null || entry.getBook() == null ? null : Book.valueOf(entry.getBook())).build());
-		}
-		if (returnItem != null && entry != null && !entry.getSources().isEmpty())
-		{
-			StepIndex.Place source = entry.getSources().get(0);
-			List<ItemRequirement> needed = source.getTools().stream().map(tools).collect(Collectors.toList());
-			stages.add(Stage.builder().kind(Stage.Kind.FETCH).act("Get the item").detail(source.getText())
-				.tiles(placeTiles(entry.getSources())).ourMarker(true).item(returnItem).tools(List.copyOf(needed))
-				.objectIds(objectsOf(entry.getSources())).build());
 		}
 		if (stages.isEmpty())
 		{

@@ -3,7 +3,6 @@ package com.cluehelper.campaign;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.GearPicker;
 import com.cluehelper.route.PlannerSettings;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,8 +24,6 @@ final class CampaignRecording
 	/** Bank and group storage hold only the items a teleport, a rune, a need or a stage could use. */
 	PlayerSnapshot player;
 	PlayerSnapshot banked;
-	/** The remembered bank's items that meet a stage's item: they decide which leading stages are dropped. */
-	Map<Integer, Integer> stageBank;
 	boolean pinPending;
 	boolean atOpenBank;
 	long nowMinutes;

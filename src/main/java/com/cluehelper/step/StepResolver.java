@@ -33,7 +33,6 @@ public class StepResolver
 	private final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
 	/** One requirement per key or tool entry, so a re-read step equals the last one. */
 	private final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
-	private final Map<StepIndex.Requires, ItemRequirement> toolRequirements = new ConcurrentHashMap<>();
 
 	@Inject
 	StepResolver(StepData data)
@@ -98,15 +97,9 @@ public class StepResolver
 		if (clue instanceof SkillChallengeClue)
 		{
 			return Stages.challenge(entry, ((SkillChallengeClue) clue).getRawChallenge(), CoreClueReader.challengeCompleted(clue),
-				CoreClueReader.returnItem(clue), targets, tool -> toolRequirements.computeIfAbsent(tool, StepResolver::anyOf),
-				EmptySlots.of(CoreClueReader.itemRequirements(clue)));
+				CoreClueReader.returnItem(clue), targets, EmptySlots.of(CoreClueReader.itemRequirements(clue)));
 		}
 		return List.of();
-	}
-
-	private static ItemRequirement anyOf(StepIndex.Requires items)
-	{
-		return ItemRequirements.any(items.getName(), items.getIds().stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new));
 	}
 
 	/** Cache tiles the step is also done at, off core's targets: Brimstail inside his cave, Martin Thwait in the den. */
@@ -284,7 +277,9 @@ public class StepResolver
 		SpadeNeed spade = clue.isRequiresSpade() ? SpadeNeed.SPADE : SpadeNeed.NONE;
 		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
 		List<ItemRequirement> items = CoreClueReader.challengeCompleted(clue) ? List.of() : CoreClueReader.itemRequirements(clue);
-		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
+		StepRequirements requirements = new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
 			CoreClueReader.lightSourceVarbitId(clue), items, stash == null ? StepRequirements.NO_STASH : stash.getObjectId());
+		ItemRequirement charliesItem = CoreClueReader.returnItem(clue);
+		return charliesItem == null ? requirements : requirements.plusOwn(charliesItem);
 	}
 }

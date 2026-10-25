@@ -110,7 +110,6 @@ public final class StepIndex
 		private WayIn entry;
 		private Reach reach;
 		private List<Place> places;
-		private List<Place> sources;
 		private List<String> wear;
 		private List<String> optional;
 		private Map<String, List<Level>> optionalFrom;
@@ -246,11 +245,6 @@ public final class StepIndex
 		public boolean hasPlaces()
 		{
 			return places != null;
-		}
-
-		public List<Place> getSources()
-		{
-			return sources == null ? List.of() : sources;
 		}
 
 		/** Core's items the task can do without (a rake for a weeded patch), by core's names for them. */
@@ -855,7 +849,6 @@ public final class StepIndex
 	{
 		private int[] tile;
 		private String text;
-		private List<Requires> tools;
 		private List<Integer> objects;
 		private List<Integer> npcs;
 		private List<String> click;
@@ -878,12 +871,6 @@ public final class StepIndex
 		public int[] getSpan()
 		{
 			return span.clone();
-		}
-
-		/** For an item source: what gathering it takes. */
-		public List<Requires> getTools()
-		{
-			return tools == null ? List.of() : tools;
 		}
 
 		public WorldPoint getTile()

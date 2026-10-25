@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.Value;
@@ -78,9 +77,7 @@ public final class CampaignRecorder
 		CampaignRecording recording = new CampaignRecording();
 		ClientTape tape = ClientTape.recording(client);
 		Step step = new StepResolver(() -> index).resolve(CoreClues.entry(coreClue), CoreClues.plugin(tape.client()));
-		recording.stageBank = stageBank(step);
-		Step travel = StageTarget.travelStep(step, PlayerSnapshot.items(input.getPlayer().getInventory()), recording.stageBank,
-			input.getPlayer().getAccountType().canTrade());
+		Step travel = StageTarget.travelStep(step, PlayerSnapshot.items(input.getPlayer().getInventory()));
 		recording.stashStates = new TreeMap<>();
 		recording.gearPieces = new TreeMap<>();
 		recording.onlyInBankedKit = new TreeMap<>();
@@ -149,19 +146,9 @@ public final class CampaignRecorder
 		return only;
 	}
 
-	/** The remembered bank's items that meet one of the step's stage items. */
-	private Map<Integer, Integer> stageBank(Step step)
-	{
-		BankMemory.Seen bank = bankMemory.getBank();
-		Predicate<Integer> meetsAStage = id -> step.getStages().stream().anyMatch(stage -> meets(stage, id));
-		return bank == null || bank.items == null ? Map.of() : bank.items.entrySet().stream().filter(stack -> meetsAStage.test(stack.getKey()))
-			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, TreeMap::new));
-	}
-
 	private static boolean meets(Stage stage, int itemId)
 	{
-		return stage.getItem() != null && stage.getItem().fulfilledBy(itemId)
-			|| stage.getTools().stream().anyMatch(tool -> tool.fulfilledBy(itemId));
+		return stage.getItem() != null && stage.getItem().fulfilledBy(itemId);
 	}
 
 	/**

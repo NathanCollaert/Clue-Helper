@@ -50,7 +50,7 @@ public final class StepRequirements
 		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, more, ownItems, stashObjectId);
 	}
 
-	/** An item the step's route needs that core's *clue* bank tag doesn't list: a source's tools, Charlie's item. */
+	/** An item the step's route needs that core's *clue* bank tag doesn't list: Charlie's item. */
 	public StepRequirements plusOwn(ItemRequirement item)
 	{
 		List<ItemRequirement> more = new ArrayList<>(ownItems);

@@ -22,8 +22,6 @@ public class Stage
 		PART,
 		/** A skill challenge's task; done once core marks the challenge completed. */
 		TASK,
-		/** Get the item Charlie asks for; done once it is carried. */
-		FETCH,
 		/** The step's own target, done last. */
 		FINAL
 	}
@@ -37,11 +35,8 @@ public class Stage
 	boolean ourMarker;
 	/** An NPC that wanders: being this close to a tile is arriving. */
 	int radius;
-	/** The key or the item Charlie wants: the stage is done once it is carried. Null for other stages. */
+	/** The key: the stage is done once it is carried. Null for other stages. */
 	ItemRequirement item;
-	/** What gathering the item takes (a rod and bait), needed while the stage is the source's. */
-	@Builder.Default
-	List<ItemRequirement> tools = List.of();
 	/** Tiles that count only while the named patch is grown (a Farming Guild redwood), by tile. */
 	@Builder.Default
 	Map<WorldPoint, String> grownOnly = Map.of();
