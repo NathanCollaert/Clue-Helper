@@ -551,10 +551,14 @@ public class ClueHelperDevPlugin extends Plugin
 		postSelfTest();
 	}
 
-	/** Mocking or chat on the login screen breaks core's plugins, so the campaign loads a few ticks into the first login. */
+	/**
+	 * Mocking or chat on the login screen breaks core's plugins, so the campaign loads a few ticks into the first login.
+	 * The mocks read core through Clue Helper's link, which is only set while Clue Helper runs.
+	 */
 	private void resumeCampaignOnceLoggedIn()
 	{
-		if (!campaignResumed && client.getGameState() == GameState.LOGGED_IN && ++campaignTicks >= AUTO_RUN_AFTER_TICKS)
+		if (!campaignResumed && client.getGameState() == GameState.LOGGED_IN && pluginManager.isPluginActive(clueHelper)
+			&& ++campaignTicks >= AUTO_RUN_AFTER_TICKS)
 		{
 			campaignResumed = true;
 			campaign.resume();
