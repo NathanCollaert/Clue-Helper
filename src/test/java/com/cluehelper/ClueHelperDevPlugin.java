@@ -1,5 +1,6 @@
 package com.cluehelper;
 
+import com.cluehelper.dev.DevHarness;
 import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
 import com.cluehelper.guide.FairyDials;
@@ -138,6 +139,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private ScheduledExecutorService executor;
 
 	private ClueHelperPlugin clueHelper;
+	/** Built in Clue Helper's own injector, so it shares the plugin's services. */
+	private DevHarness harness;
 	private final List<Runnable> unregister = new ArrayList<>();
 	private boolean autoRunPending = Boolean.getBoolean("cluehelper.selftest");
 	private int loggedInTicks;
@@ -162,6 +165,8 @@ public class ClueHelperDevPlugin extends Plugin
 	protected void startUp()
 	{
 		clueHelper = find(ClueHelperPlugin.class);
+		harness = clueHelper.getInjector().getInstance(DevHarness.class);
+		harness.start(() -> clueHelper.getGuideOverlay().getShown().getState(), clueHelper::boxState);
 		frameWriter = Executors.newSingleThreadExecutor(runnable ->
 		{
 			Thread thread = new Thread(runnable, "clue-helper-dev-frames");
@@ -182,8 +187,8 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getRoutes().addListener(this::onPlanned));
 		unregister.add(clueHelper.getGuide().addListener(this::saveGuideFrames));
-		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new CoreToggleTest()));
-		unregister.add(clueHelper.getDevHarness().getSelfTests().register(new RestartTest()));
+		unregister.add(harness.getSelfTests().register(new CoreToggleTest()));
+		unregister.add(harness.getSelfTests().register(new RestartTest()));
 		BankTrace bankTrace = new BankTrace(client, clueHelper.getBankMemory(), clueHelper.getGuide(),
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(bankTrace);
@@ -353,6 +358,7 @@ public class ClueHelperDevPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
+		harness.stop();
 		frameWriter.shutdown();
 		unregister.forEach(Runnable::run);
 		unregister.clear();
@@ -499,7 +505,7 @@ public class ClueHelperDevPlugin extends Plugin
 						BoxState shown = clueHelper.getGuideOverlay().getShown().getState();
 						run.check(shown == clueHelper.boxState(), "box shows " + shown + " after the restart, signals say "
 							+ clueHelper.boxState());
-						List<String> names = clueHelper.getDevHarness().getSelfTests().testNames();
+						List<String> names = harness.getSelfTests().testNames();
 						run.check(names.size() == new HashSet<>(names).size(), "built-in tests registered once after the restart: " + names);
 						run.done();
 					});
@@ -635,6 +641,7 @@ public class ClueHelperDevPlugin extends Plugin
 	@Subscribe
 	public void onCommandExecuted(CommandExecuted event)
 	{
+		harness.onCommandExecuted(event);
 		if (event.getCommand().equalsIgnoreCase("ch-sample"))
 		{
 			sample();

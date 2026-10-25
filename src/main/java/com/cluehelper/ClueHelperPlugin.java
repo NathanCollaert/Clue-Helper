@@ -1,6 +1,5 @@
 package com.cluehelper;
 
-import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.MenuTarget;
@@ -35,14 +34,12 @@ import com.cluehelper.ui.WaypointOverlay;
 import com.google.inject.Provides;
 import java.util.Set;
 import javax.inject.Inject;
-import javax.inject.Named;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
@@ -187,14 +184,6 @@ public class ClueHelperPlugin extends Plugin
 	private SceneDoors sceneDoors;
 
 
-	@Inject
-	@Getter(AccessLevel.PACKAGE)
-	private DevHarness devHarness;
-
-	@Inject
-	@Named("developerMode")
-	private boolean developerMode;
-
 	private Runnable unregisterRoutes;
 	private Runnable unregisterGuide;
 	private Runnable unregisterHotCold;
@@ -231,16 +220,11 @@ public class ClueHelperPlugin extends Plugin
 			overlayManager.add(overlay);
 		}
 		clientThread.invokeLater(this::showBox);
-		if (developerMode)
-		{
-			devHarness.start(() -> guideOverlay.getShown().getState(), this::boxState);
-		}
 	}
 
 	@Override
 	protected void shutDown()
 	{
-		devHarness.stop();
 		for (Overlay overlay : overlays())
 		{
 			overlayManager.remove(overlay);
@@ -440,12 +424,6 @@ public class ClueHelperPlugin extends Plugin
 		grownPatches.publish();
 		fairyRings.publish();
 		xericsHonour.publish();
-	}
-
-	@Subscribe
-	public void onCommandExecuted(CommandExecuted event)
-	{
-		devHarness.onCommandExecuted(event);
 	}
 
 	BoxState boxState()
