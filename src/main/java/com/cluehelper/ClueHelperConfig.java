@@ -25,8 +25,8 @@ public interface ClueHelperConfig extends Config
 	String spellbookSection = "spellbook";
 
 	@ConfigSection(
-		name = "Highlights and markers",
-		description = "What the plugin draws for the current sub-step",
+		name = "Guidance",
+		description = "What the plugin shows and draws for the current sub-step",
 		position = 2
 	)
 	String guidanceSection = "guidance";
@@ -41,7 +41,7 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "avoidWilderness",
 		name = "Avoid Wilderness",
-		description = "Leave out routes through the Wilderness for steps outside it, unless it's the only way there, and prefer hot/cold feels outside it. Hardcore only applies to Hardcore Ironman and Hardcore Group Ironman accounts",
+		description = "Leave out Wilderness routes for steps outside it. Hardcore only: just on Hardcore Ironman and Hardcore Group Ironman accounts",
 		section = routesSection,
 		position = 0
 	)
@@ -53,7 +53,7 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "scrollBookOutOfWilderness",
 		name = "Scroll book stays out of Wilderness",
-		description = "For a master scroll book teleport into the Wilderness (Revenant caves), take the scroll out at a bank and bank the book first",
+		description = "Bank the master scroll book before a teleport into the Wilderness",
 		section = routesSection,
 		position = 1
 	)
@@ -135,11 +135,23 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "showBox",
+		name = "Show the box",
+		description = "Show the Clue Helper box under the Clue Scroll plugin's box. Highlights and the path work without it",
+		section = guidanceSection,
+		position = 4
+	)
+	default boolean showBox()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "showNextStep",
 		name = "Show the next step",
 		description = "Show the step after the current one in the box",
 		section = guidanceSection,
-		position = 4
+		position = 5
 	)
 	default boolean showNextStep()
 	{

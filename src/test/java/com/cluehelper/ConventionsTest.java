@@ -49,7 +49,7 @@ public class ConventionsTest
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
 		"avoidWilderness", "scrollBookOutOfWilderness",
 		"highlightItems", "highlightSpells", "highlightMenus",
-		"pathLine", "showNextStep",
+		"pathLine", "showBox", "showNextStep",
 		"spellbookChanges", "useBank",
 		"hotColdPlanner"));
 

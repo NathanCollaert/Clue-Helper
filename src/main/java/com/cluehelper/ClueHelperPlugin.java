@@ -68,8 +68,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @Slf4j
 @PluginDescriptor(
 	name = "Clue Helper",
-	description = "Fastest clue routes from what you own, alongside the Clue Scroll plugin",
-	tags = {"clue", "clues", "treasure", "trails", "teleport", "route"}
+	description = "Fastest clue routes from the teleports you own, hot/cold planning and step-by-step guidance, alongside the Clue Scroll plugin",
+	tags = {"clue", "clues", "treasure", "trails", "teleport", "route", "hot", "cold", "stash", "guide"}
 )
 @PluginDependency(ClueScrollPlugin.class)
 public class ClueHelperPlugin extends Plugin

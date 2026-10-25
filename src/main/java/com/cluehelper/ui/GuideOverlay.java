@@ -1,5 +1,6 @@
 package com.cluehelper.ui;
 
+import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.ClueHelperPlugin;
 import com.cluehelper.hotcold.HotColdView;
 import java.awt.Color;
@@ -35,13 +36,15 @@ public class GuideOverlay extends OverlayPanel
 	private static final Color UPCOMING = new Color(135, 135, 135);
 	private static final char NO_BREAK = ' ';
 
+	private final ClueHelperConfig config;
 	private volatile GuideBox box = GuideBox.EMPTY;
 	private FontMetrics metrics;
 
 	@Inject
-	GuideOverlay(ClueHelperPlugin plugin)
+	GuideOverlay(ClueHelperPlugin plugin, ClueHelperConfig config)
 	{
 		super(plugin);
+		this.config = config;
 		setPosition(OverlayPosition.TOP_LEFT);
 		setPriority(BELOW_CORE_CLUE_BOX);
 		addMenuEntry(MenuAction.RUNELITE_OVERLAY_CONFIG, OverlayManager.OPTION_CONFIGURE, "Clue Helper overlay");
@@ -63,7 +66,7 @@ public class GuideOverlay extends OverlayPanel
 	public Dimension render(Graphics2D graphics)
 	{
 		GuideBox shown = box;
-		if (!shown.isShown())
+		if (!shown.isShown() || !config.showBox())
 		{
 			return null;
 		}
