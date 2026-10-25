@@ -5,6 +5,7 @@ import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
+import com.cluehelper.step.GearBonus;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
@@ -12,11 +13,15 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepRequirements;
 import com.cluehelper.transport.AvailabilityService;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,10 +50,9 @@ public class StepNeeds
 	private static final int LIT = 1;
 
 	private final Client client;
-	private final StashMemory stash;
-	private final GearPieces gearPieces;
-	private final AvailabilityService availability;
-	private final PlayerModel player;
+	private final IntFunction<StashMemory.State> stashStates;
+	private final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
+	private final Supplier<Set<Integer>> ownedItemIds;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
@@ -56,11 +60,20 @@ public class StepNeeds
 	@Inject
 	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)
 	{
+		this(client, stash::state, gearPieces::of, () -> ownedItemIds(player.getSnapshot(), availability.getBankedSnapshot()));
+	}
+
+	/**
+	 * @param client names, real levels and varbits
+	 * @param ownedItemIds what gear is picked from: carried, and stored while banking counts
+	 */
+	public StepNeeds(Client client, IntFunction<StashMemory.State> stashStates,
+		BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces, Supplier<Set<Integer>> ownedItemIds)
+	{
 		this.client = client;
-		this.stash = stash;
+		this.stashStates = stashStates;
 		this.gearPieces = gearPieces;
-		this.availability = availability;
-		this.player = player;
+		this.ownedItemIds = ownedItemIds;
 	}
 
 	public RequiredItems of(Step step)
@@ -97,10 +110,10 @@ public class StepNeeds
 		{
 			needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
 		}
-		Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds();
+		Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds.get();
 		for (StepIndex.Gear gear : step.getData().getGear())
 		{
-			GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.of(gear.getBonus(), owned));
+			GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.apply(gear.getBonus(), owned));
 			needs.add(new RequiredItems.Need(gear.getName(), worn, false, false));
 		}
 		return RequiredItems.builder()
@@ -145,11 +158,9 @@ public class StepNeeds
 	}
 
 	/** Gear is picked from all of these, the bank only while banking counts. */
-	private Set<Integer> ownedItemIds()
+	public static Set<Integer> ownedItemIds(PlayerSnapshot snapshot, PlayerSnapshot banked)
 	{
-		PlayerSnapshot snapshot = player.getSnapshot();
 		Set<Integer> ids = new HashSet<>(snapshot == null ? Set.of() : snapshot.carriedIds());
-		PlayerSnapshot banked = availability.getBankedSnapshot();
 		if (banked != null)
 		{
 			ids.addAll(banked.storedIds());
@@ -164,7 +175,7 @@ public class StepNeeds
 
 	private StashMemory.State stash(StepRequirements requirements)
 	{
-		return requirements.hasStash() ? stash.state(requirements.getStashObjectId()) : StashMemory.State.NONE;
+		return requirements.hasStash() ? stashStates.apply(requirements.getStashObjectId()) : StashMemory.State.NONE;
 	}
 
 	private static ItemRequirement anyOf(StepIndex.Requires way)

@@ -78,3 +78,18 @@ tasks.register('spellbookTimings', JavaExec) {
 	mainClass = 'com.cluehelper.dev.SpellbookTimingDump'
 	args project.findProperty('log') ?: 'src/test/resources/b04/run1-swap-and-occult.jsonl'
 }
+
+tasks.register('acceptTickChanges', JavaExec) {
+	group = 'tools'
+	description = "Take the new tick counts of the campaign steps the last test run marked ticks-only, after reading build/campaign/changed.html"
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.cluehelper.campaign.AcceptTickChanges'
+}
+
+tasks.register('campaignReplay', JavaExec) {
+	group = 'tools'
+	description = 'Replay one campaign recording beside what was recorded: gradlew campaignReplay -Pfile=<recording .json.gz>'
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.cluehelper.campaign.ReplayRecording'
+	args project.findProperty('file') ?: ''
+}

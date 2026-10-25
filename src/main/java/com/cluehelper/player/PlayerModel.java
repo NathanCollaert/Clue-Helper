@@ -548,7 +548,6 @@ public class PlayerModel
 	public boolean carriesItemNamed(String nameStart)
 	{
 		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.getInventory().keySet().stream()
-			.anyMatch(id -> client.getItemDefinition(id).getName().toLowerCase().startsWith(nameStart));
+		return snapshot != null && snapshot.carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
 }

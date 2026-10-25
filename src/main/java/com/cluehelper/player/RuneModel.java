@@ -3,6 +3,7 @@ package com.cluehelper.player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,15 @@ public final class RuneModel
 	public List<Spell> getSpells()
 	{
 		return spells;
+	}
+
+	/** Every item that pays for a rune or stands in for one: runes, combination runes, staves and tomes. */
+	public Set<Integer> sourceItemIds()
+	{
+		Set<Integer> ids = new HashSet<>();
+		payersByRune.values().forEach(ids::addAll);
+		unlimitingWornItemsByRune.values().forEach(ids::addAll);
+		return Set.copyOf(ids);
 	}
 
 	/** -1 for an unknown pouch type. */

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
@@ -38,7 +39,7 @@ final class MockClues
 
 	private static final String CLUES_PACKAGE = "net.runelite.client.plugins.cluescrolls.clues.";
 	private static final List<String> LIST_TYPES = List.of("CrypticClue", "AnagramClue", "CipherClue", "CoordinateClue",
-		"EmoteClue", "MapClue", "FairyRingClue", "MusicClue", "FaloTheBardClue", "SkillChallengeClue");
+		"EmoteClue", "MapClue", "BeginnerMapClue", "FairyRingClue", "MusicClue", "FaloTheBardClue", "SkillChallengeClue");
 
 	/** One core clue with what Clue Helper reads from it. */
 	static final class Mock
@@ -48,6 +49,8 @@ final class MockClues
 		final String type;
 		final String tier;
 		final String text;
+		/** Null for a step without a tile. */
+		final WorldPoint target;
 
 		Mock(ClueScroll clue, Step step)
 		{
@@ -56,6 +59,7 @@ final class MockClues
 			this.type = step.getType();
 			this.tier = step.getTier();
 			this.text = step.getText() == null ? step.getKey() : step.getText();
+			this.target = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		}
 
 		String describe()
@@ -168,6 +172,18 @@ final class MockClues
 		}
 		position = Math.floorMod(position + by, list.size());
 		show(list.get(position), (position + 1) + " / " + list.size());
+	}
+
+	/** Client thread. Every clue core's lists hold. */
+	List<Mock> all()
+	{
+		return catalog();
+	}
+
+	/** Client thread. One clue, outside the list. */
+	void mock(Mock mock, String where)
+	{
+		show(mock, where);
 	}
 
 	/** Client thread. */

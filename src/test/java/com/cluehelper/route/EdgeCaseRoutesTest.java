@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Charge;
-import com.cluehelper.player.Container;
 import com.cluehelper.player.HouseState;
 import com.cluehelper.player.Loadouts;
 import com.cluehelper.player.PlayerSnapshot;
@@ -19,7 +18,6 @@ import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
 import com.cluehelper.transport.CatalogLoader;
-import com.google.gson.JsonElement;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +29,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,52 +41,36 @@ import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * On a cost-model change the test writes build/golden/*.txt and fails with the changed lines; once the diff is read,
- * copy them over src/test/resources/golden/.
+ * Hand-built cases that fail quietly: consumption, spellbook changes, Wilderness starts, bank tipping points, the house,
+ * rides and start legs, apart from the campaign's played steps. On a change the test writes build/edge-cases.txt and
+ * fails with the first changed line; once the diff is read, copy it over src/test/resources/edge-cases.txt.
  */
-public class GoldenRoutesTest
+public class EdgeCaseRoutesTest
 {
-	private static final Path ACTUAL = Paths.get("build/golden");
+	private static final Path ACTUAL = Paths.get("build/edge-cases.txt");
+	private static final String GOLDEN = "/edge-cases.txt";
 	private static final WorldPoint ANYWHERE = new WorldPoint(3164, 3486, 0);
-	private static final int SAMPLE_PER_TYPE = 6;
 	private static final long NOW_MINUTES = 29_000_000L;
 	private static final int HOME_TELEPORT_TIMER_VARP = 892;
 	private static final int MINIGAME_TELEPORT_TIMER_VARP = 888;
-	/** The largest heuristic regrets on the maxed main, and Draynor Manor's fenced grounds. */
-	private static final List<String> REGRETS = List.of(
-		"cryptic:search through chests found in the upstairs of houses in eastern falador.",
-		"cryptic:you will need to under-cook to solve this one.",
-		"cryptic:search through some drawers in the upstairs of a house in rimmington.",
-		"anagram:12566",
-		"cryptic:search the crates in a bank in varrock.",
-		"emote:12021",
-		"coordinate:2840,3423,0",
-		"coordinate:2303,3328,0",
-		"emote:19791");
-
-	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin. */
 	private static final int TEAR_OF_THE_SOUL_DOCK = 45;
 	/** The Kharazi ledge below the cliff and its vine up. */
 	private static final int LEDGE_SOUTH_Y = 2940;
 	private static final int VINE_X = 2899;
 	private static final int GREATER_TELEPORT_FOCUS = 2;
 
+	/** Mid-ironman steps where a bank stop wins or loses by a few ticks either side of the margin. */
 	private static final List<String> TIPPING_POINTS = List.of("coordinate:3556", "map:3599", "spot:MISTHALIN_VARROCK_STONE_CIRCLE");
 
-	private static final GoldenCoverage COVERAGE = new GoldenCoverage();
-	private static boolean fixturesRan;
-	private static boolean specialRan;
 
 	private static WalkTable table;
 	private static Catalog catalog;
 	private static RuneModel runes;
 	private static Map<String, Step> steps;
-	private static final List<String> timings = new ArrayList<>();
 
 	@BeforeClass
 	public static void load() throws IOException
@@ -100,58 +81,12 @@ public class GoldenRoutesTest
 		steps = DriftSteps.read();
 	}
 
-	@Test
-	public void fixtureRoutesMatchTheirGoldenFiles() throws IOException
-	{
-		List<String> failures = new ArrayList<>();
-		for (String fixture : Loadouts.NAMES)
-		{
-			Loadouts.Loadout loadout = Loadouts.load(fixture);
-			PlannerSettings settings = PlannerSettings.builder()
-				.avoidWilderness(loadout.getFixture().get("avoidWilderness").getAsBoolean()).build();
-			List<String> lines = new ArrayList<>();
-			List<Long> nanos = new ArrayList<>();
-			List<Integer> labelCounts = new ArrayList<>();
-			List<Long> contexts = new ArrayList<>();
-			List<Integer> searchCounts = new ArrayList<>();
-			for (Step step : sample(loadout))
-			{
-				PlanInput input = input(ready(loadout.getCarried()), step, PlanStart.teleportOnly(ANYWHERE), settings)
-					.banked(loadout.getBankedSnapshot() == null ? null : ready(loadout.getBankedSnapshot())).build();
-				Plan plan = checked(input);
-				nanos.add(plan.getSearchNanos());
-				labelCounts.add(plan.getLabels());
-				contexts.add(plan.getContextNanos());
-				searchCounts.add(plan.getSearches());
-				lines.add(line(step.getKey(), plan));
-			}
-			timings.add(timing(fixture, nanos, labelCounts) + String.format("; judging median %.1f ms; %d searches",
-				contexts.stream().mapToLong(Long::longValue).sorted().toArray()[contexts.size() / 2] / 1e6,
-				searchCounts.stream().mapToInt(Integer::intValue).sum()));
-			compare(fixture, lines, failures);
-		}
-		writeTimings();
-		fixturesRan = true;
-		assertTrue(String.join("\n", failures), failures.isEmpty());
-	}
-
-	@AfterClass
-	public static void goldenRoutesCoverEveryTierABKind() throws IOException
-	{
-		if (!fixturesRan || !specialRan)
-		{
-			return;
-		}
-		Files.write(ACTUAL.resolve("coverage.txt"), COVERAGE.lines(), StandardCharsets.UTF_8);
-		assertTrue("no golden route uses " + COVERAGE.missing(), COVERAGE.missing().isEmpty());
-	}
-
 	/** Partway to the Gu'Tanoth cave its entrance lies past the loaded scene; going back to the landing must not win. */
 	@Test
 	public void startJoinsALongWalkPartway() throws IOException
 	{
 		SceneFiles.Recorded recorded;
-		try (InputStream in = GoldenRoutesTest.class.getResourceAsStream("/scenes/2504_2864_0.scene.gz"))
+		try (InputStream in = EdgeCaseRoutesTest.class.getResourceAsStream("/scenes/2504_2864_0.scene.gz"))
 		{
 			recorded = SceneFiles.read(in);
 		}
@@ -223,14 +158,14 @@ public class GoldenRoutesTest
 
 	private static SceneBfs.Scene scene(String name) throws IOException
 	{
-		try (InputStream in = GoldenRoutesTest.class.getResourceAsStream("/scenes/" + name + ".scene.gz"))
+		try (InputStream in = EdgeCaseRoutesTest.class.getResourceAsStream("/scenes/" + name + ".scene.gz"))
 		{
 			return SceneFiles.read(in).getScene();
 		}
 	}
 
 	@Test
-	public void specialCasesMatchTheirGoldenFile() throws IOException
+	public void edgeCasesMatchTheirGoldenFile() throws IOException
 	{
 		List<String> lines = new ArrayList<>();
 		PlannerSettings plain = PlannerSettings.builder().build();
@@ -309,8 +244,7 @@ public class GoldenRoutesTest
 		lines.add(probeLine(checked(input(mid, probes(), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 
 		List<String> failures = new ArrayList<>();
-		compare("special", lines, failures);
-		specialRan = true;
+		compare(lines, failures);
 		assertTrue(String.join("\n", failures), failures.isEmpty());
 	}
 
@@ -599,24 +533,23 @@ public class GoldenRoutesTest
 
 	private static String line(String name, Plan plan)
 	{
-		COVERAGE.add(name, plan);
 		StringBuilder out = new StringBuilder(name);
-		out.append("\n  best      ").append(describe(plan.getBest()));
+		out.append("\n  best      ").append(RouteText.describe(plan.getBest()));
 		if (plan.getDirect() != null)
 		{
-			out.append("\n  direct    ").append(describe(plan.getDirect()));
+			out.append("\n  direct    ").append(RouteText.describe(plan.getDirect()));
 		}
 		if (plan.getSameBook() != null)
 		{
-			out.append("\n  same book ").append(describe(plan.getSameBook()));
+			out.append("\n  same book ").append(RouteText.describe(plan.getSameBook()));
 		}
 		if (plan.getFasterUnqualified() != null)
 		{
-			out.append("\n  faster, under the margin ").append(describe(plan.getFasterUnqualified()));
+			out.append("\n  faster, under the margin ").append(RouteText.describe(plan.getFasterUnqualified()));
 		}
 		for (Route alternative : plan.getAlternatives())
 		{
-			out.append("\n  alt       ").append(describe(alternative));
+			out.append("\n  alt       ").append(RouteText.describe(alternative));
 		}
 		if (plan.getNote() != null)
 		{
@@ -626,47 +559,21 @@ public class GoldenRoutesTest
 		return out.toString();
 	}
 
-	private static String describe(Route route)
-	{
-		if (route == null)
-		{
-			return "none";
-		}
-		String extras = route.getRankHalfTicks() != route.getHalfTicks() ? " (rank " + (route.getRankHalfTicks() + 1) / 2 + ")" : "";
-		String spent = route.getSpent().isEmpty() ? "" : " " + route.getSpent();
-		String ends = route.getEndBook() != route.getStartBook() ? " leaves you on " + route.getEndBook() : "";
-		return route.getTicks() + "t" + extras + ": " + (route.isOpenBankStart() ? "(at the open bank) " : "") + route.describe() + spent
-			+ ends + withdraw(route);
-	}
-
-	private static String withdraw(Route route)
-	{
-		if (!route.isBanked())
-		{
-			return "";
-		}
-		String items = route.getWithdraw().stream().map(use -> use.getItemId() + (use.getContainer() == Container.GROUP_STORAGE ? " (group)" : ""))
-			.collect(Collectors.joining(", "));
-		return " withdraw [" + items + "]" + (route.isDepositFirst() ? " deposit first" : "") + (route.isPinIncluded() ? " +PIN" : "");
-	}
-
 	private static String probeLine(Plan plan)
 	{
 		return "PROBES (hot/cold spots): " + new TreeMap<>(plan.getProbeTicks().entrySet().stream().collect(Collectors.toMap(
 			e -> e.getKey().getX() + "," + e.getKey().getY() + "," + e.getKey().getPlane(), Map.Entry::getValue)));
 	}
 
-	private static void compare(String name, List<String> lines, List<String> failures) throws IOException
+	private static void compare(List<String> lines, List<String> failures) throws IOException
 	{
-		Files.createDirectories(ACTUAL);
-		Path actualFile = ACTUAL.resolve(name + ".txt");
-		Files.write(actualFile, lines, StandardCharsets.UTF_8);
-		List<String> golden = golden(name);
-		List<String> actual = Files.readAllLines(actualFile, StandardCharsets.UTF_8);
+		Files.createDirectories(ACTUAL.getParent());
+		Files.write(ACTUAL, lines, StandardCharsets.UTF_8);
+		List<String> golden = golden();
+		List<String> actual = Files.readAllLines(ACTUAL, StandardCharsets.UTF_8);
 		if (!actual.equals(golden))
 		{
-			failures.add(name + ": routes differ from /golden/" + name + ".txt (actual in " + actualFile + "), first difference: "
-				+ firstDifference(golden, actual));
+			failures.add("routes differ from " + GOLDEN + " (actual in " + ACTUAL + "), first difference: " + firstDifference(golden, actual));
 		}
 	}
 
@@ -684,9 +591,9 @@ public class GoldenRoutesTest
 		return "none";
 	}
 
-	private static List<String> golden(String name) throws IOException
+	private static List<String> golden() throws IOException
 	{
-		try (InputStream in = GoldenRoutesTest.class.getResourceAsStream("/golden/" + name + ".txt"))
+		try (InputStream in = EdgeCaseRoutesTest.class.getResourceAsStream(GOLDEN))
 		{
 			if (in == null)
 			{
@@ -694,21 +601,6 @@ public class GoldenRoutesTest
 			}
 			return new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
 		}
-	}
-
-	private static String timing(String fixture, List<Long> nanos, List<Integer> labelCounts)
-	{
-		long[] sorted = nanos.stream().mapToLong(Long::longValue).sorted().toArray();
-		int[] labels = labelCounts.stream().mapToInt(Integer::intValue).sorted().toArray();
-		return String.format("%s: %d plans, median %.1f ms, p90 %.1f ms, max %.1f ms; labels median %d, max %d", fixture,
-			sorted.length, sorted[sorted.length / 2] / 1e6, sorted[sorted.length * 9 / 10] / 1e6, sorted[sorted.length - 1] / 1e6,
-			labels[labels.length / 2], labels[labels.length - 1]);
-	}
-
-	private static void writeTimings() throws IOException
-	{
-		Files.write(ACTUAL.resolve("timings.txt"), timings, StandardCharsets.UTF_8);
-		timings.forEach(System.out::println);
 	}
 
 	static PlanInput.PlanInputBuilder input(PlayerSnapshot player, Step step, PlanStart start, PlannerSettings settings)
@@ -781,42 +673,6 @@ public class GoldenRoutesTest
 		{
 			throw new IllegalArgumentException(gameval, e);
 		}
-	}
-
-	private static List<Step> sample(Loadouts.Loadout loadout)
-	{
-		JsonElement tiers = loadout.getFixture().get("tiers");
-		List<String> allowed = tiers.isJsonArray() ? new ArrayList<>() : null;
-		if (allowed != null)
-		{
-			tiers.getAsJsonArray().forEach(t -> allowed.add(t.getAsString()));
-		}
-		Map<String, List<Step>> byType = new TreeMap<>();
-		for (Step step : steps.values())
-		{
-			if ((allowed == null || allowed.contains(step.getTier())) && step.getKind() != TargetKind.PROBES)
-			{
-				byType.computeIfAbsent(step.getType(), t -> new ArrayList<>()).add(step);
-			}
-		}
-		List<Step> sample = new ArrayList<>();
-		byType.forEach((type, list) ->
-		{
-			int take = Math.min(SAMPLE_PER_TYPE, list.size());
-			for (int i = 0; i < take; i++)
-			{
-				sample.add(list.get(i * list.size() / take));
-			}
-		});
-		for (String key : REGRETS)
-		{
-			Step step = steps.get(key);
-			if (step != null && !sample.contains(step) && (allowed == null || allowed.contains(step.getTier())))
-			{
-				sample.add(step);
-			}
-		}
-		return sample;
 	}
 
 	private static Step step(String key)

@@ -18,7 +18,7 @@ import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.StepNeeds;
-import com.cluehelper.route.WalkData;
+import com.cluehelper.route.WalkTable;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.SpadeNeed;
@@ -35,8 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -89,19 +92,31 @@ public final class SubSteps
 	private static final String SCROLL_BOOK_NAME = "master scroll book";
 
 	private final Client client;
-	private final PlayerModel player;
-	private final BankMemory bankMemory;
+	private final Supplier<PlayerSnapshot> snapshot;
+	private final IntPredicate onlyInBankedKit;
 	private final StepNeeds stepNeeds;
-	private final RoutePlanner routes;
+	private final Supplier<PlanStart> start;
+	private final Supplier<WalkTable> walkTable;
+	private final BooleanSupplier scrollBookOutOfWilderness;
 
 	@Inject
 	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes)
 	{
+		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
+			() -> routes.getWalk() == null ? null : routes.getWalk().getTable(), routes::keepsScrollBookOutOfWilderness);
+	}
+
+	/** @param client item names */
+	public SubSteps(Client client, Supplier<PlayerSnapshot> snapshot, IntPredicate onlyInBankedKit, StepNeeds stepNeeds,
+		Supplier<PlanStart> start, Supplier<WalkTable> walkTable, BooleanSupplier scrollBookOutOfWilderness)
+	{
 		this.client = client;
-		this.player = player;
-		this.bankMemory = bankMemory;
+		this.snapshot = snapshot;
+		this.onlyInBankedKit = onlyInBankedKit;
 		this.stepNeeds = stepNeeds;
-		this.routes = routes;
+		this.start = start;
+		this.walkTable = walkTable;
+		this.scrollBookOutOfWilderness = scrollBookOutOfWilderness;
 	}
 
 	/** Client thread only. The route's legs as sub-steps, then the step's own acts. */
@@ -111,7 +126,7 @@ public final class SubSteps
 		List<SubStep> legs = new RouteSteps(route, step, id -> withdrawLine(step, id), house(), takeFromStash).build(this::exitOf);
 		List<SubStep> steps = withWanderNote(withGearOnArrival(withWayInEquipped(legs, step.getData())), step.getData());
 		boolean wildernessTarget = step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0);
-		return routes.keepsScrollBookOutOfWilderness() ? withBookBanked(steps, player.carriesItemNamed(SCROLL_BOOK_NAME), wildernessTarget) : steps;
+		return scrollBookOutOfWilderness.getAsBoolean() ? withBookBanked(steps, carriesScrollBook(), wildernessTarget) : steps;
 	}
 
 	/** What to do at the step once there, its STASH items taken out first when they wait there. */
@@ -133,35 +148,41 @@ public final class SubSteps
 
 	private HouseState house()
 	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot == null ? HouseState.NONE : snapshot.getHouse();
+		PlayerSnapshot player = snapshot.get();
+		return player == null ? HouseState.NONE : player.getHouse();
 	}
 
 	private Map<Integer, Integer> carriedItems()
 	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot == null ? Map.of() : snapshot.carriedItems();
+		PlayerSnapshot player = snapshot.get();
+		return player == null ? Map.of() : player.carriedItems();
+	}
+
+	private boolean carriesScrollBook()
+	{
+		PlayerSnapshot player = snapshot.get();
+		return player != null && player.carriesItemNamed(SCROLL_BOOK_NAME, id -> client.getItemDefinition(id).getName());
 	}
 
 	/** The exit a start leg leaves the planned scene by, or null for any other walk. */
 	private Exit exitOf(Leg leg)
 	{
-		PlanStart start = routes.getStart();
-		WalkData.Loaded walk = routes.getWalk();
-		if (start == null || walk == null || start.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(start.getTile())
-			|| start.getScene().getScene().contains(leg.getTo()))
+		PlanStart from = start.get();
+		WalkTable table = walkTable.get();
+		if (from == null || table == null || from.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(from.getTile())
+			|| from.getScene().getScene().contains(leg.getTo()))
 		{
 			return null;
 		}
-		SceneBfs.ExitReach reach = start.getScene().exitTo(leg.getTo());
-		return reach == null ? null : walk.getTable().exit(reach.getOrigin(), reach.getDestination());
+		SceneBfs.ExitReach reach = from.getScene().exitTo(leg.getTo());
+		return reach == null ? null : table.exit(reach.getOrigin(), reach.getDestination());
 	}
 
 	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
 	private String withdrawLine(Step step, int itemId)
 	{
 		String name = client.getItemDefinition(itemId).getName();
-		if (bankMemory.onlyInBankedKit(itemId))
+		if (onlyInBankedKit.test(itemId))
 		{
 			return client.getItemDefinition(ItemID.HUNTSMANS_KIT).getName() + " (" + name + " inside)";
 		}

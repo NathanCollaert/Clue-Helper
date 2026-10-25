@@ -1,19 +1,28 @@
 package com.cluehelper;
 
+import com.cluehelper.campaign.Campaign;
+import com.cluehelper.campaign.CampaignRecorder;
+import com.cluehelper.campaign.Outcome;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.dev.SelfTest;
 import com.cluehelper.dev.SelfTestRun;
+import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Position;
 import com.cluehelper.player.PositionRules;
+import com.cluehelper.route.GearPieces;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.SceneFiles;
+import com.cluehelper.step.ClueTypes;
+import com.cluehelper.step.CoreClues;
+import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilitySet;
@@ -26,10 +35,12 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -158,6 +169,11 @@ public class ClueHelperDevPlugin extends Plugin
 	private final Set<String> recordedScenes = new HashSet<>();
 	private WorldPoint lastTile;
 	private MockClues mockClues;
+	private Campaign campaign;
+	private boolean campaignResumed;
+	private int campaignTicks;
+	/** Campaign recordings are written and replayed here, off the client thread. */
+	private ExecutorService campaignFiles;
 	/** PNG encoding takes seconds of CPU a minute: off RuneLite's shared executor, which other plugins' tasks wait on. */
 	private ExecutorService frameWriter;
 
@@ -237,6 +253,46 @@ public class ClueHelperDevPlugin extends Plugin
 		mockClues = new MockClues(client, clueHelper.getClueLink()::getCore, stepResolver,
 			description -> SwingUtilities.invokeLater(() -> panel[0].showMock(description)),
 			ids -> SwingUtilities.invokeLater(() -> panel[0].fillList(ids)));
+		campaign = campaign(text -> SwingUtilities.invokeLater(() -> panel[0].showCampaign(text)));
+		unregister.add(clueHelper.getRoutes().addInputListener(campaign::onPlan));
+		DevPanel.CampaignControls campaignControls = new DevPanel.CampaignControls()
+		{
+			@Override
+			public void finish()
+			{
+				campaign.finish();
+			}
+
+			@Override
+			public void actDone()
+			{
+				clientThread.invokeLater(ClueHelperDevPlugin.this::fakeActDone);
+			}
+
+			@Override
+			public void bug(String note)
+			{
+				campaign.bug(note);
+			}
+
+			@Override
+			public void previous()
+			{
+				campaign.previous();
+			}
+
+			@Override
+			public void next()
+			{
+				campaign.next();
+			}
+
+			@Override
+			public void stop()
+			{
+				campaign.stop();
+			}
+		};
 		DevPanel.MockControls controls = new DevPanel.MockControls()
 		{
 			@Override
@@ -273,7 +329,7 @@ public class ClueHelperDevPlugin extends Plugin
 			new DevPanel.Action("Skill challenge completed", () -> clientThread.invokeLater(this::completeChallenge)),
 			command("Sample routes", "ch-sample"),
 			command("Self-tests", "ch-selftest"));
-		panel[0] = new DevPanel(controls, levels -> clientThread.invokeLater(() -> clueHelper.getPlayerModel().overrideLevels(levels)), tools);
+		panel[0] = new DevPanel(campaignControls, controls, levels -> clientThread.invokeLater(() -> clueHelper.getPlayerModel().overrideLevels(levels)), tools);
 		NavigationButton button = NavigationButton.builder()
 			.tooltip("Clue Helper dev")
 			.icon(DevPanel.icon())
@@ -282,6 +338,77 @@ public class ClueHelperDevPlugin extends Plugin
 			.build();
 		clientToolbar.addNavigation(button);
 		unregister.add(() -> clientToolbar.removeNavigation(button));
+	}
+
+	private Campaign campaign(Consumer<String> show)
+	{
+		campaignFiles = Executors.newSingleThreadExecutor(runnable ->
+		{
+			Thread thread = new Thread(runnable, "clue-helper-dev-campaign");
+			thread.setDaemon(true);
+			return thread;
+		});
+		Map<String, MockClues.Mock> mocks = new HashMap<>();
+		CampaignRecorder recorder = new CampaignRecorder(client, clueHelper.getInjector().getInstance(StashMemory.class),
+			clueHelper.getInjector().getInstance(GearPieces.class), clueHelper.getBankMemory(), clueHelper.getPlayerModel()::getRuneModel);
+		return new Campaign(clientThread, recorder,
+			() -> campaignSteps(mocks),
+			new Campaign.Clues()
+			{
+				@Override
+				public void mock(Campaign.CampaignStep step)
+				{
+					mockClues.mock(mocks.get(step.getKey()), "campaign");
+				}
+
+				@Override
+				public void clear()
+				{
+					mockClues.clear();
+				}
+			},
+			() -> Outcome.guideLines(clueHelper.getGuide().getSteps()),
+			this::saveCampaignScreenshot,
+			show,
+			campaignFiles);
+	}
+
+	/** Core's clues, one per step key, each with its place in core's lists. */
+	private List<Campaign.CampaignStep> campaignSteps(Map<String, MockClues.Mock> mocks)
+	{
+		List<Campaign.CampaignStep> steps = new ArrayList<>();
+		for (MockClues.Mock mock : mockClues.all())
+		{
+			if (mocks.putIfAbsent(mock.key, mock) != null)
+			{
+				continue;
+			}
+			try
+			{
+				steps.add(new Campaign.CampaignStep(mock.key, mock.tier, mock.type, mock.text, CoreClues.source(mock.clue), mock.target));
+			}
+			catch (ReflectiveOperationException e)
+			{
+				log.warn("{} can't place {} in core's lists", TAG, mock.key, e);
+			}
+		}
+		return steps;
+	}
+
+	/** No frame while the bank PIN keypad is open; {@code then} runs either way. */
+	private void saveCampaignScreenshot(java.nio.file.Path file, Runnable then)
+	{
+		if (client.getWidget(InterfaceID.BANKPIN_KEYPAD, 0) != null)
+		{
+			then.run();
+			return;
+		}
+		drawManager.requestNextFrameListener(frame -> frameWriter.execute(() ->
+		{
+			file.toFile().getParentFile().mkdirs();
+			writeFrame(frame, file.toFile());
+			then.run();
+		}));
 	}
 
 	/** Every wall and game object with an option around the step's tile: what a door, gate or obstacle really is. */
@@ -341,6 +468,50 @@ public class ClueHelperDevPlugin extends Plugin
 	}
 
 	/**
+	 * A mocked clue gets no reply from the game, so the act waiting for one never ends: a Sherlock task is marked done
+	 * as the game's chat line would, Uri or a challenge item counts as arrived. STASH and gear acts end in the game
+	 * itself, and a step's last act ends with the campaign's Finish, which hands out the next clue.
+	 */
+	private void fakeActDone()
+	{
+		Step step = clueHelper.getClueLink().getCurrentStep();
+		SubStep current = clueHelper.getGuide().getCurrent();
+		SubStep.Done done = current == null ? null : current.getDone();
+		boolean taskLeft = step != null && ClueTypes.SKILL.equals(step.getType())
+			&& step.getStages().stream().anyMatch(stage -> stage.getKind() == Stage.Kind.TASK);
+		if (taskLeft)
+		{
+			completeChallenge();
+		}
+		else if (done == SubStep.Done.URI_HERE || done == SubStep.Done.CHALLENGE_ITEM)
+		{
+			markWatched(done == SubStep.Done.URI_HERE ? "uriTick" : "challengeTick");
+		}
+		else
+		{
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Nothing to fake for " + (done == null ? "this act" : done)
+				+ ": the game ends STASH and gear acts, Finish ends the step", null);
+			return;
+		}
+		log.info("{} act done faked: {}", TAG, taskLeft ? "skill challenge completed" : done);
+	}
+
+	/** The watcher saw its event this tick. */
+	private void markWatched(String tickField)
+	{
+		try
+		{
+			java.lang.reflect.Field field = ActWatcher.class.getDeclaredField(tickField);
+			field.setAccessible(true);
+			field.setInt(clueHelper.getInjector().getInstance(ActWatcher.class), client.getTickCount());
+		}
+		catch (ReflectiveOperationException e)
+		{
+			throw new IllegalStateException("ActWatcher has no " + tickField + " any more: update the dev panel's Act done", e);
+		}
+	}
+
+	/**
 	 * The game sends this only to a player carrying the real challenge scroll; a mocked Sherlock clue gets it from here,
 	 * so the Clue Scroll plugin marks the task done.
 	 */
@@ -360,6 +531,7 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		harness.stop();
 		frameWriter.shutdown();
+		campaignFiles.shutdown();
 		unregister.forEach(Runnable::run);
 		unregister.clear();
 	}
@@ -370,12 +542,23 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		checkLanding();
 		saveLiveFrame();
+		resumeCampaignOnceLoggedIn();
 		if (!autoRunPending || client.getGameState() != GameState.LOGGED_IN || ++loggedInTicks < AUTO_RUN_AFTER_TICKS)
 		{
 			return;
 		}
 		autoRunPending = false;
 		postSelfTest();
+	}
+
+	/** Mocking or chat on the login screen breaks core's plugins, so the campaign loads a few ticks into the first login. */
+	private void resumeCampaignOnceLoggedIn()
+	{
+		if (!campaignResumed && client.getGameState() == GameState.LOGGED_IN && ++campaignTicks >= AUTO_RUN_AFTER_TICKS)
+		{
+			campaignResumed = true;
+			campaign.resume();
+		}
 	}
 
 	private void checkLanding()

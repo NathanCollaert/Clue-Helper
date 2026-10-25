@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.IntFunction;
 import lombok.Builder;
 import lombok.Getter;
 import net.runelite.api.Item;
@@ -114,6 +115,12 @@ public final class PlayerSnapshot
 	public int boosted(Skill skill)
 	{
 		return boostedLevels.getOrDefault(skill, 1);
+	}
+
+	/** Whether an inventory item's name starts with {@code nameStart}, lower case. */
+	public boolean carriesItemNamed(String nameStart, IntFunction<String> names)
+	{
+		return inventory.keySet().stream().anyMatch(id -> names.apply(id).toLowerCase().startsWith(nameStart));
 	}
 
 	public int count(Container container, int itemId)

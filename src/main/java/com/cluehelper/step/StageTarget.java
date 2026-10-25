@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.NpcID;
@@ -29,28 +28,43 @@ public class StageTarget
 	private static final String BUY_TEXT = "Buy it on the Grand Exchange";
 	private static final Set<Integer> GE_CLERKS = Set.of(NpcID.GE_CLERK_1, NpcID.GE_CLERK_2, NpcID.GE_CLERK_3, NpcID.GE_CLERK_4);
 
-	private final Client client;
 	private final BankMemory bankMemory;
 	private final PlayerModel player;
 	private Step lastIn;
-	private int lastShape;
 	private Step lastOut;
 
 	@Inject
-	StageTarget(Client client, BankMemory bankMemory, PlayerModel player)
+	StageTarget(BankMemory bankMemory, PlayerModel player)
 	{
-		this.client = client;
 		this.bankMemory = bankMemory;
 		this.player = player;
 	}
 
+	/** The same step object while the stages left don't change. */
 	public Step travelStep(Step step)
+	{
+		BankMemory.Seen bank = bankMemory.getBank();
+		Step out = travelStep(step, carried(), bank == null || bank.items == null ? Map.of() : bank.items, canTrade());
+		if (out == step)
+		{
+			return step;
+		}
+		if (step == lastIn && out.equals(lastOut))
+		{
+			return lastOut;
+		}
+		lastIn = step;
+		lastOut = out;
+		return out;
+	}
+
+	/** {@code step} itself when no stage is dropped and none is fetched. */
+	public static Step travelStep(Step step, Item[] carried, Map<Integer, Integer> bank, boolean canTrade)
 	{
 		if (step == null || step.getStages().isEmpty())
 		{
 			return step;
 		}
-		Item[] carried = carried();
 		int dropped = 0;
 		ItemRequirement fromBank = null;
 		while (dropped < step.getStages().size() - 1)
@@ -60,7 +74,7 @@ public class StageTarget
 			{
 				dropped++;
 			}
-			else if (stage.getKind() == Stage.Kind.FETCH && banked(stage.getItem()))
+			else if (stage.getKind() == Stage.Kind.FETCH && banked(stage.getItem(), bank))
 			{
 				fromBank = stage.getItem();
 				dropped++;
@@ -72,15 +86,10 @@ public class StageTarget
 		}
 		Stage fetch = dropped < step.getStages().size() && step.getStages().get(dropped).getKind() == Stage.Kind.FETCH
 			? step.getStages().get(dropped) : null;
-		boolean buy = fetch != null && canTrade();
+		boolean buy = fetch != null && canTrade;
 		if (dropped == 0 && fetch == null)
 		{
 			return step;
-		}
-		int shape = dropped * 2 + (buy ? 1 : 0);
-		if (step == lastIn && shape == lastShape)
-		{
-			return lastOut;
 		}
 		List<Stage> left = new ArrayList<>(step.getStages().subList(dropped, step.getStages().size()));
 		StepRequirements needs = fromBank == null ? step.getRequirements() : step.getRequirements().plusOwn(fromBank);
@@ -96,16 +105,12 @@ public class StageTarget
 			}
 		}
 		boolean onlyFinal = left.size() == 1 && left.get(0).getKind() == Stage.Kind.FINAL;
-		Step out = step.toBuilder()
+		return step.toBuilder()
 			.stages(onlyFinal ? List.of() : List.copyOf(left))
 			.targets(Stages.tiles(left))
 			.kind(onlyFinal ? TargetKind.ANY_OF : TargetKind.SEQUENCE)
 			.requirements(needs)
 			.build();
-		lastIn = step;
-		lastShape = shape;
-		lastOut = out;
-		return out;
 	}
 
 	private boolean canTrade()
@@ -115,14 +120,13 @@ public class StageTarget
 	}
 
 	/** Charlie's item already in the bank is withdrawn there, not fetched: a needed item brings a bank stop. */
-	private boolean banked(ItemRequirement item)
+	private static boolean banked(ItemRequirement item, Map<Integer, Integer> bank)
 	{
-		BankMemory.Seen bank = bankMemory.getBank();
-		if (item == null || bank == null || bank.items == null)
+		if (item == null)
 		{
 			return false;
 		}
-		for (Map.Entry<Integer, Integer> stack : bank.items.entrySet())
+		for (Map.Entry<Integer, Integer> stack : bank.entrySet())
 		{
 			if (stack.getValue() > 0 && item.fulfilledBy(stack.getKey()))
 			{

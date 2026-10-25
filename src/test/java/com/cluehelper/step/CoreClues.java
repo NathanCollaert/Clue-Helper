@@ -14,7 +14,7 @@ import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.HotColdClue;
 
 /** The fake client answers every varbit and varp with one settable value, so each provider branch can be evaluated. */
-final class CoreClues
+public final class CoreClues
 {
 	static final String CLUES_PACKAGE = "net.runelite.client.plugins.cluescrolls.clues.";
 	static final int[] VAR_STATES = {0, 1, 2, 3, 4, 5, 10, 100};
@@ -31,13 +31,47 @@ final class CoreClues
 	{
 	}
 
-	static synchronized ClueScrollPlugin plugin() throws ReflectiveOperationException
+	public static synchronized ClueScrollPlugin plugin() throws ReflectiveOperationException
 	{
 		if (plugin == null)
 		{
 			plugin = pluginWithFakeClient();
 		}
 		return plugin;
+	}
+
+	/** A Clue Scroll plugin that reads {@code client}, for resolving a clue offline. */
+	public static ClueScrollPlugin plugin(Client client) throws ReflectiveOperationException
+	{
+		ClueScrollPlugin plugin = new ClueScrollPlugin();
+		Field clientField = ClueScrollPlugin.class.getDeclaredField("client");
+		clientField.setAccessible(true);
+		clientField.set(plugin, client);
+		return plugin;
+	}
+
+	/** Core's clue at {@code source}, its list and place in it: {@code CrypticClue#12}. */
+	public static ClueScroll entry(String source) throws ReflectiveOperationException
+	{
+		String[] parts = source.split("#");
+		return (ClueScroll) entries(parts[0]).get(Integer.parseInt(parts[1]));
+	}
+
+	/** Where {@code clue} is in core's lists, as {@link #entry} takes it; null for a clue in none of them. */
+	public static String source(ClueScroll clue) throws ReflectiveOperationException
+	{
+		for (String type : LIST_TYPES)
+		{
+			List<Object> entries = entries(type);
+			for (int i = 0; i < entries.size(); i++)
+			{
+				if (entries.get(i) == clue)
+				{
+					return type + "#" + i;
+				}
+			}
+		}
+		return null;
 	}
 
 	static void setVarState(int state)
@@ -53,7 +87,7 @@ final class CoreClues
 	}
 
 	/** Hot/cold clues are reset first, as core does when it hands one out, so they have a solver. */
-	static Map<String, ClueScroll> steps() throws ReflectiveOperationException
+	public static Map<String, ClueScroll> steps() throws ReflectiveOperationException
 	{
 		Map<String, ClueScroll> steps = new LinkedHashMap<>();
 		for (String type : LIST_TYPES)
@@ -119,10 +153,6 @@ final class CoreClues
 				}
 				return null;
 			});
-		ClueScrollPlugin fake = new ClueScrollPlugin();
-		Field clientField = ClueScrollPlugin.class.getDeclaredField("client");
-		clientField.setAccessible(true);
-		clientField.set(fake, client);
-		return fake;
+		return plugin(client);
 	}
 }

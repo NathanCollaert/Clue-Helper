@@ -31,7 +31,10 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 
-/** The dev launcher's sidebar: mock clues (random by tier and type, or a list of step IDs) and the ::ch- commands as buttons. */
+/**
+ * The dev launcher's sidebar: the step campaign, mock clues (random by tier and type, or a list of step IDs) and the
+ * ::ch- commands as buttons.
+ */
 final class DevPanel extends PluginPanel
 {
 	private static final int GAP = 4;
@@ -56,6 +59,23 @@ final class DevPanel extends PluginPanel
 		void clear();
 	}
 
+	/** What the campaign section drives. */
+	interface CampaignControls
+	{
+		void finish();
+
+		/** Fakes the game's reply to the guide's current act, which a mocked clue never gets. */
+		void actDone();
+
+		void bug(String note);
+
+		void previous();
+
+		void next();
+
+		void stop();
+	}
+
 	/** A dev action: its label and what it runs. */
 	static final class Action
 	{
@@ -70,16 +90,19 @@ final class DevPanel extends PluginPanel
 	}
 
 	private static final int LIST_ROWS = 7;
+	private static final int NOTE_ROWS = 2;
 	private static final int LEVEL_ROWS = 3;
 	private static final String LINE = "\n";
 	/** The label's HTML width, which the label measures larger than its pixels. */
 	private static final int TEXT_WRAP_WIDTH = 165;
 
 	private final JLabel current = new JLabel();
+	private final JLabel campaignStep = new JLabel();
+	private final JTextArea bugNote = new JTextArea(NOTE_ROWS, 0);
 	private final JTextArea list = new JTextArea(LIST_ROWS, 0);
 	private final JTextArea virtualLevels = new JTextArea(LEVEL_ROWS, 0);
 
-	DevPanel(MockControls mocks, Consumer<Map<Skill, Integer>> levels, List<Action> tools)
+	DevPanel(CampaignControls campaign, MockControls mocks, Consumer<Map<Skill, Integer>> levels, List<Action> tools)
 	{
 		super(true);
 		setLayout(new BorderLayout());
@@ -87,6 +110,8 @@ final class DevPanel extends PluginPanel
 		JPanel column = new JPanel();
 		column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
 		column.setOpaque(false);
+		campaignSection(column, campaign);
+		column.add(Box.createVerticalStrut(SECTION_GAP));
 		mockSection(column, mocks);
 		column.add(Box.createVerticalStrut(SECTION_GAP));
 		levelSection(column, levels);
@@ -102,14 +127,57 @@ final class DevPanel extends PluginPanel
 		}
 		add(column, BorderLayout.NORTH);
 		showMock(null);
+		showCampaign("Starts once logged in");
 	}
 
 	/** Swing thread. The mocked clue's description, or null for none. */
 	void showMock(String description)
 	{
-		String text = description == null ? "No mock clue" : description;
+		setWrapped(current, description == null ? "No mock clue" : description);
+	}
+
+	/** Swing thread. */
+	void showCampaign(String text)
+	{
+		setWrapped(campaignStep, text);
+	}
+
+	private static void setWrapped(JLabel label, String text)
+	{
 		String html = text.replace("&", "&amp;").replace("<", "&lt;").replace(LINE, "<br>");
-		current.setText("<html><body style='width:" + TEXT_WRAP_WIDTH + "px'>" + html + "</body></html>");
+		label.setText("<html><body style='width:" + TEXT_WRAP_WIDTH + "px'>" + html + "</body></html>");
+	}
+
+	private void campaignSection(JPanel column, CampaignControls campaign)
+	{
+		column.add(overline("CAMPAIGN"));
+		campaignStep.setFont(FontManager.getRunescapeSmallFont());
+		campaignStep.setForeground(Color.WHITE);
+		campaignStep.setAlignmentX(LEFT_ALIGNMENT);
+		column.add(campaignStep);
+		column.add(Box.createVerticalStrut(GAP));
+		column.add(row(new RowButton(new Action("Previous", campaign::previous)), new RowButton(new Action("Next", campaign::next)),
+			new RowButton(new Action("Stop", campaign::stop))));
+		column.add(Box.createVerticalStrut(GAP));
+		column.add(row(new RowButton(new Action("Finish", campaign::finish)), new RowButton(new Action("Act done", campaign::actDone)),
+			new RowButton(new Action("Bug", () ->
+		{
+			campaign.bug(bugNote.getText());
+			if (!bugNote.getText().isBlank())
+			{
+				bugNote.setText("");
+			}
+		}))));
+		column.add(Box.createVerticalStrut(GAP));
+		column.add(overline("BUG NOTE"));
+		bugNote.setFont(FontManager.getRunescapeSmallFont());
+		bugNote.setLineWrap(true);
+		bugNote.setWrapStyleWord(true);
+		JScrollPane scroll = new JScrollPane(bugNote);
+		scroll.setAlignmentX(LEFT_ALIGNMENT);
+		scroll.setPreferredSize(new Dimension(PANEL_WIDTH - 16, NOTE_ROWS * ROW_HEIGHT));
+		scroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, NOTE_ROWS * ROW_HEIGHT));
+		column.add(scroll);
 	}
 
 	/** Swing thread. */
