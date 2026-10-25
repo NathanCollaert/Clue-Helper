@@ -132,6 +132,7 @@ final class PlanTrace
 			recorded.name = need.getName();
 			recorded.stepItem = need.isStepItem();
 			recorded.inCoreTag = need.isInCoreTag();
+			recorded.blocksRoute = need.isBlocksRoute();
 			recorded.ids = owned.stream().filter(need.getRequirement()::fulfilledBy).sorted().collect(Collectors.toList());
 			if (need.getRequirement() instanceof GearRequirement)
 			{
@@ -211,6 +212,7 @@ final class PlanTrace
 		String name;
 		boolean stepItem;
 		boolean inCoreTag;
+		boolean blocksRoute;
 		List<Integer> ids;
 		/** Gear needs only: the bonus total and each owned piece. */
 		int gearAtLeast;

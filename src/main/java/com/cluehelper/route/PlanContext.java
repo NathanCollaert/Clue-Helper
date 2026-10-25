@@ -178,7 +178,8 @@ final class PlanContext
 			ItemRequirement[] groups = use.getAll().stream()
 				.map(ids -> ItemRequirements.any(use.getName(), ids.stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new)))
 				.toArray(ItemRequirement[]::new);
-			here.add(new RequiredItems.Need(use.getName(), ItemRequirements.all(use.getName(), groups), need.isStepItem(), false));
+			here.add(new RequiredItems.Need(use.getName(), ItemRequirements.all(use.getName(), groups), need.isStepItem(), false,
+				need.isBlocksRoute()));
 		}
 		return here;
 	}

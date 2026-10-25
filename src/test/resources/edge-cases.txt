@@ -215,7 +215,7 @@ quetzal: at Renu in Civitas illa Fortis, maxed, dig outside the bank on Aldarin
   alt       36t: Teleport to House → Fairy ring CKQ: Varlamore: Aldarin → walk 19 {item:556=1, item:557=1, item:563=1}
 partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost
   best      47t: Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 28 {charge:2552=1, charge:21153=1} withdraw [21153]
-  direct    122t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 71 {charge:11968=1}
+  direct    122t: Skills necklace: Cooking Guild → walk 37 → Spirit tree: Gnome Stronghold → walk 72 {charge:11968=1}
 pharaoh's sceptre: carried, maxed, yawn in the 7th room of Pyramid Plunder
   best      92t: Pharaoh's sceptre: Jalsavrah → walk 87 {charge:26948=1}
   alt       139t: Pharaoh's sceptre: Jaleustrophos → walk 134 {charge:26948=1}
@@ -271,9 +271,9 @@ start on a node: standing at the Varrock Teleport landing, to Varrock bank crate
 AREA: cryptic:a demon's best friend holds the next step of this clue.
   best      24t: Master scroll book: Key master teleport → walk 19 {charge:21389=1}
 SEQUENCE skill: cryptic:a graceful man of many colours, his crates must be full of many delights.
-  best      74t: Teleport to House → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 25 → Book of the dead: History and Hearsay → walk 28 {item:556=1, item:557=1, item:563=1, charge:25818=1}
-  alt       94t: Games necklace: Wintertodt → walk 18 → Minecart: Shayzien West → walk 33 → Book of the dead: History and Hearsay → walk 28 {charge:3853=1, charge:25818=1}
-  alt       99t: Skills necklace: Farming Guild → walk 23 → Minecart: Shayzien West → walk 33 → Book of the dead: History and Hearsay → walk 28 {charge:11968=1, charge:25818=1}
+  best      76t: Teleport to House → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 25 → Book of the dead: History and Hearsay → walk 29 {item:556=1, item:557=1, item:563=1, charge:25818=1}
+  alt       96t: Games necklace: Wintertodt → walk 18 → Minecart: Shayzien West → walk 33 → Book of the dead: History and Hearsay → walk 29 {charge:3853=1, charge:25818=1}
+  alt       100t: Skills necklace: Farming Guild → walk 23 → Minecart: Shayzien West → walk 33 → Book of the dead: History and Hearsay → walk 29 {charge:11968=1, charge:25818=1}
 SEQUENCE three-step (6 orders)
-  best      88t: Skills necklace: Mining Guild → walk 28 → Lumbridge Teleport → walk 24 → Varrock Teleport → walk 23 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
+  best      89t: Skills necklace: Mining Guild → walk 29 → Lumbridge Teleport → walk 24 → Varrock Teleport → walk 23 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
 PROBES (hot/cold spots): {2860,3562,0=27, 2915,3425,0=59, 2917,3295,0=13, 2972,3486,0=58, 2976,3239,0=39, 3030,3364,0=29, 3031,3304,0=59, 3033,3438,0=51}

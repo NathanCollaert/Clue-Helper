@@ -18,11 +18,11 @@ final class OneClick
 	}
 
 	/**
-	 * An item with one destination names no option in its row ("Skull sceptre" left-clicks "Invoke"), so any left click
-	 * that is an action of its own is its teleport.
+	 * An item with one destination names no option in its row ("Skull sceptre" left-clicks "Invoke" or "Teleport"), so
+	 * any left click that is an action of its own is its teleport: with one destination there is no list to open.
 	 */
 	static boolean isOwnTeleport(String option)
 	{
-		return option != null && !MenuLabels.isOpener(option) && !NOT_TELEPORTS.contains(MenuLabels.normalise(option));
+		return option != null && !NOT_TELEPORTS.contains(MenuLabels.normalise(option));
 	}
 }

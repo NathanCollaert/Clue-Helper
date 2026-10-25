@@ -16,6 +16,7 @@ import net.runelite.api.NPCComposition;
 import net.runelite.api.ObjectComposition;
 import net.runelite.api.TileObject;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 
@@ -33,6 +34,8 @@ public final class LeftClicks
 	private static final int SLOT_ITEM_CHILD = 1;
 	private static final String OBJECT = "object:";
 	private static final String NPC = "npc:";
+	private static final String BANK = "bank:";
+	private static final String WITHDRAW_OPTION = "Withdraw";
 	private static final Set<MenuAction> NPC_OPTIONS = EnumSet.of(MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION,
 		MenuAction.NPC_THIRD_OPTION, MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION);
 	private static final Set<MenuAction> OBJECT_OPTIONS = EnumSet.of(MenuAction.GAME_OBJECT_FIRST_OPTION,
@@ -40,6 +43,7 @@ public final class LeftClicks
 		MenuAction.GAME_OBJECT_FIFTH_OPTION);
 	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
 	private static final String USE_OPTION = "Use";
+	private static final String REMOVE_OPTION = "Remove";
 
 	private final Client client;
 	private final SwapperClicks swapperClicks;
@@ -83,11 +87,26 @@ public final class LeftClicks
 		return click != null && WEAR_OPTIONS.contains(click);
 	}
 
+	/** A worn item's left click takes it off, as it does unless a swap or the item itself says otherwise. */
+	boolean removes(int wornItemId)
+	{
+		String click = worn(wornItemId);
+		return click == null || REMOVE_OPTION.equalsIgnoreCase(MenuLabels.normalise(click));
+	}
+
 	/** A task's item does the act on a left click when it is put on or used on another (a tinderbox, a herb). */
 	boolean wearsOrUses(int itemId)
 	{
 		String click = item(itemId);
 		return click != null && (WEAR_OPTIONS.contains(click) || USE_OPTION.equals(click));
+	}
+
+	/** A bank item's left click withdraws it, whatever the quantity, unless the bank hands out notes. */
+	public boolean withdraws(int bankItemId)
+	{
+		String known = learned.get(BANK + bankItemId);
+		boolean withdrawClick = known == null || known.startsWith(WITHDRAW_OPTION);
+		return withdrawClick && client.getVarbitValue(VarbitID.BANK_WITHDRAWNOTES) == 0;
 	}
 
 	String object(TileObject object)
@@ -167,6 +186,10 @@ public final class LeftClicks
 		if (group == InterfaceID.INVENTORY && entry.getItemId() > 0)
 		{
 			return ITEM + entry.getItemId();
+		}
+		if (group == InterfaceID.BANKMAIN && entry.getItemId() > 0)
+		{
+			return BANK + entry.getItemId();
 		}
 		if (group == InterfaceID.WORNITEMS && entry.getTarget() != null && !entry.getTarget().isEmpty())
 		{

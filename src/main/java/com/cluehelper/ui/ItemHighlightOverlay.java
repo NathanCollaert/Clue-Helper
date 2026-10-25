@@ -1,6 +1,7 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.guide.LeftClicks;
 import com.cluehelper.guide.StepGuide;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
@@ -15,13 +16,15 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	private final StepGuide guide;
 	private final ClueHelperConfig config;
 	private final Highlighter highlighter;
+	private final LeftClicks leftClicks;
 
 	@Inject
-	ItemHighlightOverlay(StepGuide guide, ClueHelperConfig config, Highlighter highlighter)
+	ItemHighlightOverlay(StepGuide guide, ClueHelperConfig config, Highlighter highlighter, LeftClicks leftClicks)
 	{
 		this.guide = guide;
 		this.config = config;
 		this.highlighter = highlighter;
+		this.leftClicks = leftClicks;
 		showOnInventory();
 		showOnEquipment();
 		showOnBank();
@@ -36,7 +39,7 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 		{
 			return;
 		}
-		boolean leftClick = !inBank && guide.getFillItems().contains(itemId);
+		boolean leftClick = inBank ? leftClicks.withdraws(itemId) : guide.getFillItems().contains(itemId);
 		highlighter.item(graphics, itemId, item.getQuantity(), item.getCanvasBounds(), leftClick);
 	}
 }

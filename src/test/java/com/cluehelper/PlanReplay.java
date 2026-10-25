@@ -142,7 +142,7 @@ public final class PlanReplay
 	private static RequiredItems required(PlanTrace.Recording recording)
 	{
 		List<RequiredItems.Need> needs = recording.needs.stream()
-			.map(need -> new RequiredItems.Need(need.name, requirement(need), need.stepItem, need.inCoreTag))
+			.map(need -> new RequiredItems.Need(need.name, requirement(need), need.stepItem, need.inCoreTag, need.blocksRoute))
 			.collect(Collectors.toList());
 		return RequiredItems.builder().needs(needs).stash(StashMemory.State.valueOf(recording.stash)).build();
 	}

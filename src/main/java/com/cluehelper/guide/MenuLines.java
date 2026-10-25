@@ -382,7 +382,11 @@ public class MenuLines
 	private int[] pickRows(MenuEntry[] entries, MenuTarget target)
 	{
 		String destination = target.destination();
-		int pick = find(entries, target, entry -> isDestination(entry, target, destination));
+		int pick = find(entries, target, entry -> isExactly(entry, destination));
+		if (pick < 0)
+		{
+			pick = find(entries, target, entry -> isDestination(entry, target, destination));
+		}
 		if (pick < 0)
 		{
 			pick = find(entries, target, entry -> leadsToDestination(entry, target, destination));
@@ -614,6 +618,13 @@ public class MenuLines
 		return null;
 	}
 
+	/** An option named exactly so wins over one that only starts the same: a ladder's "Climb-up" over its "Climb". */
+	private static boolean isExactly(MenuEntry entry, String destination)
+	{
+		return destination != null && entry.getOption() != null
+			&& MenuLabels.normalise(entry.getOption()).equals(MenuLabels.normalise(destination));
+	}
+
 	private boolean isDestination(MenuEntry entry, MenuTarget target, String destination)
 	{
 		if (target.getLine() == MenuTarget.Line.FAIRY_CODE && target.getLineKey() != null)
@@ -685,7 +696,8 @@ public class MenuLines
 		}
 		NPC npc = entry.getNpc();
 		return npc != null && (target.getNpcIds().contains(npc.getId())
-			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId()));
+			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId())
+			|| npc.getName() != null && target.getNpcNames().contains(MenuLabels.normalise(npc.getName())));
 	}
 
 	private Widget child(int[] at)

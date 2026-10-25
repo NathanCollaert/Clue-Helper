@@ -61,6 +61,11 @@ public class WanderAreaOverlay extends Overlay
 		if (range != null && view.getPlane() == range.getPlane())
 		{
 			drawBox(graphics, view, range.getWest(), range.getSouth(), range.getEast(), range.getNorth());
+			int[] exclude = range.getExclude();
+			if (exclude != null)
+			{
+				drawBox(graphics, view, exclude[0], exclude[1], exclude[2], exclude[3]);
+			}
 		}
 		SubStep current = guide.getCurrent();
 		for (StepIndex.Place place : current == null ? List.<StepIndex.Place>of() : current.getSpans())

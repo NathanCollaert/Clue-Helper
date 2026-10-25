@@ -94,6 +94,21 @@ public class LoadedScene
 			&& plane >= 0 && plane < flags.length && flags[plane] != null;
 	}
 
+	/** The game lets a player step from {@code from} to {@code to}, its neighbour; both in the scene. */
+	public boolean canStep(WorldPoint from, WorldPoint to)
+	{
+		int dx = to.getX() - from.getX();
+		int dy = to.getY() - from.getY();
+		for (int d = 0; d < Directions.DX.length; d++)
+		{
+			if (Directions.DX[d] == dx && Directions.DY[d] == dy)
+			{
+				return canMove(from.getX() - baseX, from.getY() - baseY, from.getPlane(), d);
+			}
+		}
+		throw new IllegalArgumentException(to + " is no neighbour of " + from);
+	}
+
 	/** Scene coordinates, from here on. The game's movement rule; {@code d} indexes {@link Directions}. */
 	boolean canMove(int x, int y, int plane, int d)
 	{

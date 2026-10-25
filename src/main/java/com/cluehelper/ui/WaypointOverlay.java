@@ -20,10 +20,12 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Value;
 import net.runelite.api.Client;
@@ -56,6 +58,7 @@ public class WaypointOverlay extends Overlay
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	private static final float PATH_STROKE = 2f;
 	private static final int[] CONVERSATION = {InterfaceID.ChatLeft.UNIVERSE, InterfaceID.ChatRight.UNIVERSE, InterfaceID.Chatmenu.UNIVERSE};
+	private static final String NO_STEP = "";
 
 	private final Client client;
 	private final StepGuide guide;
@@ -69,6 +72,8 @@ public class WaypointOverlay extends Overlay
 	private List<WorldPoint> line = List.of();
 	private Map<TileObject, String> pathObjects = Map.of();
 	private int lineTick = -1;
+	/** The step the open conversation began on; null with no conversation open. */
+	private String conversationStepKey;
 
 	private final PathObjects paths;
 	private final WalkLine walkLine;
@@ -98,7 +103,8 @@ public class WaypointOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!config.pathLine() || inConversation())
+		noteConversationStep();
+		if (!config.pathLine() || isTalkingOnThisStep())
 		{
 			return null;
 		}
@@ -191,7 +197,7 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		WalkGoal goal = object == null ? WalkGoal.tile(waypoint) : LineTargets.objectGoal(view, object);
-		return Goal.path(goal, !outlined() && waypoint.getPlane() == view.getPlane());
+		return Goal.path(goal, !outlined() && !awaitsNpc() && waypoint.getPlane() == view.getPlane());
 	}
 
 	/** Core marks the clue itself; only the way there is ours. */
@@ -219,7 +225,10 @@ public class WaypointOverlay extends Overlay
 		}
 	}
 
-	/** Where the step is done: its NPC, else its nearest target tile; null within {@code here} tiles of it. */
+	/**
+	 * Where the step is done: its NPC, else its nearest target tile; null within {@code here} tiles of it, and inside a
+	 * wanderer's range with it out of view, where the player looks for it.
+	 */
 	private WorldPoint actTarget(WorldView view, int here)
 	{
 		Step step = clueLink.getCurrentStep();
@@ -230,6 +239,11 @@ public class WaypointOverlay extends Overlay
 		}
 		WorldPoint at = local.getWorldLocation();
 		WorldPoint target = nearestNamedNpc(view, step.getNpcs(), at);
+		StepIndex.Wander range = step.getData().getWander();
+		if (target == null && range != null && range.contains(at))
+		{
+			return null;
+		}
 		if (target == null && step.getTargets() != null)
 		{
 			target = step.getTargets().stream().min(Comparator.comparingInt(t -> t.distanceTo2D(at))).orElse(null);
@@ -277,7 +291,33 @@ public class WaypointOverlay extends Overlay
 		return best;
 	}
 
-	/** Once the player is talking, the way there is done; the chat options carry the step. */
+	private void noteConversationStep()
+	{
+		if (!inConversation())
+		{
+			conversationStepKey = null;
+		}
+		else if (conversationStepKey == null)
+		{
+			conversationStepKey = currentStepKey();
+		}
+	}
+
+	/**
+	 * Once the player is talking, the way there is done and the chat options carry the step. A step the talk moved on
+	 * to (the next clue handed over) gets its line while the chat is still open.
+	 */
+	private boolean isTalkingOnThisStep()
+	{
+		return conversationStepKey != null && conversationStepKey.equals(currentStepKey());
+	}
+
+	private String currentStepKey()
+	{
+		Step step = clueLink.getCurrentStep();
+		return step == null || step.getKey() == null ? NO_STEP : step.getKey();
+	}
+
 	private boolean inConversation()
 	{
 		for (int dialogue : CONVERSATION)
@@ -301,6 +341,13 @@ public class WaypointOverlay extends Overlay
 	private boolean outlined()
 	{
 		return !(guide.getHighlightObjects().isEmpty() && guide.getHighlightNpcs().isEmpty());
+	}
+
+	/** An NPC is the stop (Renu, a ship's crew) but isn't loaded yet: it gets the outline once in view, never its tile. */
+	private boolean awaitsNpc()
+	{
+		SubStep current = guide.getCurrent();
+		return current != null && !current.getNpcIds().isEmpty() || !guide.getMenuTarget().getNpcIds().isEmpty();
 	}
 
 	private boolean approachOutlined()
@@ -448,16 +495,55 @@ public class WaypointOverlay extends Overlay
 		graphics.setColor(Markers.COLOUR);
 		graphics.setStroke(new BasicStroke(PATH_STROKE));
 		Point previous = null;
+		WorldPoint previousTile = null;
 		for (WorldPoint tile : ahead)
 		{
+			if (previous != null && PathObjects.isJump(previousTile, tile))
+			{
+				for (TileObject object : objectsCrossed(view, previousTile, tile))
+				{
+					Point over = Perspective.localToCanvas(client, object.getLocalLocation(), view.getPlane());
+					previous = drawTo(graphics, previous, over);
+				}
+			}
 			LocalPoint local = tile.getPlane() == view.getPlane() ? LocalPoint.fromWorld(view, tile) : null;
 			Point at = local == null ? null : Perspective.localToCanvas(client, local, view.getPlane());
-			if (previous != null && at != null)
-			{
-				graphics.drawLine(previous.getX(), previous.getY(), at.getX(), at.getY());
-			}
-			previous = at;
+			previous = drawTo(graphics, previous, at);
+			previousTile = tile;
 		}
+	}
+
+	private static Point drawTo(Graphics2D graphics, Point from, Point to)
+	{
+		if (from != null && to != null)
+		{
+			graphics.drawLine(from.getX(), from.getY(), to.getX(), to.getY());
+		}
+		return to;
+	}
+
+	/**
+	 * The objects a jump goes over, nearest first: the outlined one (a stile) and the others named as it is on the way
+	 * (every stepping stone, both ends of a pipe). The line leads over them, not straight from one end to the other.
+	 */
+	private List<TileObject> objectsCrossed(WorldView view, WorldPoint from, WorldPoint to)
+	{
+		Rectangle around = new Rectangle(Math.min(from.getX(), to.getX()) - 1, Math.min(from.getY(), to.getY()) - 1,
+			Math.abs(from.getX() - to.getX()) + 3, Math.abs(from.getY() - to.getY()) + 3);
+		return pathObjects.keySet().stream()
+			.filter(object -> object.getPlane() == from.getPlane()
+				&& around.contains(object.getWorldLocation().getX(), object.getWorldLocation().getY()))
+			.flatMap(object -> paths.sameNamed(view, object, around).stream())
+			.distinct()
+			.sorted(Comparator.comparingInt(object -> squaredDistance(object.getWorldLocation(), from)))
+			.collect(Collectors.toList());
+	}
+
+	private static int squaredDistance(WorldPoint a, WorldPoint b)
+	{
+		int dx = a.getX() - b.getX();
+		int dy = a.getY() - b.getY();
+		return dx * dx + dy * dy;
 	}
 	/** What the line leads to: a tile, an NPC to approach, or the outlined objects' nearest side. */
 	@Value

@@ -87,6 +87,9 @@ public class SubStep
 	/** NPCs to outline and walk up to, from the stage: the Grand Exchange clerks. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
+	/** The step's own NPC by name, whose option is coloured only: core outlines it. */
+	@Builder.Default
+	Set<String> npcNames = Set.of();
 	@Builder.Default
 	Done done = Done.STEP_CHANGES;
 	/** An enemy may attack during this act (a dig, an emote): while one is near, the guide says to fight it. */

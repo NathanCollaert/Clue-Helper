@@ -583,270 +583,270 @@ minecart	Minecart: Ice Mountain	2923 10176 0	2995 9835 0		Ride Train cart 7028	9
 minecart	Minecart: Keldagrim	2995 9835 0	2909 10174 0		Ride Train cart 7029	995=150			571>4		-1	21	1	T	item	any	Y		op Ride		item:995=COINS varbit:571=GIANTDWARF_QUEST object:7029=ICEMOUNTAIN_TRAIN_CART
 minecart	Minecart: White Wolf Mountain	2919 10170 0	2876 9868 0		Ride Train cart 7028	995=100		Fishing Contest	571>4		-1	21	1	T	item	any	Y		op Ride		item:995=COINS varbit:571=GIANTDWARF_QUEST object:7028=KELDAGRIM_TRAIN_CART
 minecart	Minecart: Keldagrim	2876 9868 0	2909 10174 0		Ride Train cart 7030	995=100		Fishing Contest	571>4		-1	21	1	T	item	any	Y		op Ride		item:995=COINS varbit:571=GIANTDWARF_QUEST object:7030=WHITEWOLFMOUNTAIN_TRAIN_CART
-minecart	Minecart: Farming Guild	1670 3833 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1670 3833 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1670 3833 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1670 3833 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1670 3833 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1670 3833 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1670 3833 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1670 3833 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1670 3833 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1670 3833 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1670 3833 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1218 3739 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1218 3739 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1218 3739 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1218 3739 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1218 3739 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1218 3739 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1218 3739 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1218 3739 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1218 3739 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1218 3739 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1218 3739 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1808 3481 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1808 3481 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1808 3481 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1808 3481 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1808 3481 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1808 3481 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1808 3481 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1808 3481 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1808 3481 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1808 3481 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1808 3481 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1655 3543 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1655 3543 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1655 3543 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1655 3543 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1655 3543 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1655 3543 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1655 3543 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1655 3543 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1655 3543 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1655 3543 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1655 3543 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1697 3660 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1697 3660 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1697 3660 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1697 3660 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1697 3660 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1697 3660 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1697 3660 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1697 3660 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1697 3660 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1697 3660 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1697 3660 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1572 3466 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1572 3466 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1572 3466 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1572 3466 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1572 3466 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1572 3466 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1572 3466 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1572 3466 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1572 3466 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1572 3466 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1572 3466 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1518 3733 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1518 3733 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1518 3733 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1518 3733 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1518 3733 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1518 3733 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1518 3733 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1518 3733 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1518 3733 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1518 3733 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1518 3733 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1253 3548 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1253 3548 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1253 3548 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1253 3548 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1253 3548 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1253 3548 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1253 3548 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1253 3548 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1253 3548 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1253 3548 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1253 3548 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1648 3931 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1648 3931 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1648 3931 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1648 3931 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1648 3931 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1648 3931 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1648 3931 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1648 3931 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1648 3931 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1648 3931 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1648 3931 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1759 3710 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1759 3710 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1759 3710 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1759 3710 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1759 3710 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1759 3710 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1759 3710 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1759 3710 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1759 3710 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1759 3710 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1759 3710 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1590 3622 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1590 3622 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1590 3622 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1590 3622 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1590 3622 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1590 3622 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1590 3622 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1590 3622 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1590 3622 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1590 3622 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1590 3622 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1413 3577 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1413 3577 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1413 3577 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1413 3577 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1413 3577 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1413 3577 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1413 3577 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1413 3577 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1413 3577 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1413 3577 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1413 3577 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1670 3833 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1670 3833 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1670 3833 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1670 3833 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1670 3833 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1670 3833 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1670 3833 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1670 3833 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1670 3833 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1670 3833 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1670 3833 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1218 3739 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1218 3739 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1218 3739 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1218 3739 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1218 3739 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1218 3739 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1218 3739 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1218 3739 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1218 3739 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1218 3739 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1218 3739 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1808 3481 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1808 3481 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1808 3481 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1808 3481 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1808 3481 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1808 3481 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1808 3481 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1808 3481 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1808 3481 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1808 3481 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1808 3481 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1655 3543 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1655 3543 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1655 3543 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1655 3543 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1655 3543 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1655 3543 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1655 3543 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1655 3543 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1655 3543 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1655 3543 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1655 3543 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1697 3660 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1697 3660 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1697 3660 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1697 3660 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1697 3660 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1697 3660 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1697 3660 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1697 3660 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1697 3660 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1697 3660 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1697 3660 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1572 3466 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1572 3466 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1572 3466 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1572 3466 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1572 3466 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1572 3466 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1572 3466 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1572 3466 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1572 3466 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1572 3466 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1572 3466 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1518 3733 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1518 3733 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1518 3733 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1518 3733 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1518 3733 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1518 3733 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1518 3733 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1518 3733 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1518 3733 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1518 3733 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1518 3733 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1253 3548 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1253 3548 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1253 3548 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1253 3548 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1253 3548 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1253 3548 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1253 3548 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1253 3548 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1253 3548 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1253 3548 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1253 3548 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1648 3931 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1648 3931 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1648 3931 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1648 3931 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1648 3931 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1648 3931 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1648 3931 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1648 3931 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1648 3931 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1648 3931 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1648 3931 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1759 3710 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1759 3710 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1759 3710 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1759 3710 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1759 3710 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1759 3710 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1759 3710 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1759 3710 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1759 3710 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1759 3710 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1759 3710 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1590 3622 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1590 3622 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1590 3622 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1590 3622 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1590 3622 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1590 3622 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1590 3622 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1590 3622 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1590 3622 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1590 3622 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien West	1590 3622 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Arceuus	1413 3577 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Farming Guild	1413 3577 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius South	1413 3577 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Hosidius West	1413 3577 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kingstown	1413 3577 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Kourend Woodland	1413 3577 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Lovakengj	1413 3577 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Mount Quidamortem	1413 3577 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Northern Tundras	1413 3577 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Port Piscarilius	1413 3577 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
-minecart	Minecart: Shayzien East	1413 3577 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1670 3833 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1670 3833 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1670 3833 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1670 3833 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1670 3833 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1670 3833 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1670 3833 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1670 3833 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1670 3833 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1670 3833 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1670 3833 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1218 3739 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1218 3739 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1218 3739 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1218 3739 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1218 3739 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1218 3739 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1218 3739 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1218 3739 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1218 3739 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1218 3739 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1218 3739 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1808 3481 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1808 3481 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1808 3481 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1808 3481 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1808 3481 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1808 3481 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1808 3481 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1808 3481 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1808 3481 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1808 3481 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1808 3481 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1655 3543 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1655 3543 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1655 3543 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1655 3543 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1655 3543 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1655 3543 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1655 3543 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1655 3543 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1655 3543 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1655 3543 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1655 3543 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1697 3660 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1697 3660 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1697 3660 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1697 3660 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1697 3660 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1697 3660 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1697 3660 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1697 3660 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1697 3660 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1697 3660 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1697 3660 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1572 3466 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1572 3466 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1572 3466 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1572 3466 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1572 3466 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1572 3466 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1572 3466 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1572 3466 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1572 3466 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1572 3466 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1572 3466 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1518 3733 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1518 3733 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1518 3733 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1518 3733 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1518 3733 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1518 3733 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1518 3733 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1518 3733 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1518 3733 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1518 3733 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1518 3733 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1253 3548 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1253 3548 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1253 3548 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1253 3548 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1253 3548 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1253 3548 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1253 3548 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1253 3548 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1253 3548 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1253 3548 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1253 3548 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1648 3931 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1648 3931 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1648 3931 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1648 3931 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1648 3931 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1648 3931 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1648 3931 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1648 3931 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1648 3931 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1648 3931 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1648 3931 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1759 3710 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1759 3710 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1759 3710 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1759 3710 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1759 3710 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1759 3710 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1759 3710 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1759 3710 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1759 3710 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1759 3710 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1759 3710 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1590 3622 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1590 3622 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1590 3622 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1590 3622 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1590 3622 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1590 3622 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1590 3622 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1590 3622 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1590 3622 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1590 3622 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1590 3622 0	1415 3577 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1413 3577 0	1670 3833 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Arceuus		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1413 3577 0	1218 3737 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Farming Guild		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1413 3577 0	1808 3479 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius South		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1413 3577 0	1655 3543 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Hosidius West		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1413 3577 0	1699 3660 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kingstown		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1413 3577 0	1572 3466 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Kourend Woodland		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1413 3577 0	1518 3733 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Lovakengj		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1413 3577 0	1255 3548 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Mount Quidamortem		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1413 3577 0	1648 3931 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Northern Tundras		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1413 3577 0	1761 3710 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Port Piscarilius		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1413 3577 0	1590 3620 0		Travel Minecart 28835	995=20			7796<11		-1	5	1	T	item	any	Y		op Travel > Shayzien East		item:995=COINS varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1670 3833 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1670 3833 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1670 3833 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1670 3833 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1670 3833 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1670 3833 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1670 3833 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1670 3833 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1670 3833 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1670 3833 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1670 3833 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1218 3739 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1218 3739 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1218 3739 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1218 3739 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1218 3739 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1218 3739 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1218 3739 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1218 3739 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1218 3739 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1218 3739 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1218 3739 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1808 3481 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1808 3481 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1808 3481 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1808 3481 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1808 3481 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1808 3481 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1808 3481 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1808 3481 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1808 3481 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1808 3481 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1808 3481 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1655 3543 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1655 3543 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1655 3543 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1655 3543 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1655 3543 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1655 3543 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1655 3543 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1655 3543 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1655 3543 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1655 3543 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1655 3543 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1697 3660 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1697 3660 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1697 3660 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1697 3660 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1697 3660 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1697 3660 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1697 3660 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1697 3660 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1697 3660 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1697 3660 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1697 3660 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1572 3466 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1572 3466 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1572 3466 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1572 3466 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1572 3466 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1572 3466 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1572 3466 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1572 3466 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1572 3466 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1572 3466 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1572 3466 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1518 3733 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1518 3733 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1518 3733 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1518 3733 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1518 3733 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1518 3733 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1518 3733 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1518 3733 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1518 3733 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1518 3733 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1518 3733 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1253 3548 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1253 3548 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1253 3548 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1253 3548 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1253 3548 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1253 3548 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1253 3548 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1253 3548 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1253 3548 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1253 3548 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1253 3548 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1648 3931 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1648 3931 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1648 3931 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1648 3931 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1648 3931 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1648 3931 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1648 3931 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1648 3931 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1648 3931 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1648 3931 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1648 3931 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1759 3710 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1759 3710 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1759 3710 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1759 3710 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1759 3710 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1759 3710 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1759 3710 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1759 3710 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1759 3710 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1759 3710 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1759 3710 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1590 3622 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1590 3622 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1590 3622 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1590 3622 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1590 3622 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1590 3622 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1590 3622 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1590 3622 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1590 3622 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1590 3622 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien West	1590 3622 0	1415 3577 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Arceuus	1413 3577 0	1670 3833 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Arceuus		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Farming Guild	1413 3577 0	1218 3737 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Farming Guild		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius South	1413 3577 0	1808 3479 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius South		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Hosidius West	1413 3577 0	1655 3543 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Hosidius West		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kingstown	1413 3577 0	1699 3660 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kingstown		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Kourend Woodland	1413 3577 0	1572 3466 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Kourend Woodland		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Lovakengj	1413 3577 0	1518 3733 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Lovakengj		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Mount Quidamortem	1413 3577 0	1255 3548 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Mount Quidamortem		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Northern Tundras	1413 3577 0	1648 3931 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Northern Tundras		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Port Piscarilius	1413 3577 0	1761 3710 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Port Piscarilius		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
+minecart	Minecart: Shayzien East	1413 3577 0	1590 3620 0		Travel Minecart 28835				7796=11		-1	5	1	F	none	any	Y		op Travel > Shayzien East		varbit:7796=LOVAQUEST object:28835=LOVAKENGJ_MINECART
 lever	Lever: Deserted Keep	2561 3311 0	3154 3924 0		Pull Lever 1814						-1	5	0	F	none	any	Y		op Pull		object:1814=WILDINLEVER
 lever	Lever: Ardougne	3153 3923 0	2562 3311 0		Ardougne Lever 1815						-1	5	0	F	none	any	Y		op Ardougne		object:1815=WILDOUTLEVER
 lever	Lever: King Black Dragon Lair	3067 10253 0	2271 4680 0		Pull Lever 1816						-1	5	0	F	none	any	Y		op Pull		object:1816=DRAGONKINGINLEVER

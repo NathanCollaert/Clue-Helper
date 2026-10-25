@@ -86,11 +86,11 @@ public class StepNeeds
 		List<RequiredItems.Need> needs = new ArrayList<>();
 		if (requirements.getSpade() == SpadeNeed.SPADE)
 		{
-			needs.add(new RequiredItems.Need("spade", SPADE, false, SPADE_IN_CORE_TAG.contains(step.getType())));
+			needs.add(new RequiredItems.Need("spade", SPADE, false, SPADE_IN_CORE_TAG.contains(step.getType()), false));
 		}
 		if (requirements.needsLight() && !firePitLit(requirements))
 		{
-			needs.add(new RequiredItems.Need("light source", LIGHT, false, false));
+			needs.add(new RequiredItems.Need("light source", LIGHT, false, false, false));
 		}
 		boolean inCoreTag = ITEMS_IN_CORE_TAG.contains(step.getType());
 		for (ItemRequirement item : requirements.getItems())
@@ -99,22 +99,22 @@ public class StepNeeds
 			if (!EmptySlots.metByEmptySlots(item) && !optional)
 			{
 				ItemRequirement need = withAlternatives(item, step.getData());
-				needs.add(new RequiredItems.Need(item.getCollectiveName(client), need, true, inCoreTag && need == item));
+				needs.add(new RequiredItems.Need(item.getCollectiveName(client), need, true, inCoreTag && need == item, true));
 			}
 		}
 		for (ItemRequirement item : requirements.getOwnItems())
 		{
-			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, false));
+			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, false, true));
 		}
 		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
 		{
-			needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
+			needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false, false));
 		}
 		Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds.get();
 		for (StepIndex.Gear gear : step.getData().getGear())
 		{
 			GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.apply(gear.getBonus(), owned));
-			needs.add(new RequiredItems.Need(gear.getName(), worn, false, false));
+			needs.add(new RequiredItems.Need(gear.getName(), worn, false, false, false));
 		}
 		return RequiredItems.builder()
 			.needs(List.copyOf(needs))

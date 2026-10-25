@@ -469,10 +469,14 @@ public final class StepIndex
 		}
 	}
 
-	/** An NPC's wander range: the box it walks in, and tiles across it that routes may end on. */
+	/**
+	 * An NPC's wander range: the box it walks in, less a box inside it never enters (Lumbridge Castle's keep for Hans),
+	 * and tiles across it that routes may end on.
+	 */
 	public static final class Wander
 	{
 		private int[] area;
+		private int[] exclude;
 		private List<int[]> tiles;
 		private String text;
 
@@ -484,7 +488,13 @@ public final class StepIndex
 
 		public boolean contains(WorldPoint at)
 		{
-			return WayIn.within(area, at);
+			return WayIn.within(area, at) && (exclude == null || !WayIn.within(exclude, at));
+		}
+
+		/** West, south, east, north and plane of the box it never enters; null when there is none. */
+		public int[] getExclude()
+		{
+			return exclude == null ? null : exclude.clone();
 		}
 
 		public int getWest()

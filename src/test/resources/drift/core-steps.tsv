@@ -490,7 +490,7 @@ cryptic:search upstairs in the houses of seers' village for some drawers.	*	cryp
 cryptic:she's small but can build both literally and figuratively.	*	cryptic	master	ANY_OF	1486,3834,0	Lovada				none	1473	She's small but can build both literally and figuratively.
 cryptic:shhhh!	*	cryptic	master	ANY_OF	1633,3808,0	Logosia				none	1476	Shhhh!
 cryptic:show this to sherlock.	*	cryptic	elite	ANY_OF	2733,3415,0	Sherlock				none	1426	Show this to Sherlock.
-cryptic:snah? i feel all confused, like one of those cakes...	*	cryptic	hard	ANY_OF	3211,3219,0	Hans				none	1374	Snah? I feel all confused, like one of those cakes...
+cryptic:snah? i feel all confused, like one of those cakes...	*	cryptic	hard	ANY_OF	3221,3218,0	Hans				none	1374	Snah? I feel all confused, like one of those cakes...
 cryptic:someone watching the fights at the emir's arena is your next destination.	*	cryptic	easy	ANY_OF	3367,3221,0	Jeed				none	1257	Someone watching the fights at the Emir's Arena is your next destination.
 cryptic:south of a river in a town surrounded by the undead, what lies beneath the furnace?	*	cryptic	master	ANY_OF	2857,2966,0					spade	1489	South of a river in a town surrounded by the undead, what lies beneath the furnace?
 cryptic:speak to a referee.	*	cryptic	medium	ANY_OF	2386,3487,0	Gnome ball referee				none	1356	Speak to a referee.
@@ -501,7 +501,7 @@ cryptic:speak to doric, who lives north of falador.	*	cryptic	easy	ANY_OF	2951,3
 cryptic:speak to ellis in al kharid.	*	cryptic	easy	ANY_OF	3276,3191,0	Ellis				none	1271	Speak to Ellis in Al Kharid.
 cryptic:speak to gaius in taverley.	*	cryptic	easy	ANY_OF	2884,3450,0	Gaius				none	1255	Speak to Gaius in Taverley.
 cryptic:speak to hajedy.	*	cryptic	medium	ANY_OF	2779,3211,0	Hajedy				none	1360	Speak to Hajedy.
-cryptic:speak to hans to solve the clue.	*	cryptic	easy	ANY_OF	3211,3219,0	Hans				none	1247	Speak to Hans to solve the clue.
+cryptic:speak to hans to solve the clue.	*	cryptic	easy	ANY_OF	3221,3218,0	Hans				none	1247	Speak to Hans to solve the clue.
 cryptic:speak to jatix in taverley.	*	cryptic	easy	ANY_OF	2898,3428,0	Jatix				none	1254	Speak to Jatix in Taverley.
 cryptic:speak to kangai mau.	*	cryptic	medium	ANY_OF	2791,3183,0	Kangai Mau				none	1359	Speak to Kangai Mau.
 cryptic:speak to ned in draynor village.	*	cryptic	easy	ANY_OF	3098,3258,0	Ned				none	1246	Speak to Ned in Draynor Village.
@@ -519,9 +519,9 @@ cryptic:surprising? i bet he is...	*	cryptic	hard	ANY_OF	3205,3474,0	Sir Prysin	
 cryptic:surround my bones in fire, ontop the wooden pyre. finally lay me to rest, before my one last test.	*	cryptic	elite	AREA	1761,5322,0					none	1458	Surround my bones in fire, ontop the wooden pyre. Finally lay me to rest, before my one last test.
 cryptic:surrounded by white walls and gems.	*	cryptic	easy	ANY_OF	2945,3335,0	Herquin				none	1264	Surrounded by white walls and gems.
 cryptic:surviving.	*	cryptic	hard	ANY_OF	2983,3338,0	Sir Vyvin				none	1383	Surviving.
-cryptic:talk to a party-goer in falador.	*	cryptic	easy	ANY_OF	3046,3382,0	Lucy				none	1250	Talk to a party-goer in Falador.
+cryptic:talk to a party-goer in falador.	*	cryptic	easy	ANY_OF	3046,3383,1	Lucy				none	1250	Talk to a party-goer in Falador.
 cryptic:talk to ali the leaflet dropper north of the al kharid mine.	*	cryptic	easy	ANY_OF	3283,3329,0	Ali the Leaflet Dropper				none	1275	Talk to Ali the Leaflet Dropper north of the Al Kharid mine.
-cryptic:talk to ambassador spanfipple in the white knights castle.	*	cryptic	easy	ANY_OF	2979,3340,0	Ambassador Spanfipple				none	1249	Talk to Ambassador Spanfipple in the White Knights Castle.
+cryptic:talk to ambassador spanfipple in the white knights castle.	*	cryptic	easy	ANY_OF	2982,3343,1	Ambassador Spanfipple				none	1249	Talk to Ambassador Spanfipple in the White Knights Castle.
 cryptic:talk to cassie in falador.	*	cryptic	easy	ANY_OF	2975,3383,0	Cassie				none	1262	Talk to Cassie in Falador.
 cryptic:talk to charles at port piscarilius.	*	cryptic	easy	AREA	1821,3690,0	Charles	7225			none	1274	Talk to Charles at Port Piscarilius.
 cryptic:talk to charlie the tramp in varrock.	*	cryptic	beginner	ANY_OF	3209,3390,0	Charlie the Tramp				none	1236	Talk to Charlie the Tramp in Varrock.

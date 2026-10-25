@@ -271,12 +271,12 @@ item	Camulet: Bandit Camp Quarry		3191 2924 0			6707=1			4485=1		20	4	1	T	charge
 item	Kharedst's memoirs: Lunch by the Lancalliums		1714 3611 0			21760=1			6028=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:6028=HOSIDIUSQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Kharedst's memoirs: The Fisher's Flute		1803 3748 0			21760=1			6038=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:6038=PISCQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Kharedst's memoirs: History and Hearsay		1478 3576 0			21760=1			6359=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:6359=SHAYZIENQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
-item	Kharedst's memoirs: Jewelry of Jubilation		1544 3761 0			21760=1			7801=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:7801=LOVAQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
+item	Kharedst's memoirs: Jewellery of Jubilation		1544 3761 0			21760=1			7801=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:7801=LOVAQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Kharedst's memoirs: A Dark Disposition		1681 3746 0			21760=1			7857=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:7857=ARCQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Book of the dead: Lunch by the Lancalliums		1714 3611 0			25818=1			6028=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:6028=HOSIDIUSQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Book of the dead: The Fisher's Flute		1803 3748 0			25818=1			6038=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:6038=PISCQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Book of the dead: History and Hearsay		1478 3576 0			25818=1			6359=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:6359=SHAYZIENQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
-item	Book of the dead: Jewelry of Jubilation		1544 3761 0			25818=1			7801=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:7801=LOVAQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
+item	Book of the dead: Jewellery of Jubilation		1544 3761 0			25818=1			7801=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:7801=LOVAQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Book of the dead: A Dark Disposition		1681 3746 0			25818=1			7857=1;6035>0		20	4	1	T	charge	any	Y				item:25818=BOOK_OF_THE_DEAD varbit:7857=ARCQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Drakan's medallion: Ver Sinhaza		3649 3230 0			22400=1					20	4	1	F	none	any	Y				item:22400=DRAKANS_MEDALLION
 item	Drakan's medallion: Darkmeyer		3592 3337 0			22400=1		Sins of the Father			20	4	1	F	none	any	Y				item:22400=DRAKANS_MEDALLION

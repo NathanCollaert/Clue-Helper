@@ -43,6 +43,8 @@ public class RequiredItems
 		boolean stepItem;
 		/** Core's *clue* bank tag lists it already, so our bank highlights leave it out. */
 		boolean inCoreTag;
+		/** The step can't be done without it (an emote's items, Charlie's item), so there is no route while it is missing. */
+		boolean blocksRoute;
 	}
 
 	@Value

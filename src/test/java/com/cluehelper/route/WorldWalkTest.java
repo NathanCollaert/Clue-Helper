@@ -58,6 +58,41 @@ public class WorldWalkTest
 	}
 
 	/**
+	 * A goal in a house's corner, walked to from outside that corner: the line goes round through the doorway on the far
+	 * side, never ends against the wall beside the goal.
+	 */
+	@Test
+	public void aGoalInsideAHouseIsReachedThroughItsDoorway()
+	{
+		int size = 32;
+		int low = 11;
+		int high = 19;
+		int doorwayX = 15;
+		int[][] flags = new int[size][size];
+		for (int i = low; i <= high; i++)
+		{
+			wall(flags, low, i, CollisionDataFlag.BLOCK_MOVEMENT_WEST, -1, 0, CollisionDataFlag.BLOCK_MOVEMENT_EAST);
+			wall(flags, high, i, CollisionDataFlag.BLOCK_MOVEMENT_EAST, 1, 0, CollisionDataFlag.BLOCK_MOVEMENT_WEST);
+			wall(flags, i, low, CollisionDataFlag.BLOCK_MOVEMENT_SOUTH, 0, -1, CollisionDataFlag.BLOCK_MOVEMENT_NORTH);
+			if (i != doorwayX)
+			{
+				wall(flags, i, high, CollisionDataFlag.BLOCK_MOVEMENT_NORTH, 0, 1, CollisionDataFlag.BLOCK_MOVEMENT_SOUTH);
+			}
+		}
+		LoadedScene scene = new LoadedScene(0, 0, size, size, new int[][][] {flags});
+		WorldPoint corner = new WorldPoint(low, low, 0);
+		List<WorldPoint> line = new WorldWalk().path(Ground.sceneOnly(scene), new WorldPoint(low - 2, low + 1, 0), WalkGoal.tile(corner));
+
+		assertEquals("ends in the corner: " + line, corner, line.get(line.size() - 1));
+	}
+
+	private static void wall(int[][] flags, int x, int y, int side, int dx, int dy, int facingSide)
+	{
+		flags[x][y] |= side;
+		flags[x + dx][y + dy] |= facingSide;
+	}
+
+	/**
 	 * Past the loaded scene's edge, up stairs, the walk still reaches the goal, every step one the game walks: Daer
 	 * Krand in the Sisterhood Sanctuary, from the corridor north of the medallion's landing, and a long walk across
 	 * Lumbridge to Draynor's bank with no scene at all.

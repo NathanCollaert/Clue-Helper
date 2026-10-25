@@ -78,7 +78,14 @@ public final class MenuLabels
 		{
 			return true;
 		}
-		return Math.min(a.length(), b.length()) >= SHORTEST_PARTIAL && (a.startsWith(b) || b.startsWith(a));
+		return Math.min(a.length(), b.length()) >= SHORTEST_PARTIAL && (a.startsWith(b) || b.startsWith(a))
+			|| startsWithWord(a, b) || startsWithWord(b, a);
+	}
+
+	/** A short name that is the label's first word: the ring of the elements' "Air" for the game's "Air Altar". */
+	private static boolean startsWithWord(String label, String word)
+	{
+		return label.startsWith(word + " ");
 	}
 
 	/** Item options like the Ardougne cloak's "Monastery Teleport" for the catalog's "Kandarin Monastery". */

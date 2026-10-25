@@ -30,6 +30,9 @@ public class MenuTarget
 	Set<Integer> objectIds = Set.of();
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
+	/** NPCs by name as {@link MenuLabels#normalise} gives it: the step's own NPC, whose ids core knows and we don't. */
+	@Builder.Default
+	Set<String> npcNames = Set.of();
 	/** Interface components whose options count, by widget id (a scroll book's entry). */
 	@Builder.Default
 	Set<Integer> widgetIds = Set.of();

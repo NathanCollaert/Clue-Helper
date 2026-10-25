@@ -12,7 +12,7 @@ public final class WorldWalk
 {
 	/** A blocked goal tile (a fairy ring) is used from a tile this close to it. */
 	private static final int BESIDE_GOAL_TILES = 2;
-	/** Once beside the goal, a walk this much longer may still reach a side of it with no wall between. */
+	/** Once on a side of the goal with no wall between, a walk this much longer may still reach the goal itself. */
 	private static final int BESIDE_GOAL_SLACK = 8;
 
 	/**
@@ -59,7 +59,7 @@ public final class WorldWalk
 			{
 				return cost;
 			}
-			return isBeside(tile) ? cost + BESIDE_GOAL_SLACK : WalkSearch.UNREACHED;
+			return opensOnto(tile) ? cost + BESIDE_GOAL_SLACK : WalkSearch.UNREACHED;
 		}
 
 		int tile(WalkSearch search)
@@ -83,9 +83,7 @@ public final class WorldWalk
 				{
 					int tile = WalkTable.pack(goalTile.getX() + dx, goalTile.getY() + dy, goalTile.getPlane());
 					int cost = search.cost(tile);
-					boolean opensOnto = Math.abs(dx) + Math.abs(dy) == 1
-						&& !ground.isWallBetween(goalTile.getX() + dx, goalTile.getY() + dy, goalTile.getPlane(), -dx, -dy);
-					int distance = opensOnto ? 0 : Math.max(Math.abs(dx), Math.abs(dy));
+					int distance = opensOnto(tile) ? 0 : Math.max(Math.abs(dx), Math.abs(dy));
 					if (cost != WalkSearch.UNREACHED && (distance < bestDistance || distance == bestDistance && cost < bestCost))
 					{
 						best = tile;
@@ -97,10 +95,15 @@ public final class WorldWalk
 			return best;
 		}
 
-		private boolean isBeside(int tile)
+		/** A straight neighbour of the goal with no wall between; a tile beside it through a wall is no way to it. */
+		private boolean opensOnto(int tile)
 		{
-			return WalkSearch.plane(tile) == goalTile.getPlane()
-				&& Math.max(Math.abs(WalkSearch.x(tile) - goalTile.getX()), Math.abs(WalkSearch.y(tile) - goalTile.getY())) <= BESIDE_GOAL_TILES;
+			int x = WalkSearch.x(tile);
+			int y = WalkSearch.y(tile);
+			int dx = x - goalTile.getX();
+			int dy = y - goalTile.getY();
+			return WalkSearch.plane(tile) == goalTile.getPlane() && Math.abs(dx) + Math.abs(dy) == 1
+				&& !ground.isWallBetween(x, y, goalTile.getPlane(), -dx, -dy);
 		}
 	}
 }

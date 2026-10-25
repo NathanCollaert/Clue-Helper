@@ -7,6 +7,7 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -16,6 +17,8 @@ import net.runelite.api.coords.WorldPoint;
 final class Acts
 {
 	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
+	private static final String TALK_OPTION = "Talk-to";
+	private static final Set<String> TYPES_WITH_OWN_ACT = Set.of(ClueTypes.EMOTE, ClueTypes.MUSIC, ClueTypes.HOT_COLD, ClueTypes.SKILL);
 
 	private Acts()
 	{
@@ -54,7 +57,16 @@ final class Acts
 			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what + " with the key")
 				.detail("The key comes from " + step.getNpcs().get(0)).build();
 		}
-		return SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step)).build();
+		SubStep.SubStepBuilder act = SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step));
+		String npc = talkedTo(step);
+		return npc == null ? act.build() : act.option(TALK_OPTION).npcNames(Set.of(MenuLabels.normalise(npc))).build();
+	}
+
+	/** The NPC the step's own act talks to; null for a step whose act is something else. */
+	private static String talkedTo(Step step)
+	{
+		boolean ownAct = TYPES_WITH_OWN_ACT.contains(step.getType());
+		return !ownAct && !isDig(step) && hasAny(step.getNpcs()) ? step.getNpcs().get(0) : null;
 	}
 
 	/**

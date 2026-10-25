@@ -16,6 +16,9 @@ import net.runelite.api.coords.WorldPoint;
 
 public final class SceneFiles
 {
+	/** Older files end after the flags; newer ones go on with the closed doors a walk may open. */
+	private static final String DOORS = "doors";
+
 	@Value
 	public static class Recorded
 	{
@@ -34,27 +37,37 @@ public final class SceneFiles
 			int[][][] flags = scene.getFlags();
 			out.println(scene.getBaseX() + " " + scene.getBaseY() + " " + scene.getSizeX() + " " + scene.getSizeY() + " " + flags.length
 				+ " " + player.getX() + " " + player.getY() + " " + player.getPlane());
-			for (int[][] plane : flags)
+			writePlanes(out, flags);
+			if (scene.getDoorSides() != null)
 			{
-				if (plane == null)
-				{
-					out.println("-");
-					continue;
-				}
-				for (int[] column : plane)
-				{
-					StringBuilder line = new StringBuilder();
-					for (int flag : column)
-					{
-						line.append(line.length() == 0 ? "" : " ").append(flag);
-					}
-					out.println(line);
-				}
+				out.println(DOORS);
+				writePlanes(out, scene.getDoorSides());
 			}
 		}
 		catch (IOException e)
 		{
 			throw new IllegalStateException("scene " + file, e);
+		}
+	}
+
+	private static void writePlanes(PrintWriter out, int[][][] planes)
+	{
+		for (int[][] plane : planes)
+		{
+			if (plane == null)
+			{
+				out.println("-");
+				continue;
+			}
+			for (int[] column : plane)
+			{
+				StringBuilder line = new StringBuilder();
+				for (int value : column)
+				{
+					line.append(line.length() == 0 ? "" : " ").append(value);
+				}
+				out.println(line);
+			}
 		}
 	}
 
@@ -74,27 +87,34 @@ public final class SceneFiles
 			String[] h = reader.readLine().split(" ");
 			int sizeX = Integer.parseInt(h[2]);
 			int planes = Integer.parseInt(h[4]);
-			int[][][] flags = new int[planes][][];
-			for (int p = 0; p < planes; p++)
-			{
-				String first = reader.readLine();
-				if (first.equals("-"))
-				{
-					continue;
-				}
-				flags[p] = new int[sizeX][];
-				for (int x = 0; x < sizeX; x++)
-				{
-					String[] cells = (x == 0 ? first : reader.readLine()).split(" ");
-					flags[p][x] = new int[cells.length];
-					for (int y = 0; y < cells.length; y++)
-					{
-						flags[p][x][y] = Integer.parseInt(cells[y]);
-					}
-				}
-			}
-			LoadedScene scene = new LoadedScene(Integer.parseInt(h[0]), Integer.parseInt(h[1]), sizeX, Integer.parseInt(h[3]), flags);
+			int[][][] flags = readPlanes(reader, planes, sizeX);
+			int[][][] doorSides = DOORS.equals(reader.readLine()) ? readPlanes(reader, planes, sizeX) : null;
+			LoadedScene scene = new LoadedScene(Integer.parseInt(h[0]), Integer.parseInt(h[1]), sizeX, Integer.parseInt(h[3]), flags, doorSides);
 			return new Recorded(scene, new WorldPoint(Integer.parseInt(h[5]), Integer.parseInt(h[6]), Integer.parseInt(h[7])));
 		}
+	}
+
+	private static int[][][] readPlanes(BufferedReader reader, int planes, int sizeX) throws IOException
+	{
+		int[][][] values = new int[planes][][];
+		for (int p = 0; p < planes; p++)
+		{
+			String first = reader.readLine();
+			if (first.equals("-"))
+			{
+				continue;
+			}
+			values[p] = new int[sizeX][];
+			for (int x = 0; x < sizeX; x++)
+			{
+				String[] cells = (x == 0 ? first : reader.readLine()).split(" ");
+				values[p][x] = new int[cells.length];
+				for (int y = 0; y < cells.length; y++)
+				{
+					values[p][x][y] = Integer.parseInt(cells[y]);
+				}
+			}
+		}
+		return values;
 	}
 }

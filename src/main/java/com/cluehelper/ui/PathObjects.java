@@ -3,6 +3,8 @@ package com.cluehelper.ui;
 import com.cluehelper.route.Exit;
 import com.cluehelper.route.SceneDoors;
 import com.cluehelper.route.WalkTable;
+import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,8 @@ final class PathObjects
 		}
 	}
 
-	private static boolean isJump(WorldPoint from, WorldPoint to)
+	/** Two tiles of a walk that aren't neighbours on one floor: a row (stairs, a shortcut) joins them. */
+	static boolean isJump(WorldPoint from, WorldPoint to)
 	{
 		return from.getPlane() != to.getPlane() || Math.max(Math.abs(from.getX() - to.getX()), Math.abs(from.getY() - to.getY())) > 1;
 	}
@@ -112,43 +115,79 @@ final class PathObjects
 		}
 	}
 
+	/**
+	 * Client thread only. The objects named as {@code crossed} is on the tiles {@code around} a jump: every stepping stone
+	 * of a crossing, both ends of a pipe, where the walk data names only one.
+	 */
+	List<TileObject> sameNamed(WorldView view, TileObject crossed, Rectangle around)
+	{
+		String name = nameOf(crossed);
+		List<TileObject> found = new ArrayList<>();
+		for (int x = around.x; x < around.x + around.width; x++)
+		{
+			for (int y = around.y; y < around.y + around.height; y++)
+			{
+				Tile tile = tile(view, new WorldPoint(x, y, crossed.getPlane()));
+				if (tile != null)
+				{
+					objectsOn(tile).stream().filter(object -> name != null && name.equals(nameOf(object))).forEach(found::add);
+				}
+			}
+		}
+		return found;
+	}
+
+	private List<TileObject> objectsOn(Tile tile)
+	{
+		List<TileObject> objects = new ArrayList<>();
+		for (GameObject object : tile.getGameObjects())
+		{
+			if (object != null)
+			{
+				objects.add(object);
+			}
+		}
+		for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject()})
+		{
+			if (object != null)
+			{
+				objects.add(object);
+			}
+		}
+		return objects;
+	}
+
+	private String nameOf(TileObject object)
+	{
+		ObjectComposition placed = client.getObjectDefinition(object.getId());
+		ObjectComposition shown = placed.getImpostorIds() != null ? placed.getImpostor() : placed;
+		return shown == null ? null : shown.getName();
+	}
+
+	/** The one nearest the row's origin: a pipe's two ends share an id, and the one clicked is the near end. */
 	private TileObject objectNear(WorldView view, int id, WorldPoint origin)
 	{
+		TileObject nearest = null;
+		int nearestDistance = Integer.MAX_VALUE;
 		for (int dx = -ROW_OBJECT_TILES; dx <= ROW_OBJECT_TILES; dx++)
 		{
 			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
 			{
 				TileObject object = objectOn(tile(view, origin.dx(dx).dy(dy)), id);
-				if (object != null)
+				int distance = dx * dx + dy * dy;
+				if (object != null && distance < nearestDistance)
 				{
-					return object;
+					nearest = object;
+					nearestDistance = distance;
 				}
 			}
 		}
-		return null;
+		return nearest;
 	}
 
 	private TileObject objectOn(Tile tile, int id)
 	{
-		if (tile == null)
-		{
-			return null;
-		}
-		for (GameObject object : tile.getGameObjects())
-		{
-			if (object != null && isObject(object, id))
-			{
-				return object;
-			}
-		}
-		for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject()})
-		{
-			if (object != null && isObject(object, id))
-			{
-				return object;
-			}
-		}
-		return null;
+		return tile == null ? null : objectsOn(tile).stream().filter(object -> isObject(object, id)).findFirst().orElse(null);
 	}
 
 	/** Shortest Path names a multiloc by the form it shows (the Kharazi broken cart: 28931, placed as 2216). */

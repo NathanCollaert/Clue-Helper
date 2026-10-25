@@ -66,7 +66,8 @@ public final class Planner
 					? "choosing where to feel" : "no target tile for this step yet").build();
 		}
 		PlanContext ctx = new PlanContext(in);
-		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty()))
+		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty())
+			|| ctx.required.getMissing().stream().anyMatch(RequiredItems.Need::isBlocksRoute))
 		{
 			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
 				.requirementNotes(requirementNotes(ctx)).build();

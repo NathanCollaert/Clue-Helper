@@ -432,7 +432,7 @@ public class EdgeCaseRoutesTest
 
 	private static RequiredItems.Need need(String name, ItemRequirement requirement, boolean stepItem)
 	{
-		return new RequiredItems.Need(name, requirement, stepItem, false);
+		return new RequiredItems.Need(name, requirement, stepItem, false, false);
 	}
 
 	private static RequiredItems required(StashMemory.State stash, RequiredItems.Need... needs)

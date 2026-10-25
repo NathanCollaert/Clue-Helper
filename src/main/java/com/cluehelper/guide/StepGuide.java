@@ -360,6 +360,9 @@ public class StepGuide
 		{
 			actReachedStepKey = null;
 		}
+		// Before the early returns below: a follow on every tick near the step would starve them (a deposit never seen)
+		actWatcher.onGameTick(routeStep);
+		deposit.onGameTick(tile);
 		boolean changed = false;
 		if (waiting != null && !isTravelling())
 		{
@@ -377,8 +380,6 @@ public class StepGuide
 			follow(route);
 			return;
 		}
-		actWatcher.onGameTick(routeStep);
-		deposit.onGameTick(tile);
 		changed |= advance(tile);
 		changed |= refreshFight();
 		changed |= refreshBox();
@@ -437,6 +438,10 @@ public class StepGuide
 		{
 			return MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build();
 		}
+		if (current != null && !current.getNpcNames().isEmpty())
+		{
+			return MenuTarget.builder().npcNames(current.getNpcNames()).path(option).build();
+		}
 		if (isApproach())
 		{
 			return rowTargets.located(getNext().getRow());
@@ -463,7 +468,8 @@ public class StepGuide
 
 	/**
 	 * Shortest Path names one NPC per ride (a charter's Trader Crewmember), but a port's crew have several ids: when the
-	 * named one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, and its menu is
+	 * named one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC
+	 * there with that option (Port Sarim's boat to Port Piscarilius is Cabin Boy Herbert's, not Veos'). Its menu is
 	 * coloured too.
 	 */
 	private List<NPC> npcsFor(MenuTarget target)
@@ -475,8 +481,10 @@ public class StepGuide
 			return named;
 		}
 		String name = client.getNpcDefinition(target.getNpcIds().iterator().next()).getName();
-		return sceneObjects.npcsNear(boarding, RIDE_NPC_TILES, target.getPath().get(0)).stream()
-			.filter(npc -> npc.getName() != null && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toUnmodifiableList());
+		List<NPC> offering = sceneObjects.npcsNear(boarding, RIDE_NPC_TILES, target.getPath().get(0));
+		List<NPC> sameName = offering.stream().filter(npc -> npc.getName() != null && npc.getName().equalsIgnoreCase(name))
+			.collect(Collectors.toUnmodifiableList());
+		return sameName.isEmpty() ? offering : sameName;
 	}
 
 	/** NPCs found by name rather than id stand in for the named one in its menu too: their ids join the target's. */
