@@ -295,7 +295,7 @@ public class MenuLines
 		for (int i = 0; destination != null && i + 1 < rows.length; i++)
 		{
 			String text = rows[i + 1] == null ? null : Text.removeTags(rows[i + 1].getText()).trim();
-			if (Widgets.visible(rows[i]) && namesPort(rows[i], destination) && text != null && !text.isEmpty())
+			if (Widgets.visible(rows[i]) && namesPlace(rows[i], destination) && text != null && !text.isEmpty())
 			{
 				return text.charAt(0);
 			}
@@ -309,7 +309,7 @@ public class MenuLines
 		boolean found = false;
 		for (Widget marker : dynamicChildren(InterfaceID.SailingMenu.CONTENT))
 		{
-			if (Widgets.visible(marker) && namesPort(marker, destination))
+			if (Widgets.visible(marker) && namesPlace(marker, destination))
 			{
 				out.add(marker);
 				found = true;
@@ -318,9 +318,24 @@ public class MenuLines
 		Widget[] rows = dynamicChildren(InterfaceID.CharteringMenuSide.LIST_CONTENT);
 		for (int i = 0; i + 1 < rows.length; i++)
 		{
-			if (Widgets.visible(rows[i]) && namesPort(rows[i], destination))
+			if (Widgets.visible(rows[i]) && namesPlace(rows[i], destination))
 			{
 				out.add(rows[i + 1]);
+				found = true;
+			}
+		}
+		return found;
+	}
+
+	/** Each place on the glider map is a button with the place's name as its action. */
+	private boolean glider(String destination, Found out)
+	{
+		boolean found = false;
+		for (Widget button : Widgets.descendants(client.getWidget(InterfaceID.Glidermap.UNIVERSE)))
+		{
+			if (Widgets.visible(button) && namesPlace(button, destination))
+			{
+				out.add(button);
 				found = true;
 			}
 		}
@@ -334,7 +349,7 @@ public class MenuLines
 		return children == null ? new Widget[0] : children;
 	}
 
-	private static boolean namesPort(Widget widget, String label)
+	private static boolean namesPlace(Widget widget, String label)
 	{
 		for (String action : widget.getActions() == null ? new String[0] : widget.getActions())
 		{
@@ -560,7 +575,7 @@ public class MenuLines
 	private void labelled(MenuTarget target, Found out)
 	{
 		String destination = target.destination();
-		if (destination == null || charter(destination, out))
+		if (destination == null || charter(destination, out) || glider(destination, out))
 		{
 			return;
 		}

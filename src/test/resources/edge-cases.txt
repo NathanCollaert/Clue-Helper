@@ -123,8 +123,8 @@ Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley s
   best      20t: (at the open bank) Max cape: POH Portals: Taverley → walk 12 withdraw [13280] deposit first
 scroll book kept out of the Wilderness: carried, to the Lava Maze
   best      80t: Camelot Teleport: Seers' → walk 3 → bank → Master scroll book: Revenant cave teleport → walk 58 {item:556=5, item:563=1, charge:21389=1} withdraw []
-  alt       105t: Ring of dueling: Castle Wars → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {charge:2552=1, item:556=1, item:557=1, item:563=1} withdraw []
-  alt       106t: Crafting cape: Teleport → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 77 withdraw []
+  alt       105t: Crafting cape: Teleport → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {item:556=1, item:557=1, item:563=1} withdraw []
+  alt       106t: Max cape: Crafting Guild → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 77 withdraw []
   note      Wilderness target
 scroll book kept out of the Wilderness: banked, to the Lava Maze
   best      92t: Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {item:556=1, item:557=1, item:563=1}
@@ -147,7 +147,7 @@ house: Burthorpe castle steps (Eohric), no games necklace, no house
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      68t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 52
   alt       72t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 55
-  alt       74t: Construction cape: Tele to POH → House obelisk: Level 13 Wilderness → walk 1 → Obelisk: Level 50 Wilderness → walk 52
+  alt       74t: Construction cape: Tele to POH → House obelisk: Level 19 Wilderness → walk 1 → Obelisk: Level 50 Wilderness → walk 52
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)
   best      72t (rank 102): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 55 {item:563=2, item:565=2} leaves you on ANCIENT
