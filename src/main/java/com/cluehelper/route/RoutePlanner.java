@@ -29,8 +29,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.IntPredicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
@@ -41,6 +43,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.client.callback.ClientThread;
 
 /**
  * Client thread, except the plans themselves, which run on the executor through {@link PlannerRunner}. Re-plans only
@@ -58,7 +61,7 @@ public class RoutePlanner
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
 	private static final int POCKET_TILES = 3;
-	private static final int NO_TARGET_IN_SCENE = -1;
+	private static final int NO_TARGET_NEAR = -1;
 	private static final long NO_SCENE = Long.MIN_VALUE;
 
 	private final Client client;
@@ -68,6 +71,8 @@ public class RoutePlanner
 	private final CatalogData catalogData;
 	private final WalkData walkData;
 	private final PlannerRunner runner;
+	/** The walk from the player's tile, searched apart so it never supersedes a plan. */
+	private final PlannerRunner startRunner;
 	private final ClueHelperConfig config;
 	private final BankMemory bankMemory;
 	private final StepNeeds stepNeeds;
@@ -83,15 +88,15 @@ public class RoutePlanner
 	private long gatesVersion = -1;
 	private boolean[] rowOpen;
 	private WorldPoint lastTile;
-	/** After a teleport the scene loads a tick after the tile moves: a BFS over the old scene must be redone. */
+	/** After a teleport the scene loads a tick after the tile moves: a walk over the old scene must be redone. */
 	private long lastSceneBase = NO_SCENE;
 	@Getter
 	private volatile PlanStart start;
 	@Getter
 	private volatile int nearestNode = WalkTable.NO_NODE;
 	@Getter
-	private volatile long lastBfsNanos;
-	private int targetWalkBucket = NO_TARGET_IN_SCENE;
+	private volatile long lastWalkNanos;
+	private int targetWalkBucket = NO_TARGET_NEAR;
 	private Trigger lastTrigger;
 	@Getter
 	private volatile Plan plan = Plan.NONE;
@@ -104,8 +109,9 @@ public class RoutePlanner
 	@Inject
 	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
 		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds, PohService poh,
-		ProbeTarget probeTarget, StageTarget stageTarget, SceneDoors doors)
+		ProbeTarget probeTarget, StageTarget stageTarget, SceneDoors doors, ScheduledExecutorService executor, ClientThread clientThread)
 	{
+		this.startRunner = new PlannerRunner(executor, clientThread);
 		this.stageTarget = stageTarget;
 		this.doors = doors;
 		this.poh = poh;
@@ -144,6 +150,7 @@ public class RoutePlanner
 	public void stop()
 	{
 		runner.cancelAll();
+		startRunner.cancelAll();
 		plan = Plan.NONE;
 		committed = null;
 		committedStep = null;
@@ -175,6 +182,12 @@ public class RoutePlanner
 	/** Call after the player model's and availability's GameTick handlers. */
 	public void onGameTick()
 	{
+		refresh();
+	}
+
+	/** The start walk from a new tile first, then a plan once any of its inputs changed. */
+	private void refresh()
+	{
 		Step step = travelStep();
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
@@ -197,6 +210,10 @@ public class RoutePlanner
 		forgetCapeRefusalOnceCheckMoved(snapshot);
 		snapshot = withRefusals(snapshot);
 		updateStart(data, snapshot, runes, step);
+		if (start == null)
+		{
+			return;
+		}
 		PlannerSettings settings = PlannerSettings.from(config, snapshot.getAccountType());
 		AvailabilitySet carried = availability.getCarried();
 		PlayerSnapshot banked = availability.getBankedSnapshot();
@@ -240,6 +257,13 @@ public class RoutePlanner
 	public WalkData.Loaded getWalk()
 	{
 		return walk;
+	}
+
+	/** Client thread. The walk rows the player can take now, fixed for a search on another thread. */
+	public IntPredicate openRows()
+	{
+		boolean[] open = rowOpen;
+		return row -> open != null && open[row];
 	}
 
 	private PlanInput input(Step step, PlayerSnapshot snapshot, RuneModel runes, WalkData.Loaded data, Catalog loadedCatalog,
@@ -317,6 +341,10 @@ public class RoutePlanner
 	{
 		Position position = player.getPosition();
 		WalkTable table = data.getTable();
+		if (position.getKind() != Position.Kind.WORLD)
+		{
+			startRunner.cancelAll();
+		}
 		if (position.getKind() == Position.Kind.POH && table.node(PositionRules.POH_NODE) != WalkTable.NO_NODE)
 		{
 			start = PlanStart.atNode(table, table.node(PositionRules.POH_NODE));
@@ -334,33 +362,50 @@ public class RoutePlanner
 		WorldView view = client.getTopLevelWorldView();
 		long sceneBase = sceneBase(view);
 		boolean sceneReloaded = sceneBase != lastSceneBase;
-		if (position.getTile().equals(lastTile) && start != null && !sceneReloaded)
+		if (position.getTile().equals(lastTile) && (start != null || startRunner.isWorking()) && !sceneReloaded)
 		{
 			return;
 		}
 		lastTile = position.getTile();
 		lastSceneBase = sceneBase;
 		refreshGates(table, snapshot, runes);
-		SceneBfs.Result bfs = walkTheScene(view, position.getTile(), table);
-		if (isMidObstacle(bfs) && start != null)
+		LoadedScene scene = doors.withDoorsOpen(view, LoadedScene.capture(view), table);
+		Ground ground = Ground.world(data.getMap(), scene, table, openRows());
+		WorldPoint tile = position.getTile();
+		List<WorldPoint> targets = step.getTargets();
+		startRunner.submit(() -> timedWalk(ground, tile), walk -> walked(table, tile, targets, walk));
+	}
+
+	private WalkCosts timedWalk(Ground ground, WorldPoint tile)
+	{
+		long started = System.nanoTime();
+		WalkCosts walk = WalkCosts.from(ground, tile);
+		lastWalkNanos = System.nanoTime() - started;
+		return walk;
+	}
+
+	/** Client thread: the walk from the player's tile is in, and the plan goes ahead now rather than a tick later. */
+	private void walked(WalkTable table, WorldPoint tile, List<WorldPoint> targets, WalkCosts walk)
+	{
+		if (isMidObstacle(walk) && start != null)
 		{
 			retryNextTick();
 			return;
 		}
-		int nearestHere = bfs == null ? WalkTable.NO_NODE : nearest(table, bfs);
-		int targetWalk = bfs == null ? SceneBfs.UNREACHED : step.getTargets().stream().mapToInt(bfs::cost).min().orElse(SceneBfs.UNREACHED);
-		boolean targetInScene = targetWalk != SceneBfs.UNREACHED;
-		if (isInPocket(nearestHere, targetInScene, position.getTile()))
+		int nearestHere = nearest(table, walk);
+		int targetWalk = targets.stream().mapToInt(walk::cost).min().orElse(WalkCosts.UNREACHED);
+		boolean targetNear = targetWalk != WalkCosts.UNREACHED;
+		if (isInPocket(nearestHere, targetNear, tile))
 		{
 			retryNextTick();
 			return;
 		}
 		nearestNode = nearestHere;
-		targetWalkBucket = targetInScene ? targetWalk / TARGET_WALK_BUCKET_TILES : NO_TARGET_IN_SCENE;
-		start = nearestNode != WalkTable.NO_NODE || targetInScene ? PlanStart.scene(position.getTile(), bfs)
-			: PlanStart.teleportOnly(position.getTile(), bfs);
+		targetWalkBucket = targetNear ? targetWalk / TARGET_WALK_BUCKET_TILES : NO_TARGET_NEAR;
+		start = nearestNode != WalkTable.NO_NODE || targetNear ? PlanStart.scene(tile, walk)
+			: PlanStart.teleportOnly(tile, walk);
+		refresh();
 	}
-
 	private static long sceneBase(WorldView view)
 	{
 		return view == null ? NO_SCENE : (long) view.getBaseX() << 32 | view.getBaseY() & 0xFFFFFFFFL;
@@ -379,23 +424,13 @@ public class RoutePlanner
 		gatesVersion = snapshot.getVersion();
 	}
 
-	/** Null when the scene can't be walked (an instance, or no collision data). */
-	private SceneBfs.Result walkTheScene(WorldView view, WorldPoint from, WalkTable table)
-	{
-		long started = System.nanoTime();
-		SceneBfs.Scene scene = doors.withDoorsOpen(view, SceneBfs.Scene.capture(view), table);
-		SceneBfs.Result bfs = scene == null ? null : SceneBfs.run(scene, from, table, rowOpen);
-		lastBfsNanos = System.nanoTime() - started;
-		return bfs;
-	}
-
 	/**
 	 * Collision flags still loading after a reload, or the player mid-obstacle on a blocked tile (stepping stones, a
-	 * log): the BFS reaches only the player's tile.
+	 * log): the walk reaches only the player's tile.
 	 */
-	private static boolean isMidObstacle(SceneBfs.Result bfs)
+	private static boolean isMidObstacle(WalkCosts walk)
 	{
-		return bfs != null && bfs.reachedTiles() <= 1;
+		return walk.reachedTiles() <= 1;
 	}
 
 	/** Mid-obstacle in a pocket with no node (south of Kaleb's, anim 741), a few tiles from a start that had nodes. */
@@ -412,13 +447,13 @@ public class RoutePlanner
 		lastSceneBase = NO_SCENE;
 	}
 
-	private static int nearest(WalkTable table, SceneBfs.Result bfs)
+	private static int nearest(WalkTable table, WalkCosts walk)
 	{
 		int best = WalkTable.NO_NODE;
-		int bestCost = SceneBfs.UNREACHED;
+		int bestCost = WalkCosts.UNREACHED;
 		for (int node = 0; node < table.nodeCount(); node++)
 		{
-			int cost = bfs.cost(table.placed(node));
+			int cost = walk.cost(table.placed(node));
 			if (cost < bestCost)
 			{
 				best = node;

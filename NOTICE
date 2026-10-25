@@ -4,7 +4,10 @@ Copyright (c) 2026, Nathan-Collaert. Licensed under the BSD 2-Clause License (se
 This plugin bundles data derived from Shortest Path
 (https://github.com/Skretzo/shortest-path, commit 300e8de, version 1.22.0):
 the teleport catalog in src/main/resources/com/cluehelper/transport/*.tsv is seeded from its
-transport TSVs, with our corrections and extra columns on top.
+transport TSVs, with our corrections and extra columns on top. The world collision map
+src/main/resources/com/cluehelper/route/walk/collision-map.zip is its collision-map.zip unchanged,
+and the walking rules and in-game walk rewrite in src/main/java/com/cluehelper/route/WorldMap.java
+and GameWalk.java are adapted from its CollisionMap and InGameWalkRewriter.
 
 Shortest Path is by Skretzo, FIrgolitsch, wvanderp, mpickering and contributors, and is
 distributed under the following license:

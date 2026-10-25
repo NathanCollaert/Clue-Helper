@@ -21,7 +21,7 @@ import com.cluehelper.route.RequiredItems;
 import com.cluehelper.route.StepNeeds;
 import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.Stage;
@@ -992,15 +992,15 @@ public class StepGuide
 	private boolean arrived(Step step)
 	{
 		PlanStart start = routes.getStart();
-		SceneBfs.Result scene = start == null ? null : start.getScene();
+		WalkCosts walk = start == null ? null : start.getWalk();
 		boolean parts = step.getStages().stream().allMatch(stage -> stage.getKind() == Stage.Kind.PART);
-		if (scene == null || step.getWaypointAct() != null || !parts || ClueTypes.HOT_COLD.equals(step.getType()))
+		if (walk == null || step.getWaypointAct() != null || !parts || ClueTypes.HOT_COLD.equals(step.getType()))
 		{
 			return false;
 		}
 		for (WorldPoint other : step.getOtherTiles())
 		{
-			if (scene.getScene().contains(other) && scene.costNear(other) <= ARRIVED_WALK_TILES)
+			if (walk.costNear(other) <= ARRIVED_WALK_TILES)
 			{
 				return true;
 			}
@@ -1012,8 +1012,7 @@ public class StepGuide
 		for (NPC npc : client.getTopLevelWorldView().npcs())
 		{
 			WorldPoint at = npc.getWorldLocation();
-			if (npc.getName() != null && step.getNpcs().contains(npc.getName()) && scene.getScene().contains(at)
-				&& scene.costNear(at) <= ARRIVED_WALK_TILES)
+			if (npc.getName() != null && step.getNpcs().contains(npc.getName()) && walk.costNear(at) <= ARRIVED_WALK_TILES)
 			{
 				return true;
 			}

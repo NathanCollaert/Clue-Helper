@@ -14,11 +14,11 @@ import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Position;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.route.GearPieces;
+import com.cluehelper.route.LoadedScene;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.route.PlanStart;
-import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.SceneFiles;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.CoreClues;
@@ -762,13 +762,13 @@ public class ClueHelperDevPlugin extends Plugin
 		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(STEP_FRAMES, name))));
 	}
 
-	/** The recorded scenes are test resources for the scene BFS check. */
+	/** The recorded scenes are test resources for the walk checks. */
 	private void onPlanned(Plan plan)
 	{
 		PlanStart start = clueHelper.getRoutes().getStart();
-		if (start != null && start.getKind() == PlanStart.Kind.SCENE && recordedScenes.size() < MOST_SCENES)
+		LoadedScene scene = start == null || start.getWalk() == null ? null : start.getWalk().getScene();
+		if (scene != null && start.getKind() == PlanStart.Kind.SCENE && recordedScenes.size() < MOST_SCENES)
 		{
-			SceneBfs.Scene scene = start.getScene().getScene();
 			String name = scene.getBaseX() + "_" + scene.getBaseY() + "_" + start.getTile().getPlane();
 			if (recordedScenes.add(name))
 			{

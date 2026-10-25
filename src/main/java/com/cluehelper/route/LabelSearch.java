@@ -312,49 +312,25 @@ final class LabelSearch
 		{
 			return;
 		}
-		SceneBfs.Result scene = start.getScene();
+		WalkCosts walk = start.getWalk();
 		WalkTable table = ctx.table;
 		for (int node = 0; node < table.nodeCount(); node++)
 		{
-			int cost = scene.cost(table.placed(node));
-			if (cost != SceneBfs.UNREACHED && !ctx.forbidden(node))
+			int cost = walk.cost(table.placed(node));
+			if (cost != WalkCosts.UNREACHED && !ctx.forbidden(node))
 			{
 				offer(from, node, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, null, null, from.spent);
-				joinWalksAhead(from, k, scene, node);
 			}
 		}
 		for (int[] targets : legTargets)
 		{
 			for (int node : targets)
 			{
-				int cost = ctx.isTableNode(node) ? SceneBfs.UNREACHED : scene.cost(ctx.tile(node));
-				if (cost != SceneBfs.UNREACHED)
+				int cost = ctx.isTableNode(node) ? WalkCosts.UNREACHED : walk.cost(ctx.tile(node));
+				if (cost != WalkCosts.UNREACHED)
 				{
 					offer(from, node, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, null, null, from.spent);
 				}
-			}
-		}
-	}
-
-	/**
-	 * Partway along a long walk the node it leads to can be past the loaded scene, leaving only the node behind in reach.
-	 * The walk's waypoint, 40 tiles along, is often still in the scene, so the start joins the walk there instead of
-	 * going back.
-	 */
-	private void joinWalksAhead(Label from, int k, SceneBfs.Result scene, int node)
-	{
-		WalkTable table = ctx.table;
-		for (int e = table.entriesFrom(node); e < table.entriesEnd(node); e++)
-		{
-			int to = table.entryTo(e);
-			int full = table.entryFull(e);
-			boolean onFullWalk = ctx.gates(PlanContext.NOT_BANKED).cost(e) == full;
-			WorldPoint waypoint = onFullWalk && !ctx.forbidden(to) ? table.entryWaypoint(e) : null;
-			int toWaypoint = waypoint == null ? SceneBfs.UNREACHED : scene.cost(waypoint);
-			if (toWaypoint != SceneBfs.UNREACHED)
-			{
-				int cost = toWaypoint + full - WalkTable.WAYPOINT_TILES;
-				offer(from, to, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, waypoint, node, from.spent);
 			}
 		}
 	}

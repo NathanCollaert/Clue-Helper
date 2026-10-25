@@ -6,16 +6,19 @@ import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.DriftSteps;
 import com.cluehelper.route.GearPicker;
 import com.cluehelper.route.GearRequirement;
+import com.cluehelper.route.Ground;
+import com.cluehelper.route.LoadedScene;
 import com.cluehelper.route.NoTeleportAreas;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.Planner;
 import com.cluehelper.route.RequiredItems;
-import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.SceneFiles;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.route.WalkGates;
 import com.cluehelper.route.WalkTable;
+import com.cluehelper.route.WorldMap;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
@@ -66,6 +69,7 @@ public final class PlanReplay
 		}
 		Arrays.sort(files);
 		WalkTable table = WalkTable.load();
+		WorldMap map = WorldMap.load();
 		Catalog catalog = CatalogLoader.load();
 		NoTeleportAreas noTeleport = NoTeleportAreas.load();
 		Map<String, Step> steps = DriftSteps.read();
@@ -90,7 +94,7 @@ public final class PlanReplay
 				.catalog(catalog)
 				.table(table)
 				.noTeleport(noTeleport)
-				.start(start(recording, folder, table, engine))
+				.start(start(recording, folder, table, map, engine))
 				.settings(recording.settings)
 				.revertTicksLeft(recording.revertTicksLeft)
 				.refusedChanges(recording.refusedChanges)
@@ -153,28 +157,29 @@ public final class PlanReplay
 		return new GearRequirement(need.name, need.gearAtLeast, pieces);
 	}
 
-	private static PlanStart start(PlanTrace.Recording recording, File folder, WalkTable table, AvailabilityEngine engine)
+	private static PlanStart start(PlanTrace.Recording recording, File folder, WalkTable table, WorldMap map, AvailabilityEngine engine)
 		throws IOException
 	{
 		WorldPoint tile = point(recording.startTile);
-		SceneBfs.Result scene = recording.sceneFile == null ? null : scene(new File(folder, recording.sceneFile), tile, table,
-			new WalkGates(table, recording.player, engine, recording.nowMinutes).rowOpen());
+		boolean[] rowOpen = new WalkGates(table, recording.player, engine, recording.nowMinutes).rowOpen();
+		LoadedScene scene = recording.sceneFile == null ? null : scene(new File(folder, recording.sceneFile));
+		WalkCosts walk = WalkCosts.from(Ground.world(map, scene, table, row -> rowOpen[row]), tile);
 		switch (PlanStart.Kind.valueOf(recording.startKind))
 		{
 			case SCENE:
-				return PlanStart.scene(tile, scene);
+				return PlanStart.scene(tile, walk);
 			case AT_NODE:
 				return PlanStart.atNode(table, table.node(tile));
 			default:
-				return scene == null ? PlanStart.teleportOnly(tile) : PlanStart.teleportOnly(tile, scene);
+				return PlanStart.teleportOnly(tile, walk);
 		}
 	}
 
-	private static SceneBfs.Result scene(File file, WorldPoint tile, WalkTable table, boolean[] rowOpen) throws IOException
+	private static LoadedScene scene(File file) throws IOException
 	{
 		try (InputStream in = new FileInputStream(file))
 		{
-			return SceneBfs.run(SceneFiles.read(in).getScene(), tile, table, rowOpen);
+			return SceneFiles.read(in).getScene();
 		}
 	}
 

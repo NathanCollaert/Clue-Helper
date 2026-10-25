@@ -17,6 +17,7 @@ public class WalkData
 	{
 		WalkTable table;
 		NoTeleportAreas noTeleport;
+		WorldMap map;
 	}
 
 	private final CompletableFuture<Loaded> loaded;
@@ -37,7 +38,7 @@ public class WalkData
 		try
 		{
 			long started = System.nanoTime();
-			Loaded data = new Loaded(WalkTable.load(), NoTeleportAreas.load());
+			Loaded data = new Loaded(WalkTable.load(), NoTeleportAreas.load(), WorldMap.load());
 			log.debug("walk data: {} nodes, {} entries, {} rows in {} ms", data.getTable().nodeCount(), data.getTable().entryCount(),
 				data.getTable().rowCount(), (System.nanoTime() - started) / 1_000_000);
 			return data;

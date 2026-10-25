@@ -583,7 +583,7 @@ public final class Planner
 				Leg leg = leg(ctx, label, at);
 				Leg last = legs.isEmpty() ? null : legs.get(legs.size() - 1);
 				boolean merge = leg.getKind() == Leg.Kind.WALK && last != null && last.getKind() == Leg.Kind.WALK
-					&& !leavesStartScene(ctx, last) && !stageReached;
+					&& !leavesByExit(ctx, last) && !stageReached;
 				stageReached = false;
 				if (merge)
 				{
@@ -623,46 +623,15 @@ public final class Planner
 				.spent(spent)
 				.confidence(goal.confidence())
 				.wilderness(wilderness)
-				.startVia(startVia(ctx, goal))
-				.startJoinedFrom(startJoinedFrom(ctx, goal))
 				.build();
 		}
 
-		private static WorldPoint startVia(PlanContext ctx, LabelSearch.Label goal)
-		{
-			LabelSearch.Label first = startWalk(ctx, goal);
-			return first == null ? null : first.ref instanceof WorldPoint ? (WorldPoint) first.ref : ctx.tile(first.node);
-		}
-
-		private static WorldPoint startJoinedFrom(PlanContext ctx, LabelSearch.Label goal)
-		{
-			LabelSearch.Label first = startWalk(ctx, goal);
-			return first != null && first.ref2 instanceof Integer ? ctx.tile((Integer) first.ref2) : null;
-		}
-
-		/** The route's first label when it walks from the scene start. */
-		private static LabelSearch.Label startWalk(PlanContext ctx, LabelSearch.Label goal)
-		{
-			if (ctx.in.getStart().getKind() != PlanStart.Kind.SCENE)
-			{
-				return null;
-			}
-			for (LabelSearch.Label label : goal.chain())
-			{
-				if (label.kind != null)
-				{
-					return label.kind == Leg.Kind.WALK ? label : null;
-				}
-			}
-			return null;
-		}
-
 		/** A start leg through an {@link Exit} stays a leg of its own, so the guide can name the exit. */
-		private static boolean leavesStartScene(PlanContext ctx, Leg leg)
+		private static boolean leavesByExit(PlanContext ctx, Leg leg)
 		{
 			PlanStart start = ctx.in.getStart();
 			return start.getKind() == PlanStart.Kind.SCENE && leg.getFrom() != null && leg.getFrom().equals(start.getTile())
-				&& leg.getTo() != null && !start.getScene().getScene().contains(leg.getTo());
+				&& start.getWalk().exitTo(leg.getTo()) != null;
 		}
 
 		private static List<ItemUse> withdraw(PlanContext ctx, LabelSearch.Label goal)

@@ -87,7 +87,7 @@ public final class SceneDoors
 	 * the sides they open through recorded. A door that {@code table} crosses by a row (one that shuts behind the
 	 * player, its opening animated) stays shut, so its row's time counts.
 	 */
-	public SceneBfs.Scene withDoorsOpen(WorldView view, SceneBfs.Scene scene, WalkTable table)
+	public LoadedScene withDoorsOpen(WorldView view, LoadedScene scene, WalkTable table)
 	{
 		if (scene == null)
 		{
@@ -121,7 +121,7 @@ public final class SceneDoors
 				}
 			}
 		}
-		return new SceneBfs.Scene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides);
+		return new LoadedScene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides);
 	}
 
 	private static int[][][] copyOf(int[][][] flags)

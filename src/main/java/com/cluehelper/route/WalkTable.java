@@ -22,8 +22,6 @@ public final class WalkTable
 {
 	public static final int NO_NODE = -1;
 	public static final int NO_PATH = -1;
-	/** The spacing of each walk's waypoints, as the walk generator writes them. */
-	public static final int WAYPOINT_TILES = 40;
 	static final String DIRECTORY = "walk/";
 
 	public static final int KIND_LANDING = 1;
@@ -59,11 +57,9 @@ public final class WalkTable
 	private int[] rowDest = new int[0];
 	private int[] rowCost = new int[0];
 	private int[] rowGate = new int[0];
-	/** Marks a point of {@link #entryWaypoints} as a row's origin or destination, above a packed tile's bits. */
-	private static final int ROW_POINT = 1 << 30;
-	/** Entry e's points are packed tiles waypoints[waypointStart[e]] up to waypoints[waypointStart[e + 1]]. */
-	private int[] waypointStart = new int[1];
-	private int[] waypoints = new int[0];
+	private static final int[] NO_ROWS = new int[0];
+	private Map<Integer, int[]> rowsByOrigin = Map.of();
+	private boolean[] rowIsExit = new boolean[0];
 	private Map<Long, Exit> exits = Map.of();
 	private Map<Long, Exit> rowObjects = Map.of();
 	/** Each row object's id by the packed tiles its rows start from. */
@@ -80,9 +76,9 @@ public final class WalkTable
 		table.readGates(lines("gates.tsv"));
 		table.readTable(new Varints(bytes("table.bin")));
 		table.readRows(new Varints(bytes("rows.bin")));
-		table.readWaypoints(new Varints(bytes("waypoints.bin")));
 		table.readBanks(lines("banks.tsv"));
 		table.exits = rowActions(lines("exits.tsv"));
+		table.markExitRows();
 		table.rowObjects = rowActions(lines("row-objects.tsv"));
 		table.rowObjectsAt = table.rowObjects.values().stream().collect(Collectors.groupingBy(exit -> pack(exit.getOrigin()),
 			Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
@@ -143,30 +139,6 @@ public final class WalkTable
 		return entryGateSet[entry];
 	}
 
-	/** The tile 40 tiles along the entry's walk (gates passing), or null for a shorter walk. */
-	public WorldPoint entryWaypoint(int entry)
-	{
-		for (int i = waypointStart[entry]; i < waypointStart[entry + 1]; i++)
-		{
-			if ((waypoints[i] & ROW_POINT) == 0)
-			{
-				return unpack(waypoints[i]);
-			}
-		}
-		return null;
-	}
-
-	/** The entry's walk in order, short of its end: a tile every 40 tiles, and each ladder, door or cave it takes at both ends. */
-	public List<WorldPoint> entryWaypoints(int entry)
-	{
-		List<WorldPoint> along = new ArrayList<>();
-		for (int i = waypointStart[entry]; i < waypointStart[entry + 1]; i++)
-		{
-			along.add(unpack(waypoints[i] & ~ROW_POINT));
-		}
-		return along;
-	}
-
 	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
 	public int entryOpen(int entry)
 	{
@@ -213,6 +185,24 @@ public final class WalkTable
 	public int rowCost(int row)
 	{
 		return rowCost[row];
+	}
+
+	/** The row is an {@link Exit}: it leaves for a far landing (a cave, a dungeon's ladder). */
+	boolean isExitRow(int row)
+	{
+		return rowIsExit[row];
+	}
+
+	/** The rows that start on the packed tile ({@link #pack}). */
+	int[] rowsFrom(int tile)
+	{
+		return rowsByOrigin.getOrDefault(tile, NO_ROWS);
+	}
+
+	/** The packed tile the row lands on. */
+	int rowDestTile(int row)
+	{
+		return rowDest[row];
 	}
 
 	/** 0 for an always-open row, else a gate id. */
@@ -300,6 +290,15 @@ public final class WalkTable
 		}
 	}
 
+	private void markExitRows()
+	{
+		rowIsExit = new boolean[rowOrigin.length];
+		for (int row = 0; row < rowOrigin.length; row++)
+		{
+			rowIsExit[row] = exits.containsKey((long) rowOrigin[row] << 32 | rowDest[row] & 0xFFFFFFFFL);
+		}
+	}
+
 	private static Map<Long, Exit> rowActions(List<String[]> rows)
 	{
 		Map<Long, Exit> byRow = new HashMap<>();
@@ -318,9 +317,14 @@ public final class WalkTable
 		return (long) pack(origin) << 32 | pack(destination) & 0xFFFFFFFFL;
 	}
 
-	private static int pack(WorldPoint tile)
+	static int pack(WorldPoint tile)
 	{
-		return tile.getPlane() << 28 | tile.getY() << 14 | tile.getX();
+		return pack(tile.getX(), tile.getY(), tile.getPlane());
+	}
+
+	static int pack(int x, int y, int plane)
+	{
+		return plane << 28 | y << 14 | x;
 	}
 
 	private static WorldPoint parseTile(String cell)
@@ -329,7 +333,7 @@ public final class WalkTable
 		return new WorldPoint(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
 	}
 
-	private static WorldPoint unpack(int packed)
+	static WorldPoint unpack(int packed)
 	{
 		return new WorldPoint(packed & 0x3FFF, packed >>> 14 & 0x3FFF, packed >>> 28);
 	}
@@ -434,39 +438,6 @@ public final class WalkTable
 		entryOpen = open.toArray();
 	}
 
-	/** Stored relative to the point before, the first to the entry's start node; kept here as absolute packed tiles. */
-	private void readWaypoints(Varints in)
-	{
-		waypointStart = new int[entryTo.length + 1];
-		IntBuffer points = new IntBuffer();
-		int entry = 0;
-		for (int node = 0; node < tiles.length; node++)
-		{
-			WorldPoint from = placed[node];
-			for (; entry < entryStart[node + 1]; entry++)
-			{
-				waypointStart[entry] = points.size;
-				int count = in.next();
-				int x = from == null ? 0 : from.getX();
-				int y = from == null ? 0 : from.getY();
-				for (int k = 0; k < count; k++)
-				{
-					x += unzigzag(in.next());
-					int value = in.next();
-					y += unzigzag(value >>> 3);
-					points.add((value & 1) * ROW_POINT | (value >> 1 & 3) << 28 | y << 14 | x);
-				}
-			}
-		}
-		waypointStart[entry] = points.size;
-		waypoints = points.toArray();
-	}
-
-	private static int unzigzag(int value)
-	{
-		return value >>> 1 ^ -(value & 1);
-	}
-
 	private void readRows(Varints in)
 	{
 		int count = in.next();
@@ -481,6 +452,13 @@ public final class WalkTable
 			rowCost[i] = in.next();
 			rowGate[i] = in.next();
 		}
+		Map<Integer, List<Integer>> byOrigin = new HashMap<>();
+		for (int i = 0; i < count; i++)
+		{
+			byOrigin.computeIfAbsent(rowOrigin[i], tile -> new ArrayList<>()).add(i);
+		}
+		rowsByOrigin = byOrigin.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+			entry -> entry.getValue().stream().mapToInt(Integer::intValue).toArray()));
 	}
 
 	private static String cell(String[] cells, int index)

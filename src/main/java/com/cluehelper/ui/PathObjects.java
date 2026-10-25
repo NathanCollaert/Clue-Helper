@@ -1,7 +1,6 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.route.Exit;
-import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.SceneDoors;
 import com.cluehelper.route.WalkTable;
 import java.util.LinkedHashMap;
@@ -55,7 +54,7 @@ final class PathObjects
 	}
 
 	/** Client thread only. Each object with the menu option that takes the path through it. */
-	Map<TileObject, String> along(WorldView view, WalkTable table, SceneBfs.Result scene, List<WorldPoint> path)
+	Map<TileObject, String> along(WorldView view, WalkTable table, List<WorldPoint> path)
 	{
 		Map<TileObject, String> objects = new LinkedHashMap<>();
 		for (int i = 0; i + 1 < path.size(); i++)
@@ -71,14 +70,6 @@ final class PathObjects
 				addClosedDoor(objects, view, from, to);
 				addRowObject(objects, view, table == null ? null : table.rowObject(from, to), from);
 				addWalkedOverRow(objects, view, table, path, i);
-			}
-		}
-		if (!path.isEmpty() && table != null)
-		{
-			WorldPoint last = path.get(path.size() - 1);
-			for (SceneBfs.ExitReach exit : scene.exitsFrom(last))
-			{
-				addRowObject(objects, view, table.rowObject(exit.getOrigin(), exit.getDestination()), last);
 			}
 		}
 		return objects;

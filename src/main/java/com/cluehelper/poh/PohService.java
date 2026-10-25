@@ -5,7 +5,9 @@ import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.player.HouseState;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.Position;
-import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.Ground;
+import com.cluehelper.route.LoadedScene;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.transport.Catalog;
 import com.cluehelper.transport.CatalogData;
 import com.cluehelper.transport.CatalogRow;
@@ -365,13 +367,13 @@ public class PohService
 			return;
 		}
 		Map<Integer, List<WorldPoint>> found = findPieces(view.getScene());
-		SceneBfs.Result walk = walkFrom(view, local.getLocalLocation());
+		WalkCosts walk = walkFrom(view, local.getLocalLocation());
 		Map<Integer, Integer> ticks = new HashMap<>();
 		found.forEach((id, cells) ->
 		{
-			int tiles = cells.stream().mapToInt(cell -> walk == null ? SceneBfs.UNREACHED : walk.costNear(cell)).min()
-				.orElse(SceneBfs.UNREACHED);
-			if (tiles != SceneBfs.UNREACHED)
+			int tiles = cells.stream().mapToInt(cell -> walk == null ? WalkCosts.UNREACHED : walk.costNear(cell)).min()
+				.orElse(WalkCosts.UNREACHED);
+			if (tiles != WalkCosts.UNREACHED)
 			{
 				ticks.put(id, (tiles + 1) / 2);
 			}
@@ -435,7 +437,7 @@ public class PohService
 	}
 
 	/** Uses the instance's own collision flags; its points are scene coordinates, not world ones. */
-	private static SceneBfs.Result walkFrom(WorldView view, LocalPoint at)
+	private static WalkCosts walkFrom(WorldView view, LocalPoint at)
 	{
 		CollisionData[] maps = view.getCollisionMaps();
 		if (maps == null || at == null)
@@ -447,8 +449,8 @@ public class PohService
 		{
 			flags[plane] = maps[plane] == null ? null : maps[plane].getFlags();
 		}
-		SceneBfs.Scene scene = new SceneBfs.Scene(0, 0, view.getSizeX(), view.getSizeY(), flags);
-		return SceneBfs.run(scene, new WorldPoint(at.getSceneX(), at.getSceneY(), view.getPlane()), null, null);
+		LoadedScene scene = new LoadedScene(0, 0, view.getSizeX(), view.getSizeY(), flags);
+		return WalkCosts.from(Ground.sceneOnly(scene), new WorldPoint(at.getSceneX(), at.getSceneY(), view.getPlane()));
 	}
 
 	private void publish()

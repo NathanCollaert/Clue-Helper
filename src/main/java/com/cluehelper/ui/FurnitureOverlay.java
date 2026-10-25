@@ -4,10 +4,11 @@ import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.StepGuide;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.util.List;
 import javax.inject.Inject;
+import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.TileObject;
+import net.runelite.api.WorldView;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -17,13 +18,17 @@ public class FurnitureOverlay extends Overlay
 	private final StepGuide guide;
 	private final ClueHelperConfig config;
 	private final Highlighter highlighter;
+	private final LineTargets targets;
+	private final Client client;
 
 	@Inject
-	FurnitureOverlay(StepGuide guide, ClueHelperConfig config, Highlighter highlighter)
+	FurnitureOverlay(Client client, StepGuide guide, ClueHelperConfig config, Highlighter highlighter, LineTargets targets)
 	{
 		this.guide = guide;
 		this.config = config;
 		this.highlighter = highlighter;
+		this.targets = targets;
+		this.client = client;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 	}
@@ -35,15 +40,16 @@ public class FurnitureOverlay extends Overlay
 		{
 			return null;
 		}
-		List<TileObject> leftClick = guide.getFillObjects();
-		for (TileObject object : guide.getHighlightObjects())
+		WorldView view = client.getTopLevelWorldView();
+		TileObject object = view == null ? null : targets.object(view);
+		if (object != null)
 		{
-			highlighter.object(graphics, object, leftClick.contains(object));
+			highlighter.object(graphics, object, guide.getFillObjects().contains(object));
 		}
-		List<NPC> leftClickNpcs = guide.getFillNpcs();
-		for (NPC npc : guide.getHighlightNpcs())
+		NPC npc = targets.npc();
+		if (npc != null)
 		{
-			highlighter.npc(graphics, npc, leftClickNpcs.contains(npc));
+			highlighter.npc(graphics, npc, guide.getFillNpcs().contains(npc));
 		}
 		return null;
 	}

@@ -10,6 +10,7 @@ import com.cluehelper.route.PlannerSettings;
 import com.cluehelper.route.RequiredItems;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneFiles;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
 import com.google.gson.Gson;
@@ -67,10 +68,11 @@ final class PlanTrace
 		}
 		String name = String.format("%03d-%s", ++recorded, slug(input.getStep().getKey()));
 		Recording recording = recording(plan, input, millis);
-		if (input.getStart().getScene() != null)
+		WalkCosts walk = input.getStart().getWalk();
+		if (walk != null && walk.getScene() != null)
 		{
 			recording.sceneFile = name + ".scene.gz";
-			SceneFiles.write(new File(PLANS, recording.sceneFile), input.getStart().getScene().getScene(), input.getStart().getTile());
+			SceneFiles.write(new File(PLANS, recording.sceneFile), walk.getScene(), input.getStart().getTile());
 		}
 		try (Writer out = new FileWriter(new File(PLANS, name + ".json"), StandardCharsets.UTF_8))
 		{

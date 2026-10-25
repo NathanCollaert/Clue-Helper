@@ -17,7 +17,7 @@ import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.route.StepNeeds;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.route.WalkTable;
@@ -394,11 +394,11 @@ public class HotColdService
 	{
 		PlanStart start = routes.getStart();
 		WorldPoint here = player.getPosition().getTile();
-		if (start == null || start.getKind() != PlanStart.Kind.SCENE || start.getScene() == null || here == null)
+		if (start == null || start.getKind() != PlanStart.Kind.SCENE || start.getWalk() == null || here == null)
 		{
 			return List.of();
 		}
-		SceneBfs.Result scene = start.getScene();
+		WalkCosts fromHere = start.getWalk();
 		List<Probe> probes = new ArrayList<>();
 		for (int dx = -LOCAL_FAR; dx <= LOCAL_FAR; dx++)
 		{
@@ -411,8 +411,8 @@ public class HotColdService
 					continue;
 				}
 				WorldPoint tile = new WorldPoint(here.getX() + dx, here.getY() + dy, here.getPlane());
-				int cost = scene.cost(tile);
-				if (cost != SceneBfs.UNREACHED)
+				int cost = fromHere.cost(tile);
+				if (cost != WalkCosts.UNREACHED)
 				{
 					int ticks = (cost + 1) / 2;
 					probes.add(new Probe(tile, Probe.Kind.LOCAL, ticks, ticks, OriginClass.of(tile, walk.getNoTeleport()).isWilderness()));

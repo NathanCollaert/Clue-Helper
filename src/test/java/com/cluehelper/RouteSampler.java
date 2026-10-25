@@ -3,13 +3,15 @@ package com.cluehelper;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.DriftSteps;
+import com.cluehelper.route.Ground;
+import com.cluehelper.route.LoadedScene;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.Planner;
 import com.cluehelper.route.PlannerSettings;
 import com.cluehelper.route.Route;
-import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.route.WalkGates;
 import com.cluehelper.step.Step;
@@ -56,7 +58,7 @@ final class RouteSampler
 		this.executor = executor;
 	}
 
-	/** Client thread only: times the scene BFS here, then plans the steps on the executor. */
+	/** Client thread only: times the start walk here, then plans the steps on the executor. */
 	void run()
 	{
 		PlayerModel model = clueHelper.getPlayerModel();
@@ -81,16 +83,16 @@ final class RouteSampler
 		for (int i = 0; i < BFS_RUNS; i++)
 		{
 			long t0 = System.nanoTime();
-			SceneBfs.Scene scene = SceneBfs.Scene.capture(client.getTopLevelWorldView());
+			LoadedScene scene = LoadedScene.capture(client.getTopLevelWorldView());
 			long t1 = System.nanoTime();
-			SceneBfs.Result result = scene == null ? null : SceneBfs.run(scene, start.getTile(), walk.getTable(), rowOpen);
+			WalkCosts result = WalkCosts.from(Ground.world(walk.getMap(), scene, walk.getTable(), row -> rowOpen[row]), start.getTile());
 			bfs[i] = System.nanoTime() - t1;
 			capture[i] = t1 - t0;
-			reached = result == null ? 0 : result.reachedTiles();
+			reached = result.reachedTiles();
 		}
 		Arrays.sort(capture);
 		Arrays.sort(bfs);
-		log.info("{} scene at {}: capture median {} ms, BFS median {} ms (max {} ms), {} tiles reached", TAG, start.getTile(),
+		log.info("{} scene at {}: capture median {} ms, start walk median {} ms (max {} ms), {} tiles reached", TAG, start.getTile(),
 			ms(capture[BFS_RUNS / 2]), ms(bfs[BFS_RUNS / 2]), ms(bfs[BFS_RUNS - 1]), reached);
 	}
 

@@ -19,7 +19,7 @@ public final class SceneFiles
 	@Value
 	public static class Recorded
 	{
-		SceneBfs.Scene scene;
+		LoadedScene scene;
 		WorldPoint player;
 	}
 
@@ -27,7 +27,7 @@ public final class SceneFiles
 	{
 	}
 
-	public static void write(File file, SceneBfs.Scene scene, WorldPoint player)
+	public static void write(File file, LoadedScene scene, WorldPoint player)
 	{
 		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(file)), StandardCharsets.UTF_8)))
 		{
@@ -58,6 +58,15 @@ public final class SceneFiles
 		}
 	}
 
+	/** A scene recorded into the test resources' scenes folder, by its file name without ".scene.gz". */
+	public static Recorded resource(String name) throws IOException
+	{
+		try (InputStream in = SceneFiles.class.getResourceAsStream("/scenes/" + name + ".scene.gz"))
+		{
+			return read(in);
+		}
+	}
+
 	public static Recorded read(InputStream in) throws IOException
 	{
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(in), StandardCharsets.UTF_8)))
@@ -84,7 +93,7 @@ public final class SceneFiles
 					}
 				}
 			}
-			SceneBfs.Scene scene = new SceneBfs.Scene(Integer.parseInt(h[0]), Integer.parseInt(h[1]), sizeX, Integer.parseInt(h[3]), flags);
+			LoadedScene scene = new LoadedScene(Integer.parseInt(h[0]), Integer.parseInt(h[1]), sizeX, Integer.parseInt(h[3]), flags);
 			return new Recorded(scene, new WorldPoint(Integer.parseInt(h[5]), Integer.parseInt(h[6]), Integer.parseInt(h[7])));
 		}
 	}

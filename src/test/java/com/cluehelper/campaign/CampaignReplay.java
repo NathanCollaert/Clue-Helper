@@ -12,7 +12,10 @@ import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.Planner;
-import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.Ground;
+import com.cluehelper.route.LoadedScene;
+import com.cluehelper.route.WalkCosts;
+import com.cluehelper.route.WorldMap;
 import com.cluehelper.route.SceneFiles;
 import com.cluehelper.route.StepNeeds;
 import com.cluehelper.route.WalkGates;
@@ -46,25 +49,27 @@ import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 public final class CampaignReplay
 {
 	private final WalkTable table;
+	private final WorldMap map;
 	private final Catalog catalog;
 	private final NoTeleportAreas noTeleport;
 	private final RuneModel runes;
 	private final StepIndex index;
 	private Map<String, String> sourcesByKey;
 
-	private CampaignReplay(WalkTable table, Catalog catalog, NoTeleportAreas noTeleport, RuneModel runes, StepIndex index)
+	private CampaignReplay(WalkTable table, WorldMap map, Catalog catalog, NoTeleportAreas noTeleport, RuneModel runes, StepIndex index)
 	{
 		this.table = table;
+		this.map = map;
 		this.catalog = catalog;
 		this.noTeleport = noTeleport;
 		this.runes = runes;
 		this.index = index;
 	}
 
-	/** The bundled walk table, catalog and step data, and the rune model slice the tests plan with. */
+	/** The bundled walk table and world map, catalog and step data, and the rune model slice the tests plan with. */
 	public static CampaignReplay load() throws IOException
 	{
-		return new CampaignReplay(WalkTable.load(), CatalogLoader.load(), NoTeleportAreas.load(), Loadouts.runeModel(),
+		return new CampaignReplay(WalkTable.load(), WorldMap.load(), CatalogLoader.load(), NoTeleportAreas.load(), Loadouts.runeModel(),
 			StepIndex.read(new Gson()));
 	}
 
@@ -115,7 +120,7 @@ public final class CampaignReplay
 			.foreignHouseStart(recording.foreignHouseStart)
 			.build();
 		Plan plan = Planner.withoutAlternatives(input);
-		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start, () -> table,
+		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start,
 			recording.settings::isScrollBookOutOfWilderness);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 		return Outcome.of(plan, guide);
@@ -162,24 +167,25 @@ public final class CampaignReplay
 	private PlanStart start(CampaignRecording recording, Path folder, AvailabilityEngine engine) throws IOException
 	{
 		WorldPoint tile = new WorldPoint(recording.startTile[0], recording.startTile[1], recording.startTile[2]);
-		SceneBfs.Result scene = recording.sceneFile == null ? null : scene(folder.resolve(recording.sceneFile), tile,
-			new WalkGates(table, recording.player, engine, recording.nowMinutes).rowOpen());
+		boolean[] rowOpen = new WalkGates(table, recording.player, engine, recording.nowMinutes).rowOpen();
+		LoadedScene scene = recording.sceneFile == null ? null : scene(folder.resolve(recording.sceneFile));
+		WalkCosts walk = WalkCosts.from(Ground.world(map, scene, table, row -> rowOpen[row]), tile);
 		switch (PlanStart.Kind.valueOf(recording.startKind))
 		{
 			case SCENE:
-				return PlanStart.scene(tile, scene);
+				return PlanStart.scene(tile, walk);
 			case AT_NODE:
 				return PlanStart.atNode(table, table.node(tile));
 			default:
-				return scene == null ? PlanStart.teleportOnly(tile) : PlanStart.teleportOnly(tile, scene);
+				return PlanStart.teleportOnly(tile, walk);
 		}
 	}
 
-	private SceneBfs.Result scene(Path file, WorldPoint tile, boolean[] rowOpen) throws IOException
+	private static LoadedScene scene(Path file) throws IOException
 	{
 		try (InputStream in = Files.newInputStream(file))
 		{
-			return SceneBfs.run(SceneFiles.read(in).getScene(), tile, table, rowOpen);
+			return SceneFiles.read(in).getScene();
 		}
 	}
 

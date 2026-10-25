@@ -3,7 +3,7 @@ package com.cluehelper.dev;
 import com.cluehelper.route.OriginClass;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.SceneBfs;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.route.WalkData;
 import com.cluehelper.route.WalkTable;
 import java.awt.Color;
@@ -56,7 +56,7 @@ final class RouteOverlay extends Overlay
 			return null;
 		}
 		WalkTable table = data.getTable();
-		SceneBfs.Result scene = start.getScene();
+		WalkCosts walk = start.getWalk();
 		int plane = client.getTopLevelWorldView().getPlane();
 		for (int node = 0; node < table.nodeCount(); node++)
 		{
@@ -64,7 +64,7 @@ final class RouteOverlay extends Overlay
 			LocalPoint local = tile.getPlane() == plane ? LocalPoint.fromWorld(client.getTopLevelWorldView(), tile) : null;
 			if (local != null)
 			{
-				drawNode(graphics, local, node + " " + walk(scene, tile), colour(table, node));
+				drawNode(graphics, local, node + " " + walk(walk, tile), colour(table, node));
 			}
 		}
 		String origin = start.getTile() == null ? "-" : OriginClass.of(start.getTile(), data.getNoTeleport()).name();
@@ -87,10 +87,10 @@ final class RouteOverlay extends Overlay
 		}
 	}
 
-	private static String walk(SceneBfs.Result scene, WorldPoint tile)
+	private static String walk(WalkCosts walk, WorldPoint tile)
 	{
-		int cost = scene == null ? SceneBfs.UNREACHED : scene.cost(tile);
-		return cost == SceneBfs.UNREACHED ? "-" : String.valueOf(cost);
+		int cost = walk == null ? WalkCosts.UNREACHED : walk.cost(tile);
+		return cost == WalkCosts.UNREACHED ? "-" : String.valueOf(cost);
 	}
 
 	private static Color colour(WalkTable table, int node)

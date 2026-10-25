@@ -32,10 +32,10 @@ final class RouteDump
 	String header(Plan plan)
 	{
 		PlanStart start = routes.getStart();
-		return String.format("Plan %s: %d searches, %d labels, %.1f ms (judging %.1f ms); start %s, nearest node %d, scene BFS %.2f ms%s%s",
+		return String.format("Plan %s: %d searches, %d labels, %.1f ms (judging %.1f ms); start %s, nearest node %d, start walk %.2f ms%s%s",
 			plan.getStepKey(), plan.getSearches(), plan.getLabels(), plan.getSearchNanos() / NANOS_PER_MS,
 			plan.getContextNanos() / NANOS_PER_MS, start == null ? "none" : start.getKind(), routes.getNearestNode(),
-			routes.getLastBfsNanos() / NANOS_PER_MS, plan.getNote() == null ? "" : "; " + plan.getNote(),
+			routes.getLastWalkNanos() / NANOS_PER_MS, plan.getNote() == null ? "" : "; " + plan.getNote(),
 			plan.getRequirementNotes().isEmpty() ? "" : "; needs: " + String.join("; ", plan.getRequirementNotes()));
 	}
 

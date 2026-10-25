@@ -8,11 +8,12 @@ import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.player.RuneModel;
 import com.cluehelper.route.GearPicker;
 import com.cluehelper.route.GearPieces;
+import com.cluehelper.route.LoadedScene;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.RequiredItems;
-import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.StepNeeds;
+import com.cluehelper.route.WalkCosts;
 import com.cluehelper.step.CoreClues;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.StageTarget;
@@ -66,7 +67,7 @@ public final class CampaignRecorder
 	static class Capture
 	{
 		CampaignRecording recording;
-		SceneBfs.Scene scene;
+		LoadedScene scene;
 		WorldPoint sceneTile;
 		List<String> problems;
 	}
@@ -86,7 +87,7 @@ public final class CampaignRecorder
 			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()));
 		RequiredItems required = needs.of(travel);
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
-			input::getTable, input.getSettings()::isScrollBookOutOfWilderness);
+			input.getSettings()::isScrollBookOutOfWilderness);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 
 		Set<Integer> usable = usableItemIds(input, required, travel, recording);
@@ -110,8 +111,8 @@ public final class CampaignRecorder
 		recording.foreignHouseStart = input.isForeignHouseStart();
 		recording.client = tape.answers();
 		recording.expected = Outcome.of(plan, guide);
-		SceneBfs.Result scene = input.getStart().getScene();
-		return new Capture(recording, scene == null ? null : scene.getScene(), tile, problems(tape, travel, input.getStep()));
+		WalkCosts walk = input.getStart().getWalk();
+		return new Capture(recording, walk == null ? null : walk.getScene(), tile, problems(tape, travel, input.getStep()));
 	}
 
 	private static List<String> problems(ClientTape tape, Step travel, Step live)

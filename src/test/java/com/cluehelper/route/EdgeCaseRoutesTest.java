@@ -68,6 +68,7 @@ public class EdgeCaseRoutesTest
 
 
 	private static WalkTable table;
+	private static WorldMap map;
 	private static Catalog catalog;
 	private static RuneModel runes;
 	private static Map<String, Step> steps;
@@ -76,6 +77,7 @@ public class EdgeCaseRoutesTest
 	public static void load() throws IOException
 	{
 		table = WalkTable.load();
+		map = WorldMap.load();
 		catalog = CatalogLoader.load();
 		runes = Loadouts.runeModel();
 		steps = DriftSteps.read();
@@ -85,78 +87,56 @@ public class EdgeCaseRoutesTest
 	@Test
 	public void startJoinsALongWalkPartway() throws IOException
 	{
-		SceneFiles.Recorded recorded;
-		try (InputStream in = EdgeCaseRoutesTest.class.getResourceAsStream("/scenes/2504_2864_0.scene.gz"))
-		{
-			recorded = SceneFiles.read(in);
-		}
+		LoadedScene scene = SceneFiles.resource("2504_2864_0").getScene();
 		WorldPoint partway = new WorldPoint(2538, 2940, 0);
-		boolean[] allRows = new boolean[table.rowCount()];
-		Arrays.fill(allRows, true);
-		PlanStart start = PlanStart.scene(partway, SceneBfs.run(recorded.getScene(), partway, table, allRows));
+		PlanStart start = PlanStart.scene(partway, WalkCosts.from(Ground.world(map, scene, table, row -> true), partway));
 		PlayerSnapshot maxed = ready(Loadouts.load("maxed-main").getCarried());
 		Route best = checked(input(maxed, step("coordinate:3548"), start, PlannerSettings.builder().build()).build()).getBest();
 		assertTrue("walks on: " + best.describe(), best.getLegs().stream().allMatch(leg -> leg.getKind() == Leg.Kind.WALK));
 	}
 
 	/**
-	 * The path line follows the plan's start leg, until the player has walked on past it (from the BJS fairy ring
-	 * towards Tyras Camp): on the ledge below the Kharazi cliff it never leads on past the vine to
-	 * the ledge's dead end (the nearest node changes as the player walks there, and the scene ends before the clue), and
-	 * it leads towards the hole down to Gu'Tanoth's cave, not to the glider landing whose walk the table also knows.
+	 * The path line leads all the way, past the loaded scene: on the ledge below the Kharazi cliff it never heads east
+	 * into the ledge's dead end past the vine, it takes the hole down to Gu'Tanoth's cave rather than the glider
+	 * landing's walk, and it leads on to Tyras Camp from a tile past the Isafdar landing.
 	 */
-	private static final int MIN_LINE_TILES = 8;
 	private static final WorldPoint KHARAZI_CLUE = new WorldPoint(2954, 2933, 0);
-	/** Not a walk-table node: the line follows the walk to the clue beside it. */
+	/** Not a walk-table node, beside the clue. */
 	private static final WorldPoint KHARAZI_STASH = new WorldPoint(2952, 2932, 0);
+	private static final int AT_HOLE_TILES = 2;
 
 	@Test
-	public void lineFollowsThePlannedStartLeg() throws IOException
+	public void lineLeadsTheWholeWay() throws IOException
 	{
-		PlayerSnapshot maxed = ready(Loadouts.load("maxed-main").getCarried());
-		boolean[] allRows = new boolean[table.rowCount()];
-		Arrays.fill(allRows, true);
+		WorldWalk walk = new WorldWalk();
 		for (String name : List.of("2824_2896_0", "2848_2896_0", "2808_2904_0", "2848_2888_0"))
 		{
-			SceneBfs.Scene scene = scene(name);
+			LoadedScene scene = scene(name);
+			Ground ground = Ground.world(map, scene, table, row -> true);
 			for (int x = 2880; x <= 2930; x += 2)
 			{
 				WorldPoint from = new WorldPoint(x, 2942, 0);
 				for (WorldPoint goal : List.of(KHARAZI_CLUE, KHARAZI_STASH))
 				{
-					List<WorldPoint> line = scene.contains(from) ? plannedLine(maxed, scene, from, allRows, "emote:12544", goal) : List.of();
-					WorldPoint end = line.isEmpty() ? null : line.get(line.size() - 1);
-					assertTrue(name + ": the line from " + from + " to " + goal + " ends on the ledge past the vine, at " + end,
-						end == null || end.getY() < LEDGE_SOUTH_Y || end.getX() <= VINE_X);
+					List<WorldPoint> line = scene.contains(from) ? walk.path(ground, from, WalkGoal.tile(goal)) : List.of();
+					assertTrue(name + ": the line from " + from + " to " + goal + " heads into the ledge's dead end: " + line,
+						line.stream().noneMatch(tile -> tile.getY() >= LEDGE_SOUTH_Y && tile.getX() > Math.max(VINE_X, from.getX())));
 				}
 			}
 		}
 		WorldPoint at = new WorldPoint(2509, 2954, 0);
-		List<WorldPoint> line = plannedLine(maxed, scene("2488_2872_0"), at, allRows, "coordinate:3548", new WorldPoint(2581, 3030, 0));
 		WorldPoint caveEntrance = new WorldPoint(2500, 2988, 0);
-		assertTrue("towards the hole from " + at + ": " + line, !line.isEmpty()
-			&& line.get(line.size() - 1).distanceTo2D(caveEntrance) < at.distanceTo2D(caveEntrance));
+		List<WorldPoint> line = walk.path(Ground.world(map, scene("2488_2872_0"), table, row -> true), at, WalkGoal.tile(new WorldPoint(2581, 3030, 0)));
+		assertTrue("through the hole from " + at + ": " + line,
+			line.stream().anyMatch(tile -> tile.distanceTo2D(caveEntrance) <= AT_HOLE_TILES && tile.getPlane() == caveEntrance.getPlane()));
 
-		SceneBfs.Scene isafdar = scene("2096_3016_0");
-		WorldPoint landing = new WorldPoint(2150, 3070, 0);
-		WorldPoint tyrasClue = new WorldPoint(2209, 3161, 0);
-		Route planned = checked(input(maxed, step("coordinate:3560"), PlanStart.scene(landing, SceneBfs.run(isafdar, landing, table, allRows)),
-			PlannerSettings.builder().build()).build()).getBest();
 		WorldPoint walkedOn = new WorldPoint(2162, 3093, 0);
-		List<WorldPoint> onward = ScenePath.toward(SceneBfs.run(isafdar, walkedOn, table, allRows), table, tyrasClue, planned.getStartVia(),
-			planned.getStartJoinedFrom());
-		assertTrue("a line on from " + walkedOn + ", past the landing's walk: " + onward, onward.size() > MIN_LINE_TILES);
+		WorldPoint tyrasClue = new WorldPoint(2209, 3161, 0);
+		List<WorldPoint> onward = walk.path(Ground.world(map, scene("2096_3016_0"), table, row -> true), walkedOn, WalkGoal.tile(tyrasClue));
+		assertTrue("a line on from " + walkedOn + ": " + onward, !onward.isEmpty() && onward.get(onward.size() - 1).distanceTo2D(tyrasClue) <= 2);
 	}
 
-	private List<WorldPoint> plannedLine(PlayerSnapshot player, SceneBfs.Scene scene, WorldPoint at, boolean[] rows, String key,
-		WorldPoint goal)
-	{
-		SceneBfs.Result bfs = SceneBfs.run(scene, at, table, rows);
-		Route best = checked(input(player, step(key), PlanStart.scene(at, bfs), PlannerSettings.builder().build()).build()).getBest();
-		return best.getStartVia() == null ? List.of() : ScenePath.toward(bfs, table, goal, best.getStartVia(), best.getStartJoinedFrom());
-	}
-
-	private static SceneBfs.Scene scene(String name) throws IOException
+	private static LoadedScene scene(String name) throws IOException
 	{
 		try (InputStream in = EdgeCaseRoutesTest.class.getResourceAsStream("/scenes/" + name + ".scene.gz"))
 		{

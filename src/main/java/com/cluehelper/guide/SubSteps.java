@@ -16,9 +16,7 @@ import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.RequiredItems;
 import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.SceneBfs;
 import com.cluehelper.route.StepNeeds;
-import com.cluehelper.route.WalkTable;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.SpadeNeed;
@@ -96,26 +94,24 @@ public final class SubSteps
 	private final IntPredicate onlyInBankedKit;
 	private final StepNeeds stepNeeds;
 	private final Supplier<PlanStart> start;
-	private final Supplier<WalkTable> walkTable;
 	private final BooleanSupplier scrollBookOutOfWilderness;
 
 	@Inject
 	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes)
 	{
 		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
-			() -> routes.getWalk() == null ? null : routes.getWalk().getTable(), routes::keepsScrollBookOutOfWilderness);
+			routes::keepsScrollBookOutOfWilderness);
 	}
 
 	/** @param client item names */
 	public SubSteps(Client client, Supplier<PlayerSnapshot> snapshot, IntPredicate onlyInBankedKit, StepNeeds stepNeeds,
-		Supplier<PlanStart> start, Supplier<WalkTable> walkTable, BooleanSupplier scrollBookOutOfWilderness)
+		Supplier<PlanStart> start, BooleanSupplier scrollBookOutOfWilderness)
 	{
 		this.client = client;
 		this.snapshot = snapshot;
 		this.onlyInBankedKit = onlyInBankedKit;
 		this.stepNeeds = stepNeeds;
 		this.start = start;
-		this.walkTable = walkTable;
 		this.scrollBookOutOfWilderness = scrollBookOutOfWilderness;
 	}
 
@@ -164,18 +160,15 @@ public final class SubSteps
 		return player != null && player.carriesItemNamed(SCROLL_BOOK_NAME, id -> client.getItemDefinition(id).getName());
 	}
 
-	/** The exit a start leg leaves the planned scene by, or null for any other walk. */
+	/** The exit a start leg leaves by, or null for any other walk. */
 	private Exit exitOf(Leg leg)
 	{
 		PlanStart from = start.get();
-		WalkTable table = walkTable.get();
-		if (from == null || table == null || from.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(from.getTile())
-			|| from.getScene().getScene().contains(leg.getTo()))
+		if (from == null || from.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(from.getTile()))
 		{
 			return null;
 		}
-		SceneBfs.ExitReach reach = from.getScene().exitTo(leg.getTo());
-		return reach == null ? null : table.exit(reach.getOrigin(), reach.getDestination());
+		return from.getWalk().exitTo(leg.getTo());
 	}
 
 	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */

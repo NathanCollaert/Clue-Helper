@@ -30,6 +30,7 @@ logs/
 *.nar
 *.ear
 *.zip
+!src/main/resources/com/cluehelper/route/walk/collision-map.zip
 *.tar.gz
 *.rar
 

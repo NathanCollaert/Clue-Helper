@@ -99,7 +99,7 @@ public class DevHarness
 			args -> clientThread.invokeLater(this::stashes));
 		c.register("hotcold", "[reset] show the hot/cold step's feel log, or restart it keeping its last reading as the anchor",
 			args -> clientThread.invokeLater(() -> hotColdLog(args)));
-		c.register("overlay", "toggle the route graph overlay: walk-table nodes, scene BFS walks, origin class", args -> toggleOverlay());
+		c.register("overlay", "toggle the route graph overlay: walk-table nodes, start walks, origin class", args -> toggleOverlay());
 		for (SelfTest test : builtInSelfTests.create(shownState, signalledState))
 		{
 			unregister.add(selfTests.register(test));
