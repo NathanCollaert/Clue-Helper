@@ -48,6 +48,14 @@ public class MenuLines
 	private static final int NEXUS_GROUP = 17;
 	private static final int BOX_GROUP = 590;
 	private static final int LOG_FIRST_CODE = 12;
+	/** The Pendant of Ates' map has one button per place, by the place its catalog line names. */
+	private static final Map<String, Integer> ATES_BUTTONS = Map.of(
+		"The Darkfrost", InterfaceID.PendantOfAtes.TELEPORT_DARKFROST,
+		"Twilight Temple", InterfaceID.PendantOfAtes.TELEPORT_TWILIGHT,
+		"Ralos' Rise", InterfaceID.PendantOfAtes.TELEPORT_RALOS,
+		"North Aldarin", InterfaceID.PendantOfAtes.TELEPORT_ALDARIN,
+		"Kastori", InterfaceID.PendantOfAtes.TELEPORT_TLATI,
+		"Nemus Retreat", InterfaceID.PendantOfAtes.TELEPORT_AUBURN);
 	/** Each code in the travel log is followed by its favourite star. */
 	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String MAP_TELEPORT = "Teleport";
@@ -176,16 +184,18 @@ public class MenuLines
 	/** Whether any of the target's lines is on screen, coloured or outlined: the menu is open at the teleport's line. */
 	public boolean showing(MenuTarget target)
 	{
-		return !lineWidgets(target).isEmpty();
+		return !lineWidgets(target).widgets.isEmpty();
 	}
 
 	/** Only the target's lines without text (map icons, region shields, travel log codes); text lines are coloured. */
 	public List<Rectangle> lines(MenuTarget target)
 	{
 		List<Rectangle> out = new ArrayList<>();
-		for (Widget widget : lineWidgets(target))
+		Found found = lineWidgets(target);
+		for (Widget widget : found.widgets)
 		{
-			Rectangle shown = Widgets.hasTextInside(widget) ? null : Widgets.clipped(widget);
+			boolean boxed = found.mapButtons.contains(widget) || !Widgets.hasTextInside(widget);
+			Rectangle shown = boxed ? Widgets.clipped(widget) : null;
 			if (shown != null && !shown.isEmpty())
 			{
 				out.add(shown);
@@ -204,7 +214,9 @@ public class MenuLines
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
 		if (enabled)
 		{
-			lineWidgets(target).stream().flatMap(line -> Widgets.descendants(line).stream()).filter(Widgets::hasText).forEach(wanted::add);
+			Found found = lineWidgets(target);
+			found.widgets.stream().filter(line -> !found.mapButtons.contains(line)).flatMap(line -> Widgets.descendants(line).stream())
+				.filter(Widgets::hasText).forEach(wanted::add);
 			if (entryWidget != ScrollBook.NO_WIDGET)
 			{
 				for (int text : ScrollBook.texts(entryWidget))
@@ -280,11 +292,11 @@ public class MenuLines
 		entry.setOption(ColorUtil.wrapWithColorTag(Text.removeTags(entry.getOption()), new Color(TEXT_COLOUR)));
 	}
 
-	private List<Widget> lineWidgets(MenuTarget target)
+	private Found lineWidgets(MenuTarget target)
 	{
 		Found found = new Found();
 		find(target, found);
-		return found.widgets;
+		return found;
 	}
 
 	/** The key the charter's destination list gives the target's port, or 0 while the list isn't open. */
@@ -335,11 +347,25 @@ public class MenuLines
 		{
 			if (Widgets.visible(button) && namesPlace(button, destination))
 			{
-				out.add(button);
+				out.addMapButton(button);
 				found = true;
 			}
 		}
 		return found;
+	}
+
+	private boolean atesMap(String destination, Found out)
+	{
+		for (Map.Entry<String, Integer> place : ATES_BUTTONS.entrySet())
+		{
+			Widget button = client.getWidget(place.getValue());
+			if (MenuLabels.matches(place.getKey(), destination) && Widgets.visible(button))
+			{
+				out.addMapButton(button);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Widget[] dynamicChildren(int component)
@@ -575,7 +601,7 @@ public class MenuLines
 	private void labelled(MenuTarget target, Found out)
 	{
 		String destination = target.destination();
-		if (destination == null || charter(destination, out) || glider(destination, out))
+		if (destination == null || charter(destination, out) || glider(destination, out) || atesMap(destination, out))
 		{
 			return;
 		}
@@ -729,12 +755,23 @@ public class MenuLines
 	private static final class Found
 	{
 		final List<Widget> widgets = new ArrayList<>();
+		/** A map's place buttons are boxed, not recoloured: their text sits on the map's art. */
+		final Set<Widget> mapButtons = Collections.newSetFromMap(new IdentityHashMap<>());
 
 		void add(Widget widget)
 		{
 			if (Widgets.visible(widget))
 			{
 				widgets.add(widget);
+			}
+		}
+
+		void addMapButton(Widget button)
+		{
+			if (Widgets.visible(button))
+			{
+				widgets.add(button);
+				mapButtons.add(button);
 			}
 		}
 	}

@@ -103,6 +103,10 @@ public class RoutePlanner
 	@Getter
 	private volatile Route committed;
 	private String committedStep;
+	/** The step's targets when it was committed: a hot/cold step keeps its key while its target moves. */
+	private List<WorldPoint> committedTargets = List.of();
+	/** The committed walk was kept once although the last plan didn't offer it. */
+	private boolean walkHeld;
 	private int swapCheckAtCapeRefusal = NOT_REFUSED;
 	private final Set<String> refusedChanges = new HashSet<>();
 
@@ -154,6 +158,8 @@ public class RoutePlanner
 		plan = Plan.NONE;
 		committed = null;
 		committedStep = null;
+		committedTargets = List.of();
+		walkHeld = false;
 		lastTrigger = null;
 		lastTile = null;
 		start = null;
@@ -478,26 +484,45 @@ public class RoutePlanner
 	private void onPlanned(Plan planned, PlanInput input)
 	{
 		plan = planned;
-		committed = commit(planned);
+		committed = commit(planned, input.getStep().getTargets());
 		committedStep = planned.getStepKey();
+		committedTargets = input.getStep().getTargets();
 		listeners.forEach(listener -> listener.accept(planned));
 		inputListeners.forEach(listener -> listener.accept(planned, input));
 	}
 
-	private Route commit(Plan planned)
+	private Route commit(Plan planned, List<WorldPoint> targets)
 	{
 		Route best = planned.getBest();
 		Route current = committed;
-		if (best == null || current == null || !Objects.equals(committedStep, planned.getStepKey()))
+		boolean sameGoal = Objects.equals(committedStep, planned.getStepKey()) && Objects.equals(committedTargets, targets);
+		if (best == null || current == null || !sameGoal)
 		{
+			walkHeld = false;
 			return best;
 		}
 		Route same = offered(planned, current.getIdentity());
-		if (same == null || best.getTicks() <= same.getTicks() - COMMIT_MARGIN_TICKS || landsWhereItStarts(same))
+		if (same == null)
+		{
+			return holdBlockedWalk(current, best);
+		}
+		walkHeld = false;
+		if (best.getTicks() <= same.getTicks() - COMMIT_MARGIN_TICKS || landsWhereItStarts(same))
 		{
 			return best;
 		}
 		return same;
+	}
+
+	/**
+	 * A walk the loaded scene suddenly blocks is kept for one plan: a gate's collision lags a tick behind it swinging
+	 * open (King Lathas' camp). Only a walk the next plan still doesn't offer gives way.
+	 */
+	private Route holdBlockedWalk(Route walk, Route best)
+	{
+		boolean hold = !walkHeld && walk.getFirstTransport() == null && !walk.isBanked();
+		walkHeld = hold;
+		return hold ? walk : best;
 	}
 
 	/**

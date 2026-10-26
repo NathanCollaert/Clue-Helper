@@ -44,6 +44,8 @@ public final class SubSteps
 	public static final int ARRIVE_TILES = 3;
 	/** The Agility Pyramid's course spans its foot; a cave's way in is a tile. */
 	private static final int ON_WAY_IN_TILES = 40;
+	/** The route is planned a tick behind the player: its first walk may start a step or two from where they stand now. */
+	private static final int START_DRIFT_TILES = 4;
 	/** The walk from a landing to the place, a way in (a cave entrance) included. */
 	private static final Set<SubStep.Kind> WALKS_IN = EnumSet.of(SubStep.Kind.WALK, SubStep.Kind.EXIT, SubStep.Kind.ENTER,
 		SubStep.Kind.WALK_TO_CLUE);
@@ -129,7 +131,9 @@ public final class SubSteps
 	private Exit exitOf(Leg leg)
 	{
 		PlanStart from = start.get();
-		if (from == null || from.getKind() != PlanStart.Kind.SCENE || !leg.getFrom().equals(from.getTile()))
+		boolean fromHere = from != null && from.getTile() != null && leg.getFrom().getPlane() == from.getTile().getPlane()
+			&& leg.getFrom().distanceTo2D(from.getTile()) <= START_DRIFT_TILES;
+		if (from == null || from.getKind() != PlanStart.Kind.SCENE || !fromHere)
 		{
 			return null;
 		}

@@ -84,6 +84,8 @@ public class PlayerModel
 	private HouseState house = HouseState.NONE;
 	private Set<String> plantedTrees = Set.of();
 	private Set<String> unlocks = Set.of();
+	/** Items owned but known not to do what their id promises: a steel key ring the Metal key was taken off. */
+	private Set<Integer> uncounted = Set.of();
 	/** Grown patches other than spirit trees (a Farming Guild redwood), named as the step data names them. */
 	private Set<String> grownPatches = Set.of();
 	private String lastFairyRing;
@@ -91,6 +93,7 @@ public class PlayerModel
 	private long version;
 	/** Dev builds only: levels the plugin sees instead of the account's (a lower Agility to plan without a shortcut). */
 	private Map<Skill, Integer> levelOverrides = Map.of();
+	private Map<Integer, Integer> fakeCarried = Map.of();
 
 	private volatile RuneModel runeModel;
 	private volatile PlayerSnapshot snapshot;
@@ -240,6 +243,27 @@ public class PlayerModel
 	}
 
 	/** Client thread. */
+	public void setUncounted(Set<Integer> next)
+	{
+		uncounted = Set.copyOf(next);
+		markDirty("uncounted items");
+	}
+
+	/** Whether owning {@code itemId} counts for what it would bring: false for an uncounted one. */
+	public boolean counts(int itemId)
+	{
+		return !uncounted.contains(itemId);
+	}
+
+	/** {@code items} without the uncounted ones. */
+	public Map<Integer, Integer> counted(Map<Integer, Integer> items)
+	{
+		Map<Integer, Integer> counted = new HashMap<>(items);
+		counted.keySet().removeAll(uncounted);
+		return counted;
+	}
+
+	/** Client thread. */
 	public void setGrownPatches(Set<String> next)
 	{
 		grownPatches = Set.copyOf(next);
@@ -348,6 +372,13 @@ public class PlayerModel
 		markDirty("level overrides");
 	}
 
+	/** Client thread. Dev builds only: items to see in the inventory on top of the real ones; empty for none. */
+	public void fakeCarried(Map<Integer, Integer> items)
+	{
+		fakeCarried = Map.copyOf(items);
+		markDirty("fake carried items");
+	}
+
 	private void markDirty(String because)
 	{
 		if (!dirty)
@@ -417,11 +448,12 @@ public class PlayerModel
 
 	private PlayerSnapshot build(Position now)
 	{
-		Map<Integer, Integer> inventory = contents(InventoryID.INV);
+		Map<Integer, Integer> inventory = counted(contents(InventoryID.INV));
+		fakeCarried.forEach((id, quantity) -> inventory.merge(id, quantity, Integer::sum));
 		ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INV);
 		int usedSlots = inventoryContainer == null ? 0 : (int) Arrays.stream(inventoryContainer.getItems())
 			.filter(item -> item.getId() > 0 && item.getQuantity() > 0).count();
-		Map<Integer, Integer> worn = contents(InventoryID.WORN);
+		Map<Integer, Integer> worn = counted(contents(InventoryID.WORN));
 		boolean pouchHeld = inventory.keySet().stream().anyMatch(RUNE_POUCHES::contains);
 		Map<Integer, Integer> varbits = new HashMap<>();
 		watchedVarbits.forEach(id -> varbits.put(id, client.getVarbitValue(id)));

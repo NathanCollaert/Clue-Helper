@@ -1383,7 +1383,7 @@ Origin	Destination	Option	Object	ObjectId
 2511 3477 0	2527 3413 0	Swim	River	10283
 2511 3511 0	1768 5366 1	Dive in	Whirlpool	25274
 2512 3466 0	2527 3413 0	Climb	Dead Tree	2020
-2512 3476 0	2513 3468 0	Use	Rock	1996
+2512 3476 0	2513 3468 0	Take	Rope	57703
 2512 3476 0	2527 3413 0	Swim	River	10283
 2512 3476 0	2527 3413 0	Swim to	Rock	1996
 2512 3511 0	1768 5366 1	Dive in	Whirlpool	25274
@@ -1867,6 +1867,7 @@ Origin	Destination	Option	Object	ObjectId
 2628 5072 0	2547 3422 0	Climb-up	Ladder	6450
 2629 5071 0	2547 3422 0	Climb-up	Ladder	6450
 2629 5073 0	2547 3422 0	Climb-up	Ladder	6450
+2630 2997 0	2646 9378 0	Enter	Cave entrance	3379
 2630 3385 0	2630 3385 1	Climb-up	Ladder	16683
 2630 3385 1	2630 3385 0	Climb-down	Ladder	16684
 2630 3385 1	2630 3385 2	Climb-up	Ladder	16684
@@ -4910,6 +4911,7 @@ Origin	Destination	Option	Object	ObjectId
 3272 3523 0	3272 3520 0	Cross	Wilderness Ditch	23271
 3272 9235 2	3270 9235 0	Climb-down	Ladder	20285
 3272 9274 0	3270 9274 2	Climb-up	Ladder	20284
+3273 3028 0	3274 3028 0	Open	Gate	2673
 3273 3195 0	3273 3192 3	Climb	Rough wall	11633
 3273 3520 0	3273 3523 0	Cross	Wilderness Ditch	23271
 3273 3523 0	3273 3520 0	Cross	Wilderness Ditch	23271
@@ -5897,6 +5899,7 @@ Origin	Destination	Option	Object	ObjectId
 3757 3868 1	3753 3869 0	Descend	Stairs	30682
 3757 3869 1	3753 3869 0	Descend	Stairs	30682
 3757 3870 1	3753 3869 0	Descend	Stairs	30682
+3765 3883 1	3765 3898 0	Teeth-grip	Zip line	57667
 3766 3866 0	3768 3868 1	Climb-up	Ladder	30727
 3766 3867 0	3768 3868 1	Climb-up	Ladder	30727
 3766 3867 1	3768 3868 0	Climb-down	Trapdoor	30725

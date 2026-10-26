@@ -140,8 +140,8 @@ public class AvailabilityService
 		Map<Integer, Charge> charges = new HashMap<>(player.charges(stored));
 		charges.putAll(snapshot.getCharges());
 		return snapshot.toBuilder()
-			.bank(bankMemory.withKit(bank.items))
-			.groupStorage(group == null ? Map.of() : group.items)
+			.bank(player.counted(bankMemory.withKit(bank.items)))
+			.groupStorage(group == null ? Map.of() : player.counted(group.items))
 			.charges(charges)
 			.build();
 	}

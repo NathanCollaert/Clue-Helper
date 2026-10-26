@@ -24,12 +24,14 @@ import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.CoreClues;
 import com.cluehelper.step.Stage;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.ui.BoxState;
 import com.cluehelper.ui.GuideBox;
 import com.cluehelper.ui.GuideOverlay;
+import com.cluehelper.ui.WaypointOverlay;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -57,12 +59,18 @@ import net.runelite.api.GameState;
 import net.runelite.api.WorldView;
 import net.runelite.api.WallObject;
 import net.runelite.api.Tile;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.ObjectComposition;
+import net.runelite.api.Player;
+import net.runelite.api.Renderable;
+import net.runelite.api.NPC;
+import net.runelite.api.Model;
 import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -107,6 +115,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final int FRAME_NAME_KEY_CHARS = 50;
 	private static final int PLUGIN_DELAY_MS = 2000;
 	private static final int AUTO_RUN_AFTER_TICKS = 5;
+	private static final int NO_KEY = -1;
+	private String lastLineTrace = "";
 	/** Hub plugins add their sidebar tabs late; the first run waits for them. */
 	private static final int AUTO_RUN_AFTER_START_MS = 15_000;
 
@@ -201,6 +211,8 @@ public class ClueHelperDevPlugin extends Plugin
 		clearOldPngs(HotColdTrace.FRAMES);
 		SCENES.mkdirs();
 		unregister.add(clueHelper.getClueLink().addListener(this::saveStepFrame));
+		unregister.add(clueHelper.getClueLink().addListener((change, step) -> forgetFakeKey(change)));
+		unregister.add(() -> clientThread.invokeLater(() -> clueHelper.getPlayerModel().fakeCarried(Map.of())));
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getRoutes().addListener(this::onPlanned));
 		unregister.add(clueHelper.getGuide().addListener(this::saveGuideFrames));
@@ -413,16 +425,41 @@ public class ClueHelperDevPlugin extends Plugin
 		}));
 	}
 
-	/** Every wall and game object with an option around the step's tile: what a door, gate or obstacle really is. */
+	/**
+	 * Every wall and game object with an option, and every NPC, around the step's tile, or around the player where the
+	 * step's tile isn't loaded (inside a cave): what a door, gate, obstacle or way in really is.
+	 */
 	private void dumpObjectsNearStep()
 	{
 		SubStep current = clueHelper.getGuide().getCurrent();
-		WorldPoint at = current == null ? null : current.getWaypoint() != null ? current.getWaypoint() : current.getGoal();
+		WorldPoint stepTile = current == null ? null : current.getWaypoint() != null ? current.getWaypoint() : current.getGoal();
 		WorldView view = client.getTopLevelWorldView();
-		if (at == null || view == null)
+		Player local = client.getLocalPlayer();
+		if (view == null || local == null)
 		{
-			log.info("{} objects: no step tile", TAG);
+			log.info("{} objects: no scene", TAG);
 			return;
+		}
+		WorldPoint player = local.getWorldLocation();
+		WorldPoint at = stepTile != null && WorldPoint.isInScene(view, stepTile.getX(), stepTile.getY()) ? stepTile : player;
+		log.info("{} objects around {} (player at {}, step tile {})", TAG, text(at), text(player), stepTile == null ? "none" : text(stepTile));
+		dumpObjectsAround(view, at);
+		if (at.getPlane() != player.getPlane() || at.distanceTo2D(player) > OBJECT_DUMP_TILES)
+		{
+			log.info("{} objects around the player too, at {}", TAG, text(player));
+			dumpObjectsAround(view, player);
+		}
+		client.addChatMessage(net.runelite.api.ChatMessageType.GAMEMESSAGE, "", "Objects near the step written to the log", null);
+	}
+
+	private void dumpObjectsAround(WorldView view, WorldPoint at)
+	{
+		for (NPC npc : view.npcs())
+		{
+			if (npc.getWorldLocation().distanceTo2D(at) <= OBJECT_DUMP_TILES)
+			{
+				log.info("{} npc {} id {} name '{}'", TAG, text(npc.getWorldLocation()), npc.getId(), npc.getName());
+			}
 		}
 		Tile[][][] tiles = view.getScene().getTiles();
 		for (int dx = -OBJECT_DUMP_TILES; dx <= OBJECT_DUMP_TILES; dx++)
@@ -446,12 +483,30 @@ public class ClueHelperDevPlugin extends Plugin
 				{
 					if (object != null && object.getSceneMinLocation().equals(tile.getSceneLocation()))
 					{
-						logObject("game", at.dx(dx).dy(dy), object.getId(), object.getConfig(), "size " + object.sizeX() + "x" + object.sizeY());
+						logObject("game", at.dx(dx).dy(dy), object.getId(), object.getConfig(), "size " + object.sizeX() + "x" + object.sizeY()
+							+ " " + modelText(object));
 					}
 				}
 			}
 		}
-		client.addChatMessage(net.runelite.api.ChatMessageType.GAMEMESSAGE, "", "Objects near the step written to the log", null);
+	}
+
+	/** Why an object might not outline: no model, faces the outline renderer skips, or no clickbox. */
+	private static String modelText(GameObject object)
+	{
+		Renderable renderable = object.getRenderable();
+		Model model = renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
+		String clickbox = object.getClickbox() == null ? "none" : object.getClickbox().getBounds().toString();
+		if (model == null)
+		{
+			return "renderable " + (renderable == null ? "none" : renderable.getClass().getSimpleName()) + " model none clickbox " + clickbox;
+		}
+		byte[] transparencies = model.getFaceTransparencies();
+		int[] colours = model.getFaceColors3();
+		long seeThrough = java.util.stream.IntStream.range(0, model.getFaceCount())
+			.filter(face -> transparencies != null && (transparencies[face] & 0xFF) >= 254).count();
+		long undrawn = java.util.stream.IntStream.range(0, model.getFaceCount()).filter(face -> colours != null && colours[face] == -2).count();
+		return "faces " + model.getFaceCount() + " see-through " + seeThrough + " undrawn " + undrawn + " clickbox " + clickbox;
 	}
 
 	private void logObject(String kind, WorldPoint at, int id, int config, String shape)
@@ -471,7 +526,8 @@ public class ClueHelperDevPlugin extends Plugin
 
 	/**
 	 * A mocked clue gets no reply from the game, so the act waiting for one never ends: a Sherlock task is marked done
-	 * as the game's chat line would, Uri or a challenge item counts as arrived. STASH and gear acts end in the game
+	 * as the game's chat line would, a kill-for-key stage's key counts as carried until the step changes, Uri or a
+	 * challenge item counts as arrived. STASH and gear acts end in the game
 	 * itself, and a step's last act ends with the campaign's Finish, which hands out the next clue.
 	 */
 	private void fakeActDone()
@@ -481,9 +537,16 @@ public class ClueHelperDevPlugin extends Plugin
 		SubStep.Done done = current == null ? null : current.getDone();
 		boolean taskLeft = step != null && ClueTypes.SKILL.equals(step.getType())
 			&& step.getStages().stream().anyMatch(stage -> stage.getKind() == Stage.Kind.TASK);
+		int key = keyToFake(step);
 		if (taskLeft)
 		{
 			completeChallenge();
+		}
+		else if (key != NO_KEY)
+		{
+			clueHelper.getPlayerModel().fakeCarried(Map.of(key, 1));
+			log.info("{} act done faked: key {} carried until the step changes", TAG, key);
+			return;
 		}
 		else if (done == SubStep.Done.URI_HERE || done == SubStep.Done.CHALLENGE_ITEM)
 		{
@@ -496,6 +559,16 @@ public class ClueHelperDevPlugin extends Plugin
 			return;
 		}
 		log.info("{} act done faked: {}", TAG, taskLeft ? "skill challenge completed" : done);
+	}
+
+	/** The key the step's kill stage drops, while it isn't carried yet; {@link #NO_KEY} otherwise. */
+	private int keyToFake(Step step)
+	{
+		boolean killFirst = step != null && !step.getStages().isEmpty() && step.getStages().get(0).getKind() == Stage.Kind.KEY;
+		int key = !killFirst ? NO_KEY : step.getData().getTargets().stream()
+			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKey() > 0)
+			.mapToInt(StepIndex.Target::getKey).findFirst().orElse(NO_KEY);
+		return clueHelper.getPlayerModel().carriedIds().contains(key) ? NO_KEY : key;
 	}
 
 	/** The watcher saw its event this tick. */
@@ -543,6 +616,7 @@ public class ClueHelperDevPlugin extends Plugin
 	public void onGameTick(GameTick tick)
 	{
 		checkLanding();
+		traceLine();
 		saveLiveFrame();
 		resumeCampaignOnceLoggedIn();
 		if (!autoRunPending || client.getGameState() != GameState.LOGGED_IN || ++loggedInTicks < AUTO_RUN_AFTER_TICKS)
@@ -564,6 +638,26 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			campaignResumed = true;
 			campaign.resume();
+		}
+	}
+
+	/** Where the line ends and what it outlines, once per change: what a missing path or outline really was. */
+	private void traceLine()
+	{
+		WaypointOverlay overlay = clueHelper.getWaypointOverlay();
+		SubStep current = clueHelper.getGuide().getCurrent();
+		List<WorldPoint> line = overlay.getLine();
+		String objects = overlay.pathObjectTargets().stream().map(target -> target.getObjectIds() + " " + target.getPath())
+			.collect(java.util.stream.Collectors.joining(", "));
+		PlanStart start = clueHelper.getRoutes().getStart();
+		String now = (current == null ? "no sub-step" : current.getKind() + " " + current.getText())
+			+ " | line to " + (line.isEmpty() ? "nothing" : text(line.get(line.size() - 1)))
+			+ " | outlined " + (objects.isEmpty() ? "nothing" : objects)
+			+ " | plan start " + (start == null ? "none" : start.getKind() + (start.getTile() == null ? "" : " " + text(start.getTile())));
+		if (!now.equals(lastLineTrace))
+		{
+			lastLineTrace = now;
+			log.info("{} line: {}", TAG, now);
 		}
 	}
 
@@ -759,6 +853,14 @@ public class ClueHelperDevPlugin extends Plugin
 	}
 
 	/** Lets a run's reads be checked against core's overlay afterwards. */
+	private void forgetFakeKey(StepChange change)
+	{
+		if (change == StepChange.NEW || change == StepChange.CLEARED)
+		{
+			clueHelper.getPlayerModel().fakeCarried(Map.of());
+		}
+	}
+
 	private void saveStepFrame(StepChange change, Step step)
 	{
 		String key = step == null ? "none" : step.getKey().replaceAll("[^a-zA-Z0-9]+", "-");
@@ -824,6 +926,25 @@ public class ClueHelperDevPlugin extends Plugin
 	private void sample()
 	{
 		new RouteSampler(client, clueHelper, catalogData.get().getNow(null), walkData.get().getNow(null), executor).run();
+	}
+
+	/** After Clue Helper colours the menu: what the guide wanted coloured and what each entry ended up as. */
+	@Subscribe(priority = -2)
+	public void onMenuOpened(MenuOpened event)
+	{
+		SubStep current = clueHelper.getGuide().getCurrent();
+		if (current == null)
+		{
+			return;
+		}
+		log.info("{} menu for '{}': option target {} | menu target {}", TAG, current.getText(), clueHelper.getGuide().getOptionTarget(),
+			clueHelper.getGuide().getMenuTarget());
+		for (MenuEntry entry : event.getMenuEntries())
+		{
+			NPC npc = entry.getNpc();
+			log.info("{} menu entry '{}' on '{}' type {} id {} npc {}", TAG, entry.getOption(), entry.getTarget(), entry.getType(),
+				entry.getIdentifier(), npc == null ? "none" : npc.getId() + " '" + npc.getName() + "'");
+		}
 	}
 
 	@Subscribe

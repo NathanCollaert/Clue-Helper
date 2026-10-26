@@ -1,10 +1,12 @@
 package com.cluehelper.link;
 
+import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.Stages;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilityService;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +28,9 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.ClueScrollService;
+import net.runelite.client.plugins.cluescrolls.clues.AnagramClue;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
+import net.runelite.client.plugins.cluescrolls.clues.LocationClueScroll;
 
 /**
  * Core is read once per tick, at GameTick priority -1, after core's own handlers have updated it. Its active state
@@ -44,6 +48,7 @@ public class ClueLink
 	private final Client client;
 	private final StepResolver resolver;
 	private final AvailabilityService availability;
+	private final PlayerModel player;
 	private final LinkState state = new LinkState();
 	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
@@ -55,9 +60,10 @@ public class ClueLink
 
 	@Inject
 	ClueLink(PluginManager pluginManager, ClueScrollService service, Client client, StepResolver resolver,
-		AvailabilityService availability)
+		AvailabilityService availability, PlayerModel player)
 	{
 		this.availability = availability;
+		this.player = player;
 		this.pluginManager = pluginManager;
 		this.service = service;
 		this.client = client;
@@ -110,6 +116,33 @@ public class ClueLink
 	public ClueScroll coreClue()
 	{
 		return service.getClue();
+	}
+
+	/**
+	 * Client thread. Core marks its clue's NPC only while one of the clue's own tiles is in the loaded scene on the
+	 * player's floor: not inside a cave reached from that tile (Fycie in Rantz's cave), nor up the ladder from it
+	 * (Bolkoy on his platform).
+	 */
+	public boolean coreMarksNpcs()
+	{
+		WorldPoint[] locations = coreLocations();
+		return locations == null || Arrays.stream(locations).anyMatch(location -> location != null && location.isInScene(client));
+	}
+
+	/** The tiles core marks its clue's NPC from, or null where core doesn't tie the marking to a tile. */
+	private WorldPoint[] coreLocations()
+	{
+		ClueScroll clue = coreClue();
+		ClueScrollPlugin plugin = core;
+		if (plugin == null)
+		{
+			return null;
+		}
+		if (clue instanceof LocationClueScroll)
+		{
+			return ((LocationClueScroll) clue).getLocations(plugin);
+		}
+		return clue instanceof AnagramClue ? new WorldPoint[]{((AnagramClue) clue).getLocation(plugin)} : null;
 	}
 
 	public Runnable addListener(StepListener listener)
@@ -189,8 +222,8 @@ public class ClueLink
 	private boolean owns(int itemId)
 	{
 		PlayerSnapshot banked = availability.getBankedSnapshot();
-		return holds(InventoryID.INV, itemId) || holds(InventoryID.WORN, itemId)
-			|| banked != null && (banked.getBank().containsKey(itemId) || banked.getGroupStorage().containsKey(itemId));
+		return player.counts(itemId) && (holds(InventoryID.INV, itemId) || holds(InventoryID.WORN, itemId)
+			|| banked != null && (banked.getBank().containsKey(itemId) || banked.getGroupStorage().containsKey(itemId)));
 	}
 
 	private boolean holds(int containerId, int itemId)

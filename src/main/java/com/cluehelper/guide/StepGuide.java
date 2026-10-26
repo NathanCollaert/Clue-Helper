@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Container;
@@ -69,6 +70,10 @@ public class StepGuide
 
 	private static final String CAPE_LIMIT_TEXT = "five times per day";
 	private static final int NO_ANIMATION = -1;
+	/** A teleport's animation can end a tick or two before the player lands. */
+	private static final int LANDING_TICKS = 3;
+	/** A teleport animates on its click's tick or within two: any other animation (a block while being hit) isn't travel. */
+	private static final int TRAVEL_START_TICKS = 2;
 	private static final int OBJECT_REFRESH_TICKS = 5;
 	/** A bank node sits on the walkable tile in front of its booth, chest or banker. */
 	private static final int BANK_TILES = 3;
@@ -98,6 +103,7 @@ public class StepGuide
 	private final StepNeeds stepNeeds;
 	private final SubSteps subSteps;
 	private final SceneObjects sceneObjects;
+	private final ClueLink clueLink;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private static final String TALK_TO = "Talk to ";
 	private static final List<String> BOXES = List.of("puzzle box", "light box");
@@ -116,6 +122,10 @@ public class StepGuide
 	private List<SubStep> steps = List.of();
 	private int index;
 	private boolean jumpedThisSubStep;
+	private int teleportAnimatedTick = ActWatcher.NEVER;
+	private int travelClickTick = ActWatcher.NEVER;
+	/** The travel sub-step's own animation is playing: one that started right after a click during it. */
+	private boolean travelStarted;
 	private WorldPoint lastTile;
 	/** A route that came while a teleport was under way, followed once it lands. */
 	private Waiting waiting;
@@ -132,8 +142,9 @@ public class StepGuide
 	StepGuide(Client client, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
 		RowTargets rowTargets, LeftClicks leftClicks, GearActs gearActs, TaskActs taskActs, StepHighlights stepHighlights,
 		DepositReminder deposit, ObeliskDestination obelisk, ActWatcher actWatcher, StepNeeds stepNeeds, SubSteps subSteps,
-		SceneObjects sceneObjects)
+		SceneObjects sceneObjects, ClueLink clueLink)
 	{
+		this.clueLink = clueLink;
 		this.gearActs = gearActs;
 		this.taskActs = taskActs;
 		this.stepHighlights = stepHighlights;
@@ -362,6 +373,12 @@ public class StepGuide
 		{
 			actReachedStepKey = null;
 		}
+		boolean clickedJustNow = travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= TRAVEL_START_TICKS;
+		travelStarted = isTravelStep() && isAnimating() && (travelStarted || clickedJustNow);
+		if (travelStarted && getCurrent().isTravel())
+		{
+			teleportAnimatedTick = client.getTickCount();
+		}
 		// Before the early returns below: a follow on every tick near the step would starve them (a deposit never seen)
 		actWatcher.onGameTick(routeStep);
 		deposit.onGameTick(tile);
@@ -377,7 +394,7 @@ public class StepGuide
 				return;
 			}
 		}
-		if (routeStep != null && !isAtStep() && arrived(routeStep))
+		if (routeStep != null && !isAtStep() && !itemsFirst(route, routeStep) && arrived(routeStep))
 		{
 			follow(route);
 			return;
@@ -427,7 +444,7 @@ public class StepGuide
 		MenuTarget target = outlineTarget(current, option);
 		boolean ownOption = !option.isEmpty() && highlights.getMenuTarget() == MenuTarget.NONE;
 		highlights = highlights.toBuilder().optionTarget(ownOption ? target : MenuTarget.NONE).build();
-		if (target.getObjectIds().isEmpty() && target.getNpcIds().isEmpty() && !bank)
+		if (target.getObjectIds().isEmpty() && target.getNpcIds().isEmpty() && target.getNpcNames().isEmpty() && !bank)
 		{
 			scene = scene.toBuilder().objects(List.of()).npcs(List.of()).fillObjects(List.of()).fillNpcs(List.of()).build();
 			return;
@@ -483,13 +500,18 @@ public class StepGuide
 	}
 
 	/**
-	 * Shortest Path names one NPC per ride (a charter's Trader Crewmember), but a port's crew have several ids: when the
+	 * An act's NPC given by name (Fycie) is outlined only where core can't mark it. Shortest Path names one NPC per ride
+	 * (a charter's Trader Crewmember), but a port's crew have several ids: when the
 	 * named one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC
 	 * there with that option (Port Sarim's boat to Port Piscarilius is Cabin Boy Herbert's, not Veos'). Its menu is
 	 * coloured too.
 	 */
 	private List<NPC> npcsFor(MenuTarget target)
 	{
+		if (target.getNpcIds().isEmpty() && !target.getNpcNames().isEmpty())
+		{
+			return clueLink.coreMarksNpcs() ? List.of() : sceneObjects.npcsNamed(target.getNpcNames());
+		}
 		List<NPC> named = sceneObjects.npcs(target.getNpcIds());
 		WorldPoint boarding = isApproach() ? getNext().getWaypoint() : getCurrent().getWaypoint();
 		if (!named.isEmpty() || target.getNpcIds().isEmpty() || target.getPath().isEmpty() || boarding == null)
@@ -503,13 +525,16 @@ public class StepGuide
 		return sameName.isEmpty() ? offering : sameName;
 	}
 
-	/** NPCs found by name rather than id stand in for the named one in its menu too: their ids join the target's. */
+	/**
+	 * A ride's crew found by name rather than id stand in for its named NPC in its menu too: their ids join the target's.
+	 * A target that names its NPC only by name (Fycie) keeps its own option target instead.
+	 */
 	private void colourCrewMenus(MenuTarget target, List<NPC> npcs)
 	{
 		MenuTarget menuTarget = highlights.getMenuTarget();
 		Set<Integer> ids = new HashSet<>(target.getNpcIds());
 		npcs.forEach(npc -> ids.add(npc.getId()));
-		if (ids.size() > target.getNpcIds().size() && menuTarget.getNpcIds().equals(target.getNpcIds()))
+		if (!target.getNpcIds().isEmpty() && ids.size() > target.getNpcIds().size() && menuTarget.getNpcIds().equals(target.getNpcIds()))
 		{
 			highlights = highlights.toBuilder().menuTarget(menuTarget.toBuilder().npcIds(Set.copyOf(ids)).build()).build();
 		}
@@ -659,6 +684,10 @@ public class StepGuide
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
+		if (isTravelStep())
+		{
+			travelClickTick = client.getTickCount();
+		}
 		SubStep current = getCurrent();
 		if (current == null || current.getKind() != SubStep.Kind.TELEPORT || current.getRow() == null)
 		{
@@ -730,12 +759,15 @@ public class StepGuide
 		}
 		route = committed;
 		routeStep = step;
-		boolean atStep = step != null && (stillAtAct(step, tile) || arrived(step));
+		boolean atStep = step != null && !itemsFirst(committed, step) && (stillAtAct(step, tile) || arrived(step));
 		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
 			: subSteps.of(committed, step);
 		steps = deposit.before(base, tile);
 		index = 0;
 		jumpedThisSubStep = false;
+		teleportAnimatedTick = ActWatcher.NEVER;
+		travelClickTick = ActWatcher.NEVER;
+		travelStarted = false;
 		advance(tile);
 		refreshGear();
 		showMaking();
@@ -810,6 +842,9 @@ public class StepGuide
 		{
 			index++;
 			jumpedThisSubStep = false;
+			teleportAnimatedTick = ActWatcher.NEVER;
+		travelClickTick = ActWatcher.NEVER;
+		travelStarted = false;
 			moved = true;
 		}
 		SubStep current = index < steps.size() ? steps.get(index) : null;
@@ -829,8 +864,23 @@ public class StepGuide
 	/**
 	 * Arrived where the planner can't see it: the step's NPC is in the scene a short walk away (Brimstail inside his
 	 * cave, where core's tile is the entrance), or the player is beside a cache tile of the step core doesn't give. A
-	 * step of several places or a probe trip never arrives this way: their NPCs and tiles belong to one stage.
+	 * step of several places or a probe trip never arrives this way: their NPCs and tiles belong to one stage. Nor does
+	 * the NPC that only drops a key: the step is done at the object the key opens.
 	 */
+	/**
+	 * Standing at the step isn't doing it while its item still has to come from the bank (Charlie's iron dagger), or is
+	 * nowhere at all: the route's bank stop, or the box's list of what is missing, comes first.
+	 */
+	private boolean itemsFirst(Route committed, Step step)
+	{
+		if (committed != null)
+		{
+			return committed.isBanked();
+		}
+		Plan plan = routes.getPlan();
+		return step.getKey().equals(plan.getStepKey()) && plan.getBest() == null && !plan.getRequirementNotes().isEmpty();
+	}
+
 	private boolean arrived(Step step)
 	{
 		PlanStart start = routes.getStart();
@@ -847,14 +897,15 @@ public class StepGuide
 				return true;
 			}
 		}
-		if (step.getNpcs() == null || step.getNpcs().isEmpty() || client.getTopLevelWorldView() == null)
+		List<String> npcs = step.getNpcsAtStep();
+		if (npcs.isEmpty() || client.getTopLevelWorldView() == null)
 		{
 			return false;
 		}
 		for (NPC npc : client.getTopLevelWorldView().npcs())
 		{
 			WorldPoint at = npc.getWorldLocation();
-			if (npc.getName() != null && step.getNpcs().contains(npc.getName()) && walk.costNear(at) <= ARRIVED_WALK_TILES)
+			if (npc.getName() != null && npcs.contains(npc.getName()) && walk.costNear(at) <= ARRIVED_WALK_TILES)
 			{
 				return true;
 			}
@@ -909,6 +960,9 @@ public class StepGuide
 		steps = List.of();
 		index = 0;
 		jumpedThisSubStep = false;
+		teleportAnimatedTick = ActWatcher.NEVER;
+		travelClickTick = ActWatcher.NEVER;
+		travelStarted = false;
 		lastTile = null;
 		waiting = null;
 		fight = null;
@@ -922,13 +976,29 @@ public class StepGuide
 		scene = SceneHighlights.NONE;
 	}
 
-	/** A teleport or book change is animating: its item, spell and tab are already used. */
+	/** A teleport or book change is under way, until the player lands: its item, spell and tab are already used. */
 	public boolean isTravelling()
 	{
+		boolean landing = !jumpedThisSubStep && teleportAnimatedTick != ActWatcher.NEVER
+			&& client.getTickCount() - teleportAnimatedTick <= LANDING_TICKS;
+		return isTravelAnimating() || landing;
+	}
+
+	private boolean isTravelAnimating()
+	{
+		return travelStarted && isAnimating();
+	}
+
+	private boolean isTravelStep()
+	{
 		SubStep current = getCurrent();
+		return current != null && (current.isTravel() || current.getChange() != null);
+	}
+
+	private boolean isAnimating()
+	{
 		Player local = client.getLocalPlayer();
-		boolean acting = current != null && (current.isTravel() || current.getChange() != null);
-		return acting && local != null && local.getAnimation() != NO_ANIMATION;
+		return local != null && local.getAnimation() != NO_ANIMATION;
 	}
 
 	/** A walk to NPCs ends once one of them is rendered close by (an elf in Prifddinas), not at the planned tile. */

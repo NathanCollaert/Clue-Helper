@@ -32,6 +32,10 @@ public final class SceneDoors
 	private static final String OPEN = "Open";
 	/** A web across a way (the Wilderness lever's room) is slashed through like a door is opened. */
 	private static final String SLASH = "Slash";
+	/** A fence or railing squeezed through (King Lathas' camp) is passed like an opened door. */
+	private static final String SQUEEZE = "Squeeze-through";
+	/** A doorway walked through (the Lighthouse's) is passed like an opened door. */
+	private static final String WALK_THROUGH = "Walk-through";
 	private static final Set<String> LOCK_OPTIONS = Set.of("Pick-lock", "Unlock");
 	private static final String LOCKED = "locked";
 	private static final int NOTHING_OPENED = -1;
@@ -49,7 +53,7 @@ public final class SceneDoors
 	/** Shortest Path's SLASH items (knives, axes, blades), as the catalog generator writes them. */
 	private static final Set<Integer> SLASH_ITEMS = slashItems();
 
-	/** The option that opens each object: Open, Slash, or NONE. */
+	/** The option that opens each object: Open, Slash, Squeeze-through, Walk-through, or NONE. */
 	private final Map<Integer, String> openOptions = new HashMap<>();
 	private final Set<Integer> lockedIds = new HashSet<>();
 	private int lastOpened = NOTHING_OPENED;
@@ -142,7 +146,7 @@ public final class SceneDoors
 	}
 
 	/** Client thread only. */
-	/** A door or web the path can go through with one click. */
+	/** A door, web, fence or doorway the path can go through with one click. */
 	public boolean opensOnClick(WallObject wall)
 	{
 		return opens(wall.getId());
@@ -173,10 +177,11 @@ public final class SceneDoors
 	private boolean opens(int id)
 	{
 		String option = openOption(id);
-		return !lockedIds.contains(id) && (OPEN.equals(option) || SLASH.equals(option) && canSlash);
+		return !lockedIds.contains(id) && (OPEN.equals(option) || SQUEEZE.equalsIgnoreCase(option) || WALK_THROUGH.equalsIgnoreCase(option)
+			|| SLASH.equals(option) && canSlash);
 	}
 
-	/** Client thread only. The option that opens a door or web, or "" for anything else. */
+	/** Client thread only. The option that opens a door, web, fence to squeeze through or doorway, or "" for anything else. */
 	public String openOption(int id)
 	{
 		return openOptions.computeIfAbsent(id, key ->
@@ -193,7 +198,8 @@ public final class SceneDoors
 				{
 					return NONE;
 				}
-				option = OPEN.equals(action) || SLASH.equals(action) ? action : option;
+				option = OPEN.equals(action) || SLASH.equals(action) || SQUEEZE.equalsIgnoreCase(action) || WALK_THROUGH.equalsIgnoreCase(action)
+					? action : option;
 			}
 			return option;
 		});

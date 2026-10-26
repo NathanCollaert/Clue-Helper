@@ -78,7 +78,8 @@ public final class CampaignRecorder
 		CampaignRecording recording = new CampaignRecording();
 		ClientTape tape = ClientTape.recording(client);
 		Step step = new StepResolver(() -> index).resolve(CoreClues.entry(coreClue), CoreClues.plugin(tape.client()));
-		Step travel = StageTarget.travelStep(step, PlayerSnapshot.items(input.getPlayer().getInventory()));
+		Step travel = StageTarget.travelStep(CampaignReplay.asLive(step, input.getPlayer(), input.getBanked()),
+			PlayerSnapshot.items(input.getPlayer().getInventory()));
 		recording.stashStates = new TreeMap<>();
 		recording.gearPieces = new TreeMap<>();
 		recording.onlyInBankedKit = new TreeMap<>();

@@ -66,11 +66,11 @@ anagram:30933	*	anagram	medium	ANY_OF	1212,3119,0	Teicuh				none	5175	CUTE HI
 anagram:31274	*	anagram	medium	ANY_OF	3143,2423,0	Elder Torgan				none	7041	NOT RAG
 anagram:3611	*	anagram	medium	ANY_OF	2461,3382,0	Femi				none	1538	ME IF
 anagram:3612	*	anagram	medium	ANY_OF	2402,3419,0	Brimstail				none	1517	BAIL TRIMS
-anagram:3613	*	anagram	medium	ANY_OF	2858,3577,0	Saba				none	1509	A BAS
+anagram:3613	*	anagram	medium	ANY_OF	2269,4752,0	Saba				none	1509	A BAS
 anagram:3616	*	anagram	medium	ANY_OF	3359,3276,0	Jaraah				none	1511	AHA JAR
-anagram:3618	*	anagram	medium	ANY_OF	2630,2997,0	Fycie				none	1531	ICY FE
+anagram:3618	*	anagram	medium	ANY_OF	2653,9392,0	Fycie				none	1531	ICY FE
 anagram:7268	*	anagram	hard	ANY_OF	2395,3486,0	Gnome Coach				none	1556	C ON GAME HOC
-anagram:7270	*	anagram	hard	ANY_OF	2526,3162,0	Bolkoy				none	1555	BY LOOK
+anagram:7270	*	anagram	hard	ANY_OF	2526,3162,1	Bolkoy				none	1555	BY LOOK
 anagram:7272	*	anagram	hard	ANY_OF	2807,3191,0	Cap'n Izzy No-Beard				none	1565	O BIRDZ A ZANY EN PC
 anagram:7274	*	anagram	medium	ANY_OF	2658,3670,0	Brundt the Chieftain				none	1520	DT RUN B
 anagram:7276	*	anagram	medium	ANY_OF	2790,3066,0	Gabooty				none	1525	GOT A BOY
@@ -556,7 +556,7 @@ cryptic:their bane awaits, but don't be going in there without permission.	*	cry
 cryptic:they're everywhere!!!! but they were here first. dig for treasure where the ground is rich with ore.	*	cryptic	hard	ANY_OF	3081,3421,0					spade	1411	THEY'RE EVERYWHERE!!!! But they were here first. Dig for treasure where the ground is rich with ore.
 cryptic:this aviator is at the peak of his profession.	*	cryptic	hard	ANY_OF	2847,3499,0	Captain Bleemadge				none	1377	This aviator is at the peak of his profession.
 cryptic:this crate holds a better reward than a broken arrow.	*	cryptic	medium	ANY_OF	2671,3437,0			356		none	1367	This crate holds a better reward than a broken arrow.
-cryptic:this crate is mine, all mine, even if it is in the middle of the desert.	*	cryptic	medium	ANY_OF	3289,3022,0			18889		none	1365	This crate is mine, all mine, even if it is in the middle of the desert.
+cryptic:this crate is mine, all mine, even if it is in the middle of the desert.	*	cryptic	medium	SEQUENCE	3270,3027,0|3289,3022,0			18889		none	1365	This crate is mine, all mine, even if it is in the middle of the desert.
 cryptic:this place sure is a mess.	*	cryptic	master	ANY_OF	1646,3631,0	Ewesey				none	1470	This place sure is a mess.
 cryptic:this village has a problem with cartloads of the undead. try checking the bookcase to find an answer.	*	cryptic	hard	ANY_OF	2833,2992,0			394		none	1405	This village has a problem with cartloads of the undead. Try checking the bookcase to find an answer.
 cryptic:three rule below and three sit at top. come dig at my entrance.	*	cryptic	elite	ANY_OF	2523,3739,0					spade	1448	Three rule below and three sit at top. Come dig at my entrance.

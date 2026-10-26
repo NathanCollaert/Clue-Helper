@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ParamID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.NpcID;
@@ -112,10 +113,30 @@ final class RowTargets
 	MenuTarget heldTeleport(SubStep teleport, Set<Integer> held)
 	{
 		CatalogRow row = teleport.getRow();
+		List<String> path = optionPath(row);
 		MenuTarget.MenuTargetBuilder target = row.isQuetzalMap()
 			? MenuTarget.quetzal(row.quetzalTableId()).toBuilder().path(List.of(SIGNAL_OPTION))
-			: MenuTarget.builder().path(optionPath(row));
+			: MenuTarget.builder().path(path.isEmpty() ? wornOption(held) : path);
 		return withItems(target, held).alternatives(sameLanding(teleport)).build();
+	}
+
+	/**
+	 * A one-place teleport has no menu line: in the inventory its left click teleports, but worn it is the item's
+	 * first worn option (Invoke on a skull sceptre). Empty when none of the items is worn.
+	 */
+	private List<String> wornOption(Set<Integer> held)
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		for (int itemId : held)
+		{
+			String option = snapshot != null && snapshot.getWorn().containsKey(itemId)
+				? client.getItemDefinition(itemId).getStringValue(ParamID.OC_ITEM_OP1) : null;
+			if (option != null && !option.isEmpty())
+			{
+				return List.of(option);
+			}
+		}
+		return List.of();
 	}
 
 	MenuTarget heldBookChange(Set<Integer> held, Book book)

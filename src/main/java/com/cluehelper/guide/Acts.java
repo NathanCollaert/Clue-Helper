@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.NpcID;
 
 /**
  * What to do once at the step, per type: the sub-steps after the travel. Texts name what core doesn't show in the same
@@ -18,6 +19,9 @@ final class Acts
 {
 	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
 	private static final String TALK_OPTION = "Talk-to";
+	/** By ids: core doesn't mark Uri, and a target by name is left to core while the clue's tile is in view. */
+	private static final Set<Integer> URI_IDS = Set.of(NpcID.TRAIL_BEGINNER_URI, NpcID.TRAIL_EASY_URI, NpcID.TRAIL_MEDIUM_URI,
+		NpcID.TRAIL_HARD_URI, NpcID.TRAIL_ELITE_URI, NpcID.TRAIL_MASTER_URI, NpcID.URI_EMOTE);
 	private static final Set<String> TYPES_WITH_OWN_ACT = Set.of(ClueTypes.EMOTE, ClueTypes.MUSIC, ClueTypes.HOT_COLD, ClueTypes.SKILL);
 
 	private Acts()
@@ -51,7 +55,7 @@ final class Acts
 				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
 				.actItems(step.getActItems()).build();
 		}
-		if (needsItemFromNpc(step))
+		if (step.isKeyFromNpc())
 		{
 			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
 			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what + " with the key")
@@ -59,7 +63,7 @@ final class Acts
 		}
 		SubStep.SubStepBuilder act = SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step));
 		String npc = talkedTo(step);
-		return npc == null ? act.build() : act.option(TALK_OPTION).npcNames(Set.of(MenuLabels.normalise(npc))).build();
+		return npc == null ? act.build() : talkTo(act, npc).build();
 	}
 
 	/** The NPC the step's own act talks to; null for a step whose act is something else. */
@@ -67,17 +71,6 @@ final class Acts
 	{
 		boolean ownAct = TYPES_WITH_OWN_ACT.contains(step.getType());
 		return !ownAct && !isDig(step) && hasAny(step.getNpcs()) ? step.getNpcs().get(0) : null;
-	}
-
-	/**
-	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to
-	 * the guardian".
-	 */
-	private static boolean needsItemFromNpc(Step step)
-	{
-		boolean talk = step.getText() != null && step.getText().toLowerCase().contains("speak");
-		return ClueTypes.CRYPTIC.equals(step.getType()) && !talk && hasAny(step.getNpcs())
-			&& (hasAny(step.getObjectNames()) || hasAny(step.getObjectIds()));
 	}
 
 	private static boolean hasAny(List<?> list)
@@ -175,7 +168,8 @@ final class Acts
 		String emotes = step.getEmotes().isEmpty() ? "the emote" : String.join(", then ", step.getEmotes());
 		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
 			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
-		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to Uri").detail(items ? "Stay equipped" : null).build());
+		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to Uri").detail(items ? "Stay equipped" : null)
+			.option(TALK_OPTION).npcIds(URI_IDS).build());
 		return List.copyOf(acts);
 	}
 
@@ -212,14 +206,19 @@ final class Acts
 	private static List<SubStep> talkThenChallenge(Step step, StepIndex.Challenge challenge)
 	{
 		String npc = step.getNpcs().get(0);
-		SubStep talk = SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to " + npc).detail(withFloor(step, null))
-			.done(SubStep.Done.CHALLENGE_ITEM).build();
+		SubStep talk = talkTo(SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to " + npc).detail(withFloor(step, null))
+			.done(SubStep.Done.CHALLENGE_ITEM), npc).build();
 		if (challenge.getBox() != null)
 		{
 			String box = challenge.getBox().toLowerCase().contains("light") ? "light box" : "puzzle box";
 			return List.of(talk, act("Open the " + box + ", then talk to " + npc + " again", null).toBuilder().actItemNamed(box).build());
 		}
-		return List.of(talk, act("Talk to " + npc + " again: answer the challenge", null));
+		return List.of(talk, talkTo(act("Talk to " + npc + " again: answer the challenge", null).toBuilder(), npc).build());
+	}
+
+	private static SubStep.SubStepBuilder talkTo(SubStep.SubStepBuilder act, String npc)
+	{
+		return act.option(TALK_OPTION).npcNames(Set.of(MenuLabels.normalise(npc)));
 	}
 
 	private static SubStep act(String text, String detail)

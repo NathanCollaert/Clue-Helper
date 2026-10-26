@@ -207,6 +207,9 @@ public class EdgeCaseRoutesTest
 		lines.add(line("avoidWilderness, King Black Dragon's lair: outside it, but only reachable through it",
 			checked(input(maxed, step("emote:dance in the king black dragon's lair. beware of double agents! equip a black dragonhide body, black dragonhide vambraces and a black dragon mask."),
 				PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().avoidWilderness(true).build()).build())));
+		lines.add(line("avoidWilderness, start at the level 50 obelisk (3306,3915), to Varrock: out by the obelisk",
+			checked(input(maxed, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3306, 3915, 0))),
+				plain.toBuilder().avoidWilderness(true).build()).build())));
 
 		PlayerSnapshot midBank = ready(Loadouts.load("mid-ironman").getBankedSnapshot());
 		lines.add(line("bank tipping point: mid-ironman, bank on, to Varrock bank crates",
@@ -402,6 +405,9 @@ public class EdgeCaseRoutesTest
 			checked(input(boatAtTheTear, tear, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		lines.add(line("sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium",
 			checked(input(alsoCarrying(maxed, ItemID.SAILORS_AMULET), step("emote:31268"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		PlayerSnapshot bridgeUnbuilt = withVarbits(maxed, Map.of(VarbitID.FENK_BUILT_BRIDGE_NORTH, 1, VarbitID.FENK_BUILT_BRIDGE_SOUTH, 1));
+		lines.add(line("gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave",
+			checked(input(bridgeUnbuilt, step("emote:10256"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 	}
 
 	private static PlayerSnapshot ridesOnly(PlayerSnapshot player)

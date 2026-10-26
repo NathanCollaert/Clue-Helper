@@ -94,6 +94,14 @@ public class StepResolver
 			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
 				ItemRequirements::item), targets);
 		}
+		StepIndex.Requires dropped = entry == null ? null
+			: entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
+		if (dropped != null)
+		{
+			ItemRequirement item = ItemRequirements.any(dropped.getName(), dropped.getIds().stream().map(ItemRequirements::item)
+				.toArray(ItemRequirement[]::new));
+			return Stages.killForWayIn(dropped, item, targets);
+		}
 		if (clue instanceof SkillChallengeClue)
 		{
 			return Stages.challenge(entry, ((SkillChallengeClue) clue).getRawChallenge(), CoreClueReader.challengeCompleted(clue),

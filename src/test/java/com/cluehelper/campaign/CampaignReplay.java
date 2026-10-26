@@ -22,6 +22,7 @@ import com.cluehelper.route.WalkGates;
 import com.cluehelper.route.WalkTable;
 import com.cluehelper.step.CoreClues;
 import com.cluehelper.step.StageTarget;
+import com.cluehelper.step.Stages;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
@@ -96,7 +97,8 @@ public final class CampaignReplay
 		ClientTape tape = ClientTape.replaying(recording.client);
 		Client client = tape.client();
 		PlayerSnapshot player = recording.player;
-		Step travel = StageTarget.travelStep(resolve(recording, client), PlayerSnapshot.items(player.getInventory()));
+		Step travel = StageTarget.travelStep(asLive(resolve(recording, client), player, recording.banked),
+			PlayerSnapshot.items(player.getInventory()));
 		StepNeeds needs = new StepNeeds(client, id -> stashState(recording, id), (bonus, owned) -> gearPieces(recording, bonus.name(), owned),
 			() -> StepNeeds.ownedItemIds(player, recording.banked));
 		AvailabilityEngine engine = new AvailabilityEngine(runes, id -> "item " + id);
@@ -179,6 +181,18 @@ public final class CampaignReplay
 			default:
 				return PlanStart.teleportOnly(tile, walk);
 		}
+	}
+
+	/** The step as the live client hands it on: a kill for a key the player owns, carried or banked, is dropped. */
+	static Step asLive(Step resolved, PlayerSnapshot player, PlayerSnapshot banked)
+	{
+		return Stages.adjusted(resolved, id -> owns(player, banked, id), player.getPosition().getTile());
+	}
+
+	private static boolean owns(PlayerSnapshot player, PlayerSnapshot banked, int itemId)
+	{
+		return player.getInventory().containsKey(itemId) || player.getWorn().containsKey(itemId)
+			|| banked != null && (banked.getBank().containsKey(itemId) || banked.getGroupStorage().containsKey(itemId));
 	}
 
 	private static LoadedScene scene(Path file) throws IOException

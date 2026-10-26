@@ -1,6 +1,6 @@
 # Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
-boat	Boat: Fishing Platform	2720 3301 0	2782 3273 0		Travel Holgart 7789			Sea Slug			-1	9	1	F	none	any	Y		npc Travel		npc:7789=HOLGARTLANDTRAVEL
+boat	Boat: Fishing Platform	2720 3301 0	2782 3273 0		Travel Jeb 4803			Sea Slug			-1	9	1	F	none	any	Y		npc Travel		npc:4803=SLUG2_JEB_STAGE2
 boat	Boat: Witchaven	2782 3273 0	2720 3301 0		Travel Holgart 5070			Sea Slug			-1	9	1	F	none	any	Y		npc Travel		npc:5070=HOLGARTPLATFORM
 boat	Boat: Braindeath Island	3680 3536 0	2162 5114 1		Talk-to Pirate Pete 601			Rum Deal			-1	9	1	F	none	any	Y		npc Talk-to		npc:601=DEAL_PETE
 boat	Boat: Port Phasmatys	2162 5114 1	3680 3536 0		Talk-to Pirate Pete 602			Rum Deal			-1	9	1	F	none	any	Y		npc Talk-to		npc:602=DEAL_ISLAND_PETE

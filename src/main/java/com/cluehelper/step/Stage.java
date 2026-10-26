@@ -37,6 +37,9 @@ public class Stage
 	int radius;
 	/** The key: the stage is done once it is carried. Null for other stages. */
 	ItemRequirement item;
+	/** Any of these owned anywhere, the bank too, skips the stage: the way in's requires bring it from there. */
+	@Builder.Default
+	Set<Integer> skippedWhenOwned = Set.of();
 	/** Tiles that count only while the named patch is grown (a Farming Guild redwood), by tile. */
 	@Builder.Default
 	Map<WorldPoint, String> grownOnly = Map.of();

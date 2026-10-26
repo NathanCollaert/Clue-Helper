@@ -18,7 +18,8 @@ public final class MenuLabels
 	/** Catalog (Shortest Path) labels that the worn Max cape's options name differently. */
 	private static final Map<String, String> GAME_NAMES = Map.of(
 		"feldip hills", "carnivorous chinchompas",
-		"tele to poh", "home");
+		"tele to poh", "home",
+		"bandit camp quarry", "enakhras temple entrance");
 	private static final Pattern APOSTROPHE = Pattern.compile("['’]");
 	private static final Pattern HOTKEY_LABEL = Pattern.compile("^([0-9A-Z])[.:] ");
 	private static final Pattern TAGS = Pattern.compile("<[^>]*>");

@@ -46,6 +46,8 @@ public final class WalkTable
 	private int[] entryFull = new int[0];
 	private int[] entryGateSet = new int[0];
 	private int[] entryOpen = new int[0];
+	private int[] entryAlternative = new int[0];
+	private int[] entryAlternativeGateSet = new int[0];
 	private int[] reverseStart = {0};
 	private int[] reverseEntry = new int[0];
 	private int[] entryFrom = new int[0];
@@ -61,7 +63,7 @@ public final class WalkTable
 	private Map<Integer, int[]> rowsByOrigin = Map.of();
 	private boolean[] rowIsExit = new boolean[0];
 	private Map<Long, Exit> exits = Map.of();
-	private Map<Long, Exit> rowObjects = Map.of();
+	private Map<Long, List<Exit>> rowObjects = Map.of();
 	/** Each row object's id by the packed tiles its rows start from. */
 	private Map<Integer, Set<Integer>> rowObjectsAt = Map.of();
 
@@ -79,9 +81,9 @@ public final class WalkTable
 		table.readBanks(lines("banks.tsv"));
 		table.exits = rowActions(lines("exits.tsv"));
 		table.markExitRows();
-		table.rowObjects = rowActions(lines("row-objects.tsv"));
-		table.rowObjectsAt = table.rowObjects.values().stream().collect(Collectors.groupingBy(exit -> pack(exit.getOrigin()),
-			Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
+		table.rowObjects = rowsByTiles(lines("row-objects.tsv"));
+		table.rowObjectsAt = table.rowObjects.values().stream().flatMap(List::stream).collect(Collectors.groupingBy(
+			exit -> pack(exit.getOrigin()), Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
 		table.indexReverse();
 		return table;
 	}
@@ -143,6 +145,22 @@ public final class WalkTable
 	public int entryOpen(int entry)
 	{
 		return entryOpen[entry];
+	}
+
+	/**
+	 * The cheapest cost passing none of {@link #entryGateSet}'s gates, or {@link #NO_PATH}; kept only when it uses gates
+	 * of its own ({@link #entryAlternativeGateSet}) and beats {@link #entryOpen}. A place with two differently gated ways
+	 * in stays reachable when the cheaper way's gates fail.
+	 */
+	public int entryAlternative(int entry)
+	{
+		return entryAlternative[entry];
+	}
+
+	/** 0 when the entry has no {@link #entryAlternative}; else an index into {@link #gateSet(int)}. */
+	public int entryAlternativeGateSet(int entry)
+	{
+		return entryAlternativeGateSet[entry];
 	}
 
 	public int gateSetCount()
@@ -217,10 +235,13 @@ public final class WalkTable
 		return exits.get(exitKey(origin, destination));
 	}
 
-	/** The object clicked to take the row from {@code origin} to {@code destination} (a ladder, a door), or null. */
-	public Exit rowObject(WorldPoint origin, WorldPoint destination)
+	/**
+	 * The objects a row from {@code origin} to {@code destination} is taken through (a ladder, a door); empty for none.
+	 * Several rows can join the same tiles: the Observatory's climb is both its grapple's rocks and its rope.
+	 */
+	public List<Exit> rowObjects(WorldPoint origin, WorldPoint destination)
 	{
-		return rowObjects.get(exitKey(origin, destination));
+		return rowObjects.getOrDefault(exitKey(origin, destination), List.of());
 	}
 
 	/** A row starts by {@code tile} (on it or next to it) through the object: the same id elsewhere says nothing. */
@@ -304,12 +325,28 @@ public final class WalkTable
 		Map<Long, Exit> byRow = new HashMap<>();
 		for (String[] c : rows)
 		{
-			WorldPoint origin = parseTile(c[0]);
-			WorldPoint destination = parseTile(c[1]);
-			int objectId = c[4].isEmpty() ? -1 : Integer.parseInt(c[4]);
-			byRow.putIfAbsent(exitKey(origin, destination), new Exit(origin, destination, c[2], c[3], objectId));
+			Exit row = rowAction(c);
+			byRow.putIfAbsent(exitKey(row.getOrigin(), row.getDestination()), row);
 		}
 		return byRow;
+	}
+
+	private static Map<Long, List<Exit>> rowsByTiles(List<String[]> rows)
+	{
+		Map<Long, List<Exit>> byTiles = new HashMap<>();
+		for (String[] c : rows)
+		{
+			Exit row = rowAction(c);
+			byTiles.computeIfAbsent(exitKey(row.getOrigin(), row.getDestination()), key -> new ArrayList<>()).add(row);
+		}
+		byTiles.replaceAll((key, sameTiles) -> List.copyOf(sameTiles));
+		return byTiles;
+	}
+
+	private static Exit rowAction(String[] c)
+	{
+		int objectId = c[4].isEmpty() ? -1 : Integer.parseInt(c[4]);
+		return new Exit(parseTile(c[0]), parseTile(c[1]), c[2], c[3], objectId);
 	}
 
 	private static long exitKey(WorldPoint origin, WorldPoint destination)
@@ -415,6 +452,7 @@ public final class WalkTable
 			}
 		}
 		IntBuffer to = new IntBuffer(), full = new IntBuffer(), set = new IntBuffer(), open = new IntBuffer();
+		IntBuffer alternative = new IntBuffer(), alternativeSet = new IntBuffer();
 		entryStart = new int[nodes + 1];
 		for (int node = 0; node < nodes; node++)
 		{
@@ -425,10 +463,14 @@ public final class WalkTable
 			{
 				previous += in.next();
 				to.add(previous);
-				full.add(in.next());
+				int fullCost = in.next();
+				full.add(fullCost);
 				int gateSet = in.next();
 				set.add(gateSet);
 				open.add(gateSet == 0 ? NO_PATH : in.next() - 1);
+				int alternativeGateSet = gateSet == 0 ? 0 : in.next();
+				alternativeSet.add(alternativeGateSet);
+				alternative.add(alternativeGateSet == 0 ? NO_PATH : fullCost + in.next());
 			}
 		}
 		entryStart[nodes] = to.size;
@@ -436,6 +478,8 @@ public final class WalkTable
 		entryFull = full.toArray();
 		entryGateSet = set.toArray();
 		entryOpen = open.toArray();
+		entryAlternative = alternative.toArray();
+		entryAlternativeGateSet = alternativeSet.toArray();
 	}
 
 	private void readRows(Varints in)

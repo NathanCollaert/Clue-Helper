@@ -78,14 +78,30 @@ public final class WalkGates
 	/** {@link WalkTable#NO_PATH} when the failed gates block every way. */
 	public int cost(int entry)
 	{
-		int set = table.entryGateSet(entry);
-		return setPass[set] ? table.entryFull(entry) + setExtra[set] : table.entryOpen(entry);
+		int set = walkedGateSet(entry);
+		if (set == table.entryGateSet(entry))
+		{
+			return table.entryFull(entry) + setExtra[set];
+		}
+		return set == 0 ? table.entryOpen(entry) : table.entryAlternative(entry) + setExtra[set];
 	}
 
 	/** Sorted item ids to take from the bank for {@link #cost}'s walk. */
 	public int[] withdraw(int entry)
 	{
-		return setWithdraw[table.entryGateSet(entry)];
+		return setWithdraw[walkedGateSet(entry)];
+	}
+
+	/** The gate set of the walk {@link #cost} takes: the full path's, else the alternative's, else 0 for the open one. */
+	private int walkedGateSet(int entry)
+	{
+		int full = table.entryGateSet(entry);
+		if (setPass[full])
+		{
+			return full;
+		}
+		int alternative = table.entryAlternativeGateSet(entry);
+		return alternative != 0 && setPass[alternative] ? alternative : 0;
 	}
 
 	/** Sorted: every stored item some gate takes. */

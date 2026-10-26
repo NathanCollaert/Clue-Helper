@@ -10,10 +10,12 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.route.Ground;
 import com.cluehelper.route.WalkGoal;
 import com.cluehelper.route.WalkData;
+import com.cluehelper.route.WalkTable;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.WalkCosts;
 import com.cluehelper.route.WorldWalk;
 import com.cluehelper.step.Stage;
+import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import java.awt.BasicStroke;
@@ -25,7 +27,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.Value;
 import net.runelite.api.Client;
@@ -57,6 +61,10 @@ public class WaypointOverlay extends Overlay
 	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	private static final float PATH_STROKE = 2f;
+	/** A climb's far end can stand a few tiles off the walk data's landing tile (the Observatory's rocks). */
+	private static final int ROW_ENDS_MARGIN_TILES = 3;
+	/** A longer jump (a cave entrance into another region) crosses nothing between its ends: only its start is looked at. */
+	private static final int CROSSING_JUMP_TILES = 20;
 	private static final int[] CONVERSATION = {InterfaceID.ChatLeft.UNIVERSE, InterfaceID.ChatRight.UNIVERSE, InterfaceID.Chatmenu.UNIVERSE};
 	private static final String NO_STEP = "";
 
@@ -170,7 +178,7 @@ public class WaypointOverlay extends Overlay
 		}
 		if (waypoint == null && current != null && isActWithoutPlace(current))
 		{
-			WorldPoint act = actTarget(view, current.getTab() == StepGuide.Tab.EMOTES ? SubSteps.ARRIVE_TILES : 1);
+			WorldPoint act = actTarget(view, current, current.getTab() == StepGuide.Tab.EMOTES ? SubSteps.ARRIVE_TILES : 1);
 			return act == null ? null : Goal.path(WalkGoal.tile(act), false);
 		}
 		if (!walkableWaypoint(waypoint, view) && !guide.getHighlightObjects().isEmpty())
@@ -207,10 +215,13 @@ public class WaypointOverlay extends Overlay
 		return goal == null ? null : Goal.path(WalkGoal.tile(goal), false);
 	}
 
-	/** The step's own act, or one part of a three-step, with nothing outlined to walk to and no item to click. */
+	/**
+	 * The step's own act, one part of a three-step or the kill for a key, with nothing outlined to walk to and no item to
+	 * click.
+	 */
 	private boolean isActWithoutPlace(SubStep current)
 	{
-		boolean stepOrPartAct = current.getStage() == null || current.getStage().getKind() == Stage.Kind.PART;
+		boolean stepOrPartAct = current.getStage() == null || current.getStage().getKind() == Stage.Kind.PART || isKillForKey(current);
 		return current.getKind() == SubStep.Kind.ACT && stepOrPartAct && current.getActItemNamed() == null
 			&& guide.getHighlightObjects().isEmpty();
 	}
@@ -226,29 +237,38 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/**
-	 * Where the step is done: its NPC, else its nearest target tile; null within {@code here} tiles of it, and inside a
-	 * wanderer's range with it out of view, where the player looks for it.
+	 * Where the act is done: its NPC, else its nearest tile; null within {@code here} tiles of it, and inside a
+	 * wanderer's range with it out of view, where the player looks for it. The kill for a key leads to the NPC
+	 * dropping the key, else the stage's marker. A hot/cold feel without a waypoint is done where the player stands:
+	 * the step's tiles are only the places it might be felt from.
 	 */
-	private WorldPoint actTarget(WorldView view, int here)
+	private WorldPoint actTarget(WorldView view, SubStep current, int here)
 	{
 		Step step = clueLink.getCurrentStep();
 		Player local = client.getLocalPlayer();
-		if (step == null || local == null || view == null)
+		if (step == null || local == null || view == null || ClueTypes.HOT_COLD.equals(step.getType()))
 		{
 			return null;
 		}
+		boolean killForKey = isKillForKey(current);
 		WorldPoint at = local.getWorldLocation();
-		WorldPoint target = nearestNamedNpc(view, step.getNpcs(), at);
+		WorldPoint target = killForKey ? nearestKeyHolder(view, step, current.getStage(), at) : nearestNamedNpc(view, step.getNpcsAtStep(), at);
 		StepIndex.Wander range = step.getData().getWander();
-		if (target == null && range != null && range.contains(at))
+		if (target == null && !killForKey && range != null && range.contains(at))
 		{
 			return null;
 		}
-		if (target == null && step.getTargets() != null)
+		List<WorldPoint> tiles = killForKey ? current.getStage().getTiles() : step.getTargets();
+		if (target == null && tiles != null)
 		{
-			target = step.getTargets().stream().min(Comparator.comparingInt(t -> t.distanceTo2D(at))).orElse(null);
+			target = tiles.stream().min(Comparator.comparingInt(t -> t.distanceTo2D(at))).orElse(null);
 		}
 		return target == null || target.distanceTo2D(at) <= here ? null : target;
+	}
+
+	private static boolean isKillForKey(SubStep current)
+	{
+		return current.getStage() != null && current.getStage().getKind() == Stage.Kind.KEY;
 	}
 
 	/**
@@ -260,7 +280,7 @@ public class WaypointOverlay extends Overlay
 	{
 		Step step = clueLink.getCurrentStep();
 		StepIndex.Wander range = step == null ? null : step.getData().getWander();
-		WorldPoint npc = step == null ? null : nearestNamedNpc(view, step.getNpcs(), goal);
+		WorldPoint npc = step == null ? null : nearestNamedNpc(view, step.getNpcsAtStep(), goal);
 		boolean npcThere = npc != null && npc.getPlane() == goal.getPlane()
 			&& (range != null ? range.contains(npc) : npc.distanceTo2D(goal) <= WANDER_TILES);
 		if (npcThere)
@@ -272,18 +292,29 @@ public class WaypointOverlay extends Overlay
 		return looking ? null : goal;
 	}
 
+	/** The NPC dropping the key: the stage's own (the Mercenary Captain), else core's for the clue. */
+	private static WorldPoint nearestKeyHolder(WorldView view, Step step, Stage kill, WorldPoint at)
+	{
+		return kill.getNpcIds().isEmpty() ? nearestNamedNpc(view, step.getNpcs(), at)
+			: nearestNpc(view, npc -> kill.getNpcIds().contains(npc.getId()), at);
+	}
+
 	private static WorldPoint nearestNamedNpc(WorldView view, List<String> names, WorldPoint at)
 	{
 		if (names == null || names.isEmpty())
 		{
 			return null;
 		}
+		return nearestNpc(view, npc -> npc.getName() != null && names.stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName())), at);
+	}
+
+	private static WorldPoint nearestNpc(WorldView view, Predicate<NPC> wanted, WorldPoint at)
+	{
 		WorldPoint best = null;
 		for (NPC npc : view.npcs())
 		{
 			WorldPoint tile = npc.getWorldLocation();
-			boolean named = npc.getName() != null && names.stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName()));
-			if (named && (best == null || tile.distanceTo2D(at) < best.distanceTo2D(at)))
+			if (wanted.test(npc) && (best == null || tile.distanceTo2D(at) < best.distanceTo2D(at)))
 			{
 				best = tile;
 			}
@@ -458,6 +489,12 @@ public class WaypointOverlay extends Overlay
 		}
 	}
 
+	/** Client thread. The tiles the line was last drawn through. */
+	public List<WorldPoint> getLine()
+	{
+		return line;
+	}
+
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
 	public List<MenuTarget> pathObjectTargets()
 	{
@@ -523,20 +560,32 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/**
-	 * The objects a jump goes over, nearest first: the outlined one (a stile) and the others named as it is on the way
-	 * (every stepping stone, both ends of a pipe). The line leads over them, not straight from one end to the other.
+	 * The objects a jump goes over, nearest first: the outlined one (a stile), the others named as it is on the way
+	 * (every stepping stone, both ends of a pipe) and the objects of the jump's other rows (a climb's rocks at the top
+	 * of its rope). The line leads over them, not straight from one end to the other.
 	 */
-	private List<TileObject> objectsCrossed(WorldView view, WorldPoint from, WorldPoint to)
+	private List<TileObject> objectsCrossed(WorldView view, WorldPoint from, WorldPoint jumpEnd)
 	{
-		Rectangle around = new Rectangle(Math.min(from.getX(), to.getX()) - 1, Math.min(from.getY(), to.getY()) - 1,
-			Math.abs(from.getX() - to.getX()) + 3, Math.abs(from.getY() - to.getY()) + 3);
-		return pathObjects.keySet().stream()
+		boolean crossing = from.getPlane() == jumpEnd.getPlane() && from.distanceTo2D(jumpEnd) <= CROSSING_JUMP_TILES;
+		WorldPoint to = crossing ? jumpEnd : from;
+		Rectangle around = around(from, to, 1);
+		Stream<TileObject> outlined = pathObjects.keySet().stream()
 			.filter(object -> object.getPlane() == from.getPlane()
 				&& around.contains(object.getWorldLocation().getX(), object.getWorldLocation().getY()))
-			.flatMap(object -> paths.sameNamed(view, object, around).stream())
+			.flatMap(object -> paths.sameNamed(view, object, around).stream());
+		WalkData.Loaded data = routes.getWalk();
+		WalkTable table = data == null || view.isInstance() ? null : data.getTable();
+		List<TileObject> rowEnds = paths.rowObjectsAround(view, table, from, jumpEnd, around(from, to, ROW_ENDS_MARGIN_TILES));
+		return Stream.concat(outlined, rowEnds.stream())
 			.distinct()
 			.sorted(Comparator.comparingInt(object -> squaredDistance(object.getWorldLocation(), from)))
 			.collect(Collectors.toList());
+	}
+
+	private static Rectangle around(WorldPoint from, WorldPoint to, int margin)
+	{
+		return new Rectangle(Math.min(from.getX(), to.getX()) - margin, Math.min(from.getY(), to.getY()) - margin,
+			Math.abs(from.getX() - to.getX()) + 2 * margin + 1, Math.abs(from.getY() - to.getY()) + 2 * margin + 1);
 	}
 
 	private static int squaredDistance(WorldPoint a, WorldPoint b)

@@ -96,7 +96,7 @@ final class PlanContext
 		targetInWilderness = in.getStep().getTargets().stream().anyMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
 		onlyInWilderness = allInWilderness(in.getStep().getTargets())
 			|| in.getStep().getStages().stream().anyMatch(stage -> allInWilderness(stage.getTiles()));
-		avoidsWilderness = in.getSettings().isAvoidWilderness() && !onlyInWilderness;
+		avoidsWilderness = in.getSettings().isAvoidWilderness() && !onlyInWilderness && !startsInWilderness(in.getStart());
 		PlayerSnapshot carrier = in.getPlayer();
 		depositsBookFirst = in.getSettings().isScrollBookOutOfWilderness() && targetInWilderness
 			&& (carrier.carried(BookScrolls.BOOK) > 0);
@@ -347,6 +347,12 @@ final class PlanContext
 	boolean forbidden(int node)
 	{
 		return avoidsWilderness && classes[node].isWilderness();
+	}
+
+	/** Already inside, the way out may take the Wilderness' own obelisks and levers. */
+	private boolean startsInWilderness(PlanStart start)
+	{
+		return start != null && start.getTile() != null && OriginClass.of(start.getTile(), in.getNoTeleport()).isWilderness();
 	}
 
 	private boolean allInWilderness(List<WorldPoint> tiles)

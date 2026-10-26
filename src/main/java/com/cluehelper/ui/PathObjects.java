@@ -5,6 +5,7 @@ import com.cluehelper.route.SceneDoors;
 import com.cluehelper.route.WalkTable;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ final class PathObjects
 	private static final int NORTH = 2;
 	private static final int EAST = 4;
 	private static final int SOUTH = 8;
+	private static final String OPEN = "Open";
 
 	private final Client client;
 	private final SceneDoors doors;
@@ -65,12 +67,12 @@ final class PathObjects
 			WorldPoint to = path.get(i + 1);
 			if (isJump(from, to))
 			{
-				addRowObject(objects, view, table == null ? null : table.rowObject(from, to), from);
+				addRowObject(objects, view, table == null ? List.of() : table.rowObjects(from, to), from);
 			}
 			else
 			{
 				addClosedDoor(objects, view, from, to);
-				addRowObject(objects, view, table == null ? null : table.rowObject(from, to), from);
+				addRowObject(objects, view, table == null ? List.of() : table.rowObjects(from, to), from);
 				addWalkedOverRow(objects, view, table, path, i);
 			}
 		}
@@ -86,7 +88,7 @@ final class PathObjects
 	{
 		for (int j = origin + 2; table != null && j < Math.min(path.size(), origin + 1 + ROW_OBJECT_TILES + 2); j++)
 		{
-			addRowObject(objects, view, table.rowObject(path.get(origin), path.get(j)), path.get(origin));
+			addRowObject(objects, view, table.rowObjects(path.get(origin), path.get(j)), path.get(origin));
 		}
 	}
 
@@ -96,23 +98,72 @@ final class PathObjects
 		return from.getPlane() != to.getPlane() || Math.max(Math.abs(from.getX() - to.getX()), Math.abs(from.getY() - to.getY())) > 1;
 	}
 
-	private void addRowObject(Map<TileObject, String> objects, WorldView view, Exit row, WorldPoint origin)
+	/** Of the rows joining the same tiles, the object nearest the origin is the one clicked (the rope below the rocks). */
+	private void addRowObject(Map<TileObject, String> objects, WorldView view, List<Exit> rows, WorldPoint origin)
 	{
-		if (row == null || row.getObjectId() < 0)
+		Exit clicked = null;
+		TileObject object = null;
+		for (Exit row : rows)
 		{
+			TileObject near = row.getObjectId() < 0 ? null : objectNear(view, row.getObjectId(), origin);
+			if (near != null && (object == null || squaredDistance(near, origin) < squaredDistance(object, origin)))
+			{
+				clicked = row;
+				object = near;
+			}
+		}
+		if (object == null)
+		{
+			rows.stream().filter(row -> row.getObjectId() >= 0).findFirst().ifPresent(row -> addClosed(objects, view, row, origin));
 			return;
 		}
-		Prerequisite first = FIRST.get(row.getObjectId());
+		Prerequisite first = FIRST.get(clicked.getObjectId());
 		TileObject before = first == null ? null : objectNear(view, first.getObjectId(), origin);
 		if (before != null)
 		{
 			objects.putIfAbsent(before, first.getOption());
 		}
-		TileObject object = objectNear(view, row.getObjectId(), origin);
-		if (object != null)
+		objects.putIfAbsent(object, clicked.getOption());
+	}
+
+	/** A closed trapdoor is another object of the same name, opened first: the row names only its open form. */
+	private void addClosed(Map<TileObject, String> objects, WorldView view, Exit row, WorldPoint origin)
+	{
+		TileObject closed = null;
+		for (int dx = -ROW_OBJECT_TILES; dx <= ROW_OBJECT_TILES; dx++)
 		{
-			objects.putIfAbsent(object, row.getOption());
+			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
+			{
+				Tile tile = tile(view, origin.dx(dx).dy(dy));
+				for (TileObject object : tile == null ? List.<TileObject>of() : objectsOn(tile))
+				{
+					boolean opens = row.getTarget().equals(nameOf(object)) && hasOption(object, OPEN);
+					if (opens && (closed == null || squaredDistance(object, origin) < squaredDistance(closed, origin)))
+					{
+						closed = object;
+					}
+				}
+			}
 		}
+		if (closed != null)
+		{
+			objects.putIfAbsent(closed, OPEN);
+		}
+	}
+
+	private boolean hasOption(TileObject object, String option)
+	{
+		ObjectComposition placed = client.getObjectDefinition(object.getId());
+		ObjectComposition shown = placed.getImpostorIds() != null ? placed.getImpostor() : placed;
+		return shown != null && shown.getActions() != null && Arrays.asList(shown.getActions()).contains(option);
+	}
+
+	private static int squaredDistance(TileObject object, WorldPoint origin)
+	{
+		WorldPoint at = object.getWorldLocation();
+		int dx = at.getX() - origin.getX();
+		int dy = at.getY() - origin.getY();
+		return dx * dx + dy * dy;
 	}
 
 	/**
@@ -131,6 +182,30 @@ final class PathObjects
 				if (tile != null)
 				{
 					objectsOn(tile).stream().filter(object -> name != null && name.equals(nameOf(object))).forEach(found::add);
+				}
+			}
+		}
+		return found;
+	}
+
+	/**
+	 * Client thread only. The objects of every row from {@code from} to {@code to} on the tiles {@code around}: a climb's
+	 * rope at its foot and its rocks at the top, which the walk data names as two rows.
+	 */
+	List<TileObject> rowObjectsAround(WorldView view, WalkTable table, WorldPoint from, WorldPoint to, Rectangle around)
+	{
+		List<Exit> rows = table == null ? List.of() : table.rowObjects(from, to);
+		List<TileObject> found = new ArrayList<>();
+		for (int x = around.x; !rows.isEmpty() && x < around.x + around.width; x++)
+		{
+			for (int y = around.y; y < around.y + around.height; y++)
+			{
+				Tile tile = tile(view, new WorldPoint(x, y, from.getPlane()));
+				if (tile != null)
+				{
+					objectsOn(tile).stream()
+						.filter(object -> rows.stream().anyMatch(row -> row.getObjectId() >= 0 && isObject(object, row.getObjectId())))
+						.forEach(found::add);
 				}
 			}
 		}

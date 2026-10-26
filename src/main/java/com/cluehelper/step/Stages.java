@@ -23,6 +23,7 @@ public final class Stages
 {
 	/** Key NPCs wander over a camp, a floor or a field. */
 	private static final int KEY_AREA_TILES = 15;
+	private static final String ATTACK = "Attack";
 	private static final String ANYWHERE = "Anywhere, with what it needs";
 	private static final Pattern ACTIVATE_PRAYER = Pattern.compile("activate the (\\w+) prayer\\.?");
 
@@ -75,11 +76,39 @@ public final class Stages
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
 	}
 
+	/**
+	 * Kill the NPC that drops the way in's item, then go in: skipped while the player owns the item anywhere, as the way
+	 * in's requires then bring it.
+	 */
+	static List<Stage> killForWayIn(StepIndex.Requires requires, ItemRequirement item, List<WorldPoint> targets)
+	{
+		StepIndex.From from = requires.getFrom();
+		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act(from.getText()).tiles(List.of(from.getTile())).ourMarker(true)
+			.radius(KEY_AREA_TILES).item(item).npcIds(Set.copyOf(from.getNpcs())).option(ATTACK)
+			.skippedWhenOwned(Set.copyOf(requires.getIds())).build();
+		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
+	}
+
 	/** The task's places drop once the player owns one of the entry's {@code anywhereWith} items (a sacred eel). */
 	/** The step as the player's state leaves it: a task done anywhere once an item is owned, or under way inside its area. */
 	public static Step adjusted(Step step, Predicate<Integer> owns, WorldPoint at)
 	{
-		return underWayInSpan(doneAnywhereWhenOwned(step, owns), at);
+		return underWayInSpan(doneAnywhereWhenOwned(withoutOwnedDrops(step, owns), owns), at);
+	}
+
+	/** A kill for an item the player already owns is skipped; the step keeps its own places alone once no stage is left. */
+	private static Step withoutOwnedDrops(Step step, Predicate<Integer> owns)
+	{
+		List<Stage> left = step.getStages().stream()
+			.filter(stage -> stage.getSkippedWhenOwned().stream().noneMatch(owns))
+			.collect(Collectors.toUnmodifiableList());
+		if (left.size() == step.getStages().size())
+		{
+			return step;
+		}
+		boolean onlyFinal = left.size() == 1 && left.get(0).getKind() == Stage.Kind.FINAL;
+		return step.toBuilder().stages(onlyFinal ? List.of() : left).targets(tiles(left))
+			.kind(onlyFinal ? TargetKind.ANY_OF : TargetKind.SEQUENCE).build();
 	}
 
 	private static Step doneAnywhereWhenOwned(Step step, Predicate<Integer> owns)

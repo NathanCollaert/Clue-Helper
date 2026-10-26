@@ -57,4 +57,25 @@ public class Step
 	{
 		return List.copyOf(data.getRows());
 	}
+
+	/**
+	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to
+	 * the guardian".
+	 */
+	public boolean isKeyFromNpc()
+	{
+		boolean talk = text != null && text.toLowerCase().contains("speak");
+		return ClueTypes.CRYPTIC.equals(type) && !talk && hasAny(npcs) && (hasAny(objectNames) || hasAny(objectIds));
+	}
+
+	/** The NPCs the step is done with: none when its NPC only drops the key for its object. */
+	public List<String> getNpcsAtStep()
+	{
+		return npcs == null || isKeyFromNpc() ? List.of() : npcs;
+	}
+
+	private static boolean hasAny(List<?> list)
+	{
+		return list != null && !list.isEmpty();
+	}
 }

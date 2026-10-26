@@ -65,6 +65,10 @@ avoidWilderness, King Black Dragon's lair: outside it, but only reachable throug
   alt       37t (rank 45): Max cape: Spellbook → ANCIENT → Ghorrock Teleport → walk 25 → Lever: King Black Dragon Lair {cape=1, item:563=2, item:555=8} leaves you on ANCIENT
   alt       46t: Teleport to House → Portal nexus: Ghorrock → walk 25 → Lever: King Black Dragon Lair {item:556=1, item:557=1, item:563=1}
   note      only reachable through the Wilderness
+avoidWilderness, start at the level 50 obelisk (3306,3915), to Varrock: out by the obelisk
+  best      33t: Obelisk: Level 13 Wilderness → Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       33t: Obelisk: Level 19 Wilderness → Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
+  alt       38t: Obelisk: Level 27 Wilderness → Slayer ring: Dark Beasts → Varrock Teleport → walk 23 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 bank tipping point: mid-ironman, bank on, to Varrock bank crates
   best      27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}
   alt       37t: Skills necklace: Cooking Guild → walk 32 {charge:11968=1}
@@ -124,7 +128,7 @@ Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley s
 scroll book kept out of the Wilderness: carried, to the Lava Maze
   best      80t: Camelot Teleport: Seers' → walk 3 → bank → Master scroll book: Revenant cave teleport → walk 58 {item:556=5, item:563=1, charge:21389=1} withdraw []
   alt       105t: Crafting cape: Teleport → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {item:556=1, item:557=1, item:563=1} withdraw []
-  alt       106t: Max cape: Crafting Guild → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 77 withdraw []
+  alt       106t: Ring of dueling: Castle Wars → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 77 {charge:2552=1} withdraw []
   note      Wilderness target
 scroll book kept out of the Wilderness: banked, to the Lava Maze
   best      92t: Teleport to House → House obelisk: Level 35 Wilderness → walk 77 {item:556=1, item:557=1, item:563=1}
@@ -147,7 +151,7 @@ house: Burthorpe castle steps (Eohric), no games necklace, no house
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      68t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 52
   alt       72t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 55
-  alt       74t: Construction cape: Tele to POH → House obelisk: Level 19 Wilderness → walk 1 → Obelisk: Level 50 Wilderness → walk 52
+  alt       74t: Construction cape: Tele to POH → House obelisk: Level 13 Wilderness → walk 1 → Obelisk: Level 50 Wilderness → walk 52
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)
   best      72t (rank 102): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 55 {item:563=2, item:565=2} leaves you on ANCIENT
@@ -264,6 +268,11 @@ sailing: boat 1 moored at the Tear of the Soul with a greater teleport focus, ma
 sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium
   best      9t: Max cape: Other Teleports: The Pandemonium → walk 4
   alt       13t: Sailors' amulet: The Pandemonium → walk 8 {charge:32399=1}
+gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave
+  best      79t (rank 87): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 73 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  same book 89t: Teleport to House → Portal nexus: Fenken' Castle → walk 73 {item:556=1, item:557=1, item:563=1}
+  alt       92t: Teleport to House → Fairy ring ALQ: Morytania: Haunted Woods → walk 75 {item:556=1, item:557=1, item:563=1}
+  alt       111t: Ectophial → walk 104
 start on a node: standing at the Varrock Teleport landing, to Varrock bank crates
   best      23t: walk 23
   alt       27t: Varrock Teleport → walk 23 {item:556=3, item:554=1, item:563=1}

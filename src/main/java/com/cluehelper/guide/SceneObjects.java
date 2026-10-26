@@ -86,6 +86,25 @@ final class SceneObjects
 		return found;
 	}
 
+	/** By the names menus show, normalised. */
+	List<NPC> npcsNamed(Set<String> names)
+	{
+		List<NPC> found = new ArrayList<>();
+		WorldView view = client.getTopLevelWorldView();
+		if (names.isEmpty() || view == null)
+		{
+			return found;
+		}
+		for (NPC npc : view.npcs())
+		{
+			if (npc.getName() != null && names.contains(MenuLabels.normalise(npc.getName())))
+			{
+				found.add(npc);
+			}
+		}
+		return found;
+	}
+
 	List<NPC> npcs(Set<Integer> ids)
 	{
 		List<NPC> found = new ArrayList<>();

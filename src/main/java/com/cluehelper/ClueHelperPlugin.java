@@ -11,6 +11,7 @@ import com.cluehelper.memory.FairyRingMemory;
 import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.SpiritTreeMemory;
+import com.cluehelper.memory.KeyRingMemory;
 import com.cluehelper.memory.XericsHonourMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.CheckLines;
@@ -108,6 +109,9 @@ public class ClueHelperPlugin extends Plugin
 	private XericsHonourMemory xericsHonour;
 
 	@Inject
+	private KeyRingMemory keyRing;
+
+	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private FairyRingMemory fairyRings;
 
@@ -176,6 +180,7 @@ public class ClueHelperPlugin extends Plugin
 	private MenuLines menuLines;
 
 	@Inject
+	@Getter(AccessLevel.PACKAGE)
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
@@ -213,6 +218,7 @@ public class ClueHelperPlugin extends Plugin
 		clientThread.invokeLater(grownPatches::publish);
 		clientThread.invokeLater(fairyRings::publish);
 		clientThread.invokeLater(xericsHonour::publish);
+		clientThread.invokeLater(keyRing::publish);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
@@ -360,6 +366,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		stashMemory.onMenuOptionClicked(event);
+		keyRing.onMenuOptionClicked(event);
 		sceneDoors.onMenuOptionClicked(event);
 		fairyRings.onMenuOptionClicked(event);
 		bankMemory.onMenuOptionClicked(event);
@@ -440,6 +447,7 @@ public class ClueHelperPlugin extends Plugin
 		grownPatches.publish();
 		fairyRings.publish();
 		xericsHonour.publish();
+		keyRing.publish();
 	}
 
 	BoxState boxState()

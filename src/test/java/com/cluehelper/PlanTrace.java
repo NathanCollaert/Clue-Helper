@@ -3,11 +3,13 @@ package com.cluehelper;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.GearPicker;
 import com.cluehelper.route.GearRequirement;
+import com.cluehelper.route.Leg;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.PlannerSettings;
 import com.cluehelper.route.RequiredItems;
+import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.route.SceneFiles;
 import com.cluehelper.route.WalkCosts;
@@ -30,8 +32,9 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 
 /**
- * Each plan slower than {@link #SLOW_MILLIS}, with what it was planned from, as a {@link Recording} in {@link #PLANS}
- * (its scene beside it), which {@code PlanReplay} plans again offline. Nothing while the bank PIN keypad is open.
+ * Each plan slower than {@link #SLOW_MILLIS}, and each that drops a short walk for a teleport (the step's own walk
+ * suddenly found long), with what it was planned from, as a {@link Recording} in {@link #PLANS} (its scene beside it),
+ * which {@code PlanReplay} plans again offline. Nothing while the bank PIN keypad is open.
  */
 @Slf4j
 final class PlanTrace
@@ -41,11 +44,13 @@ final class PlanTrace
 	private static final long SLOW_MILLIS = 300;
 	private static final long NANOS_PER_MILLI = 1_000_000;
 	private static final int MOST_RECORDINGS = 40;
+	private static final int SHORT_WALK_HALF_TICKS = 2 * 40;
 
 	private final Client client;
 	private final Gson gson = new Gson();
 	private final Runnable unregister;
 	private int recorded;
+	private String shortWalkStepKey;
 
 	PlanTrace(Client client, RoutePlanner routes)
 	{
@@ -62,11 +67,12 @@ final class PlanTrace
 	private void record(Plan plan, PlanInput input)
 	{
 		long millis = plan.getSearchNanos() / NANOS_PER_MILLI;
-		if (millis < SLOW_MILLIS || recorded >= MOST_RECORDINGS || pinOpen() || input.getStep() == null)
+		boolean leftShortWalk = leftShortWalk(plan);
+		if (millis < SLOW_MILLIS && !leftShortWalk || recorded >= MOST_RECORDINGS || pinOpen() || input.getStep() == null)
 		{
 			return;
 		}
-		String name = String.format("%03d-%s", ++recorded, slug(input.getStep().getKey()));
+		String name = String.format("%03d-%s%s", ++recorded, leftShortWalk ? "left-walk-" : "", slug(input.getStep().getKey()));
 		Recording recording = recording(plan, input, millis);
 		WalkCosts walk = input.getStart().getWalk();
 		if (walk != null && walk.getScene() != null)
@@ -83,6 +89,16 @@ final class PlanTrace
 		{
 			log.warn("{} could not record {}", TAG, name, e);
 		}
+	}
+
+	/** The last plan for this step was a short walk and this one travels instead. */
+	private boolean leftShortWalk(Plan plan)
+	{
+		Route best = plan.getBest();
+		boolean walkOnly = best != null && best.getLegs().stream().allMatch(leg -> leg.getKind() == Leg.Kind.WALK);
+		boolean left = best != null && !walkOnly && plan.getStepKey() != null && plan.getStepKey().equals(shortWalkStepKey);
+		shortWalkStepKey = walkOnly && best.getHalfTicks() <= SHORT_WALK_HALF_TICKS ? plan.getStepKey() : null;
+		return left;
 	}
 
 	private static Recording recording(Plan plan, PlanInput input, long millis)

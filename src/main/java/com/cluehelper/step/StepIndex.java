@@ -697,6 +697,13 @@ public final class StepIndex
 		private String name;
 		/** Worn to go in (a diving helmet), not just carried (a spade). */
 		private boolean wear;
+		/** Who drops it for a player owning none (the Mercenary Captain's Metal key); null when it can't be got there. */
+		private From from;
+
+		public From getFrom()
+		{
+			return from;
+		}
 
 		public boolean isWear()
 		{
@@ -944,6 +951,29 @@ public final class StepIndex
 		public String getName()
 		{
 			return name;
+		}
+	}
+
+	/** An NPC killed for a way in's item: where it stands and what the stage says. */
+	public static final class From
+	{
+		private List<Integer> npcs;
+		private int[] tile;
+		private String text;
+
+		public List<Integer> getNpcs()
+		{
+			return npcs == null ? List.of() : npcs;
+		}
+
+		public WorldPoint getTile()
+		{
+			return point(tile);
+		}
+
+		public String getText()
+		{
+			return text;
 		}
 	}
 

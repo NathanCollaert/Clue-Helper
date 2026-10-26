@@ -39,12 +39,14 @@ public final class Hypotheses
 	 * The grid of the newest readings that a spot fits exactly and that keep no spot core has dropped. An older reading
 	 * that contradicts them is taken as left over from another clue or missed in between: core starts afresh on each
 	 * clue and keeps the true spot, while an outdated log can rule it out. Failing that, the newest readings that fit
-	 * exactly, then the whole log's closest fits.
+	 * exactly, then the whole log's closest fits. The anchor a solved step left rules nothing out: the game's "last time"
+	 * can be a feel the log never saw, and one more feel costs less than a dig in the wrong place.
 	 *
 	 * @param coreSpots core's remaining spots; empty when it has none to go by
 	 */
-	public static Hypotheses fitting(List<Spot> spots, HotColdTier tier, List<Reading> readings, Set<String> coreSpots)
+	public static Hypotheses fitting(List<Spot> spots, HotColdTier tier, List<Reading> logged, Set<String> coreSpots)
 	{
+		List<Reading> readings = withoutCarriedAnchor(logged);
 		Hypotheses exact = null;
 		for (int start = 0; start < readings.size(); start++)
 		{
@@ -59,6 +61,11 @@ public final class Hypotheses
 			}
 		}
 		return exact != null ? exact : filter(spots, tier, readings);
+	}
+
+	private static List<Reading> withoutCarriedAnchor(List<Reading> logged)
+	{
+		return !logged.isEmpty() && logged.get(0).isAnchor() ? logged.subList(1, logged.size()) : logged;
 	}
 
 	/** The readings from {@code start} on, the one before kept as the anchor of their first comparison. */
