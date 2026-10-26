@@ -18,6 +18,7 @@ import com.cluehelper.step.Stage;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepRequirements;
+import com.cluehelper.transport.Category;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Comparator;
@@ -74,6 +75,8 @@ public class StepGuide
 	private static final int LANDING_TICKS = 3;
 	/** A teleport animates on its click's tick or within two: any other animation (a block while being hit) isn't travel. */
 	private static final int TRAVEL_START_TICKS = 2;
+	/** The Grouping teleport starts its animation 3-6 ticks after the click (8 of 8 in the step campaign). */
+	private static final int MINIGAME_TRAVEL_START_TICKS = 7;
 	private static final int OBJECT_REFRESH_TICKS = 5;
 	/** A bank node sits on the walkable tile in front of its booth, chest or banker. */
 	private static final int BANK_TILES = 3;
@@ -373,7 +376,7 @@ public class StepGuide
 		{
 			actReachedStepKey = null;
 		}
-		boolean clickedJustNow = travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= TRAVEL_START_TICKS;
+		boolean clickedJustNow = travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= travelStartTicks();
 		travelStarted = isTravelStep() && isAnimating() && (travelStarted || clickedJustNow);
 		if (travelStarted && getCurrent().isTravel())
 		{
@@ -987,6 +990,13 @@ public class StepGuide
 	private boolean isTravelAnimating()
 	{
 		return travelStarted && isAnimating();
+	}
+
+	private int travelStartTicks()
+	{
+		SubStep current = getCurrent();
+		boolean minigame = current != null && current.getRow() != null && current.getRow().getCategory() == Category.MINIGAME;
+		return minigame ? MINIGAME_TRAVEL_START_TICKS : TRAVEL_START_TICKS;
 	}
 
 	private boolean isTravelStep()

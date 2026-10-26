@@ -17,6 +17,7 @@ import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.PlannerRunner;
 import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.route.Running;
 import com.cluehelper.route.WalkCosts;
 import com.cluehelper.route.StepNeeds;
 import com.cluehelper.route.WalkData;
@@ -419,7 +420,7 @@ public class HotColdService
 				int cost = fromHere.cost(tile);
 				if (cost != WalkCosts.UNREACHED)
 				{
-					int ticks = (cost + 1) / 2;
+					int ticks = (Running.halfTicks(cost) + 1) / 2;
 					probes.add(new Probe(tile, Probe.Kind.LOCAL, ticks, ticks, OriginClass.of(tile, walk.getNoTeleport()).isWilderness()));
 				}
 			}

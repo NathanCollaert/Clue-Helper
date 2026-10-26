@@ -22,9 +22,8 @@ import net.runelite.api.coords.WorldPoint;
 /** Pure, so it runs on the executor with snapshot data only. */
 public final class Planner
 {
-	/** A route with a bank stop or a walked change must beat its reference by this margin. */
-	private static final int MARGIN_MIN_HALF_TICKS = 10;
-	private static final int MARGIN_PERCENT = 10;
+	/** A route with a bank stop or a walked change must beat its reference by this much: near-ties stay on fewer steps. */
+	private static final int MARGIN_HALF_TICKS = 4;
 	private static final int REGION_SIZE = 64;
 	private static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
 	/** Catalog landings of one place spread 0–2 tiles. */
@@ -185,7 +184,7 @@ public final class Planner
 		}
 	}
 
-	/** The expected search: half the area's radius, run at one tile per half-tick. */
+	/** The expected search: half the area's radius, run. */
 	static int areaHalfTicks(Step step)
 	{
 		List<Integer> regions = step.getRegions();
@@ -204,7 +203,7 @@ public final class Planner
 			maxY = Math.max(maxY, y + REGION_SIZE);
 		}
 		int radius = Math.max(maxX - minX, maxY - minY) / 2;
-		return radius / 2;
+		return Running.halfTicks(radius / 2);
 	}
 
 	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
@@ -554,8 +553,7 @@ public final class Planner
 			{
 				return true;
 			}
-			int margin = Math.max(MARGIN_MIN_HALF_TICKS, reference.getRankHalfTicks() * MARGIN_PERCENT / 100);
-			return route.getRankHalfTicks() < reference.getRankHalfTicks() - margin;
+			return route.getRankHalfTicks() < reference.getRankHalfTicks() - MARGIN_HALF_TICKS;
 		}
 	}
 }

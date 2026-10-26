@@ -65,7 +65,7 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "useBank",
 		name = "Use the bank",
-		description = "Count banked teleports and items (and GIM group storage). A bank stop is shown as Best only when it beats going direct by 5 ticks or 10%",
+		description = "Count banked teleports and items (and GIM group storage). A bank stop is shown as Best only when it beats going direct by more than 2 ticks",
 		section = routesSection,
 		position = 2
 	)

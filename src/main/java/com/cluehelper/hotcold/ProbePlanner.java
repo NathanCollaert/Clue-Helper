@@ -1,5 +1,6 @@
 package com.cluehelper.hotcold;
 
+import com.cluehelper.route.Running;
 import com.cluehelper.step.HotColdTier;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -142,7 +143,7 @@ public final class ProbePlanner
 
 	private static int walkTicks(WorldPoint from, int x, int y)
 	{
-		return (Hypotheses.distance(from, x, y) + 1) / 2;
+		return (Running.halfTicks(Hypotheses.distance(from, x, y)) + 1) / 2;
 	}
 
 	private static WorldPoint centre(Hypotheses.Samples samples, int spot)

@@ -1,55 +1,55 @@
 # Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
-nexus	Portal nexus: Varrock	1858 7051 0	3213 3424 0								20	3	4	F	none	any	Y	nexus:1	nexus 450 Misthalin		
-nexus	Portal nexus: Grand Exchange	1858 7051 0	3165 3479 0						4480=1		20	3	4	F	none	any	Y	nexus:1	nexus 451 Misthalin		varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE
-nexus	Portal nexus: Lumbridge	1858 7051 0	3221 3218 0								20	3	4	F	none	any	Y	nexus:2	nexus 452 Misthalin		
-nexus	Portal nexus: Falador	1858 7051 0	2964 3378 0								20	3	4	F	none	any	Y	nexus:3	nexus 453 Asgarnia		
-nexus	Portal nexus: Camelot	1858 7051 0	2757 3479 0								20	3	4	F	none	any	Y	nexus:4	nexus 454 Kandarin		
-nexus	Portal nexus: Seers' Village	1858 7051 0	2726 3487 0						4477=1		20	3	4	F	none	any	Y	nexus:4	nexus 455 Kandarin		varbit:4477=KANDARIN_DIARY_HARD_COMPLETE
-nexus	Portal nexus: Ardougne	1858 7051 0	2662 3305 0								20	3	4	F	none	any	Y	nexus:5	nexus 456 Kandarin		
-nexus	Portal nexus: Watchtower	1858 7051 0	2546 3114 0								20	3	4	F	none	any	Y	nexus:6	nexus 457 Kandarin		
-nexus	Portal nexus: Yanille	1858 7051 0	2584 3097 0						4460=1		20	3	4	F	none	any	Y	nexus:6	nexus 458 Kandarin		varbit:4460=ARDOUGNE_DIARY_HARD_COMPLETE
-nexus	Portal nexus: Senntisten	1858 7051 0	3320 3337 0								20	3	4	F	none	any	Y	nexus:7	nexus 459 Misthalin		
-nexus	Portal nexus: Marim	1858 7051 0	2797 2798 1								20	3	4	F	none	any	Y	nexus:8	nexus 460 Kandarin		
-nexus	Portal nexus: Kharyrll	1858 7051 0	3494 3473 0								20	3	4	F	none	any	Y	nexus:9	nexus 461 Morytania		
-nexus	Portal nexus: Lunar Isle	1858 7051 0	2113 3915 0								20	3	4	F	none	any	Y	nexus:10	nexus 462 Fremennik		
-nexus	Portal nexus: Kourend Castle	1858 7051 0	1641 3673 0								20	3	4	F	none	any	Y	nexus:11	nexus 463 Kourend		
-nexus	Portal nexus: Civitas illa Fortis	1858 7051 0	1681 3133 0								20	3	4	F	none	any	Y	nexus:31	nexus 855 Varlamore		
-nexus	Portal nexus: Waterbirth Island	1858 7051 0	2546 3755 0								20	3	4	F	none	any	Y	nexus:12	nexus 464 Fremennik		
-nexus	Portal nexus: Fishing Guild	1858 7051 0	2613 3391 0								20	3	4	F	none	any	Y	nexus:13	nexus 465 Kandarin		
-nexus	Portal nexus: Annakarl	1858 7051 0	3288 3888 0								20	3	4	F	none	any	Y	nexus:14	nexus 466 Wilderness		
-nexus	Portal nexus: Troll Stronghold	1858 7051 0	2845 3694 0						4493=0		20	3	4	F	none	any	Y	nexus:15	nexus 467 Asgarnia		varbit:4493=FREMENNIK_DIARY_HARD_COMPLETE
-nexus	Portal nexus: Troll Stronghold	1858 7051 0	2837 3695 0						4493=1		20	3	4	F	none	any	Y	nexus:15	nexus 467 Asgarnia		varbit:4493=FREMENNIK_DIARY_HARD_COMPLETE
-nexus	Portal nexus: Catherby	1858 7051 0	2801 3449 0								20	3	4	F	none	any	Y	nexus:16	nexus 468 Kandarin		
-nexus	Portal nexus: Ghorrock	1858 7051 0	2976 3872 0								20	3	4	F	none	any	Y	nexus:17	nexus 469 Wilderness		
-nexus	Portal nexus: Carrallanger	1858 7051 0	3158 3666 0								20	3	4	F	none	any	Y	nexus:18	nexus 470 Wilderness		
-nexus	Portal nexus: Weiss	1858 7051 0	2846 3938 0								20	3	4	F	none	any	Y	nexus:19	nexus 592 Fremennik		
-nexus	Portal nexus: Arceuus Library	1858 7051 0	1632 3837 0								20	3	4	F	none	any	Y	nexus:20	nexus 2887 Kourend		
-nexus	Portal nexus: Draynor Manor	1858 7051 0	3109 3351 0								20	3	4	F	none	any	Y	nexus:21	nexus 1246 Misthalin		
-nexus	Portal nexus: Battlefront	1858 7051 0	1347 3740 0								20	3	4	F	none	any	Y	nexus:22	nexus 1247 Kourend		
-nexus	Portal nexus: Mind Altar	1858 7051 0	2979 3510 0								20	3	4	F	none	any	Y	nexus:23	nexus 1248 Asgarnia		
-nexus	Portal nexus: Salve Graveyard	1858 7051 0	3433 3461 0								20	3	4	F	none	any	Y	nexus:24	nexus 1249 Morytania		
-nexus	Portal nexus: Fenken' Castle	1858 7051 0	3548 3529 0								20	3	4	F	none	any	Y	nexus:25	nexus 1250 Morytania		
-nexus	Portal nexus: West Ardougne	1858 7051 0	2500 3290 0								20	3	4	F	none	any	Y	nexus:26	nexus 1251 Kandarin		
-nexus	Portal nexus: Harmony Island	1858 7051 0	3797 2866 0								20	3	4	F	none	any	Y	nexus:27	nexus 1252 Morytania		
-nexus	Portal nexus: Cemetery	1858 7051 0	2981 3764 0								20	3	4	F	none	any	Y	nexus:28	nexus 1253 Wilderness		
-nexus	Portal nexus: Barrows	1858 7051 0	3564 3315 0								20	3	4	F	none	any	Y	nexus:29	nexus 1254 Morytania		
-nexus	Portal nexus: Ape Atoll Dungeon	1858 7051 0	2771 9102 0								20	3	4	F	none	any	Y	nexus:30	nexus 1255 Kandarin		
-nexus	Portal nexus: Trollheim	1858 7051 0	2890 3679 0								20	3	4	F	none	any	Y	nexus:32	nexus 6414 Asgarnia		
-nexus	Portal nexus: Paddewwa	1858 7051 0	3097 9881 0								20	3	4	F	none	any	Y	nexus:33	nexus 6415 Misthalin		
-nexus	Portal nexus: Lassar	1858 7051 0	3004 3470 0								20	3	4	F	none	any	Y	nexus:34	nexus 6416 Asgarnia		
-nexus	Portal nexus: Dareeyak	1858 7051 0	2968 3696 0								20	3	4	F	none	any	Y	nexus:35	nexus 6417 Wilderness		
-nexus	Portal nexus: Ourania	1858 7051 0	2468 3246 0								20	3	4	F	none	any	Y	nexus:36	nexus 6418 Kandarin		
-nexus	Portal nexus: Barbarian Outpost	1858 7051 0	2543 3569 0								20	3	4	F	none	any	Y	nexus:37	nexus 6419 Kandarin		
-nexus	Portal nexus: Port Khazard	1858 7051 0	2636 3167 0								20	3	4	F	none	any	Y	nexus:38	nexus 6420 Kandarin		
-nexus	Portal nexus: Ice Plateau	1858 7051 0	2975 3938 0								20	3	4	F	none	any	Y	nexus:39	nexus 6421 Wilderness		
-nexus	Portal nexus: Respawn (Lumbridge)	1858 7051 0	3221 3218 0						668=0;3910=0;621=0;10528=0;12310=0;9805=0		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:668=FALADOR_SPAWN varbit:3910=CAMELOT_SPAWN varbit:621=EDGEVILLE_SPAWN varbit:10528=WILDERNESS_SPAWN varbit:12310=KOUREND_SPAWN varbit:9805=CIVITAS_SPAWN
-nexus	Portal nexus: Respawn (Falador)	1858 7051 0	2964 3378 0						668=1		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:668=FALADOR_SPAWN
-nexus	Portal nexus: Respawn (Camelot)	1858 7051 0	2757 3479 0						3910=1		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:3910=CAMELOT_SPAWN
-nexus	Portal nexus: Respawn (Edgeville)	1858 7051 0	3095 3469 0						621=1		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:621=EDGEVILLE_SPAWN
-nexus	Portal nexus: Respawn (Ferox Enclave)	1858 7051 0	3151 3636 0						10528=1		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:10528=WILDERNESS_SPAWN
-nexus	Portal nexus: Respawn (Kourend Castle)	1858 7051 0	1630 3674 0						12310=1		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:12310=KOUREND_SPAWN
-nexus	Portal nexus: Respawn (Civitas illa Fortis)	1858 7051 0	1682 3135 0						9805=1		20	3	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:9805=CIVITAS_SPAWN
+nexus	Portal nexus: Varrock	1858 7051 0	3213 3424 0								20	1	4	F	none	any	Y	nexus:1	nexus 450 Misthalin		
+nexus	Portal nexus: Grand Exchange	1858 7051 0	3165 3479 0						4480=1		20	1	4	F	none	any	Y	nexus:1	nexus 451 Misthalin		varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE
+nexus	Portal nexus: Lumbridge	1858 7051 0	3221 3218 0								20	1	4	F	none	any	Y	nexus:2	nexus 452 Misthalin		
+nexus	Portal nexus: Falador	1858 7051 0	2964 3378 0								20	1	4	F	none	any	Y	nexus:3	nexus 453 Asgarnia		
+nexus	Portal nexus: Camelot	1858 7051 0	2757 3479 0								20	1	4	F	none	any	Y	nexus:4	nexus 454 Kandarin		
+nexus	Portal nexus: Seers' Village	1858 7051 0	2726 3487 0						4477=1		20	1	4	F	none	any	Y	nexus:4	nexus 455 Kandarin		varbit:4477=KANDARIN_DIARY_HARD_COMPLETE
+nexus	Portal nexus: Ardougne	1858 7051 0	2662 3305 0								20	1	4	F	none	any	Y	nexus:5	nexus 456 Kandarin		
+nexus	Portal nexus: Watchtower	1858 7051 0	2546 3114 0								20	1	4	F	none	any	Y	nexus:6	nexus 457 Kandarin		
+nexus	Portal nexus: Yanille	1858 7051 0	2584 3097 0						4460=1		20	1	4	F	none	any	Y	nexus:6	nexus 458 Kandarin		varbit:4460=ARDOUGNE_DIARY_HARD_COMPLETE
+nexus	Portal nexus: Senntisten	1858 7051 0	3320 3337 0								20	1	4	F	none	any	Y	nexus:7	nexus 459 Misthalin		
+nexus	Portal nexus: Marim	1858 7051 0	2797 2798 1								20	1	4	F	none	any	Y	nexus:8	nexus 460 Kandarin		
+nexus	Portal nexus: Kharyrll	1858 7051 0	3494 3473 0								20	1	4	F	none	any	Y	nexus:9	nexus 461 Morytania		
+nexus	Portal nexus: Lunar Isle	1858 7051 0	2113 3915 0								20	1	4	F	none	any	Y	nexus:10	nexus 462 Fremennik		
+nexus	Portal nexus: Kourend Castle	1858 7051 0	1641 3673 0								20	1	4	F	none	any	Y	nexus:11	nexus 463 Kourend		
+nexus	Portal nexus: Civitas illa Fortis	1858 7051 0	1681 3133 0								20	1	4	F	none	any	Y	nexus:31	nexus 855 Varlamore		
+nexus	Portal nexus: Waterbirth Island	1858 7051 0	2546 3755 0								20	1	4	F	none	any	Y	nexus:12	nexus 464 Fremennik		
+nexus	Portal nexus: Fishing Guild	1858 7051 0	2613 3391 0								20	1	4	F	none	any	Y	nexus:13	nexus 465 Kandarin		
+nexus	Portal nexus: Annakarl	1858 7051 0	3288 3888 0								20	1	4	F	none	any	Y	nexus:14	nexus 466 Wilderness		
+nexus	Portal nexus: Troll Stronghold	1858 7051 0	2845 3694 0						4493=0		20	1	4	F	none	any	Y	nexus:15	nexus 467 Asgarnia		varbit:4493=FREMENNIK_DIARY_HARD_COMPLETE
+nexus	Portal nexus: Troll Stronghold	1858 7051 0	2837 3695 0						4493=1		20	1	4	F	none	any	Y	nexus:15	nexus 467 Asgarnia		varbit:4493=FREMENNIK_DIARY_HARD_COMPLETE
+nexus	Portal nexus: Catherby	1858 7051 0	2801 3449 0								20	1	4	F	none	any	Y	nexus:16	nexus 468 Kandarin		
+nexus	Portal nexus: Ghorrock	1858 7051 0	2976 3872 0								20	1	4	F	none	any	Y	nexus:17	nexus 469 Wilderness		
+nexus	Portal nexus: Carrallanger	1858 7051 0	3158 3666 0								20	1	4	F	none	any	Y	nexus:18	nexus 470 Wilderness		
+nexus	Portal nexus: Weiss	1858 7051 0	2846 3938 0								20	1	4	F	none	any	Y	nexus:19	nexus 592 Fremennik		
+nexus	Portal nexus: Arceuus Library	1858 7051 0	1632 3837 0								20	1	4	F	none	any	Y	nexus:20	nexus 2887 Kourend		
+nexus	Portal nexus: Draynor Manor	1858 7051 0	3109 3351 0								20	1	4	F	none	any	Y	nexus:21	nexus 1246 Misthalin		
+nexus	Portal nexus: Battlefront	1858 7051 0	1347 3740 0								20	1	4	F	none	any	Y	nexus:22	nexus 1247 Kourend		
+nexus	Portal nexus: Mind Altar	1858 7051 0	2979 3510 0								20	1	4	F	none	any	Y	nexus:23	nexus 1248 Asgarnia		
+nexus	Portal nexus: Salve Graveyard	1858 7051 0	3433 3461 0								20	1	4	F	none	any	Y	nexus:24	nexus 1249 Morytania		
+nexus	Portal nexus: Fenken' Castle	1858 7051 0	3548 3529 0								20	1	4	F	none	any	Y	nexus:25	nexus 1250 Morytania		
+nexus	Portal nexus: West Ardougne	1858 7051 0	2500 3290 0								20	1	4	F	none	any	Y	nexus:26	nexus 1251 Kandarin		
+nexus	Portal nexus: Harmony Island	1858 7051 0	3797 2866 0								20	1	4	F	none	any	Y	nexus:27	nexus 1252 Morytania		
+nexus	Portal nexus: Cemetery	1858 7051 0	2981 3764 0								20	1	4	F	none	any	Y	nexus:28	nexus 1253 Wilderness		
+nexus	Portal nexus: Barrows	1858 7051 0	3564 3315 0								20	1	4	F	none	any	Y	nexus:29	nexus 1254 Morytania		
+nexus	Portal nexus: Ape Atoll Dungeon	1858 7051 0	2771 9102 0								20	1	4	F	none	any	Y	nexus:30	nexus 1255 Kandarin		
+nexus	Portal nexus: Trollheim	1858 7051 0	2890 3679 0								20	1	4	F	none	any	Y	nexus:32	nexus 6414 Asgarnia		
+nexus	Portal nexus: Paddewwa	1858 7051 0	3097 9881 0								20	1	4	F	none	any	Y	nexus:33	nexus 6415 Misthalin		
+nexus	Portal nexus: Lassar	1858 7051 0	3004 3470 0								20	1	4	F	none	any	Y	nexus:34	nexus 6416 Asgarnia		
+nexus	Portal nexus: Dareeyak	1858 7051 0	2968 3696 0								20	1	4	F	none	any	Y	nexus:35	nexus 6417 Wilderness		
+nexus	Portal nexus: Ourania	1858 7051 0	2468 3246 0								20	1	4	F	none	any	Y	nexus:36	nexus 6418 Kandarin		
+nexus	Portal nexus: Barbarian Outpost	1858 7051 0	2543 3569 0								20	1	4	F	none	any	Y	nexus:37	nexus 6419 Kandarin		
+nexus	Portal nexus: Port Khazard	1858 7051 0	2636 3167 0								20	1	4	F	none	any	Y	nexus:38	nexus 6420 Kandarin		
+nexus	Portal nexus: Ice Plateau	1858 7051 0	2975 3938 0								20	1	4	F	none	any	Y	nexus:39	nexus 6421 Wilderness		
+nexus	Portal nexus: Respawn (Lumbridge)	1858 7051 0	3221 3218 0						668=0;3910=0;621=0;10528=0;12310=0;9805=0		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:668=FALADOR_SPAWN varbit:3910=CAMELOT_SPAWN varbit:621=EDGEVILLE_SPAWN varbit:10528=WILDERNESS_SPAWN varbit:12310=KOUREND_SPAWN varbit:9805=CIVITAS_SPAWN
+nexus	Portal nexus: Respawn (Falador)	1858 7051 0	2964 3378 0						668=1		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:668=FALADOR_SPAWN
+nexus	Portal nexus: Respawn (Camelot)	1858 7051 0	2757 3479 0						3910=1		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:3910=CAMELOT_SPAWN
+nexus	Portal nexus: Respawn (Edgeville)	1858 7051 0	3095 3469 0						621=1		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:621=EDGEVILLE_SPAWN
+nexus	Portal nexus: Respawn (Ferox Enclave)	1858 7051 0	3151 3636 0						10528=1		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:10528=WILDERNESS_SPAWN
+nexus	Portal nexus: Respawn (Kourend Castle)	1858 7051 0	1630 3674 0						12310=1		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:12310=KOUREND_SPAWN
+nexus	Portal nexus: Respawn (Civitas illa Fortis)	1858 7051 0	1682 3135 0						9805=1		20	1	4	F	none	any	Y	nexus:40	nexus 6422 Misthalin		varbit:9805=CIVITAS_SPAWN
 mounted	Mounted glory: Edgeville	1858 7051 0	3087 3496 0								20	4	0	F	none	any	Y	object:13523	op Edgeville		object:13523=POH_TROPHY_AMULETOFGLORY_4
 mounted	Mounted glory: Karamja	1858 7051 0	2918 3176 0								20	4	1	F	none	any	Y	object:13523	op Karamja		object:13523=POH_TROPHY_AMULETOFGLORY_4
 mounted	Mounted glory: Draynor Village	1858 7051 0	3105 3251 0								20	4	1	F	none	any	Y	object:13523	op Draynor Village		object:13523=POH_TROPHY_AMULETOFGLORY_4
@@ -71,59 +71,59 @@ mounted	Mounted digsite pendant: 2. Fossil Island	1858 7051 0	3763 3869 1					Bo
 mounted	Mounted digsite pendant: 2. Fossil Island (left-click)	1858 7051 0	3763 3869 1					Bone Voyage	6651=2		20	5	0	F	none	any	Y	object:33416|33417|33418|33420	op Fossil Island		varbit:6651=POH_NEXUS_DIGSITE object:33416=POH_AMULET_DIG_DIGSITE object:33417=POH_AMULET_DIG_FOSSIL object:33418=POH_AMULET_DIG_LITHKREN object:33420=POH_AMULET_DIGSITE
 mounted	Mounted digsite pendant: 3. Lithkren	1858 7051 0	3549 10456 0					Dragon Slayer II			20	5	2	F	none	any	Y	object:33416|33417|33418|33420	list 3: Lithkren		object:33416=POH_AMULET_DIG_DIGSITE object:33417=POH_AMULET_DIG_FOSSIL object:33418=POH_AMULET_DIG_LITHKREN object:33420=POH_AMULET_DIGSITE
 mounted	Mounted digsite pendant: 3. Lithkren (left-click)	1858 7051 0	3549 10456 0					Dragon Slayer II	6651=3		20	5	0	F	none	any	Y	object:33416|33417|33418|33420	op Lithkren		varbit:6651=POH_NEXUS_DIGSITE object:33416=POH_AMULET_DIG_DIGSITE object:33417=POH_AMULET_DIG_FOSSIL object:33418=POH_AMULET_DIG_LITHKREN object:33420=POH_AMULET_DIGSITE
-jewellery box	Jewellery box: 1. Emir's Arena	1858 7051 0	3315 3235 0								20	4	4	F	none	any	Y	object:29154|29155|29156	box 0		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 1. Emir's Arena	1858 7051 0	3315 3235 0								20	4	1	F	none	any	Y	object:29154|29155|29156	box 0		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 1. Emir's Arena (right-click)	1858 7051 0	3315 3235 0						2308=1		20	4	1	F	none	any	Y	object:29154|29155|29156	op Emir's Arena		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 2. Castle Wars	1858 7051 0	2440 3090 0								20	4	4	F	none	any	Y	object:29154|29155|29156	box 1		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 2. Castle Wars	1858 7051 0	2440 3090 0								20	4	1	F	none	any	Y	object:29154|29155|29156	box 1		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 2. Castle Wars (right-click)	1858 7051 0	2440 3090 0						2308=2		20	4	1	F	none	any	Y	object:29154|29155|29156	op Castle Wars		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 3. Ferox Enclave	1858 7051 0	3151 3635 0								20	4	4	F	none	any	Y	object:29154|29155|29156	box 2		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 3. Ferox Enclave	1858 7051 0	3151 3635 0								20	4	1	F	none	any	Y	object:29154|29155|29156	box 2		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 3. Ferox Enclave (right-click)	1858 7051 0	3151 3635 0						2308=3		20	4	1	F	none	any	Y	object:29154|29155|29156	op Ferox Enclave		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 4. Fortis Colosseum	1858 7051 0	1793 3107 0						11410>8		20	4	4	F	none	any	Y	object:29154|29155|29156	box 3		varbit:11410=COLOSSEUM_HIGHEST_WAVE object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 4. Fortis Colosseum	1858 7051 0	1793 3107 0						11410>8		20	4	1	F	none	any	Y	object:29154|29155|29156	box 3		varbit:11410=COLOSSEUM_HIGHEST_WAVE object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 4. Fortis Colosseum (right-click)	1858 7051 0	1793 3107 0						11410>8;2308=4		20	4	1	F	none	any	Y	object:29154|29155|29156	op Fortis Colosseum		varbit:11410=COLOSSEUM_HIGHEST_WAVE varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 5. Burthorpe	1858 7051 0	2899 3553 0								20	4	4	F	none	any	Y	object:29154|29155|29156	box 4		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 5. Burthorpe	1858 7051 0	2899 3553 0								20	4	1	F	none	any	Y	object:29154|29155|29156	box 4		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 5. Burthorpe (right-click)	1858 7051 0	2899 3553 0						2308=5		20	4	1	F	none	any	Y	object:29154|29155|29156	op Burthorpe		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 6. Barbarian Outpost	1858 7051 0	2520 3571 0								20	4	4	F	none	any	Y	object:29154|29155|29156	box 5		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 6. Barbarian Outpost	1858 7051 0	2520 3571 0								20	4	1	F	none	any	Y	object:29154|29155|29156	box 5		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 6. Barbarian Outpost (right-click)	1858 7051 0	2520 3571 0						2308=6		20	4	1	F	none	any	Y	object:29154|29155|29156	op Barbarian Outpost		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 8. Chasm of Tears	1858 7051 0	3245 9500 2								20	4	4	F	none	any	Y	object:29154|29155|29156	box 7		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 8. Chasm of Tears	1858 7051 0	3245 9500 2								20	4	1	F	none	any	Y	object:29154|29155|29156	box 7		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 8. Chasm of Tears (right-click)	1858 7051 0	3245 9500 2						2308=8		20	4	1	F	none	any	Y	object:29154|29155|29156	op Chasm of Tears		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 7. Corporeal Beast	1858 7051 0	2964 4382 2								20	4	4	F	none	any	Y	object:29154|29155|29156	box 6		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 7. Corporeal Beast	1858 7051 0	2964 4382 2								20	4	1	F	none	any	Y	object:29154|29155|29156	box 6		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 7. Corporeal Beast (right-click)	1858 7051 0	2964 4382 2						2308=7		20	4	1	F	none	any	Y	object:29154|29155|29156	op Corporeal Beast		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: 9. Wintertodt Camp	1858 7051 0	1631 3940 0								20	4	4	F	none	any	Y	object:29154|29155|29156	box 8		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: 9. Wintertodt Camp	1858 7051 0	1631 3940 0								20	4	1	F	none	any	Y	object:29154|29155|29156	box 8		object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: 9. Wintertodt Camp (right-click)	1858 7051 0	1631 3940 0						2308=9		20	4	1	F	none	any	Y	object:29154|29155|29156	op Wintertodt Camp		varbit:2308=POH_JEWELLERYBOX_MULTI object:29154=POH_JEWELLERY_BOX_1 object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: A. Warriors' Guild	1858 7051 0	2882 3547 0								20	4	4	F	none	any	Y	object:29155|29156	box 9		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: A. Warriors' Guild	1858 7051 0	2882 3547 0								20	4	1	F	none	any	Y	object:29155|29156	box 9		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: A. Warriors' Guild (right-click)	1858 7051 0	2882 3547 0						2308=10		20	4	1	F	none	any	Y	object:29155|29156	op Warriors' Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: B. Champions' Guild	1858 7051 0	3192 3368 0								20	4	4	F	none	any	Y	object:29155|29156	box 10		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: B. Champions' Guild	1858 7051 0	3192 3368 0								20	4	1	F	none	any	Y	object:29155|29156	box 10		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: B. Champions' Guild (right-click)	1858 7051 0	3192 3368 0						2308=11		20	4	1	F	none	any	Y	object:29155|29156	op Champions' Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: C. Monastery	1858 7051 0	3052 3490 0								20	4	4	F	none	any	Y	object:29155|29156	box 11		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: C. Monastery	1858 7051 0	3052 3490 0								20	4	1	F	none	any	Y	object:29155|29156	box 11		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: C. Monastery (right-click)	1858 7051 0	3052 3490 0						2308=12		20	4	1	F	none	any	Y	object:29155|29156	op Monastery		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: D. Ranging Guild	1858 7051 0	2653 3439 0								20	4	4	F	none	any	Y	object:29155|29156	box 12		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: D. Ranging Guild	1858 7051 0	2653 3439 0								20	4	1	F	none	any	Y	object:29155|29156	box 12		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: D. Ranging Guild (right-click)	1858 7051 0	2653 3439 0						2308=13		20	4	1	F	none	any	Y	object:29155|29156	op Ranging Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: E. Fishing Guild	1858 7051 0	2611 3390 0								20	4	4	F	none	any	Y	object:29155|29156	box 13		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: E. Fishing Guild	1858 7051 0	2611 3390 0								20	4	1	F	none	any	Y	object:29155|29156	box 13		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: E. Fishing Guild (right-click)	1858 7051 0	2611 3390 0						2308=14		20	4	1	F	none	any	Y	object:29155|29156	op Fishing Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: F. Mining Guild	1858 7051 0	3049 9763 0								20	4	4	F	none	any	Y	object:29155|29156	box 14		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: F. Mining Guild	1858 7051 0	3049 9763 0								20	4	1	F	none	any	Y	object:29155|29156	box 14		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: F. Mining Guild (right-click)	1858 7051 0	3049 9763 0						2308=15		20	4	1	F	none	any	Y	object:29155|29156	op Mining Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: G. Crafting Guild	1858 7051 0	2933 3295 0								20	4	4	F	none	any	Y	object:29155|29156	box 15		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: G. Crafting Guild	1858 7051 0	2933 3295 0								20	4	1	F	none	any	Y	object:29155|29156	box 15		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: G. Crafting Guild (right-click)	1858 7051 0	2933 3295 0						2308=16		20	4	1	F	none	any	Y	object:29155|29156	op Crafting Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: H. Cooking Guild	1858 7051 0	3144 3438 0								20	4	4	F	none	any	Y	object:29155|29156	box 16		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: H. Cooking Guild	1858 7051 0	3144 3438 0								20	4	1	F	none	any	Y	object:29155|29156	box 16		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: H. Cooking Guild (right-click)	1858 7051 0	3144 3438 0						2308=17		20	4	1	F	none	any	Y	object:29155|29156	op Cooking Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: I. Woodcutting Guild	1858 7051 0	1662 3505 0								20	4	4	F	none	any	Y	object:29155|29156	box 17		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: I. Woodcutting Guild	1858 7051 0	1662 3505 0								20	4	1	F	none	any	Y	object:29155|29156	box 17		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: I. Woodcutting Guild (right-click)	1858 7051 0	1662 3505 0						2308=18		20	4	1	F	none	any	Y	object:29155|29156	op Woodcutting Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: J. Farming Guild	1858 7051 0	1248 3719 0								20	4	4	F	none	any	Y	object:29155|29156	box 18		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: J. Farming Guild	1858 7051 0	1248 3719 0								20	4	1	F	none	any	Y	object:29155|29156	box 18		object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: J. Farming Guild (right-click)	1858 7051 0	1248 3719 0						2308=19		20	4	1	F	none	any	Y	object:29155|29156	op Farming Guild		varbit:2308=POH_JEWELLERYBOX_MULTI object:29155=POH_JEWELLERY_BOX_2 object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: K. Miscellania	1858 7051 0	2534 3862 0								20	4	4	F	none	any	Y	object:29156	box 19		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: K. Miscellania	1858 7051 0	2534 3862 0								20	4	1	F	none	any	Y	object:29156	box 19		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: K. Miscellania (right-click)	1858 7051 0	2534 3862 0						2308=20		20	4	1	F	none	any	Y	object:29156	op Miscellania		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: L. Grand Exchange	1858 7051 0	3163 3478 0								20	4	4	F	none	any	Y	object:29156	box 20		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: L. Grand Exchange	1858 7051 0	3163 3478 0								20	4	1	F	none	any	Y	object:29156	box 20		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: L. Grand Exchange (right-click)	1858 7051 0	3163 3478 0						2308=21		20	4	1	F	none	any	Y	object:29156	op Grand Exchange		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: M. Falador Park	1858 7051 0	2995 3375 0								20	4	4	F	none	any	Y	object:29156	box 21		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: M. Falador Park	1858 7051 0	2995 3375 0								20	4	1	F	none	any	Y	object:29156	box 21		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: M. Falador Park (right-click)	1858 7051 0	2995 3375 0						2308=22		20	4	1	F	none	any	Y	object:29156	op Falador Park		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: N. Dondakan's Rock	1858 7051 0	2824 10168 0								20	4	4	F	none	any	Y	object:29156	box 22		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: N. Dondakan's Rock	1858 7051 0	2824 10168 0								20	4	1	F	none	any	Y	object:29156	box 22		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: N. Dondakan's Rock (right-click)	1858 7051 0	2824 10168 0						2308=23		20	4	1	F	none	any	Y	object:29156	op Dondakan's Rock		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: O. Edgeville	1858 7051 0	3087 3496 0								20	4	4	F	none	any	Y	object:29156	box 23		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: O. Edgeville	1858 7051 0	3087 3496 0								20	4	1	F	none	any	Y	object:29156	box 23		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: O. Edgeville (right-click)	1858 7051 0	3087 3496 0						2308=24		20	4	1	F	none	any	Y	object:29156	op Edgeville		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: P. Karamja	1858 7051 0	2918 3176 0								20	4	4	F	none	any	Y	object:29156	box 24		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: P. Karamja	1858 7051 0	2918 3176 0								20	4	1	F	none	any	Y	object:29156	box 24		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: P. Karamja (right-click)	1858 7051 0	2918 3176 0						2308=25		20	4	1	F	none	any	Y	object:29156	op Karamja		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: Q. Draynor Village	1858 7051 0	3105 3251 0								20	4	4	F	none	any	Y	object:29156	box 25		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: Q. Draynor Village	1858 7051 0	3105 3251 0								20	4	1	F	none	any	Y	object:29156	box 25		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: Q. Draynor Village (right-click)	1858 7051 0	3105 3251 0						2308=26		20	4	1	F	none	any	Y	object:29156	op Draynor Village		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
-jewellery box	Jewellery box: R. Al Kharid	1858 7051 0	3293 3163 0								20	4	4	F	none	any	Y	object:29156	box 26		object:29156=POH_JEWELLERY_BOX_3
+jewellery box	Jewellery box: R. Al Kharid	1858 7051 0	3293 3163 0								20	4	1	F	none	any	Y	object:29156	box 26		object:29156=POH_JEWELLERY_BOX_3
 jewellery box	Jewellery box: R. Al Kharid (right-click)	1858 7051 0	3293 3163 0						2308=27		20	4	1	F	none	any	Y	object:29156	op Al Kharid		varbit:2308=POH_JEWELLERYBOX_MULTI object:29156=POH_JEWELLERY_BOX_3
 portal	Portal chamber: Ape Atoll Dungeon	1858 7051 0	2771 9102 0								20	1	0	F	none	any	Y	object:37592|37604|37616			object:37592=POH_PORTAL_TEAK_APE_ATOLL object:37604=POH_PORTAL_MAG_APE_ATOLL object:37616=POH_PORTAL_MARBLE_APE_ATOLL
 portal	Portal chamber: Annakarl	1858 7051 0	3288 3888 0								20	1	0	F	none	any	Y	object:29341|29349|29357			object:29341=POH_PORTAL_TEAK_ANNAKARL object:29349=POH_PORTAL_MAG_ANNAKARL object:29357=POH_PORTAL_MARBLE_ANNAKARL

@@ -5,26 +5,36 @@ import net.runelite.api.coords.WorldPoint;
 
 public enum OriginClass
 {
-	WILD0(0),
-	WILD20(20),
-	WILD30(30),
+	/** Minigame rows work only outside the Wilderness, so level 0 needs an exit too. */
+	WILD0(0, 3524),
+	WILD20(20, 3679),
+	WILD30(30, 3759),
 	/** No teleport, and no spellbook change either, since no teleport could follow. */
 	WILD_DEEP(Integer.MAX_VALUE),
 	/** Grouping (minigame) teleports don't work from inside a house. */
 	POH(0),
 	NO_TELEPORT(Integer.MAX_VALUE);
 
-	/** Walking due south to this surface y reaches the class. */
-	static final int EXIT_WILD30_Y = 3759;
-	static final int EXIT_WILD20_Y = 3679;
-	/** Minigame rows work only outside the Wilderness, so level 0 needs an exit too. */
-	static final int EXIT_WILD0_Y = 3524;
+	private static final int NO_EXIT = Integer.MIN_VALUE;
 
 	private final int highestLevel;
+	/** Walking due south to this surface y reaches the class. */
+	private final int exitY;
 
 	OriginClass(int highestLevel)
 	{
+		this(highestLevel, NO_EXIT);
+	}
+
+	OriginClass(int highestLevel, int exitY)
+	{
 		this.highestLevel = highestLevel;
+		this.exitY = exitY;
+	}
+
+	int exitY()
+	{
+		return exitY;
 	}
 
 	public static OriginClass of(WorldPoint tile, NoTeleportAreas noTeleport)

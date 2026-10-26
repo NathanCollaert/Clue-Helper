@@ -50,9 +50,9 @@ public class Leg
 	}
 
 	/** Due south until out of the Wilderness, a tile per half-tick. */
-	public static Leg wildernessExit(WorldPoint from, int halfTicks, Book book)
+	public static Leg wildernessExit(WorldPoint from, int exitY, int halfTicks, Book book)
 	{
-		return new Leg(Kind.WILDERNESS_EXIT, from, new WorldPoint(from.getX(), from.getY() - halfTicks, from.getPlane()), halfTicks, null, null, null, book);
+		return new Leg(Kind.WILDERNESS_EXIT, from, new WorldPoint(from.getX(), exitY, from.getPlane()), halfTicks, null, null, null, book);
 	}
 
 	public static Leg teleport(WorldPoint from, CatalogRow row, int halfTicks, Book book)

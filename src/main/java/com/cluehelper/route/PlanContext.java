@@ -28,8 +28,8 @@ final class PlanContext
 {
 	static final int NOT_BANKED = 0;
 	static final int BANKED = 1;
-	/** Arrival to the next transport's first click: open 1 tick, leave 2. */
-	private static final int BANK_STOP_HALF_TICKS = 6;
+	/** Arrival to the next transport's first click, items aside: 4 ticks over the step campaign's bank stops. */
+	private static final int BANK_STOP_HALF_TICKS = 8;
 	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
 	private static final int PIN_HALF_TICKS = 8;

@@ -299,7 +299,7 @@ final class LabelSearch
 			int[] withdrawn = sortedUnion(from.withdrawn, gates.withdraw(e));
 			if (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(to))
 			{
-				int total = cost + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+				int total = Running.halfTicks(cost) + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
 				offer(from, to, from.b, from.c, k, from.t, from.leg, total, total, Leg.Kind.WALK, null, null, from.spent, withdrawn);
 			}
 		}
@@ -319,7 +319,8 @@ final class LabelSearch
 			int cost = walk.cost(table.placed(node));
 			if (cost != WalkCosts.UNREACHED && !ctx.forbidden(node))
 			{
-				offer(from, node, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, null, null, from.spent);
+				int half = Running.halfTicks(cost);
+				offer(from, node, from.b, from.c, k, from.t, from.leg, half, half, Leg.Kind.WALK, null, null, from.spent);
 			}
 		}
 		for (int[] targets : legTargets)
@@ -329,7 +330,8 @@ final class LabelSearch
 				int cost = ctx.isTableNode(node) ? WalkCosts.UNREACHED : walk.cost(ctx.tile(node));
 				if (cost != WalkCosts.UNREACHED)
 				{
-					offer(from, node, from.b, from.c, k, from.t, from.leg, cost, cost, Leg.Kind.WALK, null, null, from.spent);
+					int half = Running.halfTicks(cost);
+					offer(from, node, from.b, from.c, k, from.t, from.leg, half, half, Leg.Kind.WALK, null, null, from.spent);
 				}
 			}
 		}
@@ -343,17 +345,17 @@ final class LabelSearch
 		{
 			return;
 		}
-		exit(from, k, tile, origin, OriginClass.WILD30, OriginClass.EXIT_WILD30_Y);
-		exit(from, k, tile, origin, OriginClass.WILD20, OriginClass.EXIT_WILD20_Y);
-		exit(from, k, tile, origin, OriginClass.WILD0, OriginClass.EXIT_WILD0_Y);
+		exit(from, k, tile, origin, OriginClass.WILD30);
+		exit(from, k, tile, origin, OriginClass.WILD20);
+		exit(from, k, tile, origin, OriginClass.WILD0);
 	}
 
-	private void exit(Label from, int k, WorldPoint tile, OriginClass origin, OriginClass to, int exitY)
+	private void exit(Label from, int k, WorldPoint tile, OriginClass origin, OriginClass to)
 	{
-		if (to.ordinal() < origin.ordinal() && tile.getY() > exitY)
+		if (to.ordinal() < origin.ordinal() && tile.getY() > to.exitY())
 		{
-			int tiles = tile.getY() - exitY;
-			offer(from, ctx.abstractNode(to), from.b, from.c, k, from.t, from.leg, tiles, tiles, Leg.Kind.WILDERNESS_EXIT, null, null, from.spent);
+			int half = Running.halfTicks(tile.getY() - to.exitY());
+			offer(from, ctx.abstractNode(to), from.b, from.c, k, from.t, from.leg, half, half, Leg.Kind.WILDERNESS_EXIT, null, null, from.spent);
 		}
 	}
 
