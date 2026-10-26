@@ -17,8 +17,9 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 - **Routes from what you own.** Teleports in your inventory, worn or in your bank, your spellbook, your house
   (portal nexus, jewellery box, fairy ring, spirit tree, mounted items, altar), fairy rings, spirit trees, quetzals,
   boats, charters, minecarts, gliders, the master scroll book and more. Charges you have checked are counted.
-- **Bank stops only when they pay off.** A route through the bank is picked only when it is clearly faster than
-  going straight there. The box lists what to withdraw, and what to deposit first if your inventory is full.
+- **Bank stops only when they pay off.** A route through the bank is picked only when it is faster than going
+  straight there. The box lists what to withdraw, and what to deposit first if your inventory is full, and the bank
+  opens on a tab holding just the items to take out.
 - **Spellbook changes.** Routes can switch spellbook on the way when that is faster, if you have the runes.
 - **Step-by-step guidance.** The item, spell, menu line or teleport option to click is highlighted, and so is the
   fairy ring code. A path line leads you to the next spot and outlines the doors, stairs and ladders on the way.
@@ -37,6 +38,7 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 | Use the bank | Count banked teleports and items, and GIM group storage               | On |
 | Spellbook changes | Which spellbook changes routes may use | All |
 | Highlight items / spells / menu lines | What gets highlighted for the current action                          | On |
+| Withdraw tab | Open a bank tab with only the items to withdraw (uses the Bank Tags plugin) | On |
 | Path | Draw the path line to where to go next                                | On |
 | Show the box | Show the Clue Helper box under Clue Scroll's                          | On |
 | Show the next step | Show the action after the current one in the box                      | On |
