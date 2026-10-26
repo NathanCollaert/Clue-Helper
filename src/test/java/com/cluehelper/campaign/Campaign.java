@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -40,8 +41,6 @@ public final class Campaign
 {
 	private static final String TAG = "[CH-CAMPAIGN]";
 	private static final List<String> TIERS = List.of("beginner", "easy", "medium", "hard", "elite", "master");
-	/** The Grand Exchange, where the walk through each tier starts. */
-	private static final WorldPoint TOUR_START = new WorldPoint(3164, 3486, 0);
 	private static final Path STAGING = Paths.get("build/campaign/staging");
 	private static final String NOTE_FILE = "note.txt";
 	private static final String GUIDE_FILE = "guide-now.txt";
@@ -422,42 +421,35 @@ public final class Campaign
 		}
 	}
 
-	/** New core steps join at the end; steps core no longer has drop out. */
+	/**
+	 * The steps up to the untested one reached last keep their place; every other step, new core steps included, is dealt
+	 * again each session. Steps core no longer has drop out.
+	 */
 	private void updateOrder()
 	{
-		Set<String> known = new HashSet<>(progress.order);
-		progress.order.removeIf(key -> !byKey.containsKey(key));
-		List<CampaignStep> added = byKey.values().stream().filter(step -> !known.contains(step.getKey())).collect(Collectors.toList());
-		progress.order.addAll(tour(added));
+		int reached = progress.order.indexOf(progress.untestedFrom) + 1;
+		List<String> kept = progress.order.subList(0, reached).stream().filter(byKey::containsKey).collect(Collectors.toList());
+		Set<String> keptKeys = new HashSet<>(kept);
+		List<CampaignStep> rest = byKey.values().stream().filter(step -> !keptKeys.contains(step.getKey())).collect(Collectors.toList());
+		progress.order = kept;
+		progress.order.addAll(shuffledByTier(rest));
 	}
 
-	/** By tier, and within a tier from each step to the nearest one left, so steps in a row are close. */
-	private static List<String> tour(List<CampaignStep> steps)
+	/** By tier, and in a random order within a tier, so the same teleports don't come round every time. */
+	private static List<String> shuffledByTier(List<CampaignStep> steps)
 	{
 		List<String> order = new ArrayList<>();
-		Map<String, List<CampaignStep>> byTier = steps.stream().collect(Collectors.groupingBy(CampaignStep::getTier));
+		Map<String, List<String>> byTier = steps.stream()
+			.collect(Collectors.groupingBy(CampaignStep::getTier, Collectors.mapping(CampaignStep::getKey, Collectors.toList())));
 		List<String> tiers = new ArrayList<>(byTier.keySet());
 		tiers.sort(Comparator.comparingInt(tier -> TIERS.contains(tier) ? TIERS.indexOf(tier) : TIERS.size()));
 		for (String tier : tiers)
 		{
-			List<CampaignStep> left = byTier.get(tier).stream().filter(step -> step.getTarget() != null).collect(Collectors.toList());
-			WorldPoint at = TOUR_START;
-			while (!left.isEmpty())
-			{
-				WorldPoint from = at;
-				CampaignStep nearest = left.stream().min(Comparator.comparingInt(step -> distance(from, step.getTarget()))).orElseThrow();
-				left.remove(nearest);
-				order.add(nearest.getKey());
-				at = nearest.getTarget();
-			}
-			byTier.get(tier).stream().filter(step -> step.getTarget() == null).forEach(step -> order.add(step.getKey()));
+			List<String> keys = byTier.get(tier);
+			Collections.shuffle(keys);
+			order.addAll(keys);
 		}
 		return order;
-	}
-
-	private static int distance(WorldPoint a, WorldPoint b)
-	{
-		return Math.max(Math.abs(a.getX() - b.getX()), Math.abs(a.getY() - b.getY()));
 	}
 
 	/** A golden recording on disk means the step was finished, even when progress.json was lost. */

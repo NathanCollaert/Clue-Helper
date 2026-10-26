@@ -28,7 +28,7 @@ final class CampaignProgress
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-	/** Every step key, by tier and then a walk from each to the nearest next. */
+	/** Every step key, by tier and in a random order within each. */
 	List<String> order = new ArrayList<>();
 	String current;
 	/** The untested step the walk through the order reached last: after the retests, the untested go on from there. */
