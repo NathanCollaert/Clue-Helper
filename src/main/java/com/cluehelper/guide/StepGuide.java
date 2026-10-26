@@ -45,7 +45,9 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.util.Text;
@@ -391,6 +393,20 @@ public class StepGuide
 		changed |= showMaking();
 		checkRefusal();
 		checkTeleportRefusal();
+		show(changed);
+	}
+
+	/** The bank sub-step ends the frame the bank opens, not a tick later, so the withdraw guidance shows with the bank. */
+	public void onWidgetLoaded(WidgetLoaded event)
+	{
+		if (event.getGroupId() == InterfaceID.BANKMAIN)
+		{
+			show(advance(lastTile));
+		}
+	}
+
+	private void show(boolean changed)
+	{
 		if (changed)
 		{
 			updateHighlights();

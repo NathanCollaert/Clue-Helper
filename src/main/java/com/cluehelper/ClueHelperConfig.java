@@ -99,11 +99,23 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "withdrawTab",
+		name = "Withdraw tab",
+		description = "Open a bank tab with only the items to withdraw (needs the Bank Tags plugin)",
+		section = guidanceSection,
+		position = 1
+	)
+	default boolean withdrawTab()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "highlightSpells",
 		name = "Highlight spells",
 		description = "Highlight the spell the current sub-step casts",
 		section = guidanceSection,
-		position = 1
+		position = 2
 	)
 	default boolean highlightSpells()
 	{
@@ -115,7 +127,7 @@ public interface ClueHelperConfig extends Config
 		name = "Highlight menu lines",
 		description = "Highlight the destination in teleport menus such as the portal nexus and jewellery box",
 		section = guidanceSection,
-		position = 2
+		position = 3
 	)
 	default boolean highlightMenus()
 	{
@@ -127,7 +139,7 @@ public interface ClueHelperConfig extends Config
 		name = "Path",
 		description = "Draw the path to where to go next. Never drawn onto the clue's own target",
 		section = guidanceSection,
-		position = 3
+		position = 4
 	)
 	default boolean pathLine()
 	{
@@ -139,7 +151,7 @@ public interface ClueHelperConfig extends Config
 		name = "Show the box",
 		description = "Show the Clue Helper box under the Clue Scroll plugin's box. Highlights and the path work without it",
 		section = guidanceSection,
-		position = 4
+		position = 5
 	)
 	default boolean showBox()
 	{
@@ -151,7 +163,7 @@ public interface ClueHelperConfig extends Config
 		name = "Show the next step",
 		description = "Show the step after the current one in the box",
 		section = guidanceSection,
-		position = 5
+		position = 6
 	)
 	default boolean showNextStep()
 	{

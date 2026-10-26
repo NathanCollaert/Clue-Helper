@@ -31,6 +31,7 @@ import com.cluehelper.ui.MenuLineOverlay;
 import com.cluehelper.ui.BoxState;
 import com.cluehelper.ui.WidgetHighlightOverlay;
 import com.cluehelper.ui.WaypointOverlay;
+import com.cluehelper.ui.WithdrawTab;
 import com.google.inject.Provides;
 import java.util.Set;
 import javax.inject.Inject;
@@ -47,6 +48,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.PostMenuSort;
+import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
@@ -61,6 +63,7 @@ import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.banktags.BankTagsPlugin;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -72,6 +75,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 	tags = {"clue", "clues", "treasure", "trails", "teleport", "route", "hot", "cold", "stash", "guide"}
 )
 @PluginDependency(ClueScrollPlugin.class)
+@PluginDependency(BankTagsPlugin.class)
 public class ClueHelperPlugin extends Plugin
 {
 	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
@@ -183,6 +187,9 @@ public class ClueHelperPlugin extends Plugin
 	@Inject
 	private SceneDoors sceneDoors;
 
+	@Inject
+	private WithdrawTab withdrawTab;
+
 
 	private Runnable unregisterRoutes;
 	private Runnable unregisterGuide;
@@ -211,6 +218,7 @@ public class ClueHelperPlugin extends Plugin
 		routes.start();
 		guide.start();
 		hotCold.start();
+		withdrawTab.start();
 		unregisterRoutes = routes.addListener(plan -> showBox());
 		unregisterGuide = guide.addListener(this::showBox);
 		unregisterHotCold = hotCold.addListener(this::showBox);
@@ -231,6 +239,7 @@ public class ClueHelperPlugin extends Plugin
 		unregisterHotCold.run();
 		unregisterGuide.run();
 		unregisterRoutes.run();
+		withdrawTab.stop();
 		hotCold.stop();
 		guide.stop();
 		routes.stop();
@@ -269,6 +278,7 @@ public class ClueHelperPlugin extends Plugin
 		routes.onGameTick();
 		hotCold.onGameTick();
 		guide.onGameTick();
+		withdrawTab.onGameTick();
 		if (planner.isWorking() != shownWorking)
 		{
 			shownWorking = planner.isWorking();
@@ -289,6 +299,8 @@ public class ClueHelperPlugin extends Plugin
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
 		bankMemory.onWidgetLoaded(event);
+		guide.onWidgetLoaded(event);
+		withdrawTab.onWidgetLoaded(event);
 	}
 
 	@Subscribe
@@ -296,6 +308,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		bankMemory.onWidgetClosed(event);
 		menuLines.onWidgetClosed(event);
+		withdrawTab.onWidgetClosed(event);
 	}
 
 	@Subscribe
@@ -335,6 +348,12 @@ public class ClueHelperPlugin extends Plugin
 	{
 		menuLines.onScriptPreFired(event);
 		poh.onScriptPreFired(event);
+	}
+
+	@Subscribe
+	public void onScriptPostFired(ScriptPostFired event)
+	{
+		withdrawTab.onScriptPostFired(event);
 	}
 
 	@Subscribe

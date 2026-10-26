@@ -72,6 +72,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.banktags.BankTagsService;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.DrawManager;
@@ -206,6 +207,7 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(harness.getSelfTests().register(new CoreToggleTest()));
 		unregister.add(harness.getSelfTests().register(new RestartTest()));
 		BankTrace bankTrace = new BankTrace(client, clueHelper.getBankMemory(), clueHelper.getGuide(),
+			clueHelper.getInjector().getInstance(BankTagsService.class),
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(bankTrace);
 		unregister.add(() -> eventBus.unregister(bankTrace));

@@ -48,7 +48,7 @@ public class ConventionsTest
 
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
 		"avoidWilderness", "scrollBookOutOfWilderness",
-		"highlightItems", "highlightSpells", "highlightMenus",
+		"highlightItems", "withdrawTab", "highlightSpells", "highlightMenus",
 		"pathLine", "showBox", "showNextStep",
 		"spellbookChanges", "useBank",
 		"hotColdPlanner"));
