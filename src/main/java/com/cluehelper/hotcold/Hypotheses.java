@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -32,6 +33,45 @@ public final class Hypotheses
 		this.spot = spot;
 		this.weight = weight;
 		this.misses = misses;
+	}
+
+	/**
+	 * The grid of the newest readings that a spot fits exactly and that keep no spot core has dropped. An older reading
+	 * that contradicts them is taken as left over from another clue or missed in between: core starts afresh on each
+	 * clue and keeps the true spot, while an outdated log can rule it out. Failing that, the newest readings that fit
+	 * exactly, then the whole log's closest fits.
+	 *
+	 * @param coreSpots core's remaining spots; empty when it has none to go by
+	 */
+	public static Hypotheses fitting(List<Spot> spots, HotColdTier tier, List<Reading> readings, Set<String> coreSpots)
+	{
+		Hypotheses exact = null;
+		for (int start = 0; start < readings.size(); start++)
+		{
+			Hypotheses grid = filter(spots, tier, from(readings, start));
+			if (grid.isExact() && (coreSpots.isEmpty() || coreSpots.containsAll(grid.spotShares().keySet())))
+			{
+				return grid;
+			}
+			if (grid.isExact() && exact == null)
+			{
+				exact = grid;
+			}
+		}
+		return exact != null ? exact : filter(spots, tier, readings);
+	}
+
+	/** The readings from {@code start} on, the one before kept as the anchor of their first comparison. */
+	private static List<Reading> from(List<Reading> readings, int start)
+	{
+		if (start == 0)
+		{
+			return readings;
+		}
+		List<Reading> newest = new ArrayList<>();
+		newest.add(readings.get(start - 1).asAnchor());
+		newest.addAll(readings.subList(start, readings.size()));
+		return newest;
 	}
 
 	public static Hypotheses filter(List<Spot> spots, HotColdTier tier, List<Reading> readings)

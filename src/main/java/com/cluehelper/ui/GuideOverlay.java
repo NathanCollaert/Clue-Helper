@@ -100,11 +100,6 @@ public class GuideOverlay extends OverlayPanel
 	private void hotCold(HotColdView view)
 	{
 		line(view.getTitle(), TEXT);
-		List<String> lines = view.getLines();
-		for (int i = 0; i < lines.size(); i++)
-		{
-			line(lines.get(i), i == 0 ? MUTED : TEXT);
-		}
 		view.getWarnings().forEach(warning -> line(warning, WARNING));
 	}
 

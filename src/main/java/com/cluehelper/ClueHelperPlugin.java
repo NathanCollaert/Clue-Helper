@@ -188,7 +188,6 @@ public class ClueHelperPlugin extends Plugin
 	private Runnable unregisterGuide;
 	private Runnable unregisterHotCold;
 	private boolean shownWorking;
-	private boolean shownCarryingClue;
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -270,11 +269,9 @@ public class ClueHelperPlugin extends Plugin
 		routes.onGameTick();
 		hotCold.onGameTick();
 		guide.onGameTick();
-		boolean carryingClue = clueLink.carriesClue();
-		if (planner.isWorking() != shownWorking || carryingClue != shownCarryingClue)
+		if (planner.isWorking() != shownWorking)
 		{
 			shownWorking = planner.isWorking();
-			shownCarryingClue = carryingClue;
 			showBox();
 		}
 	}

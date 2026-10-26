@@ -57,10 +57,10 @@ public class GuideBoxPresenter
 
 	public void refresh()
 	{
-		GuideBox box = GuideBox.of(boxState(), dormantReason(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
+		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
 			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
-		GuideBox.GuideBoxBuilder shown = atStep.toBuilder().carryingClue(clueLink.carriesClue());
+		GuideBox.GuideBoxBuilder shown = atStep.toBuilder();
 		if (atStep.getState().showsRoutes())
 		{
 			shown.hotCold(hotColdView());
@@ -92,8 +92,7 @@ public class GuideBoxPresenter
 			return null;
 		}
 		HotColdTier tier = HotColdTier.of(step.getTier());
-		return HotColdView.of(new HotColdView.Inputs(plan, hotCold.getCoreSpots(), hotCold.isCoreReset(),
-			hotCold.spotsOf(tier), tier, hotCold.hitpoints()));
+		return HotColdView.of(new HotColdView.Inputs(plan, hotCold.spotsOf(tier), tier, hotCold.hitpoints()));
 	}
 
 	private GuideBox.Prompts prompts()

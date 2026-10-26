@@ -18,6 +18,11 @@ public final class ProbePlanner
 {
 	/** A feel doesn't stop movement; the click and the chat line take about a tick. */
 	public static final int FEEL_TICKS = 1;
+	/**
+	 * Ranking-only ticks on every feel. In the simulator 1 to 3 solve masters fastest and with fewer feels than none;
+	 * from 4 up the solves get slower.
+	 */
+	private static final int FEEL_PENALTY_TICKS = 2;
 	/** Below this a probe can't tell any two spots apart. */
 	private static final double MIN_BITS = 1e-6;
 	private static final int COMPARISONS = Comparison.values().length + 1;
@@ -46,11 +51,6 @@ public final class ProbePlanner
 		double probability;
 		/** Spot name to its share within this branch, largest first. */
 		Map<String, Double> spots;
-
-		public String label()
-		{
-			return comparison == null ? band.getText() : band.getText() + ", " + comparison.getText();
-		}
 	}
 
 	@Value
@@ -105,7 +105,7 @@ public final class ProbePlanner
 
 	static int cost(Probe probe, Costs costs)
 	{
-		return probe.getRankTicks() + FEEL_TICKS + (probe.isWilderness() ? costs.getWildernessPenaltyTicks() : 0);
+		return probe.getRankTicks() + FEEL_TICKS + FEEL_PENALTY_TICKS + (probe.isWilderness() ? costs.getWildernessPenaltyTicks() : 0);
 	}
 
 	/**

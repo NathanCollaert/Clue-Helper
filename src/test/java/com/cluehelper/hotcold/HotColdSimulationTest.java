@@ -13,17 +13,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdLocation;
+import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdSolver;
+import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdTemperature;
+import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdTemperatureChange;
 import org.junit.Test;
 
 /**
  * A simulation on the live planner's own rules: every spot solved from the tier's NPC, the truth on core's centre
  * (the disputed spots then sit k tiles off the cache's), with crude costs: any walk-table node 10 ticks away,
- * scene tiles at a run's pace. Counts feels until a dig and ticks until the dig tile; a dig on the wrong spot or no
- * decision is a failure.
+ * scene tiles at a run's pace. Core's own solver runs alongside on the same feels, as it does in the client. Counts
+ * feels until a dig and ticks until the dig tile; a dig on the wrong spot or no decision is a failure.
  */
 public class HotColdSimulationTest
 {
@@ -33,9 +38,9 @@ public class HotColdSimulationTest
 	private static final int LOCAL_TILES = 32;
 	private static final int LOCAL_STRIDE = 4;
 	private static final int MOST_FEELS = 12;
-	/** Regression bounds, a little above this planner's numbers on 2026-10-21: beginner 1.80, master 4.15. */
+	/** Regression bounds, a little above this planner's numbers on 2026-10-25: beginner 1.80, master 4.04. */
 	private static final double BEGINNER_MEAN_FEELS = 2.0;
-	private static final double MASTER_MEAN_FEELS = 4.3;
+	private static final double MASTER_MEAN_FEELS = 4.2;
 	private static final Path OUT = Paths.get("build/hotcold/simulation.tsv");
 
 	@Test
@@ -54,6 +59,43 @@ public class HotColdSimulationTest
 		assertTrue("master mean feels " + master, master <= MASTER_MEAN_FEELS);
 	}
 
+	/**
+	 * A log the last clue of the tier left behind: the game compares the new clue's first feel with that clue's last
+	 * one, while core starts afresh. The beginner clue was solved but the log kept, the master clue dropped after two
+	 * feels. No dig may be on the wrong spot.
+	 */
+	@Test
+	public void aLogLeftByTheLastClueNeverLeadsToAWrongDig() throws IOException
+	{
+		StepIndex index = StepIndex.read(new Gson());
+		List<WorldPoint> landings = landings();
+		List<String> wrong = new ArrayList<>();
+		wrong.addAll(wrongDigsAfter(HotColdLocation.DRAYNOR_MANOR_MUSHROOMS, Integer.MAX_VALUE, RELDO, index, landings));
+		wrong.addAll(wrongDigsAfter(HotColdLocation.FREMENNIK_PROVINCE_LUNAR_NORTH, 2, JORRAL, index, landings));
+		assertEquals(List.of(), wrong);
+	}
+
+	private static List<String> wrongDigsAfter(HotColdLocation previous, int feelsLeft, WorldPoint start, StepIndex index,
+		List<WorldPoint> landings)
+	{
+		HotColdTier tier = previous.isBeginnerClue() ? HotColdTier.BEGINNER : HotColdTier.MASTER;
+		List<Spot> spots = Spots.of(index, tier);
+		ProbePlanner.Costs costs = ProbePlanner.Costs.builder().wildernessPenaltyTicks(HotColdService.WILDERNESS_PENALTY_TICKS).build();
+		List<Reading> leftOver = new ArrayList<>();
+		solve(previous, tier, start, spots, landings, costs, leftOver);
+		leftOver.subList(Math.min(feelsLeft, leftOver.size()), leftOver.size()).clear();
+		List<String> wrong = new ArrayList<>();
+		for (HotColdLocation truth : HotColdLocation.values())
+		{
+			if (truth.isBeginnerClue() == previous.isBeginnerClue() && truth != previous
+				&& solve(truth, tier, start, spots, landings, costs, new ArrayList<>(leftOver))[2] != 1)
+			{
+				wrong.add(truth.name() + " after " + previous.name());
+			}
+		}
+		return wrong;
+	}
+
 	private static double meanFeels(boolean beginner, WorldPoint start, StepIndex index, List<WorldPoint> landings, List<String> rows)
 	{
 		HotColdTier tier = beginner ? HotColdTier.BEGINNER : HotColdTier.MASTER;
@@ -68,7 +110,7 @@ public class HotColdSimulationTest
 			{
 				continue;
 			}
-			int[] result = solve(truth, tier, start, spots, landings, costs);
+			int[] result = solve(truth, tier, start, spots, landings, costs, new ArrayList<>());
 			total += result[0];
 			String outcome = result[2] == 1 ? "dug" : "FAILED";
 			rows.add((beginner ? "beginner" : "master") + "\t" + truth.name() + "\t" + result[0] + "\t" + result[1] + "\t" + outcome);
@@ -81,17 +123,20 @@ public class HotColdSimulationTest
 		return (double) total / spots.size();
 	}
 
-	/** @return feels, ticks, 1 when the dig found the spot */
+	/**
+	 * @param readings the log so far, which the solve's feels are added to
+	 * @return feels, ticks, 1 when the dig found the spot
+	 */
 	private static int[] solve(HotColdLocation truth, HotColdTier tier, WorldPoint start, List<Spot> spots, List<WorldPoint> landings,
-		ProbePlanner.Costs costs)
+		ProbePlanner.Costs costs, List<Reading> readings)
 	{
 		WorldPoint centre = truth.getWorldPoint();
-		List<Reading> readings = new ArrayList<>();
+		HotColdSolver core = coreSolver(tier);
 		WorldPoint at = start;
 		int ticks = 0;
 		for (int feels = 0; feels <= MOST_FEELS; feels++)
 		{
-			HotColdPlan plan = ProbeJob.decide("sim", spots, tier, readings, probes(at, landings), costs);
+			HotColdPlan plan = ProbeJob.decide("sim", spots, tier, readings, coreSpots(core), probes(at, landings), costs);
 			if (plan.isDig())
 			{
 				boolean found = plan.getTile().distanceTo2D(centre) <= Band.digRadius(tier);
@@ -105,7 +150,9 @@ public class HotColdSimulationTest
 			Probe probe = plan.getChoice().getProbe();
 			ticks += probe.getTicks() + ProbePlanner.FEEL_TICKS;
 			at = probe.getTile();
-			readings.add(feel(at, centre, tier, readings));
+			Reading reading = feel(at, centre, tier, readings);
+			readings.add(reading);
+			signal(core, reading, tier);
 		}
 		return new int[]{MOST_FEELS, ticks, 0};
 	}
@@ -118,6 +165,36 @@ public class HotColdSimulationTest
 		Comparison comparison = previous == null || band == Band.SHAKING ? null
 			: Comparison.of(distance, new WorldPoint(previous.getX(), previous.getY(), 0).distanceTo2D(centre));
 		return new Reading(at.getX(), at.getY(), at.getPlane(), band, comparison);
+	}
+
+	private static HotColdSolver coreSolver(HotColdTier tier)
+	{
+		Set<HotColdLocation> spots = new HashSet<>();
+		for (HotColdLocation location : HotColdLocation.values())
+		{
+			if (location.isBeginnerClue() == (tier == HotColdTier.BEGINNER))
+			{
+				spots.add(location);
+			}
+		}
+		return new HotColdSolver(spots);
+	}
+
+	private static CoreSpots coreSpots(HotColdSolver core)
+	{
+		Set<String> names = new HashSet<>();
+		core.getPossibleLocations().forEach(location -> names.add(location.name()));
+		return new CoreSpots(names, core.getLastWorldPoint() != null);
+	}
+
+	private static void signal(HotColdSolver core, Reading reading, HotColdTier tier)
+	{
+		Set<HotColdTemperature> temperatures = tier == HotColdTier.BEGINNER
+			? HotColdTemperature.BEGINNER_HOT_COLD_TEMPERATURES : HotColdTemperature.MASTER_HOT_COLD_TEMPERATURES;
+		HotColdTemperature temperature = temperatures.stream()
+			.filter(candidate -> candidate.getText().equals(reading.getBand().getText())).findFirst().orElseThrow();
+		HotColdTemperatureChange change = reading.getComparison() == null ? null : HotColdTemperatureChange.valueOf(reading.getComparison().name());
+		core.signal(new WorldPoint(reading.getX(), reading.getY(), reading.getPlane()), temperature, change);
 	}
 
 	private static List<Probe> probes(WorldPoint at, List<WorldPoint> landings)

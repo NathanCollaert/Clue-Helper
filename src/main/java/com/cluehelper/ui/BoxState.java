@@ -2,11 +2,9 @@ package com.cluehelper.ui;
 
 public enum BoxState
 {
-	DORMANT("Off on this world",
-		"Clue Helper stays off on seasonal, Deadman, beta and other special worlds."),
-	CORE_OFF("Turn the Clue Scroll plugin back on",
-		"Clue Helper works alongside RuneLite's Clue Scroll plugin. Turn it back on to continue."),
-	READ_CLUE("Read the clue to start", null),
+	DORMANT(null, null),
+	CORE_OFF(null, null),
+	READ_CLUE(null, null),
 	NO_CLUE(null, null),
 	WORKING("Working…",
 		"Ranking routes from what you have."),
@@ -31,24 +29,10 @@ public enum BoxState
 		return detail;
 	}
 
+	/** Only while the Clue Scroll plugin shows a clue: the box sits under core's and is never on screen alone. */
 	public boolean showsRoutes()
 	{
 		return this == WORKING || this == ROUTES;
-	}
-
-	/** The box is always in view, so core off and dormant would nag a player who isn't doing a clue. */
-	public boolean shownWhen(boolean carryingClue)
-	{
-		switch (this)
-		{
-			case NO_CLUE:
-				return false;
-			case CORE_OFF:
-			case DORMANT:
-				return carryingClue;
-			default:
-				return true;
-		}
 	}
 
 	public static BoxState of(boolean dormant, boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean planning)

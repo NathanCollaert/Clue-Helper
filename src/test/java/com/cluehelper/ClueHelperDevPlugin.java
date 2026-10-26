@@ -643,8 +643,7 @@ public class ClueHelperDevPlugin extends Plugin
 				{
 					GuideBox box = clueHelper.getGuideOverlay().getShown();
 					run.check(box.getState() == BoxState.CORE_OFF, "box state " + box.getState() + ", expected CORE_OFF");
-					run.check(box.isShown() == box.isCarryingClue(), "core-off box shown " + box.isShown()
-						+ " with a clue carried " + box.isCarryingClue());
+					run.check(!box.isShown(), "core-off box hidden");
 					frame("core-off");
 					setPluginRunning(core, true);
 					executor.execute(configManager::sendConfig);

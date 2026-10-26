@@ -275,20 +275,24 @@ public class HotColdService
 	}
 
 	/**
-	 * A beginner dig gives the next clue without the "cools" line, so a step that ends on its dig tile is taken as
-	 * solved; otherwise the next clue of the tier would start from this one's readings. Banking the clue there is the
-	 * case this misjudges.
+	 * A beginner dig gives the next clue without the "cools" line, so a step that ends on any spot of its tier is taken
+	 * as solved, whether or not the plan pointed there; otherwise the next clue of the tier would start from this one's
+	 * readings. Banking the clue there is the case this misjudges.
 	 */
 	private void forgetIfDug(HotColdPlan last)
 	{
 		WorldPoint tile = player.getPosition().getTile();
-		boolean dig = last != null && last.isDig();
-		if (dig && tile != null && tile.getPlane() == last.getTile().getPlane()
-			&& tile.distanceTo2D(last.getTile()) <= Band.digRadius(last.getTier()))
+		if (last != null && tile != null && standsOnSpot(tile, last.getTier()))
 		{
 			logs.set(logs.get().solved(last.getStepKey()));
 			trace("dug at " + tile + ": log of " + last.getStepKey() + " cleared, last reading kept as the anchor");
 		}
+	}
+
+	private boolean standsOnSpot(WorldPoint tile, HotColdTier tier)
+	{
+		return tile.getPlane() == 0 && spots(tier).stream().anyMatch(spot ->
+			Math.max(Math.abs(tile.getX() - spot.getX()), Math.abs(tile.getY() - spot.getY())) <= Band.digRadius(tier) + spot.getRadius());
 	}
 
 	private void readCore()
@@ -327,6 +331,7 @@ public class HotColdService
 			.tier(tier)
 			.spots(spots(tier))
 			.readings(logs.get().get(step.getKey()))
+			.core(new CoreSpots(coreReset ? Set.of() : coreSpots, !coreReset))
 			.here(carried && player.getPosition().getKind() == Position.Kind.WORLD ? player.getPosition().getTile() : null)
 			.local(carried ? localProbes(walk) : List.of())
 			.landingSearch(landingSearch)
@@ -516,16 +521,6 @@ public class HotColdService
 		HotColdPlan current = plan;
 		lines.add(current == null ? "no plan" : describe(current));
 		return lines;
-	}
-
-	public Set<String> getCoreSpots()
-	{
-		return coreSpots;
-	}
-
-	public boolean isCoreReset()
-	{
-		return coreReset;
 	}
 
 	public int hitpoints()

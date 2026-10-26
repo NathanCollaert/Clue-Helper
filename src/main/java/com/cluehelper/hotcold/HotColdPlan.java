@@ -67,9 +67,4 @@ public class HotColdPlan
 	{
 		return action == Action.DIG_HERE || action == Action.DIG_SPOT;
 	}
-
-	public List<ProbePlanner.Branch> branches()
-	{
-		return choice == null ? List.of() : choice.getBranches();
-	}
 }

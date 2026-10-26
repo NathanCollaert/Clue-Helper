@@ -24,6 +24,7 @@ public class ProbeJob
 	HotColdTier tier;
 	List<Spot> spots;
 	List<Reading> readings;
+	CoreSpots core;
 	WorldPoint here;
 	/** Scene tiles near the player with their walk in ticks. */
 	List<Probe> local;
@@ -50,19 +51,28 @@ public class ProbeJob
 		boolean needsProbes = readings.isEmpty() || readings.get(readings.size() - 1).getBand() != Band.SHAKING;
 		int landings = needsProbes ? addLandings(probes) : 0;
 		long landingNanos = System.nanoTime() - started;
-		return decide(stepKey, spots, tier, readings, probes, costs).toBuilder()
+		return decide(stepKey, spots, tier, readings, core, probes, costs).toBuilder()
 			.landings(landings).landingNanos(landingNanos).considered(List.copyOf(probes)).nanos(System.nanoTime() - started).build();
 	}
 
-	/** The rules after the probes are in, shared with the simulator. */
-	public static HotColdPlan decide(String stepKey, List<Spot> spots, HotColdTier tier, List<Reading> readings, List<Probe> probes,
-		ProbePlanner.Costs costs)
+	/**
+	 * The rules after the probes are in, shared with the simulator. Until core has seen a feel of this clue the log may
+	 * be the last clue's, so it is never dug on: the next feel is planned as for a new clue instead.
+	 */
+	public static HotColdPlan decide(String stepKey, List<Spot> spots, HotColdTier tier, List<Reading> readings, CoreSpots core,
+		List<Probe> probes, ProbePlanner.Costs costs)
 	{
-		Hypotheses grid = Hypotheses.filter(spots, tier, readings);
+		Hypotheses grid = Hypotheses.fitting(spots, tier, readings, core.getNames());
+		Reading last = readings.isEmpty() ? null : readings.get(readings.size() - 1);
+		boolean shook = last != null && last.getBand() == Band.SHAKING;
+		boolean settled = shook || grid.keptSpots().size() == 1;
+		if (settled && !core.isFelt())
+		{
+			grid = Hypotheses.filter(spots, tier, List.of(last.asAnchor()));
+		}
 		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares())
 			.exact(grid.isExact()).readings(FeelLogs.feels(readings)).probes(probes.size());
-		Reading last = readings.isEmpty() ? null : readings.get(readings.size() - 1);
-		if (last != null && last.getBand() == Band.SHAKING)
+		if (shook && core.isFelt())
 		{
 			return HotColdPlan.digHere(plan, new WorldPoint(last.getX(), last.getY(), last.getPlane()));
 		}

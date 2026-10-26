@@ -24,9 +24,6 @@ public class GuideBox
 	private static final Set<String> ROUTE_NOTES = Set.of(NO_ROUTE, NO_PLAN_YET, "Walk too long", "No target tile for this step yet");
 
 	BoxState state;
-	boolean carryingClue;
-	/** Replaces the state's own detail line. */
-	String statusDetail;
 	String now;
 	@Builder.Default
 	List<String> nowItems = List.of();
@@ -34,7 +31,7 @@ public class GuideBox
 	String next;
 	@Builder.Default
 	List<String> notes = List.of();
-	/** Null outside a hot/cold step, or with the probe planner off. */
+	/** Null outside a hot/cold step, with the probe planner off, or when the route says it all. */
 	HotColdView hotCold;
 
 	/** What the player is asked to do once, so that what they own counts. */
@@ -48,7 +45,7 @@ public class GuideBox
 
 	public boolean isShown()
 	{
-		return state.shownWhen(carryingClue);
+		return state.showsRoutes();
 	}
 
 	/** "Working…" only while there is nothing else to show: a re-plan keeps the last guidance on screen. */
@@ -59,7 +56,7 @@ public class GuideBox
 
 	public String detail()
 	{
-		return title() == null ? null : statusDetail != null ? statusDetail : state.getDetail();
+		return title() == null ? null : state.getDetail();
 	}
 
 	private boolean hasGuidance()
@@ -79,14 +76,9 @@ public class GuideBox
 	 * @param next null unless the next sub-step is wanted
 	 * @param f2pBook the book a member is stuck on while on an F2P world, or null
 	 */
-	public static GuideBox of(BoxState state, String dormantReason, Plan plan, Route committed, SubStep now, SubStep next,
-		Book f2pBook, Prompts prompts)
+	public static GuideBox of(BoxState state, Plan plan, Route committed, SubStep now, SubStep next, Book f2pBook, Prompts prompts)
 	{
 		GuideBoxBuilder box = GuideBox.builder().state(state);
-		if (state == BoxState.DORMANT)
-		{
-			return box.statusDetail("Clue Helper stays off on this " + dormantReason + ".").build();
-		}
 		if (!state.showsRoutes() || plan == null)
 		{
 			return box.build();
