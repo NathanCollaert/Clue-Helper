@@ -1,0 +1,25 @@
+name: Slow or wrong route
+description: Clue Helper sent you a slower way than one you have, or guided you wrong on a step.
+labels: ["route"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! If you came here from **Report route** in game, the report is already on your clipboard: paste it in the last box.
+        Not there? Stand at the step (or where you started), right-click the **Clue Helper** box and pick **Report route**.
+  - type: textarea
+    id: expected
+    attributes:
+      label: What would have been faster?
+      description: The teleport or way you would take, and roughly how long it takes. Mention anything the plugin might not know, like an unlock or charges.
+      placeholder: "I have a Xeric's talisman with charges; Xeric's Heart lands right next to the step."
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Route report
+      description: Paste the report from Report route here (Ctrl+V).
+      render: text
+    validations:
+      required: true

@@ -29,6 +29,7 @@ import com.cluehelper.ui.GuideBox;
 import com.cluehelper.ui.GuideOverlay;
 import com.cluehelper.ui.ItemHighlightOverlay;
 import com.cluehelper.ui.MenuLineOverlay;
+import com.cluehelper.ui.RouteReport;
 import com.cluehelper.ui.BoxState;
 import com.cluehelper.ui.WidgetHighlightOverlay;
 import com.cluehelper.ui.WaypointOverlay;
@@ -195,6 +196,9 @@ public class ClueHelperPlugin extends Plugin
 	@Inject
 	private WithdrawTab withdrawTab;
 
+	@Inject
+	private RouteReport routeReport;
+
 
 	private Runnable unregisterRoutes;
 	private Runnable unregisterGuide;
@@ -225,6 +229,7 @@ public class ClueHelperPlugin extends Plugin
 		guide.start();
 		hotCold.start();
 		withdrawTab.start();
+		routeReport.start();
 		unregisterRoutes = routes.addListener(plan -> showBox());
 		unregisterGuide = guide.addListener(this::showBox);
 		unregisterHotCold = hotCold.addListener(this::showBox);
@@ -245,6 +250,7 @@ public class ClueHelperPlugin extends Plugin
 		unregisterHotCold.run();
 		unregisterGuide.run();
 		unregisterRoutes.run();
+		routeReport.stop();
 		withdrawTab.stop();
 		hotCold.stop();
 		guide.stop();

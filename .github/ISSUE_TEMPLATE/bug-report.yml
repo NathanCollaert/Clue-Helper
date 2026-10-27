@@ -1,0 +1,17 @@
+name: Bug report
+description: Something in Clue Helper doesn't work, looks wrong or slows the game down.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you saw, and what you expected instead. A screenshot helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Route report (if it's about a clue step)
+      description: Right-click the Clue Helper box, pick Report route, and paste it here.
+      render: text

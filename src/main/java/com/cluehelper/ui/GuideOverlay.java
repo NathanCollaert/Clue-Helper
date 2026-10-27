@@ -43,13 +43,14 @@ public class GuideOverlay extends OverlayPanel
 	private FontMetrics metrics;
 
 	@Inject
-	GuideOverlay(ClueHelperPlugin plugin, ClueHelperConfig config)
+	GuideOverlay(ClueHelperPlugin plugin, ClueHelperConfig config, RouteReport report)
 	{
 		super(plugin);
 		this.config = config;
 		setPosition(OverlayPosition.TOP_LEFT);
 		setPriority(BELOW_CORE_CLUE_BOX);
 		addMenuEntry(MenuAction.RUNELITE_OVERLAY_CONFIG, OverlayManager.OPTION_CONFIGURE, "Clue Helper overlay");
+		addMenuEntry(MenuAction.RUNELITE_OVERLAY, "Report route", "Clue Helper", entry -> report.send());
 	}
 
 	/** Any thread. */

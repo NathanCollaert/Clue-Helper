@@ -11,6 +11,7 @@ import com.cluehelper.route.LoadedScene;
 import com.cluehelper.route.NoTeleportAreas;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
+import com.cluehelper.route.PlanRecording;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.Planner;
 import com.cluehelper.route.RequiredItems;
@@ -25,27 +26,30 @@ import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
 import com.cluehelper.transport.CatalogLoader;
+import com.cluehelper.ui.RouteReport;
 import com.google.gson.Gson;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /**
- * Plans each {@link PlanTrace} recording again, warm and as the live planner does, and prints its time and labels beside
- * the live ones:
+ * Plans each {@link PlanTrace} recording, and each route report a player pasted into a {@code .txt} file, again, warm
+ * and as the live planner does, and prints its time, labels and best route beside the live ones:
  * {@code gradlew planReplay [-Pplans=<folder>]}.
  */
 public final class PlanReplay
@@ -53,6 +57,7 @@ public final class PlanReplay
 	private static final int WARM_UP = 2;
 	private static final int TIMED = 3;
 	private static final long NANOS_PER_MILLI = 1_000_000;
+	private static final String REPORT = ".txt";
 
 	private PlanReplay()
 	{
@@ -61,7 +66,7 @@ public final class PlanReplay
 	public static void main(String[] args) throws IOException
 	{
 		File folder = new File(args.length > 0 ? args[0] : PlanTrace.PLANS.getPath());
-		File[] files = folder.listFiles((dir, name) -> name.endsWith(".json"));
+		File[] files = folder.listFiles((dir, name) -> name.endsWith(".json") || name.endsWith(REPORT));
 		if (files == null || files.length == 0)
 		{
 			System.out.println("No recordings in " + folder);
@@ -77,35 +82,51 @@ public final class PlanReplay
 		Gson gson = new Gson();
 		for (File file : files)
 		{
-			PlanTrace.Recording recording;
-			try (Reader in = new FileReader(file, StandardCharsets.UTF_8))
-			{
-				recording = gson.fromJson(in, PlanTrace.Recording.class);
-			}
+			PlanRecording recording = gson.fromJson(recordingJson(file), PlanRecording.class);
 			PlanInput input = PlanInput.builder()
-				.step(steps.getOrDefault(recording.stepKey, stepOf(recording)))
-				.player(recording.player)
-				.banked(recording.banked)
-				.pinPending(recording.pinPending)
-				.atOpenBank(recording.atOpenBank)
+				.step(steps.getOrDefault(recording.getStepKey(), stepOf(recording)))
+				.player(recording.getPlayer())
+				.banked(recording.getBanked())
+				.pinPending(recording.isPinPending())
+				.atOpenBank(recording.isAtOpenBank())
 				.required(required(recording))
 				.engine(engine)
-				.nowMinutes(recording.nowMinutes)
+				.nowMinutes(recording.getNowMinutes())
 				.catalog(catalog)
 				.table(table)
 				.noTeleport(noTeleport)
 				.start(start(recording, folder, table, map, engine))
-				.settings(recording.settings)
-				.revertTicksLeft(recording.revertTicksLeft)
-				.refusedChanges(recording.refusedChanges)
-				.foreignHouseStart(recording.foreignHouseStart)
-				.followedFirstTransport(recording.followedFirstTransport)
+				.settings(recording.getSettings())
+				.revertTicksLeft(recording.getRevertTicksLeft())
+				.refusedChanges(recording.getRefusedChanges())
+				.foreignHouseStart(recording.isForeignHouseStart())
+				.followedFirstTransport(recording.getFollowedFirstTransport())
 				.build();
 			report(file.getName(), recording, input);
 		}
 	}
 
-	private static void report(String name, PlanTrace.Recording recording, PlanInput input)
+	private static String recordingJson(File file) throws IOException
+	{
+		String text = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+		if (!file.getName().endsWith(REPORT))
+		{
+			return text;
+		}
+		int start = text.indexOf(RouteReport.REPLAY_START);
+		int end = text.indexOf(RouteReport.REPLAY_END);
+		if (start < 0 || end < start)
+		{
+			throw new IOException(file + " has no replay data");
+		}
+		byte[] gzipped = Base64.getMimeDecoder().decode(text.substring(start + RouteReport.REPLAY_START.length(), end).trim());
+		try (InputStream in = new GZIPInputStream(new ByteArrayInputStream(gzipped)))
+		{
+			return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+		}
+	}
+
+	private static void report(String name, PlanRecording recording, PlanInput input)
 	{
 		Plan plan = null;
 		for (int i = 0; i < WARM_UP; i++)
@@ -119,52 +140,52 @@ public final class PlanReplay
 			plan = Planner.withoutAlternatives(input);
 			best = Math.min(best, System.nanoTime() - started);
 		}
-		System.out.printf("%s: live %d ms %d labels | replay %d ms %d labels, %d searches | %s%n", name, recording.liveMillis,
-			recording.liveLabels, best / NANOS_PER_MILLI, plan.getLabels(), plan.getSearches(),
+		System.out.printf("%s: live %d ms %d labels | replay %d ms %d labels, %d searches | %s%n", name, recording.getLiveMillis(),
+			recording.getLiveLabels(), best / NANOS_PER_MILLI, plan.getLabels(), plan.getSearches(),
 			plan.getBest() == null ? "no route" : plan.getBest().describe());
 	}
 
 	/** A three-step or other key the step data lacks: its targets are enough to plan. */
-	private static Step stepOf(PlanTrace.Recording recording)
+	private static Step stepOf(PlanRecording recording)
 	{
-		List<WorldPoint> targets = recording.targets.stream().map(PlanReplay::point).collect(Collectors.toList());
-		List<Stage> stages = recording.stages == null ? List.of() : recording.stages.stream().map(PlanReplay::stage).collect(Collectors.toList());
-		return Step.builder().key(recording.stepKey).type(recording.stepType).tier(recording.tier).kind(TargetKind.valueOf(recording.kind))
+		List<WorldPoint> targets = recording.getTargets().stream().map(PlanReplay::point).collect(Collectors.toList());
+		List<Stage> stages = recording.getStages() == null ? List.of() : recording.getStages().stream().map(PlanReplay::stage).collect(Collectors.toList());
+		return Step.builder().key(recording.getStepKey()).type(recording.getStepType()).tier(recording.getTier()).kind(TargetKind.valueOf(recording.getKind()))
 			.targets(targets).stages(stages).regions(List.of()).build();
 	}
 
-	private static Stage stage(PlanTrace.RecordedStage recorded)
+	private static Stage stage(PlanRecording.RecordedStage recorded)
 	{
-		return Stage.builder().kind(Stage.Kind.valueOf(recorded.kind)).act(recorded.act)
-			.tiles(recorded.tiles.stream().map(PlanReplay::point).collect(Collectors.toList())).worn(recorded.worn).build();
+		return Stage.builder().kind(Stage.Kind.valueOf(recorded.getKind())).act(recorded.getAct())
+			.tiles(recorded.getTiles().stream().map(PlanReplay::point).collect(Collectors.toList())).worn(recorded.getWorn()).build();
 	}
 
-	private static RequiredItems required(PlanTrace.Recording recording)
+	private static RequiredItems required(PlanRecording recording)
 	{
-		List<RequiredItems.Need> needs = recording.needs.stream()
-			.map(need -> new RequiredItems.Need(need.name, requirement(need), need.stepItem, need.inCoreTag, need.blocksRoute))
+		List<RequiredItems.Need> needs = recording.getNeeds().stream()
+			.map(need -> new RequiredItems.Need(need.getName(), requirement(need), need.isStepItem(), need.isInCoreTag(), need.isBlocksRoute()))
 			.collect(Collectors.toList());
-		return RequiredItems.builder().needs(needs).stash(StashMemory.State.valueOf(recording.stash)).build();
+		return RequiredItems.builder().needs(needs).stash(StashMemory.State.valueOf(recording.getStash())).build();
 	}
 
-	private static ItemRequirement requirement(PlanTrace.RecordedNeed need)
+	private static ItemRequirement requirement(PlanRecording.RecordedNeed need)
 	{
-		if (need.gearPieces == null)
+		if (need.getGearPieces() == null)
 		{
-			return new AnyOf(Set.copyOf(need.ids));
+			return new AnyOf(Set.copyOf(need.getIds()));
 		}
-		Map<Integer, GearPicker.Piece> pieces = need.gearPieces.stream().collect(Collectors.toMap(GearPicker.Piece::getItemId, piece -> piece));
-		return new GearRequirement(need.name, need.gearAtLeast, pieces);
+		Map<Integer, GearPicker.Piece> pieces = need.getGearPieces().stream().collect(Collectors.toMap(GearPicker.Piece::getItemId, piece -> piece));
+		return new GearRequirement(need.getName(), need.getGearAtLeast(), pieces);
 	}
 
-	private static PlanStart start(PlanTrace.Recording recording, File folder, WalkTable table, WorldMap map, AvailabilityEngine engine)
+	private static PlanStart start(PlanRecording recording, File folder, WalkTable table, WorldMap map, AvailabilityEngine engine)
 		throws IOException
 	{
-		WorldPoint tile = point(recording.startTile);
-		boolean[] rowOpen = new WalkGates(table, recording.player, engine, recording.nowMinutes).rowOpen();
-		LoadedScene scene = recording.sceneFile == null ? null : scene(new File(folder, recording.sceneFile));
+		WorldPoint tile = point(recording.getStartTile());
+		boolean[] rowOpen = new WalkGates(table, recording.getPlayer(), engine, recording.getNowMinutes()).rowOpen();
+		LoadedScene scene = recording.getSceneFile() == null ? null : scene(new File(folder, recording.getSceneFile()));
 		WalkCosts walk = WalkCosts.from(Ground.world(map, scene, table, row -> rowOpen[row]), tile);
-		switch (PlanStart.Kind.valueOf(recording.startKind))
+		switch (PlanStart.Kind.valueOf(recording.getStartKind()))
 		{
 			case SCENE:
 				return PlanStart.scene(tile, walk);

@@ -36,6 +36,11 @@ public final class AvailabilityEngine
 		this.itemNames = itemNames;
 	}
 
+	public RuneModel getRunes()
+	{
+		return runes;
+	}
+
 	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */
 	public AvailabilitySet carried(List<CatalogRow> rows, PlayerSnapshot player, long nowMinutes)
 	{
