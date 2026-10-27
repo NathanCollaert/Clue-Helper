@@ -2,6 +2,7 @@ package com.cluehelper.transport;
 
 import com.cluehelper.player.PositionRules;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Builder;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
@@ -11,11 +12,17 @@ import net.runelite.api.coords.WorldPoint;
  * landing row (destination and code, no origin) per code; any entry reaches any landing.
  */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class CatalogRow
 {
 	private static final String QUETZAL_MENU = "quetzal ";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
+	private static final Pattern BRACKETED_NOTE = Pattern.compile(" \\([^)]*\\)$");
+	/** A jewellery box's or mounted item's "7. " before its place. */
+	private static final Pattern HOTKEY_LABEL = Pattern.compile("^[0-9A-Z]\\. ");
+	/** The words round a place: "Teleport to House tablet", "Kharyrll Teleport", "Watson teleport"; all of "Teleport". */
+	private static final Pattern TELEPORT_WORDS = Pattern.compile(
+		"^Teleport to |^Teleport$|(" + MINIGAME_SUFFIX + "| [Tt]eleport( scroll)?| tablet)$");
 
 	String name;
 	Category category;
@@ -67,6 +74,20 @@ public class CatalogRow
 	public String minigameName()
 	{
 		return name.replace(MINIGAME_SUFFIX, "");
+	}
+
+	/**
+	 * Where the row goes, as its name says it: the part after the last colon, without the teleport words round it;
+	 * empty when the name doesn't say ("Farming cape: Teleport", "Ectophial").
+	 */
+	public String destination()
+	{
+		String place = BRACKETED_NOTE.matcher(name).replaceFirst("");
+		int colon = place.lastIndexOf(": ");
+		String last = colon >= 0 ? HOTKEY_LABEL.matcher(place.substring(colon + 2)).replaceFirst("") : place;
+		String stripped = TELEPORT_WORDS.matcher(last).replaceAll("");
+		boolean onlyAnItem = colon < 0 && stripped.equals(place);
+		return onlyAnItem ? "" : stripped;
 	}
 
 	/** The place after the row name's colon, without its bracketed note. */

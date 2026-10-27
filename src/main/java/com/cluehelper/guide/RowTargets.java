@@ -95,7 +95,9 @@ final class RowTargets
 					.objectIds(objectsOf(row)).build();
 			}
 			case "box":
-				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objectsOf(row)).build();
+				// The ornate box's own option repeats the last place it sent the player to: one click when it's this one.
+				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objectsOf(row))
+					.path(List.of(row.destination())).build();
 			case "npc":
 				return MenuTarget.builder().npcIds(Set.of(row.getObjectId())).path(List.of(parts[1].split(MENU_STEP))).build();
 			default:

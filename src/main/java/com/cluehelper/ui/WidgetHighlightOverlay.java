@@ -2,6 +2,7 @@ package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.MenuLines;
+import com.cluehelper.guide.PrayerFilters;
 import com.cluehelper.guide.ScrollBook;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.guide.Widgets;
@@ -10,7 +11,9 @@ import com.cluehelper.step.Stages;
 import com.cluehelper.step.Step;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Prayer;
@@ -45,12 +48,14 @@ public class WidgetHighlightOverlay extends Overlay
 	private final MenuLines menuLines;
 	private final Highlighter highlighter;
 	private final ClueLink clueLink;
+	private final PrayerFilters prayerFilters;
 
 	@Inject
 	WidgetHighlightOverlay(Client client, StepGuide guide, ClueHelperConfig config, MenuLines menuLines, Highlighter highlighter,
-		ClueLink clueLink)
+		ClueLink clueLink, PrayerFilters prayerFilters)
 	{
 		this.clueLink = clueLink;
+		this.prayerFilters = prayerFilters;
 		this.menuLines = menuLines;
 		this.highlighter = highlighter;
 		this.client = client;
@@ -63,6 +68,7 @@ public class WidgetHighlightOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		prayerFilters.rememberFor(clueLink.getCurrentStep());
 		if (menuLines.showing(guide.getMenuTarget()) || guide.isTravelling())
 		{
 			return null;
@@ -89,18 +95,36 @@ public class WidgetHighlightOverlay extends Overlay
 		return null;
 	}
 
-	/** Sherlock's prayer task: the prayer to turn on while the task is left, and to turn off again while it is on. */
+	/**
+	 * Sherlock's prayer task: the prayer to turn on while the task is left, and to turn off again while it is on; then the
+	 * filters changed to find it, set back.
+	 */
 	private void outlinePrayer(Graphics2D graphics)
 	{
 		Step step = clueLink.getCurrentStep();
 		Prayer prayer = Stages.prayerToActivate(step);
-		if (prayer == null || !Stages.taskLeft(step) && !client.isPrayerActive(prayer))
+		if (prayer == null)
 		{
 			return;
 		}
+		if (Stages.taskLeft(step) || client.isPrayerActive(prayer))
+		{
+			outlinePrayerButton(graphics, prayer);
+			return;
+		}
+		outlineFiltersToRestore(graphics);
+	}
+
+	private void outlinePrayerButton(Graphics2D graphics, Prayer prayer)
+	{
 		if (!shown(InterfaceID.Prayerbook.UNIVERSE))
 		{
 			outline(graphics, tabStone(PRAYER_STONES));
+			return;
+		}
+		if (shown(InterfaceID.Prayerbook.FILTERMENU))
+		{
+			outlineToggles(graphics, prayerFilters.hidingTiers());
 			return;
 		}
 		Widget widget = named(client.getWidget(InterfaceID.Prayerbook.UNIVERSE), prayer.name());
@@ -110,6 +134,42 @@ public class WidgetHighlightOverlay extends Overlay
 			return;
 		}
 		highlighter.box(graphics, widget.getBounds());
+	}
+
+	private void outlineFiltersToRestore(Graphics2D graphics)
+	{
+		List<PrayerFilters.Filter> changed = prayerFilters.changed();
+		boolean menuOpen = shown(InterfaceID.Prayerbook.FILTERMENU);
+		if (changed.isEmpty() && !menuOpen)
+		{
+			return;
+		}
+		if (!shown(InterfaceID.Prayerbook.UNIVERSE))
+		{
+			outline(graphics, tabStone(PRAYER_STONES));
+			return;
+		}
+		if (!menuOpen)
+		{
+			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
+			return;
+		}
+		outlineToggles(graphics, changed);
+	}
+
+	/** The filters' lines in the open filter menu, found by their text; with none left, the Filters button to close it. */
+	private void outlineToggles(Graphics2D graphics, List<PrayerFilters.Filter> filters)
+	{
+		List<Widget> toggles = Widgets.descendants(client.getWidget(InterfaceID.Prayerbook.FILTERMENU)).stream()
+			.filter(widget -> widget.getText() != null && filters.stream()
+				.anyMatch(filter -> Text.removeTags(widget.getText()).toLowerCase().contains(filter.getPhrase())))
+			.collect(Collectors.toList());
+		if (toggles.isEmpty())
+		{
+			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
+			return;
+		}
+		toggles.forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 	}
 
 	/** The prayer's own button, found by its name: the book's component order isn't the prayers' order. */

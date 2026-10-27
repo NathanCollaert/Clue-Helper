@@ -161,7 +161,8 @@ final class WalkSearch
 			{
 				pushed += push(buckets, next, cost + ground.stepCost(x, y, plane, d), tile, NONE);
 			}
-			else if (d < Directions.STRAIGHT && ground.isBlocked(nx, ny, plane) && ground.openRowsFrom(next).length > 0)
+			else if (d < Directions.STRAIGHT && ground.isBlocked(nx, ny, plane) && ground.openRowsFrom(next).length > 0
+				&& !ground.isWallBetween(x, y, plane, Directions.DX[d], Directions.DY[d]))
 			{
 				pushed += push(buckets, next, cost + 1, tile, NONE);
 			}

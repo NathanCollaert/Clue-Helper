@@ -16,10 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.Model;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
 import net.runelite.api.NPC;
 import net.runelite.api.Renderable;
 import net.runelite.api.TileObject;
 import net.runelite.api.WorldView;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
@@ -50,6 +54,14 @@ public class Highlighter
 	 * sliver no one sees.
 	 */
 	private static final int FLAT_MARKER_FACES = 2;
+	/**
+	 * The outline takes only a world ring's butterflies, not its mushrooms: a circle on the ground marks them. A house's
+	 * ring and spirit tree outline their mushrooms themselves.
+	 */
+	private static final Set<Integer> FAIRY_RINGS = Set.of(ObjectID.FAIRYRING_MINORHUB, ObjectID.FAIRYRING_HOMEHUB);
+	/** In local units: a tile is 128. */
+	private static final int RING_RADIUS = 150;
+	private static final int RING_POINTS = 32;
 
 	private final Client client;
 	private final ModelOutlineRenderer outlines;
@@ -91,6 +103,10 @@ public class Highlighter
 				graphics.fill(silhouette.of(object));
 			}
 			outlines.drawOutline(object, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
+			if (FAIRY_RINGS.contains(object.getId()))
+			{
+				groundRing(graphics, object);
+			}
 		}
 		catch (NullPointerException e)
 		{
@@ -99,6 +115,28 @@ public class Highlighter
 				log.warn("No model to highlight object {} at {}", object.getId(), object.getWorldLocation(), e);
 			}
 		}
+	}
+
+	/** The mushrooms' circle on the ground round the object, outlined: the ring itself, not a box about it. */
+	private void groundRing(Graphics2D graphics, TileObject object)
+	{
+		LocalPoint centre = object.getLocalLocation();
+		Polygon ring = new Polygon();
+		for (int i = 0; i < RING_POINTS; i++)
+		{
+			double angle = 2 * Math.PI * i / RING_POINTS;
+			LocalPoint at = new LocalPoint(centre.getX() + (int) (RING_RADIUS * Math.cos(angle)),
+				centre.getY() + (int) (RING_RADIUS * Math.sin(angle)), centre.getWorldView());
+			Point point = Perspective.localToCanvas(client, at, object.getPlane());
+			if (point == null)
+			{
+				return;
+			}
+			ring.addPoint(point.getX(), point.getY());
+		}
+		graphics.setColor(Markers.COLOUR);
+		graphics.setStroke(new BasicStroke(STROKE));
+		graphics.draw(ring);
 	}
 
 	/** Where an object the outline renderer can't draw is clicked: its clickbox, else its tile. */

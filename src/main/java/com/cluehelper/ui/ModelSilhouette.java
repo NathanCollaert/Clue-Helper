@@ -88,7 +88,7 @@ final class ModelSilhouette
 		}
 	}
 
-	/** Back faces are left out, so every face added winds the same way and overlaps fill once. */
+	/** Every face is added wound the same way, so overlaps fill once and the shape is the whole model's. */
 	private void addFaces(Path2D shape, WorldView view, Renderable renderable, int localX, int localY, int z,
 		int orientation)
 	{
@@ -111,11 +111,15 @@ final class ModelSilhouette
 			int b = second[face];
 			int c = third[face];
 			boolean onScreen = y[a] != OFF_SCREEN && y[b] != OFF_SCREEN && y[c] != OFF_SCREEN;
-			if (onScreen && isDrawn(model, face) && facesCamera(x[a], y[a], x[b], y[b], x[c], y[c]))
+			if (onScreen && isDrawn(model, face))
 			{
+				// Turned to wind as the faces facing the camera do: a flat model wound the other way (Doris' trapdoor) still fills
+				boolean facing = facesCamera(x[a], y[a], x[b], y[b], x[c], y[c]);
+				int next = facing ? b : c;
+				int last = facing ? c : b;
 				shape.moveTo(x[a], y[a]);
-				shape.lineTo(x[b], y[b]);
-				shape.lineTo(x[c], y[c]);
+				shape.lineTo(x[next], y[next]);
+				shape.lineTo(x[last], y[last]);
 				shape.closePath();
 			}
 		}

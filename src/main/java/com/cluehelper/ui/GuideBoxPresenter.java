@@ -57,8 +57,8 @@ public class GuideBoxPresenter
 
 	public void refresh()
 	{
-		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
-			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
+		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getShown(),
+			config.showNextStep() ? guide.getShownNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
 		GuideBox.GuideBoxBuilder shown = atStep.toBuilder();
 		if (atStep.getState().showsRoutes())

@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
+import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
 
 /**
  * Plans a recording again offline the way the plugin planned it live: the core clue resolved with today's step data,
@@ -98,7 +99,7 @@ public final class CampaignReplay
 		Client client = tape.client();
 		PlayerSnapshot player = recording.player;
 		Step travel = StageTarget.travelStep(asLive(resolve(recording, client), player, recording.banked),
-			PlayerSnapshot.items(player.getInventory()));
+			StageTarget.owned(player, recording.banked));
 		StepNeeds needs = new StepNeeds(client, id -> stashState(recording, id), (bonus, owned) -> gearPieces(recording, bonus.name(), owned),
 			() -> StepNeeds.ownedItemIds(player, recording.banked));
 		AvailabilityEngine engine = new AvailabilityEngine(runes, id -> "item " + id);
@@ -123,7 +124,7 @@ public final class CampaignReplay
 			.build();
 		Plan plan = Planner.withoutAlternatives(input);
 		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start,
-			recording.settings::isScrollBookOutOfWilderness);
+			recording.settings::isScrollBookOutOfWilderness, id -> false);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 		return Outcome.of(plan, guide);
 	}
@@ -133,7 +134,7 @@ public final class CampaignReplay
 		try
 		{
 			StepResolver resolver = new StepResolver(() -> index);
-			Step step = resolver.resolve(CoreClues.entry(recording.coreClue), CoreClues.plugin(client));
+			Step step = resolveAsRecorded(resolver, CoreClues.entry(recording.coreClue), recording.challengeCompleted, client);
 			if (step.getKey().equals(recording.key))
 			{
 				return step;
@@ -148,6 +149,30 @@ public final class CampaignReplay
 		catch (ReflectiveOperationException e)
 		{
 			throw new IllegalStateException("can't read core's clue " + recording.coreClue + " for " + recording.key, e);
+		}
+	}
+
+	/**
+	 * Core's clues are shared objects: replayed in the live client on Finish, a Sherlock task done since the capture is
+	 * done on the very clue the replay reads, so it is set back to its captured state for the resolve.
+	 */
+	private Step resolveAsRecorded(StepResolver resolver, ClueScroll clue, Boolean completed, Client client)
+		throws ReflectiveOperationException
+	{
+		if (!(clue instanceof SkillChallengeClue) || completed == null)
+		{
+			return resolver.resolve(clue, CoreClues.plugin(client));
+		}
+		SkillChallengeClue challenge = (SkillChallengeClue) clue;
+		boolean live = challenge.isChallengeCompleted();
+		challenge.setChallengeCompleted(completed);
+		try
+		{
+			return resolver.resolve(clue, CoreClues.plugin(client));
+		}
+		finally
+		{
+			challenge.setChallengeCompleted(live);
 		}
 	}
 

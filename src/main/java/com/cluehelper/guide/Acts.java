@@ -7,6 +7,7 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.NpcID;
@@ -63,7 +64,21 @@ final class Acts
 		}
 		SubStep.SubStepBuilder act = SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step));
 		String npc = talkedTo(step);
-		return npc == null ? act.build() : talkTo(act, npc).build();
+		if (npc != null)
+		{
+			return talkTo(act, npc).build();
+		}
+		String object = talkedToObject(step);
+		return object == null ? act.build() : act.text("Talk to the " + object.toLowerCase()).option(TALK_OPTION)
+			.objectIds(Set.copyOf(step.getObjectIds())).build();
+	}
+
+	/** The object the step's act talks to (the spirit tree); null for a step whose act is something else. */
+	private static String talkedToObject(Step step)
+	{
+		boolean ownAct = TYPES_WITH_OWN_ACT.contains(step.getType());
+		return ownAct ? null : step.getData().getTargets().stream().map(StepIndex.Target::getTalkTo).filter(Objects::nonNull)
+			.findFirst().orElse(null);
 	}
 
 	/** The NPC the step's own act talks to; null for a step whose act is something else. */

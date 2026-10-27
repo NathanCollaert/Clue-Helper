@@ -16,6 +16,8 @@ final class CampaignRecording
 	String key;
 	/** Core's list and the clue's place in it ({@code CrypticClue#12}); the key finds it when the list moved. */
 	String coreClue;
+	/** A Sherlock task's state at capture; null for other clues and for recordings made before it was kept. */
+	Boolean challengeCompleted;
 	String tier;
 	String type;
 	String text;

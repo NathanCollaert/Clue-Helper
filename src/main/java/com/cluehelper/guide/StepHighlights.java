@@ -34,9 +34,13 @@ final class StepHighlights
 {
 	private static final String SEARCH_OPTION = "Search";
 	private static final String REMOVE_OPTION = "Remove";
+	private static final String OPEN_OPTION = "Open";
+	private static final String CLOSE_OPTION = "Close";
 	private static final String TELEPORT_TO_DESTINATION = "Teleport to Destination";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Set.of(ObjectID.FAIRYRING_HOMEHUB, ObjectID.FAIRYRING_MINORHUB,
 		ObjectID.POH_FAIRY_RING, ObjectID.POH_SPIRIT_RING);
+	/** The house's spiritual fairy tree lists its ring options above "Tree", so a left click never opens the tree list. */
+	private static final Set<Integer> NOT_FILLED_UNHOVERED = Set.of(ObjectID.POH_SPIRIT_RING);
 
 	private final Client client;
 	private final PlayerModel player;
@@ -129,9 +133,10 @@ final class StepHighlights
 	List<TileObject> fillObjects(List<TileObject> objects, Highlights shown)
 	{
 		String objectOption = shown.getObjectOption();
+		// Filled until a hover shows otherwise: most left clicks do the step, and a hover is kept for later sessions
 		if (objectOption != null)
 		{
-			return objects.stream().filter(object -> leftClicks.isLeftClick(object, objectOption))
+			return objects.stream().filter(object -> isFilledUnhovered(object) || leftClicks.isLeftClick(object, objectOption))
 				.collect(Collectors.toUnmodifiableList());
 		}
 		MenuTarget menuTarget = shown.getMenuTarget();
@@ -140,10 +145,22 @@ final class StepHighlights
 		String label = shown.getOneClickLabel();
 		boolean houseList = menuTarget.getLine() == MenuTarget.Line.NEXUS || menuTarget.getLine() == MenuTarget.Line.BOX;
 		return objects.stream()
-			.filter(object -> ring ? ringGoesTo(leftClicks.object(object), menuTarget.getLineKey())
-				: oneClickTo(leftClicks.object(object), label, firstClick)
-				|| houseList && MenuLabels.isOpener(leftClicks.object(object)))
+			.filter(object -> isFilledUnhovered(object) || (ring ? ringGoesTo(leftClicks.object(object), menuTarget.getLineKey())
+				: oneClickTo(leftClicks.object(object), label, firstClick) || isOpenedAlready(object, firstClick)
+				|| houseList && MenuLabels.isOpener(leftClicks.object(object))))
 			.collect(Collectors.toUnmodifiableList());
+	}
+
+	/** Someone opened it already, so its left click now goes on through it ("Go-down" on Doris' trapdoor), unless it shuts it. */
+	private boolean isOpenedAlready(TileObject object, String firstClick)
+	{
+		return OPEN_OPTION.equalsIgnoreCase(firstClick) && !leftClicks.offers(object, OPEN_OPTION)
+			&& !CLOSE_OPTION.equalsIgnoreCase(leftClicks.object(object));
+	}
+
+	private boolean isFilledUnhovered(TileObject object)
+	{
+		return !leftClicks.isLearned(object) && !NOT_FILLED_UNHOVERED.contains(object.getId());
 	}
 
 	/** Each worn item's "Remove", coloured in its menu; worn options name the item but carry no id. */
@@ -152,6 +169,20 @@ final class StepHighlights
 		Set<String> names = worn.stream().map(id -> MenuLabels.normalise(client.getItemDefinition(id).getName()))
 			.collect(Collectors.toUnmodifiableSet());
 		return MenuTarget.builder().itemIds(worn).itemNames(names).path(List.of(REMOVE_OPTION)).build();
+	}
+
+	/** Deposited items are clicked in the deposit box, which shows the inventory and worn items itself. */
+	private static StepGuide.Tab actItemsTab(SubStep.Done done)
+	{
+		switch (done)
+		{
+			case SLOTS_EMPTY:
+				return StepGuide.Tab.EQUIPMENT;
+			case ITEMS_GONE:
+				return StepGuide.Tab.NONE;
+			default:
+				return StepGuide.Tab.INVENTORY;
+		}
 	}
 
 	/** The act's items whose left click does the act: put on, taken off (a Max cape left-clicking "Home" isn't), else all. */
@@ -172,7 +203,8 @@ final class StepHighlights
 	List<NPC> fillNpcs(List<NPC> npcs, String npcOption)
 	{
 		return npcOption == null ? List.of()
-			: npcs.stream().filter(npc -> npcOption.equalsIgnoreCase(leftClicks.npc(npc))).collect(Collectors.toUnmodifiableList());
+			: npcs.stream().filter(npc -> !leftClicks.isLearned(npc) || npcOption.equalsIgnoreCase(leftClicks.npc(npc)))
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	/** An act's own items, its STASH unit, the gear to put on, or a planted tree's line; else only its one-click fill. */
@@ -191,8 +223,7 @@ final class StepHighlights
 		if (!current.getActItems().isEmpty())
 		{
 			boolean takesOff = current.getDone() == SubStep.Done.SLOTS_EMPTY;
-			shown.items(current.getActItems()).fillItems(actItemFill(current))
-				.tab(takesOff ? StepGuide.Tab.EQUIPMENT : StepGuide.Tab.INVENTORY);
+			shown.items(current.getActItems()).fillItems(actItemFill(current)).tab(actItemsTab(current.getDone()));
 			return (takesOff ? shown.menuTarget(removeTarget(current.getActItems())) : shown).build();
 		}
 		String planted = taskActs.plantedTreeLine(current, step);

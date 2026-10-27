@@ -14,9 +14,10 @@ import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
 import com.cluehelper.transport.SpellbookChange;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntFunction;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ final class LegSteps
 	/** A feel's information depends on its exact tile, so the walk ends on the marker. */
 	private static final int PROBE_ARRIVE_TILES = 0;
 	private static final String FAIRY_RING_PREFIX = "Fairy ring";
+	private static final String CODE_SEPARATOR = "-";
 	private static final String TALK_TO = "Talk to";
 	private static final String NPC_MENU = "npc ";
 	private static final Map<Category, String> RIDE_PLACES = Map.of(Category.BOAT, "the boat", Category.CANOE,
@@ -59,13 +61,13 @@ final class LegSteps
 	}
 
 	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
-	static SubStep withdraw(Route route, IntFunction<String> itemNames)
+	static SubStep withdraw(Route route, Function<ItemUse, String> itemLines)
 	{
 		if (route.getWithdraw().isEmpty())
 		{
 			return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text("Close the bank").build();
 		}
-		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemNames)).collect(Collectors.toList());
+		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemLines)).collect(Collectors.toList());
 		String text = route.isDepositFirst() ? "Deposit to free slots, then withdraw:" : "Withdraw from the bank:";
 		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text(text).items(List.copyOf(items))
 			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
@@ -130,7 +132,29 @@ final class LegSteps
 			.waypoint(standsAt).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).row(row).build();
 	}
 
-	static SubStep fairyRing(Leg leg)
+	/** A chained code (the Fairy Queen's hideout) is dialled one code at a time, each from the ring the last one landed at. */
+	static List<SubStep> fairyRing(Leg leg)
+	{
+		CatalogRow landing = leg.getLanding();
+		String code = landing.getCode();
+		if (code == null || !code.contains(CODE_SEPARATOR))
+		{
+			return List.of(oneRing(leg));
+		}
+		String[] hops = code.split(CODE_SEPARATOR);
+		List<SubStep> steps = new ArrayList<>();
+		for (int i = 0; i < hops.length; i++)
+		{
+			boolean last = i == hops.length - 1;
+			steps.add(SubStep.builder().kind(SubStep.Kind.FAIRY_RING).text("Fairy ring " + MenuLines.menuColoured(hops[i]))
+				.detail("Code " + (i + 1) + " of " + hops.length + (last ? "" : ", then dial the next where you land"))
+				.waypoint(i == 0 ? leg.getFrom() : null).goal(last ? leg.getTo() : null).radius(SubSteps.LANDING_TILES)
+				.row(landing.toBuilder().code(hops[i]).build()).build());
+		}
+		return List.copyOf(steps);
+	}
+
+	private static SubStep oneRing(Leg leg)
 	{
 		CatalogRow landing = leg.getLanding();
 		String place = landing.getName();
@@ -173,11 +197,10 @@ final class LegSteps
 			+ text.substring(colon + 2);
 	}
 
-	/** A required item's use carries the whole banked stack, so the amount still to take comes with the name. */
-	private static String itemLine(ItemUse use, IntFunction<String> itemNames)
+	private static String itemLine(ItemUse use, Function<ItemUse, String> itemLines)
 	{
 		String storage = use.getContainer() == Container.GROUP_STORAGE ? " (group storage)" : "";
-		return itemNames.apply(use.getItemId()) + storage;
+		return itemLines.apply(use) + storage;
 	}
 
 	private static String exitText(Exit exit)

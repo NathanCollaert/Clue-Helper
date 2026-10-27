@@ -651,7 +651,7 @@ public class ClueHelperDevPlugin extends Plugin
 			.collect(java.util.stream.Collectors.joining(", "));
 		PlanStart start = clueHelper.getRoutes().getStart();
 		String now = (current == null ? "no sub-step" : current.getKind() + " " + current.getText())
-			+ " | line to " + (line.isEmpty() ? "nothing" : text(line.get(line.size() - 1)))
+			+ " | line " + (line.isEmpty() ? "to nothing" : "from " + text(line.get(0)) + " to " + text(line.get(line.size() - 1)))
 			+ " | outlined " + (objects.isEmpty() ? "nothing" : objects)
 			+ " | plan start " + (start == null ? "none" : start.getKind() + (start.getTile() == null ? "" : " " + text(start.getTile())));
 		if (!now.equals(lastLineTrace))

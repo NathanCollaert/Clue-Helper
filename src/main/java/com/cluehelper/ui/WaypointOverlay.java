@@ -335,15 +335,22 @@ public class WaypointOverlay extends Overlay
 		{
 			conversationStepKey = null;
 		}
-		else if (conversationStepKey == null)
+		else if (conversationStepKey == null && isTalkStep())
 		{
 			conversationStepKey = currentStepKey();
 		}
 	}
 
+	/** A dig or a search has no one to talk to: a chat on the way (a cave's exit) doesn't end the walk. */
+	private boolean isTalkStep()
+	{
+		Step step = clueLink.getCurrentStep();
+		return step != null && !step.getNpcsAtStep().isEmpty();
+	}
+
 	/**
-	 * Once the player is talking, the way there is done and the chat options carry the step. A step the talk moved on
-	 * to (the next clue handed over) gets its line while the chat is still open.
+	 * Once the player is talking on a talk step, the way there is done and the chat options carry the step. A step the
+	 * talk moved on to (the next clue handed over) gets its line while the chat is still open.
 	 */
 	private boolean isTalkingOnThisStep()
 	{

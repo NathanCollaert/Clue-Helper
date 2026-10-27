@@ -55,7 +55,7 @@ public final class ClientTape
 		return new TreeMap<>(answers);
 	}
 
-	/** Calls a replay can't answer: they returned something other than a value or a definition. */
+	/** Calls a replay can't answer: they returned something other than a value, a definition or nothing. */
 	public Set<String> unreplayable()
 	{
 		return Set.copyOf(unreplayable);
@@ -126,7 +126,11 @@ public final class ClientTape
 			}
 			throw new IllegalStateException("not on the tape: " + key);
 		}
-		unreplayable.add(key);
+		// A call that returns nothing (core scrolling a list with runScript) replays as nothing: no answer is missing
+		if (method.getReturnType() != void.class)
+		{
+			unreplayable.add(key);
+		}
 		return invoke(method, target, args);
 	}
 

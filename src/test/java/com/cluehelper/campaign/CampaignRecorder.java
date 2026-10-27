@@ -36,6 +36,8 @@ import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
+import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /**
@@ -77,9 +79,10 @@ public final class CampaignRecorder
 	{
 		CampaignRecording recording = new CampaignRecording();
 		ClientTape tape = ClientTape.recording(client);
-		Step step = new StepResolver(() -> index).resolve(CoreClues.entry(coreClue), CoreClues.plugin(tape.client()));
+		ClueScroll clue = CoreClues.entry(coreClue);
+		Step step = new StepResolver(() -> index).resolve(clue, CoreClues.plugin(tape.client()));
 		Step travel = StageTarget.travelStep(CampaignReplay.asLive(step, input.getPlayer(), input.getBanked()),
-			PlayerSnapshot.items(input.getPlayer().getInventory()));
+			StageTarget.owned(input.getPlayer(), input.getBanked()));
 		recording.stashStates = new TreeMap<>();
 		recording.gearPieces = new TreeMap<>();
 		recording.onlyInBankedKit = new TreeMap<>();
@@ -88,12 +91,13 @@ public final class CampaignRecorder
 			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()));
 		RequiredItems required = needs.of(travel);
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
-			input.getSettings()::isScrollBookOutOfWilderness);
+			input.getSettings()::isScrollBookOutOfWilderness, id -> false);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 
 		Set<Integer> usable = usableItemIds(input, required, travel, recording);
 		recording.key = step.getKey();
 		recording.coreClue = coreClue;
+		recording.challengeCompleted = clue instanceof SkillChallengeClue ? ((SkillChallengeClue) clue).isChallengeCompleted() : null;
 		recording.tier = step.getTier();
 		recording.type = step.getType();
 		recording.text = step.getText();

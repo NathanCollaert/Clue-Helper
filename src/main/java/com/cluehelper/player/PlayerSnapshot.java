@@ -123,6 +123,12 @@ public final class PlayerSnapshot
 		return inventory.keySet().stream().anyMatch(id -> names.apply(id).toLowerCase().startsWith(nameStart));
 	}
 
+	/** Whether an item in the inventory or worn has a name starting with {@code nameStart}, lower case. */
+	public boolean holdsOrWearsItemNamed(String nameStart, IntFunction<String> names)
+	{
+		return carriedIds().stream().anyMatch(id -> names.apply(id).toLowerCase().startsWith(nameStart));
+	}
+
 	public int count(Container container, int itemId)
 	{
 		if (container == Container.INVENTORY)

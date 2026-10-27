@@ -137,6 +137,7 @@ public class ActWatcher
 			case EQUIPPED:
 			case ITEM_CARRIED:
 			case ITEM_GONE:
+			case ITEMS_GONE:
 			case WAY_IN_WORN:
 			case GEAR_WORN:
 			case SLOTS_EMPTY:

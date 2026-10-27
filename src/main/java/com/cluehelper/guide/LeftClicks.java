@@ -1,7 +1,10 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.memory.MemorySlot;
+import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.player.Container;
 import com.cluehelper.player.ItemUse;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +31,7 @@ import net.runelite.api.widgets.WidgetUtil;
 @Singleton
 public final class LeftClicks
 {
+	static final String KEY = "leftClicks";
 	private static final String ITEM = "item:";
 	private static final String WORN = "worn:";
 	private static final String WORN_ID = "wornid:";
@@ -47,13 +51,15 @@ public final class LeftClicks
 
 	private final Client client;
 	private final SwapperClicks swapperClicks;
-	private final Map<String, String> learned = new HashMap<>();
+	/** Kept in the profile, so a hover once is enough for every later session. */
+	private final MemorySlot<Learned> remembered;
 
 	@Inject
-	LeftClicks(Client client, SwapperClicks swapperClicks)
+	LeftClicks(Client client, SwapperClicks swapperClicks, MemoryStore memory)
 	{
 		this.client = client;
 		this.swapperClicks = swapperClicks;
+		this.remembered = memory.slot(KEY, Learned.class, Learned::new);
 	}
 
 	/** @return whether the left click learned is new */
@@ -61,7 +67,7 @@ public final class LeftClicks
 	{
 		String key = key(hoverMenuTop);
 		String option = hoverMenuTop.getOption();
-		return key != null && option != null && !option.equals(learned.put(key, option));
+		return key != null && option != null && remember(key, option);
 	}
 
 	String swappedOrLearned(ItemUse use)
@@ -104,21 +110,57 @@ public final class LeftClicks
 	/** A bank item's left click withdraws it, whatever the quantity, unless the bank hands out notes. */
 	public boolean withdraws(int bankItemId)
 	{
-		String known = learned.get(BANK + bankItemId);
+		String known = learned().get(BANK + bankItemId);
 		boolean withdrawClick = known == null || known.startsWith(WITHDRAW_OPTION);
 		return withdrawClick && client.getVarbitValue(VarbitID.BANK_WITHDRAWNOTES) == 0;
 	}
 
 	String object(TileObject object)
 	{
-		String known = learned.get(OBJECT + object.getId());
+		ObjectComposition shown = shown(object.getId());
+		String known = learned().get(OBJECT + shown.getId());
 		if (known != null)
 		{
 			return known;
 		}
-		ObjectComposition definition = client.getObjectDefinition(object.getId());
-		String swapped = swapperClicks.object(definition);
-		return swapped != null ? swapped : defaultClick(definition);
+		String swapped = swapperClicks.object(shown);
+		return swapped != null ? swapped : defaultClick(shown);
+	}
+
+	/** An ornate jewellery box's left click becomes the place it just sent the player to. */
+	void learnBoxUsed(Set<Integer> boxIds, String destination)
+	{
+		boxIds.forEach(id -> remember(OBJECT + shown(id).getId(), destination));
+	}
+
+	/** Its left click was seen on a hover, not guessed from its definition. */
+	boolean isLearned(TileObject object)
+	{
+		return learned().containsKey(OBJECT + shown(object.getId()).getId());
+	}
+
+	boolean isLearned(NPC npc)
+	{
+		return learned().containsKey(NPC + npc.getId());
+	}
+
+	/** Whether its shown form lists the option at all: an open trapdoor no longer offers "Open". */
+	boolean offers(TileObject object, String option)
+	{
+		String[] actions = shown(object.getId()).getActions();
+		return actions != null && Arrays.stream(actions).anyMatch(option::equalsIgnoreCase);
+	}
+
+	/** A multiloc whose form shown now lacks the option: a Dorgesh-Kaan lamp that isn't broken for this player. */
+	boolean isShownWithout(TileObject object, String option)
+	{
+		return changesForm(object) && !offers(object, option);
+	}
+
+	/** A multiloc: what it shows, and offers, depends on the player's varbits. */
+	boolean changesForm(TileObject object)
+	{
+		return client.getObjectDefinition(object.getId()).getImpostorIds() != null;
 	}
 
 	public boolean isLeftClick(TileObject object, String option)
@@ -130,7 +172,7 @@ public final class LeftClicks
 	/** Learned from the hover menu, else the NPC's first option. */
 	String npc(NPC npc)
 	{
-		String known = learned.get(NPC + npc.getId());
+		String known = learned().get(NPC + npc.getId());
 		if (known != null)
 		{
 			return known;
@@ -141,7 +183,7 @@ public final class LeftClicks
 
 	private String carried(int itemId)
 	{
-		String known = learned.get(ITEM + itemId);
+		String known = learned().get(ITEM + itemId);
 		return known != null ? known : swapperClicks.item(itemId);
 	}
 
@@ -151,9 +193,20 @@ public final class LeftClicks
 	 */
 	private String worn(int itemId)
 	{
-		String byName = learned.get(WORN + MenuLabels.normalise(client.getItemDefinition(itemId).getName()));
-		String known = byName != null ? byName : learned.get(WORN_ID + itemId);
+		String byName = learned().get(WORN + MenuLabels.normalise(client.getItemDefinition(itemId).getName()));
+		String known = byName != null ? byName : learned().get(WORN_ID + itemId);
 		return known != null ? known : swapperClicks.worn(itemId);
+	}
+
+	/**
+	 * A multiloc's own definition has no actions: its shown form's do, and each form clicks differently (Doris' trapdoor,
+	 * 12266, opens as 12267 and goes down as 12268), so left clicks are learned per shown form.
+	 */
+	private ObjectComposition shown(int objectId)
+	{
+		ObjectComposition placed = client.getObjectDefinition(objectId);
+		ObjectComposition impostor = placed.getImpostorIds() == null ? null : placed.getImpostor();
+		return impostor != null ? impostor : placed;
 	}
 
 	/** The house settings put the jewellery box's and nexus' left-click destination on their varbit-picked form. */
@@ -179,7 +232,7 @@ public final class LeftClicks
 		return null;
 	}
 
-	private static String key(MenuEntry entry)
+	private String key(MenuEntry entry)
 	{
 		Widget widget = entry.getWidget();
 		int group = widget == null ? -1 : WidgetUtil.componentToInterface(widget.getId());
@@ -204,7 +257,7 @@ public final class LeftClicks
 		{
 			return NPC + entry.getNpc().getId();
 		}
-		return OBJECT_OPTIONS.contains(entry.getType()) ? OBJECT + entry.getIdentifier() : null;
+		return OBJECT_OPTIONS.contains(entry.getType()) ? OBJECT + shown(entry.getIdentifier()).getId() : null;
 	}
 
 	private static int slotItem(Widget slot)
@@ -215,5 +268,29 @@ public final class LeftClicks
 		}
 		Widget item = slot.getChild(SLOT_ITEM_CHILD);
 		return item == null ? -1 : item.getItemId();
+	}
+
+	private Map<String, String> learned()
+	{
+		return remembered.get().clicks;
+	}
+
+	/** @return whether the left click is new */
+	private boolean remember(String key, String option)
+	{
+		if (option.equals(learned().get(key)))
+		{
+			return false;
+		}
+		Learned next = new Learned();
+		next.clicks = new HashMap<>(learned());
+		next.clicks.put(key, option);
+		remembered.set(next);
+		return true;
+	}
+
+	static final class Learned
+	{
+		Map<String, String> clicks = new HashMap<>();
 	}
 }

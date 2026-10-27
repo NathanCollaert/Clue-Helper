@@ -520,9 +520,23 @@ public class RoutePlanner
 	 */
 	private Route holdBlockedWalk(Route walk, Route best)
 	{
-		boolean hold = !walkHeld && walk.getFirstTransport() == null && !walk.isBanked();
+		boolean hold = !walkHeld && walk.getFirstTransport() == null && !walk.isBanked() && isAlong(walk);
 		walkHeld = hold;
 		return hold ? walk : best;
+	}
+
+	/** The player is still on the walk's way, not teleported off it (back to the Crafting Guild). */
+	private boolean isAlong(Route walk)
+	{
+		PlanStart from = start;
+		WorldPoint at = from == null ? null : from.getTile();
+		if (at == null || walk.getLegs().isEmpty())
+		{
+			return false;
+		}
+		Leg leg = walk.getLegs().get(0);
+		WorldPoint end = walk.getLegs().get(walk.getLegs().size() - 1).getTo();
+		return at.getPlane() == end.getPlane() && at.distanceTo2D(end) <= leg.getFrom().distanceTo2D(end) + LANDED_TILES;
 	}
 
 	/**

@@ -8,6 +8,7 @@ import com.cluehelper.step.EmptySlots;
 import com.cluehelper.step.GearBonus;
 import com.cluehelper.step.SpadeNeed;
 import com.cluehelper.step.Stage;
+import com.cluehelper.step.Stages;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepRequirements;
@@ -106,9 +107,19 @@ public class StepNeeds
 		{
 			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, false, true));
 		}
+		boolean gettingLeft = isGettingLeft(step);
 		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
 		{
-			needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false, false));
+			// An item the route still goes to get (the battered key from its bookcase) isn't brought along
+			if (!(gettingLeft && way.getFrom() != null))
+			{
+				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false, false));
+			}
+		}
+		ItemRequirement key = ownedKey(step);
+		if (key != null)
+		{
+			needs.add(new RequiredItems.Need(key.getCollectiveName(client), key, false, false, false));
 		}
 		Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds.get();
 		for (StepIndex.Gear gear : step.getData().getGear())
@@ -176,6 +187,23 @@ public class StepNeeds
 	private StashMemory.State stash(StepRequirements requirements)
 	{
 		return requirements.hasStash() ? stashStates.apply(requirements.getStashObjectId()) : StashMemory.State.NONE;
+	}
+
+	/** A stage that gets an item (a key, the battered key) is still ahead. */
+	private static boolean isGettingLeft(Step step)
+	{
+		return step.getStages().stream().anyMatch(stage -> stage.getKind() == Stage.Kind.KEY);
+	}
+
+	/**
+	 * The step's key once its kill stage is dropped, the key or its ring being owned (StageTarget): brought along, out of
+	 * the bank when it's there. Null while the key is still to be got, or for a step without one.
+	 */
+	private static ItemRequirement ownedKey(Step step)
+	{
+		return isGettingLeft(step) ? null : step.getData().getTargets().stream()
+			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null)
+			.findFirst().map(target -> Stages.keyItem(target.getKey())).orElse(null);
 	}
 
 	private static ItemRequirement anyOf(StepIndex.Requires way)

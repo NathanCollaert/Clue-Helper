@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Value;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.CollisionDataFlag;
@@ -38,7 +39,6 @@ public final class SceneDoors
 	private static final String WALK_THROUGH = "Walk-through";
 	private static final Set<String> LOCK_OPTIONS = Set.of("Pick-lock", "Unlock");
 	private static final String LOCKED = "locked";
-	private static final int NOTHING_OPENED = -1;
 	private static final int WEST = 1;
 	private static final int NORTH = 2;
 	private static final int EAST = 4;
@@ -55,8 +55,9 @@ public final class SceneDoors
 
 	/** The option that opens each object: Open, Slash, Squeeze-through, Walk-through, or NONE. */
 	private final Map<Integer, String> openOptions = new HashMap<>();
-	private final Set<Integer> lockedIds = new HashSet<>();
-	private int lastOpened = NOTHING_OPENED;
+	/** By place: doors share ids across the game, and one locked door doesn't lock every other one like it. */
+	private final Set<Door> locked = new HashSet<>();
+	private Door lastOpened;
 	private volatile boolean canSlash;
 	private final Client client;
 
@@ -74,15 +75,17 @@ public final class SceneDoors
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		lastOpened = OPEN.equals(event.getMenuOption()) ? event.getId() : NOTHING_OPENED;
+		WorldView view = client.getTopLevelWorldView();
+		boolean open = OPEN.equals(event.getMenuOption()) && view != null;
+		lastOpened = open ? new Door(event.getId(), WorldPoint.fromScene(view, event.getParam0(), event.getParam1(), view.getPlane())) : null;
 	}
 
 	public void onChatMessage(ChatMessage message)
 	{
 		boolean game = message.getType() == ChatMessageType.GAMEMESSAGE || message.getType() == ChatMessageType.SPAM;
-		if (game && lastOpened != NOTHING_OPENED && message.getMessage().toLowerCase().contains(LOCKED))
+		if (game && lastOpened != null && message.getMessage().toLowerCase().contains(LOCKED))
 		{
-			lockedIds.add(lastOpened);
+			locked.add(lastOpened);
 		}
 	}
 
@@ -113,7 +116,7 @@ public final class SceneDoors
 				{
 					Tile tile = tiles[plane][x][y];
 					WallObject wall = tile == null ? null : tile.getWallObject();
-					if (wall != null && opens(wall.getId()) && !passedByRow(table, wall.getId(), view, x, y, plane))
+					if (wall != null && opensOnClick(wall) && !passedByRow(table, wall.getId(), view, x, y, plane))
 					{
 						clearWall(flags[plane], doorSides[plane], x, y, wall.getOrientationA());
 					}
@@ -149,7 +152,7 @@ public final class SceneDoors
 	/** A door, web, fence or doorway the path can go through with one click. */
 	public boolean opensOnClick(WallObject wall)
 	{
-		return opens(wall.getId());
+		return opens(wall.getId()) && !locked.contains(new Door(wall.getId(), wall.getWorldLocation()));
 	}
 
 	/** Client thread only. The closed door standing across {@code tile}'s diagonal, or null. */
@@ -161,7 +164,8 @@ public final class SceneDoors
 		}
 		for (GameObject object : tile.getGameObjects())
 		{
-			if (object != null && (object.getConfig() & OBJECT_TYPE_MASK) == DIAGONAL_WALL && opens(object.getId()))
+			if (object != null && (object.getConfig() & OBJECT_TYPE_MASK) == DIAGONAL_WALL && opens(object.getId())
+				&& !locked.contains(new Door(object.getId(), object.getWorldLocation())))
 			{
 				return object;
 			}
@@ -177,7 +181,7 @@ public final class SceneDoors
 	private boolean opens(int id)
 	{
 		String option = openOption(id);
-		return !lockedIds.contains(id) && (OPEN.equals(option) || SQUEEZE.equalsIgnoreCase(option) || WALK_THROUGH.equalsIgnoreCase(option)
+		return (OPEN.equals(option) || SQUEEZE.equalsIgnoreCase(option) || WALK_THROUGH.equalsIgnoreCase(option)
 			|| SLASH.equals(option) && canSlash);
 	}
 
@@ -268,5 +272,12 @@ public final class SceneDoors
 		{
 			flags[x][y] &= ~flag;
 		}
+	}
+
+	@Value
+	private static class Door
+	{
+		int id;
+		WorldPoint at;
 	}
 }

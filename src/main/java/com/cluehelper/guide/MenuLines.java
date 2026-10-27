@@ -3,6 +3,7 @@ package com.cluehelper.guide;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -20,6 +21,7 @@ import net.runelite.api.Menu;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
+import net.runelite.api.ObjectComposition;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.gameval.InterfaceID;
@@ -60,6 +62,8 @@ public class MenuLines
 	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String MAP_TELEPORT = "Teleport";
 	private static final String MAP_REGION = "Select";
+	private static final String OPEN_OPTION = "Open";
+	private static final String CLOSE_OPTION = "Close";
 	/** Same cyan as {@code Markers.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
 
@@ -436,6 +440,10 @@ public class MenuLines
 		{
 			pick = find(entries, target, entry -> MenuLabels.isOpener(entry.getOption()));
 		}
+		if (pick < 0)
+		{
+			pick = find(entries, target, entry -> goesThroughOpened(entry, destination));
+		}
 		return pick < 0 ? new int[0] : new int[]{pick};
 	}
 
@@ -712,7 +720,7 @@ public class MenuLines
 		return -1;
 	}
 
-	private static boolean isOptionOnTarget(MenuEntry entry, MenuTarget target)
+	private boolean isOptionOnTarget(MenuEntry entry, MenuTarget target)
 	{
 		if (target.getItemIds().contains(entry.getItemId()))
 		{
@@ -731,7 +739,7 @@ public class MenuLines
 		boolean objectOption = type == MenuAction.GAME_OBJECT_FIRST_OPTION || type == MenuAction.GAME_OBJECT_SECOND_OPTION
 			|| type == MenuAction.GAME_OBJECT_THIRD_OPTION || type == MenuAction.GAME_OBJECT_FOURTH_OPTION
 			|| type == MenuAction.GAME_OBJECT_FIFTH_OPTION;
-		if (objectOption && target.getObjectIds().contains(entry.getIdentifier()))
+		if (objectOption && isFormOf(entry, target.getObjectIds()))
 		{
 			return true;
 		}
@@ -739,6 +747,33 @@ public class MenuLines
 		return npc != null && (target.getNpcIds().contains(npc.getId())
 			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId())
 			|| npc.getName() != null && target.getNpcNames().contains(MenuLabels.normalise(npc.getName())));
+	}
+
+	/**
+	 * A multiloc's entry carries its own id (Doris' trapdoor, 12266); a target may name any form of it, shown now or
+	 * not (12267 closed, 12268 open).
+	 */
+	private boolean isFormOf(MenuEntry entry, Set<Integer> objectIds)
+	{
+		if (objectIds.contains(entry.getIdentifier()))
+		{
+			return true;
+		}
+		int[] forms = client.getObjectDefinition(entry.getIdentifier()).getImpostorIds();
+		return forms != null && Arrays.stream(forms).anyMatch(objectIds::contains);
+	}
+
+	/** Someone opened the exit's object already, so its first option goes on through it ("Go-down" on the trapdoor). */
+	private boolean goesThroughOpened(MenuEntry entry, String destination)
+	{
+		if (!OPEN_OPTION.equalsIgnoreCase(destination) || entry.getType() != MenuAction.GAME_OBJECT_FIRST_OPTION
+			|| CLOSE_OPTION.equalsIgnoreCase(MenuLabels.normalise(entry.getOption())))
+		{
+			return false;
+		}
+		ObjectComposition placed = client.getObjectDefinition(entry.getIdentifier());
+		ObjectComposition shown = placed.getImpostorIds() != null && placed.getImpostor() != null ? placed.getImpostor() : placed;
+		return shown.getActions() == null || Arrays.stream(shown.getActions()).noneMatch(OPEN_OPTION::equalsIgnoreCase);
 	}
 
 	private Widget child(int[] at)

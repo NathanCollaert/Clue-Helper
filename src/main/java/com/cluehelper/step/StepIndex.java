@@ -354,6 +354,8 @@ public final class StepIndex
 		private Integer key;
 		private int[] keyTile;
 		private String text;
+		/** An object's name when talking is all it does (the spirit tree); null otherwise. */
+		private String talkTo;
 
 		public Kind getKind()
 		{
@@ -384,6 +386,11 @@ public final class StepIndex
 		public String getText()
 		{
 			return text;
+		}
+
+		public String getTalkTo()
+		{
+			return talkTo;
 		}
 	}
 
@@ -958,6 +965,10 @@ public final class StepIndex
 	public static final class From
 	{
 		private List<Integer> npcs;
+		/** An object the item is had from (the Elemental Workshop's bookcase), instead of an NPC that drops it. */
+		private List<Integer> objects;
+		/** The object's option; an NPC is attacked. */
+		private String option;
 		private int[] tile;
 		private String text;
 
@@ -966,6 +977,15 @@ public final class StepIndex
 			return npcs == null ? List.of() : npcs;
 		}
 
+		public List<Integer> getObjects()
+		{
+			return objects == null ? List.of() : objects;
+		}
+
+		public String getOption()
+		{
+			return option;
+		}
 		public WorldPoint getTile()
 		{
 			return point(tile);

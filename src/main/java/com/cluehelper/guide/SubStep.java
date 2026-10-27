@@ -33,6 +33,8 @@ public class SubStep
 		ITEM_CARRIED,
 		/** No item named {@code actItemNamed} is in the inventory any more (a book deposited). */
 		ITEM_GONE,
+		/** None of {@code actItems} is carried or worn any more (weapons and armour left before Entrana). */
+		ITEMS_GONE,
 		/** The way in's worn requirements (diving gear) are all worn. */
 		WAY_IN_WORN,
 		/** The needs named in {@code wornNeeds} are met by worn items alone. */

@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -173,7 +174,7 @@ final class SceneObjects
 		return found;
 	}
 
-	private static void collect(Tile[][] plane, Set<Integer> ids, List<TileObject> found)
+	private void collect(Tile[][] plane, Set<Integer> ids, List<TileObject> found)
 	{
 		for (Tile[] column : plane)
 		{
@@ -185,19 +186,33 @@ final class SceneObjects
 				}
 				for (GameObject object : tile.getGameObjects())
 				{
-					if (object != null && ids.contains(object.getId()) && !found.contains(object))
+					if (object != null && isOneOf(object, ids) && !found.contains(object))
 					{
 						found.add(object);
 					}
 				}
 				for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getDecorativeObject(), tile.getGroundObject()})
 				{
-					if (object != null && ids.contains(object.getId()))
+					if (object != null && isOneOf(object, ids))
 					{
 						found.add(object);
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * By its own id, or any form it can show: a trapdoor (12266) shows as closed (12267) or open (12268), and stays the
+	 * step's while it is open.
+	 */
+	private boolean isOneOf(TileObject object, Set<Integer> ids)
+	{
+		if (ids.contains(object.getId()))
+		{
+			return true;
+		}
+		int[] forms = client.getObjectDefinition(object.getId()).getImpostorIds();
+		return forms != null && Arrays.stream(forms).anyMatch(ids::contains);
 	}
 }

@@ -583,6 +583,13 @@ public class PlayerModel
 		return snapshot != null && snapshot.carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
 
+	/** Client thread. Held or worn: an item put away (in a deposit box) is gone from both. */
+	public boolean holdsOrWearsItemNamed(String nameStart)
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot != null && snapshot.holdsOrWearsItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
+	}
+
 	/** Inventory and worn; empty while logged out. */
 	public Set<Integer> carriedIds()
 	{

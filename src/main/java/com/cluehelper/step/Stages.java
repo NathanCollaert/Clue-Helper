@@ -17,6 +17,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.CrypticClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 
 /** Builds the stages of steps done in several places. Act texts never repeat core's solutions. */
 public final class Stages
@@ -68,6 +69,12 @@ public final class Stages
 		return "Search it";
 	}
 
+	/** The key a kill-for-key stage gets: a clue's own key, which no key ring holds. */
+	public static ItemRequirement keyItem(int keyId)
+	{
+		return ItemRequirements.item(keyId);
+	}
+
 	/** Kill one of the key's NPCs where the cache says, then search the step's own object. */
 	static List<Stage> killForKey(StepIndex.Target key, String npc, ItemRequirement keyItem, List<WorldPoint> targets)
 	{
@@ -84,7 +91,8 @@ public final class Stages
 	{
 		StepIndex.From from = requires.getFrom();
 		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act(from.getText()).tiles(List.of(from.getTile())).ourMarker(true)
-			.radius(KEY_AREA_TILES).item(item).npcIds(Set.copyOf(from.getNpcs())).option(ATTACK)
+			.radius(KEY_AREA_TILES).item(item).npcIds(Set.copyOf(from.getNpcs())).objectIds(Set.copyOf(from.getObjects()))
+			.option(from.getOption() == null ? ATTACK : from.getOption())
 			.skippedWhenOwned(Set.copyOf(requires.getIds())).build();
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
 	}

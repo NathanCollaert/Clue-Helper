@@ -3,6 +3,7 @@ package com.cluehelper.guide;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.HouseState;
+import com.cluehelper.player.ItemUse;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.route.Exit;
@@ -25,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -36,6 +36,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 @Singleton
@@ -55,6 +56,9 @@ public final class SubSteps
 	static final int AREA_ARRIVE_TILES = 15;
 
 	private static final int MAX_STACK = Integer.MAX_VALUE / 2;
+	private static final String ENTRANA_SHIP = "Ship: Entrana";
+	private static final String ENTRANA_RULE = "Entrana allows no weapons or armour: the deposit box by the monks";
+	private static final String DEPOSIT = "Deposit";
 
 	private final Client client;
 	private final Supplier<PlayerSnapshot> snapshot;
@@ -62,17 +66,21 @@ public final class SubSteps
 	private final StepNeeds stepNeeds;
 	private final Supplier<PlanStart> start;
 	private final BooleanSupplier scrollBookOutOfWilderness;
+	private final IntPredicate weaponOrArmour;
 
 	@Inject
-	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes)
+	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear)
 	{
 		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
-			routes::keepsScrollBookOutOfWilderness);
+			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour);
 	}
 
-	/** @param client item names */
+	/**
+	 * @param client item names
+	 * @param weaponOrArmour what the Entrana monks turn away
+	 */
 	public SubSteps(Client client, Supplier<PlayerSnapshot> snapshot, IntPredicate onlyInBankedKit, StepNeeds stepNeeds,
-		Supplier<PlanStart> start, BooleanSupplier scrollBookOutOfWilderness)
+		Supplier<PlanStart> start, BooleanSupplier scrollBookOutOfWilderness, IntPredicate weaponOrArmour)
 	{
 		this.client = client;
 		this.snapshot = snapshot;
@@ -80,16 +88,53 @@ public final class SubSteps
 		this.stepNeeds = stepNeeds;
 		this.start = start;
 		this.scrollBookOutOfWilderness = scrollBookOutOfWilderness;
+		this.weaponOrArmour = weaponOrArmour;
 	}
 
 	/** Client thread only. The route's legs as sub-steps, then the step's own acts. */
 	public List<SubStep> of(Route route, Step step)
 	{
 		boolean takeFromStash = takeFromStash(step);
-		List<SubStep> legs = new RouteSteps(route, step, id -> withdrawLine(step, id), house(), takeFromStash).build(this::exitOf);
-		List<SubStep> steps = withWanderNote(withGearOnArrival(withWayInEquipped(legs, step.getData())), step.getData());
+		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash).build(this::exitOf);
+		List<SubStep> steps = withEntranaDeposits(withWanderNote(withGearOnArrival(withWayInEquipped(legs, step.getData())),
+			step.getData()));
 		boolean wildernessTarget = step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0);
 		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), wildernessTarget) : steps;
+	}
+
+	/**
+	 * Before the ship to Entrana, every weapon and piece of armour carried or worn goes in the deposit box by its monks,
+	 * which turn away anyone with one.
+	 */
+	private List<SubStep> withEntranaDeposits(List<SubStep> steps)
+	{
+		int ship = IntStream.range(0, steps.size()).filter(i -> isEntranaShip(steps.get(i))).findFirst().orElse(-1);
+		PlayerSnapshot carrier = snapshot.get();
+		if (ship < 0 || carrier == null)
+		{
+			return steps;
+		}
+		Set<Integer> banned = carrier.carriedIds().stream().filter(weaponOrArmour::test).collect(Collectors.toUnmodifiableSet());
+		if (banned.isEmpty())
+		{
+			return steps;
+		}
+		List<SubStep> out = new ArrayList<>(steps);
+		out.add(ship, entranaDeposit(banned));
+		return List.copyOf(out);
+	}
+
+	private static boolean isEntranaShip(SubStep step)
+	{
+		return step.getKind() == SubStep.Kind.TELEPORT && step.getRow() != null && ENTRANA_SHIP.equals(step.getRow().getName());
+	}
+
+	private SubStep entranaDeposit(Set<Integer> banned)
+	{
+		List<String> names = banned.stream().map(id -> client.getItemDefinition(id).getName()).sorted().collect(Collectors.toList());
+		return SubStep.builder().kind(SubStep.Kind.ACT).text("Deposit in the deposit box:").items(List.copyOf(names))
+			.detail(ENTRANA_RULE).actItems(banned).objectIds(Set.of(ObjectID.SARIM_DEPOSIT_BOX)).option(DEPOSIT)
+			.done(SubStep.Done.ITEMS_GONE).build();
 	}
 
 	/** What to do at the step once there, its STASH items taken out first when they wait there. */
@@ -141,15 +186,25 @@ public final class SubSteps
 	}
 
 	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
-	private String withdrawLine(Step step, int itemId)
+	/**
+	 * A step need's use carries the whole banked stack, so its amount is what the need still lacks; a teleport's use
+	 * carries what the teleport spends (its runes).
+	 */
+	private String withdrawLine(Step step, ItemUse use)
 	{
+		int itemId = use.getItemId();
 		String name = client.getItemDefinition(itemId).getName();
 		if (onlyInBankedKit.test(itemId))
 		{
 			return client.getItemDefinition(ItemID.HUNTSMANS_KIT).getName() + " (" + name + " inside)";
 		}
-		int more = stillToTake(step, itemId);
-		return more > 1 ? name + " x" + more : name;
+		int amount = isStepNeed(step, itemId) ? stillToTake(step, itemId) : use.getQuantity();
+		return amount > 1 ? amount + " x " + name : name;
+	}
+
+	private boolean isStepNeed(Step step, int itemId)
+	{
+		return stepNeeds.of(step).getNeeds().stream().anyMatch(need -> need.getRequirement().fulfilledBy(itemId));
 	}
 
 	/** The fewest of the item that, with what is carried, meet every step need it counts towards. */
@@ -209,17 +264,17 @@ public final class SubSteps
 		private final List<SubStep> steps = new ArrayList<>();
 		private final Route route;
 		private final Step step;
-		private final IntFunction<String> itemNames;
+		private final Function<ItemUse, String> itemLines;
 		private final HouseState house;
 		private final boolean takeFromStash;
 		/** The STASH unit stands outside the step's way in: its items come before going in. */
 		private final boolean stashFirst;
 
-		RouteSteps(Route route, Step step, IntFunction<String> itemNames, HouseState house, boolean takeFromStash)
+		RouteSteps(Route route, Step step, Function<ItemUse, String> itemLines, HouseState house, boolean takeFromStash)
 		{
 			this.route = route;
 			this.step = step;
-			this.itemNames = itemNames;
+			this.itemLines = itemLines;
 			this.house = house;
 			this.takeFromStash = takeFromStash;
 			this.stashFirst = takeFromStash && stashOutsideWayIn(step);
@@ -229,7 +284,7 @@ public final class SubSteps
 		{
 			if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 			{
-				steps.add(LegSteps.withdraw(route, itemNames));
+				steps.add(LegSteps.withdraw(route, itemLines));
 			}
 			List<Stage> stages = step.getStages().stream().filter(stage -> !stage.getTiles().isEmpty()).collect(Collectors.toList());
 			List<Leg> legs = route.getLegs();
@@ -278,7 +333,7 @@ public final class SubSteps
 					steps.add(LegSteps.teleport(leg, house));
 					break;
 				case FAIRY_RING:
-					steps.add(LegSteps.fairyRing(leg));
+					steps.addAll(LegSteps.fairyRing(leg));
 					break;
 				case SPELLBOOK_CHANGE:
 					steps.add(LegSteps.change(leg));
@@ -286,7 +341,7 @@ public final class SubSteps
 				case BANK:
 					steps.add(SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank")
 						.detail(route.isPinIncluded() ? "Your PIN comes first" : null).waypoint(leg.getTo()).build());
-					steps.add(LegSteps.withdraw(route, itemNames));
+					steps.add(LegSteps.withdraw(route, itemLines));
 					break;
 				default:
 					throw new IllegalArgumentException("unhandled leg kind " + leg.getKind());

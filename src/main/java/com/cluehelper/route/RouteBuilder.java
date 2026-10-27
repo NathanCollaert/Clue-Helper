@@ -170,7 +170,8 @@ final class RouteBuilder
 			case BANK:
 				return Leg.bank(at, label.edgeHalf, book);
 			case WILDERNESS_EXIT:
-				return Leg.wildernessExit(at, ctx.originClass(label.node).exitY(), label.edgeHalf, book);
+				// The exit's node has no tile, so its origin class is WILD0's: its own class says how far south it goes.
+				return Leg.wildernessExit(at, ctx.abstractClass(label.node).exitY(), label.edgeHalf, book);
 			case WALK:
 				return Leg.walk(at, ctx.tile(label.node), label.edgeHalf, book);
 			default:

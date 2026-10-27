@@ -94,8 +94,9 @@ public class WorldWalkTest
 
 	/**
 	 * Past the loaded scene's edge, up stairs, the walk still reaches the goal, every step one the game walks: Daer
-	 * Krand in the Sisterhood Sanctuary, from the corridor north of the medallion's landing, and a long walk across
-	 * Lumbridge to Draynor's bank with no scene at all.
+	 * Krand in the Sisterhood Sanctuary, from the corridor north of the medallion's landing, a long walk across
+	 * Lumbridge to Draynor's bank with no scene at all, and Doris' trapdoor in Edgeville, through her door rather
+	 * than the wall beside it.
 	 */
 	@Test
 	public void walksPastTheSceneTileByTile() throws IOException
@@ -110,6 +111,8 @@ public class WorldWalkTest
 			assertWalks(walk, Ground.world(map, sanctuary, table, row -> true), at, daerKrand);
 		}
 		assertWalks(walk, Ground.world(map, null, table, row -> true), new WorldPoint(3222, 3218, 0), new WorldPoint(3092, 3245, 0));
+		LoadedScene edgeville = SceneFiles.resource("3048_3424_0").getScene();
+		assertWalks(walk, Ground.world(map, edgeville, table, row -> true), new WorldPoint(3080, 3501, 0), new WorldPoint(3077, 3493, 0));
 	}
 
 	private static void assertWalks(WorldWalk walk, Ground ground, WorldPoint from, WorldPoint to)
@@ -129,7 +132,7 @@ public class WorldWalkTest
 		}
 	}
 
-	/** A walk, or a straight step onto a blocked tile a row starts from. */
+	/** A walk, or a straight step with no wall between onto a blocked tile a row starts from. */
 	private static boolean canStep(Ground ground, WorldPoint a, WorldPoint b)
 	{
 		for (int d = 0; d < Directions.COUNT; d++)
@@ -137,7 +140,8 @@ public class WorldWalkTest
 			if (a.getX() + Directions.DX[d] == b.getX() && a.getY() + Directions.DY[d] == b.getY())
 			{
 				return ground.canMove(a.getX(), a.getY(), a.getPlane(), d)
-					|| d < Directions.STRAIGHT && ground.openRowsFrom(WalkTable.pack(b)).length > 0;
+					|| d < Directions.STRAIGHT && ground.openRowsFrom(WalkTable.pack(b)).length > 0
+					&& !ground.isWallBetween(a.getX(), a.getY(), a.getPlane(), Directions.DX[d], Directions.DY[d]);
 			}
 		}
 		return false;

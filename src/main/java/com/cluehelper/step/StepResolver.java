@@ -92,7 +92,7 @@ public class StepResolver
 		if (key != null)
 		{
 			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
-				ItemRequirements::item), targets);
+				Stages::keyItem), targets);
 		}
 		StepIndex.Requires dropped = entry == null ? null
 			: entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);

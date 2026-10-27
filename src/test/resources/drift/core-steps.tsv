@@ -120,7 +120,7 @@ cipher:19910	*	cipher	hard	ANY_OF	2347,4435,0	npc 1161				none	2275	The cipher r
 cipher:23067	*	cipher	quest	ANY_OF	3077,3260,0					none	2262	The cipher reveals who to speak to next: ESBZOPS QJH QFO
 cipher:23170	*	cipher	hard	ANY_OF	2329,3689,0	npc 4293				none	2277	The cipher reveals who to speak to next: BSOPME MZETQPS
 cipher:23172	*	cipher	hard	ANY_OF	2541,3548,0	npc 2153				none	2276	The cipher reveals who to speak to next: IWPPLQTP
-cipher:28916	*	cipher	hard	ANY_OF	1559,3045,0	npc 13135				none	3510	The cipher reveals who to speak to next: BXJA UNJMNA YRCAR
+cipher:28916	*	cipher	hard	ANY_OF	1558,3046,2	npc 13135				none	3510	The cipher reveals who to speak to next: BXJA UNJMNA YRCAR
 cipher:30929	*	cipher	hard	ANY_OF	1376,3037,0	npc 14762				none	5183	The cipher reveals who to speak to next: YAROYGR
 coordinate:12033	*	coordinate	medium	ANY_OF	2594,2899,0					spade	1946	Dig at 2594,2899,0
 coordinate:12035	*	coordinate	medium	ANY_OF	3510,3074,0					spade	1932	Dig at 3510,3074,0
@@ -314,7 +314,7 @@ cryptic:anger those who adhere to saradomin's edicts to prevent travel.	*	crypti
 cryptic:are you somewhat entertained?	*	cryptic	medium	ANY_OF	1802,9504,0	Gloria				none	3496	Are you somewhat entertained?
 cryptic:banish a chilling spirit.	*	cryptic	elite	AREA	1627,9623,0	Frost Nagua				none	3696	Banish a chilling spirit.
 cryptic:belladonna, my dear. if only i had gloves, then i could hold you at last.	*	cryptic	easy	AREA	3088,3357,0	Tool Leprechaun	12340			none	1268	Belladonna, my dear. If only I had gloves, then I could hold you at last.
-cryptic:citric cellar.	*	cryptic	hard	ANY_OF	2490,3488,0	Heckel Funch				none	1373	Citric cellar.
+cryptic:citric cellar.	*	cryptic	hard	ANY_OF	2490,3488,1	Heckel Funch				none	1373	Citric cellar.
 cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an old god you desire.	0,4,5,10,100	cryptic	master	ANY_OF	3293,3933,1|3448,3549,1|3119,9996,0	Viggora				none	1495	Come brave adventurer, your sense is on fire. If you talk to me, it's an old god you desire.
 cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an old god you desire.	1	cryptic	master	ANY_OF	3295,3934,1	Viggora				none	1495	Come brave adventurer, your sense is on fire. If you talk to me, it's an old god you desire.
 cryptic:come brave adventurer, your sense is on fire. if you talk to me, it's an old god you desire.	2	cryptic	master	ANY_OF	3447,3547,1	Viggora				none	1495	Come brave adventurer, your sense is on fire. If you talk to me, it's an old god you desire.
@@ -572,7 +572,7 @@ cryptic:where the best are commemorated, and a celebratory cup, not just for bee
 cryptic:with a name like that, you'd expect a little more than just a few scimitars.	*	cryptic	elite	ANY_OF	2759,2775,0	Daga				none	1436	With a name like that, you'd expect a little more than just a few scimitars.
 cryptic:with drinks and dwarves i make my way, upon my head a glass will stay.	*	cryptic	elite	ANY_OF	1432,9584,1	Funbo				none	3497	With drinks and dwarves I make my way, upon my head a glass will stay.
 cryptic:within the town of lumbridge lives a man named bob. he walks out of his door and takes 1 step east, 7 steps north, 5 steps west and 1 step south. once he arrives, he digs a hole and buries his treasure.	*	cryptic	quest	ANY_OF	3230,3209,0					spade	2298	Within the town of Lumbridge lives a man named Bob. He walks out of his door and takes 1 step east, 7 steps north, 5 steps west and 1 step south. Once he arrives, he digs a hole and buries his treasure.
-cryptic:you have all of the elements available to solve this clue. fortunately you do not have to go as far as to stand in a draft.	*	cryptic	hard	ANY_OF	2723,9891,0			18506		none	1407	You have all of the elements available to solve this clue. Fortunately you do not have to go as far as to stand in a draft.
+cryptic:you have all of the elements available to solve this clue. fortunately you do not have to go as far as to stand in a draft.	*	cryptic	hard	SEQUENCE	2716,3482,0|2723,9891,0			18506		none	1407	You have all of the elements available to solve this clue. Fortunately you do not have to go as far as to stand in a draft.
 cryptic:you might have to turn over a few stones to progress.	*	cryptic	elite	AREA	2700,3722,0					none	1459	You might have to turn over a few stones to progress.
 cryptic:you must be 100 to play with me.	*	cryptic	elite	ANY_OF	2638,2656,0	Squire (Veteran)				none	1437	You must be 100 to play with me.
 cryptic:you were 3 and i was the 6th. come speak to me.	*	cryptic	elite	ANY_OF	3146,9913,0	Vannaka				none	1430	You were 3 and I was the 6th. Come speak to me.
