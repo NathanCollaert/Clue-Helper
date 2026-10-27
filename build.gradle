@@ -57,10 +57,10 @@ tasks.register('dev', JavaExec) {
 
 tasks.register('coreClues', JavaExec) {
 	group = 'tools'
-	description = "Export core's clue data from the client jar to tools/cache/out/core-clues.json"
+	description = "Export core's clue data from the client jar to Clue-Helper-Tools/tools/cache/out/core-clues.json"
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'com.cluehelper.step.CoreClueExport'
-	args 'tools/cache/out/core-clues.json'
+	args 'Clue-Helper-Tools/tools/cache/out/core-clues.json'
 }
 
 tasks.register('planReplay', JavaExec) {

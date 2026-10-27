@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public class StepDataCacheTest
 {
-	private static final Path DUMP = Path.of("tools/cache/dump/2026-10-18");
+	private static final Path DUMP = Path.of("Clue-Helper-Tools/tools/cache/dump/2026-10-18");
 	private static final Path SKILL_STEPS = Path.of("src/main/resources/com/cluehelper/step/steps/skill.json");
 	private static final Path ROW_OBJECTS = Path.of("src/main/resources/com/cluehelper/route/walk/row-objects.tsv");
 	private static final String SHERLOCK = "skill:SHERLOCK:";

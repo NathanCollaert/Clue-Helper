@@ -20,9 +20,9 @@ import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
 /**
- * Gson fills this from the generated step files (tools/steps/generate.py), one per clue type: field names are their
- * JSON keys. Fields the plugin doesn't use yet (outfits, requirement groups) stay in the files only. Keys iterate in
- * sorted order, which the golden routes' sample depends on.
+ * Gson fills this from the generated step files (Clue-Helper-Tools/tools/steps/generate.py), one per clue type: field
+ * names are their JSON keys. Fields the plugin doesn't use yet (outfits, requirement groups) stay in the files only.
+ * Keys iterate in sorted order, which the golden routes' sample depends on.
  */
 @Slf4j
 public final class StepIndex
@@ -723,7 +723,7 @@ public final class StepIndex
 
 	/**
 	 * The way into a target's area: the object to use (-1 for none) and the box that counts as inside. The walk data
-	 * holds it as a walk row (tools/walk), so routes already pass through it.
+	 * holds it as a walk row (Clue-Helper-Tools/tools/walk), so routes already pass through it.
 	 */
 	public static final class WayIn
 	{

@@ -47,8 +47,6 @@ Thumbs.db
 demo/
 !gradle/wrapper/gradle-wrapper.jar
 
-# Planning, findings, offline tools and spikes stay local: the repo holds only what the plugin needs to run
-PLAN.md
-plan/
-docs/
-tools/
+# Planning, findings, offline tools and spikes live in their own repo, cloned here: this one holds only what the
+# plugin needs to run
+Clue-Helper-Tools/

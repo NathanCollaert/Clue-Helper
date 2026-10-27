@@ -13,7 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Where the campaign stands, kept in tools/campaign/progress.json so it survives restarts. Claude edits it after a fix. */
+/**
+ * Where the campaign stands, kept in Clue-Helper-Tools/tools/campaign/progress.json so it survives restarts. Claude
+ * edits it after a fix.
+ */
 final class CampaignProgress
 {
 	enum Status

@@ -26,9 +26,9 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * Writes core's clue data to JSON for tools/cache/c1_match.py and tools/steps/generate.py. Provider lambdas run
- * under every var state in {@link CoreClues#VAR_STATES}, so varbit- or quest-dependent entries list all
- * their branches. Run: gradlew coreClues.
+ * Writes core's clue data to JSON for Clue-Helper-Tools/tools/cache/c1_match.py and
+ * Clue-Helper-Tools/tools/steps/generate.py. Provider lambdas run under every var state in
+ * {@link CoreClues#VAR_STATES}, so varbit- or quest-dependent entries list all their branches. Run: gradlew coreClues.
  */
 public class CoreClueExport
 {
@@ -38,7 +38,7 @@ public class CoreClueExport
 
 	public static void main(String[] args) throws Exception
 	{
-		Path out = Paths.get(args.length > 0 ? args[0] : "tools/cache/out/core-clues.json");
+		Path out = Paths.get(args.length > 0 ? args[0] : "Clue-Helper-Tools/tools/cache/out/core-clues.json");
 		fakePlugin = CoreClues.plugin();
 
 		JsonObject root = new JsonObject();

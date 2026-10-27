@@ -22,8 +22,8 @@ public final class CampaignFiles
 {
 	/** The golden recordings, one folder per tier. They ship in the public repo. */
 	public static final Path GOLDENS = Paths.get("src/test/resources/campaign");
-	/** Progress and bug reports stay local: tools/ is never committed. */
-	public static final Path LOCAL = Paths.get("tools/campaign");
+	/** Progress and bug reports stay out of the public repo, in the Clue-Helper-Tools checkout it ignores. */
+	public static final Path LOCAL = Paths.get("Clue-Helper-Tools/tools/campaign");
 	public static final Path BUGS = LOCAL.resolve("bugs");
 	public static final Path PROGRESS = LOCAL.resolve("progress.json");
 	/** The golden test's report: each changed key with {@code route} or {@code ticks}, and the page that shows why. */

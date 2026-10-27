@@ -36,7 +36,7 @@ import org.junit.Test;
 /**
  * On a snapshot difference this writes build/drift/core-steps.tsv: review the diff, then copy it over
  * src/test/resources/drift/core-steps.tsv. A cache-side change shows up only once
- * tools/steps/generate.py regenerates the step files from a newer dump.
+ * Clue-Helper-Tools/tools/steps/generate.py regenerates the step files from a newer dump.
  */
 public class CoreDriftTest
 {
@@ -108,7 +108,7 @@ public class CoreDriftTest
 	{
 		Set<String> coreKeys = SOURCES_BY_KEY.keySet();
 		Set<String> dataKeys = index.getSteps().keySet();
-		assertEquals("core keys missing from the step files (regenerate them, tools/steps/generate.py)",
+		assertEquals("core keys missing from the step files (regenerate them, Clue-Helper-Tools/tools/steps/generate.py)",
 			Set.of(), difference(coreKeys, dataKeys));
 		assertEquals("step file keys core no longer has", Set.of(), difference(dataKeys, coreKeys));
 
