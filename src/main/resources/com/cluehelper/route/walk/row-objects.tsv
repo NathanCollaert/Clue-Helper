@@ -448,8 +448,8 @@ Origin	Destination	Option	Object	ObjectId
 1799 9969 0	1670 3569 0	Climb-up	Staircase	34864
 1800 9967 0	1670 3569 0	Climb-up	Staircase	34864
 1800 9968 0	1670 3569 0	Climb-up	Staircase	34864
-1802 9956 0	1802 9958 0	Open	Temple Door	34843
-1802 9958 0	1802 9956 0	Open	Temple Door	34843
+1802 9956 0	1802 9958 0	Open	Temple Door	34842
+1802 9958 0	1802 9956 0	Open	Temple Door	34842
 1803 9967 0	1726 9994 0	Enter	Strange passage	28918
 1803 9968 0	1726 9994 0	Enter	Strange passage	28918
 1808 3679 0	1811 3679 1	Cross	Gangplank	50063
@@ -494,6 +494,7 @@ Origin	Destination	Option	Object	ObjectId
 1927 6223 0	1963 6221 3	Squeeze-through	Crevice	40889
 1930 4438 0	3288 2801 0	Leave Tomb	Tomb Door	20931
 1932 4468 0	3288 2801 0	Leave Tomb	Tomb Door	20931
+1934 4420 3	3288 2801 0	Leave Tomb	Tomb Door	20932
 1934 4428 3	1944 4427 0	Start-minigame	Guardian mummy	1779
 1936 9009 1	2457 2849 0	Climb-up	Ladder	32205
 1937 4969 0	1937 4970 0	Open	Gate	9141
@@ -2315,6 +2316,12 @@ Origin	Destination	Option	Object	ObjectId
 2761 3657 0	2761 3660 0	Climb-over	Rockslide	5847
 2761 3660 0	2761 3657 0	Climb-over	Rockslide	5847
 2761 4497 0	2697 4497 0	Climb-up	Ladder	4968
+2762 2934 0	2762 2936 0	Chop-down	Jungle Bush	2892
+2762 2936 0	2762 2934 0	Chop-down	Jungle Bush	2892
+2762 2936 0	2762 2938 0	Chop-down	Jungle Bush	2892
+2762 2938 0	2762 2936 0	Chop-down	Jungle Bush	2892
+2762 2940 0	2762 2942 0	Chop-down	Jungle Bush	2892
+2762 2943 0	2762 2941 0	Chop-down	Jungle Bush	2892
 2762 2989 0	2760 9389 0	Search	Well stacked rocks	2234
 2763 2703 0	2763 9103 0	Climb-down	Bamboo Ladder	4780
 2763 3238 1	2760 3238 0	Cross	Gangplank	17401
@@ -2403,6 +2410,14 @@ Origin	Destination	Option	Object	ObjectId
 2789 9296 0	2790 9295 0	Jump-over	Jagged wall	2926
 2790 4486 0	2726 4486 0	Climb-up	Ladder	4968
 2790 9295 0	2789 9296 0	Jump-over	Jagged wall	2926
+2791 2935 0	2791 2937 0	Chop-down	Jungle tree	2890
+2791 2937 0	2791 2935 0	Chop-down	Jungle tree	2890
+2791 2937 0	2791 2939 0	Chop-down	Jungle Bush	2893
+2791 2939 0	2791 2937 0	Chop-down	Jungle Bush	2893
+2791 2939 0	2791 2941 0	Chop-down	Jungle Bush	2893
+2791 2941 0	2791 2939 0	Chop-down	Jungle Bush	2893
+2791 2941 0	2791 2943 0	Chop-down	Jungle tree	2890
+2791 2943 0	2791 2941 0	Chop-down	Jungle tree	2890
 2791 2978 0	2795 2978 0	Climb	Rocks	2231
 2791 2979 0	2795 2979 0	Climb	Rocks	2231
 2791 2980 0	2795 2980 0	Climb	Rocks	2231
@@ -2411,11 +2426,25 @@ Origin	Destination	Option	Object	ObjectId
 2792 3417 1	2792 3414 0	Cross	Gangplank	17395
 2792 4592 0	3454 3242 0	Walk-up	Stairs	4923
 2792 4827 0	2980 3511 0	Use	Portal	34749
+2793 2937 0	2793 2939 0	Chop-down	Jungle Bush	2893
+2793 2939 0	2793 2937 0	Chop-down	Jungle Bush	2893
+2793 2939 0	2793 2941 0	Chop-down	Jungle Bush	2893
+2793 2941 0	2793 2939 0	Chop-down	Jungle Bush	2893
+2793 2941 0	2793 2943 0	Chop-down	Jungle tree	2890
+2793 2943 0	2793 2941 0	Chop-down	Jungle tree	2890
+2795 2793 0	2795 2797 1	Climb-up	Stairs	4756
+2795 2797 1	2795 2793 0	Climb-down	Stairs	4755
+2795 2938 0	2795 2940 0	Chop-down	Jungle Bush	2893
+2795 2940 0	2795 2942 0	Chop-down	Jungle Bush	2892
+2795 2941 0	2795 2939 0	Chop-down	Jungle Bush	2892
+2795 2943 0	2795 2941 0	Chop-down	Jungle Bush	2893
 2795 2978 0	2791 2978 0	Climb	Rocks	2231
 2795 2979 0	2791 2979 0	Climb	Rocks	2231
 2795 2980 0	2791 2980 0	Climb	Rocks	2231
 2795 3719 0	2799 10134 0	Enter	Tunnel	5012
 2795 4529 0	2731 4529 0	Climb-up	Ladder	4968
+2796 2793 0	2796 2797 1	Climb-up	Stairs	4756
+2796 2797 1	2796 2793 0	Climb-down	Stairs	4755
 2796 3614 0	2808 10002 0	Enter	Cave Entrance	2123
 2796 3615 0	2808 10002 0	Enter	Cave Entrance	2123
 2796 3616 0	2808 10002 0	Enter	Cave Entrance	2123
@@ -2423,19 +2452,40 @@ Origin	Destination	Option	Object	ObjectId
 2796 4528 0	2732 4528 0	Climb-up	Ladder	4968
 2796 4530 0	2732 4530 0	Climb-up	Ladder	4968
 2796 4599 0	2732 4535 0	Climb-down	Ladder	4969
+2797 2761 0	2800 2762 0	Talk-to	Elder Guard	5278
 2797 3719 0	2799 10134 0	Enter	Tunnel	5012
 2797 4529 0	2733 4529 0	Climb-up	Ladder	4968
 2797 4567 0	2733 4503 0	Climb-down	Ladder	4969
 2797 4598 0	2733 4534 0	Climb-down	Ladder	4969
 2797 4600 0	2733 4536 0	Climb-down	Ladder	4969
+2798 2938 0	2798 2940 0	Chop-down	Jungle Bush	2893
+2798 2940 0	2798 2942 0	Chop-down	Jungle Bush	2892
+2798 2941 0	2798 2939 0	Chop-down	Jungle Bush	2892
+2798 2943 0	2798 2941 0	Chop-down	Jungle tree	2890
 2798 4453 0	2799 4453 0	Open	Door	4962
 2798 4566 0	2734 4502 0	Climb-down	Ladder	4969
 2798 4568 0	2734 4504 0	Climb-down	Ladder	4969
 2798 4599 0	2734 4535 0	Climb-down	Ladder	4969
+2799 2793 0	2799 2797 1	Climb-up	Stairs	4756
+2799 2797 1	2799 2793 0	Climb-down	Stairs	4755
+2799 2937 0	2799 2939 0	Chop-down	Jungle Bush	2893
+2799 2939 0	2799 2937 0	Chop-down	Jungle Bush	2893
+2799 2939 0	2799 2941 0	Chop-down	Jungle Bush	2893
+2799 2941 0	2799 2939 0	Chop-down	Jungle Bush	2893
+2799 2941 0	2799 2943 0	Chop-down	Jungle Bush	2892
+2799 2943 0	2799 2941 0	Chop-down	Jungle Bush	2892
 2799 4453 0	2798 4453 0	Open	Door	4962
 2799 4567 0	2735 4503 0	Climb-down	Ladder	4969
 2799 5160 0	3315 2796 0	Climb-up	Ladder	20277
 2799 10134 0	2797 3719 0	Enter	Tunnel	5013
+2800 2793 0	2800 2797 1	Climb-up	Stairs	4756
+2800 2797 1	2800 2793 0	Climb-down	Stairs	4755
+2800 2936 0	2800 2938 0	Chop-down	Jungle tree	2889
+2800 2938 0	2800 2940 0	Chop-down	Jungle tree	2890
+2800 2939 0	2800 2937 0	Chop-down	Jungle tree	2889
+2800 2940 0	2800 2942 0	Chop-down	Jungle Bush	2893
+2800 2941 0	2800 2939 0	Chop-down	Jungle Bush	2893
+2800 2943 0	2800 2941 0	Chop-down	Jungle tree	2890
 2800 4429 0	3435 9635 0	Crawl-through	Cart tunnel	29333
 2800 5160 0	2166 4409 2	Climb-down	Ladder	20278
 2800 10134 0	2797 3719 0	Enter	Tunnel	5013
@@ -2460,6 +2510,10 @@ Origin	Destination	Option	Object	ObjectId
 2812 3451 1	2812 3451 0	Climb-down	Ladder	16679
 2813 3450 0	2813 3450 1	Climb-up	Ladder	16683
 2813 3450 1	2813 3450 0	Climb-down	Ladder	16679
+2816 2936 0	2816 2938 0	Chop-down	Jungle Bush	2892
+2816 2938 0	2816 2936 0	Chop-down	Jungle Bush	2892
+2816 2938 0	2816 2940 0	Chop-down	Jungle Bush	2893
+2816 2940 0	2816 2938 0	Chop-down	Jungle Bush	2893
 2816 3083 0	2817 3083 0	Open	Hardwood Grove Doors	9038
 2816 3562 0	2817 3564 0	Climb-over	Stile	3730
 2816 3563 0	2817 3561 0	Climb-over	Stile	3730
@@ -2468,6 +2522,14 @@ Origin	Destination	Option	Object	ObjectId
 2817 3561 0	2817 3564 0	Climb-over	Stile	3730
 2817 3564 0	2817 3561 0	Climb-over	Stile	3730
 2818 3562 0	2817 3564 0	Climb-over	Stile	3730
+2819 2936 0	2819 2938 0	Chop-down	Jungle Bush	2893
+2819 2938 0	2819 2936 0	Chop-down	Jungle Bush	2893
+2819 2938 0	2819 2940 0	Chop-down	Jungle Bush	2893
+2819 2940 0	2819 2938 0	Chop-down	Jungle Bush	2893
+2820 2935 0	2820 2937 0	Chop-down	Jungle tree	2890
+2820 2937 0	2820 2939 0	Chop-down	Jungle Bush	2893
+2820 2938 0	2820 2936 0	Chop-down	Jungle Bush	2892
+2820 2940 0	2820 2938 0	Chop-down	Jungle tree	2890
 2820 3486 0	2820 9882 0	Climb-down	Stairs	55
 2820 3557 0	2820 3558 0	Open	Door	3746
 2820 3558 0	2820 3557 0	Open	Door	3746
@@ -2772,6 +2834,12 @@ Origin	Destination	Option	Object	ObjectId
 2863 2976 0	2863 2971 0	Cross	Stepping stone	16466
 2863 9570 0	2480 5175 0	Enter	Cave entrance	11835
 2863 9574 0	2480 5175 0	Enter	Cave entrance	11835
+2864 2934 0	2864 2936 0	Chop-down	Jungle Bush	2892
+2864 2936 0	2864 2934 0	Chop-down	Jungle Bush	2892
+2864 2936 0	2864 2938 0	Chop-down	Jungle tree	2889
+2864 2939 0	2864 2937 0	Chop-down	Jungle tree	2889
+2864 2939 0	2864 2941 0	Chop-down	Jungle Bush	2893
+2864 2941 0	2864 2939 0	Chop-down	Jungle Bush	2893
 2864 9570 0	2480 5175 0	Enter	Cave entrance	11835
 2865 3938 0	2866 3938 0	Squeeze-through	Broken fence	46817
 2865 9571 0	2480 5175 0	Enter	Cave entrance	11835
@@ -2785,11 +2853,23 @@ Origin	Destination	Option	Object	ObjectId
 2865 10210 0	2862 10209 1	Climb-up	Stairs	6087
 2865 10221 0	2865 10224 1	Climb-up	Stairs	6085
 2865 10224 1	2865 10221 0	Climb-down	Stairs	6086
+2866 2934 0	2866 2936 0	Chop-down	Jungle Bush	2892
+2866 2936 0	2866 2934 0	Chop-down	Jungle Bush	2892
+2866 2936 0	2866 2938 0	Chop-down	Jungle Bush	2892
+2866 2938 0	2866 2940 0	Chop-down	Jungle Bush	2893
+2866 2939 0	2866 2937 0	Chop-down	Jungle tree	2890
+2866 2941 0	2866 2939 0	Chop-down	Jungle tree	2890
 2866 3428 0	2869 3428 0	Climb	Rocks	62423
 2866 3938 0	2865 3938 0	Squeeze-through	Broken fence	46817
 2867 3718 0	2874 3720 0	Enter	Cave entrance	6440
 2867 3719 0	2874 3720 0	Enter	Cave entrance	6440
 2867 3720 0	2874 3720 0	Enter	Cave entrance	6440
+2868 2934 0	2868 2936 0	Chop-down	Jungle tree	2889
+2868 2936 0	2868 2934 0	Chop-down	Jungle tree	2889
+2868 2936 0	2868 2938 0	Chop-down	Jungle tree	2889
+2868 2938 0	2868 2940 0	Chop-down	Jungle Bush	2892
+2868 2939 0	2868 2937 0	Chop-down	Jungle Bush	2892
+2868 2941 0	2868 2939 0	Chop-down	Jungle Bush	2893
 2868 3016 0	2400 4835 0	Enter	Mysterious ruins	34821
 2868 3721 0	2874 3720 0	Enter	Cave entrance	6440
 2868 10198 1	2865 10198 2	Climb-up	Stairs	6089
@@ -2808,6 +2888,10 @@ Origin	Destination	Option	Object	ObjectId
 2871 2972 1	2871 2972 0	Climb-down	Ladder	16679
 2871 3003 0	2871 3008 0	Climb	Rocks	53240
 2871 3008 0	2871 3003 0	Climb	Rocks	53238
+2872 2934 0	2872 2936 0	Chop-down	Jungle Bush	2892
+2872 2936 0	2872 2934 0	Chop-down	Jungle Bush	2892
+2872 2938 0	2872 2940 0	Chop-down	Jungle tree	2889
+2872 2941 0	2872 2939 0	Chop-down	Jungle tree	2890
 2872 2971 0	2872 2971 1	Climb-up	Ladder	16683
 2872 2971 1	2872 2971 0	Climb-down	Ladder	16679
 2872 3671 0	2869 3671 0	Climb	Rocks	16521
@@ -2969,6 +3053,7 @@ Origin	Destination	Option	Object	ObjectId
 2906 3472 1	2906 3468 0	Walk-down	Staircase	24673
 2906 3476 0	2906 9876 0	Climb-down	Ladder	24718
 2906 3537 0	3061 4985 1	Enter	Trapdoor	7257
+2906 3537 0	3061 4985 1	Enter	Trapdoor	7257
 2906 3557 0	2906 3557 1	Climb-up	Ladder	16683
 2906 3557 1	2906 3557 0	Climb-down	Ladder	16679
 2906 3570 0	2906 3570 1	Climb-up	Ladder	16683
@@ -3101,12 +3186,30 @@ Origin	Destination	Option	Object	ObjectId
 2931 10182 0	2930 10179 1	Climb-up	Stairs	6087
 2931 10196 0	1940 4958 0	Climb-down	Stairs	9084
 2931 10197 0	1940 4958 0	Climb-down	Stairs	9084
+2932 2936 0	2932 2938 0	Chop-down	Jungle tree	2890
+2932 2938 0	2932 2936 0	Chop-down	Jungle tree	2890
+2932 2938 0	2932 2940 0	Chop-down	Jungle Bush	2892
+2932 2940 0	2932 2942 0	Chop-down	Jungle Bush	2892
+2932 2941 0	2932 2939 0	Chop-down	Jungle tree	2889
+2932 2943 0	2932 2941 0	Chop-down	Jungle Bush	2893
 2932 4711 2	2549 3112 1	Climb-down	Ladder	2797
+2933 2937 0	2933 2939 0	Chop-down	Jungle Bush	2893
+2933 2939 0	2933 2937 0	Chop-down	Jungle Bush	2893
+2933 2939 0	2933 2941 0	Chop-down	Jungle Bush	2893
+2933 2941 0	2933 2939 0	Chop-down	Jungle Bush	2893
+2933 2941 0	2933 2943 0	Chop-down	Jungle tree	2890
+2933 2943 0	2933 2941 0	Chop-down	Jungle tree	2890
 2933 3288 0	2933 3289 0	Open	Guild Door	14910
 2933 4712 2	2549 3112 1	Climb-down	Ladder	2797
 2933 10165 1	2930 10165 0	Climb-down	Stairs	6086
 2934 3355 0	2936 3355 0	Climb-over	Crumbling wall	24222
 2935 9810 0	2936 9810 0	Squeeze-through	Loose Railing	28849
+2936 2936 0	2936 2938 0	Chop-down	Jungle tree	2889
+2936 2938 0	2936 2936 0	Chop-down	Jungle tree	2889
+2936 2938 0	2936 2940 0	Chop-down	Jungle Bush	2893
+2936 2940 0	2936 2938 0	Chop-down	Jungle Bush	2893
+2936 2940 0	2936 2942 0	Chop-down	Jungle tree	2889
+2936 2943 0	2936 2941 0	Chop-down	Jungle tree	2889
 2936 3355 0	2934 3355 0	Climb-over	Crumbling wall	24222
 2936 9810 0	2935 9810 0	Squeeze-through	Loose Railing	28849
 2938 3252 0	2937 3252 0	Open	Exit door	2602
@@ -3217,14 +3320,14 @@ Origin	Destination	Option	Object	ObjectId
 2968 3348 1	2971 3347 0	Climb-down	Staircase	24068
 2968 3520 0	2968 3523 0	Cross	Wilderness Ditch	23271
 2968 3523 0	2968 3520 0	Cross	Wilderness Ditch	23271
-2968 9550 0	2992 9547 0	Enter	Tunnel	55988
+2968 9550 0	2992 9547 0	Enter	Tunnel	55989
 2969 3520 0	2969 3523 0	Cross	Wilderness Ditch	23271
 2969 3523 0	2969 3520 0	Cross	Wilderness Ditch	23271
-2969 9550 0	2992 9547 0	Enter	Tunnel	55988
+2969 9550 0	2992 9547 0	Enter	Tunnel	55989
 2970 3462 0	2972 3462 0	Climb-over	Crumbling wall	24749
 2970 3520 0	2970 3523 0	Cross	Wilderness Ditch	23271
 2970 3523 0	2970 3520 0	Cross	Wilderness Ditch	23271
-2970 9550 0	2992 9547 0	Enter	Tunnel	55988
+2970 9550 0	2992 9547 0	Enter	Tunnel	55989
 2971 3347 0	2968 3348 1	Climb-up	Staircase	24067
 2971 3369 0	2971 3373 1	Climb-up	Staircase	24079
 2971 3373 1	2971 3369 0	Climb-down	Staircase	24080
@@ -3592,6 +3695,7 @@ Origin	Destination	Option	Object	ObjectId
 3060 3523 0	3060 3520 0	Cross	Wilderness Ditch	23271
 3060 9555 0	3060 9557 0	Climb	Steps	8729
 3060 9557 0	3060 9555 0	Climb	Steps	8729
+3060 9766 0	3728 5692 0	Enter	Cave	26654
 3060 9766 0	3728 5692 0	Enter	Cave	26654
 3061 3376 0	3058 9776 0	Climb-down	Staircase	16664
 3061 3377 0	3058 9777 0	Climb-down	Staircase	16664
@@ -5479,11 +5583,13 @@ Origin	Destination	Option	Object	ObjectId
 3539 3544 1	3539 3544 0	Climb-down	Ladder	16679
 3540 3543 0	3540 3543 1	Climb-up	Ladder	16683
 3540 3543 1	3540 3543 0	Climb-down	Ladder	16679
+3544 3282 0	3548 3283 0	Jump-Across	Dry stone wall	53256
 3547 3539 1	3547 3539 2	Climb-up	Ladder	16683
 3547 3539 2	3547 3539 1	Climb-down	Ladder	16679
 3547 3554 1	3547 3554 2	Climb-up	Ladder	16683
 3547 3554 2	3547 3554 1	Climb-down	Ladder	16679
 3547 3565 0	3548 3565 0	Open	Door	5174
+3548 3283 0	3544 3282 0	Jump-Across	Dry stone wall	53256
 3548 3538 1	3548 3538 2	Climb-up	Ladder	16683
 3548 3538 2	3548 3538 1	Climb-down	Ladder	16679
 3548 3540 1	3548 3540 2	Climb-up	Ladder	16683
@@ -5867,7 +5973,11 @@ Origin	Destination	Option	Object	ObjectId
 3729 3830 0	3730 3831 1	Climb Up	Ladder	30938
 3729 3832 0	3730 3831 1	Climb Up	Ladder	30938
 3730 3831 1	3728 3831 0	Climb Down	Ladder	30939
+3731 5682 0	3731 5684 0	Mine	Rockfall	26680
+3731 5684 0	3731 5682 0	Mine	Rockfall	26680
 3732 9683 0	3720 3307 0	Climb-up	Ladder	32644
+3733 5679 0	3733 5681 0	Mine	Rockfall	26679
+3733 5681 0	3733 5679 0	Mine	Rockfall	26679
 3735 3319 1	3736 3318 0	Climb-down	Staircase	24359
 3736 3316 1	3736 3316 2	Climb-up	Ladder	24351
 3736 3316 2	3736 3316 1	Climb-down	Ladder	24352

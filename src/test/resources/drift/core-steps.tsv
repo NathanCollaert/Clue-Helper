@@ -16,7 +16,7 @@ anagram:12135	*	anagram	elite	ANY_OF	2326,3178,0	Oronwen				none	1578	NO OWNER
 anagram:12136	*	anagram	elite	ANY_OF	3300,3231,0	Cam the Camel				none	1576	MACHETE CLAM
 anagram:12137	*	anagram	elite	ANY_OF	2660,3654,0	Sigli the Huntsman				none	1581	UNLEASH NIGHT MIST
 anagram:12138	*	anagram	elite	ANY_OF	3462,3557,0	Old crone				none	1573	COOL NERD
-anagram:12566	*	anagram	hard	ANY_OF	3061,3377,0	Prospector Percy				none	1557	COPPER ORE CRYPTS
+anagram:12566	*	anagram	hard	ANY_OF	3758,5664,0	Prospector Percy				none	1557	COPPER ORE CRYPTS
 anagram:12568	*	anagram	hard	ANY_OF	3564,3288,0	Strange Old Man				none	1561	DRAGONS LAMENT
 anagram:12570	*	anagram	hard	ANY_OF	2906,3537,0	Martin Thwait				none	1567	RAT MAT WITHIN
 anagram:12572	*	anagram	hard	ANY_OF	3088,3253,0	Wise Old Man				none	1568	SLIDE WOMAN
@@ -518,7 +518,7 @@ cryptic:strength potions with red spiders' eggs? he is quite a herbalist.	*	cryp
 cryptic:surprising? i bet he is...	*	cryptic	hard	ANY_OF	3205,3474,0	Sir Prysin				none	1388	Surprising? I bet he is...
 cryptic:surround my bones in fire, ontop the wooden pyre. finally lay me to rest, before my one last test.	*	cryptic	elite	AREA	1761,5322,0					none	1458	Surround my bones in fire, ontop the wooden pyre. Finally lay me to rest, before my one last test.
 cryptic:surrounded by white walls and gems.	*	cryptic	easy	ANY_OF	2945,3335,0	Herquin				none	1264	Surrounded by white walls and gems.
-cryptic:surviving.	*	cryptic	hard	ANY_OF	2983,3338,0	Sir Vyvin				none	1383	Surviving.
+cryptic:surviving.	*	cryptic	hard	ANY_OF	2982,3336,2	Sir Vyvin				none	1383	Surviving.
 cryptic:talk to a party-goer in falador.	*	cryptic	easy	ANY_OF	3046,3383,1	Lucy				none	1250	Talk to a party-goer in Falador.
 cryptic:talk to ali the leaflet dropper north of the al kharid mine.	*	cryptic	easy	ANY_OF	3283,3329,0	Ali the Leaflet Dropper				none	1275	Talk to Ali the Leaflet Dropper north of the Al Kharid mine.
 cryptic:talk to ambassador spanfipple in the white knights castle.	*	cryptic	easy	ANY_OF	2982,3343,1	Ambassador Spanfipple				none	1249	Talk to Ambassador Spanfipple in the White Knights Castle.

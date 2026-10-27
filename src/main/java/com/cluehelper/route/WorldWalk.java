@@ -28,7 +28,7 @@ public final class WorldWalk
 		return tile == WalkSearch.NONE ? List.of() : new GameWalk().along(ground, search.trace(tile));
 	}
 
-	/** Where the walk ends: the goal, the first tile found that uses its object, or the best tile beside it. */
+	/** Where the walk ends: the goal's first tile found, the first tile found that uses its object, or the best tile beside it. */
 	private static final class End implements WalkSearch.Stop
 	{
 		private final Ground ground;
@@ -36,6 +36,7 @@ public final class WorldWalk
 		private final WorldPoint goalTile;
 		private final int target;
 		private int usedFrom = WalkSearch.NONE;
+		private int reached = WalkSearch.NONE;
 
 		End(Ground ground, WalkGoal goal)
 		{
@@ -55,8 +56,9 @@ public final class WorldWalk
 				usedFrom = uses ? tile : usedFrom;
 				return uses ? cost : WalkSearch.UNREACHED;
 			}
-			if (tile == target)
+			if (goal.contains(WalkSearch.x(tile), WalkSearch.y(tile), WalkSearch.plane(tile)))
 			{
+				reached = reached == WalkSearch.NONE ? tile : reached;
 				return cost;
 			}
 			return opensOnto(tile) ? cost + BESIDE_GOAL_SLACK : WalkSearch.UNREACHED;
@@ -64,7 +66,7 @@ public final class WorldWalk
 
 		int tile(WalkSearch search)
 		{
-			return goal.isObject() ? usedFrom : besideGoal(search);
+			return goal.isObject() ? usedFrom : reached != WalkSearch.NONE ? reached : besideGoal(search);
 		}
 
 		/** The goal when reached, else the reached tile beside it with no wall between, else the nearest. */

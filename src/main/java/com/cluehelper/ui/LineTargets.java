@@ -17,6 +17,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.TileObject;
+import net.runelite.api.WallObject;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
@@ -27,6 +28,12 @@ import net.runelite.api.coords.WorldPoint;
 @Singleton
 final class LineTargets
 {
+	/** WallObject.getOrientationA's sides of its tile. */
+	private static final int WALL_WEST = 1;
+	private static final int WALL_NORTH = 2;
+	private static final int WALL_EAST = 4;
+	private static final int WALL_SOUTH = 8;
+
 	private final Client client;
 	private final StepGuide guide;
 	private final RoutePlanner routes;
@@ -90,6 +97,13 @@ final class LineTargets
 	/** The object itself is walked to, as the game walks when it is clicked. */
 	static WalkGoal objectGoal(WorldView view, TileObject object)
 	{
+		WorldPoint[] sides = wallSides(object);
+		if (sides != null)
+		{
+			WorldPoint southWest = new WorldPoint(Math.min(sides[0].getX(), sides[1].getX()), Math.min(sides[0].getY(), sides[1].getY()),
+				sides[0].getPlane());
+			return WalkGoal.area(southWest, 1 + Math.abs(sides[0].getX() - sides[1].getX()), 1 + Math.abs(sides[0].getY() - sides[1].getY()));
+		}
 		if (!(object instanceof GameObject))
 		{
 			return WalkGoal.object(object.getWorldLocation(), 1, 1);
@@ -112,8 +126,40 @@ final class LineTargets
 		return instanceWalk;
 	}
 
+	/**
+	 * A door in a wall (the Pyramid Plunder lobby's Tomb Door) is used from its own tile or the one across the edge it
+	 * stands on; the edge between them is the wall itself, so "beside it with no wall between" finds neither. Null for
+	 * anything but a straight wall.
+	 */
+	private static WorldPoint[] wallSides(TileObject object)
+	{
+		if (!(object instanceof WallObject))
+		{
+			return null;
+		}
+		WorldPoint at = object.getWorldLocation();
+		switch (((WallObject) object).getOrientationA())
+		{
+			case WALL_WEST:
+				return new WorldPoint[] {at, at.dx(-1)};
+			case WALL_NORTH:
+				return new WorldPoint[] {at, at.dy(1)};
+			case WALL_EAST:
+				return new WorldPoint[] {at, at.dx(1)};
+			case WALL_SOUTH:
+				return new WorldPoint[] {at, at.dy(-1)};
+			default:
+				return null;
+		}
+	}
+
 	private static WorldPoint beside(WorldView view, WalkCosts here, TileObject object)
 	{
+		WorldPoint[] sides = wallSides(object);
+		if (sides != null)
+		{
+			return here.cost(sides[0]) <= here.cost(sides[1]) ? sides[0] : sides[1];
+		}
 		if (!(object instanceof GameObject))
 		{
 			return object.getWorldLocation();

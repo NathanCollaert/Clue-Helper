@@ -12,9 +12,18 @@ final class OneClick
 	{
 	}
 
+	/**
+	 * A list opener's click only opens the list, unless the row ends on that very option ("Quest point cape: Teleport"):
+	 * then nothing follows it.
+	 */
 	static boolean teleportsTo(String option, String destination)
 	{
-		return option != null && destination != null && !MenuLabels.isOpener(option) && MenuLabels.matches(option, destination);
+		if (option == null || destination == null)
+		{
+			return false;
+		}
+		boolean rowsLastClick = MenuLabels.normalise(option).equals(MenuLabels.normalise(destination));
+		return rowsLastClick || !MenuLabels.isOpener(option) && MenuLabels.matches(option, destination);
 	}
 
 	/**

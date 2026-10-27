@@ -96,9 +96,10 @@ public class EdgeCaseRoutesTest
 	}
 
 	/**
-	 * The path line leads all the way, past the loaded scene: on the ledge below the Kharazi cliff it never heads east
-	 * into the ledge's dead end past the vine, it takes the hole down to Gu'Tanoth's cave rather than the glider
-	 * landing's walk, and it leads on to Tyras Camp from a tile past the Isafdar landing.
+	 * The path line leads all the way, past the loaded scene: on the ledge below the Kharazi cliff, with no axe and
+	 * machete for the jungle's bushes, it never heads east into the ledge's dead end past the vine, it takes the hole
+	 * down to Gu'Tanoth's cave rather than the glider landing's walk, and it leads on to Tyras Camp from a tile past the
+	 * Isafdar landing.
 	 */
 	private static final WorldPoint KHARAZI_CLUE = new WorldPoint(2954, 2933, 0);
 	/** Not a walk-table node, beside the clue. */
@@ -112,7 +113,7 @@ public class EdgeCaseRoutesTest
 		for (String name : List.of("2824_2896_0", "2848_2896_0", "2808_2904_0", "2848_2888_0"))
 		{
 			LoadedScene scene = scene(name);
-			Ground ground = Ground.world(map, scene, table, row -> true);
+			Ground ground = Ground.world(map, scene, table, EdgeCaseRoutesTest::needsNoTool);
 			for (int x = 2880; x <= 2930; x += 2)
 			{
 				WorldPoint from = new WorldPoint(x, 2942, 0);
@@ -134,6 +135,12 @@ public class EdgeCaseRoutesTest
 		WorldPoint tyrasClue = new WorldPoint(2209, 3161, 0);
 		List<WorldPoint> onward = walk.path(Ground.world(map, scene("2096_3016_0"), table, row -> true), walkedOn, WalkGoal.tile(tyrasClue));
 		assertTrue("a line on from " + walkedOn + ": " + onward, !onward.isEmpty() && onward.get(onward.size() - 1).distanceTo2D(tyrasClue) <= 2);
+	}
+
+	private static boolean needsNoTool(int row)
+	{
+		int gate = table.rowGate(row);
+		return gate == 0 || table.getGates().get(gate - 1).getItems().isEmpty();
 	}
 
 	private static LoadedScene scene(String name) throws IOException

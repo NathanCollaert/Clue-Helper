@@ -105,7 +105,7 @@ final class PathObjects
 		TileObject object = null;
 		for (Exit row : rows)
 		{
-			TileObject near = row.getObjectId() < 0 ? null : objectNear(view, row.getObjectId(), origin);
+			TileObject near = row.getObjectId() < 0 ? null : rowObject(view, row, origin);
 			if (near != null && (object == null || squaredDistance(near, origin) < squaredDistance(object, origin)))
 			{
 				clicked = row;
@@ -160,9 +160,13 @@ final class PathObjects
 
 	private static int squaredDistance(TileObject object, WorldPoint origin)
 	{
-		WorldPoint at = object.getWorldLocation();
-		int dx = at.getX() - origin.getX();
-		int dy = at.getY() - origin.getY();
+		return squaredDistance(object.getWorldLocation(), origin);
+	}
+
+	private static int squaredDistance(WorldPoint a, WorldPoint b)
+	{
+		int dx = a.getX() - b.getX();
+		int dy = a.getY() - b.getY();
 		return dx * dx + dy * dy;
 	}
 
@@ -189,27 +193,49 @@ final class PathObjects
 	}
 
 	/**
-	 * Client thread only. The objects of every row from {@code from} to {@code to} on the tiles {@code around}: a climb's
-	 * rope at its foot and its rocks at the top, which the walk data names as two rows.
+	 * Client thread only. The object of every row from {@code from} to {@code to} on the tiles {@code around}: a climb's
+	 * rope at its foot and its rocks at the top, which the walk data names as two rows. Each row is one object, the one
+	 * nearest both its ends on one floor, else nearest {@code from}: Marim's two staircases share their ids and stand
+	 * within reach of each other's rows, as the Kharazi Jungle's bushes do.
 	 */
 	List<TileObject> rowObjectsAround(WorldView view, WalkTable table, WorldPoint from, WorldPoint to, Rectangle around)
 	{
 		List<Exit> rows = table == null ? List.of() : table.rowObjects(from, to);
-		List<TileObject> found = new ArrayList<>();
+		Map<Integer, TileObject> nearestByRow = new LinkedHashMap<>();
 		for (int x = around.x; !rows.isEmpty() && x < around.x + around.width; x++)
 		{
 			for (int y = around.y; y < around.y + around.height; y++)
 			{
 				Tile tile = tile(view, new WorldPoint(x, y, from.getPlane()));
-				if (tile != null)
+				if (tile == null)
 				{
-					objectsOn(tile).stream()
-						.filter(object -> rows.stream().anyMatch(row -> row.getObjectId() >= 0 && isObject(object, row.getObjectId())))
-						.forEach(found::add);
+					continue;
+				}
+				for (TileObject object : objectsOn(tile))
+				{
+					for (Exit row : rows)
+					{
+						if (row.getObjectId() >= 0 && isObject(object, row.getObjectId()))
+						{
+							nearestByRow.merge(row.getObjectId(), object, (kept, other) -> nearer(from, to, kept, other));
+						}
+					}
 				}
 			}
 		}
-		return found;
+		return List.copyOf(nearestByRow.values());
+	}
+
+	private static TileObject nearer(WorldPoint from, WorldPoint to, TileObject a, TileObject b)
+	{
+		return closeness(b, from, to) < closeness(a, from, to) ? b : a;
+	}
+
+	/** Nearness to both ends of a hop on one floor, else to its start alone. */
+	private static int closeness(TileObject object, WorldPoint from, WorldPoint to)
+	{
+		boolean hop = to.getPlane() == from.getPlane() && to.distanceTo2D(from) <= ROW_OBJECT_TILES;
+		return squaredDistance(object, from) + (hop ? squaredDistance(object, to) : 0);
 	}
 
 	private List<TileObject> objectsOn(Tile tile)
@@ -240,6 +266,37 @@ final class PathObjects
 	}
 
 	/** The one nearest the row's origin: a pipe's two ends share an id, and the one clicked is the near end. */
+	/**
+	 * The object a row crosses. Across a short hop on one floor it stands between the row's ends: the Kharazi Jungle's
+	 * bushes share one id, and the one beside the origin is as near as the one in front of it.
+	 */
+	private TileObject rowObject(WorldView view, Exit row, WorldPoint origin)
+	{
+		WorldPoint end = row.getDestination();
+		boolean hop = end.getPlane() == origin.getPlane() && end.distanceTo2D(origin) <= ROW_OBJECT_TILES;
+		if (!hop)
+		{
+			return objectNear(view, row.getObjectId(), origin);
+		}
+		TileObject between = null;
+		int nearestBoth = Integer.MAX_VALUE;
+		for (int dx = -ROW_OBJECT_TILES; dx <= ROW_OBJECT_TILES; dx++)
+		{
+			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
+			{
+				WorldPoint at = origin.dx(dx).dy(dy);
+				TileObject object = objectOn(tile(view, at), row.getObjectId());
+				int toBoth = squaredDistance(at, origin) + squaredDistance(at, end);
+				if (object != null && toBoth < nearestBoth)
+				{
+					between = object;
+					nearestBoth = toBoth;
+				}
+			}
+		}
+		return between;
+	}
+
 	private TileObject objectNear(WorldView view, int id, WorldPoint origin)
 	{
 		TileObject nearest = null;

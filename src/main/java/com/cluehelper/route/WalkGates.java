@@ -7,7 +7,10 @@ import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Requirements;
 import com.cluehelper.transport.RowAvailability;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
@@ -104,10 +107,18 @@ public final class WalkGates
 		return alternative != 0 && setPass[alternative] ? alternative : 0;
 	}
 
-	/** Sorted: every stored item some gate takes. */
-	public int[] storedGateItems()
+	/** Each gate's stored items, sorted, once per distinct set. */
+	public List<int[]> storedGateTools()
 	{
-		return IntStream.range(1, gateWithdraw.length).flatMap(g -> IntStream.of(gateWithdraw[g])).distinct().sorted().toArray();
+		Map<String, int[]> tools = new LinkedHashMap<>();
+		for (int g = 1; g < gateWithdraw.length; g++)
+		{
+			if (gateWithdraw[g].length > 0)
+			{
+				tools.putIfAbsent(Arrays.toString(gateWithdraw[g]), gateWithdraw[g]);
+			}
+		}
+		return List.copyOf(tools.values());
 	}
 
 	public boolean[] rowOpen()

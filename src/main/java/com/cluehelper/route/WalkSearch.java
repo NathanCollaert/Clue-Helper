@@ -148,6 +148,10 @@ final class WalkSearch
 		{
 			pushed += push(buckets, ground.rowDestination(row), cost + ground.rowCost(row), tile, row);
 		}
+		if (isSteppedOntoObstacle(tile, x, y, plane))
+		{
+			return pushed;
+		}
 		for (int d = 0; d < Directions.COUNT; d++)
 		{
 			int nx = x + Directions.DX[d];
@@ -163,6 +167,15 @@ final class WalkSearch
 			}
 		}
 		return pushed;
+	}
+
+	/**
+	 * A blocked tile walked onto (the Strange floor) is left only by its rows, as the walk generator's table is: walking
+	 * off its far side would cross without the row's time or gate. The start and a row's landing walk off as usual.
+	 */
+	private boolean isSteppedOntoObstacle(int tile, int x, int y, int plane)
+	{
+		return parent(tile) != NONE && via(tile) == NONE && ground.isBlocked(x, y, plane);
 	}
 
 	private int push(IntList[] buckets, int tile, int cost, int from, int via)

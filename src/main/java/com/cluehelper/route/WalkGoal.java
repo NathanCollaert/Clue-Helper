@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
-/** Where a walk ends: on a tile, or where the game stops to use an object. */
+/** Where a walk ends: on a tile, on any tile of an area, or where the game stops to use an object. */
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WalkGoal
@@ -20,10 +20,22 @@ public class WalkGoal
 		return new WalkGoal(tile, 1, 1, false);
 	}
 
+	/** Any tile of the area will do (a Wilderness obelisk teleports whoever stands on its platform). */
+	public static WalkGoal area(WorldPoint southWest, int sizeX, int sizeY)
+	{
+		return new WalkGoal(southWest, sizeX, sizeY, false);
+	}
+
 	/** The game walks to the first tile it finds on a straight side of the object with no wall between. */
 	public static WalkGoal object(WorldPoint southWest, int sizeX, int sizeY)
 	{
 		return new WalkGoal(southWest, sizeX, sizeY, true);
+	}
+
+	boolean contains(int x, int y, int plane)
+	{
+		return plane == southWest.getPlane() && x >= southWest.getX() && x < southWest.getX() + sizeX
+			&& y >= southWest.getY() && y < southWest.getY() + sizeY;
 	}
 
 	/** On a straight side of the object, outside it, with no wall between. */

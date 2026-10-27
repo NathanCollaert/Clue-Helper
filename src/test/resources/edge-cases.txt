@@ -1,27 +1,27 @@
 consumption: glory(1) carried, bank on with glory(1), to Draynor
   best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1706=1}
 consumption: minigame teleports only, bank on, to Varrock bank crates
-  best      65t: Soul Wars Minigame Teleport → walk 2 → bank → Varrock tablet → walk 26 {cooldown:888=1, item:8007=1} withdraw [8007]
-  direct    161t: Clan Wars Minigame Teleport → walk 135 {cooldown:888=1}
+  best      66t: Soul Wars Minigame Teleport → walk 2 → bank → Varrock tablet → walk 28 {cooldown:888=1, item:8007=1} withdraw [8007]
+  direct    163t: Clan Wars Minigame Teleport → walk 137 {cooldown:888=1}
 Lunar, swap runes and Max cape carried, to Varrock: Spellbook Swap, not the cape
-  best      35t: Spellbook Swap · Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
-  same book 38t: Ring of wealth: Grand Exchange → walk 33 {charge:11980=1}
-  alt       41t: Skills necklace: Cooking Guild → walk 36 {charge:11968=1}
-  alt       41t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 26
+  best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  same book 40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
+  alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
+  alt       43t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 28
 Lunar, swap runes and Max cape, Spellbook Swap only
-  best      35t: Spellbook Swap · Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
-  same book 38t: Ring of wealth: Grand Exchange → walk 33 {charge:11980=1}
-  alt       41t: Skills necklace: Cooking Guild → walk 36 {charge:11968=1}
-  alt       41t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 26
+  best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  same book 40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
+  alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
+  alt       43t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 28
 pending revert to Lunar on Standard, 150 ticks left: Standard teleport at +0
-  best      30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
-  alt       38t: Ring of wealth: Grand Exchange → walk 33 {charge:11980=1}
-  alt       38t: Varrock Teleport: Grand Exchange → walk 33 {item:556=3, item:554=1, item:563=1}
+  best      32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  alt       40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
+  alt       40t: Varrock Teleport: Grand Exchange → walk 35 {item:556=3, item:554=1, item:563=1}
 pending revert, window unknown: plans from Lunar
-  best      35t: Spellbook Swap · Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
-  same book 38t: Ring of wealth: Grand Exchange → walk 33 {charge:11980=1}
-  alt       41t: Skills necklace: Cooking Guild → walk 36 {charge:11968=1}
-  alt       41t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 26
+  best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  same book 40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
+  alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
+  alt       43t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 28
 pending revert on Standard, Ancient target: the cape from a pending revert
   best      44t: Teleport to House → Portal nexus: Senntisten → walk 30 {item:556=1, item:557=1, item:563=1}
   alt       44t: Varrock Teleport → Spellbook Swap · Senntisten Teleport → walk 30 {item:556=3, item:554=1, item:563=4, item:566=1, item:9075=3, item:564=2}
@@ -31,21 +31,21 @@ pending revert on Standard, Ancient target: the cape from a pending revert
   alt       48t: Civitas illa Fortis Teleport → walk 44 {item:557=1, item:554=1, item:563=2}
   alt       56t: Ring of dueling: Fortis Colosseum → walk 9 → Quetzal: Civitas illa Fortis → walk 35 {charge:2552=1}
 Lunar, swap runes only in the bank (bank on)
-  best      38t: Ring of wealth: Grand Exchange → walk 33 {charge:11980=1}
-  alt       32t (rank 40): Max cape: Spellbook → STANDARD → Varrock Teleport → walk 26 {cape=1, item:556=3, item:554=1, item:563=1} leaves you on STANDARD
-  alt       41t: Skills necklace: Cooking Guild → walk 36 {charge:11968=1}
+  best      40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
+  alt       34t (rank 42): Max cape: Spellbook → STANDARD → Varrock Teleport → walk 28 {cape=1, item:556=3, item:554=1, item:563=1} leaves you on STANDARD
+  alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
   best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
   alt       56t: Ring of dueling: Fortis Colosseum → walk 9 → Quetzal: Civitas illa Fortis → walk 35 {charge:2552=1}
   alt       56t: Master scroll book: Digsite teleport → walk 51 {charge:21389=1}
 Wilderness start at level 26 (3100,3720), to Varrock
-  best      35t: Slayer ring: Stronghold → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
-  alt       35t: Slayer ring: Slayer Tower → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
-  alt       35t: Slayer ring: Fremennik → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      37t: Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       37t: Slayer ring: Slayer Tower → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       37t: Slayer ring: Fremennik → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 Wilderness start at level 36 (3100,3800), to Varrock
-  best      58t: walk south 23 → Slayer ring: Stronghold → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
-  alt       58t: walk south 23 → Slayer ring: Slayer Tower → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
-  alt       58t: walk south 23 → Slayer ring: Fremennik → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      60t: walk south 23 → Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       60t: walk south 23 → Slayer ring: Slayer Tower → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  alt       60t: walk south 23 → Slayer ring: Fremennik → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 member on an F2P world on Ancient: Edgeville Home Teleport
   best      33t: Edgeville Home Teleport → walk 9 {cooldown:892=1}
 avoidWilderness with a Wilderness target
@@ -65,13 +65,13 @@ avoidWilderness, King Black Dragon's lair: outside it, but only reachable throug
   alt       40t (rank 48): Max cape: Spellbook → ANCIENT → Ghorrock Teleport → walk 28 → Lever: King Black Dragon Lair {cape=1, item:563=2, item:555=8} leaves you on ANCIENT
   note      only reachable through the Wilderness
 avoidWilderness, start at the level 50 obelisk (3306,3915), to Varrock: out by the obelisk
-  best      36t: Obelisk: Level 13 Wilderness → Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
-  alt       36t: Obelisk: Level 19 Wilderness → Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
-  alt       41t: Obelisk: Level 27 Wilderness → Slayer ring: Stronghold → Varrock Teleport → walk 26 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      45t: Obelisk: Level 13 Wilderness → Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  alt       45t: Obelisk: Level 19 Wilderness → Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  alt       50t: Obelisk: Level 27 Wilderness → Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 bank tipping point: mid-ironman, bank on, to Varrock bank crates
-  best      30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
-  alt       41t: Skills necklace: Cooking Guild → walk 36 {charge:11968=1}
-  alt       46t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 26 {charge:2552=1, item:8007=1} withdraw [8007]
+  best      32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
+  alt       48t: Ring of dueling: Castle Wars → walk 4 → bank → Varrock tablet → walk 28 {charge:2552=1, item:8007=1} withdraw [8007]
 Fountain of Rune case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked
   best      27t: Camelot Teleport: Seers' → walk 4 → bank → Wilderness sword 4: Teleport → walk 6 {item:556=5, item:563=1} withdraw [13111] deposit first
   direct    73t: Teleport to House → House obelisk: Level 50 Wilderness → walk 58 {item:556=1, item:557=1, item:563=1}
@@ -136,9 +136,9 @@ scroll book kept out of the Wilderness: banked, to the Lava Maze
   alt       104t: Teleport to House → Portal nexus: Ghorrock → walk 90 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
 at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required
-  best      32t: (at the open bank) Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1} withdraw [952]
-  alt       35t: (at the open bank) Varrock tablet → walk 26 {item:8007=1} withdraw [8007, 952]
-  alt       41t: (at the open bank) walk 39 withdraw [952]
+  best      34t: (at the open bank) Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1} withdraw [952]
+  alt       37t: (at the open bank) Varrock tablet → walk 28 {item:8007=1} withdraw [8007, 952]
+  alt       43t: (at the open bank) walk 41 withdraw [952]
 house: Burthorpe castle steps (Eohric), no games necklace, a fully built house
   best      27t: Teleport to House → Jewellery box: 5. Burthorpe → walk 13 {item:556=1, item:557=1, item:563=1}
   alt       39t: Burthorpe Games Room Minigame Teleport → walk 13 {cooldown:888=1}
@@ -150,7 +150,7 @@ house: Burthorpe castle steps (Eohric), no games necklace, no house
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      74t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 58
   alt       77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62
-  alt       81t: Construction cape: Tele to POH → House obelisk: Level 13 Wilderness → walk 1 → Obelisk: Level 50 Wilderness → walk 58
+  alt       88t: Construction cape: Tele to POH → House obelisk: Level 13 Wilderness → walk 1 → Obelisk: Level 50 Wilderness → walk 58
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)
   best      79t (rank 109): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
@@ -160,8 +160,8 @@ house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
   best      77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62
-  alt       83t: Construction cape: Tele to POH → Portal nexus: Ghorrock → walk 4 → Obelisk: Level 50 Wilderness → walk 58
-  alt       84t: Games necklace: Corporeal Beast → walk 15 → Obelisk: Level 50 Wilderness → walk 58 {charge:3853=1}
+  alt       90t: Construction cape: Tele to POH → Portal nexus: Ghorrock → walk 4 → Obelisk: Level 50 Wilderness → walk 58
+  alt       91t: Games necklace: Corporeal Beast → walk 15 → Obelisk: Level 50 Wilderness → walk 58 {charge:3853=1}
   note      Wilderness target
 house: standing in the own house, Burthorpe castle steps
   best      18t: Games necklace: Burthorpe → walk 13 {charge:3853=1}
@@ -174,7 +174,7 @@ house: standing in a stranger's house, Burthorpe castle steps
 house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelisk
   best      72t: Teleport to House → Portal chamber: Annakarl → walk 62 {item:556=1, item:557=1, item:563=1}
   alt       69t (rank 77): Max cape: Spellbook → ANCIENT → Annakarl Teleport → walk 62 {cape=1, item:563=2, item:565=2} leaves you on ANCIENT
-  alt       84t: Games necklace: Corporeal Beast → walk 15 → Obelisk: Level 50 Wilderness → walk 58 {charge:3853=1}
+  alt       91t: Games necklace: Corporeal Beast → walk 15 → Obelisk: Level 50 Wilderness → walk 58 {charge:3853=1}
   note      Wilderness target
 house: Yanille upstairs house, the Yanille twin of the Watchtower slot, no law runes
   best      30t: Construction cape: Tele to POH → Portal nexus: Yanille → walk 8 → walk 7
@@ -189,8 +189,8 @@ house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ti
   alt       73t: Lumbridge Teleport → walk 69 {item:556=3, item:557=1, item:563=1}
 house: map w356 without a house (the overworld fairy rings)
   best      23t: Necklace of passage: Wizards' Tower → walk 18 {charge:21146=1}
-  alt       35t: Slayer ring: Fremennik → walk 14 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11866=1}
   alt       35t: Ring of wealth: Miscellania → walk 14 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11980=1}
+  alt       37t: Slayer ring: Fremennik → walk 16 → Fairy ring DIS: Misthalin: Wizards' Tower → walk 3 {charge:11866=1}
 spirit tree: anagram 23133 (Madame Caldarium), maxed
   best      40t: Max cape: Other Teleports: Feldip Hills → walk 35 {daily:4819=1}
   alt       45t: Master scroll book: Feldip hills teleport → walk 40 {charge:21389=1}
@@ -256,11 +256,11 @@ ride: mushtree, boarding at 3764,3879,1 with coins, an axe and logs only, anagra
   best      28t: walk 17 → Boat: north Fossil Island → Boat: Fossil Island → walk 3
   alt       42t: Mushtree: Mushroom Meadow → walk 34
 ride: wilderness obelisk, boarding at 2979,3865,0 with coins, an axe and logs only, spot:WILDERNESS_20
-  best      13t: Obelisk: Level 19 Wilderness → walk 7
+  best      20t: Obelisk: Level 19 Wilderness → walk 7
   note      Wilderness target
 ride: lever, then the keep's web, boarding at 3090,3475,0 with the axe and a Wilderness sword banked, clap in the Magic Axe Hut
   best      84t: walk 12 → bank → walk 12 → Lever: Deserted Keep → walk 48 withdraw [13108] deposit first
-  direct    162t: walk 86 → Obelisk: Level 50 Wilderness → walk 70
+  direct    169t: walk 86 → Obelisk: Level 50 Wilderness → walk 70
   note      Wilderness target
 sailing: boat 1 moored at the Tear of the Soul with a greater teleport focus, maxed, the Tear's beach
   best      9t: Teleport to Boat → walk 4 {item:563=2, item:557=2, item:555=2}
@@ -272,15 +272,15 @@ gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkens
   alt       89t (rank 97): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
   alt       103t: Teleport to House → Fairy ring ALQ: Morytania: Haunted Woods → walk 85 {item:556=1, item:557=1, item:563=1}
 start on a node: standing at the Varrock Teleport landing, to Varrock bank crates
-  best      26t: walk 26
-  alt       30t: Varrock Teleport → walk 26 {item:556=3, item:554=1, item:563=1}
-  alt       41t: Skills necklace: Cooking Guild → walk 36 {charge:11968=1}
+  best      28t: walk 28
+  alt       32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
 AREA: cryptic:a demon's best friend holds the next step of this clue.
-  best      26t: Master scroll book: Key master teleport → walk 21 {charge:21389=1}
+  best      28t: Master scroll book: Key master teleport → walk 23 {charge:21389=1}
 SEQUENCE skill: cryptic:a graceful man of many colours, his crates must be full of many delights.
   best      84t: Teleport to House → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 28 → Book of the dead: History and Hearsay → walk 33 {item:556=1, item:557=1, item:563=1, charge:25818=1}
   alt       106t: Games necklace: Wintertodt → walk 21 → Minecart: Shayzien West → walk 37 → Book of the dead: History and Hearsay → walk 33 {charge:3853=1, charge:25818=1}
   alt       111t: Skills necklace: Farming Guild → walk 26 → Minecart: Shayzien West → walk 37 → Book of the dead: History and Hearsay → walk 33 {charge:11968=1, charge:25818=1}
 SEQUENCE three-step (6 orders)
-  best      99t: Skills necklace: Mining Guild → walk 33 → Lumbridge Teleport → walk 27 → Varrock Teleport → walk 26 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
-PROBES (hot/cold spots): {2860,3562,0=30, 2915,3425,0=66, 2917,3295,0=14, 2972,3486,0=65, 2976,3239,0=43, 3030,3364,0=32, 3031,3304,0=66, 3033,3438,0=57}
+  best      103t: Skills necklace: Mining Guild → walk 35 → Lumbridge Teleport → walk 28 → Varrock Teleport → walk 28 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
+PROBES (hot/cold spots): {2860,3562,0=30, 2915,3425,0=66, 2917,3295,0=14, 2972,3486,0=65, 2976,3239,0=43, 3030,3364,0=34, 3031,3304,0=66, 3033,3438,0=57}

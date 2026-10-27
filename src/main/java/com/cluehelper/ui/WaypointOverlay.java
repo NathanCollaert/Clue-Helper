@@ -18,11 +18,13 @@ import com.cluehelper.step.Stage;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
+import com.cluehelper.transport.Category;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +62,7 @@ public class WaypointOverlay extends Overlay
 	private static final int CROSSING_TICKS = 10;
 	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
+	private static final int OBELISK_PLATFORM_TILES = 3;
 	private static final float PATH_STROKE = 2f;
 	/** A climb's far end can stand a few tiles off the walk data's landing tile (the Observatory's rocks). */
 	private static final int ROW_ENDS_MARGIN_TILES = 3;
@@ -193,6 +196,10 @@ public class WaypointOverlay extends Overlay
 		if (waypoint == null)
 		{
 			return null;
+		}
+		if (isObeliskTeleport(current))
+		{
+			return Goal.path(WalkGoal.area(waypoint, OBELISK_PLATFORM_TILES, OBELISK_PLATFORM_TILES), false);
 		}
 		TileObject object = outlined() ? targets.object(view) : null;
 		NPC approached = object == null && approachOutlined() ? targets.npc() : null;
@@ -381,6 +388,13 @@ public class WaypointOverlay extends Overlay
 		return current != null && !current.getNpcIds().isEmpty() || !guide.getMenuTarget().getNpcIds().isEmpty();
 	}
 
+	/** Its row's origin is the south-west corner of the platform, and the whole platform teleports. */
+	private static boolean isObeliskTeleport(SubStep current)
+	{
+		return current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
+			&& current.getRow().getCategory() == Category.WILDERNESS_OBELISK;
+	}
+
 	private boolean approachOutlined()
 	{
 		SubStep current = guide.getCurrent();
@@ -562,7 +576,9 @@ public class WaypointOverlay extends Overlay
 	/**
 	 * The objects a jump goes over, nearest first: the outlined one (a stile), the others named as it is on the way
 	 * (every stepping stone, both ends of a pipe) and the objects of the jump's other rows (a climb's rocks at the top
-	 * of its rope). The line leads over them, not straight from one end to the other.
+	 * of its rope). The line leads over them, not straight from one end to the other. Across a short jump only those
+	 * that each bring it nearer the far end count: the Kharazi Jungle's bushes stand in a wall, all one name and id,
+	 * and would pull the line back and forth across it.
 	 */
 	private List<TileObject> objectsCrossed(WorldView view, WorldPoint from, WorldPoint jumpEnd)
 	{
@@ -576,10 +592,27 @@ public class WaypointOverlay extends Overlay
 		WalkData.Loaded data = routes.getWalk();
 		WalkTable table = data == null || view.isInstance() ? null : data.getTable();
 		List<TileObject> rowEnds = paths.rowObjectsAround(view, table, from, jumpEnd, around(from, to, ROW_ENDS_MARGIN_TILES));
-		return Stream.concat(outlined, rowEnds.stream())
+		List<TileObject> nearestFirst = Stream.concat(outlined, rowEnds.stream())
 			.distinct()
 			.sorted(Comparator.comparingInt(object -> squaredDistance(object.getWorldLocation(), from)))
 			.collect(Collectors.toList());
+		return crossing ? nearingEnd(nearestFirst, from, jumpEnd) : nearestFirst;
+	}
+
+	private static List<TileObject> nearingEnd(List<TileObject> nearestFirst, WorldPoint from, WorldPoint end)
+	{
+		List<TileObject> nearing = new ArrayList<>();
+		int left = squaredDistance(from, end);
+		for (TileObject object : nearestFirst)
+		{
+			int toEnd = squaredDistance(object.getWorldLocation(), end);
+			if (toEnd < left)
+			{
+				nearing.add(object);
+				left = toEnd;
+			}
+		}
+		return nearing;
 	}
 
 	private static Rectangle around(WorldPoint from, WorldPoint to, int margin)

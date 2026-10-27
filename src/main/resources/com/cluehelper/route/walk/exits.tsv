@@ -155,6 +155,7 @@ Origin	Destination	Option	Object	ObjectId
 1927 4477 0	3288 2801 0	Leave Tomb	Tomb Door	20931
 1930 4438 0	3288 2801 0	Leave Tomb	Tomb Door	20931
 1932 4468 0	3288 2801 0	Leave Tomb	Tomb Door	20931
+1934 4420 3	3288 2801 0	Leave Tomb	Tomb Door	20932
 1936 9009 1	2457 2849 0	Climb-up	Ladder	32205
 1939 4958 0	2931 10196 0	Climb-up	Stairs	9138
 1940 4958 0	2931 10196 0	Climb-up	Stairs	9138
@@ -875,6 +876,7 @@ Origin	Destination	Option	Object	ObjectId
 2905 3643 0	2907 10019 0	Enter	Cave Entrance	3757
 2906 3476 0	2906 9876 0	Climb-down	Ladder	24718
 2906 3537 0	3061 4985 1	Enter	Trapdoor	7257
+2906 3537 0	3061 4985 1	Enter	Trapdoor	7257
 2906 9876 0	2906 3476 0	Climb-up	Ladder	24717
 2906 10019 0	2904 3643 0	Exit	Cave Exit	3758
 2906 10035 0	2908 3654 0	Exit	Cave Exit	3758
@@ -976,6 +978,7 @@ Origin	Destination	Option	Object	ObjectId
 3054 3382 0	3065 9951 0	Climb-down	Staircase	24249
 3058 9776 0	3061 3376 0	Climb-up	Staircase	23969
 3058 9777 0	3061 3377 0	Climb-up	Staircase	23969
+3060 9766 0	3728 5692 0	Enter	Cave	26654
 3060 9766 0	3728 5692 0	Enter	Cave	26654
 3061 3376 0	3058 9776 0	Climb-down	Staircase	16664
 3061 3377 0	3058 9777 0	Climb-down	Staircase	16664

@@ -470,12 +470,22 @@ final class LabelSearch
 	}
 
 	/**
-	 * A web's knife or sword, or a stage's gear, is used a few legs after the bank, where a stop that took nothing yet
-	 * only walks to bank-item uses; so a second stop takes them at once.
+	 * A web's knife or sword, the Kharazi Jungle's axe and machete, or a stage's gear, is used a few legs after the bank,
+	 * where a stop that took nothing yet only walks to bank-item uses; so another stop takes them at once, one gate's
+	 * tools each, so a web's knife never brings the jungle's axe along.
 	 */
 	private void takeGateItems(Label from, int k, int bankHalfTicks)
 	{
-		int[] withdrawn = sortedUnion(sortedUnion(from.withdrawn, ctx.gates(PlanContext.BANKED).storedGateItems()), ctx.stageWithdraw());
+		takeAtStop(from, k, bankHalfTicks, new int[0]);
+		for (int[] tools : ctx.gates(PlanContext.BANKED).storedGateTools())
+		{
+			takeAtStop(from, k, bankHalfTicks, tools);
+		}
+	}
+
+	private void takeAtStop(Label from, int k, int bankHalfTicks, int[] tools)
+	{
+		int[] withdrawn = sortedUnion(sortedUnion(from.withdrawn, tools), ctx.stageWithdraw());
 		if (withdrawn.length > from.withdrawn.length)
 		{
 			int half = bankHalfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);

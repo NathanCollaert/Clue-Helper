@@ -217,12 +217,26 @@ public class StepGuide
 		return index + 1 < steps.size() ? steps.get(index + 1) : null;
 	}
 
+	/** At the bank, or walking to it: acts done on the spot first (a scroll taken out of its book) still end there. */
 	private boolean isBankStop()
 	{
 		SubStep current = getCurrent();
-		SubStep next = getNext();
-		return current != null && (current.getKind() == SubStep.Kind.BANK
-			|| current.getKind() == SubStep.Kind.WALK && next != null && next.getKind() == SubStep.Kind.BANK);
+		if (current == null || current.getKind() == SubStep.Kind.BANK)
+		{
+			return current != null;
+		}
+		if (current.getKind() != SubStep.Kind.WALK || fight != null && fight.getAgain() != null)
+		{
+			return false;
+		}
+		for (int i = index + 1; i < steps.size(); i++)
+		{
+			if (steps.get(i).getKind() != SubStep.Kind.ACT)
+			{
+				return steps.get(i).getKind() == SubStep.Kind.BANK;
+			}
+		}
+		return false;
 	}
 
 	/**
