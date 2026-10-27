@@ -1,42 +1,20 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.memory.BankMemory;
-import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.HouseState;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.route.Exit;
-import com.cluehelper.player.PositionRules;
-import com.cluehelper.route.Leg;
-import com.cluehelper.route.PlanStart;
-import com.cluehelper.route.RequiredItems;
-import com.cluehelper.route.Route;
-import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.StepNeeds;
-import com.cluehelper.step.EmptySlots;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-import java.util.function.Function;
-import java.util.function.IntPredicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
+import com.cluehelper.memory.*;
+import com.cluehelper.player.*;
+import com.cluehelper.route.*;
+import com.cluehelper.step.*;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
+import net.runelite.client.game.ItemEquipmentStats;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemStats;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 @Singleton
@@ -543,5 +521,23 @@ public final class SubSteps
 			out.add(sub);
 		}
 		return List.copyOf(out);
+	}
+
+	/** Client thread only. Weapons and armour as the Entrana monks see them: any attack, defence or strength bonus. */
+	@Singleton
+	public static class CombatGear
+	{
+		@Inject
+		private ItemManager itemManager;
+
+		public boolean isWeaponOrArmour(int itemId)
+		{
+			ItemStats stats = itemManager.getItemStats(itemId);
+			ItemEquipmentStats bonuses = stats == null || !stats.isEquipable() ? null : stats.getEquipment();
+			return bonuses != null && (bonuses.getAstab() != 0 || bonuses.getAslash() != 0 || bonuses.getAcrush() != 0
+				|| bonuses.getAmagic() != 0 || bonuses.getArange() != 0 || bonuses.getDstab() != 0 || bonuses.getDslash() != 0
+				|| bonuses.getDcrush() != 0 || bonuses.getDmagic() != 0 || bonuses.getDrange() != 0 || bonuses.getStr() != 0
+				|| bonuses.getRstr() != 0 || bonuses.getMdmg() != 0);
+		}
 	}
 }

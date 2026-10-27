@@ -1,25 +1,14 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.memory.BankMemory;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.*;
 import com.cluehelper.route.Exit;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import com.cluehelper.step.StepRequirements;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.Category;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.cluehelper.step.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.NPC;
-import net.runelite.api.TileObject;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
@@ -42,28 +31,22 @@ final class StepHighlights
 	/** The house's spiritual fairy tree lists its ring options above "Tree", so a left click never opens the tree list. */
 	private static final Set<Integer> NOT_FILLED_UNHOVERED = Set.of(ObjectID.POH_SPIRIT_RING);
 
-	private final Client client;
-	private final PlayerModel player;
-	private final BankMemory bankMemory;
-	private final LeftClicks leftClicks;
-	private final RowTargets rowTargets;
-	private final TaskActs taskActs;
-	private final DepositReminder deposit;
-	private final ObeliskDestination obelisk;
-
 	@Inject
-	StepHighlights(Client client, PlayerModel player, BankMemory bankMemory, LeftClicks leftClicks, RowTargets rowTargets,
-		TaskActs taskActs, DepositReminder deposit, ObeliskDestination obelisk)
-	{
-		this.client = client;
-		this.player = player;
-		this.bankMemory = bankMemory;
-		this.leftClicks = leftClicks;
-		this.rowTargets = rowTargets;
-		this.taskActs = taskActs;
-		this.deposit = deposit;
-		this.obelisk = obelisk;
-	}
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private LeftClicks leftClicks;
+	@Inject
+	private RowTargets rowTargets;
+	@Inject
+	private TaskActs taskActs;
+	@Inject
+	private DepositReminder deposit;
+	@Inject
+	private ObeliskDestination obelisk;
 
 	Highlights of(SubStep current, Step step)
 	{
@@ -360,7 +343,7 @@ final class StepHighlights
 		boolean oneDestination = label == null && rowTargets.hasOneDestination(current);
 		return shown.getHeldUses().stream()
 			.filter(use -> signals ? RowTargets.SIGNAL_OPTION.equalsIgnoreCase(leftClicks.item(use))
-				: oneDestination ? OneClick.isOwnTeleport(leftClicks.item(use)) : OneClick.teleportsTo(leftClicks.swappedOrLearned(use), label))
+				: oneDestination ? isOwnTeleport(leftClicks.item(use)) : teleportsTo(leftClicks.swappedOrLearned(use), label))
 			.map(ItemUse::getItemId)
 			.collect(Collectors.toUnmodifiableSet());
 	}
@@ -413,7 +396,7 @@ final class StepHighlights
 
 	private static boolean oneClickTo(String leftClick, String label, String firstClick)
 	{
-		return OneClick.teleportsTo(leftClick, label) || firstClick != null && MenuLabels.matches(leftClick, firstClick);
+		return teleportsTo(leftClick, label) || firstClick != null && MenuLabels.matches(leftClick, firstClick);
 	}
 
 	/** Menu Entry Swapper's "Last-destination" carries no code, so the remembered last ring stands in for it. */
@@ -426,5 +409,32 @@ final class StepHighlights
 		PlayerSnapshot snapshot = player.getSnapshot();
 		String last = snapshot == null ? null : snapshot.getLastFairyRing();
 		return leftClick != null && !leftClick.contains("(") && MenuLabels.isLastDestination(leftClick + " (" + last + ")", code);
+	}
+
+	/** Left clicks of teleport items that don't teleport. */
+	private static final Set<String> NOT_TELEPORTS = Set.of("wield", "wear", "equip", "remove", "use", "drop", "examine", "check",
+		"inspect", "read");
+
+	/**
+	 * A list opener's click only opens the list, unless the row ends on that very option ("Quest point cape: Teleport"):
+	 * then nothing follows it.
+	 */
+	private static boolean teleportsTo(String option, String destination)
+	{
+		if (option == null || destination == null)
+		{
+			return false;
+		}
+		boolean rowsLastClick = MenuLabels.normalise(option).equals(MenuLabels.normalise(destination));
+		return rowsLastClick || !MenuLabels.isOpener(option) && MenuLabels.matches(option, destination);
+	}
+
+	/**
+	 * An item with one destination names no option in its row ("Skull sceptre" left-clicks "Invoke" or "Teleport"), so
+	 * any left click that is an action of its own is its teleport: with one destination there is no list to open.
+	 */
+	private static boolean isOwnTeleport(String option)
+	{
+		return option != null && !NOT_TELEPORTS.contains(MenuLabels.normalise(option));
 	}
 }

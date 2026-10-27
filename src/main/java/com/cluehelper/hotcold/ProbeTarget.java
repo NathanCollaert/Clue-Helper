@@ -1,12 +1,7 @@
 package com.cluehelper.hotcold;
 
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.HotColdTier;
-import com.cluehelper.step.SpadeNeed;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.TargetKind;
-import java.util.List;
-import java.util.Set;
+import com.cluehelper.step.*;
+import java.util.*;
 import javax.inject.Singleton;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;

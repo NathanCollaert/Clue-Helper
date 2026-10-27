@@ -1,10 +1,8 @@
 package com.cluehelper.route;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.BitSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.*;
 
 /**
  * Shortest Path's collision map of the whole game, doors open: four bits per tile, whether its north and east edges

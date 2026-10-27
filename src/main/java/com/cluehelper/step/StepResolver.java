@@ -1,25 +1,15 @@
 package com.cluehelper.step;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
-import net.runelite.client.plugins.cluescrolls.clues.CrypticClue;
-import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
-import net.runelite.client.plugins.cluescrolls.clues.HotColdClue;
-import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
-import net.runelite.client.plugins.cluescrolls.clues.ThreeStepCrypticClue;
+import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 @Slf4j
 @Singleton

@@ -1,19 +1,10 @@
 package com.cluehelper.route;
 
 import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerSnapshot;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.cluehelper.player.*;
+import java.util.*;
 import java.util.stream.Collectors;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 

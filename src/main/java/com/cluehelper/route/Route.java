@@ -1,16 +1,10 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.Book;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PositionRules;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.RowAvailability;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.cluehelper.player.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 import java.util.stream.Collectors;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value

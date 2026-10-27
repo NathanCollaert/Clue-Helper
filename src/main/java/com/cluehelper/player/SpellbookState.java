@@ -1,7 +1,6 @@
 package com.cluehelper.player;
 
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 import lombok.Value;
 
 @Value

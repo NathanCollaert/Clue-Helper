@@ -1,13 +1,9 @@
 package com.cluehelper.step;
 
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.*;
 import com.cluehelper.transport.AvailabilityService;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import net.runelite.api.Item;
 
 /**
@@ -18,17 +14,12 @@ import net.runelite.api.Item;
 @Singleton
 public class StageTarget
 {
-	private final PlayerModel player;
-	private final AvailabilityService availability;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private AvailabilityService availability;
 	private Step lastIn;
 	private Step lastOut;
-
-	@Inject
-	StageTarget(PlayerModel player, AvailabilityService availability)
-	{
-		this.player = player;
-		this.availability = availability;
-	}
 
 	/** The same step object while the stages left don't change. */
 	public Step travelStep(Step step)

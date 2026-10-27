@@ -1,36 +1,17 @@
 package com.cluehelper.route;
 
 import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.EmptySlots;
-import com.cluehelper.step.GearBonus;
-import com.cluehelper.step.SpadeNeed;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.Stages;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import com.cluehelper.step.StepRequirements;
+import com.cluehelper.player.*;
+import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.IntFunction;
-import java.util.function.Supplier;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 /** Client thread only: reads varbits. */
 @Singleton

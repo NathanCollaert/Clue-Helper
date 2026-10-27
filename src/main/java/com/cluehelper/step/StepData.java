@@ -1,10 +1,8 @@
 package com.cluehelper.step;
 
 import com.google.gson.Gson;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.concurrent.*;
+import javax.inject.*;
 
 @Singleton
 public class StepData

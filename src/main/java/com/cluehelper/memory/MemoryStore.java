@@ -1,11 +1,11 @@
 package com.cluehelper.memory;
 
+import com.cluehelper.ClueHelperConfig;
 import com.google.gson.Gson;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import net.runelite.client.config.ConfigManager;
 
 /**
@@ -54,6 +54,40 @@ public class MemoryStore
 		for (MemorySlot<?> slot : slots)
 		{
 			slot.forget();
+		}
+	}
+
+	private static final class RuneLiteProfileConfig implements ProfileConfig
+	{
+		private final ConfigManager configManager;
+
+		RuneLiteProfileConfig(ConfigManager configManager)
+		{
+			this.configManager = configManager;
+		}
+
+		@Override
+		public String profileKey()
+		{
+			return configManager.getRSProfileKey();
+		}
+
+		@Override
+		public String get(String key)
+		{
+			return configManager.getRSProfileConfiguration(ClueHelperConfig.GROUP, key);
+		}
+
+		@Override
+		public void set(String key, String value)
+		{
+			configManager.setRSProfileConfiguration(ClueHelperConfig.GROUP, key, value);
+		}
+
+		@Override
+		public void unset(String key)
+		{
+			configManager.unsetRSProfileConfiguration(ClueHelperConfig.GROUP, key);
 		}
 	}
 }

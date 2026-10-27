@@ -1,10 +1,8 @@
 package com.cluehelper.memory;
 
 import com.cluehelper.player.PlayerModel;
-import java.util.Locale;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;

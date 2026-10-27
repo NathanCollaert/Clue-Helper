@@ -1,28 +1,19 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.guide.MenuLines;
-import com.cluehelper.guide.PrayerFilters;
-import com.cluehelper.guide.ScrollBook;
-import com.cluehelper.guide.StepGuide;
-import com.cluehelper.guide.Widgets;
+import com.cluehelper.guide.*;
 import com.cluehelper.link.ClueLink;
-import com.cluehelper.step.Stages;
-import com.cluehelper.step.Step;
+import com.cluehelper.step.*;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import net.runelite.api.Client;
-import net.runelite.api.Prayer;
+import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.*;
 
 public class WidgetHighlightOverlay extends Overlay
 {

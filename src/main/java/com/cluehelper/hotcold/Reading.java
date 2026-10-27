@@ -1,11 +1,7 @@
 package com.cluehelper.hotcold;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** Stored as JSON in the feel log, so its fields are its format. */

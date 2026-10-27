@@ -1,7 +1,6 @@
 package com.cluehelper.guide;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 
 /**
  * Client thread only. An obelisk takes two clicks: Set Destination and its list line, then Teleport to Destination.
@@ -12,11 +11,6 @@ final class ObeliskDestination
 {
 	private boolean listSeen;
 	private String setFor;
-
-	@Inject
-	ObeliskDestination()
-	{
-	}
 
 	/**
 	 * Call every tick. {@code watching} while the step's menu target is the obelisk's list line; {@code showing} while

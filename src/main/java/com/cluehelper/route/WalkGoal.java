@@ -1,8 +1,6 @@
 package com.cluehelper.route;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** Where a walk ends: on a tile, on any tile of an area, or where the game stops to use an object. */

@@ -1,17 +1,9 @@
 package com.cluehelper.player;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.IntFunction;
-import lombok.Builder;
-import lombok.Getter;
-import net.runelite.api.Item;
-import net.runelite.api.Quest;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
+import lombok.*;
+import net.runelite.api.*;
 
 /**
  * Immutable, so any thread can read it. Walking alone doesn't make a new version: see

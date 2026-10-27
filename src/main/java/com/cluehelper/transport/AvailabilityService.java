@@ -2,20 +2,11 @@ package com.cluehelper.transport;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.memory.BankMemory;
-import com.cluehelper.player.Charge;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.player.RuneModel;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import com.cluehelper.player.*;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import net.runelite.api.Client;
 
 /** Client thread, except the getters. Also judges again when a cooldown clears, since no var changes then. */
@@ -24,10 +15,14 @@ public class AvailabilityService
 {
 	private static final long MILLIS_PER_MINUTE = 60_000L;
 
-	private final PlayerModel player;
-	private final Client client;
-	private final BankMemory bankMemory;
-	private final ClueHelperConfig config;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private Client client;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private ClueHelperConfig config;
 	private final Set<Integer> catalogItems = new HashSet<>();
 	private final Map<Integer, String> itemNames = new ConcurrentHashMap<>();
 	private final List<Consumer<AvailabilitySet>> listeners = new CopyOnWriteArrayList<>();
@@ -37,18 +32,8 @@ public class AvailabilityService
 	private volatile AvailabilitySet banked = AvailabilitySet.EMPTY;
 	private volatile PlayerSnapshot bankedSnapshot;
 	private long judgedBankVersion = -1;
-	private volatile long lastJudgeNanos;
 	private volatile boolean stale = true;
 	private Runnable unregister;
-
-	@Inject
-	AvailabilityService(PlayerModel player, Client client, BankMemory bankMemory, ClueHelperConfig config)
-	{
-		this.player = player;
-		this.client = client;
-		this.bankMemory = bankMemory;
-		this.config = config;
-	}
 
 	public void start()
 	{
@@ -105,12 +90,10 @@ public class AvailabilityService
 			stale = false;
 			judgedBankVersion = bankMemory.getVersion();
 			nameCatalogItems();
-			long started = System.nanoTime();
 			AvailabilityEngine engine = new AvailabilityEngine(runes, this::itemName);
 			carried = engine.carried(catalog, snapshot, now);
 			bankedSnapshot = withBank(snapshot);
 			banked = bankedSnapshot == null ? AvailabilitySet.EMPTY : engine.carried(catalog, bankedSnapshot, now);
-			lastJudgeNanos = System.nanoTime() - started;
 			AvailabilitySet judged = carried;
 			listeners.forEach(listener -> listener.accept(judged));
 		}
@@ -168,11 +151,6 @@ public class AvailabilityService
 	public PlayerSnapshot getBankedSnapshot()
 	{
 		return bankedSnapshot;
-	}
-
-	public long getLastJudgeNanos()
-	{
-		return lastJudgeNanos;
 	}
 
 	public static long nowMinutes()

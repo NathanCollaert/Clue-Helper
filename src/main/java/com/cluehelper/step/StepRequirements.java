@@ -1,8 +1,6 @@
 package com.cluehelper.step;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 

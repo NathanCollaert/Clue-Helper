@@ -1,11 +1,8 @@
 package com.cluehelper.route;
 
-import com.cluehelper.AvoidWilderness;
-import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.SpellbookChanges;
+import com.cluehelper.*;
 import com.cluehelper.player.AccountType;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 /** Copied on the client thread. */
 @Value

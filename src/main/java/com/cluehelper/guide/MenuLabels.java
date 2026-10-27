@@ -1,11 +1,7 @@
 package com.cluehelper.guide;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.regex.*;
 
 /**
  * Text matching is only for lines no script argument identifies: the nexus and the jewellery box are matched by struct

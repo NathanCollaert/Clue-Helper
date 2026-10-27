@@ -1,24 +1,11 @@
 package com.cluehelper.ui;
 
-import com.cluehelper.route.Exit;
-import com.cluehelper.route.SceneDoors;
-import com.cluehelper.route.WalkTable;
+import com.cluehelper.route.*;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import lombok.Value;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.Tile;
-import net.runelite.api.TileObject;
-import net.runelite.api.WallObject;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** The objects a path line leads through: each walk row it takes (a ladder, stairs, a shortcut) and each closed door. */
@@ -47,15 +34,10 @@ final class PathObjects
 	private static final int SOUTH = 8;
 	private static final String OPEN = "Open";
 
-	private final Client client;
-	private final SceneDoors doors;
-
 	@Inject
-	PathObjects(Client client, SceneDoors doors)
-	{
-		this.client = client;
-		this.doors = doors;
-	}
+	private Client client;
+	@Inject
+	private SceneDoors doors;
 
 	/** Client thread only. Each object with the menu option that takes the path through it. */
 	Map<TileObject, String> along(WorldView view, WalkTable table, List<WorldPoint> path)

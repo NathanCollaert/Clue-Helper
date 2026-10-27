@@ -65,8 +65,14 @@ public class RuneModelTest
 	private Set<String> lunarCastable(PlayerSnapshot player)
 	{
 		return model.getSpells().stream()
-			.filter(spell -> spell.getBook() == Book.LUNAR && model.whyNotCastable(spell, player).isEmpty())
+			.filter(spell -> spell.getBook() == Book.LUNAR && affords(spell, player))
 			.map(Spell::getName).collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	/** The test account is maxed with every quest done on a members world, so only the runes decide. */
+	private boolean affords(Spell spell, PlayerSnapshot player)
+	{
+		return spell.getRunes().stream().allMatch(cost -> model.supply(cost.getRune(), cost.getQuantity(), player).isEnough());
 	}
 
 	private static PlayerSnapshot maxedWithOnlyARunePouch(Map<Integer, Integer> pouch)

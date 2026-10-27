@@ -1,18 +1,14 @@
 package com.cluehelper;
 
-import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepResolver;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -24,19 +20,12 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 
 /**
- * Hands the Clue Scroll plugin a clue as if read: one at random, filtered by tier and type, or a list of step IDs walked
- * with next and previous. Core's own lists are the source, so a mocked clue is the object a real read gives.
+ * Hands the Clue Scroll plugin a clue as if read: a list of step IDs walked with next and previous. Core's own lists are the source, so a mocked clue is the object a real read gives.
  */
 @Slf4j
 final class MockClues
 {
 	static final String COMMAND = "ch-mock";
-	static final String ANY = "any";
-	static final List<String> TIERS = List.of(ANY, "beginner", "easy", "medium", "hard", "elite", "master");
-	static final List<String> TYPES = List.of(ANY, ClueTypes.ANAGRAM, ClueTypes.CIPHER, ClueTypes.COORDINATE, ClueTypes.CRYPTIC,
-		ClueTypes.EMOTE, ClueTypes.FAIRY_RING, ClueTypes.FALO, ClueTypes.MAP, ClueTypes.MUSIC, ClueTypes.SKILL);
-	static final int RANDOM_LIST_LENGTH = 6;
-
 	private static final String CLUES_PACKAGE = "net.runelite.client.plugins.cluescrolls.clues.";
 	private static final List<String> LIST_TYPES = List.of("CrypticClue", "AnagramClue", "CipherClue", "CoordinateClue",
 		"EmoteClue", "MapClue", "BeginnerMapClue", "FairyRingClue", "MusicClue", "FaloTheBardClue", "SkillChallengeClue");
@@ -72,39 +61,28 @@ final class MockClues
 	private final Supplier<ClueScrollPlugin> core;
 	private final StepResolver resolver;
 	private final Consumer<String> shown;
-	private final Random random = new Random();
 	private List<Mock> catalog;
 	private List<String> listIds = List.of();
 	private List<Mock> list = List.of();
 	private int position = -1;
 
-	private final Consumer<List<String>> listFilled;
-
-	/**
-	 * @param shown gets each mocked clue's description, or null once cleared
-	 * @param listFilled gets the step IDs of a random list, for the list field
-	 */
-	MockClues(Client client, Supplier<ClueScrollPlugin> core, StepResolver resolver, Consumer<String> shown,
-		Consumer<List<String>> listFilled)
+	/** @param shown gets each mocked clue's description, or null once cleared */
+	MockClues(Client client, Supplier<ClueScrollPlugin> core, StepResolver resolver, Consumer<String> shown)
 	{
 		this.client = client;
 		this.core = core;
 		this.resolver = resolver;
 		this.shown = shown;
-		this.listFilled = listFilled;
 	}
 
-	/** Client thread, from ::ch-mock [random [tier] [type] | next | prev | off | step ID]. */
+	/** Client thread, from ::ch-mock [next | prev | off | step ID]. */
 	void run(String[] arguments)
 	{
 		String argument = arguments.length == 0 ? "" : arguments[0].toLowerCase(Locale.ROOT);
 		switch (argument)
 		{
 			case "":
-				say("::" + COMMAND + " random [tier] [type], next, prev, off, or a step ID");
-				return;
-			case "random":
-				random(arguments.length > 1 ? arguments[1] : ANY, arguments.length > 2 ? arguments[2] : ANY);
+				say("::" + COMMAND + " next, prev, off, or a step ID");
 				return;
 			case "next":
 				walk(listIds, 1);
@@ -118,34 +96,6 @@ final class MockClues
 			default:
 				walk(List.of(String.join(" ", arguments)), 1);
 		}
-	}
-
-	/** Client thread. A single clue; the list keeps its place. */
-	void random(String tier, String type)
-	{
-		List<Mock> pool = pool(tier, type);
-		if (pool.isEmpty())
-		{
-			say("No " + tier + " " + type + " clue to mock");
-			return;
-		}
-		show(pool.get(random.nextInt(pool.size())), "");
-	}
-
-	/** Client thread. Fills the list with random step IDs and starts it. */
-	void randomList(String tier, String type)
-	{
-		List<Mock> pool = new ArrayList<>(pool(tier, type));
-		if (pool.isEmpty())
-		{
-			say("No " + tier + " " + type + " clue to mock");
-			return;
-		}
-		Collections.shuffle(pool, random);
-		List<String> ids = pool.subList(0, Math.min(RANDOM_LIST_LENGTH, pool.size())).stream().map(mock -> mock.key)
-			.collect(Collectors.toList());
-		listFilled.accept(ids);
-		walk(ids, 1);
 	}
 
 	/**
@@ -219,14 +169,6 @@ final class MockClues
 		say("Mock clue " + (where.isEmpty() ? "" : where + " ") + mock.key);
 		log.info("[CH-MOCK] {} {} {}", mock.key, mock.tier, where);
 		shown.accept((where.isEmpty() ? "" : where + "  ") + mock.describe());
-	}
-
-	private List<Mock> pool(String tier, String type)
-	{
-		return catalog().stream()
-			.filter(mock -> ANY.equalsIgnoreCase(tier) || tier.equalsIgnoreCase(mock.tier))
-			.filter(mock -> ANY.equalsIgnoreCase(type) || type.equalsIgnoreCase(mock.type))
-			.collect(Collectors.toList());
 	}
 
 	private Mock find(String id)

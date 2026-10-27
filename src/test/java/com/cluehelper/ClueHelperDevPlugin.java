@@ -4,8 +4,6 @@ import com.cluehelper.campaign.Campaign;
 import com.cluehelper.campaign.CampaignRecorder;
 import com.cluehelper.campaign.Outcome;
 import com.cluehelper.dev.DevHarness;
-import com.cluehelper.dev.SelfTest;
-import com.cluehelper.dev.SelfTestRun;
 import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.SubStep;
@@ -16,8 +14,6 @@ import com.cluehelper.player.PositionRules;
 import com.cluehelper.route.GearPieces;
 import com.cluehelper.route.LoadedScene;
 import com.cluehelper.route.Plan;
-import com.cluehelper.route.WalkData;
-import com.cluehelper.transport.CatalogData;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.SceneFiles;
 import com.cluehelper.step.ClueTypes;
@@ -28,9 +24,6 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.ui.BoxState;
-import com.cluehelper.ui.GuideBox;
-import com.cluehelper.ui.GuideOverlay;
 import com.cluehelper.ui.WaypointOverlay;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -46,12 +39,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ChatMessageType;
@@ -73,31 +64,23 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.banktags.BankTagsService;
-import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.DrawManager;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-/**
- * Dev launcher only: self-tests that need files or drive other plugins, which the plugin jar must not do.
- * With -Dcluehelper.selftest=true (gradlew dev -Pselftest) it runs ::ch-selftest once the UI has settled,
- * and again a few ticks after the first login.
- */
+/** Dev launcher only: the step campaign, mock clues, traces and game frames, which the plugin jar must not hold. */
 @Slf4j
-@PluginDescriptor(name = "Clue Helper Dev", description = "Dev only: game frames and plugin toggle checks")
+@PluginDescriptor(name = "Clue Helper Dev", description = "Dev only: step campaign, traces and game frames")
 public class ClueHelperDevPlugin extends Plugin
 {
 	private static final String TAG = "[CH-TEST]";
-	private static final File SNAPSHOTS = new File("build/selftest");
 	private static final File STEP_FRAMES = new File("build/steps");
 	private static final File PLAYER_FRAMES = new File("build/player");
 	private static final File LANDING_FRAMES = new File("build/landings");
@@ -113,12 +96,9 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final int MOST_SCENES = 12;
 	private static final int LANDING_CANDIDATES = 2;
 	private static final int FRAME_NAME_KEY_CHARS = 50;
-	private static final int PLUGIN_DELAY_MS = 2000;
 	private static final int AUTO_RUN_AFTER_TICKS = 5;
 	private static final int NO_KEY = -1;
 	private String lastLineTrace = "";
-	/** Hub plugins add their sidebar tabs late; the first run waits for them. */
-	private static final int AUTO_RUN_AFTER_START_MS = 15_000;
 
 	@Inject
 	private Client client;
@@ -128,9 +108,6 @@ public class ClueHelperDevPlugin extends Plugin
 
 	@Inject
 	private PluginManager pluginManager;
-
-	@Inject
-	private ConfigManager configManager;
 
 	@Inject
 	private EventBus eventBus;
@@ -150,23 +127,10 @@ public class ClueHelperDevPlugin extends Plugin
 	@Inject
 	private FairyDials fairyDials;
 
-	@Inject
-	private CatalogData catalogData;
-
-	@Inject
-	private WalkData walkData;
-
-	/** For the blocking config save, which must not run on the Swing thread. */
-	@Inject
-	private ScheduledExecutorService executor;
-
 	private ClueHelperPlugin clueHelper;
 	/** Built in Clue Helper's own injector, so it shares the plugin's services. */
 	private DevHarness harness;
 	private final List<Runnable> unregister = new ArrayList<>();
-	private boolean autoRunPending = Boolean.getBoolean("cluehelper.selftest");
-	private int loggedInTicks;
-	private int snapshotCount;
 	private int stepFrameCount;
 	private int playerFrameCount;
 	private int lastAvailableCount = -1;
@@ -176,7 +140,6 @@ public class ClueHelperDevPlugin extends Plugin
 	private String lastGuideText;
 	private int liveFrameCount;
 	private String lastPlannedStep;
-	private boolean sampled;
 	private final Set<String> recordedScenes = new HashSet<>();
 	private WorldPoint lastTile;
 	private MockClues mockClues;
@@ -193,7 +156,7 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		clueHelper = find(ClueHelperPlugin.class);
 		harness = clueHelper.getInjector().getInstance(DevHarness.class);
-		harness.start(() -> clueHelper.getGuideOverlay().getShown().getState(), clueHelper::boxState);
+		harness.start();
 		frameWriter = Executors.newSingleThreadExecutor(runnable ->
 		{
 			Thread thread = new Thread(runnable, "clue-helper-dev-frames");
@@ -201,7 +164,6 @@ public class ClueHelperDevPlugin extends Plugin
 			thread.setPriority(Thread.MIN_PRIORITY);
 			return thread;
 		});
-		clearOldPngs(SNAPSHOTS);
 		clearOldPngs(STEP_FRAMES);
 		clearOldPngs(PLAYER_FRAMES);
 		clearOldPngs(LANDING_FRAMES);
@@ -216,8 +178,6 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(clueHelper.getAvailability().addListener(this::savePlayerFrame));
 		unregister.add(clueHelper.getRoutes().addListener(this::onPlanned));
 		unregister.add(clueHelper.getGuide().addListener(this::saveGuideFrames));
-		unregister.add(harness.getSelfTests().register(new CoreToggleTest()));
-		unregister.add(harness.getSelfTests().register(new RestartTest()));
 		BankTrace bankTrace = new BankTrace(client, clueHelper.getBankMemory(), clueHelper.getGuide(),
 			clueHelper.getInjector().getInstance(BankTagsService.class),
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
@@ -254,19 +214,14 @@ public class ClueHelperDevPlugin extends Plugin
 		PlanTrace planTrace = new PlanTrace(client, clueHelper.getRoutes());
 		unregister.add(planTrace::stop);
 		addDevPanel();
-		log.info("{} dev plugin up; auto-run: {}", TAG, autoRunPending);
-		if (autoRunPending)
-		{
-			later(AUTO_RUN_AFTER_START_MS, this::postSelfTest);
-		}
+		log.info("{} dev plugin up", TAG);
 	}
 
 	private void addDevPanel()
 	{
 		DevPanel[] panel = new DevPanel[1];
 		mockClues = new MockClues(client, clueHelper.getClueLink()::getCore, stepResolver,
-			description -> SwingUtilities.invokeLater(() -> panel[0].showMock(description)),
-			ids -> SwingUtilities.invokeLater(() -> panel[0].fillList(ids)));
+			description -> SwingUtilities.invokeLater(() -> panel[0].showMock(description)));
 		campaign = campaign(text -> SwingUtilities.invokeLater(() -> panel[0].showCampaign(text)));
 		unregister.add(clueHelper.getRoutes().addInputListener(campaign::onPlan));
 		DevPanel.CampaignControls campaignControls = new DevPanel.CampaignControls()
@@ -310,18 +265,6 @@ public class ClueHelperDevPlugin extends Plugin
 		DevPanel.MockControls controls = new DevPanel.MockControls()
 		{
 			@Override
-			public void random(String tier, String type)
-			{
-				clientThread.invokeLater(() -> mockClues.random(tier, type));
-			}
-
-			@Override
-			public void randomList(String tier, String type)
-			{
-				clientThread.invokeLater(() -> mockClues.randomList(tier, type));
-			}
-
-			@Override
 			public void walk(List<String> ids, int by)
 			{
 				clientThread.invokeLater(() -> mockClues.walk(ids, by));
@@ -334,16 +277,8 @@ public class ClueHelperDevPlugin extends Plugin
 			}
 		};
 		List<DevPanel.Action> tools = List.of(
-			command("Routes to the log", "ch-routes"),
-			command("Guide sub-steps", "ch-guide"),
-			command("Step as a fixture line", "ch-step"),
-			command("Player snapshot", "ch-player"),
-			command("Route graph overlay", "ch-overlay"),
-			new DevPanel.Action("Objects near the step", () -> clientThread.invokeLater(this::dumpObjectsNearStep)),
-			new DevPanel.Action("Skill challenge completed", () -> clientThread.invokeLater(this::completeChallenge)),
-			command("Sample routes", "ch-sample"),
-			command("Self-tests", "ch-selftest"));
-		panel[0] = new DevPanel(campaignControls, controls, levels -> clientThread.invokeLater(() -> clueHelper.getPlayerModel().overrideLevels(levels)), tools);
+			new DevPanel.Action("Objects near the step", () -> clientThread.invokeLater(this::dumpObjectsNearStep)));
+		panel[0] = new DevPanel(campaignControls, controls, tools);
 		NavigationButton button = NavigationButton.builder()
 			.tooltip("Clue Helper dev")
 			.icon(DevPanel.icon())
@@ -596,11 +531,6 @@ public class ClueHelperDevPlugin extends Plugin
 		log.info("{} posted '{}'", TAG, CHALLENGE_COMPLETED);
 	}
 
-	private DevPanel.Action command(String label, String command)
-	{
-		return new DevPanel.Action(label, () -> clientThread.invokeLater(() -> eventBus.post(new CommandExecuted(command, new String[0]))));
-	}
-
 	@Override
 	protected void shutDown()
 	{
@@ -619,12 +549,6 @@ public class ClueHelperDevPlugin extends Plugin
 		traceLine();
 		saveLiveFrame();
 		resumeCampaignOnceLoggedIn();
-		if (!autoRunPending || client.getGameState() != GameState.LOGGED_IN || ++loggedInTicks < AUTO_RUN_AFTER_TICKS)
-		{
-			return;
-		}
-		autoRunPending = false;
-		postSelfTest();
 	}
 
 	/**
@@ -702,125 +626,6 @@ public class ClueHelperDevPlugin extends Plugin
 		return tile.getX() + " " + tile.getY() + " " + tile.getPlane();
 	}
 
-	private void postSelfTest()
-	{
-		log.info("{} auto-run: posting ::ch-selftest", TAG);
-		clientThread.invokeLater(() -> eventBus.post(new CommandExecuted("ch-selftest", new String[0])));
-	}
-
-	private final class CoreToggleTest implements SelfTest
-	{
-		@Override
-		public int order()
-		{
-			return 110;
-		}
-
-		@Override
-		public String name()
-		{
-			return "core toggle drives the box";
-		}
-
-		@Override
-		public void run(SelfTestRun run)
-		{
-			SwingUtilities.invokeLater(() ->
-			{
-				Plugin core = find(ClueScrollPlugin.class);
-				if (!pluginManager.isPluginActive(core))
-				{
-					run.skip("core Clue Scroll is off already");
-					run.done();
-					return;
-				}
-				setPluginRunning(core, false);
-				later(PLUGIN_DELAY_MS, () ->
-				{
-					GuideBox box = clueHelper.getGuideOverlay().getShown();
-					run.check(box.getState() == BoxState.CORE_OFF, "box state " + box.getState() + ", expected CORE_OFF");
-					run.check(!box.isShown(), "core-off box hidden");
-					frame("core-off");
-					setPluginRunning(core, true);
-					executor.execute(configManager::sendConfig);
-					later(PLUGIN_DELAY_MS, () ->
-					{
-						run.check(pluginManager.isPluginActive(core), "core Clue Scroll running again");
-						BoxState shown = clueHelper.getGuideOverlay().getShown().getState();
-						run.check(shown == clueHelper.boxState(), "box shows " + shown + ", signals say " + clueHelper.boxState());
-						run.check(shown != BoxState.CORE_OFF, "box left the core-off state");
-						frame("core-on");
-						run.done();
-					});
-				});
-			});
-		}
-	}
-
-	private final class RestartTest implements SelfTest
-	{
-		@Override
-		public int order()
-		{
-			return 1000;
-		}
-
-		@Override
-		public String name()
-		{
-			return "plugin restart";
-		}
-
-		@Override
-		public void run(SelfTestRun run)
-		{
-			SwingUtilities.invokeLater(() ->
-			{
-				stopOrStart(clueHelper, false);
-				later(PLUGIN_DELAY_MS, () ->
-				{
-					run.check(!overlayManager.anyMatch(GuideOverlay.class::isInstance), "box overlay removed on stop");
-					stopOrStart(clueHelper, true);
-					later(PLUGIN_DELAY_MS, () ->
-					{
-						run.check(overlayManager.anyMatch(GuideOverlay.class::isInstance), "box overlay back on start");
-						BoxState shown = clueHelper.getGuideOverlay().getShown().getState();
-						run.check(shown == clueHelper.boxState(), "box shows " + shown + " after the restart, signals say "
-							+ clueHelper.boxState());
-						List<String> names = harness.getSelfTests().testNames();
-						run.check(names.size() == new HashSet<>(names).size(), "built-in tests registered once after the restart: " + names);
-						run.done();
-					});
-				});
-			});
-		}
-	}
-
-	private void setPluginRunning(Plugin plugin, boolean running)
-	{
-		pluginManager.setPluginEnabled(plugin, running);
-		stopOrStart(plugin, running);
-	}
-
-	private void stopOrStart(Plugin plugin, boolean start)
-	{
-		try
-		{
-			if (start)
-			{
-				pluginManager.startPlugin(plugin);
-			}
-			else
-			{
-				pluginManager.stopPlugin(plugin);
-			}
-		}
-		catch (PluginInstantiationException e)
-		{
-			log.warn("{} could not {} {}", TAG, start ? "start" : "stop", plugin.getName(), e);
-		}
-	}
-
 	private <T extends Plugin> T find(Class<T> type)
 	{
 		for (Plugin plugin : pluginManager.getPlugins())
@@ -831,12 +636,6 @@ public class ClueHelperDevPlugin extends Plugin
 			}
 		}
 		throw new IllegalStateException("no " + type.getSimpleName() + " loaded");
-	}
-
-	private void frame(String name)
-	{
-		File file = new File(SNAPSHOTS, String.format("%02d-%s.png", ++snapshotCount, name));
-		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file)));
 	}
 
 	private static void clearOldPngs(File dir)
@@ -883,11 +682,6 @@ public class ClueHelperDevPlugin extends Plugin
 				log.info("{} scene {} recorded at {}", TAG, name, text(start.getTile()));
 			}
 		}
-		if (!sampled)
-		{
-			sampled = true;
-			sample();
-		}
 		if (plan.getStepKey() == null || plan.getStepKey().equals(lastPlannedStep))
 		{
 			return;
@@ -923,11 +717,6 @@ public class ClueHelperDevPlugin extends Plugin
 		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(GUIDE_FRAMES, name + "-game.png"))));
 	}
 
-	private void sample()
-	{
-		new RouteSampler(client, clueHelper, catalogData.get().getNow(null), walkData.get().getNow(null), executor).run();
-	}
-
 	/** After Clue Helper colours the menu: what the guide wanted coloured and what each entry ended up as. */
 	@Subscribe(priority = -2)
 	public void onMenuOpened(MenuOpened event)
@@ -951,11 +740,7 @@ public class ClueHelperDevPlugin extends Plugin
 	public void onCommandExecuted(CommandExecuted event)
 	{
 		harness.onCommandExecuted(event);
-		if (event.getCommand().equalsIgnoreCase("ch-sample"))
-		{
-			sample();
-		}
-		else if (event.getCommand().equalsIgnoreCase(MockClues.COMMAND))
+		if (event.getCommand().equalsIgnoreCase(MockClues.COMMAND))
 		{
 			// Commands arrive inside the chat script, and core's clue providers run quest scripts, which can't nest.
 			clientThread.invokeLater(() -> mockClues.run(event.getArguments()));
@@ -989,12 +774,5 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			log.warn("{} step frame {} failed", TAG, file, e);
 		}
-	}
-
-	private static void later(int ms, Runnable action)
-	{
-		Timer timer = new Timer(ms, e -> action.run());
-		timer.setRepeats(false);
-		timer.start();
 	}
 }

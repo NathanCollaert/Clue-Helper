@@ -1,8 +1,7 @@
 package com.cluehelper.hotcold;
 
 import com.cluehelper.step.HotColdTier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import lombok.Value;
 
 /**

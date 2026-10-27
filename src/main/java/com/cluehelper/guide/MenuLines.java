@@ -2,32 +2,15 @@ package com.cluehelper.guide;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.Menu;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.events.WidgetClosed;
+import java.util.function.*;
+import javax.inject.*;
+import net.runelite.api.*;
+import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.util.ColorUtil;
-import net.runelite.client.util.Text;
+import net.runelite.client.util.*;
 
 /**
  * Teleport interfaces are read from their scripts' arguments, before better-teleport-menu rewrites them. Lines and menu
@@ -79,9 +62,12 @@ public class MenuLines
 		return String.format("<col=%06x>%s</col>", TEXT_COLOUR, text);
 	}
 
-	private final Client client;
-	private final QuetzalIcons quetzalIcons;
-	private final FairyDials fairyDials;
+	@Inject
+	private Client client;
+	@Inject
+	private QuetzalIcons quetzalIcons;
+	@Inject
+	private FairyDials fairyDials;
 	private final Map<String, int[]> listLines = new HashMap<>();
 	private String listTitle;
 	private final List<int[]> rawListLines = new ArrayList<>();
@@ -89,14 +75,6 @@ public class MenuLines
 	private final Map<Integer, int[]> nexusLines = new HashMap<>();
 	private final Map<Integer, int[]> boxLines = new HashMap<>();
 	private final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
-
-	@Inject
-	MenuLines(Client client, QuetzalIcons quetzalIcons, FairyDials fairyDials)
-	{
-		this.client = client;
-		this.quetzalIcons = quetzalIcons;
-		this.fairyDials = fairyDials;
-	}
 
 	/** Call from a handler at priority 2, ahead of better-teleport-menu's at 1. */
 	public void onScriptPreFired(ScriptPreFired event)

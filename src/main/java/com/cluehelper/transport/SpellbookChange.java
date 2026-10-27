@@ -2,8 +2,7 @@ package com.cluehelper.transport;
 
 import com.cluehelper.player.Book;
 import java.util.List;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value

@@ -3,8 +3,7 @@ package com.cluehelper.transport;
 import com.cluehelper.player.PositionRules;
 import java.util.List;
 import java.util.regex.Pattern;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**

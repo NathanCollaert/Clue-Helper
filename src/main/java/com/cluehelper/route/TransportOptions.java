@@ -1,23 +1,8 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.Book;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.HouseState;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.player.SpellbookState;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.Category;
-import com.cluehelper.transport.HouseNeed;
-import com.cluehelper.transport.Requirements;
-import com.cluehelper.transport.RowAvailability;
-import com.cluehelper.transport.SpellbookChange;
-import com.cluehelper.transport.Spend;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.cluehelper.player.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 
 /** The teleports and spellbook changes available on one side of the bank stop, placed by where each is used from. */
 final class TransportOptions

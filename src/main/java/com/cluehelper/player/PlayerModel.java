@@ -1,41 +1,14 @@
 package com.cluehelper.player;
 
 import com.cluehelper.memory.BankMemory;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.GameState;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.Player;
-import net.runelite.api.Quest;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
-import net.runelite.api.VarbitComposition;
-import net.runelite.api.WorldEntity;
-import net.runelite.api.WorldType;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.*;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
@@ -66,13 +39,16 @@ public class PlayerModel
 	public static final int UNKNOWN_TICK = -1;
 	private static final int INVENTORY_SLOTS = 28;
 
-	private final Client client;
-	private final BankMemory bankMemory;
-	private final ChargeReader chargeReader;
-	private final CheckLines checkLines;
+	@Inject
+	private Client client;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private ChargeReader chargeReader;
+	@Inject
+	private CheckLines checkLines;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
 	private final Queue<int[]> pendingWatches = new ConcurrentLinkedQueue<>();
-	private final RebuildStats stats = new RebuildStats();
 
 	private final Set<Integer> watchedVarbits = new HashSet<>();
 	private final Set<Integer> watchedVarps = new HashSet<>();
@@ -91,23 +67,12 @@ public class PlayerModel
 	private String lastFairyRing;
 	private String dirtyBecause;
 	private long version;
-	/** Dev builds only: levels the plugin sees instead of the account's (a lower Agility to plan without a shortcut). */
-	private Map<Skill, Integer> levelOverrides = Map.of();
 	private Map<Integer, Integer> fakeCarried = Map.of();
 
 	private volatile RuneModel runeModel;
 	private volatile PlayerSnapshot snapshot;
 	private volatile Position position = Position.NONE;
 	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
-
-	@Inject
-	PlayerModel(Client client, ChargeReader chargeReader, CheckLines checkLines, BankMemory bankMemory)
-	{
-		this.bankMemory = bankMemory;
-		this.client = client;
-		this.chargeReader = chargeReader;
-		this.checkLines = checkLines;
-	}
 
 	public void start()
 	{
@@ -161,12 +126,6 @@ public class PlayerModel
 		return runeModel;
 	}
 
-	public RebuildStats getStats()
-	{
-		return stats;
-	}
-
-	/** Listeners run on the client thread, after each rebuild. */
 	public Runnable addListener(Consumer<PlayerSnapshot> listener)
 	{
 		listeners.add(listener);
@@ -345,7 +304,7 @@ public class PlayerModel
 			long started = System.nanoTime();
 			PlayerSnapshot built = build(now);
 			trackPendingRevert(last, built);
-			stats.record(dirtyBecause, System.nanoTime() - started, client.getTickCount());
+			log.debug("snapshot rebuilt ({}) in {} ms", dirtyBecause, (System.nanoTime() - started) / 1_000_000.0);
 			snapshot = built;
 			listeners.forEach(listener -> listener.accept(built));
 		}
@@ -363,13 +322,6 @@ public class PlayerModel
 		{
 			pendingRevertSinceTick = last == null ? UNKNOWN_TICK : client.getTickCount();
 		}
-	}
-
-	/** Client thread. Dev builds only: the levels to see instead of the account's; empty for the real ones. */
-	public void overrideLevels(Map<Skill, Integer> levels)
-	{
-		levelOverrides = Map.copyOf(levels);
-		markDirty("level overrides");
 	}
 
 	/** Client thread. Dev builds only: items to see in the inventory on top of the real ones; empty for none. */
@@ -466,8 +418,6 @@ public class PlayerModel
 			boosted.put(skill, client.getBoostedSkillLevel(skill));
 			real.put(skill, client.getRealSkillLevel(skill));
 		}
-		boosted.putAll(levelOverrides);
-		real.putAll(levelOverrides);
 		Set<Integer> held = new HashSet<>(inventory.keySet());
 		held.addAll(worn.keySet());
 		Set<WorldType> worldTypes = client.getWorldType();
@@ -573,7 +523,6 @@ public class PlayerModel
 		long started = System.nanoTime();
 		T value = read.get();
 		log.debug("read {} in {} ms", what, (System.nanoTime() - started) / 1_000_000.0);
-		stats.recordRead(what, System.nanoTime() - started);
 		return value;
 	}
 	/** Client thread. Whether an inventory item's name starts with {@code nameStart}, lower case. */

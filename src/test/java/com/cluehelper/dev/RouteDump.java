@@ -6,7 +6,6 @@ import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 final class RouteDump
@@ -19,14 +18,6 @@ final class RouteDump
 	RouteDump(RoutePlanner routes)
 	{
 		this.routes = routes;
-	}
-
-	void describe(Consumer<String> chat, Consumer<String> logOnly)
-	{
-		Plan plan = routes.getPlan();
-		chat.accept(header(plan));
-		summary(plan).forEach(chat);
-		candidates(plan).forEach(logOnly);
 	}
 
 	String header(Plan plan)
@@ -48,15 +39,6 @@ final class RouteDump
 		line(lines, "Same book", plan.getSameBook());
 		line(lines, "Faster, under the margin", plan.getFasterUnqualified());
 		plan.getAlternatives().forEach(route -> line(lines, "Alt", route));
-		return lines;
-	}
-
-	List<String> candidates(Plan plan)
-	{
-		List<String> lines = new ArrayList<>();
-		plan.getCandidates().forEach(candidate -> line(lines, "candidate (" + candidate.getCategory() + ")", candidate.getRoute()));
-		plan.getProbeTicks().forEach((tile, ticks) ->
-			lines.add("probe " + tile.getX() + "," + tile.getY() + "," + tile.getPlane() + " " + ticks + "t"));
 		return lines;
 	}
 

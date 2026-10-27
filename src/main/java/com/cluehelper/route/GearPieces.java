@@ -1,19 +1,10 @@
 package com.cluehelper.route;
 
 import com.cluehelper.step.GearBonus;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.client.game.ItemEquipmentStats;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemStats;
+import java.util.*;
+import javax.inject.*;
+import net.runelite.api.*;
+import net.runelite.client.game.*;
 
 /** Client thread only: item stats and names. What each owned item adds to a gear bonus, cached by item. */
 @Singleton
@@ -21,16 +12,11 @@ public class GearPieces
 {
 	private static final int AMMO = EquipmentInventorySlot.AMMO.getSlotIdx();
 
-	private final Client client;
-	private final ItemManager itemManager;
-	private final Map<GearBonus, Map<Integer, Optional<GearPicker.Piece>>> cache = new EnumMap<>(GearBonus.class);
-
 	@Inject
-	GearPieces(Client client, ItemManager itemManager)
-	{
-		this.client = client;
-		this.itemManager = itemManager;
-	}
+	private Client client;
+	@Inject
+	private ItemManager itemManager;
+	private final Map<GearBonus, Map<Integer, Optional<GearPicker.Piece>>> cache = new EnumMap<>(GearBonus.class);
 
 	public Map<Integer, GearPicker.Piece> of(GearBonus bonus, Collection<Integer> itemIds)
 	{

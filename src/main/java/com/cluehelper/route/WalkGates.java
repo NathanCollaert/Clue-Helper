@@ -1,18 +1,8 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.Container;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.transport.AvailabilityEngine;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.Requirements;
-import com.cluehelper.transport.RowAvailability;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import com.cluehelper.player.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 import java.util.stream.IntStream;
 import net.runelite.api.gameval.ItemID;
 

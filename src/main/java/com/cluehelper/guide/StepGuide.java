@@ -1,60 +1,25 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.link.ClueLink;
-import com.cluehelper.memory.BankMemory;
-import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.player.PositionRules;
-import com.cluehelper.route.Plan;
-import com.cluehelper.route.PlanStart;
-import com.cluehelper.route.StepNeeds;
-import com.cluehelper.route.Route;
-import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.WalkCosts;
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.StepIndex;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepRequirements;
+import com.cluehelper.memory.*;
+import com.cluehelper.player.*;
+import com.cluehelper.route.*;
+import com.cluehelper.step.*;
 import com.cluehelper.transport.Category;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
+import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.WorldView;
-import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
-import net.runelite.api.KeyCode;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.GameState;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetUtil;
+import net.runelite.api.events.*;
 import net.runelite.api.gameval.AnimationID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.util.Text;
 
@@ -101,28 +66,45 @@ public class StepGuide
 	private static final Set<Integer> TOPLEVELS = Set.of(InterfaceID.TOPLEVEL, InterfaceID.TOPLEVEL_OSRS_STRETCH,
 		InterfaceID.TOPLEVEL_PRE_EOC);
 
-	private final Client client;
-	private final RoutePlanner routes;
-	private final PlayerModel player;
-	private final BankMemory bankMemory;
-	private final MenuLines menuLines;
-	private final RowTargets rowTargets;
-	private final GearActs gearActs;
-	private final TaskActs taskActs;
-	private final StepHighlights stepHighlights;
-	private final ActWatcher actWatcher;
-	private final StepNeeds stepNeeds;
-	private final SubSteps subSteps;
-	private final SceneObjects sceneObjects;
-	private final ClueLink clueLink;
+	@Inject
+	private Client client;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private MenuLines menuLines;
+	@Inject
+	private RowTargets rowTargets;
+	@Inject
+	private GearActs gearActs;
+	@Inject
+	private TaskActs taskActs;
+	@Inject
+	private StepHighlights stepHighlights;
+	@Inject
+	private ActWatcher actWatcher;
+	@Inject
+	private StepNeeds stepNeeds;
+	@Inject
+	private SubSteps subSteps;
+	@Inject
+	private SceneObjects sceneObjects;
+	@Inject
+	private ClueLink clueLink;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private static final String TALK_TO = "Talk to ";
 	private static final List<String> BOXES = List.of("puzzle box", "light box");
-	private final LeftClicks leftClicks;
-	private final DepositReminder deposit;
+	@Inject
+	private LeftClicks leftClicks;
+	@Inject
+	private DepositReminder deposit;
 	private final ChangeRefusal changeRefusal = new ChangeRefusal();
 	private final TeleportRefusal teleportRefusal = new TeleportRefusal();
-	private final ObeliskDestination obelisk;
+	@Inject
+	private ObeliskDestination obelisk;
 
 	private Runnable unregister;
 	private Route route;
@@ -154,31 +136,6 @@ public class StepGuide
 	private List<WorldPoint> pickUpTiles = List.of();
 	private Highlights highlights = Highlights.NONE;
 	private SceneHighlights scene = SceneHighlights.NONE;
-
-	@Inject
-	StepGuide(Client client, RoutePlanner routes, PlayerModel player, BankMemory bankMemory, MenuLines menuLines,
-		RowTargets rowTargets, LeftClicks leftClicks, GearActs gearActs, TaskActs taskActs, StepHighlights stepHighlights,
-		DepositReminder deposit, ObeliskDestination obelisk, ActWatcher actWatcher, StepNeeds stepNeeds, SubSteps subSteps,
-		SceneObjects sceneObjects, ClueLink clueLink)
-	{
-		this.clueLink = clueLink;
-		this.gearActs = gearActs;
-		this.taskActs = taskActs;
-		this.stepHighlights = stepHighlights;
-		this.subSteps = subSteps;
-		this.sceneObjects = sceneObjects;
-		this.actWatcher = actWatcher;
-		this.deposit = deposit;
-		this.obelisk = obelisk;
-		this.stepNeeds = stepNeeds;
-		this.leftClicks = leftClicks;
-		this.menuLines = menuLines;
-		this.rowTargets = rowTargets;
-		this.bankMemory = bankMemory;
-		this.client = client;
-		this.routes = routes;
-		this.player = player;
-	}
 
 	public void start()
 	{
@@ -1387,5 +1344,74 @@ public class StepGuide
 	{
 		SubStep view;
 		SubStep again;
+	}
+
+	/** Client thread only. A refused book change leaves the book as it was; the next tick shows whether it changed. */
+	private static final class ChangeRefusal
+	{
+		private static final int CHECK_TICKS = 2;
+
+		private String candidate;
+		private Book book;
+		private int checkTick;
+
+		/** A MESBOX line during the change: the change is suspect until its check tick. */
+		void suspect(String change, Book book, int tick)
+		{
+			candidate = change;
+			this.book = book;
+			checkTick = tick + CHECK_TICKS;
+		}
+
+		/** The change the game refused, once its check tick has come and the book is not the one it changes to; null otherwise. */
+		String refused(int tick, int spellbookVarbit)
+		{
+			if (candidate == null || tick < checkTick)
+			{
+				return null;
+			}
+			String refused = spellbookVarbit != book.ordinal() ? candidate : null;
+			candidate = null;
+			return refused;
+		}
+
+		void clear()
+		{
+			candidate = null;
+		}
+	}
+
+	/** The objects and NPCs found in the loaded scene for the current sub-step, searched again every few ticks. */
+	@Value
+	@Builder(toBuilder = true)
+	private static class SceneHighlights
+	{
+		static final SceneHighlights NONE = SceneHighlights.builder().build();
+
+		@Builder.Default
+		List<TileObject> objects = List.of();
+		@Builder.Default
+		List<NPC> npcs = List.of();
+		/** Outlined objects whose left click does what the step needs. */
+		@Builder.Default
+		List<TileObject> fillObjects = List.of();
+		@Builder.Default
+		List<NPC> fillNpcs = List.of();
+		/** The option an outlined NPC is filled for when it is its left click (the Guardian mummy's Start-minigame). */
+		String npcOption;
+		/** The tick of the last search; {@link ActWatcher#NEVER} forces one. */
+		@Builder.Default
+		int foundTick = ActWatcher.NEVER;
+		/**
+		 * Searches since the last that found something: a house's furniture appears a tick or two after the load, so empty
+		 * searches repeat every tick at first, then every few ticks.
+		 */
+		@Builder.Default
+		int emptySearches = 0;
+
+		boolean isEmpty()
+		{
+			return objects.isEmpty() && npcs.isEmpty();
+		}
 	}
 }

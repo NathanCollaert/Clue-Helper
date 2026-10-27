@@ -1,27 +1,13 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.memory.MemorySlot;
-import com.cluehelper.memory.MemoryStore;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.ItemUse;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.NPCComposition;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.TileObject;
+import com.cluehelper.memory.*;
+import com.cluehelper.player.*;
+import java.util.*;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetUtil;
+import net.runelite.api.widgets.*;
 
 /**
  * What a left click on an item, object or NPC does, Menu Entry Swapper's swaps included. Learned from the hover menu's

@@ -1,17 +1,12 @@
 package com.cluehelper.memory;
 
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PositionRules;
+import com.cluehelper.player.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.Player;
+import java.util.regex.*;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;

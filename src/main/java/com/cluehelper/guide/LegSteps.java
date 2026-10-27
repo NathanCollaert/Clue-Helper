@@ -1,25 +1,12 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.player.Book;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.HouseState;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.route.Exit;
-import com.cluehelper.route.Leg;
-import com.cluehelper.route.Route;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import com.cluehelper.step.TargetKind;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.Category;
-import com.cluehelper.transport.SpellbookChange;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.cluehelper.player.*;
+import com.cluehelper.route.*;
+import com.cluehelper.step.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 

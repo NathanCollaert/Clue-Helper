@@ -1,15 +1,9 @@
 package com.cluehelper.hotcold;
 
-import com.cluehelper.route.OriginClass;
-import com.cluehelper.route.Plan;
-import com.cluehelper.route.PlanInput;
-import com.cluehelper.route.Planner;
+import com.cluehelper.route.*;
 import com.cluehelper.step.HotColdTier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** One plan after a feel: filter the grid, gather probes, choose. Snapshot data only, so it runs on the executor. */

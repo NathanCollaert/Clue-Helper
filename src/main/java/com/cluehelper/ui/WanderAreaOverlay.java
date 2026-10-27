@@ -1,25 +1,18 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.guide.StepGuide;
-import com.cluehelper.guide.SubStep;
+import com.cluehelper.guide.*;
 import com.cluehelper.link.ClueLink;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
+import com.cluehelper.step.*;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.util.List;
 import javax.inject.Inject;
-import net.runelite.api.Client;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.*;
 
 /**
  * The edge of a wide wanderer's range on the ground (Wingstone's desert), so the player knows where to look, and of the

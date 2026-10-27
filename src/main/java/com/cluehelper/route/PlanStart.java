@@ -1,8 +1,6 @@
 package com.cluehelper.route;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value

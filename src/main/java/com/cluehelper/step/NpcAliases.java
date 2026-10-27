@@ -1,8 +1,6 @@
 package com.cluehelper.step;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Core names the NPC who stands there after a quest; before it, another NPC does the same job. */
 final class NpcAliases

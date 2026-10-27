@@ -1,17 +1,12 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.guide.FairyDials;
-import com.cluehelper.guide.MenuLines;
-import com.cluehelper.guide.MenuTarget;
-import com.cluehelper.guide.StepGuide;
+import com.cluehelper.guide.*;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import javax.inject.Inject;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.*;
 
 public class MenuLineOverlay extends Overlay
 {

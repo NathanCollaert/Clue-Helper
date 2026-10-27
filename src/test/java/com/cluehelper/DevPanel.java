@@ -12,28 +12,21 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import net.runelite.api.Skill;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 
 /**
- * The dev launcher's sidebar: the step campaign, mock clues (random by tier and type, or a list of step IDs) and the
- * ::ch- commands as buttons.
+ * The dev launcher's sidebar: the step campaign, mock clues from a list of step IDs, and dev tools as buttons.
  */
 final class DevPanel extends PluginPanel
 {
@@ -49,10 +42,6 @@ final class DevPanel extends PluginPanel
 	/** What the mock section drives; each runs on the client thread. */
 	interface MockControls
 	{
-		void random(String tier, String type);
-
-		void randomList(String tier, String type);
-
 		/** {@code by} 1 for the next step ID of {@code ids}, -1 for the one before. */
 		void walk(List<String> ids, int by);
 
@@ -91,7 +80,6 @@ final class DevPanel extends PluginPanel
 
 	private static final int LIST_ROWS = 7;
 	private static final int NOTE_ROWS = 2;
-	private static final int LEVEL_ROWS = 3;
 	private static final String LINE = "\n";
 	/** The label's HTML width, which the label measures larger than its pixels. */
 	private static final int TEXT_WRAP_WIDTH = 165;
@@ -100,9 +88,8 @@ final class DevPanel extends PluginPanel
 	private final JLabel campaignStep = new JLabel();
 	private final JTextArea bugNote = new JTextArea(NOTE_ROWS, 0);
 	private final JTextArea list = new JTextArea(LIST_ROWS, 0);
-	private final JTextArea virtualLevels = new JTextArea(LEVEL_ROWS, 0);
 
-	DevPanel(CampaignControls campaign, MockControls mocks, Consumer<Map<Skill, Integer>> levels, List<Action> tools)
+	DevPanel(CampaignControls campaign, MockControls mocks, List<Action> tools)
 	{
 		super(true);
 		setLayout(new BorderLayout());
@@ -113,8 +100,6 @@ final class DevPanel extends PluginPanel
 		campaignSection(column, campaign);
 		column.add(Box.createVerticalStrut(SECTION_GAP));
 		mockSection(column, mocks);
-		column.add(Box.createVerticalStrut(SECTION_GAP));
-		levelSection(column, levels);
 		column.add(Box.createVerticalStrut(SECTION_GAP));
 		column.add(overline("DEV"));
 		for (int i = 0; i < tools.size(); i++)
@@ -180,24 +165,9 @@ final class DevPanel extends PluginPanel
 		column.add(scroll);
 	}
 
-	/** Swing thread. */
-	void fillList(List<String> ids)
-	{
-		list.setText(String.join(LINE, ids));
-	}
-
 	private void mockSection(JPanel column, MockControls mocks)
 	{
-		column.add(overline("MOCK CLUE"));
-		JComboBox<String> tier = combo(MockClues.TIERS);
-		JComboBox<String> type = combo(MockClues.TYPES);
-		column.add(row(tier, type));
-		column.add(Box.createVerticalStrut(GAP));
-		column.add(row(
-			new RowButton(new Action("Random clue", () -> mocks.random(selected(tier), selected(type)))),
-			new RowButton(new Action("Random list", () -> mocks.randomList(selected(tier), selected(type))))));
-		column.add(Box.createVerticalStrut(SECTION_GAP));
-		column.add(overline("STEP IDS, ONE PER LINE"));
+		column.add(overline("MOCK CLUES, ONE STEP ID PER LINE"));
 		list.setFont(FontManager.getRunescapeSmallFont());
 		list.setLineWrap(false);
 		JScrollPane scroll = new JScrollPane(list);
@@ -216,59 +186,9 @@ final class DevPanel extends PluginPanel
 		column.add(current);
 	}
 
-	/** Levels the plugin plans with instead of the account's, one SKILL=level per line: AGILITY=50. */
-	private void levelSection(JPanel column, Consumer<Map<Skill, Integer>> levels)
-	{
-		column.add(overline("VIRTUAL LEVELS, SKILL=LEVEL"));
-		virtualLevels.setFont(FontManager.getRunescapeSmallFont());
-		JScrollPane scroll = new JScrollPane(virtualLevels);
-		scroll.setAlignmentX(LEFT_ALIGNMENT);
-		scroll.setPreferredSize(new Dimension(PANEL_WIDTH - 16, LEVEL_ROWS * ROW_HEIGHT * 2 / 3));
-		scroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, LEVEL_ROWS * ROW_HEIGHT * 2 / 3));
-		column.add(scroll);
-		column.add(Box.createVerticalStrut(GAP));
-		column.add(row(new RowButton(new Action("Apply", () -> levels.accept(parseLevels(virtualLevels.getText())))),
-			new RowButton(new Action("Clear", () ->
-			{
-				virtualLevels.setText("");
-				levels.accept(Map.of());
-			}))));
-	}
-
-	/** Lines that aren't SKILL=level are left out. */
-	static Map<Skill, Integer> parseLevels(String text)
-	{
-		Map<Skill, Integer> levels = new EnumMap<>(Skill.class);
-		for (String line : text.split(LINE))
-		{
-			String[] parts = line.trim().split("\\s*=\\s*");
-			Skill skill = parts.length != 2 ? null
-				: Arrays.stream(Skill.values()).filter(each -> each.name().equalsIgnoreCase(parts[0])).findFirst().orElse(null);
-			if (skill != null && parts[1].matches("\\d{1,3}"))
-			{
-				levels.put(skill, Integer.parseInt(parts[1]));
-			}
-		}
-		return levels;
-	}
-
 	private List<String> lines()
 	{
 		return List.of(list.getText().split(LINE));
-	}
-
-	private static String selected(JComboBox<String> box)
-	{
-		Object item = box.getSelectedItem();
-		return item == null ? MockClues.ANY : item.toString();
-	}
-
-	private static JComboBox<String> combo(List<String> items)
-	{
-		JComboBox<String> box = new JComboBox<>(items.toArray(new String[0]));
-		box.setFont(FontManager.getRunescapeSmallFont());
-		box.setFocusable(false);
-		return box;
 	}
 
 	private static JLabel overline(String title)

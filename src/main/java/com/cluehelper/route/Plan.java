@@ -1,9 +1,7 @@
 package com.cluehelper.route;
 
-import java.util.List;
-import java.util.Map;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** Each route is null when no such route exists. */

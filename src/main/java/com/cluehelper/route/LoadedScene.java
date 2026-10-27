@@ -1,9 +1,7 @@
 package com.cluehelper.route;
 
 import lombok.Value;
-import net.runelite.api.CollisionData;
-import net.runelite.api.CollisionDataFlag;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** The loaded scene's collision flags as captured, and the closed doors on it a walk may open at a cost. */

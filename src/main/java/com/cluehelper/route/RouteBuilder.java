@@ -1,14 +1,7 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.Book;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.ItemUse;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.cluehelper.player.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 

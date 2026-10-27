@@ -1,10 +1,7 @@
 package com.cluehelper.hotcold;
 
-import com.cluehelper.step.HotColdTier;
-import com.cluehelper.step.StepIndex;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.cluehelper.step.*;
+import java.util.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.Enemy;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdLocation;

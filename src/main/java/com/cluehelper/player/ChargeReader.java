@@ -1,15 +1,9 @@
 package com.cluehelper.player;
 
-import com.cluehelper.memory.MemorySlot;
-import com.cluehelper.memory.MemoryStore;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.cluehelper.memory.*;
+import java.util.*;
+import java.util.regex.*;
+import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;

@@ -3,39 +3,23 @@ package com.cluehelper.ui;
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.route.Plan;
-import com.cluehelper.route.PlanInput;
-import com.cluehelper.route.PlanRecording;
-import com.cluehelper.route.Route;
-import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.route.*;
 import com.cluehelper.step.Step;
-import com.cluehelper.transport.AvailabilityService;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.RowAvailability;
+import com.cluehelper.transport.*;
 import com.google.gson.Gson;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.RuneLiteProperties;
-import net.runelite.client.chat.ChatMessageManager;
-import net.runelite.client.chat.QueuedMessage;
-import net.runelite.client.config.ConfigItemDescriptor;
-import net.runelite.client.config.ConfigManager;
+import net.runelite.client.chat.*;
+import net.runelite.client.config.*;
 import net.runelite.client.util.LinkBrowser;
 
 /**
@@ -53,29 +37,23 @@ public class RouteReport
 	private static final String HAVE = "have";
 	private static final String IN_THE_BANK = "in the bank";
 
-	private final ClueLink clueLink;
-	private final RoutePlanner routes;
-	private final AvailabilityService availability;
-	private final ConfigManager configManager;
-	private final ClueHelperConfig config;
-	private final ChatMessageManager chat;
-	private final Gson gson;
+	@Inject
+	private ClueLink clueLink;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private AvailabilityService availability;
+	@Inject
+	private ConfigManager configManager;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private ChatMessageManager chat;
+	@Inject
+	private Gson gson;
 	private volatile PlanInput lastInput;
 	private volatile Plan lastPlan;
 	private Runnable unregister;
-
-	@Inject
-	RouteReport(ClueLink clueLink, RoutePlanner routes, AvailabilityService availability, ConfigManager configManager,
-		ClueHelperConfig config, ChatMessageManager chat, Gson gson)
-	{
-		this.clueLink = clueLink;
-		this.routes = routes;
-		this.availability = availability;
-		this.configManager = configManager;
-		this.config = config;
-		this.chat = chat;
-		this.gson = gson;
-	}
 
 	public void start()
 	{

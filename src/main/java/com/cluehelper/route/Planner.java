@@ -1,22 +1,9 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.PositionRules;
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.TargetKind;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.cluehelper.step.*;
+import java.util.*;
+import java.util.stream.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** Pure, so it runs on the executor with snapshot data only. */

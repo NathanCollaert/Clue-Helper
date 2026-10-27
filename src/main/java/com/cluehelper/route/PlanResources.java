@@ -1,12 +1,7 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.Charge;
-import com.cluehelper.player.Container;
-import com.cluehelper.player.PlayerSnapshot;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.cluehelper.player.*;
+import java.util.*;
 
 /** What a route spends: items, charges, cooldowns and cape uses, each with the units available before and after a bank stop. */
 final class PlanResources

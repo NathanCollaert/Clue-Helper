@@ -1,10 +1,6 @@
 package com.cluehelper.hotcold;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Our own record of each hot/cold step's readings, the anchor the game compares against: it keeps it across logout,

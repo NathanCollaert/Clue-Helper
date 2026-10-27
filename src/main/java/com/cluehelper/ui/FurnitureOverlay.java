@@ -5,13 +5,8 @@ import com.cluehelper.guide.StepGuide;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
-import net.runelite.api.Client;
-import net.runelite.api.NPC;
-import net.runelite.api.TileObject;
-import net.runelite.api.WorldView;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.api.*;
+import net.runelite.client.ui.overlay.*;
 
 public class FurnitureOverlay extends Overlay
 {

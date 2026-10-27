@@ -1,8 +1,7 @@
 package com.cluehelper.guide;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 

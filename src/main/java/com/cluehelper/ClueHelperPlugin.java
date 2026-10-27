@@ -1,74 +1,29 @@
 package com.cluehelper;
 
-import com.cluehelper.guide.ActWatcher;
-import com.cluehelper.guide.MenuLines;
-import com.cluehelper.guide.MenuTarget;
-import com.cluehelper.guide.StepGuide;
+import com.cluehelper.guide.*;
 import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.link.ClueLink;
-import com.cluehelper.memory.BankMemory;
-import com.cluehelper.memory.FairyRingMemory;
-import com.cluehelper.memory.GrownPatches;
-import com.cluehelper.memory.MemoryStore;
-import com.cluehelper.memory.SpiritTreeMemory;
-import com.cluehelper.memory.KeyRingMemory;
-import com.cluehelper.memory.XericsHonourMemory;
-import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.CheckLines;
-import com.cluehelper.player.PlayerModel;
+import com.cluehelper.memory.*;
+import com.cluehelper.player.*;
 import com.cluehelper.poh.PohService;
-import com.cluehelper.route.PlannerRunner;
-import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.SceneDoors;
-import com.cluehelper.transport.AvailabilityService;
-import com.cluehelper.transport.CatalogData;
-import com.cluehelper.ui.FurnitureOverlay;
-import com.cluehelper.ui.GuideBoxPresenter;
-import com.cluehelper.ui.WanderAreaOverlay;
-import com.cluehelper.ui.GuideBox;
-import com.cluehelper.ui.GuideOverlay;
-import com.cluehelper.ui.ItemHighlightOverlay;
-import com.cluehelper.ui.MenuLineOverlay;
-import com.cluehelper.ui.RouteReport;
-import com.cluehelper.ui.BoxState;
-import com.cluehelper.ui.WidgetHighlightOverlay;
-import com.cluehelper.ui.WaypointOverlay;
-import com.cluehelper.ui.WithdrawTab;
+import com.cluehelper.route.*;
+import com.cluehelper.transport.*;
+import com.cluehelper.ui.*;
 import com.google.inject.Provides;
 import java.util.Set;
 import javax.inject.Inject;
-import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.MenuOpened;
-import net.runelite.api.events.PostMenuSort;
-import net.runelite.api.events.ScriptPostFired;
-import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.events.StatChanged;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.events.WidgetClosed;
-import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.*;
+import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.events.PluginChanged;
-import net.runelite.client.events.RuneScapeProfileChanged;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDependency;
-import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.events.*;
+import net.runelite.client.plugins.*;
 import net.runelite.client.plugins.banktags.BankTagsPlugin;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.*;
 
 @Slf4j
 @PluginDescriptor(
@@ -185,7 +140,6 @@ public class ClueHelperPlugin extends Plugin
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private GuideOverlay guideOverlay;
 	@Inject
 	private GuideBoxPresenter box;
@@ -454,11 +408,6 @@ public class ClueHelperPlugin extends Plugin
 		fairyRings.publish();
 		xericsHonour.publish();
 		keyRing.publish();
-	}
-
-	BoxState boxState()
-	{
-		return box.boxState();
 	}
 
 	private Overlay[] overlays()

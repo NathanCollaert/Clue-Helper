@@ -1,11 +1,8 @@
 package com.cluehelper.hotcold;
 
 import com.cluehelper.step.HotColdTier;
-import java.util.List;
-import java.util.Map;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value

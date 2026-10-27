@@ -1,20 +1,8 @@
 package com.cluehelper.guide;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.NPC;
-import net.runelite.api.NPCComposition;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.Scene;
-import net.runelite.api.Tile;
-import net.runelite.api.TileObject;
-import net.runelite.api.WorldView;
+import java.util.*;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** Client thread only. */
@@ -25,13 +13,8 @@ final class SceneObjects
 	/** Some bank chests (the Crafting Guild's) open with Use. */
 	private static final String USE = "Use";
 
-	private final Client client;
-
 	@Inject
-	SceneObjects(Client client)
-	{
-		this.client = client;
-	}
+	private Client client;
 
 	List<TileObject> banksNear(WorldPoint at, int radius)
 	{

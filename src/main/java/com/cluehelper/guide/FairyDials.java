@@ -4,10 +4,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -28,13 +26,8 @@ public class FairyDials
 	/** The front mushroom only shows through a hole in the plank. */
 	private static final int[] MUSHROOM_RADII = {21, 31, 31, 31};
 
-	private final Client client;
-
 	@Inject
-	FairyDials(Client client)
-	{
-		this.client = client;
-	}
+	private Client client;
 
 	public List<Shape> shapes(String code)
 	{

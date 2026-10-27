@@ -9,7 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
@@ -31,17 +30,6 @@ final class StepDump
 	{
 		this.link = link;
 		this.gson = gson;
-	}
-
-	void describe(Consumer<String> reply)
-	{
-		Step step = link.getCurrentStep();
-		if (step == null)
-		{
-			reply.accept("No step (core active " + link.isActive() + ", needs read " + link.needsRead() + ")");
-			return;
-		}
-		lines(step).forEach(reply);
 	}
 
 	/** Client thread only. */

@@ -1,11 +1,8 @@
 package com.cluehelper.step;
 
 import com.cluehelper.player.Book;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 

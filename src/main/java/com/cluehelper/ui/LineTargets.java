@@ -1,24 +1,10 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.guide.StepGuide;
-import com.cluehelper.route.Ground;
-import com.cluehelper.route.LoadedScene;
-import com.cluehelper.route.PlanStart;
-import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.SceneDoors;
-import com.cluehelper.route.WalkCosts;
-import com.cluehelper.route.WalkGoal;
+import com.cluehelper.route.*;
 import java.util.Comparator;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
-import net.runelite.api.Point;
-import net.runelite.api.TileObject;
-import net.runelite.api.WallObject;
-import net.runelite.api.WorldView;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -34,22 +20,17 @@ final class LineTargets
 	private static final int WALL_EAST = 4;
 	private static final int WALL_SOUTH = 8;
 
-	private final Client client;
-	private final StepGuide guide;
-	private final RoutePlanner routes;
-	private final SceneDoors doors;
+	@Inject
+	private Client client;
+	@Inject
+	private StepGuide guide;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private SceneDoors doors;
 
 	private WorldPoint instanceTile;
 	private WalkCosts instanceWalk;
-
-	@Inject
-	LineTargets(Client client, StepGuide guide, RoutePlanner routes, SceneDoors doors)
-	{
-		this.client = client;
-		this.guide = guide;
-		this.routes = routes;
-		this.doors = doors;
-	}
 
 	/** The outlined object cheapest to walk to: the game walks to the nearest side of the booth or chest clicked. */
 	TileObject object(WorldView view)

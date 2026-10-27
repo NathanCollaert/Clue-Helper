@@ -1,14 +1,7 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.EmptySlots;
-import com.cluehelper.step.SpadeNeed;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import com.cluehelper.step.*;
+import java.util.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.NpcID;
 

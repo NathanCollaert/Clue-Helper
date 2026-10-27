@@ -1,7 +1,6 @@
 package com.cluehelper.memory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Items that left the inventory or equipment right after a Deposit click, held until the bank's own update confirms

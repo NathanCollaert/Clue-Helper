@@ -1,10 +1,8 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.player.ItemUse;
-import java.util.List;
-import java.util.Set;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 
 /** What the overlays mark for the current sub-step, as one value: {@link #NONE} marks nothing. */
 @Value

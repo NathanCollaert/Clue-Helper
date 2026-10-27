@@ -1,10 +1,7 @@
 package com.cluehelper.guide;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.DBTableID;
 import net.runelite.api.widgets.Widget;
@@ -14,14 +11,9 @@ public class QuetzalIcons
 {
 	private static final int MOST_PIXELS_OFF = 24;
 
-	private final Client client;
-	private Map<Integer, int[]> positions;
-
 	@Inject
-	QuetzalIcons(Client client)
-	{
-		this.client = client;
-	}
+	private Client client;
+	private Map<Integer, int[]> positions;
 
 	/** The first call reads the cache, so it must be on the client thread. */
 	public int[] position(int quetzalTableId)

@@ -1,18 +1,9 @@
 package com.cluehelper.transport;
 
 import com.cluehelper.player.Book;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import net.runelite.api.Quest;
-import net.runelite.api.Skill;
+import java.util.*;
+import java.util.regex.*;
+import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 

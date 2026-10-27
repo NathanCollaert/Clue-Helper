@@ -1,36 +1,21 @@
 package com.cluehelper.link;
 
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.step.Stages;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepResolver;
+import com.cluehelper.player.*;
+import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import java.util.concurrent.*;
+import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.ParamID;
-import net.runelite.api.Player;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.events.PluginChanged;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginManager;
-import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.plugins.cluescrolls.ClueScrollService;
-import net.runelite.client.plugins.cluescrolls.clues.AnagramClue;
-import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
-import net.runelite.client.plugins.cluescrolls.clues.LocationClueScroll;
+import net.runelite.client.plugins.*;
+import net.runelite.client.plugins.cluescrolls.*;
+import net.runelite.client.plugins.cluescrolls.clues.*;
 
 /**
  * Core is read once per tick, at GameTick priority -1, after core's own handlers have updated it. Its active state
@@ -43,12 +28,18 @@ public class ClueLink
 {
 	private static final int NO_CLUE_PARAM = -1;
 
-	private final PluginManager pluginManager;
-	private final ClueScrollService service;
-	private final Client client;
-	private final StepResolver resolver;
-	private final AvailabilityService availability;
-	private final PlayerModel player;
+	@Inject
+	private PluginManager pluginManager;
+	@Inject
+	private ClueScrollService service;
+	@Inject
+	private Client client;
+	@Inject
+	private StepResolver resolver;
+	@Inject
+	private AvailabilityService availability;
+	@Inject
+	private PlayerModel player;
 	private final LinkState state = new LinkState();
 	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
@@ -57,18 +48,6 @@ public class ClueLink
 	private volatile Step current;
 	private volatile boolean inventoryChanged;
 	private boolean inventoryHoldsClue;
-
-	@Inject
-	ClueLink(PluginManager pluginManager, ClueScrollService service, Client client, StepResolver resolver,
-		AvailabilityService availability, PlayerModel player)
-	{
-		this.availability = availability;
-		this.player = player;
-		this.pluginManager = pluginManager;
-		this.service = service;
-		this.client = client;
-		this.resolver = resolver;
-	}
 
 	/** Swing thread. Core's instance exists even while it is off. */
 	public void start()
@@ -279,5 +258,12 @@ public class ClueLink
 	{
 		Plugin c = core;
 		return c != null && pluginManager.isPluginActive(c);
+	}
+
+	/** Called on the client thread. */
+	public interface StepListener
+	{
+		/** @param step the current step, or null after {@link StepChange#CLEARED} */
+		void onStepChange(StepChange change, Step step);
 	}
 }

@@ -1,27 +1,14 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.PlayerSnapshot;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import lombok.Value;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.CollisionDataFlag;
-import net.runelite.api.GameObject;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.Tile;
-import net.runelite.api.WallObject;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.*;
 
 /**
  * The walk table, like Shortest Path, takes doors as open: a closed one costs a click, not a detour. A locked door
@@ -59,13 +46,8 @@ public final class SceneDoors
 	private final Set<Door> locked = new HashSet<>();
 	private Door lastOpened;
 	private volatile boolean canSlash;
-	private final Client client;
-
 	@Inject
-	public SceneDoors(Client client)
-	{
-		this.client = client;
-	}
+	private Client client;
 
 	/** From each new snapshot: a web opens only to a player carrying or wielding something that slashes. */
 	public void playerChanged(PlayerSnapshot player)

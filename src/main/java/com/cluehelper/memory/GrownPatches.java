@@ -2,8 +2,7 @@ package com.cluehelper.memory;
 
 import com.cluehelper.player.PlayerModel;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.events.ConfigChanged;
@@ -23,15 +22,10 @@ public class GrownPatches
 	private static final int REGROWN_FIRST = 41;
 	private static final int REGROWN_LAST = 55;
 
-	private final ConfigManager configManager;
-	private final PlayerModel player;
-
 	@Inject
-	GrownPatches(ConfigManager configManager, PlayerModel player)
-	{
-		this.configManager = configManager;
-		this.player = player;
-	}
+	private ConfigManager configManager;
+	@Inject
+	private PlayerModel player;
 
 	/** Call on start, after a profile change and when Time Tracking writes one of its patches. */
 	public void publish()

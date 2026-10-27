@@ -1,8 +1,7 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.Book;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.SpellbookChange;
+import com.cluehelper.transport.*;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 

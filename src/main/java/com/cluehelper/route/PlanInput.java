@@ -2,11 +2,9 @@ package com.cluehelper.route;
 
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.Step;
-import com.cluehelper.transport.AvailabilityEngine;
-import com.cluehelper.transport.Catalog;
+import com.cluehelper.transport.*;
 import java.util.Set;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 /** Snapshot data only, never the client, so a plan runs on any thread. */
 @Value

@@ -1,8 +1,7 @@
 package com.cluehelper.step;
 
 import net.runelite.api.gameval.ItemID;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 /** The two tiers with hot/cold steps, each with its own strange device: a master device doesn't work on a beginner clue. */
 public enum HotColdTier

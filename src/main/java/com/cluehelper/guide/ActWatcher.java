@@ -1,20 +1,12 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import java.util.HashSet;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
+import com.cluehelper.player.*;
+import com.cluehelper.step.*;
+import java.util.*;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.*;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.util.Text;
 
@@ -30,8 +22,10 @@ public class ActWatcher
 	private static final int SPAWN_TILES = 5;
 	private static final Set<String> CHALLENGE_ITEMS = Set.of("challenge scroll", "puzzle box", "light box");
 
-	private final Client client;
-	private final PlayerModel player;
+	@Inject
+	private Client client;
+	@Inject
+	private PlayerModel player;
 	private int withdrawTick = NEVER;
 	private int depositTick = NEVER;
 	private int uriTick = NEVER;
@@ -40,13 +34,6 @@ public class ActWatcher
 	private NPC enemy;
 	private boolean inventoryChanged = true;
 	private boolean challengeCarried;
-
-	@Inject
-	ActWatcher(Client client, PlayerModel player)
-	{
-		this.client = client;
-		this.player = player;
-	}
 
 	public void onChatMessage(ChatMessage message)
 	{

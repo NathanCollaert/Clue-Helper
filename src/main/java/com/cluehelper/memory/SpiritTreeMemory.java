@@ -1,19 +1,12 @@
 package com.cluehelper.memory;
 
 import com.cluehelper.player.PlayerModel;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.HashTable;
-import net.runelite.api.Player;
-import net.runelite.api.WidgetNode;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.WidgetModalMode;

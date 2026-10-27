@@ -1,14 +1,10 @@
 package com.cluehelper.transport;
 
 import com.cluehelper.player.Book;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.io.*;
+import java.util.*;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**

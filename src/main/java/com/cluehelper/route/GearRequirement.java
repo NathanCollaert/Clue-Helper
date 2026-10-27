@@ -1,13 +1,9 @@
 package com.cluehelper.route;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Value;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
+import net.runelite.api.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /** Worn gear adding up to a bonus total, as a need: any owned piece that adds to it counts as one of its items. */

@@ -1,12 +1,8 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.Step;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.cluehelper.step.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;

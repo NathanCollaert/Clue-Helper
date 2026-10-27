@@ -11,14 +11,11 @@ import com.cluehelper.player.PlayerModel;
 import com.cluehelper.poh.PohService;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.route.WalkData;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
-import com.cluehelper.ui.BoxState;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +24,6 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @Singleton
@@ -38,9 +34,7 @@ public class DevHarness
 
 	private final Client client;
 	private final ClientThread clientThread;
-	private final SelfTestRunner selfTests;
 	private final StepLogger stepLogger;
-	private final BuiltInSelfTests builtInSelfTests;
 	private final ClueLink clueLink;
 	private final StepDump stepDump;
 	private final PlayerDump playerDump;
@@ -51,59 +45,38 @@ public class DevHarness
 	private final PohService poh;
 	private final StashMemory stash;
 	private String lastGuideLine;
-	private final RouteOverlay routeOverlay;
-	private final OverlayManager overlayManager;
 	private final List<Runnable> unregister = new ArrayList<>();
-	private boolean overlayShown;
 	private volatile DevCommands commands;
 	private final HotColdService hotCold;
 
 	@Inject
-	DevHarness(Client client, ClientThread clientThread, SelfTestRunner selfTests, StepLogger stepLogger,
-		BuiltInSelfTests builtInSelfTests, ClueLink clueLink, Gson gson, PlayerModel player,
-		AvailabilityService availability, RoutePlanner routes, WalkData walkData, OverlayManager overlayManager, StepGuide guide,
-		PohService poh, StashMemory stash, HotColdService hotCold)
+	DevHarness(Client client, ClientThread clientThread, StepLogger stepLogger, ClueLink clueLink, Gson gson, PlayerModel player,
+		AvailabilityService availability, RoutePlanner routes, StepGuide guide, PohService poh, StashMemory stash, HotColdService hotCold)
 	{
 		this.hotCold = hotCold;
 		this.poh = poh;
 		this.stash = stash;
 		this.client = client;
 		this.clientThread = clientThread;
-		this.selfTests = selfTests;
 		this.stepLogger = stepLogger;
-		this.builtInSelfTests = builtInSelfTests;
 		this.clueLink = clueLink;
 		this.stepDump = new StepDump(clueLink, gson);
-		this.playerDump = new PlayerDump(client, player, availability);
+		this.playerDump = new PlayerDump(client, player);
 		this.availability = availability;
 		this.routes = routes;
 		this.routeDump = new RouteDump(routes);
-		this.routeOverlay = new RouteOverlay(client, routes, walkData);
-		this.overlayManager = overlayManager;
 		this.guide = guide;
 	}
 
-	public void start(Supplier<BoxState> shownState, Supplier<BoxState> signalledState)
+	public void start()
 	{
 		DevCommands c = new DevCommands(this::reply);
-		c.register("selftest", "run the in-client self-tests", args -> runSelfTests());
 		c.register("steplog", "[clear] show or clear this profile's step log", this::stepLog);
-		c.register("step", "show the current step and log it as a replay fixture line", args -> dumpStep());
-		c.register("player", "show the player snapshot, castable spells and A_carried", args ->
-			playerDump.describe(this::reply, line -> log.info("{}   {}", PlayerDump.TAG, line)));
-		c.register("routes", "show the current step's routes; every candidate goes to the log", args ->
-			routeDump.describe(this::reply, line -> log.info("{}   {}", RouteDump.TAG, line)));
-		c.register("guide", "show the followed route's sub-steps and what is highlighted", args -> dumpGuide());
 		c.register("poh", "[forget] show what is known about your house, or forget it", this::house);
 		c.register("stash", "compare every STASH unit's built varbit, the core check (script 1479) and what we remember",
 			args -> clientThread.invokeLater(this::stashes));
 		c.register("hotcold", "[reset] show the hot/cold step's feel log, or restart it keeping its last reading as the anchor",
 			args -> clientThread.invokeLater(() -> hotColdLog(args)));
-		c.register("overlay", "toggle the route graph overlay: walk-table nodes, start walks, origin class", args -> toggleOverlay());
-		for (SelfTest test : builtInSelfTests.create(shownState, signalledState))
-		{
-			unregister.add(selfTests.register(test));
-		}
 		stepLogger.setEnabled(true);
 		unregister.add(clueLink.addListener(this::onStepChange));
 		unregister.add(availability.addListener(playerDump::onJudged));
@@ -116,10 +89,6 @@ public class DevHarness
 	public void stop()
 	{
 		commands = null;
-		if (overlayShown)
-		{
-			toggleOverlay();
-		}
 		stepLogger.setEnabled(false);
 		unregister.forEach(Runnable::run);
 		unregister.clear();
@@ -132,11 +101,6 @@ public class DevHarness
 		{
 			c.dispatch(event.getCommand(), event.getArguments());
 		}
-	}
-
-	public SelfTestRunner getSelfTests()
-	{
-		return selfTests;
 	}
 
 	private StepLogger getStepLogger()
@@ -186,51 +150,6 @@ public class DevHarness
 			current.getWaypoint(), guide.getHighlightItems(), guide.getHighlightSpellWidget() + "/" + guide.getHighlightMenuWidget(),
 			guide.getHighlightObjects().size() + guide.getHighlightNpcs().size(), guide.isAtStep(),
 			guide.getRoute() == null ? "-" : guide.getRoute().describe());
-	}
-
-	private void dumpGuide()
-	{
-		reply("Guide: " + guideLine());
-		List<SubStep> steps = guide.getSteps();
-		for (int i = 0; i < steps.size(); i++)
-		{
-			SubStep step = steps.get(i);
-			reply(String.format("  %s%d %s: %s%s", step == guide.getCurrent() ? "> " : "", i + 1, step.getKind(), step.getText(),
-				step.getDetail() == null ? "" : " (" + step.getDetail() + ")"));
-		}
-	}
-
-	private void toggleOverlay()
-	{
-		overlayShown = !overlayShown;
-		if (overlayShown)
-		{
-			overlayManager.add(routeOverlay);
-		}
-		else
-		{
-			overlayManager.remove(routeOverlay);
-		}
-	}
-
-	private void dumpStep()
-	{
-		stepDump.describe(this::reply);
-		Step step = clueLink.getCurrentStep();
-		if (step != null)
-		{
-			log.info(stepDump.fixtureLine(client.getTickCount(), StepChange.UNCHANGED, step));
-		}
-	}
-
-	private void runSelfTests()
-	{
-		boolean started = selfTests.run(report ->
-		{
-			reply("Self-test: " + report);
-			report.failures().forEach(failure -> reply("  failed: " + failure));
-		});
-		reply(started ? "Self-test started: " + selfTests.testNames().size() + " tests" : "A self-test run is already going");
 	}
 
 	private void hotColdLog(String[] args)

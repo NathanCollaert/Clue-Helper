@@ -1,31 +1,12 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.player.Book;
-import com.cluehelper.player.HouseState;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.player.PositionRules;
-import com.cluehelper.player.RuneModel;
-import com.cluehelper.player.Spell;
-import com.cluehelper.transport.AvailabilityEngine;
-import com.cluehelper.transport.AvailabilityService;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.Category;
-import com.cluehelper.transport.HouseNeed;
-import com.cluehelper.transport.RowAvailability;
-import com.cluehelper.transport.SpellbookChange;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.cluehelper.player.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.ParamID;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.NpcID;
@@ -57,18 +38,13 @@ final class RowTargets
 		Book.LUNAR, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_LUNAR,
 		Book.ARCEUUS, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ARCEUUS);
 
-	private final Client client;
-	private final PlayerModel player;
-	private final AvailabilityService availability;
-	private final Map<String, Integer> spellWidgets = new HashMap<>();
-
 	@Inject
-	RowTargets(Client client, PlayerModel player, AvailabilityService availability)
-	{
-		this.client = client;
-		this.player = player;
-		this.availability = availability;
-	}
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private AvailabilityService availability;
+	private final Map<String, Integer> spellWidgets = new HashMap<>();
 
 	/** The row's object or NPC, with the menu its catalog line names. */
 	MenuTarget located(CatalogRow row)

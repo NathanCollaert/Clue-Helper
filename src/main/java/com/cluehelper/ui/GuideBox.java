@@ -3,18 +3,12 @@ package com.cluehelper.ui;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.player.Book;
-import com.cluehelper.route.Plan;
-import com.cluehelper.route.Route;
+import com.cluehelper.route.*;
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.regex.*;
 import java.util.stream.Collectors;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import net.runelite.client.util.ColorUtil;
 
 /** Built on the client thread and handed to the overlay as one immutable value. */

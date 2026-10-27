@@ -1,12 +1,9 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.step.Step;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.VarbitID;
 
@@ -46,15 +43,10 @@ public class PrayerFilters
 	/** Only these can hide a prayer the player could turn on: the level and requirement filters hide ones they can't. */
 	private static final List<Filter> TIERS = List.of(Filter.LOWER_TIERS, Filter.MULTI_SKILL);
 
-	private final Client client;
+	@Inject
+	private Client client;
 	private String stepKey;
 	private Map<Filter, Integer> found = Map.of();
-
-	@Inject
-	PrayerFilters(Client client)
-	{
-		this.client = client;
-	}
 
 	/** Notes the filters the first time a step is seen, before its task has anyone change them. */
 	public void rememberFor(Step step)

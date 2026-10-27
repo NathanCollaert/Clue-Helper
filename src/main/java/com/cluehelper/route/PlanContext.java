@@ -2,27 +2,13 @@ package com.cluehelper.route;
 
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.memory.StashMemory;
-import com.cluehelper.player.Book;
-import com.cluehelper.player.ItemUse;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.player.PositionRules;
-import com.cluehelper.player.SpellbookState;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.StepIndex;
+import com.cluehelper.player.*;
+import com.cluehelper.step.*;
 import com.cluehelper.transport.CatalogRow;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 final class PlanContext
 {

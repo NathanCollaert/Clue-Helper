@@ -1,21 +1,13 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.memory.BankMemory;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.route.RequiredItems;
-import com.cluehelper.route.StepNeeds;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import com.cluehelper.player.*;
+import com.cluehelper.route.*;
+import com.cluehelper.step.*;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
@@ -28,21 +20,16 @@ import net.runelite.client.util.Text;
 @Singleton
 final class TaskActs
 {
-	private final Client client;
-	private final PlayerModel player;
-	private final BankMemory bankMemory;
-	private final StepNeeds stepNeeds;
-	private final LeftClicks leftClicks;
-
 	@Inject
-	TaskActs(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, LeftClicks leftClicks)
-	{
-		this.client = client;
-		this.player = player;
-		this.bankMemory = bankMemory;
-		this.stepNeeds = stepNeeds;
-		this.leftClicks = leftClicks;
-	}
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private StepNeeds stepNeeds;
+	@Inject
+	private LeftClicks leftClicks;
 
 	/** The items the task needs that the player carries, outlined (used on each other, not clicked once). */
 	Highlights withItems(Highlights shown, SubStep current, Step step)

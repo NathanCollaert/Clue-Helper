@@ -1,12 +1,9 @@
 package com.cluehelper.route;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.function.*;
+import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.callback.ClientThread;
 

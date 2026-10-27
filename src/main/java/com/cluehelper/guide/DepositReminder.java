@@ -2,10 +2,8 @@ package com.cluehelper.guide;
 
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.step.StepRequirements;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
@@ -19,15 +17,10 @@ final class DepositReminder
 {
 	private static final int DEPOSIT_TILES = 15;
 
-	private final ActWatcher actWatcher;
+	@Inject
+	private ActWatcher actWatcher;
 	private Pending pending;
 	private boolean beenNear;
-
-	@Inject
-	DepositReminder(ActWatcher actWatcher)
-	{
-		this.actWatcher = actWatcher;
-	}
 
 	/** The unit to put the items back into; null when nothing is owed. */
 	WorldPoint getAt()

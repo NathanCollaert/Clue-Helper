@@ -1,26 +1,18 @@
 package com.cluehelper.ui;
 
-import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.ClueHelperPlugin;
+import com.cluehelper.*;
 import com.cluehelper.hotcold.HotColdView;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.*;
+import javax.inject.*;
 import net.runelite.api.MenuAction;
 import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.ui.overlay.OverlayPanel;
-import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.ComponentConstants;
-import net.runelite.client.ui.overlay.components.LineComponent;
-import net.runelite.client.ui.overlay.components.TitleComponent;
-import net.runelite.client.util.ColorUtil;
-import net.runelite.client.util.Text;
+import net.runelite.client.ui.overlay.*;
+import net.runelite.client.ui.overlay.components.*;
+import net.runelite.client.util.*;
 
 /** The guidance text, under the Clue Scroll plugin's own box and as wide. Renders only the value it was handed. */
 @Singleton

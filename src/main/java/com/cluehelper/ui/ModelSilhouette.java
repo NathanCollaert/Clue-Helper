@@ -2,19 +2,8 @@ package com.cluehelper.ui;
 
 import java.awt.Shape;
 import java.awt.geom.Path2D;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.DecorativeObject;
-import net.runelite.api.GameObject;
-import net.runelite.api.GroundObject;
-import net.runelite.api.Model;
-import net.runelite.api.NPC;
-import net.runelite.api.Perspective;
-import net.runelite.api.Renderable;
-import net.runelite.api.TileObject;
-import net.runelite.api.WallObject;
-import net.runelite.api.WorldView;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 
 /**
@@ -30,13 +19,8 @@ final class ModelSilhouette
 	private static final int SEE_THROUGH = 254;
 	private static final int NO_ROTATION = 0;
 
-	private final Client client;
-
 	@Inject
-	ModelSilhouette(Client client)
-	{
-		this.client = client;
-	}
+	private Client client;
 
 	Shape of(TileObject object)
 	{

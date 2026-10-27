@@ -1,10 +1,8 @@
 package com.cluehelper.transport;
 
 import com.cluehelper.player.Book;
-import java.util.List;
-import java.util.Set;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.Quest;
 
 /** A row with {@link #getErrors()} stays in the catalog but is never available, so it can't silently disappear. */

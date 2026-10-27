@@ -1,23 +1,15 @@
 package com.cluehelper.step;
 
-import com.cluehelper.player.Book;
-import com.cluehelper.player.PositionRules;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.cluehelper.player.*;
+import java.util.*;
+import java.util.function.*;
+import java.util.regex.*;
 import java.util.stream.Collectors;
 import net.runelite.api.Prayer;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.CrypticClue;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 /** Builds the stages of steps done in several places. Act texts never repeat core's solutions. */
 public final class Stages

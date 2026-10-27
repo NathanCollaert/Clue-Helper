@@ -1,11 +1,7 @@
 package com.cluehelper.guide;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.EntityOps;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.ObjectComposition;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemVariationMapping;
 
@@ -29,15 +25,10 @@ public class SwapperClicks
 	private static final int FIRST_WORN_OPTION_PARAM = 451;
 	private static final int LAST_WORN_OPTION_ID = 9;
 
-	private final Client client;
-	private final ConfigManager configManager;
-
 	@Inject
-	SwapperClicks(Client client, ConfigManager configManager)
-	{
-		this.client = client;
-		this.configManager = configManager;
-	}
+	private Client client;
+	@Inject
+	private ConfigManager configManager;
 
 	String object(ObjectComposition object)
 	{

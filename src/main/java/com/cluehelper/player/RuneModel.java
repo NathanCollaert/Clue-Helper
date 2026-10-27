@@ -1,18 +1,8 @@
 package com.cluehelper.player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import lombok.Value;
-import net.runelite.api.EnumID;
-import net.runelite.api.Quest;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
 
 /**
@@ -161,33 +151,6 @@ public final class RuneModel
 			}
 		}
 		return new Supply(have >= quantity, have, have >= quantity ? List.copyOf(used) : List.of());
-	}
-
-	/** Ignores which book is active: that is the planner's business. */
-	public List<String> whyNotCastable(Spell spell, PlayerSnapshot player)
-	{
-		List<String> whyNot = new ArrayList<>();
-		if (player.boosted(Skill.MAGIC) < spell.getLevel())
-		{
-			whyNot.add("needs " + spell.getLevel() + " Magic");
-		}
-		if (spell.isMembers() && !player.isMembersWorld())
-		{
-			whyNot.add("members world only");
-		}
-		if (spell.getQuest() != null && !player.finished(spell.getQuest()))
-		{
-			whyNot.add(player.isQuestsRead() ? spell.getQuest().getName() + " not finished" : "quests not read yet");
-		}
-		for (Spell.RuneCost cost : spell.getRunes())
-		{
-			Supply supply = supply(cost.getRune(), cost.getQuantity(), player);
-			if (!supply.isEnough())
-			{
-				whyNot.add(shortfall(cost.getRune(), cost.getQuantity(), supply.getHave()));
-			}
-		}
-		return whyNot;
 	}
 
 	public String shortfall(int rune, int quantity, int have)

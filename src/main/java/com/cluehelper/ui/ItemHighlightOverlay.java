@@ -1,13 +1,11 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.guide.LeftClicks;
-import com.cluehelper.guide.StepGuide;
+import com.cluehelper.guide.*;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.WidgetItem;
-import net.runelite.api.widgets.WidgetUtil;
+import net.runelite.api.widgets.*;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
 public class ItemHighlightOverlay extends WidgetItemOverlay

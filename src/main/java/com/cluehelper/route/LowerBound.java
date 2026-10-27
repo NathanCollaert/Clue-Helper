@@ -1,8 +1,6 @@
 package com.cluehelper.route;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * A* lower bounds in half-ticks. They must never overestimate and must stay consistent over every edge kind, or the

@@ -1,10 +1,7 @@
 package com.cluehelper.player;
 
-import java.util.ArrayList;
-import java.util.List;
-import net.runelite.api.Client;
-import net.runelite.api.EnumComposition;
-import net.runelite.api.ItemComposition;
+import java.util.*;
+import net.runelite.api.*;
 
 /** Client thread only. */
 final class ClientCacheView implements CacheView

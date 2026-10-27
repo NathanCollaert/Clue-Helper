@@ -1,15 +1,9 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.player.RuneModel;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.Step;
-import com.cluehelper.transport.ItemClause;
-import com.cluehelper.transport.Requirements;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import com.cluehelper.player.*;
+import com.cluehelper.step.*;
+import com.cluehelper.transport.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;

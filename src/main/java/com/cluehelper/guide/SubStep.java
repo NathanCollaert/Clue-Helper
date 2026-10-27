@@ -2,14 +2,10 @@ package com.cluehelper.guide;
 
 import com.cluehelper.player.Book;
 import com.cluehelper.route.Exit;
-import com.cluehelper.step.Stage;
-import com.cluehelper.step.StepIndex;
-import com.cluehelper.transport.CatalogRow;
-import com.cluehelper.transport.SpellbookChange;
-import java.util.List;
-import java.util.Set;
-import lombok.Builder;
-import lombok.Value;
+import com.cluehelper.step.*;
+import com.cluehelper.transport.*;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 

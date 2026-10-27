@@ -2,58 +2,42 @@ package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.StepGuide;
-import com.cluehelper.hotcold.HotColdPlan;
-import com.cluehelper.hotcold.HotColdService;
-import com.cluehelper.hotcold.HotColdView;
+import com.cluehelper.hotcold.*;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
-import com.cluehelper.player.Book;
-import com.cluehelper.player.HouseState;
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
+import com.cluehelper.player.*;
 import com.cluehelper.poh.PohService;
-import com.cluehelper.route.PlannerRunner;
-import com.cluehelper.route.RoutePlanner;
-import com.cluehelper.step.ClueTypes;
-import com.cluehelper.step.HotColdTier;
-import com.cluehelper.step.Step;
+import com.cluehelper.route.*;
+import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 
 /** Client thread only. Reads the guide, the routes and the hot/cold planner into one box and hands it to the overlay. */
 @Singleton
 public class GuideBoxPresenter
 {
-	private final ClueLink clueLink;
-	private final PlayerModel playerModel;
-	private final PlannerRunner planner;
-	private final RoutePlanner routes;
-	private final StepGuide guide;
-	private final HotColdService hotCold;
-	private final BankMemory bankMemory;
-	private final PohService poh;
-	private final AvailabilityService availability;
-	private final ClueHelperConfig config;
-	private final GuideOverlay overlay;
-
 	@Inject
-	GuideBoxPresenter(ClueLink clueLink, PlayerModel playerModel, PlannerRunner planner, RoutePlanner routes, StepGuide guide,
-		HotColdService hotCold, BankMemory bankMemory, PohService poh, AvailabilityService availability, ClueHelperConfig config,
-		GuideOverlay overlay)
-	{
-		this.clueLink = clueLink;
-		this.playerModel = playerModel;
-		this.planner = planner;
-		this.routes = routes;
-		this.guide = guide;
-		this.hotCold = hotCold;
-		this.bankMemory = bankMemory;
-		this.poh = poh;
-		this.availability = availability;
-		this.config = config;
-		this.overlay = overlay;
-	}
+	private ClueLink clueLink;
+	@Inject
+	private PlayerModel playerModel;
+	@Inject
+	private PlannerRunner planner;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private StepGuide guide;
+	@Inject
+	private HotColdService hotCold;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private PohService poh;
+	@Inject
+	private AvailabilityService availability;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private GuideOverlay overlay;
 
 	public void refresh()
 	{

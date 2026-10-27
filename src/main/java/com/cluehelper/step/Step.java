@@ -1,9 +1,7 @@
 package com.cluehelper.step;
 
-import java.util.List;
-import java.util.Set;
-import lombok.Builder;
-import lombok.Value;
+import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value

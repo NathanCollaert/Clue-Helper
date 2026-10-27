@@ -1,27 +1,14 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.player.PlayerModel;
-import com.cluehelper.player.PlayerSnapshot;
-import com.cluehelper.route.GearPicker;
-import com.cluehelper.route.GearRequirement;
-import com.cluehelper.route.RequiredItems;
-import com.cluehelper.route.StepNeeds;
-import com.cluehelper.step.EmptySlots;
-import com.cluehelper.step.Step;
-import com.cluehelper.step.StepIndex;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import com.cluehelper.player.*;
+import com.cluehelper.route.*;
+import com.cluehelper.step.*;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
+import javax.inject.*;
+import net.runelite.api.*;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.client.plugins.cluescrolls.clues.item.AllRequirementsCollection;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 /** Acts that put gear on or take it off: what to change now, from what is carried and worn, and when it is done. */
 @Singleton
@@ -29,17 +16,12 @@ final class GearActs
 {
 	private static final String EQUIP_TEXT = "Equip:";
 
-	private final Client client;
-	private final PlayerModel player;
-	private final StepNeeds stepNeeds;
-
 	@Inject
-	GearActs(Client client, PlayerModel player, StepNeeds stepNeeds)
-	{
-		this.client = client;
-		this.player = player;
-		this.stepNeeds = stepNeeds;
-	}
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private StepNeeds stepNeeds;
 
 	/** A gear act as the pieces to put on or take off now; any other sub-step, or one there is no step for, as it is. */
 	SubStep refresh(SubStep act, Step step)

@@ -3,8 +3,7 @@ package com.cluehelper.route;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Value;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
+import net.runelite.api.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
 /** Core's item, or every one of the parts that make it (a vial of water and a cadantine for the unfinished potion). */

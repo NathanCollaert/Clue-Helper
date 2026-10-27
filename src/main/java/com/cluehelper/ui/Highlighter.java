@@ -7,21 +7,11 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.Model;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
-import net.runelite.api.NPC;
-import net.runelite.api.Renderable;
-import net.runelite.api.TileObject;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemManager;
@@ -63,21 +53,16 @@ public class Highlighter
 	private static final int RING_RADIUS = 150;
 	private static final int RING_POINTS = 32;
 
-	private final Client client;
-	private final ModelOutlineRenderer outlines;
-	private final ItemManager itemManager;
+	@Inject
+	private Client client;
+	@Inject
+	private ModelOutlineRenderer outlines;
+	@Inject
+	private ItemManager itemManager;
 	private final Set<Integer> unmodelled = new HashSet<>();
 
-	private final ModelSilhouette silhouette;
-
 	@Inject
-	Highlighter(Client client, ModelOutlineRenderer outlines, ItemManager itemManager, ModelSilhouette silhouette)
-	{
-		this.client = client;
-		this.silhouette = silhouette;
-		this.outlines = outlines;
-		this.itemManager = itemManager;
-	}
+	private ModelSilhouette silhouette;
 
 	/**
 	 * The client's own getModel throws a NullPointerException for some dynamic objects (seen at Trollheim and after

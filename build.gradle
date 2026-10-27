@@ -40,18 +40,14 @@ test {
 
 tasks.register('dev', JavaExec) {
 	group = 'application'
-	description = 'Launch a dev client with Clue Helper: gradlew dev [-Pselftest]'
+	description = 'Launch a dev client with Clue Helper: gradlew dev'
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'com.cluehelper.ClueHelperPluginTest'
 	// RuneLite refuses to load a builtin plugin without assertions on.
 	// Core's GPU plugin trips its own assert in ModelUploader.uploadSortedModel (1.13.2, seen drawing
 	// the bank), which stops the client; assertions stay on everywhere else.
 	jvmArgs '-ea', '-da:net.runelite.client.plugins.gpu...', '-Xmx1g'
-	if (project.hasProperty('selftest')) {
-		// ClueHelperDevPlugin runs ::ch-selftest a few ticks after the first login.
-		systemProperty 'cluehelper.selftest', 'true'
-	}
-	// The ::ch-* commands and self-tests exist only in developer mode.
+	// The ::ch-* commands exist only in developer mode.
 	args '--developer-mode'
 }
 

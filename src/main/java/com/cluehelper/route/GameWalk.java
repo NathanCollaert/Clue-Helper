@@ -1,8 +1,6 @@
 package com.cluehelper.route;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**

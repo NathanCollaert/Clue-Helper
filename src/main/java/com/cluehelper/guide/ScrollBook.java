@@ -2,10 +2,7 @@ package com.cluehelper.guide;
 
 import com.cluehelper.route.BookScrolls;
 import com.cluehelper.transport.CatalogRow;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Value;
