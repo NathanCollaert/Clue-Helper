@@ -38,9 +38,6 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 | 📜 **Every step type** | Emotes with their items and STASH units, Charlie's items, Sherlock's skill tasks, keys dropped by monsters, gear to wear on arrival. |
 | 🔥 **Hot/cold planner** | On beginner and master hot/cold steps it suggests where to feel the strange device next, from your feels so far, and routes you there. |
 
-Every beginner, easy, medium and hard step has been played through in game. Elite and master steps are supported
-but haven't all been walked yet: if one feels off, please [report it](#report-a-slow-route-or-a-bug).
-
 ## Report a slow route or a bug
 
 Think you have a faster way than the one Clue Helper picked, or it guided you wrong? Reporting takes ten seconds:
