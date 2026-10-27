@@ -24,7 +24,7 @@ public class HouseOwnershipTest
 		List<String> expected = new ArrayList<>();
 		List<String> actual = new ArrayList<>();
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(
-			HouseOwnershipTest.class.getResourceAsStream("/b12/entries.jsonl"), StandardCharsets.UTF_8)))
+			HouseOwnershipTest.class.getResourceAsStream("/poh/entries.jsonl"), StandardCharsets.UTF_8)))
 		{
 			for (String line = in.readLine(); line != null; line = in.readLine())
 			{

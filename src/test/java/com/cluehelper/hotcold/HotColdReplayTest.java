@@ -112,7 +112,7 @@ public class HotColdReplayTest
 	{
 		List<String[]> rows = new ArrayList<>();
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(
-			HotColdReplayTest.class.getResourceAsStream("/b18/feels.tsv"), StandardCharsets.UTF_8)))
+			HotColdReplayTest.class.getResourceAsStream("/hotcold/feels.tsv"), StandardCharsets.UTF_8)))
 		{
 			for (String line = in.readLine(); line != null; line = in.readLine())
 			{

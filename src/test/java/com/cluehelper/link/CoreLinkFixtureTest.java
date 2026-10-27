@@ -25,8 +25,8 @@ import org.junit.Test;
  */
 public class CoreLinkFixtureTest
 {
-	private static final String RUN1 = "/b03/run1-clue-reads-and-toggles.jsonl";
-	private static final String RUN2 = "/b03/run2-start-with-core-off.jsonl";
+	private static final String RUN1 = "/core-link/run1-clue-reads-and-toggles.jsonl";
+	private static final String RUN2 = "/core-link/run2-start-with-core-off.jsonl";
 	private static final Gson GSON = new Gson();
 
 	@Test

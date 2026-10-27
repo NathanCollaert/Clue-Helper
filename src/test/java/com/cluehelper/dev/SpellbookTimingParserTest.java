@@ -18,8 +18,8 @@ import org.junit.Test;
 
 public class SpellbookTimingParserTest
 {
-	private static final String RUN1 = "/b04/run1-swap-and-occult.jsonl";
-	private static final String RUN2 = "/b04/run2-cape-altars-tyss-wild.jsonl";
+	private static final String RUN1 = "/spellbook/run1-swap-and-occult.jsonl";
+	private static final String RUN2 = "/spellbook/run2-cape-altars-tyss-wild.jsonl";
 	private static final Gson GSON = new Gson();
 	/** First-click ticks in run 2 made from a distance (house entry or approach), so walking is in their time. */
 	private static final Set<Integer> CLICKED_WHILE_STILL_WALKING_TO_IT = Set.of(1602, 2009);

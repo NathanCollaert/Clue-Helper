@@ -1,2 +1,2 @@
-# Areas where no teleport works (PLAN 5.4 origin class noTeleport). Hand-written; empty until B20 finds one a route reaches.
+# Areas where no teleport works. Hand-written; empty until a route is found that reaches one.
 name	minX	minY	maxX	maxY	plane

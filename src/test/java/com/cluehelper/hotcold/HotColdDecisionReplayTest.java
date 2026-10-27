@@ -33,7 +33,7 @@ public class HotColdDecisionReplayTest
 		List<String> differences = new ArrayList<>();
 		int decisions = 0;
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(
-			HotColdDecisionReplayTest.class.getResourceAsStream("/b19/decisions.jsonl.gz")), StandardCharsets.UTF_8)))
+			HotColdDecisionReplayTest.class.getResourceAsStream("/hotcold/decisions.jsonl.gz")), StandardCharsets.UTF_8)))
 		{
 			for (String line = in.readLine(); line != null; line = in.readLine())
 			{

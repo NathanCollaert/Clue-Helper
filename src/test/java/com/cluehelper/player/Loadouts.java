@@ -206,7 +206,7 @@ public final class Loadouts
 
 	public static RuneModel runeModel()
 	{
-		return RuneModel.load(new RuneModelTest.SliceCacheView("/b08/cache-runes.json"));
+		return RuneModel.load(new RuneModelTest.SliceCacheView("/runes/cache-runes.json"));
 	}
 
 	public static int itemId(String family)

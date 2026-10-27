@@ -25,13 +25,13 @@ import org.junit.Test;
 
 public class RuneModelTest
 {
-	private final RuneModel model = RuneModel.load(new SliceCacheView("/b08/cache-runes.json"));
+	private final RuneModel model = RuneModel.load(new SliceCacheView("/runes/cache-runes.json"));
 
 	@Test
 	public void everySpellAgreesWithTheCacheSpellTable() throws Exception
 	{
 		List<String> expected = new ArrayList<>();
-		try (BufferedReader in = reader("/b08/spells.tsv"))
+		try (BufferedReader in = reader("/runes/spells.tsv"))
 		{
 			in.readLine();
 			String line;

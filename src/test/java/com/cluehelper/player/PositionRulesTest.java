@@ -27,7 +27,7 @@ public class PositionRulesTest
 	{
 		Map<Position.Kind, Integer> seen = new EnumMap<>(Position.Kind.class);
 		List<String> wrong = new ArrayList<>();
-		for (String file : new String[]{"/b03/run1-clue-reads-and-toggles.jsonl", "/b03/run2-start-with-core-off.jsonl"})
+		for (String file : new String[]{"/core-link/run1-clue-reads-and-toggles.jsonl", "/core-link/run2-start-with-core-off.jsonl"})
 		{
 			for (JsonObject event : events(file, "position"))
 			{
@@ -57,7 +57,7 @@ public class PositionRulesTest
 	{
 		List<String> wrong = new ArrayList<>();
 		int checked = 0;
-		for (String file : new String[]{"/b04/run1-swap-and-occult.jsonl", "/b04/run2-cape-altars-tyss-wild.jsonl"})
+		for (String file : new String[]{"/spellbook/run1-swap-and-occult.jsonl", "/spellbook/run2-cape-altars-tyss-wild.jsonl"})
 		{
 			for (JsonObject event : events(file, "wild"))
 			{

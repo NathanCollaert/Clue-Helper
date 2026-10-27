@@ -112,7 +112,7 @@ public class EdgeCaseRoutesTest
 		WorldWalk walk = new WorldWalk();
 		for (String name : List.of("2824_2896_0", "2848_2896_0", "2808_2904_0", "2848_2888_0"))
 		{
-			LoadedScene scene = scene(name);
+			LoadedScene scene = SceneFiles.resource(name).getScene();
 			Ground ground = Ground.world(map, scene, table, EdgeCaseRoutesTest::needsNoTool);
 			for (int x = 2880; x <= 2930; x += 2)
 			{
@@ -127,13 +127,13 @@ public class EdgeCaseRoutesTest
 		}
 		WorldPoint at = new WorldPoint(2509, 2954, 0);
 		WorldPoint caveEntrance = new WorldPoint(2500, 2988, 0);
-		List<WorldPoint> line = walk.path(Ground.world(map, scene("2488_2872_0"), table, row -> true), at, WalkGoal.tile(new WorldPoint(2581, 3030, 0)));
+		List<WorldPoint> line = walk.path(Ground.world(map, SceneFiles.resource("2488_2872_0").getScene(), table, row -> true), at, WalkGoal.tile(new WorldPoint(2581, 3030, 0)));
 		assertTrue("through the hole from " + at + ": " + line,
 			line.stream().anyMatch(tile -> tile.distanceTo2D(caveEntrance) <= AT_HOLE_TILES && tile.getPlane() == caveEntrance.getPlane()));
 
 		WorldPoint walkedOn = new WorldPoint(2162, 3093, 0);
 		WorldPoint tyrasClue = new WorldPoint(2209, 3161, 0);
-		List<WorldPoint> onward = walk.path(Ground.world(map, scene("2096_3016_0"), table, row -> true), walkedOn, WalkGoal.tile(tyrasClue));
+		List<WorldPoint> onward = walk.path(Ground.world(map, SceneFiles.resource("2096_3016_0").getScene(), table, row -> true), walkedOn, WalkGoal.tile(tyrasClue));
 		assertTrue("a line on from " + walkedOn + ": " + onward, !onward.isEmpty() && onward.get(onward.size() - 1).distanceTo2D(tyrasClue) <= 2);
 	}
 
@@ -141,14 +141,6 @@ public class EdgeCaseRoutesTest
 	{
 		int gate = table.rowGate(row);
 		return gate == 0 || table.getGates().get(gate - 1).getItems().isEmpty();
-	}
-
-	private static LoadedScene scene(String name) throws IOException
-	{
-		try (InputStream in = EdgeCaseRoutesTest.class.getResourceAsStream("/scenes/" + name + ".scene.gz"))
-		{
-			return SceneFiles.read(in).getScene();
-		}
 	}
 
 	@Test

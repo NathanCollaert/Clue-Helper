@@ -1,4 +1,4 @@
-# B18 run 20261021-124554: device lines, logins and clue reads. tick, event, tier, 3544, core count, core spots (when 5 or fewer), message
+# Run 20261021-124554: device lines, logins and clue reads. tick, event, tier, 3544, core count, core spots (when 5 or fewer), message
 0	login	beginner				
 7	read	beginner				
 19	feel	beginner	48090320	2	LUMBRIDGE_COW_FIELD,NORTHEAST_OF_AL_KHARID_MINE	The device is very cold, and the same temperature as last time.

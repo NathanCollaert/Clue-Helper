@@ -76,7 +76,7 @@ tasks.register('spellbookTimings', JavaExec) {
 	description = 'Print the spellbook-change trials of one probe events.jsonl: gradlew spellbookTimings -Plog=<relative path>'
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'com.cluehelper.dev.SpellbookTimingDump'
-	args project.findProperty('log') ?: 'src/test/resources/b04/run1-swap-and-occult.jsonl'
+	args project.findProperty('log') ?: 'src/test/resources/spellbook/run1-swap-and-occult.jsonl'
 }
 
 tasks.register('acceptTickChanges', JavaExec) {
