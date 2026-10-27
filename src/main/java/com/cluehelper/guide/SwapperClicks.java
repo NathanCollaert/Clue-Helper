@@ -30,9 +30,8 @@ public class SwapperClicks
 	@Inject
 	private ConfigManager configManager;
 
-	String object(ObjectComposition object)
+	String object(ObjectComposition shown)
 	{
-		ObjectComposition shown = object.getImpostorIds() != null && object.getImpostor() != null ? object.getImpostor() : object;
 		Integer value = swap("object_" + shown.getId());
 		if (value == null || value < 0)
 		{

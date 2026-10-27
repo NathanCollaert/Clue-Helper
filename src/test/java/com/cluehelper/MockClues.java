@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ final class MockClues
 	}
 
 	private final Client client;
+	private final Random dice = new Random();
 	private final Supplier<ClueScrollPlugin> core;
 	private final StepResolver resolver;
 	private final Consumer<String> shown;
@@ -134,6 +136,19 @@ final class MockClues
 	void mock(Mock mock, String where)
 	{
 		show(mock, where);
+	}
+
+	/** Client thread. A clue of a type drawn at random, so a small list comes up as often as a large one. */
+	void random()
+	{
+		List<List<Mock>> byType = new ArrayList<>(catalog().stream().collect(Collectors.groupingBy(mock -> mock.type)).values());
+		if (byType.isEmpty())
+		{
+			say("No clues in core's lists");
+			return;
+		}
+		List<Mock> ofType = byType.get(dice.nextInt(byType.size()));
+		show(ofType.get(dice.nextInt(ofType.size())), "random");
 	}
 
 	/** Client thread. */

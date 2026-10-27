@@ -205,9 +205,15 @@ public final class StepIndex
 			getGear().forEach(item -> names.add(item.getName()));
 			if (entry == null)
 			{
-				getRequires().stream().filter(Requires::isWear).forEach(need -> names.add(need.getName()));
+				wornRequires().forEach(need -> names.add(need.getName()));
 			}
 			return List.copyOf(names);
+		}
+
+		/** The requirements that are gear to wear. */
+		public List<Requires> wornRequires()
+		{
+			return getRequires().stream().filter(Requires::isWear).collect(Collectors.toList());
 		}
 
 		/** Hand data: worn gear the talk needs, picked from what the player owns. */

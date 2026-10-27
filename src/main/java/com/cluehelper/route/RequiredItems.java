@@ -32,13 +32,12 @@ public class RequiredItems
 		String name;
 		ItemRequirement requirement;
 		boolean stepItem;
-		/** Core's *clue* bank tag lists it already, so our bank highlights leave it out. */
-		boolean inCoreTag;
 		/** The step can't be done without it (an emote's items, Charlie's item), so there is no route while it is missing. */
 		boolean blocksRoute;
 	}
 
 	@Value
+	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class Verdict
 	{
 		private static final Verdict MET = new Verdict(true, true, List.of(), List.of(), Map.of());
@@ -51,15 +50,6 @@ public class RequiredItems
 		List<Need> missing;
 		/** For a missing need with another way to it: the parts of that way also missing. */
 		Map<Need, List<String>> missingParts;
-
-		private Verdict(boolean carried, boolean banked, List<ItemUse> withdraw, List<Need> missing, Map<Need, List<String>> missingParts)
-		{
-			this.carried = carried;
-			this.banked = banked;
-			this.withdraw = withdraw;
-			this.missing = missing;
-			this.missingParts = missingParts;
-		}
 
 		/** Not met even with the bank: these needs are owned nowhere. */
 		static Verdict missing(List<Need> missing, Map<Need, List<String>> missingParts)

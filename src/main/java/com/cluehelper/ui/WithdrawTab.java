@@ -94,7 +94,7 @@ public class WithdrawTab
 		{
 			return;
 		}
-		Set<Integer> wanted = config.withdrawTab() ? guide.getBankHighlightItems() : Set.of();
+		Set<Integer> wanted = config.withdrawTab() ? guide.getHighlights().getBankItems() : Set.of();
 		if (wanted.isEmpty())
 		{
 			close();

@@ -487,7 +487,8 @@ final class LabelSearch
 		}
 	}
 
-	private void transport(Label from, int node, int c, int k, int half, Leg.Kind kind, TransportOptions.Teleport tele, Object second)
+	private void transport(Label from, int node, int c, int k, int half, Leg.Kind kind, TransportOptions.Teleport tele,
+		TransportOptions.Edge second)
 	{
 		int t = 1;
 		if (onlyFirst != null && from.t == 0)
@@ -502,17 +503,10 @@ final class LabelSearch
 		}
 		int[] spent = spend(from.spent, tele.res, tele.amounts, from.b);
 		int[] withdrawn = sortedUnion(from.withdrawn, tele.withdraw);
-		if (second instanceof TransportOptions.Change)
+		if (second != null)
 		{
-			TransportOptions.Change swap = (TransportOptions.Change) second;
-			spent = spend(spent, swap.res, swap.amounts, from.b);
-			withdrawn = sortedUnion(withdrawn, swap.withdraw);
-		}
-		else if (second instanceof TransportOptions.Teleport)
-		{
-			TransportOptions.Teleport landing = (TransportOptions.Teleport) second;
-			spent = spend(spent, landing.res, landing.amounts, from.b);
-			withdrawn = sortedUnion(withdrawn, landing.withdraw);
+			spent = spend(spent, second.res, second.amounts, from.b);
+			withdrawn = sortedUnion(withdrawn, second.withdraw);
 		}
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
@@ -613,13 +607,13 @@ final class LabelSearch
 	 * state: it can do whatever the higher one goes on to do, and never needs the margin.
 	 */
 	private Label offer(Label from, int node, int b, int c, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
-		Object ref, Object ref2, int[] spent)
+		TransportOptions.Edge ref, TransportOptions.Edge ref2, int[] spent)
 	{
 		return offer(from, node, b, c, k, t, leg, addHalf, addRank, kind, ref, ref2, spent, from == null ? NOTHING : from.withdrawn);
 	}
 
 	private Label offer(Label from, int node, int b, int c, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
-		Object ref, Object ref2, int[] spent, int[] withdrawn)
+		TransportOptions.Edge ref, TransportOptions.Edge ref2, int[] spent, int[] withdrawn)
 	{
 		int half = (from == null ? 0 : from.half) + addHalf;
 		int rank = (from == null ? 0 : from.rank) + addRank;
@@ -859,8 +853,8 @@ final class LabelSearch
 		int[] withdrawn = NOTHING;
 		Label parent;
 		Leg.Kind kind;
-		Object ref;
-		Object ref2;
+		TransportOptions.Edge ref;
+		TransportOptions.Edge ref2;
 		int edgeHalf;
 		Book endBook;
 		boolean dead;
@@ -870,8 +864,7 @@ final class LabelSearch
 			RowAvailability.Confidence worst = RowAvailability.Confidence.SURE;
 			for (Label l = this; l != null; l = l.parent)
 			{
-				RowAvailability.Confidence c = l.ref instanceof TransportOptions.Teleport ? ((TransportOptions.Teleport) l.ref).confidence
-					: l.ref instanceof TransportOptions.Change ? ((TransportOptions.Change) l.ref).confidence : null;
+				RowAvailability.Confidence c = l.ref == null ? null : l.ref.confidence;
 				if (c != null && c.ordinal() > worst.ordinal())
 				{
 					worst = c;

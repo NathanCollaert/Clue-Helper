@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import java.util.*;
+import java.util.function.Predicate;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -19,26 +20,18 @@ final class SceneObjects
 	List<TileObject> banksNear(WorldPoint at, int radius)
 	{
 		List<TileObject> found = new ArrayList<>();
-		WorldView view = client.getTopLevelWorldView();
-		if (at == null || view == null || at.getPlane() != view.getPlane())
+		for (Tile tile : at == null ? List.<Tile>of() : tilesOnFloor())
 		{
-			return found;
-		}
-		Tile[][] plane = view.getScene().getTiles()[view.getPlane()];
-		for (Tile[] column : plane)
-		{
-			for (Tile tile : column)
+			WorldPoint where = tile.getWorldLocation();
+			if (where.getPlane() != at.getPlane() || where.distanceTo2D(at) > radius)
 			{
-				if (tile == null || tile.getWorldLocation().distanceTo2D(at) > radius)
+				continue;
+			}
+			for (GameObject object : tile.getGameObjects())
+			{
+				if (object != null && !found.contains(object) && banks(client.getObjectDefinition(object.getId())))
 				{
-					continue;
-				}
-				for (GameObject object : tile.getGameObjects())
-				{
-					if (object != null && !found.contains(object) && banks(client.getObjectDefinition(object.getId())))
-					{
-						found.add(object);
-					}
+					found.add(object);
 				}
 			}
 		}
@@ -53,35 +46,33 @@ final class SceneObjects
 	/** The NPCs within {@code radius} of {@code at} that have {@code option}. */
 	List<NPC> npcsNear(WorldPoint at, int radius, String option)
 	{
-		List<NPC> found = new ArrayList<>();
-		WorldView view = client.getTopLevelWorldView();
-		if (at == null || view == null)
-		{
-			return found;
-		}
-		for (NPC npc : view.npcs())
-		{
-			NPCComposition composition = npc.getTransformedComposition();
-			if (composition != null && hasAction(composition.getActions(), option) && npc.getWorldLocation().distanceTo2D(at) <= radius)
-			{
-				found.add(npc);
-			}
-		}
-		return found;
+		return at == null ? List.of() : npcs(npc -> offers(npc, option) && npc.getWorldLocation().distanceTo2D(at) <= radius);
 	}
 
 	/** By the names menus show, normalised. */
 	List<NPC> npcsNamed(Set<String> names)
 	{
+		return npcs(npc -> npc.getName() != null && names.contains(MenuLabels.normalise(npc.getName())));
+	}
+
+	List<NPC> npcs(Set<Integer> ids)
+	{
+		return npcs(npc -> ids.contains(npc.getId())
+			|| npc.getTransformedComposition() != null && ids.contains(npc.getTransformedComposition().getId()));
+	}
+
+	/** The loaded NPCs that {@code wanted} accepts. */
+	List<NPC> npcs(Predicate<NPC> wanted)
+	{
 		List<NPC> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
-		if (names.isEmpty() || view == null)
+		if (view == null)
 		{
 			return found;
 		}
 		for (NPC npc : view.npcs())
 		{
-			if (npc.getName() != null && names.contains(MenuLabels.normalise(npc.getName())))
+			if (wanted.test(npc))
 			{
 				found.add(npc);
 			}
@@ -89,23 +80,10 @@ final class SceneObjects
 		return found;
 	}
 
-	List<NPC> npcs(Set<Integer> ids)
+	private static boolean offers(NPC npc, String option)
 	{
-		List<NPC> found = new ArrayList<>();
-		WorldView view = client.getTopLevelWorldView();
-		if (ids.isEmpty() || view == null)
-		{
-			return found;
-		}
-		for (NPC npc : view.npcs())
-		{
-			NPCComposition composition = npc.getTransformedComposition();
-			if (ids.contains(npc.getId()) || composition != null && ids.contains(composition.getId()))
-			{
-				found.add(npc);
-			}
-		}
-		return found;
+		NPCComposition composition = npc.getTransformedComposition();
+		return composition != null && Widgets.hasAction(composition.getActions(), option);
 	}
 
 	private static boolean banks(ObjectComposition composition)
@@ -114,30 +92,10 @@ final class SceneObjects
 		{
 			return false;
 		}
-		ObjectComposition shown = composition.getImpostorIds() != null ? composition.getImpostor() : composition;
-		if (shown == null)
-		{
-			return false;
-		}
+		ObjectComposition shown = LeftClicks.shownForm(composition);
 		boolean bankChest = shown.getName() != null && shown.getName().toLowerCase().startsWith("bank")
-			&& hasAction(shown.getActions(), USE);
-		return hasAction(shown.getActions(), BANK) || bankChest;
-	}
-
-	private static boolean hasAction(String[] actions, String wanted)
-	{
-		if (actions == null)
-		{
-			return false;
-		}
-		for (String action : actions)
-		{
-			if (wanted.equalsIgnoreCase(action))
-			{
-				return true;
-			}
-		}
-		return false;
+			&& Widgets.hasAction(shown.getActions(), USE);
+		return Widgets.hasAction(shown.getActions(), BANK) || bankChest;
 	}
 
 	/** A house entry lands on one floor and moves up the next tick, so every floor is searched. */
@@ -169,14 +127,14 @@ final class SceneObjects
 				}
 				for (GameObject object : tile.getGameObjects())
 				{
-					if (object != null && isOneOf(object, ids) && !found.contains(object))
+					if (object != null && isFormOf(object.getId(), ids) && !found.contains(object))
 					{
 						found.add(object);
 					}
 				}
 				for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getDecorativeObject(), tile.getGroundObject()})
 				{
-					if (object != null && isOneOf(object, ids))
+					if (object != null && isFormOf(object.getId(), ids))
 					{
 						found.add(object);
 					}
@@ -189,13 +147,50 @@ final class SceneObjects
 	 * By its own id, or any form it can show: a trapdoor (12266) shows as closed (12267) or open (12268), and stays the
 	 * step's while it is open.
 	 */
-	private boolean isOneOf(TileObject object, Set<Integer> ids)
+	boolean isFormOf(int objectId, Set<Integer> ids)
 	{
-		if (ids.contains(object.getId()))
+		if (ids.contains(objectId))
 		{
 			return true;
 		}
-		int[] forms = client.getObjectDefinition(object.getId()).getImpostorIds();
+		int[] forms = client.getObjectDefinition(objectId).getImpostorIds();
 		return forms != null && Arrays.stream(forms).anyMatch(ids::contains);
+	}
+
+	/** Every loaded tile on the player's floor with that item on the ground. */
+	List<WorldPoint> groundItemTiles(int itemId)
+	{
+		List<WorldPoint> found = new ArrayList<>();
+		for (Tile tile : tilesOnFloor())
+		{
+			List<TileItem> items = tile.getGroundItems();
+			if (items != null && items.stream().anyMatch(item -> item.getId() == itemId))
+			{
+				found.add(tile.getWorldLocation());
+			}
+		}
+		return List.copyOf(found);
+	}
+
+	/** The loaded tiles on the player's floor; none while no scene is loaded. */
+	private List<Tile> tilesOnFloor()
+	{
+		List<Tile> tiles = new ArrayList<>();
+		WorldView view = client.getTopLevelWorldView();
+		if (view == null)
+		{
+			return tiles;
+		}
+		for (Tile[] column : view.getScene().getTiles()[view.getPlane()])
+		{
+			for (Tile tile : column)
+			{
+				if (tile != null)
+				{
+					tiles.add(tile);
+				}
+			}
+		}
+		return tiles;
 	}
 }

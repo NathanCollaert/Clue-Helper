@@ -46,6 +46,9 @@ final class DevPanel extends PluginPanel
 		void walk(List<String> ids, int by);
 
 		void clear();
+
+		/** A clue of any type and tier. */
+		void random();
 	}
 
 	/** What the campaign section drives. */
@@ -179,6 +182,7 @@ final class DevPanel extends PluginPanel
 		column.add(row(new RowButton(new Action("Previous", () -> mocks.walk(lines(), -1))),
 			new RowButton(new Action("Next", () -> mocks.walk(lines(), 1))),
 			new RowButton(new Action("Clear", mocks::clear))));
+		column.add(row(new RowButton(new Action("Random clue", mocks::random))));
 		column.add(Box.createVerticalStrut(GAP));
 		current.setFont(FontManager.getRunescapeSmallFont());
 		current.setForeground(Color.WHITE);

@@ -28,7 +28,7 @@ public final class LeftClicks
 	private static final String WITHDRAW_OPTION = "Withdraw";
 	private static final Set<MenuAction> NPC_OPTIONS = EnumSet.of(MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION,
 		MenuAction.NPC_THIRD_OPTION, MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION);
-	private static final Set<MenuAction> OBJECT_OPTIONS = EnumSet.of(MenuAction.GAME_OBJECT_FIRST_OPTION,
+	static final Set<MenuAction> OBJECT_OPTIONS = EnumSet.of(MenuAction.GAME_OBJECT_FIRST_OPTION,
 		MenuAction.GAME_OBJECT_SECOND_OPTION, MenuAction.GAME_OBJECT_THIRD_OPTION, MenuAction.GAME_OBJECT_FOURTH_OPTION,
 		MenuAction.GAME_OBJECT_FIFTH_OPTION);
 	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
@@ -110,7 +110,7 @@ public final class LeftClicks
 			return known;
 		}
 		String swapped = swapperClicks.object(shown);
-		return swapped != null ? swapped : defaultClick(shown);
+		return swapped != null ? swapped : firstAction(shown.getActions());
 	}
 
 	/** An ornate jewellery box's left click becomes the place it just sent the player to. */
@@ -133,8 +133,7 @@ public final class LeftClicks
 	/** Whether its shown form lists the option at all: an open trapdoor no longer offers "Open". */
 	boolean offers(TileObject object, String option)
 	{
-		String[] actions = shown(object.getId()).getActions();
-		return actions != null && Arrays.stream(actions).anyMatch(option::equalsIgnoreCase);
+		return Widgets.hasAction(shown(object.getId()).getActions(), option);
 	}
 
 	/** A multiloc whose form shown now lacks the option: a Dorgesh-Kaan lamp that isn't broken for this player. */
@@ -190,16 +189,17 @@ public final class LeftClicks
 	 */
 	private ObjectComposition shown(int objectId)
 	{
-		ObjectComposition placed = client.getObjectDefinition(objectId);
-		ObjectComposition impostor = placed.getImpostorIds() == null ? null : placed.getImpostor();
-		return impostor != null ? impostor : placed;
+		return shownForm(client.getObjectDefinition(objectId));
 	}
 
-	/** The house settings put the jewellery box's and nexus' left-click destination on their varbit-picked form. */
-	private static String defaultClick(ObjectComposition object)
+	/**
+	 * The form a multiloc shows now, picked by the player's varbits (the house settings put the jewellery box's and
+	 * nexus' left-click destination on it); the definition itself when it has one form, or shows none.
+	 */
+	public static ObjectComposition shownForm(ObjectComposition placed)
 	{
-		ObjectComposition shown = object.getImpostorIds() != null ? object.getImpostor() : object;
-		return shown == null ? null : firstAction(shown.getActions());
+		ObjectComposition impostor = placed.getImpostorIds() == null ? null : placed.getImpostor();
+		return impostor != null ? impostor : placed;
 	}
 
 	private static String firstAction(String[] actions)

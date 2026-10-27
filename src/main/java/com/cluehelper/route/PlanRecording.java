@@ -89,14 +89,7 @@ public final class PlanRecording
 	/** A need as the owned items that count for it: its "all of" sets are kept as "any of". */
 	private static List<RecordedNeed> needs(PlanInput input)
 	{
-		Set<Integer> owned = new HashSet<>(input.getPlayer().getInventory().keySet());
-		owned.addAll(input.getPlayer().getWorn().keySet());
-		PlayerSnapshot banked = input.getBanked();
-		if (banked != null)
-		{
-			owned.addAll(banked.getBank().keySet());
-			owned.addAll(banked.getGroupStorage().keySet());
-		}
+		Set<Integer> owned = StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked());
 		List<RecordedNeed> needs = new ArrayList<>();
 		for (RequiredItems.Need need : input.getRequired().getNeeds())
 		{
@@ -138,7 +131,6 @@ public final class PlanRecording
 	{
 		private String name;
 		private boolean stepItem;
-		private boolean inCoreTag;
 		private boolean blocksRoute;
 		private List<Integer> ids;
 		/** Gear needs only: the bonus total and each owned piece. */
@@ -154,7 +146,6 @@ public final class PlanRecording
 			RecordedNeed recorded = new RecordedNeed();
 			recorded.name = need.getName();
 			recorded.stepItem = need.isStepItem();
-			recorded.inCoreTag = need.isInCoreTag();
 			recorded.blocksRoute = need.isBlocksRoute();
 			recorded.ids = owned.stream().filter(need.getRequirement()::fulfilledBy).sorted().collect(Collectors.toList());
 			if (need.getRequirement() instanceof GearRequirement)

@@ -7,7 +7,7 @@ import lombok.*;
 /** What the overlays mark for the current sub-step, as one value: {@link #NONE} marks nothing. */
 @Value
 @Builder(toBuilder = true)
-class Highlights
+public class Highlights
 {
 	static final Highlights NONE = Highlights.builder().build();
 

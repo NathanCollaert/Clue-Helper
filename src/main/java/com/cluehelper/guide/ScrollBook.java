@@ -169,25 +169,25 @@ public final class ScrollBook
 	private static SubStep takeOut(CatalogRow row)
 	{
 		String scroll = BookScrolls.scrollName(row);
-		return SubStep.builder().kind(SubStep.Kind.ACT).text("Open the master scroll book: take out a " + scroll)
+		return SubStep.of(SubStep.Kind.ACT, "Open the master scroll book: take out a " + scroll)
 			.detail("With the bank closed").row(row).actItemNamed(BOOK_NAME).actOption(OPEN_OPTION)
 			.carriedWhenDone(scroll.toLowerCase()).done(SubStep.Done.ITEM_CARRIED).build();
 	}
 
 	private static SubStep bankAgain(WorldPoint bank)
 	{
-		return SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank").detail("To deposit the master scroll book")
+		return SubStep.of(SubStep.Kind.BANK, "Open the bank").detail("To deposit the master scroll book")
 			.waypoint(bank).build();
 	}
 
 	private static SubStep deposit()
 	{
-		return SubStep.builder().kind(SubStep.Kind.ACT).text("Deposit the master scroll book").detail("It stays out of the Wilderness")
+		return SubStep.of(SubStep.Kind.ACT, "Deposit the master scroll book").detail("It stays out of the Wilderness")
 			.actItemNamed(BOOK_NAME).done(SubStep.Done.ITEM_GONE).build();
 	}
 
 	private static SubStep closeBank()
 	{
-		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text("Close the bank").build();
+		return SubStep.of(SubStep.Kind.WITHDRAW, "Close the bank").build();
 	}
 }

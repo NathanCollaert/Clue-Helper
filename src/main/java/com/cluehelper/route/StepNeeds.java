@@ -25,10 +25,6 @@ public class StepNeeds
 		13138, 13139, 13140, 20720, 29777, 13280, 13342, 26824, 26826, 26828, 26830, 26832, 26834, 26836, 26838, 26840, 26842,
 		26844, 26846, 26848, 30363};
 	private static final ItemRequirement LIGHT = light();
-	/** Core's *clue* bank tag holds a plain spade for these types, and every emote and skill-challenge item. */
-	private static final Set<String> SPADE_IN_CORE_TAG = Set.of(ClueTypes.COORDINATE, ClueTypes.HOT_COLD, ClueTypes.FAIRY_RING,
-		ClueTypes.MAP, ClueTypes.BEGINNER_MAP);
-	private static final Set<String> ITEMS_IN_CORE_TAG = Set.of(ClueTypes.EMOTE, ClueTypes.SKILL);
 	private static final int LIT = 1;
 
 	private final Client client;
@@ -68,25 +64,23 @@ public class StepNeeds
 		List<RequiredItems.Need> needs = new ArrayList<>();
 		if (requirements.getSpade() == SpadeNeed.SPADE)
 		{
-			needs.add(new RequiredItems.Need("spade", SPADE, false, SPADE_IN_CORE_TAG.contains(step.getType()), false));
+			needs.add(new RequiredItems.Need("spade", SPADE, false, false));
 		}
 		if (requirements.needsLight() && !firePitLit(requirements))
 		{
-			needs.add(new RequiredItems.Need("light source", LIGHT, false, false, false));
+			needs.add(new RequiredItems.Need("light source", LIGHT, false, false));
 		}
-		boolean inCoreTag = ITEMS_IN_CORE_TAG.contains(step.getType());
 		for (ItemRequirement item : requirements.getItems())
 		{
 			boolean optional = isOptional(item.getCollectiveName(client), step.getData());
 			if (!EmptySlots.metByEmptySlots(item) && !optional)
 			{
-				ItemRequirement need = withAlternatives(item, step.getData());
-				needs.add(new RequiredItems.Need(item.getCollectiveName(client), need, true, inCoreTag && need == item, true));
+				needs.add(new RequiredItems.Need(item.getCollectiveName(client), withAlternatives(item, step.getData()), true, true));
 			}
 		}
 		for (ItemRequirement item : requirements.getOwnItems())
 		{
-			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, false, true));
+			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, true));
 		}
 		boolean gettingLeft = isGettingLeft(step);
 		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
@@ -94,19 +88,19 @@ public class StepNeeds
 			// An item the route still goes to get (the battered key from its bookcase) isn't brought along
 			if (!(gettingLeft && way.getFrom() != null))
 			{
-				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false, false));
+				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
 			}
 		}
 		ItemRequirement key = ownedKey(step);
 		if (key != null)
 		{
-			needs.add(new RequiredItems.Need(key.getCollectiveName(client), key, false, false, false));
+			needs.add(new RequiredItems.Need(key.getCollectiveName(client), key, false, false));
 		}
 		Set<Integer> owned = step.getData().getGear().isEmpty() ? Set.of() : ownedItemIds.get();
 		for (StepIndex.Gear gear : step.getData().getGear())
 		{
 			GearRequirement worn = new GearRequirement(gear.getName(), gear.getAtLeast(), gearPieces.apply(gear.getBonus(), owned));
-			needs.add(new RequiredItems.Need(gear.getName(), worn, false, false, false));
+			needs.add(new RequiredItems.Need(gear.getName(), worn, false, false));
 		}
 		return RequiredItems.builder()
 			.needs(List.copyOf(needs))

@@ -1,11 +1,12 @@
 package com.cluehelper.route;
 
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** The loaded scene's collision flags as captured, and the closed doors on it a walk may open at a cost. */
 @Value
+@AllArgsConstructor
 public class LoadedScene
 {
 	private static final int FULL = CollisionDataFlag.BLOCK_MOVEMENT_FULL;
@@ -38,16 +39,6 @@ public class LoadedScene
 		this(baseX, baseY, sizeX, sizeY, flags, null);
 	}
 
-	public LoadedScene(int baseX, int baseY, int sizeX, int sizeY, int[][][] flags, int[][][] doorSides)
-	{
-		this.baseX = baseX;
-		this.baseY = baseY;
-		this.sizeX = sizeX;
-		this.sizeY = sizeY;
-		this.flags = flags;
-		this.doorSides = doorSides;
-	}
-
 	/** Client thread only. Null for an instanced scene or one without collision data. */
 	public static LoadedScene capture(WorldView view)
 	{
@@ -65,17 +56,27 @@ public class LoadedScene
 		int[][][] flags = new int[maps.length][][];
 		for (int plane = 0; plane < maps.length; plane++)
 		{
-			if (maps[plane] != null)
+			flags[plane] = maps[plane] == null ? null : maps[plane].getFlags();
+		}
+		return new LoadedScene(view.getBaseX(), view.getBaseY(), view.getSizeX(), view.getSizeY(), copy(flags));
+	}
+
+	/** A deep copy of [plane][x][y] flags; a null plane stays null. */
+	static int[][][] copy(int[][][] flags)
+	{
+		int[][][] copy = new int[flags.length][][];
+		for (int plane = 0; plane < flags.length; plane++)
+		{
+			if (flags[plane] != null)
 			{
-				int[][] source = maps[plane].getFlags();
-				flags[plane] = new int[source.length][];
-				for (int x = 0; x < source.length; x++)
+				copy[plane] = new int[flags[plane].length][];
+				for (int x = 0; x < flags[plane].length; x++)
 				{
-					flags[plane][x] = source[x].clone();
+					copy[plane][x] = flags[plane][x].clone();
 				}
 			}
 		}
-		return new LoadedScene(view.getBaseX(), view.getBaseY(), view.getSizeX(), view.getSizeY(), flags);
+		return copy;
 	}
 
 	/** The client blocks the scene's first row and last five. */

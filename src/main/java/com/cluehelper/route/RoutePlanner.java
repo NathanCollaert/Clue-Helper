@@ -66,10 +66,7 @@ public class RoutePlanner
 	private long lastSceneBase = NO_SCENE;
 	@Getter
 	private volatile PlanStart start;
-	@Getter
 	private volatile int nearestNode = WalkTable.NO_NODE;
-	@Getter
-	private volatile long lastWalkNanos;
 	private int targetWalkBucket = NO_TARGET_NEAR;
 	private Trigger lastTrigger;
 	@Getter
@@ -194,21 +191,17 @@ public class RoutePlanner
 		{
 			return;
 		}
-		PlannerSettings settings = PlannerSettings.from(config, snapshot.getAccountType());
 		AvailabilitySet carried = availability.getCarried();
-		PlayerSnapshot banked = availability.getBankedSnapshot();
 		RequiredItems required = stepNeeds.of(step);
-		boolean atOpenBank = bankMemory.isBankOpen();
-		boolean foreignHouse = poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
 		Trigger trigger = new Trigger(step, snapshot.getVersion(), carried.getSnapshotVersion(), carried.getValidUntilMinute(),
-			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), settings, Set.copyOf(refusedChanges),
-			bankMemory.getVersion(), atOpenBank, required, foreignHouse);
+			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), PlannerSettings.from(config, snapshot.getAccountType()),
+			Set.copyOf(refusedChanges), bankMemory.getVersion(), bankMemory.isBankOpen(), required, isForeignHouse());
 		if (trigger.equals(lastTrigger))
 		{
 			return;
 		}
 		lastTrigger = trigger;
-		PlanInput input = input(step, snapshot, runes, data, loadedCatalog, settings, banked, required, atOpenBank, foreignHouse);
+		PlanInput input = input(step, snapshot, runes, data, loadedCatalog, required);
 		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
 		runner.submit(() -> Planner.withoutAlternatives(followingInput), planned -> onPlanned(planned, followingInput));
 	}
@@ -227,10 +220,7 @@ public class RoutePlanner
 		{
 			return null;
 		}
-		snapshot = withRefusals(snapshot);
-		boolean foreignHouse = poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
-		return input(step, snapshot, runes, data, loadedCatalog, PlannerSettings.from(config, snapshot.getAccountType()),
-			availability.getBankedSnapshot(), required, bankMemory.isBankOpen(), foreignHouse);
+		return input(step, withRefusals(snapshot), runes, data, loadedCatalog, required);
 	}
 
 	/** Loaded walk data; null until it is. */
@@ -247,14 +237,15 @@ public class RoutePlanner
 	}
 
 	private PlanInput input(Step step, PlayerSnapshot snapshot, RuneModel runes, WalkData.Loaded data, Catalog loadedCatalog,
-		PlannerSettings settings, PlayerSnapshot banked, RequiredItems required, boolean atOpenBank, boolean foreignHouse)
+		RequiredItems required)
 	{
+		PlayerSnapshot banked = availability.getBankedSnapshot();
 		return PlanInput.builder()
 			.step(step)
 			.player(snapshot)
 			.banked(banked == null ? null : withRefusals(banked))
 			.pinPending(bankMemory.isPinPending())
-			.atOpenBank(atOpenBank)
+			.atOpenBank(bankMemory.isBankOpen())
 			.required(required)
 			.engine(new AvailabilityEngine(runes, id -> "item " + id))
 			.nowMinutes(AvailabilityService.nowMinutes())
@@ -262,11 +253,16 @@ public class RoutePlanner
 			.table(data.getTable())
 			.noTeleport(data.getNoTeleport())
 			.start(start)
-			.settings(settings)
+			.settings(PlannerSettings.from(config, snapshot.getAccountType()))
 			.revertTicksLeft(revertTicksLeft())
 			.refusedChanges(Set.copyOf(refusedChanges))
-			.foreignHouseStart(foreignHouse)
+			.foreignHouseStart(isForeignHouse())
 			.build();
+	}
+
+	private boolean isForeignHouse()
+	{
+		return poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
 	}
 
 	/** Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says. */
@@ -353,15 +349,7 @@ public class RoutePlanner
 		Ground ground = Ground.world(data.getMap(), scene, table, openRows());
 		WorldPoint tile = position.getTile();
 		List<WorldPoint> targets = step.getTargets();
-		startRunner.submit(() -> timedWalk(ground, tile), walk -> walked(table, tile, targets, walk));
-	}
-
-	private WalkCosts timedWalk(Ground ground, WorldPoint tile)
-	{
-		long started = System.nanoTime();
-		WalkCosts walk = WalkCosts.from(ground, tile);
-		lastWalkNanos = System.nanoTime() - started;
-		return walk;
+		startRunner.submit(() -> WalkCosts.from(ground, tile), walk -> walked(table, tile, targets, walk));
 	}
 
 	/** Client thread: the walk from the player's tile is in, and the plan goes ahead now rather than a tick later. */

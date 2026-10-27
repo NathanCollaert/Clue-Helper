@@ -140,8 +140,8 @@ public final class PlanReplay
 			plan = Planner.withoutAlternatives(input);
 			best = Math.min(best, System.nanoTime() - started);
 		}
-		System.out.printf("%s: live %d ms %d labels | replay %d ms %d labels, %d searches | %s%n", name, recording.getLiveMillis(),
-			recording.getLiveLabels(), best / NANOS_PER_MILLI, plan.getLabels(), plan.getSearches(),
+		System.out.printf("%s: live %d ms %d labels | replay %d ms %d labels | %s%n", name, recording.getLiveMillis(),
+			recording.getLiveLabels(), best / NANOS_PER_MILLI, plan.getLabels(),
 			plan.getBest() == null ? "no route" : plan.getBest().describe());
 	}
 
@@ -163,7 +163,7 @@ public final class PlanReplay
 	private static RequiredItems required(PlanRecording recording)
 	{
 		List<RequiredItems.Need> needs = recording.getNeeds().stream()
-			.map(need -> new RequiredItems.Need(need.getName(), requirement(need), need.isStepItem(), need.isInCoreTag(), need.isBlocksRoute()))
+			.map(need -> new RequiredItems.Need(need.getName(), requirement(need), need.isStepItem(), need.isBlocksRoute()))
 			.collect(Collectors.toList());
 		return RequiredItems.builder().needs(needs).stash(StashMemory.State.valueOf(recording.getStash())).build();
 	}

@@ -45,17 +45,17 @@ final class Acts
 	{
 		if (step.getWaypointAct() != null)
 		{
-			return SubStep.builder().kind(SubStep.Kind.ACT).text(step.getWaypointAct())
+			return SubStep.of(SubStep.Kind.ACT, step.getWaypointAct())
 				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
 				.actItems(step.getActItems()).build();
 		}
 		if (step.isKeyFromNpc())
 		{
 			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
-			return SubStep.builder().kind(SubStep.Kind.ACT).text("Search " + what + " with the key")
+			return SubStep.of(SubStep.Kind.ACT, "Search " + what + " with the key")
 				.detail("The key comes from " + step.getNpcs().get(0)).build();
 		}
-		SubStep.SubStepBuilder act = SubStep.builder().kind(SubStep.Kind.ACT).text(actText(step));
+		SubStep.SubStepBuilder act = SubStep.of(SubStep.Kind.ACT, actText(step));
 		String npc = talkedTo(step);
 		if (npc != null)
 		{
@@ -170,13 +170,12 @@ final class Acts
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		if (stash != null && spot != null)
 		{
-			acts.add(SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue")
-				.goal(spot).radius(SubSteps.ARRIVE_TILES).build());
+			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES));
 		}
 		String emotes = step.getEmotes().isEmpty() ? "the emote" : String.join(", then ", step.getEmotes());
-		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
+		acts.add(SubStep.of(SubStep.Kind.ACT, "Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
 			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
-		acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to Uri").detail(items ? "Stay equipped" : null)
+		acts.add(SubStep.of(SubStep.Kind.ACT, "Talk to Uri").detail(items ? "Stay equipped" : null)
 			.option(TALK_OPTION).npcIds(URI_IDS).build());
 		return List.copyOf(acts);
 	}
@@ -184,7 +183,7 @@ final class Acts
 	/** Take the items out of the STASH unit and put them on. */
 	static List<SubStep> fromStash(Step step)
 	{
-		SubStep take = SubStep.builder().kind(SubStep.Kind.ACT).text("Search the STASH unit: take the items")
+		SubStep take = SubStep.of(SubStep.Kind.ACT, "Search the STASH unit: take the items")
 			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
 		return items ? List.of(take, equip()) : List.of(take);
@@ -192,7 +191,7 @@ final class Acts
 
 	private static SubStep equip()
 	{
-		return SubStep.builder().kind(SubStep.Kind.ACT).text("Equip the items").detail("The Clue Scroll plugin lists them")
+		return SubStep.of(SubStep.Kind.ACT, "Equip the items").detail("The Clue Scroll plugin lists them")
 			.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
@@ -214,14 +213,20 @@ final class Acts
 	private static List<SubStep> talkThenChallenge(Step step, StepIndex.Challenge challenge)
 	{
 		String npc = step.getNpcs().get(0);
-		SubStep talk = talkTo(SubStep.builder().kind(SubStep.Kind.ACT).text("Talk to " + npc).detail(withFloor(step, null))
+		SubStep talk = talkTo(SubStep.of(SubStep.Kind.ACT, "Talk to " + npc).detail(withFloor(step, null))
 			.done(SubStep.Done.CHALLENGE_ITEM), npc).build();
 		if (challenge.getBox() != null)
 		{
 			String box = challenge.getBox().toLowerCase().contains("light") ? "light box" : "puzzle box";
-			return List.of(talk, act("Open the " + box + ", then talk to " + npc + " again", null).toBuilder().actItemNamed(box).build());
+			return List.of(talk, openBoxThenTalk(SubStep.builder().kind(SubStep.Kind.ACT), box, npc));
 		}
 		return List.of(talk, talkTo(act("Talk to " + npc + " again: answer the challenge", null).toBuilder(), npc).build());
+	}
+
+	/** The box the talk handed over is opened (core solves it), then the NPC is talked to again; {@code act} is the talk, or a new act. */
+	static SubStep openBoxThenTalk(SubStep.SubStepBuilder act, String box, String npc)
+	{
+		return act.text("Open the " + box + ", then talk to " + npc + " again").actItemNamed(box).build();
 	}
 
 	private static SubStep.SubStepBuilder talkTo(SubStep.SubStepBuilder act, String npc)
@@ -231,7 +236,7 @@ final class Acts
 
 	private static SubStep act(String text, String detail)
 	{
-		return SubStep.builder().kind(SubStep.Kind.ACT).text(text).detail(detail).build();
+		return SubStep.of(SubStep.Kind.ACT, text).detail(detail).build();
 	}
 
 	private static boolean isDig(Step step)

@@ -2,10 +2,11 @@ package com.cluehelper.route;
 
 import com.cluehelper.player.Book;
 import com.cluehelper.transport.*;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Leg
 {
 	public enum Kind
@@ -29,19 +30,6 @@ public class Leg
 	SpellbookChange change;
 	/** For a pending Spellbook Swap, the temporary book. */
 	Book bookAfter;
-
-	private Leg(Kind kind, WorldPoint from, WorldPoint to, int halfTicks, CatalogRow row, CatalogRow landing, SpellbookChange change,
-		Book bookAfter)
-	{
-		this.kind = kind;
-		this.from = from;
-		this.to = to;
-		this.halfTicks = halfTicks;
-		this.row = row;
-		this.landing = landing;
-		this.change = change;
-		this.bookAfter = bookAfter;
-	}
 
 	public static Leg walk(WorldPoint from, WorldPoint to, int halfTicks, Book book)
 	{

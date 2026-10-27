@@ -83,7 +83,7 @@ public final class SceneDoors
 			return null;
 		}
 		Tile[][][] tiles = view.getScene().getTiles();
-		int[][][] flags = copyOf(scene.getFlags());
+		int[][][] flags = LoadedScene.copy(scene.getFlags());
 		int[][][] doorSides = new int[flags.length][][];
 		for (int plane = 0; plane < Math.min(tiles.length, flags.length); plane++)
 		{
@@ -111,23 +111,6 @@ public final class SceneDoors
 			}
 		}
 		return new LoadedScene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides);
-	}
-
-	private static int[][][] copyOf(int[][][] flags)
-	{
-		int[][][] copy = new int[flags.length][][];
-		for (int plane = 0; plane < flags.length; plane++)
-		{
-			if (flags[plane] != null)
-			{
-				copy[plane] = new int[flags[plane].length][];
-				for (int x = 0; x < flags[plane].length; x++)
-				{
-					copy[plane][x] = flags[plane][x].clone();
-				}
-			}
-		}
-		return copy;
 	}
 
 	/** Client thread only. */

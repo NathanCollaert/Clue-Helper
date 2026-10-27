@@ -14,32 +14,30 @@ final class TransportOptions
 	/** The house scene loads about a tick after the transport's own landing. */
 	private static final int HOUSE_LOAD_HALF_TICKS = 2;
 
-	static final class Teleport
+	/** A teleport or a spellbook change as the search takes it: where it ends, what it costs and what it spends. */
+	static class Edge
 	{
-		CatalogRow row;
-		int node;
-		int halfTicks;
-		Book book;
-		int[] res;
-		int[] amounts;
-		int[] withdraw;
-		List<ItemUse> withdrawUses;
-		RowAvailability.Confidence confidence;
-		boolean minigame;
-		int maxWilderness;
-	}
-
-	static final class Change
-	{
-		SpellbookChange change;
 		int node = WalkTable.NO_NODE;
 		int halfTicks;
 		int[] res;
 		int[] amounts;
 		int[] withdraw;
 		List<ItemUse> withdrawUses;
-		boolean capeUse;
 		RowAvailability.Confidence confidence;
+	}
+
+	static final class Teleport extends Edge
+	{
+		CatalogRow row;
+		Book book;
+		boolean minigame;
+		int maxWilderness;
+	}
+
+	static final class Change extends Edge
+	{
+		SpellbookChange change;
+		boolean capeUse;
 	}
 
 	final List<Teleport> teleports = new ArrayList<>();
@@ -198,14 +196,9 @@ final class TransportOptions
 		tele.halfTicks = 2 * (row.getDuration() + row.getMenuTicks())
 			+ (tele.node != WalkTable.NO_NODE && tele.node == ctx.pohNode ? HOUSE_LOAD_HALF_TICKS : 0);
 		tele.book = row.getRequirements().getBook();
-		tele.confidence = judged.getConfidence();
 		tele.minigame = row.getCategory() == Category.MINIGAME;
 		tele.maxWilderness = row.getRequirements().getMaxWildernessLevel();
-		Spending spending = spending(row.getSpends(), judged.getWitness(), player, bankState);
-		tele.res = spending.res;
-		tele.amounts = spending.amounts;
-		tele.withdrawUses = withdrawUses(judged.getWitness());
-		tele.withdraw = ids(tele.withdrawUses);
+		spending(tele, row.getSpends(), judged, player, bankState);
 		return tele;
 	}
 
@@ -215,23 +208,13 @@ final class TransportOptions
 		c.change = change;
 		c.halfTicks = change.isTemporary() ? 2 * (SWAP_DURATION_TICKS + SWAP_MENU_TICKS) : 2 * (change.getDuration() + change.getMenuTicks());
 		c.capeUse = change.getSpends().stream().anyMatch(s -> s.getKind() == Spend.Kind.CAPE_USE);
-		c.confidence = judged.getConfidence();
-		Spending spending = spending(change.getSpends(), judged.getWitness(), player, bankState);
-		c.res = spending.res;
-		c.amounts = spending.amounts;
-		c.withdrawUses = withdrawUses(judged.getWitness());
-		c.withdraw = ids(c.withdrawUses);
+		spending(c, change.getSpends(), judged, player, bankState);
 		return c;
 	}
 
-	private static final class Spending
+	private void spending(Edge edge, List<Spend> spends, RowAvailability judged, PlayerSnapshot player, int bankState)
 	{
-		int[] res;
-		int[] amounts;
-	}
-
-	private Spending spending(List<Spend> spends, List<ItemUse> witness, PlayerSnapshot player, int bankState)
-	{
+		List<ItemUse> witness = judged.getWitness();
 		Map<Integer, Integer> units = new LinkedHashMap<>();
 		for (Spend spend : spends)
 		{
@@ -269,10 +252,11 @@ final class TransportOptions
 			}
 		}
 		units.forEach(ctx.resources::used);
-		Spending s = new Spending();
-		s.res = units.keySet().stream().mapToInt(Integer::intValue).toArray();
-		s.amounts = units.values().stream().mapToInt(Integer::intValue).toArray();
-		return s;
+		edge.res = units.keySet().stream().mapToInt(Integer::intValue).toArray();
+		edge.amounts = units.values().stream().mapToInt(Integer::intValue).toArray();
+		edge.confidence = judged.getConfidence();
+		edge.withdrawUses = withdrawUses(witness);
+		edge.withdraw = ids(edge.withdrawUses);
 	}
 
 	private static int houseWalkHalfTicks(Requirements requirements, PlayerSnapshot player)
@@ -286,7 +270,8 @@ final class TransportOptions
 		return 2 * house.walkTicks(need.getKind() == HouseNeed.Kind.NEXUS ? HouseState.NEXUS_OBJECTS : need.getIds());
 	}
 
-	private static List<ItemUse> withdrawUses(List<ItemUse> witness)
+	/** The stored items a judged row's witness takes out of the bank. */
+	static List<ItemUse> withdrawUses(List<ItemUse> witness)
 	{
 		List<ItemUse> stored = new ArrayList<>();
 		for (ItemUse use : witness)
@@ -299,7 +284,8 @@ final class TransportOptions
 		return List.copyOf(stored);
 	}
 
-	private static int[] ids(List<ItemUse> uses)
+	/** The uses' item ids, sorted, each once. */
+	static int[] ids(List<ItemUse> uses)
 	{
 		return uses.stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
 	}

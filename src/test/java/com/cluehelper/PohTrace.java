@@ -72,7 +72,7 @@ final class PohTrace
 	@Subscribe(priority = -3)
 	public void onGameTick(GameTick tick)
 	{
-		MenuTarget target = guide.getMenuTarget();
+		MenuTarget target = guide.getHighlights().getMenuTarget();
 		String now = target == null || target.isEmpty() ? null : describe(target);
 		if (now != null && !now.equals(lastTarget))
 		{
@@ -87,9 +87,9 @@ final class PohTrace
 			{
 				logMinigameCards();
 			}
-			if (pendingInterface == InterfaceID.BOOKOFSCROLLS && guide.getHighlightMenuWidget() >= 0)
+			if (pendingInterface == InterfaceID.BOOKOFSCROLLS && guide.getHighlights().getMenuWidget() >= 0)
 			{
-				logScrollEntry(guide.getHighlightMenuWidget());
+				logScrollEntry(guide.getHighlights().getMenuWidget());
 			}
 			if (pendingInterface == NEXUS_GROUP)
 			{
@@ -133,7 +133,7 @@ final class PohTrace
 	@Subscribe(priority = -3)
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (TELEPORT_INTERFACES.contains(event.getGroupId()) && !guide.getMenuTarget().isEmpty() && !keypadOpen())
+		if (TELEPORT_INTERFACES.contains(event.getGroupId()) && !guide.getHighlights().getMenuTarget().isEmpty() && !keypadOpen())
 		{
 			pendingInterface = event.getGroupId();
 		}
@@ -147,7 +147,7 @@ final class PohTrace
 	@Subscribe(priority = -3)
 	public void onMenuOpened(MenuOpened event)
 	{
-		MenuTarget target = guide.getMenuTarget();
+		MenuTarget target = guide.getHighlights().getMenuTarget();
 		if (target.isEmpty() || keypadOpen())
 		{
 			return;
@@ -179,7 +179,7 @@ final class PohTrace
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		SubStep current = guide.getCurrent();
-		if (current == null || keypadOpen() || guide.getMenuTarget().isEmpty())
+		if (current == null || keypadOpen() || guide.getHighlights().getMenuTarget().isEmpty())
 		{
 			return;
 		}
@@ -279,7 +279,7 @@ final class PohTrace
 	{
 		return target.getLine() + " id=" + target.getLineId() + " key=" + target.getLineKey() + " name=" + target.getLineName()
 			+ " path=" + target.getPath() + " items=" + target.getItemIds() + " objects=" + target.getObjectIds()
-			+ " found=" + guide.getHighlightObjects().size() + " filled=" + guide.getFillItems() + "/" + guide.getFillObjects().size();
+			+ " found=" + guide.getHighlightObjects().size() + " filled=" + guide.getHighlights().getFillItems() + "/" + guide.getFillObjects().size();
 	}
 
 	private boolean keypadOpen()

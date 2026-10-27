@@ -275,6 +275,12 @@ public class ClueHelperDevPlugin extends Plugin
 			{
 				clientThread.invokeLater(mockClues::clear);
 			}
+
+			@Override
+			public void random()
+			{
+				clientThread.invokeLater(mockClues::random);
+			}
 		};
 		List<DevPanel.Action> tools = List.of(
 			new DevPanel.Action("Objects near the step", () -> clientThread.invokeLater(this::dumpObjectsNearStep)));
@@ -726,8 +732,8 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			return;
 		}
-		log.info("{} menu for '{}': option target {} | menu target {}", TAG, current.getText(), clueHelper.getGuide().getOptionTarget(),
-			clueHelper.getGuide().getMenuTarget());
+		log.info("{} menu for '{}': option target {} | menu target {}", TAG, current.getText(), clueHelper.getGuide().getHighlights().getOptionTarget(),
+			clueHelper.getGuide().getHighlights().getMenuTarget());
 		for (MenuEntry entry : event.getMenuEntries())
 		{
 			NPC npc = entry.getNpc();

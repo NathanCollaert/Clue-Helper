@@ -1,5 +1,6 @@
 package com.cluehelper.ui;
 
+import com.cluehelper.guide.LeftClicks;
 import com.cluehelper.route.*;
 import java.awt.Rectangle;
 import java.util.*;
@@ -135,9 +136,8 @@ final class PathObjects
 
 	private boolean hasOption(TileObject object, String option)
 	{
-		ObjectComposition placed = client.getObjectDefinition(object.getId());
-		ObjectComposition shown = placed.getImpostorIds() != null ? placed.getImpostor() : placed;
-		return shown != null && shown.getActions() != null && Arrays.asList(shown.getActions()).contains(option);
+		ObjectComposition shown = LeftClicks.shownForm(client.getObjectDefinition(object.getId()));
+		return shown.getActions() != null && Arrays.asList(shown.getActions()).contains(option);
 	}
 
 	private static int squaredDistance(TileObject object, WorldPoint origin)
@@ -242,9 +242,7 @@ final class PathObjects
 
 	private String nameOf(TileObject object)
 	{
-		ObjectComposition placed = client.getObjectDefinition(object.getId());
-		ObjectComposition shown = placed.getImpostorIds() != null ? placed.getImpostor() : placed;
-		return shown == null ? null : shown.getName();
+		return LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getName();
 	}
 
 	/** The one nearest the row's origin: a pipe's two ends share an id, and the one clicked is the near end. */
@@ -311,9 +309,7 @@ final class PathObjects
 		{
 			return true;
 		}
-		ObjectComposition placed = client.getObjectDefinition(object.getId());
-		ObjectComposition shown = placed.getImpostorIds() != null ? placed.getImpostor() : null;
-		return shown != null && shown.getId() == id;
+		return LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getId() == id;
 	}
 
 	private void addClosedDoor(Map<TileObject, String> objects, WorldView view, WorldPoint from, WorldPoint to)

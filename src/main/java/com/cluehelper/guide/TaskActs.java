@@ -48,11 +48,11 @@ final class TaskActs
 		{
 			return withCast(shown, cast, carried);
 		}
-		if (current.getStage().getOption() != null && makingNow(step, carried) == null)
+		StepIndex.Making making = makingNow(step, carried);
+		if (current.getStage().getOption() != null && making == null)
 		{
 			return shown;
 		}
-		StepIndex.Making making = makingNow(step, carried);
 		Set<Integer> items = making != null
 			? carried.stream().filter(id -> making.getItems().stream().anyMatch(group -> group.contains(id))).collect(Collectors.toUnmodifiableSet())
 			: carried.stream().filter(id -> step.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
@@ -143,22 +143,9 @@ final class TaskActs
 
 	private static Widget withText(Widget parent, String text)
 	{
-		if (parent.getText() != null && Text.removeTags(parent.getText()).equalsIgnoreCase(text))
-		{
-			return parent;
-		}
-		for (Widget[] children : new Widget[][]{parent.getStaticChildren(), parent.getDynamicChildren(), parent.getNestedChildren()})
-		{
-			for (Widget child : children == null ? new Widget[0] : children)
-			{
-				Widget found = child.isHidden() ? null : withText(child, text);
-				if (found != null)
-				{
-					return found;
-				}
-			}
-		}
-		return null;
+		return Widgets.descendants(parent).stream()
+			.filter(widget -> !widget.isHidden() && widget.getText() != null && Text.removeTags(widget.getText()).equalsIgnoreCase(text))
+			.findFirst().orElse(null);
 	}
 
 	/** The name of a step item only the carried huntsman's kit holds, or null. */

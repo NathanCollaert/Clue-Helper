@@ -65,7 +65,7 @@ final class BankTrace
 			SubStep now = guide.getCurrent();
 			if (now != null && now.getKind() == SubStep.Kind.WITHDRAW)
 			{
-				log("withdraw sub-step: " + now.getText() + " | outlined " + guide.getBankHighlightItems());
+				log("withdraw sub-step: " + now.getText() + " | outlined " + guide.getHighlights().getBankItems());
 				saveFrame.accept(new File(FRAMES, String.format("%03d-t%d.png", ++frames, client.getTickCount())));
 			}
 		}
@@ -84,7 +84,7 @@ final class BankTrace
 			bankOpenTick = client.getTickCount();
 			bankOpen = true;
 			shownTag = bankTags.getActiveTag();
-			log("bank open, tab '" + shownTag + "', withdraw items " + guide.getBankHighlightItems());
+			log("bank open, tab '" + shownTag + "', withdraw items " + guide.getHighlights().getBankItems());
 			saveFrame.accept(new File(FRAMES, String.format("%03d-t%d-open.png", ++frames, client.getTickCount())));
 		}
 	}
@@ -113,7 +113,7 @@ final class BankTrace
 		if (bankOpen && !Objects.equals(active, shownTag))
 		{
 			shownTag = active;
-			log("tab now '" + active + "', withdraw items " + guide.getBankHighlightItems());
+			log("tab now '" + active + "', withdraw items " + guide.getHighlights().getBankItems());
 			saveFrame.accept(new File(FRAMES, String.format("%03d-t%d-tab.png", ++frames, client.getTickCount())));
 		}
 	}
@@ -132,7 +132,7 @@ final class BankTrace
 	{
 		if (event.getScriptId() == ScriptID.BANKMAIN_INIT)
 		{
-			log("bank init done, tab '" + bankTags.getActiveTag() + "', withdraw items " + guide.getBankHighlightItems());
+			log("bank init done, tab '" + bankTags.getActiveTag() + "', withdraw items " + guide.getHighlights().getBankItems());
 		}
 	}
 

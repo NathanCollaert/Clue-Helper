@@ -42,7 +42,7 @@ public final class WalkGates
 			CatalogRow asRow = CatalogRow.builder().name("gate " + (g + 1)).requirements(gates.get(g)).build();
 			RowAvailability judged = engine.judge(asRow, player, nowMinutes);
 			gatePass[g + 1] = judged.isAvailable();
-			gateWithdraw[g + 1] = judged.isAvailable() ? storedIds(judged) : NOTHING;
+			gateWithdraw[g + 1] = judged.isAvailable() ? TransportOptions.ids(TransportOptions.withdrawUses(judged.getWitness())) : NOTHING;
 			if (judged.isAvailable() && isSlash(gates.get(g)))
 			{
 				slashWith(g + 1, judged, player);
@@ -154,12 +154,5 @@ public final class WalkGates
 			}
 		}
 		return -1;
-	}
-
-	private static int[] storedIds(RowAvailability judged)
-	{
-		return judged.getWitness().stream()
-			.filter(use -> use.getContainer().isStored())
-			.mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
 	}
 }

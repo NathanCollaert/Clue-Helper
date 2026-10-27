@@ -99,7 +99,7 @@ final class PlanContext
 		required = in.getRequired().toBuilder()
 			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(Collectors.toList()))
 			.build().judge(in.getPlayer(), bankedPlayer);
-		requiredWithdraw = required.getWithdraw().stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
+		requiredWithdraw = TransportOptions.ids(required.getWithdraw());
 		stageWithdraw = stageNeeds.values().stream().flatMap(verdict -> verdict.getWithdraw().stream()).mapToInt(ItemUse::getItemId)
 			.distinct().sorted().toArray();
 		expandBooks();
@@ -164,7 +164,7 @@ final class PlanContext
 			ItemRequirement[] groups = use.getAll().stream()
 				.map(ids -> ItemRequirements.any(use.getName(), ids.stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new)))
 				.toArray(ItemRequirement[]::new);
-			here.add(new RequiredItems.Need(use.getName(), ItemRequirements.all(use.getName(), groups), need.isStepItem(), false,
+			here.add(new RequiredItems.Need(use.getName(), ItemRequirements.all(use.getName(), groups), need.isStepItem(),
 				need.isBlocksRoute()));
 		}
 		return here;
@@ -199,8 +199,7 @@ final class PlanContext
 	int[] stageWithdraw(int node, int bankState)
 	{
 		RequiredItems.Verdict verdict = stageNeeds.get(node);
-		return verdict == null || verdict.isCarried() || bankState != BANKED ? new int[0]
-			: verdict.getWithdraw().stream().mapToInt(ItemUse::getItemId).distinct().sorted().toArray();
+		return verdict == null || verdict.isCarried() || bankState != BANKED ? new int[0] : TransportOptions.ids(verdict.getWithdraw());
 	}
 
 	/** Every stage's bank items, taken at the bank stop as a web's knife is. */
@@ -235,7 +234,7 @@ final class PlanContext
 
 	boolean isUsableBank(int node)
 	{
-		if (!isTableNode(node) || !table.is(node, WalkTable.KIND_BANK))
+		if (!isTableNode(node) || !table.isBank(node))
 		{
 			return false;
 		}

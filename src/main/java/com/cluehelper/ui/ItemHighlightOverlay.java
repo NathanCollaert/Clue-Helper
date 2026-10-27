@@ -32,12 +32,12 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem item)
 	{
 		boolean inBank = item.getWidget() != null && WidgetUtil.componentToInterface(item.getWidget().getId()) == InterfaceID.BANKMAIN;
-		if (!config.highlightItems() || !(inBank ? guide.getBankHighlightItems() : guide.getHighlightItems()).contains(itemId)
+		if (!config.highlightItems() || !(inBank ? guide.getHighlights().getBankItems() : guide.getHighlights().getItems()).contains(itemId)
 			|| !inBank && guide.isTravelling())
 		{
 			return;
 		}
-		boolean leftClick = inBank ? leftClicks.withdraws(itemId) : guide.getFillItems().contains(itemId);
+		boolean leftClick = inBank ? leftClicks.withdraws(itemId) : guide.getHighlights().getFillItems().contains(itemId);
 		highlighter.item(graphics, itemId, item.getQuantity(), item.getCanvasBounds(), leftClick);
 	}
 }

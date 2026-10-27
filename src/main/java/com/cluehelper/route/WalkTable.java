@@ -13,22 +13,11 @@ public final class WalkTable
 	public static final int NO_NODE = -1;
 	public static final int NO_PATH = -1;
 	static final String DIRECTORY = "walk/";
-
-	public static final int KIND_LANDING = 1;
-	public static final int KIND_ORIGIN = 1 << 1;
-	public static final int KIND_BANK = 1 << 2;
-	public static final int KIND_TARGET = 1 << 3;
-	private static final int KIND_POH = 1 << 4;
-	public static final int KIND_CHANGE = 1 << 5;
-	private static final int KIND_ENTRY = 1 << 6;
-	/** Where a far walk row lands: only start legs walk from it, nothing walks to it. */
-	private static final int KIND_EXIT = 1 << 7;
-	private static final Map<String, Integer> KIND_BITS = Map.of("landing", KIND_LANDING, "origin", KIND_ORIGIN,
-		"bank", KIND_BANK, "target", KIND_TARGET, "poh", KIND_POH, "change", KIND_CHANGE, "entry", KIND_ENTRY, "exit", KIND_EXIT);
+	private static final String KIND_BANK = "bank";
 
 	private WorldPoint[] tiles = new WorldPoint[0];
 	private WorldPoint[] placed = new WorldPoint[0];
-	private int[] kinds = new int[0];
+	private boolean[] bank = new boolean[0];
 	private final Map<WorldPoint, Integer> byTile = new HashMap<>();
 
 	private int[] entryStart = {0};
@@ -64,14 +53,14 @@ public final class WalkTable
 	public static WalkTable load() throws IOException
 	{
 		WalkTable table = new WalkTable();
-		table.readNodes(lines("nodes.tsv"));
-		table.readGates(lines("gates.tsv"));
-		table.readTable(new Varints(bytes("table.bin")));
-		table.readRows(new Varints(bytes("rows.bin")));
-		table.readBanks(lines("banks.tsv"));
-		table.exits = rowActions(lines("exits.tsv"));
+		table.readNodes(lines(DIRECTORY + "nodes.tsv"));
+		table.readGates(lines(DIRECTORY + "gates.tsv"));
+		table.readTable(new Varints(bytes(DIRECTORY + "table.bin")));
+		table.readRows(new Varints(bytes(DIRECTORY + "rows.bin")));
+		table.readBanks(lines(DIRECTORY + "banks.tsv"));
+		table.exits = rowActions(lines(DIRECTORY + "exits.tsv"));
 		table.markExitRows();
-		table.rowObjects = rowsByTiles(lines("row-objects.tsv"));
+		table.rowObjects = rowsByTiles(lines(DIRECTORY + "row-objects.tsv"));
 		table.rowObjectsAt = table.rowObjects.values().stream().flatMap(List::stream).collect(Collectors.groupingBy(
 			exit -> pack(exit.getOrigin()), Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
 		table.indexReverse();
@@ -94,9 +83,9 @@ public final class WalkTable
 		return placed[node];
 	}
 
-	public boolean is(int node, int kind)
+	public boolean isBank(int node)
 	{
-		return (kinds[node] & kind) != 0;
+		return bank[node];
 	}
 
 	public int node(WorldPoint tile)
@@ -370,16 +359,13 @@ public final class WalkTable
 		int count = rows.size();
 		tiles = new WorldPoint[count];
 		placed = new WorldPoint[count];
-		kinds = new int[count];
+		bank = new boolean[count];
 		for (String[] c : rows)
 		{
 			int id = Integer.parseInt(c[0]);
 			tiles[id] = new WorldPoint(Integer.parseInt(c[1]), Integer.parseInt(c[2]), Integer.parseInt(c[3]));
 			placed[id] = c[4].isEmpty() ? null : new WorldPoint(Integer.parseInt(c[4]), Integer.parseInt(c[5]), Integer.parseInt(c[6]));
-			for (String kind : c[7].split(","))
-			{
-				kinds[id] |= KIND_BITS.getOrDefault(kind, 0);
-			}
+			bank[id] = Arrays.asList(c[7].split(",")).contains(KIND_BANK);
 			byTile.putIfAbsent(tiles[id], id);
 		}
 	}
@@ -441,8 +427,8 @@ public final class WalkTable
 				gateSets[s][g] = in.next();
 			}
 		}
-		IntBuffer to = new IntBuffer(), full = new IntBuffer(), set = new IntBuffer(), open = new IntBuffer();
-		IntBuffer alternative = new IntBuffer(), alternativeSet = new IntBuffer();
+		IntList to = new IntList(), full = new IntList(), set = new IntList(), open = new IntList();
+		IntList alternative = new IntList(), alternativeSet = new IntList();
 		entryStart = new int[nodes + 1];
 		for (int node = 0; node < nodes; node++)
 		{
@@ -500,20 +486,21 @@ public final class WalkTable
 		return index < cells.length ? cells[index] : "";
 	}
 
-	private static InputStream open(String name) throws IOException
+	private static InputStream open(String resource) throws IOException
 	{
-		InputStream in = WalkTable.class.getResourceAsStream(DIRECTORY + name);
+		InputStream in = WalkTable.class.getResourceAsStream(resource);
 		if (in == null)
 		{
-			throw new IOException("missing resource " + DIRECTORY + name);
+			throw new IOException("missing resource " + resource);
 		}
 		return in;
 	}
 
-	private static List<String[]> lines(String name) throws IOException
+	/** The tab-separated rows of a resource of this package, after its header; blank and # lines left out. */
+	static List<String[]> lines(String resource) throws IOException
 	{
 		List<String[]> rows = new ArrayList<>();
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(open(name), StandardCharsets.UTF_8)))
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(open(resource), StandardCharsets.UTF_8)))
 		{
 			boolean header = true;
 			String line;
@@ -534,9 +521,9 @@ public final class WalkTable
 		return rows;
 	}
 
-	private static byte[] bytes(String name) throws IOException
+	private static byte[] bytes(String resource) throws IOException
 	{
-		try (InputStream in = open(name))
+		try (InputStream in = open(resource))
 		{
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			byte[] buffer = new byte[8192];
@@ -575,26 +562,6 @@ public final class WalkTable
 					return value;
 				}
 			}
-		}
-	}
-
-	private static final class IntBuffer
-	{
-		int[] data = new int[1024];
-		int size;
-
-		void add(int value)
-		{
-			if (size == data.length)
-			{
-				data = Arrays.copyOf(data, size * 2);
-			}
-			data[size++] = value;
-		}
-
-		int[] toArray()
-		{
-			return Arrays.copyOf(data, size);
 		}
 	}
 }

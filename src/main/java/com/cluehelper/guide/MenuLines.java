@@ -68,6 +68,8 @@ public class MenuLines
 	private QuetzalIcons quetzalIcons;
 	@Inject
 	private FairyDials fairyDials;
+	@Inject
+	private SceneObjects sceneObjects;
 	private final Map<String, int[]> listLines = new HashMap<>();
 	private String listTitle;
 	private final List<int[]> rawListLines = new ArrayList<>();
@@ -447,12 +449,12 @@ public class MenuLines
 			{
 				continue;
 			}
-			if (Widgets.hasAction(icon, MAP_TELEPORT) && MenuLabels.matches(icon.getName(), target.getLineName()))
+			if (Widgets.hasAction(icon.getActions(), MAP_TELEPORT) && MenuLabels.matches(icon.getName(), target.getLineName()))
 			{
 				out.add(icon);
 				return;
 			}
-			if (Widgets.hasAction(icon, MAP_REGION) && MenuLabels.matches(icon.getName(), target.getLineKey()))
+			if (Widgets.hasAction(icon.getActions(), MAP_REGION) && MenuLabels.matches(icon.getName(), target.getLineKey()))
 			{
 				region = icon;
 			}
@@ -713,11 +715,7 @@ public class MenuLines
 		{
 			return true;
 		}
-		MenuAction type = entry.getType();
-		boolean objectOption = type == MenuAction.GAME_OBJECT_FIRST_OPTION || type == MenuAction.GAME_OBJECT_SECOND_OPTION
-			|| type == MenuAction.GAME_OBJECT_THIRD_OPTION || type == MenuAction.GAME_OBJECT_FOURTH_OPTION
-			|| type == MenuAction.GAME_OBJECT_FIFTH_OPTION;
-		if (objectOption && isFormOf(entry, target.getObjectIds()))
+		if (LeftClicks.OBJECT_OPTIONS.contains(entry.getType()) && sceneObjects.isFormOf(entry.getIdentifier(), target.getObjectIds()))
 		{
 			return true;
 		}
@@ -725,20 +723,6 @@ public class MenuLines
 		return npc != null && (target.getNpcIds().contains(npc.getId())
 			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId())
 			|| npc.getName() != null && target.getNpcNames().contains(MenuLabels.normalise(npc.getName())));
-	}
-
-	/**
-	 * A multiloc's entry carries its own id (Doris' trapdoor, 12266); a target may name any form of it, shown now or
-	 * not (12267 closed, 12268 open).
-	 */
-	private boolean isFormOf(MenuEntry entry, Set<Integer> objectIds)
-	{
-		if (objectIds.contains(entry.getIdentifier()))
-		{
-			return true;
-		}
-		int[] forms = client.getObjectDefinition(entry.getIdentifier()).getImpostorIds();
-		return forms != null && Arrays.stream(forms).anyMatch(objectIds::contains);
 	}
 
 	/** Someone opened the exit's object already, so its first option goes on through it ("Go-down" on the trapdoor). */
@@ -749,9 +733,8 @@ public class MenuLines
 		{
 			return false;
 		}
-		ObjectComposition placed = client.getObjectDefinition(entry.getIdentifier());
-		ObjectComposition shown = placed.getImpostorIds() != null && placed.getImpostor() != null ? placed.getImpostor() : placed;
-		return shown.getActions() == null || Arrays.stream(shown.getActions()).noneMatch(OPEN_OPTION::equalsIgnoreCase);
+		ObjectComposition shown = LeftClicks.shownForm(client.getObjectDefinition(entry.getIdentifier()));
+		return !Widgets.hasAction(shown.getActions(), OPEN_OPTION);
 	}
 
 	private Widget child(int[] at)

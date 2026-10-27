@@ -1,7 +1,5 @@
 package com.cluehelper.route;
 
-import java.util.Arrays;
-
 /**
  * The cheapest walk from one tile over a {@link Ground}, tile by tile in {@link Directions} order: each step one tile,
  * a closed door a few more, a walk row its own cost. One search per instance; once run, read from any thread.
@@ -119,7 +117,7 @@ final class WalkSearch
 	/** The landings of the {@link Exit} rows reached, packed. */
 	int[] exitLandings()
 	{
-		return Arrays.copyOf(exitLandings.data, exitLandings.size);
+		return exitLandings.toArray();
 	}
 
 	/** The walk to {@code end}, packed tiles from the start on. */
@@ -233,20 +231,5 @@ final class WalkSearch
 	static int plane(int tile)
 	{
 		return tile >>> 28;
-	}
-
-	private static final class IntList
-	{
-		int[] data = new int[256];
-		int size;
-
-		void add(int value)
-		{
-			if (size == data.length)
-			{
-				data = Arrays.copyOf(data, size * 2);
-			}
-			data[size++] = value;
-		}
 	}
 }

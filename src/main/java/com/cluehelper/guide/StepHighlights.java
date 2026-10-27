@@ -146,14 +146,6 @@ final class StepHighlights
 		return !leftClicks.isLearned(object) && !NOT_FILLED_UNHOVERED.contains(object.getId());
 	}
 
-	/** Each worn item's "Remove", coloured in its menu; worn options name the item but carry no id. */
-	private MenuTarget removeTarget(Set<Integer> worn)
-	{
-		Set<String> names = worn.stream().map(id -> MenuLabels.normalise(client.getItemDefinition(id).getName()))
-			.collect(Collectors.toUnmodifiableSet());
-		return MenuTarget.builder().itemIds(worn).itemNames(names).path(List.of(REMOVE_OPTION)).build();
-	}
-
 	/** Deposited items are clicked in the deposit box, which shows the inventory and worn items itself. */
 	private static StepGuide.Tab actItemsTab(SubStep.Done done)
 	{
@@ -207,7 +199,7 @@ final class StepHighlights
 		{
 			boolean takesOff = current.getDone() == SubStep.Done.SLOTS_EMPTY;
 			shown.items(current.getActItems()).fillItems(actItemFill(current)).tab(actItemsTab(current.getDone()));
-			return (takesOff ? shown.menuTarget(removeTarget(current.getActItems())) : shown).build();
+			return (takesOff ? shown.menuTarget(rowTargets.items(current.getActItems(), REMOVE_OPTION)) : shown).build();
 		}
 		String planted = taskActs.plantedTreeLine(current, step);
 		if (planted != null)
@@ -230,7 +222,7 @@ final class StepHighlights
 	private static StepIndex.WayIn wayInOf(Step step, Exit exit)
 	{
 		StepIndex.WayIn way = step == null ? null : step.getData().getEntry();
-		return way != null && exit.getOrigin().equals(way.getTile()) && exit.getDestination().equals(way.getTo()) ? way : null;
+		return SubSteps.isWayIn(exit, way) ? way : null;
 	}
 
 	/** A conversation's chat options follow its option, so each menu's pick is coloured in turn. */

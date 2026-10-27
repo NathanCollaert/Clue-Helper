@@ -280,7 +280,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
-		menuLines.colourLines(guide.getMenuTarget(), guide.getHighlightMenuWidget(), config.highlightMenus());
+		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getMenuWidget(), config.highlightMenus());
 	}
 
 	/** Runs after Menu Entry Swapper's swaps, so the menu's top entry is the real left click. */
@@ -299,8 +299,8 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe(priority = -1)
 	public void onMenuOpened(MenuOpened event)
 	{
-		menuLines.colourMenu(guide.getMenuTarget(), config.highlightMenus());
-		menuLines.colourMenu(guide.getOptionTarget(), config.highlightMenus());
+		menuLines.colourMenu(guide.getHighlights().getMenuTarget(), config.highlightMenus());
+		menuLines.colourMenu(guide.getHighlights().getOptionTarget(), config.highlightMenus());
 		for (MenuTarget pathObject : waypointOverlay.pathObjectTargets())
 		{
 			menuLines.colourMenu(pathObject, config.highlightMenus());

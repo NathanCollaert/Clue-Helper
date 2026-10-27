@@ -42,25 +42,21 @@ public final class Planner
 		Step step = in.getStep();
 		if (step != null && step.getData().isHidden())
 		{
-			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-				.note("not guided: a Leagues step").build();
+			return Plan.builder().stepKey(step.getKey()).note("not guided: a Leagues step").build();
 		}
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
-			return Plan.builder().stepKey(step == null ? null : step.getKey()).alternatives(List.of()).candidates(List.of())
-				.probeTicks(Map.of()).note(step == null ? "no step" : ClueTypes.HOT_COLD.equals(step.getType())
-					? "choosing where to feel" : "no target tile for this step yet").build();
+			return Plan.builder().stepKey(step == null ? null : step.getKey()).note(step == null ? "no step"
+				: ClueTypes.HOT_COLD.equals(step.getType()) ? "choosing where to feel" : "no target tile for this step yet").build();
 		}
 		PlanContext ctx = new PlanContext(in);
 		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty())
 			|| ctx.required.getMissing().stream().anyMatch(RequiredItems.Need::isBlocksRoute))
 		{
-			return Plan.builder().stepKey(step.getKey()).alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-				.requirementNotes(requirementNotes(ctx)).build();
+			return Plan.builder().stepKey(step.getKey()).requirementNotes(requirementNotes(ctx)).build();
 		}
 		List<List<int[]>> orders = legOrders(ctx, step);
 		ctx.freezeNodes();
-		long contextNanos = System.nanoTime() - started;
 		int area = step.getKind() == TargetKind.AREA ? areaHalfTicks(step) : 0;
 		boolean probes = step.getKind() == TargetKind.PROBES;
 		Searches searches = new Searches(ctx, area, probes);
@@ -74,22 +70,20 @@ public final class Planner
 			if (throughWilderness.getBest() != null)
 			{
 				return throughWilderness.toBuilder().note("only reachable through the Wilderness")
-					.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels())
-					.searches(searches.count + throughWilderness.getSearches()).build();
+					.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels()).build();
 			}
 		}
 		plan.best(picks.best).direct(picks.direct != picks.best ? picks.direct : null)
 			.sameBook(picks.best != null && picks.best.isChanged() ? picks.sameBook : null)
 			.fasterUnqualified(picks.fasterUnqualified)
-			.candidates(picks.candidates);
+			.candidates(picks.candidates());
 		Map<WorldPoint, Integer> probeRanks = new LinkedHashMap<>();
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
 		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
 		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
 		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.onlyInWilderness ? "Wilderness target" : null);
 		plan.requirementNotes(requirementNotes(ctx));
-		return plan.searchNanos(System.nanoTime() - started).contextNanos(contextNanos).labels(searches.labels)
-			.searches(searches.count).build();
+		return plan.searchNanos(System.nanoTime() - started).labels(searches.labels).build();
 	}
 
 	/** Avoiding the Wilderness never hides the only way to a step outside it, such as the King Black Dragon's lair. */
@@ -307,16 +301,7 @@ public final class Planner
 		Map<WorldPoint, Integer> ticks = new LinkedHashMap<>();
 		search.probeBest.forEach((node, best) ->
 		{
-			Route[][] routes = new Route[2][LabelSearch.CATEGORIES];
-			for (int b = 0; b < 2; b++)
-			{
-				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
-				{
-					LabelSearch.Label arrival = best[b][c];
-					routes[b][c] = arrival == null ? null : RouteBuilder.build(ctx, arrival, arrival.rank);
-				}
-			}
-			Route pick = new Picks(routes).best;
+			Route pick = new Picks(Picks.routes(ctx, best)).best;
 			if (pick != null)
 			{
 				ticks.put(ctx.tile(node), pick.getTicks());
@@ -395,7 +380,6 @@ public final class Planner
 		final int area;
 		final boolean probes;
 		int labels;
-		int count;
 
 		Searches(PlanContext ctx, int area, boolean probes)
 		{
@@ -441,7 +425,6 @@ public final class Planner
 				LabelSearch search = new LabelSearch(ctx, order, area, first, rankLimit);
 				search.run();
 				labels += search.labels;
-				count++;
 				Route pick = new Picks(ctx, search).best;
 				if (pick != null && pick.getRankHalfTicks() < bestRank)
 				{
@@ -457,37 +440,26 @@ public final class Planner
 			LabelSearch search = new LabelSearch(ctx, order, probes, area, excluded, rankLimit);
 			search.run();
 			labels += search.labels;
-			count++;
 			return search;
 		}
 	}
 
 	static final class Picks
 	{
+		final Route[][] routes;
 		Route best;
 		Route direct;
 		Route sameBook;
 		Route fasterUnqualified;
-		List<Plan.Candidate> candidates = new ArrayList<>();
 
 		Picks(PlanContext ctx, LabelSearch search)
 		{
-			this(routes(ctx, search));
-			for (int b = 0; b < 2; b++)
-			{
-				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
-				{
-					LabelSearch.Label goal = search.goals[b][c];
-					if (goal != null)
-					{
-						candidates.add(new Plan.Candidate(category(b, c), RouteBuilder.build(ctx, goal, goal.rank)));
-					}
-				}
-			}
+			this(routes(ctx, search.goals));
 		}
 
 		Picks(Route[][] r)
 		{
+			routes = r;
 			Route plain = faster(r[0][LabelSearch.NONE], r[0][LabelSearch.CHANGED]);
 			Route bankOnly = faster(r[1][LabelSearch.NONE], r[1][LabelSearch.CHANGED]);
 			Route walkedOnly = r[0][LabelSearch.WALKED];
@@ -506,14 +478,31 @@ public final class Planner
 			fasterUnqualified = fastest != null && best != null && fastest.getRankHalfTicks() < best.getRankHalfTicks() ? fastest : null;
 		}
 
-		private static Route[][] routes(PlanContext ctx, LabelSearch search)
+		/** Every goal route, by bank state and change category. */
+		List<Plan.Candidate> candidates()
+		{
+			List<Plan.Candidate> candidates = new ArrayList<>();
+			for (int b = 0; b < 2; b++)
+			{
+				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
+				{
+					if (routes[b][c] != null)
+					{
+						candidates.add(new Plan.Candidate(category(b, c), routes[b][c]));
+					}
+				}
+			}
+			return candidates;
+		}
+
+		static Route[][] routes(PlanContext ctx, LabelSearch.Label[][] goals)
 		{
 			Route[][] routes = new Route[2][LabelSearch.CATEGORIES];
 			for (int b = 0; b < 2; b++)
 			{
 				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
 				{
-					LabelSearch.Label goal = search.goals[b][c];
+					LabelSearch.Label goal = goals[b][c];
 					routes[b][c] = goal == null ? null : RouteBuilder.build(ctx, goal, goal.rank);
 				}
 			}

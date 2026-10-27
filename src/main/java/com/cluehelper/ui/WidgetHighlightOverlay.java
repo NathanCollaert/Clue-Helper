@@ -60,24 +60,24 @@ public class WidgetHighlightOverlay extends Overlay
 	public Dimension render(Graphics2D graphics)
 	{
 		prayerFilters.rememberFor(clueLink.getCurrentStep());
-		if (menuLines.showing(guide.getMenuTarget()) || guide.isTravelling())
+		if (menuLines.showing(guide.getHighlights().getMenuTarget()) || guide.isTravelling())
 		{
 			return null;
 		}
 		if (config.highlightSpells())
 		{
-			outline(graphics, guide.getHighlightSpellWidget());
+			outline(graphics, guide.getHighlights().getSpellWidget());
 		}
 		guide.getHighlightChoice().forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 		if (config.highlightMenus())
 		{
-			outlineEntry(graphics, guide.getHighlightMenuWidget());
+			outlineEntry(graphics, guide.getHighlights().getMenuWidget());
 		}
 		if (config.highlightItems())
 		{
 			outlinePrayer(graphics);
 		}
-		StepGuide.Tab tab = guide.getHighlightTab();
+		StepGuide.Tab tab = guide.getHighlights().getTab();
 		boolean wanted = tab == StepGuide.Tab.MAGIC ? config.highlightSpells() : config.highlightItems();
 		if (tab != StepGuide.Tab.NONE && wanted && !shown(TAB_CONTENT.get(tab)))
 		{

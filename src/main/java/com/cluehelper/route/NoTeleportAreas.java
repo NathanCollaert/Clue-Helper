@@ -1,7 +1,6 @@
 package com.cluehelper.route;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -21,30 +20,10 @@ public final class NoTeleportAreas
 	public static NoTeleportAreas load() throws IOException
 	{
 		List<int[]> boxes = new ArrayList<>();
-		try (InputStream in = NoTeleportAreas.class.getResourceAsStream(RESOURCE))
+		for (String[] c : WalkTable.lines(RESOURCE))
 		{
-			if (in == null)
-			{
-				throw new IOException("missing resource " + RESOURCE);
-			}
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-			boolean header = true;
-			String line;
-			while ((line = reader.readLine()) != null)
-			{
-				if (line.isEmpty() || line.startsWith("#"))
-				{
-					continue;
-				}
-				if (header)
-				{
-					header = false;
-					continue;
-				}
-				String[] c = line.split("\t");
-				boxes.add(new int[]{Integer.parseInt(c[1]), Integer.parseInt(c[2]), Integer.parseInt(c[3]), Integer.parseInt(c[4]),
-					Integer.parseInt(c[5])});
-			}
+			boxes.add(new int[]{Integer.parseInt(c[1]), Integer.parseInt(c[2]), Integer.parseInt(c[3]), Integer.parseInt(c[4]),
+				Integer.parseInt(c[5])});
 		}
 		return new NoTeleportAreas(List.copyOf(boxes));
 	}

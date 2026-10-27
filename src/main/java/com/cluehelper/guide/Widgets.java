@@ -48,11 +48,16 @@ public final class Widgets
 		return descendants(widget).stream().anyMatch(Widgets::hasText);
 	}
 
-	static boolean hasAction(Widget widget, String action)
+	/** Whether a widget's, object's or NPC's actions list the option, ignoring case; never when they are null. */
+	static boolean hasAction(String[] actions, String option)
 	{
-		for (String a : widget.getActions())
+		if (actions == null)
 		{
-			if (action.equalsIgnoreCase(a))
+			return false;
+		}
+		for (String action : actions)
+		{
+			if (option.equalsIgnoreCase(action))
 			{
 				return true;
 			}

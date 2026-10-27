@@ -9,8 +9,7 @@ import net.runelite.api.coords.WorldPoint;
 @Builder(toBuilder = true)
 public class Plan
 {
-	public static final Plan NONE = Plan.builder().alternatives(List.of()).candidates(List.of()).probeTicks(Map.of())
-		.note("no step").build();
+	public static final Plan NONE = Plan.builder().note("no step").build();
 
 	String stepKey;
 	Route best;
@@ -21,23 +20,23 @@ public class Plan
 	/** Faster than Best, but it didn't beat its reference by the margin. */
 	Route fasterUnqualified;
 	/** Each with a first transport no earlier route has. */
-	List<Route> alternatives;
+	@Builder.Default
+	List<Route> alternatives = List.of();
 	/** The followed route's way, planned again when the best starts another way; null when that way isn't within the margin. */
 	Route followed;
-	List<Candidate> candidates;
+	@Builder.Default
+	List<Candidate> candidates = List.of();
 	/** PROBES steps only. */
-	Map<WorldPoint, Integer> probeTicks;
+	@Builder.Default
+	Map<WorldPoint, Integer> probeTicks = Map.of();
 	/** PROBES steps only: each tile's ranking ticks, penalties included. */
 	@Builder.Default
 	Map<WorldPoint, Integer> probeRanks = Map.of();
 	String note;
 	@Builder.Default
 	List<String> requirementNotes = List.of();
-	/** Includes {@link #contextNanos}. */
 	long searchNanos;
-	long contextNanos;
 	int labels;
-	int searches;
 
 	@Value
 	public static class Candidate

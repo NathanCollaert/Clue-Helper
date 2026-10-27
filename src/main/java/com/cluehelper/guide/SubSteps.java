@@ -110,7 +110,7 @@ public final class SubSteps
 	private SubStep entranaDeposit(Set<Integer> banned)
 	{
 		List<String> names = banned.stream().map(id -> client.getItemDefinition(id).getName()).sorted().collect(Collectors.toList());
-		return SubStep.builder().kind(SubStep.Kind.ACT).text("Deposit in the deposit box:").items(List.copyOf(names))
+		return SubStep.of(SubStep.Kind.ACT, "Deposit in the deposit box:").items(List.copyOf(names))
 			.detail(ENTRANA_RULE).actItems(banned).objectIds(Set.of(ObjectID.SARIM_DEPOSIT_BOX)).option(DEPOSIT)
 			.done(SubStep.Done.ITEMS_GONE).build();
 	}
@@ -300,7 +300,7 @@ public final class SubSteps
 					addWalk(leg, next, exit);
 					break;
 				case WILDERNESS_EXIT:
-					steps.add(SubStep.builder().kind(SubStep.Kind.WILDERNESS_EXIT).text("Walk south out of deep Wilderness")
+					steps.add(SubStep.of(SubStep.Kind.WILDERNESS_EXIT, "Walk south out of deep Wilderness")
 						.detail("Teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
 					break;
 				case SWAP_TELEPORT:
@@ -317,7 +317,7 @@ public final class SubSteps
 					steps.add(LegSteps.change(leg));
 					break;
 				case BANK:
-					steps.add(SubStep.builder().kind(SubStep.Kind.BANK).text("Open the bank")
+					steps.add(SubStep.of(SubStep.Kind.BANK, "Open the bank")
 						.detail(route.isPinIncluded() ? "Your PIN comes first" : null).waypoint(leg.getTo()).build());
 					steps.add(LegSteps.withdraw(route, itemLines));
 					break;
@@ -329,7 +329,7 @@ public final class SubSteps
 		/** A walk into the step's area goes in by its way in, with the STASH items first when the unit stands outside. */
 		private void addWalk(Leg leg, Leg next, Exit exit)
 		{
-			boolean wayIn = exit != null && isWayIn(exit, step);
+			boolean wayIn = exit != null && isWayIn(exit, step.getData().getEntry());
 			if ((exit == null || wayIn) && entersStepArea(leg, step))
 			{
 				if (stashFirst)
@@ -383,7 +383,7 @@ public final class SubSteps
 	/** Ends when the stage is dropped from the step, which brings a new plan. */
 	static SubStep stageAct(Stage stage)
 	{
-		return SubStep.builder().kind(SubStep.Kind.ACT).text(stage.getAct()).detail(stage.getDetail()).stage(stage)
+		return SubStep.of(SubStep.Kind.ACT, stage.getAct()).detail(stage.getDetail()).stage(stage)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
@@ -415,9 +415,8 @@ public final class SubSteps
 	}
 
 	/** An exit leg that is the step's own hand-written way in, named by its text instead of "Take the exit". */
-	private static boolean isWayIn(Exit exit, Step step)
+	static boolean isWayIn(Exit exit, StepIndex.WayIn way)
 	{
-		StepIndex.WayIn way = step.getData().getEntry();
 		return way != null && exit.getOrigin().equals(way.getTile()) && exit.getDestination().equals(way.getTo());
 	}
 
@@ -443,7 +442,7 @@ public final class SubSteps
 	static List<SubStep> stageActs(Stage stage)
 	{
 		List<SubStep> acts = new ArrayList<>(remove(stage.getEmptied()));
-		stage.getBefore().forEach(before -> acts.add(SubStep.builder().kind(SubStep.Kind.ACT).text(before.getText())
+		stage.getBefore().forEach(before -> acts.add(SubStep.of(SubStep.Kind.ACT, before.getText())
 			.npcIds(Set.copyOf(before.getNpcs())).option(before.getOption()).groundItem(before.getGroundItem())
 			.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()));
 		acts.addAll(stage.getWorn().isEmpty() ? List.of() : equip(stage.getWorn()));
@@ -454,15 +453,15 @@ public final class SubSteps
 	/** Take off what core's empty-slot requirements forbid; none when there are none. */
 	static List<SubStep> remove(List<ItemRequirement> emptied)
 	{
-		return emptied.isEmpty() ? List.of() : List.of(SubStep.builder().kind(SubStep.Kind.ACT)
-			.text("Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
+		return emptied.isEmpty() ? List.of() : List.of(SubStep.of(SubStep.Kind.ACT, "Take off your " + EmptySlots.slotNames(emptied))
+			.emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
 			.tab(StepGuide.Tab.EQUIPMENT).build());
 	}
 
 	/** Put on the needs named, done once worn items alone meet them. */
 	static List<SubStep> equip(List<String> wornNeeds)
 	{
-		return List.of(SubStep.builder().kind(SubStep.Kind.ACT).text("Equip the " + String.join(" and ", wornNeeds))
+		return List.of(SubStep.of(SubStep.Kind.ACT, "Equip the " + String.join(" and ", wornNeeds))
 			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(StepGuide.Tab.INVENTORY).build());
 	}
 
@@ -501,14 +500,12 @@ public final class SubSteps
 
 	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data)
 	{
-		List<StepIndex.Requires> worn = data == null ? List.of()
-			: data.getRequires().stream().filter(StepIndex.Requires::isWear).collect(Collectors.toList());
+		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequires();
 		if (worn.isEmpty())
 		{
 			return steps;
 		}
-		SubStep equip = SubStep.builder().kind(SubStep.Kind.ACT)
-			.text("Equip the " + worn.stream().map(StepIndex.Requires::getName).collect(Collectors.joining(" and ")))
+		SubStep equip = SubStep.of(SubStep.Kind.ACT, "Equip the " + worn.stream().map(StepIndex.Requires::getName).collect(Collectors.joining(" and ")))
 			.actItems(worn.stream().flatMap(need -> need.getIds().stream()).collect(Collectors.toUnmodifiableSet()))
 			.done(SubStep.Done.WAY_IN_WORN).tab(StepGuide.Tab.INVENTORY).build();
 		List<SubStep> out = new ArrayList<>();

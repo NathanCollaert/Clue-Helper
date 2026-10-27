@@ -2,7 +2,6 @@ package com.cluehelper.route;
 
 import com.cluehelper.player.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 
 /** A searched goal label as the route the guide follows: its legs, withdraw list and what it spends. */
@@ -58,7 +57,6 @@ final class RouteBuilder
 			.rankHalfTicks(rank + extra)
 			.banked(banked)
 			.withdraw(withdraw)
-			.withdrawInCoreTag(inCoreTag(ctx, goal, withdraw))
 			.depositFirst(depositFirst)
 			.pinIncluded(bankLeg && ctx.in.isPinPending())
 			.openBankStart(banked && !bankLeg)
@@ -99,33 +97,15 @@ final class RouteBuilder
 		Map<Integer, ItemUse> byItem = new LinkedHashMap<>();
 		for (LabelSearch.Label label : goal.chain())
 		{
-			for (Object ref : new Object[]{label.ref, label.ref2})
+			for (TransportOptions.Edge ref : new TransportOptions.Edge[]{label.ref, label.ref2})
 			{
-				List<ItemUse> uses = ref instanceof TransportOptions.Teleport ? ((TransportOptions.Teleport) ref).withdrawUses
-					: ref instanceof TransportOptions.Change ? ((TransportOptions.Change) ref).withdrawUses : null;
-				if (label.b == PlanContext.BANKED && uses != null)
+				if (label.b == PlanContext.BANKED && ref != null)
 				{
-					uses.forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+					ref.withdrawUses.forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
 				}
 			}
 		}
 		return byItem;
-	}
-
-	private static Set<Integer> inCoreTag(PlanContext ctx, LabelSearch.Label goal, List<ItemUse> withdraw)
-	{
-		Set<Integer> routeItems = routeWithdraw(goal).keySet();
-		Set<Integer> tagged = new HashSet<>();
-		for (ItemUse use : withdraw)
-		{
-			List<RequiredItems.Need> helped = ctx.in.getRequired().getNeeds().stream()
-				.filter(need -> need.getRequirement().fulfilledBy(use.getItemId())).collect(Collectors.toList());
-			if (!routeItems.contains(use.getItemId()) && !helped.isEmpty() && helped.stream().allMatch(RequiredItems.Need::isInCoreTag))
-			{
-				tagged.add(use.getItemId());
-			}
-		}
-		return Set.copyOf(tagged);
 	}
 
 	/** A stack of something already in the inventory takes no new slot. */
@@ -135,15 +115,11 @@ final class RouteBuilder
 	}
 
 	/** Every unit a leg uses, tracked by the search or not. */
-	private static void tally(PlanContext ctx, Object ref, Map<String, Integer> spent)
+	private static void tally(PlanContext ctx, TransportOptions.Edge ref, Map<String, Integer> spent)
 	{
-		int[] res = ref instanceof TransportOptions.Teleport ? ((TransportOptions.Teleport) ref).res
-			: ref instanceof TransportOptions.Change ? ((TransportOptions.Change) ref).res : null;
-		int[] amounts = ref instanceof TransportOptions.Teleport ? ((TransportOptions.Teleport) ref).amounts
-			: ref instanceof TransportOptions.Change ? ((TransportOptions.Change) ref).amounts : null;
-		for (int i = 0; res != null && i < res.length; i++)
+		for (int i = 0; ref != null && i < ref.res.length; i++)
 		{
-			spent.merge(ctx.resources.name(res[i]), amounts[i], Integer::sum);
+			spent.merge(ctx.resources.name(ref.res[i]), ref.amounts[i], Integer::sum);
 		}
 	}
 

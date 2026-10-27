@@ -38,13 +38,17 @@ final class LegSteps
 		int radius = stage.getRadius() > 0 ? stage.getRadius() : SubSteps.ARRIVE_TILES;
 		if (!stage.isOurMarker())
 		{
-			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue")
-				.goal(leg.getTo()).radius(radius).build();
+			return walkToClue(leg.getTo(), radius);
 		}
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
-		return SubStep.builder().kind(SubStep.Kind.WALK).text(text).waypoint(leg.getTo()).goal(leg.getTo()).radius(radius)
+		return SubStep.of(SubStep.Kind.WALK, text).waypoint(leg.getTo()).goal(leg.getTo()).radius(radius)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
+	}
+
+	static SubStep walkToClue(WorldPoint goal, int radius)
+	{
+		return SubStep.of(SubStep.Kind.WALK_TO_CLUE, "Walk to the clue").goal(goal).radius(radius).build();
 	}
 
 	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
@@ -52,11 +56,11 @@ final class LegSteps
 	{
 		if (route.getWithdraw().isEmpty())
 		{
-			return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text("Close the bank").build();
+			return SubStep.of(SubStep.Kind.WITHDRAW, "Close the bank").build();
 		}
 		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemLines)).collect(Collectors.toList());
 		String text = route.isDepositFirst() ? "Deposit to free slots, then withdraw:" : "Withdraw from the bank:";
-		return SubStep.builder().kind(SubStep.Kind.WITHDRAW).text(text).items(List.copyOf(items))
+		return SubStep.of(SubStep.Kind.WITHDRAW, text).items(List.copyOf(items))
 			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
 	}
 
@@ -69,22 +73,20 @@ final class LegSteps
 		}
 		if (step.getWaypointAct() != null && step.getTargets().contains(leg.getTo()))
 		{
-			return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the marker")
+			return SubStep.of(SubStep.Kind.WALK, "Walk to the marker")
 				.waypoint(leg.getTo()).goal(leg.getTo()).radius(step.isActAnywhere() ? SubSteps.ARRIVE_TILES : PROBE_ARRIVE_TILES).build();
 		}
 		if (step.getTargets().contains(leg.getTo()))
 		{
-			int radius = step.getKind() == TargetKind.AREA ? SubSteps.AREA_ARRIVE_TILES : SubSteps.ARRIVE_TILES;
-			return SubStep.builder().kind(SubStep.Kind.WALK_TO_CLUE).text("Walk to the clue")
-				.goal(leg.getTo()).radius(radius).build();
+			return walkToClue(leg.getTo(), step.getKind() == TargetKind.AREA ? SubSteps.AREA_ARRIVE_TILES : SubSteps.ARRIVE_TILES);
 		}
-		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to " + walkGoal(next))
+		return SubStep.of(SubStep.Kind.WALK, "Walk to " + walkGoal(next))
 			.waypoint(leg.getTo()).goal(leg.getTo()).radius(SubSteps.ARRIVE_TILES).build();
 	}
 
 	static SubStep stashWalk(WorldPoint stash)
 	{
-		return SubStep.builder().kind(SubStep.Kind.WALK).text("Walk to the STASH unit").waypoint(stash).goal(stash).radius(SubSteps.ARRIVE_TILES).build();
+		return SubStep.of(SubStep.Kind.WALK, "Walk to the STASH unit").waypoint(stash).goal(stash).radius(SubSteps.ARRIVE_TILES).build();
 	}
 
 	static SubStep enter(StepIndex.Entry data)
@@ -93,13 +95,13 @@ final class LegSteps
 		String needs = data.getRequires().stream().map(StepIndex.Requires::getName).collect(Collectors.joining(", "));
 		String option = way.getOption() == null || way.getOption().isEmpty() ? null : way.getOption();
 		String detail = option == null ? needs : needs.isEmpty() ? option : option + "; needs " + needs;
-		return SubStep.builder().kind(SubStep.Kind.ENTER).text("Go in: " + way.getText()).detail(detail.isEmpty() ? null : detail)
+		return SubStep.of(SubStep.Kind.ENTER, "Go in: " + way.getText()).detail(detail.isEmpty() ? null : detail)
 			.waypoint(way.getTile()).wayIn(way).build();
 	}
 
 	static SubStep exit(Leg leg, Exit exit)
 	{
-		return SubStep.builder().kind(SubStep.Kind.EXIT).text(exitText(exit))
+		return SubStep.of(SubStep.Kind.EXIT, exitText(exit))
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).exit(exit).build();
 	}
 
@@ -107,7 +109,7 @@ final class LegSteps
 	static SubStep swap(Leg leg)
 	{
 		Book book = leg.getRow().getRequirements().getBook();
-		return SubStep.builder().kind(SubStep.Kind.SPELLBOOK_SWAP).text("Spellbook Swap to " + book.label())
+		return SubStep.of(SubStep.Kind.SPELLBOOK_SWAP, "Spellbook Swap to " + book.label())
 			.detail("Right-click Spellbook Swap, then pick the book").book(book).change(leg.getChange()).build();
 	}
 
@@ -115,7 +117,7 @@ final class LegSteps
 	{
 		CatalogRow row = leg.getRow();
 		WorldPoint standsAt = row.isLocated() && !row.isInHouse() ? leg.getFrom() : null;
-		return SubStep.builder().kind(SubStep.Kind.TELEPORT).text(withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
+		return SubStep.of(SubStep.Kind.TELEPORT, withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
 			.waypoint(standsAt).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).row(row).build();
 	}
 
@@ -133,7 +135,7 @@ final class LegSteps
 		for (int i = 0; i < hops.length; i++)
 		{
 			boolean last = i == hops.length - 1;
-			steps.add(SubStep.builder().kind(SubStep.Kind.FAIRY_RING).text("Fairy ring " + MenuLines.menuColoured(hops[i]))
+			steps.add(SubStep.of(SubStep.Kind.FAIRY_RING, "Fairy ring " + MenuLines.menuColoured(hops[i]))
 				.detail("Code " + (i + 1) + " of " + hops.length + (last ? "" : ", then dial the next where you land"))
 				.waypoint(i == 0 ? leg.getFrom() : null).goal(last ? leg.getTo() : null).radius(SubSteps.LANDING_TILES)
 				.row(landing.toBuilder().code(hops[i]).build()).build());
@@ -148,8 +150,7 @@ final class LegSteps
 		int colon = place.indexOf(": ");
 		String where = place.startsWith(FAIRY_RING_PREFIX) && colon >= 0 ? place.substring(colon + 2) : place;
 		boolean coded = landing.getCode() != null && landing.getCode().length() == 3;
-		return SubStep.builder().kind(SubStep.Kind.FAIRY_RING)
-			.text(coded ? "Fairy ring " + MenuLines.menuColoured(landing.getCode()) : "Fairy ring to " + where)
+		return SubStep.of(SubStep.Kind.FAIRY_RING, coded ? "Fairy ring " + MenuLines.menuColoured(landing.getCode()) : "Fairy ring to " + where)
 			.waypoint(leg.getFrom()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).row(landing).build();
 	}
 
@@ -159,11 +160,11 @@ final class LegSteps
 		String book = leg.getBookAfter().label();
 		if (change.isAnywhere())
 		{
-			return SubStep.builder().kind(SubStep.Kind.CHANGE_BOOK).text(capeName(change) + ": Spellbook → " + book)
+			return SubStep.of(SubStep.Kind.CHANGE_BOOK, capeName(change) + ": Spellbook → " + book)
 				.detail(change.getName().contains("(worn)") ? "Right-click the worn cape in the equipment tab" : "Right-click the cape: Spellbook")
 				.book(leg.getBookAfter()).change(change).build();
 		}
-		return SubStep.builder().kind(SubStep.Kind.CHANGE_BOOK).text(change.getName() + " → " + book)
+		return SubStep.of(SubStep.Kind.CHANGE_BOOK, change.getName() + " → " + book)
 			.detail(warning(change)).waypoint(change.getTile()).book(leg.getBookAfter()).change(change).build();
 	}
 

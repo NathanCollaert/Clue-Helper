@@ -29,9 +29,6 @@ public class Route
 	boolean wilderness;
 	@Builder.Default
 	List<ItemUse> withdraw = List.of();
-	/** Core's *clue* bank tag already shows these, so our bank highlights leave them out. */
-	@Builder.Default
-	Set<Integer> withdrawInCoreTag = Set.of();
 	/** The withdraw list needs more slots than are free; the extra click is counted in the ticks. */
 	boolean depositFirst;
 	boolean pinIncluded;

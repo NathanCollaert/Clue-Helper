@@ -365,7 +365,7 @@ public class WaypointOverlay extends Overlay
 	private boolean awaitsNpc()
 	{
 		SubStep current = guide.getCurrent();
-		return current != null && !current.getNpcIds().isEmpty() || !guide.getMenuTarget().getNpcIds().isEmpty();
+		return current != null && !current.getNpcIds().isEmpty() || !guide.getHighlights().getMenuTarget().getNpcIds().isEmpty();
 	}
 
 	/** Its row's origin is the south-west corner of the platform, and the whole platform teleports. */

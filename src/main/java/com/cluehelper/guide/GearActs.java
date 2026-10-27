@@ -63,8 +63,7 @@ final class GearActs
 	 */
 	private SubStep equipWhatIsCarried(SubStep act, Step step)
 	{
-		List<StepIndex.Requires> worn = step.getData().getRequires().stream().filter(StepIndex.Requires::isWear)
-			.collect(Collectors.toList());
+		List<StepIndex.Requires> worn = step.getData().wornRequires();
 		Set<Integer> carried = player.carriedIds();
 		Integer coversAll = worn.get(0).getIds().stream().filter(carried::contains)
 			.filter(id -> worn.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
@@ -117,8 +116,7 @@ final class GearActs
 			return true;
 		}
 		Set<Integer> on = player.wornIds();
-		return step.getData().getRequires().stream().filter(StepIndex.Requires::isWear)
-			.allMatch(need -> need.getIds().stream().anyMatch(on::contains));
+		return step.getData().wornRequires().stream().allMatch(need -> need.getIds().stream().anyMatch(on::contains));
 	}
 
 	private boolean wearsGear(SubStep act, Step step)

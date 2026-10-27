@@ -49,7 +49,8 @@ final class RowTargets
 	/** The row's object or NPC, with the menu its catalog line names. */
 	MenuTarget located(CatalogRow row)
 	{
-		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objectsOf(row));
+		Set<Integer> objects = objectsOf(row);
+		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objects);
 		String menu = row.getMenu();
 		if (menu == null)
 		{
@@ -60,7 +61,7 @@ final class RowTargets
 		switch (parts[0])
 		{
 			case "quetzal":
-				return MenuTarget.quetzal(row.quetzalTableId()).toBuilder().objectIds(objectsOf(row))
+				return MenuTarget.quetzal(row.quetzalTableId()).toBuilder().objectIds(objects)
 					.npcIds(Set.of(NpcID.QUETZAL_CHILD_GREEN)).path(List.of(TRAVEL_OPTION)).build();
 			case "list":
 				return target.path(listPath(row, outside, parts[1])).build();
@@ -68,11 +69,11 @@ final class RowTargets
 			{
 				String[] nexus = parts[1].split(" ", 2);
 				return MenuTarget.nexus(Integer.parseInt(nexus[0]), nexus[1], row.nexusPlace()).toBuilder()
-					.objectIds(objectsOf(row)).build();
+					.objectIds(objects).build();
 			}
 			case "box":
 				// The ornate box's own option repeats the last place it sent the player to: one click when it's this one.
-				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objectsOf(row))
+				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objects)
 					.path(List.of(row.destination())).build();
 			case "npc":
 				return MenuTarget.builder().npcIds(Set.of(row.getObjectId())).path(List.of(parts[1].split(MENU_STEP))).build();

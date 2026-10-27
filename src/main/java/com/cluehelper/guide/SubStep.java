@@ -127,6 +127,11 @@ public class SubStep
 	@Builder.Default
 	StepGuide.Tab tab = StepGuide.Tab.NONE;
 
+	public static SubStepBuilder of(Kind kind, String text)
+	{
+		return builder().kind(kind).text(text);
+	}
+
 	/** Gear put on or taken off, or something fetched before the act: done where the player stands, no line to the place. */
 	public boolean isPreparation()
 	{

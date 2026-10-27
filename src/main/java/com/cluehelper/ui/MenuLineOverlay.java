@@ -31,7 +31,7 @@ public class MenuLineOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		MenuTarget target = guide.getMenuTarget();
+		MenuTarget target = guide.getHighlights().getMenuTarget();
 		if (!config.highlightMenus() || target == null || target.isEmpty())
 		{
 			return null;
