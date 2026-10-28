@@ -33,20 +33,20 @@ public class SpiritTreeMemory
 		"Hosidius", new int[]{6711, VarbitID.FARMING_TRANSMIT_F},
 		"Farming Guild", new int[]{4922, VarbitID.FARMING_TRANSMIT_A});
 
-	private final Client client;
-	private final PlayerModel player;
-	private final MemorySlot<Patches> remembered;
+	@Inject
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	private MemorySlot<Patches> remembered;
 	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 	private Set<String> published;
 	private int lastRegion = -1;
 	private int lastRegionTick = -1;
 
 	@Inject
-	SpiritTreeMemory(Client client, MemoryStore memory, PlayerModel player)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.player = player;
-		this.remembered = memory.slot(KEY, Patches.class, Patches::new);
+		remembered = memory.slot(KEY, Patches.class, Patches::new);
 	}
 
 	public Set<String> grown()

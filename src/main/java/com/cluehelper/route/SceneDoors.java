@@ -26,10 +26,11 @@ public final class SceneDoors
 	private static final String WALK_THROUGH = "Walk-through";
 	private static final Set<String> LOCK_OPTIONS = Set.of("Pick-lock", "Unlock");
 	private static final String LOCKED = "locked";
-	private static final int WEST = 1;
-	private static final int NORTH = 2;
-	private static final int EAST = 4;
-	private static final int SOUTH = 8;
+	/** WallObject.getOrientationA's sides of its tile. */
+	public static final int WEST = 1;
+	public static final int NORTH = 2;
+	public static final int EAST = 4;
+	public static final int SOUTH = 8;
 	private static final int OBJECT_TYPE_MASK = 0x1F;
 	/** A wall across a tile's diagonal (the Wizards' Tower door) is a game object blocking the whole tile. */
 	private static final int DIAGONAL_WALL = 9;

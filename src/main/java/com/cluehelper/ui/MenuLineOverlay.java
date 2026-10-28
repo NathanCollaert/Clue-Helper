@@ -10,20 +10,19 @@ import net.runelite.client.ui.overlay.*;
 
 public class MenuLineOverlay extends Overlay
 {
-	private final StepGuide guide;
-	private final MenuLines lines;
-	private final FairyDials dials;
-	private final ClueHelperConfig config;
-	private final Highlighter highlighter;
-
 	@Inject
-	MenuLineOverlay(StepGuide guide, MenuLines lines, FairyDials dials, ClueHelperConfig config, Highlighter highlighter)
+	private StepGuide guide;
+	@Inject
+	private MenuLines lines;
+	@Inject
+	private FairyDials dials;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private Highlighter highlighter;
+
+	MenuLineOverlay()
 	{
-		this.highlighter = highlighter;
-		this.guide = guide;
-		this.lines = lines;
-		this.dials = dials;
-		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
 	}
@@ -32,7 +31,7 @@ public class MenuLineOverlay extends Overlay
 	public Dimension render(Graphics2D graphics)
 	{
 		MenuTarget target = guide.getHighlights().getMenuTarget();
-		if (!config.highlightMenus() || target == null || target.isEmpty())
+		if (!config.highlightMenus() || target.isEmpty())
 		{
 			return null;
 		}

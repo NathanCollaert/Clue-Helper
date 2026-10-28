@@ -33,25 +33,23 @@ public class WidgetHighlightOverlay extends Overlay
 		StepGuide.Tab.EMOTES, new int[]{InterfaceID.Toplevel.STONE12, InterfaceID.ToplevelOsrsStretch.STONE12, InterfaceID.ToplevelPreEoc.STONE12},
 		StepGuide.Tab.MUSIC, new int[]{InterfaceID.Toplevel.STONE13, InterfaceID.ToplevelOsrsStretch.STONE13, InterfaceID.ToplevelPreEoc.STONE13});
 
-	private final Client client;
-	private final StepGuide guide;
-	private final ClueHelperConfig config;
-	private final MenuLines menuLines;
-	private final Highlighter highlighter;
-	private final ClueLink clueLink;
-	private final PrayerFilters prayerFilters;
-
 	@Inject
-	WidgetHighlightOverlay(Client client, StepGuide guide, ClueHelperConfig config, MenuLines menuLines, Highlighter highlighter,
-		ClueLink clueLink, PrayerFilters prayerFilters)
+	private Client client;
+	@Inject
+	private StepGuide guide;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private MenuLines menuLines;
+	@Inject
+	private Highlighter highlighter;
+	@Inject
+	private ClueLink clueLink;
+	@Inject
+	private PrayerFilters prayerFilters;
+
+	WidgetHighlightOverlay()
 	{
-		this.clueLink = clueLink;
-		this.prayerFilters = prayerFilters;
-		this.menuLines = menuLines;
-		this.highlighter = highlighter;
-		this.client = client;
-		this.guide = guide;
-		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_WIDGETS);
 	}
@@ -79,7 +77,7 @@ public class WidgetHighlightOverlay extends Overlay
 		}
 		StepGuide.Tab tab = guide.getHighlights().getTab();
 		boolean wanted = tab == StepGuide.Tab.MAGIC ? config.highlightSpells() : config.highlightItems();
-		if (tab != StepGuide.Tab.NONE && wanted && !shown(TAB_CONTENT.get(tab)))
+		if (tab != StepGuide.Tab.NONE && wanted && !Widgets.shown(client, TAB_CONTENT.get(tab)))
 		{
 			outline(graphics, tabStone(TAB_STONES.get(tab)));
 		}
@@ -108,12 +106,12 @@ public class WidgetHighlightOverlay extends Overlay
 
 	private void outlinePrayerButton(Graphics2D graphics, Prayer prayer)
 	{
-		if (!shown(InterfaceID.Prayerbook.UNIVERSE))
+		if (!Widgets.shown(client, InterfaceID.Prayerbook.UNIVERSE))
 		{
 			outline(graphics, tabStone(PRAYER_STONES));
 			return;
 		}
-		if (shown(InterfaceID.Prayerbook.FILTERMENU))
+		if (Widgets.shown(client, InterfaceID.Prayerbook.FILTERMENU))
 		{
 			outlineToggles(graphics, prayerFilters.hidingTiers());
 			return;
@@ -130,12 +128,12 @@ public class WidgetHighlightOverlay extends Overlay
 	private void outlineFiltersToRestore(Graphics2D graphics)
 	{
 		List<PrayerFilters.Filter> changed = prayerFilters.changed();
-		boolean menuOpen = shown(InterfaceID.Prayerbook.FILTERMENU);
+		boolean menuOpen = Widgets.shown(client, InterfaceID.Prayerbook.FILTERMENU);
 		if (changed.isEmpty() && !menuOpen)
 		{
 			return;
 		}
-		if (!shown(InterfaceID.Prayerbook.UNIVERSE))
+		if (!Widgets.shown(client, InterfaceID.Prayerbook.UNIVERSE))
 		{
 			outline(graphics, tabStone(PRAYER_STONES));
 			return;
@@ -171,22 +169,9 @@ public class WidgetHighlightOverlay extends Overlay
 			.findFirst().orElse(null);
 	}
 
-	private boolean shown(int widgetId)
-	{
-		Widget widget = client.getWidget(widgetId);
-		return widget != null && !widget.isHidden();
-	}
-
 	private int tabStone(int[] perLayout)
 	{
-		for (int stone : perLayout)
-		{
-			if (shown(stone))
-			{
-				return stone;
-			}
-		}
-		return -1;
+		return Arrays.stream(perLayout).filter(stone -> Widgets.shown(client, stone)).findFirst().orElse(-1);
 	}
 
 	/**

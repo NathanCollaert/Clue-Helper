@@ -1,16 +1,20 @@
 package com.cluehelper.step;
 
+import lombok.Getter;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 /** The two tiers with hot/cold steps, each with its own strange device: a master device doesn't work on a beginner clue. */
+@Getter
 public enum HotColdTier
 {
 	BEGINNER("beginner", ItemID.BEGINNER_DEVICE, "reldo"),
 	MASTER("master", ItemID.MASTER_DEVICE, "jorral");
 
+	/** The tier as a step names it. */
 	private final String tierName;
 	private final int deviceItemId;
+	/** The NPC who hands out the device, as a step key names him. */
 	private final String deviceNpc;
 	private final ItemRequirement device;
 
@@ -33,27 +37,5 @@ public enum HotColdTier
 			}
 		}
 		throw new IllegalArgumentException("no hot/cold tier " + tier);
-	}
-
-	/** The tier as a step names it. */
-	public String getTierName()
-	{
-		return tierName;
-	}
-
-	public int getDeviceItemId()
-	{
-		return deviceItemId;
-	}
-
-	public ItemRequirement getDevice()
-	{
-		return device;
-	}
-
-	/** The NPC who hands out the device, as a step key names him. */
-	public String getDeviceNpc()
-	{
-		return deviceNpc;
 	}
 }

@@ -1,8 +1,10 @@
 package com.cluehelper.hotcold;
 
 import com.cluehelper.step.HotColdTier;
+import lombok.*;
 
 /** Core's bands, measured exact for both tiers: Chebyshev distance to the spot's centre. */
+@RequiredArgsConstructor
 public enum Band
 {
 	SHAKING("visibly shaking", 3, 4),
@@ -14,21 +16,10 @@ public enum Band
 	VERY_COLD("very cold", 499, 499),
 	ICE_COLD("ice cold", Integer.MAX_VALUE, Integer.MAX_VALUE);
 
+	@Getter
 	private final String text;
 	private final int beginnerMax;
 	private final int masterMax;
-
-	Band(String text, int beginnerMax, int masterMax)
-	{
-		this.text = text;
-		this.beginnerMax = beginnerMax;
-		this.masterMax = masterMax;
-	}
-
-	public String getText()
-	{
-		return text;
-	}
 
 	public static Band of(int distance, HotColdTier tier)
 	{

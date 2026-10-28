@@ -135,7 +135,7 @@ public final class RequirementParser
 		}
 		if (name.startsWith(UNLOCK_PREFIX))
 		{
-			return new ItemClause.Branch(Collections.emptyList(), quantity, name.substring(UNLOCK_PREFIX.length()));
+			return new ItemClause.Branch(List.of(), quantity, name.substring(UNLOCK_PREFIX.length()));
 		}
 		List<Integer> ids = itemIds(name);
 		if (ids == null || ids.isEmpty())
@@ -150,10 +150,10 @@ public final class RequirementParser
 	{
 		if (name.chars().allMatch(Character::isDigit))
 		{
-			return Collections.singletonList(Integer.parseInt(name));
+			return List.of(Integer.parseInt(name));
 		}
 		Integer rune = RUNE_NAMES.get(name);
-		return rune != null ? Collections.singletonList(rune) : null;
+		return rune != null ? List.of(rune) : null;
 	}
 
 	private static void parseLevels(String cell, Parsed out)

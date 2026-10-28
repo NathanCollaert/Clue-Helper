@@ -23,18 +23,17 @@ public class WanderAreaOverlay extends Overlay
 	private static final int PLANE = 4;
 	private static final Stroke EDGE = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10, new float[]{8, 8}, 0);
 
-	private final Client client;
-	private final ClueLink clueLink;
-	private final ClueHelperConfig config;
-	private final StepGuide guide;
-
 	@Inject
-	WanderAreaOverlay(Client client, ClueLink clueLink, ClueHelperConfig config, StepGuide guide)
+	private Client client;
+	@Inject
+	private ClueLink clueLink;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private StepGuide guide;
+
+	WanderAreaOverlay()
 	{
-		this.guide = guide;
-		this.client = client;
-		this.clueLink = clueLink;
-		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 	}
@@ -47,7 +46,7 @@ public class WanderAreaOverlay extends Overlay
 		{
 			return null;
 		}
-		graphics.setColor(Markers.COLOUR);
+		graphics.setColor(Highlighter.COLOUR);
 		graphics.setStroke(EDGE);
 		Step step = clueLink.getCurrentStep();
 		StepIndex.Wander range = step == null ? null : step.getData().getWander();
@@ -91,11 +90,7 @@ public class WanderAreaOverlay extends Overlay
 		for (int i = 0; i <= steps; i++)
 		{
 			Point at = corner(view, fromX + Integer.signum(toX - fromX) * i, fromY + Integer.signum(toY - fromY) * i);
-			if (previous != null && at != null)
-			{
-				graphics.drawLine(previous.getX(), previous.getY(), at.getX(), at.getY());
-			}
-			previous = at;
+			previous = WaypointOverlay.drawTo(graphics, previous, at);
 		}
 	}
 

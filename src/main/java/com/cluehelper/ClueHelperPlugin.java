@@ -184,14 +184,14 @@ public class ClueHelperPlugin extends Plugin
 		hotCold.start();
 		withdrawTab.start();
 		routeReport.start();
-		unregisterRoutes = routes.addListener(plan -> showBox());
-		unregisterGuide = guide.addListener(this::showBox);
-		unregisterHotCold = hotCold.addListener(this::showBox);
+		unregisterRoutes = routes.addListener(plan -> box.refresh());
+		unregisterGuide = guide.addListener(box::refresh);
+		unregisterHotCold = hotCold.addListener(box::refresh);
 		for (Overlay overlay : overlays())
 		{
 			overlayManager.add(overlay);
 		}
-		clientThread.invokeLater(this::showBox);
+		clientThread.invokeLater(box::refresh);
 	}
 
 	@Override
@@ -221,7 +221,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		if (clueLink.onPluginChanged(event))
 		{
-			clientThread.invokeLater(this::showBox);
+			clientThread.invokeLater(box::refresh);
 		}
 	}
 
@@ -231,7 +231,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		if (clueLink.onGameTick())
 		{
-			showBox();
+			box.refresh();
 		}
 		bankMemory.onGameTick();
 		poh.onGameTick();
@@ -244,11 +244,11 @@ public class ClueHelperPlugin extends Plugin
 		routes.onGameTick();
 		hotCold.onGameTick();
 		guide.onGameTick();
-		withdrawTab.onGameTick();
+		withdrawTab.refresh();
 		if (planner.isWorking() != shownWorking)
 		{
 			shownWorking = planner.isWorking();
-			showBox();
+			box.refresh();
 		}
 	}
 
@@ -385,13 +385,13 @@ public class ClueHelperPlugin extends Plugin
 		{
 			return;
 		}
-		clientThread.invokeLater(this::showBox);
+		clientThread.invokeLater(box::refresh);
 		if (HOT_COLD_KEYS.contains(event.getKey()))
 		{
 			clientThread.invokeLater(() ->
 			{
 				hotCold.onConfigChanged();
-				showBox();
+				box.refresh();
 			});
 		}
 	}
@@ -413,12 +413,5 @@ public class ClueHelperPlugin extends Plugin
 	private Overlay[] overlays()
 	{
 		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, wanderAreaOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
-	}
-
-
-	/** Client thread only: reads the guide's state into one value for the overlay. */
-	private void showBox()
-	{
-		box.refresh();
 	}
 }

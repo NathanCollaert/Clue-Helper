@@ -47,7 +47,7 @@ public class MenuLines
 	private static final String MAP_REGION = "Select";
 	private static final String OPEN_OPTION = "Open";
 	private static final String CLOSE_OPTION = "Close";
-	/** Same cyan as {@code Markers.COLOUR}, the colour of every Clue Helper highlight. */
+	/** Same cyan as {@code Highlighter.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
 
 	/** A hotkey as the info box names it: upper case, in the colour of the menu line it presses. */

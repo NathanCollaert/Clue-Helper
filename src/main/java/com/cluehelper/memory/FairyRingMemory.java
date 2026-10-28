@@ -29,9 +29,11 @@ public class FairyRingMemory
 	/** A ring teleport lands about 7 ticks after the confirm, arrival lock included. */
 	private static final int LANDING_WITHIN_TICKS = 12;
 
-	private final Client client;
-	private final PlayerModel player;
-	private final MemorySlot<Last> remembered;
+	@Inject
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	private MemorySlot<Last> remembered;
 	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 	private String pending;
 	private int pendingTick;
@@ -39,11 +41,9 @@ public class FairyRingMemory
 	private String published;
 
 	@Inject
-	FairyRingMemory(Client client, MemoryStore memory, PlayerModel player)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.player = player;
-		this.remembered = memory.slot(KEY, Last.class, Last::new);
+		remembered = memory.slot(KEY, Last.class, Last::new);
 	}
 
 	public Runnable addListener(Consumer<String> devTraceLines)

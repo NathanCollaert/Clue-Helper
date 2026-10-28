@@ -206,8 +206,7 @@ public class GuideBox
 
 	static String bookName(Book book)
 	{
-		String name = book.name().toLowerCase(Locale.ROOT);
-		return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+		return capitalise(book.name().toLowerCase(Locale.ROOT));
 	}
 
 	private static String capitalise(String text)

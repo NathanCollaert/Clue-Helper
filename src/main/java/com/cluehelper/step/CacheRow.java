@@ -1,26 +1,14 @@
 package com.cluehelper.step;
 
+import lombok.Getter;
+
+@Getter
 public final class CacheRow
 {
 	private int id;
 	private String name;
-	private Branch when;
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
 	/** Null when the step has one row for every branch. */
-	public Branch getWhen()
-	{
-		return when;
-	}
+	private Branch when;
 
 	@Override
 	public String toString()
@@ -33,11 +21,6 @@ public final class CacheRow
 		private int varbit;
 		private Integer equals;
 		private Integer notEquals;
-
-		public int getVarbit()
-		{
-			return varbit;
-		}
 
 		public boolean holdsFor(int value)
 		{

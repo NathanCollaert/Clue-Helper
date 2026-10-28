@@ -35,17 +35,17 @@ public final class LeftClicks
 	private static final String USE_OPTION = "Use";
 	private static final String REMOVE_OPTION = "Remove";
 
-	private final Client client;
-	private final SwapperClicks swapperClicks;
+	@Inject
+	private Client client;
+	@Inject
+	private SwapperClicks swapperClicks;
 	/** Kept in the profile, so a hover once is enough for every later session. */
-	private final MemorySlot<Learned> remembered;
+	private MemorySlot<Learned> remembered;
 
 	@Inject
-	LeftClicks(Client client, SwapperClicks swapperClicks, MemoryStore memory)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.swapperClicks = swapperClicks;
-		this.remembered = memory.slot(KEY, Learned.class, Learned::new);
+		remembered = memory.slot(KEY, Learned.class, Learned::new);
 	}
 
 	/** @return whether the left click learned is new */

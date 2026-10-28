@@ -8,7 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 
 /** Client thread only. */
 @Singleton
-final class SceneObjects
+public final class SceneObjects
 {
 	private static final String BANK = "Bank";
 	/** Some bank chests (the Crafting Guild's) open with Use. */
@@ -121,26 +121,36 @@ final class SceneObjects
 		{
 			for (Tile tile : column)
 			{
-				if (tile == null)
+				for (TileObject object : tile == null ? List.<TileObject>of() : objectsOn(tile))
 				{
-					continue;
-				}
-				for (GameObject object : tile.getGameObjects())
-				{
-					if (object != null && isFormOf(object.getId(), ids) && !found.contains(object))
-					{
-						found.add(object);
-					}
-				}
-				for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getDecorativeObject(), tile.getGroundObject()})
-				{
-					if (object != null && isFormOf(object.getId(), ids))
+					if (isFormOf(object.getId(), ids) && !found.contains(object))
 					{
 						found.add(object);
 					}
 				}
 			}
 		}
+	}
+
+	/** The tile's game objects, then its wall, ground and decorative object: a large object is on each tile it covers. */
+	public static List<TileObject> objectsOn(Tile tile)
+	{
+		List<TileObject> objects = new ArrayList<>();
+		for (GameObject object : tile.getGameObjects())
+		{
+			if (object != null)
+			{
+				objects.add(object);
+			}
+		}
+		for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject()})
+		{
+			if (object != null)
+			{
+				objects.add(object);
+			}
+		}
+		return objects;
 	}
 
 	/**

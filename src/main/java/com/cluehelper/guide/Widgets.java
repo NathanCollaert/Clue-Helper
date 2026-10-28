@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import java.awt.Rectangle;
 import java.util.*;
+import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 
@@ -31,6 +32,13 @@ public final class Widgets
 		return out;
 	}
 
+	/** The widget by id is loaded and not hidden. */
+	public static boolean shown(Client client, int widgetId)
+	{
+		Widget widget = client.getWidget(widgetId);
+		return widget != null && !widget.isHidden();
+	}
+
 	/** Not hidden, and with a width on screen. */
 	static boolean visible(Widget widget)
 	{
@@ -49,7 +57,7 @@ public final class Widgets
 	}
 
 	/** Whether a widget's, object's or NPC's actions list the option, ignoring case; never when they are null. */
-	static boolean hasAction(String[] actions, String option)
+	public static boolean hasAction(String[] actions, String option)
 	{
 		if (actions == null)
 		{

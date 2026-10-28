@@ -377,8 +377,7 @@ final class StepHighlights
 	private Highlights takeOutFromBook(Highlights.HighlightsBuilder shown, Set<Integer> items, SubStep current, String option)
 	{
 		boolean fromBook = current.getDone() == SubStep.Done.ITEM_CARRIED && current.getRow() != null;
-		Widget book = fromBook ? client.getWidget(InterfaceID.Bookofscrolls.CONTENTS) : null;
-		boolean bookOpen = book != null && !book.isHidden();
+		boolean bookOpen = fromBook && Widgets.shown(client, InterfaceID.Bookofscrolls.CONTENTS);
 		return shown.menuWidget(fromBook ? ScrollBook.entry(current.getRow().getName()) : ScrollBook.NO_WIDGET)
 			.menuTarget(bookOpen
 				? MenuTarget.builder().widgetIds(ScrollBook.widgets(current.getRow().getName())).path(List.of(ScrollBook.REMOVE_OPTION)).build()

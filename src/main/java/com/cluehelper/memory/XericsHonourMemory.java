@@ -26,17 +26,17 @@ public class XericsHonourMemory
 	/** The real landing is 3 tiles north of the catalog's (1254 3563); a little more allows for a spread. */
 	private static final int LANDING_TILES = 5;
 
-	private final Client client;
-	private final PlayerModel player;
-	private final MemorySlot<Seen> remembered;
+	@Inject
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	private MemorySlot<Seen> remembered;
 	private WorldPoint lastTile;
 
 	@Inject
-	XericsHonourMemory(Client client, MemoryStore memory, PlayerModel player)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.player = player;
-		this.remembered = memory.slot(KEY, Seen.class, Seen::new);
+		remembered = memory.slot(KEY, Seen.class, Seen::new);
 	}
 
 	/** Call on start and after a profile change. */

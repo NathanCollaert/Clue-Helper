@@ -53,7 +53,7 @@ public final class PositionRules
 	 */
 	public static Position onBoat(WorldPoint boatTile)
 	{
-		return boatTile == null ? Position.NONE : new Position(boatTile, Position.Kind.BOAT, boatTile);
+		return boatTile == null ? Position.NONE : new Position(boatTile, Position.Kind.BOAT);
 	}
 
 	/**
@@ -68,9 +68,9 @@ public final class PositionRules
 		}
 		if (isInPoh(mappedTile))
 		{
-			return new Position(POH_NODE, Position.Kind.POH, mappedTile);
+			return new Position(POH_NODE, Position.Kind.POH);
 		}
-		return new Position(mappedTile, topLevelInstance ? Position.Kind.INSTANCE : Position.Kind.WORLD, mappedTile);
+		return new Position(mappedTile, topLevelInstance ? Position.Kind.INSTANCE : Position.Kind.WORLD);
 	}
 
 	/** x/y only: the POH template comes back on plane 2 from every floor. */

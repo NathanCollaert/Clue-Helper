@@ -10,20 +10,19 @@ import net.runelite.client.ui.overlay.*;
 
 public class FurnitureOverlay extends Overlay
 {
-	private final StepGuide guide;
-	private final ClueHelperConfig config;
-	private final Highlighter highlighter;
-	private final LineTargets targets;
-	private final Client client;
-
 	@Inject
-	FurnitureOverlay(Client client, StepGuide guide, ClueHelperConfig config, Highlighter highlighter, LineTargets targets)
+	private StepGuide guide;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private Highlighter highlighter;
+	@Inject
+	private LineTargets targets;
+	@Inject
+	private Client client;
+
+	FurnitureOverlay()
 	{
-		this.guide = guide;
-		this.config = config;
-		this.highlighter = highlighter;
-		this.targets = targets;
-		this.client = client;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 	}

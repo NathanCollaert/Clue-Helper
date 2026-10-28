@@ -51,12 +51,6 @@ public class GuideOverlay extends OverlayPanel
 		this.box = box;
 	}
 
-	/** Readable from any thread. */
-	public GuideBox getShown()
-	{
-		return box;
-	}
-
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{

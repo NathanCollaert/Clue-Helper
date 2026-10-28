@@ -54,17 +54,12 @@ public class WithdrawTab
 		});
 	}
 
-	public void onGameTick()
-	{
-		update();
-	}
-
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
 		if (event.getGroupId() == InterfaceID.BANKMAIN)
 		{
 			bankOpen = true;
-			update();
+			refresh();
 		}
 	}
 
@@ -75,7 +70,7 @@ public class WithdrawTab
 		{
 			bankOpen = true;
 			forgetItems();
-			update();
+			refresh();
 		}
 	}
 
@@ -88,7 +83,8 @@ public class WithdrawTab
 		}
 	}
 
-	private void update()
+	/** Opens or updates the tab for the items the sub-step withdraws now, while the bank is open. */
+	public void refresh()
 	{
 		if (!bankOpen)
 		{

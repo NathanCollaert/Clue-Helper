@@ -1,7 +1,7 @@
 package com.cluehelper.player;
 
 import java.util.*;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
 
@@ -9,6 +9,7 @@ import net.runelite.api.gameval.ItemID;
  * Everything except the tomes comes from the cache, so a game update that adds a staff or a rune carries
  * over by itself. The spellbook widget is never read: it is stale while the magic tab is hidden.
  */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RuneModel
 {
 	private static final int PARAM_RUNE_1 = 365;
@@ -39,22 +40,13 @@ public final class RuneModel
 		{ItemID.TOME_OF_EARTH, ItemID.EARTHRUNE},
 	};
 
+	@Getter
 	private final List<Spell> spells;
 	private final Map<Integer, Integer> pouchRunes;
 	/** The rune itself comes first. */
 	private final Map<Integer, List<Integer>> payersByRune;
 	private final Map<Integer, Set<Integer>> unlimitingWornItemsByRune;
 	private final Map<Integer, String> runeNames;
-
-	private RuneModel(List<Spell> spells, Map<Integer, Integer> pouchRunes, Map<Integer, List<Integer>> payersByRune,
-		Map<Integer, Set<Integer>> unlimitingWornItemsByRune, Map<Integer, String> runeNames)
-	{
-		this.spells = spells;
-		this.pouchRunes = pouchRunes;
-		this.payersByRune = payersByRune;
-		this.unlimitingWornItemsByRune = unlimitingWornItemsByRune;
-		this.runeNames = runeNames;
-	}
 
 	/** On the client thread when {@code cache} is the client. */
 	public static RuneModel load(CacheView cache)
@@ -95,11 +87,6 @@ public final class RuneModel
 		unlimited.forEach((rune, set) -> unlimitedCopy.put(rune, Set.copyOf(set)));
 		return new RuneModel(List.copyOf(spells(cache)), Map.copyOf(pouchRunes), Map.copyOf(payers),
 			Map.copyOf(unlimitedCopy), Map.copyOf(names));
-	}
-
-	public List<Spell> getSpells()
-	{
-		return spells;
 	}
 
 	/** Every item that pays for a rune or stands in for one: runes, combination runes, staves and tomes. */

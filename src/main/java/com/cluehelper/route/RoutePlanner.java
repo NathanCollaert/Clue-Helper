@@ -38,22 +38,36 @@ public class RoutePlanner
 	private static final int NO_TARGET_NEAR = -1;
 	private static final long NO_SCENE = Long.MIN_VALUE;
 
-	private final Client client;
-	private final ClueLink clueLink;
-	private final PlayerModel player;
-	private final AvailabilityService availability;
-	private final CatalogData catalogData;
-	private final WalkData walkData;
-	private final PlannerRunner runner;
+	@Inject
+	private Client client;
+	@Inject
+	private ClueLink clueLink;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private AvailabilityService availability;
+	@Inject
+	private CatalogData catalogData;
+	@Inject
+	private WalkData walkData;
+	@Inject
+	private PlannerRunner runner;
 	/** The walk from the player's tile, searched apart so it never supersedes a plan. */
-	private final PlannerRunner startRunner;
-	private final ClueHelperConfig config;
-	private final BankMemory bankMemory;
-	private final StepNeeds stepNeeds;
-	private final PohService poh;
-	private final ProbeTarget probeTarget;
-	private final StageTarget stageTarget;
-	private final SceneDoors doors;
+	private PlannerRunner startRunner;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private BankMemory bankMemory;
+	@Inject
+	private StepNeeds stepNeeds;
+	@Inject
+	private PohService poh;
+	@Inject
+	private ProbeTarget probeTarget;
+	@Inject
+	private StageTarget stageTarget;
+	@Inject
+	private SceneDoors doors;
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
 	private final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
 
@@ -82,25 +96,9 @@ public class RoutePlanner
 	private final Set<String> refusedChanges = new HashSet<>();
 
 	@Inject
-	RoutePlanner(Client client, ClueLink clueLink, PlayerModel player, AvailabilityService availability, CatalogData catalogData,
-		WalkData walkData, PlannerRunner runner, ClueHelperConfig config, BankMemory bankMemory, StepNeeds stepNeeds, PohService poh,
-		ProbeTarget probeTarget, StageTarget stageTarget, SceneDoors doors, ScheduledExecutorService executor, ClientThread clientThread)
+	void init(ScheduledExecutorService executor, ClientThread clientThread)
 	{
-		this.startRunner = new PlannerRunner(executor, clientThread);
-		this.stageTarget = stageTarget;
-		this.doors = doors;
-		this.poh = poh;
-		this.probeTarget = probeTarget;
-		this.bankMemory = bankMemory;
-		this.stepNeeds = stepNeeds;
-		this.client = client;
-		this.clueLink = clueLink;
-		this.player = player;
-		this.availability = availability;
-		this.catalogData = catalogData;
-		this.walkData = walkData;
-		this.runner = runner;
-		this.config = config;
+		startRunner = new PlannerRunner(executor, clientThread);
 	}
 
 	/** The guide takes such a scroll out at the bank as the plan does. */

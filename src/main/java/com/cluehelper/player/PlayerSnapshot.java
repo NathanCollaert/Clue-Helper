@@ -29,8 +29,6 @@ public final class PlayerSnapshot
 	private final AccountType accountType;
 	private final Map<Integer, Integer> inventory;
 	private final Map<Integer, Integer> worn;
-	/** -1 when nothing is wielded. */
-	private final int weapon;
 	/** The pouch varbits keep their values while it is banked, so they only count while it is held. */
 	private final boolean pouchHeld;
 	private final Map<Integer, Integer> pouch;
@@ -63,7 +61,7 @@ public final class PlayerSnapshot
 	@Builder(toBuilder = true)
 	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
 		boolean pvpWorld, String dormantReason, AccountType accountType, Map<Integer, Integer> inventory,
-		Map<Integer, Integer> worn, int weapon, boolean pouchHeld, Map<Integer, Integer> pouch,
+		Map<Integer, Integer> worn, boolean pouchHeld, Map<Integer, Integer> pouch,
 		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
 		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
 		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
@@ -80,7 +78,6 @@ public final class PlayerSnapshot
 		this.accountType = accountType;
 		this.inventory = copy(inventory);
 		this.worn = copy(worn);
-		this.weapon = weapon;
 		this.pouchHeld = pouchHeld;
 		this.pouch = pouchHeld ? copy(pouch) : Map.of();
 		this.boostedLevels = copy(boostedLevels);

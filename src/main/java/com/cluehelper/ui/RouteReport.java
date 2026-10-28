@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 import javax.inject.*;
 import net.runelite.api.ChatMessageType;
@@ -245,12 +246,7 @@ public class RouteReport
 
 	private static String tiles(List<WorldPoint> tiles)
 	{
-		StringBuilder out = new StringBuilder();
-		for (WorldPoint tile : tiles)
-		{
-			out.append(out.length() == 0 ? "" : ", ").append(tile(tile));
-		}
-		return out.toString();
+		return tiles.stream().map(RouteReport::tile).collect(Collectors.joining(", "));
 	}
 
 	private static String tile(WorldPoint tile)

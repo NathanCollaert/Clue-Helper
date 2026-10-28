@@ -1,27 +1,35 @@
 package com.cluehelper.step;
 
 import java.util.*;
+import lombok.*;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 
-/** Core's item requirements are tested only through their own {@code fulfilledBy}, never taken apart. */
+/**
+ * Core's item requirements are tested only through their own {@code fulfilledBy}, never taken apart. Equal by value: a
+ * rewritten step (a probe trip, a stage dropped) is rebuilt every tick and must equal the last one.
+ */
+@Getter
+@EqualsAndHashCode
 public final class StepRequirements
 {
+	/** The {@code stashObjectId} of a step without a STASH unit. */
+	public static final int NO_STASH = -1;
+
 	private final SpadeNeed spade;
+	@Getter(AccessLevel.NONE)
 	private final boolean light;
+	/** The varbit that says the step's fire pit is lit, so no light is needed; -1 for none. */
 	private final int firePitVarbitId;
+	/** Core's light-source varbit of a coordinate clue; -1 for none. */
 	private final int lightSourceVarbitId;
 	private final List<ItemRequirement> items;
+	/** Items the step's route needs that core's *clue* bank tag doesn't list: Charlie's item. */
 	private final List<ItemRequirement> ownItems;
+	/** The emote step's STASH unit object, or {@link #NO_STASH}. */
 	private final int stashObjectId;
 
 	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
-		int stashObjectId)
-	{
-		this(spade, light, firePitVarbitId, lightSourceVarbitId, items, List.of(), stashObjectId);
-	}
-
-	private StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
 		List<ItemRequirement> ownItems, int stashObjectId)
 	{
 		this.spade = spade;
@@ -33,12 +41,9 @@ public final class StepRequirements
 		this.stashObjectId = stashObjectId;
 	}
 
-	/** The {@code stashObjectId} of a step without a STASH unit. */
-	public static final int NO_STASH = -1;
-
 	public static StepRequirements none()
 	{
-		return new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), NO_STASH);
+		return new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), List.of(), NO_STASH);
 	}
 
 	public StepRequirements plus(ItemRequirement item)
@@ -48,55 +53,14 @@ public final class StepRequirements
 		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, more, ownItems, stashObjectId);
 	}
 
-	/** An item the step's route needs that core's *clue* bank tag doesn't list: Charlie's item. */
-	public StepRequirements plusOwn(ItemRequirement item)
-	{
-		List<ItemRequirement> more = new ArrayList<>(ownItems);
-		more.add(item);
-		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, items, more, stashObjectId);
-	}
-
-	public List<ItemRequirement> getOwnItems()
-	{
-		return ownItems;
-	}
-
-	/** The emote step's STASH unit object, or {@link #NO_STASH}. */
-	public int getStashObjectId()
-	{
-		return stashObjectId;
-	}
-
 	public boolean hasStash()
 	{
 		return stashObjectId != NO_STASH;
 	}
 
-	public SpadeNeed getSpade()
-	{
-		return spade;
-	}
-
 	public boolean needsLight()
 	{
 		return light;
-	}
-
-	/** The varbit that says the step's fire pit is lit, so no light is needed; -1 for none. */
-	public int getFirePitVarbitId()
-	{
-		return firePitVarbitId;
-	}
-
-	/** Core's light-source varbit of a coordinate clue; -1 for none. */
-	public int getLightSourceVarbitId()
-	{
-		return lightSourceVarbitId;
-	}
-
-	public List<ItemRequirement> getItems()
-	{
-		return items;
 	}
 
 	public boolean itemsFulfilledBy(Item[] items)
@@ -109,26 +73,6 @@ public final class StepRequirements
 			}
 		}
 		return true;
-	}
-
-	/** By value: a rewritten step (a probe trip, a stage dropped) is rebuilt every tick and must equal the last one. */
-	@Override
-	public boolean equals(Object other)
-	{
-		if (!(other instanceof StepRequirements))
-		{
-			return false;
-		}
-		StepRequirements that = (StepRequirements) other;
-		return spade == that.spade && light == that.light && firePitVarbitId == that.firePitVarbitId
-			&& lightSourceVarbitId == that.lightSourceVarbitId && stashObjectId == that.stashObjectId && items.equals(that.items)
-			&& ownItems.equals(that.ownItems);
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return Objects.hash(spade, light, firePitVarbitId, lightSourceVarbitId, stashObjectId, items, ownItems);
 	}
 
 	@Override

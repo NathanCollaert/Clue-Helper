@@ -1,13 +1,14 @@
 package com.cluehelper.ui;
 
-import com.cluehelper.guide.LeftClicks;
+import com.cluehelper.guide.*;
 import com.cluehelper.route.*;
 import java.awt.Rectangle;
 import java.util.*;
+import java.util.function.*;
 import javax.inject.*;
 import lombok.Value;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.coords.*;
 
 /** The objects a path line leads through: each walk row it takes (a ladder, stairs, a shortcut) and each closed door. */
 @Singleton
@@ -29,10 +30,6 @@ final class PathObjects
 		int objectId;
 		String option;
 	}
-	private static final int WEST = 1;
-	private static final int NORTH = 2;
-	private static final int EAST = 4;
-	private static final int SOUTH = 8;
 	private static final String OPEN = "Open";
 
 	@Inject
@@ -50,16 +47,21 @@ final class PathObjects
 			WorldPoint to = path.get(i + 1);
 			if (isJump(from, to))
 			{
-				addRowObject(objects, view, table == null ? List.of() : table.rowObjects(from, to), from);
+				addRowObject(objects, view, rows(table, from, to), from);
 			}
 			else
 			{
 				addClosedDoor(objects, view, from, to);
-				addRowObject(objects, view, table == null ? List.of() : table.rowObjects(from, to), from);
+				addRowObject(objects, view, rows(table, from, to), from);
 				addWalkedOverRow(objects, view, table, path, i);
 			}
 		}
 		return objects;
+	}
+
+	private static List<Exit> rows(WalkTable table, WorldPoint from, WorldPoint to)
+	{
+		return table == null ? List.of() : table.rowObjects(from, to);
 	}
 
 	/**
@@ -69,9 +71,9 @@ final class PathObjects
 	private void addWalkedOverRow(Map<TileObject, String> objects, WorldView view, WalkTable table,
 		List<WorldPoint> path, int origin)
 	{
-		for (int j = origin + 2; table != null && j < Math.min(path.size(), origin + 1 + ROW_OBJECT_TILES + 2); j++)
+		for (int j = origin + 2; j < Math.min(path.size(), origin + 1 + ROW_OBJECT_TILES + 2); j++)
 		{
-			addRowObject(objects, view, table.rowObjects(path.get(origin), path.get(j)), path.get(origin));
+			addRowObject(objects, view, rows(table, path.get(origin), path.get(j)), path.get(origin));
 		}
 	}
 
@@ -112,22 +114,8 @@ final class PathObjects
 	/** A closed trapdoor is another object of the same name, opened first: the row names only its open form. */
 	private void addClosed(Map<TileObject, String> objects, WorldView view, Exit row, WorldPoint origin)
 	{
-		TileObject closed = null;
-		for (int dx = -ROW_OBJECT_TILES; dx <= ROW_OBJECT_TILES; dx++)
-		{
-			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
-			{
-				Tile tile = tile(view, origin.dx(dx).dy(dy));
-				for (TileObject object : tile == null ? List.<TileObject>of() : objectsOn(tile))
-				{
-					boolean opens = row.getTarget().equals(nameOf(object)) && hasOption(object, OPEN);
-					if (opens && (closed == null || squaredDistance(object, origin) < squaredDistance(closed, origin)))
-					{
-						closed = object;
-					}
-				}
-			}
-		}
+		TileObject closed = nearestAround(view, origin, object -> row.getTarget().equals(nameOf(object)) && hasOption(object, OPEN),
+			(at, object) -> squaredDistance(object, origin));
 		if (closed != null)
 		{
 			objects.putIfAbsent(closed, OPEN);
@@ -136,8 +124,7 @@ final class PathObjects
 
 	private boolean hasOption(TileObject object, String option)
 	{
-		ObjectComposition shown = LeftClicks.shownForm(client.getObjectDefinition(object.getId()));
-		return shown.getActions() != null && Arrays.asList(shown.getActions()).contains(option);
+		return Widgets.hasAction(LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getActions(), option);
 	}
 
 	private static int squaredDistance(TileObject object, WorldPoint origin)
@@ -145,7 +132,7 @@ final class PathObjects
 		return squaredDistance(object.getWorldLocation(), origin);
 	}
 
-	private static int squaredDistance(WorldPoint a, WorldPoint b)
+	static int squaredDistance(WorldPoint a, WorldPoint b)
 	{
 		int dx = a.getX() - b.getX();
 		int dy = a.getY() - b.getY();
@@ -167,7 +154,7 @@ final class PathObjects
 				Tile tile = tile(view, new WorldPoint(x, y, crossed.getPlane()));
 				if (tile != null)
 				{
-					objectsOn(tile).stream().filter(object -> name != null && name.equals(nameOf(object))).forEach(found::add);
+					SceneObjects.objectsOn(tile).stream().filter(object -> name != null && name.equals(nameOf(object))).forEach(found::add);
 				}
 			}
 		}
@@ -182,7 +169,7 @@ final class PathObjects
 	 */
 	List<TileObject> rowObjectsAround(WorldView view, WalkTable table, WorldPoint from, WorldPoint to, Rectangle around)
 	{
-		List<Exit> rows = table == null ? List.of() : table.rowObjects(from, to);
+		List<Exit> rows = rows(table, from, to);
 		Map<Integer, TileObject> nearestByRow = new LinkedHashMap<>();
 		for (int x = around.x; !rows.isEmpty() && x < around.x + around.width; x++)
 		{
@@ -193,7 +180,7 @@ final class PathObjects
 				{
 					continue;
 				}
-				for (TileObject object : objectsOn(tile))
+				for (TileObject object : SceneObjects.objectsOn(tile))
 				{
 					for (Exit row : rows)
 					{
@@ -220,32 +207,11 @@ final class PathObjects
 		return squaredDistance(object, from) + (hop ? squaredDistance(object, to) : 0);
 	}
 
-	private List<TileObject> objectsOn(Tile tile)
-	{
-		List<TileObject> objects = new ArrayList<>();
-		for (GameObject object : tile.getGameObjects())
-		{
-			if (object != null)
-			{
-				objects.add(object);
-			}
-		}
-		for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject()})
-		{
-			if (object != null)
-			{
-				objects.add(object);
-			}
-		}
-		return objects;
-	}
-
 	private String nameOf(TileObject object)
 	{
 		return LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getName();
 	}
 
-	/** The one nearest the row's origin: a pipe's two ends share an id, and the one clicked is the near end. */
 	/**
 	 * The object a row crosses. Across a short hop on one floor it stands between the row's ends: the Kharazi Jungle's
 	 * bushes share one id, and the one beside the origin is as near as the one in front of it.
@@ -254,30 +220,21 @@ final class PathObjects
 	{
 		WorldPoint end = row.getDestination();
 		boolean hop = end.getPlane() == origin.getPlane() && end.distanceTo2D(origin) <= ROW_OBJECT_TILES;
-		if (!hop)
-		{
-			return objectNear(view, row.getObjectId(), origin);
-		}
-		TileObject between = null;
-		int nearestBoth = Integer.MAX_VALUE;
-		for (int dx = -ROW_OBJECT_TILES; dx <= ROW_OBJECT_TILES; dx++)
-		{
-			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
-			{
-				WorldPoint at = origin.dx(dx).dy(dy);
-				TileObject object = objectOn(tile(view, at), row.getObjectId());
-				int toBoth = squaredDistance(at, origin) + squaredDistance(at, end);
-				if (object != null && toBoth < nearestBoth)
-				{
-					between = object;
-					nearestBoth = toBoth;
-				}
-			}
-		}
-		return between;
+		return nearestAround(view, origin, object -> isObject(object, row.getObjectId()),
+			(at, object) -> squaredDistance(at, origin) + (hop ? squaredDistance(at, end) : 0));
 	}
 
 	private TileObject objectNear(WorldView view, int id, WorldPoint origin)
+	{
+		return nearestAround(view, origin, object -> isObject(object, id), (at, object) -> squaredDistance(at, origin));
+	}
+
+	/**
+	 * Of the objects {@code wanted} within {@link #ROW_OBJECT_TILES} of the origin, the one with the lowest
+	 * {@code distance} of its tile and itself; of several as near, the first met going west to east, south to north.
+	 */
+	private static TileObject nearestAround(WorldView view, WorldPoint origin, Predicate<TileObject> wanted,
+		ToIntBiFunction<WorldPoint, TileObject> distance)
 	{
 		TileObject nearest = null;
 		int nearestDistance = Integer.MAX_VALUE;
@@ -285,21 +242,20 @@ final class PathObjects
 		{
 			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
 			{
-				TileObject object = objectOn(tile(view, origin.dx(dx).dy(dy)), id);
-				int distance = dx * dx + dy * dy;
-				if (object != null && distance < nearestDistance)
+				WorldPoint at = origin.dx(dx).dy(dy);
+				Tile tile = tile(view, at);
+				for (TileObject object : tile == null ? List.<TileObject>of() : SceneObjects.objectsOn(tile))
 				{
-					nearest = object;
-					nearestDistance = distance;
+					int toObject = wanted.test(object) ? distance.applyAsInt(at, object) : Integer.MAX_VALUE;
+					if (toObject < nearestDistance)
+					{
+						nearest = object;
+						nearestDistance = toObject;
+					}
 				}
 			}
 		}
 		return nearest;
-	}
-
-	private TileObject objectOn(Tile tile, int id)
-	{
-		return tile == null ? null : objectsOn(tile).stream().filter(object -> isObject(object, id)).findFirst().orElse(null);
 	}
 
 	/** Shortest Path names a multiloc by the form it shows (the Kharazi broken cart: 28931, placed as 2216). */
@@ -316,8 +272,8 @@ final class PathObjects
 	{
 		int dx = Integer.signum(to.getX() - from.getX());
 		int dy = Integer.signum(to.getY() - from.getY());
-		int fromSides = (dx > 0 ? EAST : dx < 0 ? WEST : 0) | (dy > 0 ? NORTH : dy < 0 ? SOUTH : 0);
-		int toSides = (dx > 0 ? WEST : dx < 0 ? EAST : 0) | (dy > 0 ? SOUTH : dy < 0 ? NORTH : 0);
+		int fromSides = (dx > 0 ? SceneDoors.EAST : dx < 0 ? SceneDoors.WEST : 0) | (dy > 0 ? SceneDoors.NORTH : dy < 0 ? SceneDoors.SOUTH : 0);
+		int toSides = (dx > 0 ? SceneDoors.WEST : dx < 0 ? SceneDoors.EAST : 0) | (dy > 0 ? SceneDoors.SOUTH : dy < 0 ? SceneDoors.NORTH : 0);
 		for (TileObject door : new TileObject[]{closedDoorFacing(view, from, fromSides),
 			closedDoorFacing(view, to, toSides), doors.diagonalDoor(tile(view, to))})
 		{
@@ -337,14 +293,7 @@ final class PathObjects
 
 	private static Tile tile(WorldView view, WorldPoint at)
 	{
-		int x = at.getX() - view.getBaseX();
-		int y = at.getY() - view.getBaseY();
-		Tile[][][] tiles = view.getScene().getTiles();
-		if (at.getPlane() < 0 || at.getPlane() >= tiles.length || x < 0 || y < 0 || x >= tiles[at.getPlane()].length
-			|| y >= tiles[at.getPlane()][x].length)
-		{
-			return null;
-		}
-		return tiles[at.getPlane()][x][y];
+		LocalPoint local = LocalPoint.fromWorld(view, at);
+		return local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
 	}
 }

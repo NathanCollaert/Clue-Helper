@@ -23,16 +23,16 @@ public class KeyRingMemory
 	private static final String METAL_KEY = "metal key";
 	private static final String ON_THE_RING = METAL_KEY + " -> steel key ring";
 
-	private final Client client;
-	private final PlayerModel player;
-	private final MemorySlot<Ring> remembered;
+	@Inject
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	private MemorySlot<Ring> remembered;
 
 	@Inject
-	KeyRingMemory(Client client, MemoryStore memory, PlayerModel player)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.player = player;
-		this.remembered = memory.slot(KEY, Ring.class, Ring::new);
+		remembered = memory.slot(KEY, Ring.class, Ring::new);
 	}
 
 	/** Call on start and after a profile change. */

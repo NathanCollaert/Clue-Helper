@@ -52,15 +52,15 @@ public class GuideBoxPresenter
 		overlay.show(shown.build());
 	}
 
-	public BoxState boxState()
+	private BoxState boxState()
 	{
-		return BoxState.of(dormantReason() != null, clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
+		return BoxState.of(isDormant(), clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
 	}
 
-	private String dormantReason()
+	private boolean isDormant()
 	{
 		PlayerSnapshot snapshot = playerModel.getSnapshot();
-		return snapshot == null ? null : snapshot.getDormantReason();
+		return snapshot != null && snapshot.getDormantReason() != null;
 	}
 
 	private HotColdView hotColdView()

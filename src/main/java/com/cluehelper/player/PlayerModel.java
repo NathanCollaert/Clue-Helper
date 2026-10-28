@@ -432,7 +432,6 @@ public class PlayerModel
 			.accountType(AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)))
 			.inventory(bankMemory.withKit(inventory))
 			.worn(worn)
-			.weapon(weapon())
 			.pouchHeld(pouchHeld)
 			.pouch(pouchHeld ? pouch() : Map.of())
 			.boostedLevels(boosted)
@@ -470,13 +469,6 @@ public class PlayerModel
 			}
 		}
 		return contents;
-	}
-
-	private int weapon()
-	{
-		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
-		Item item = worn == null ? null : worn.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
-		return item == null ? -1 : item.getId();
 	}
 
 	private Map<Integer, Integer> pouch()

@@ -68,16 +68,6 @@ public class StageTarget
 			}
 			dropped++;
 		}
-		if (dropped == 0)
-		{
-			return step;
-		}
-		List<Stage> left = step.getStages().subList(dropped, step.getStages().size());
-		boolean onlyFinal = left.size() == 1 && left.get(0).getKind() == Stage.Kind.FINAL;
-		return step.toBuilder()
-			.stages(onlyFinal ? List.of() : List.copyOf(left))
-			.targets(Stages.tiles(left))
-			.kind(onlyFinal ? TargetKind.ANY_OF : TargetKind.SEQUENCE)
-			.build();
+		return dropped == 0 ? step : Stages.withStagesLeft(step, step.getStages().subList(dropped, step.getStages().size()));
 	}
 }

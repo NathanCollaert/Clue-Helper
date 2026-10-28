@@ -15,7 +15,9 @@ import net.runelite.api.coords.LocalPoint;
 final class ModelSilhouette
 {
 	private static final int OFF_SCREEN = Integer.MIN_VALUE;
+	/** A face the client never draws. */
 	private static final int HIDDEN_FACE = -2;
+	/** RuneLite's outline renderer skips faces this transparent. */
 	private static final int SEE_THROUGH = 254;
 	private static final int NO_ROTATION = 0;
 
@@ -109,11 +111,13 @@ final class ModelSilhouette
 		}
 	}
 
-	private static boolean isDrawn(Model model, int face)
+	/** Neither skipped by the outline renderer as see-through nor never drawn by the client. */
+	static boolean isDrawn(Model model, int face)
 	{
 		byte[] transparencies = model.getFaceTransparencies();
+		int[] colours = model.getFaceColors3();
 		boolean seeThrough = transparencies != null && (transparencies[face] & 0xFF) >= SEE_THROUGH;
-		return !seeThrough && model.getFaceColors3()[face] != HIDDEN_FACE;
+		return !seeThrough && (colours == null || colours[face] != HIDDEN_FACE);
 	}
 
 	private static boolean facesCamera(int x1, int y1, int x2, int y2, int x3, int y3)

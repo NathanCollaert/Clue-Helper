@@ -1,5 +1,9 @@
 package com.cluehelper.ui;
 
+import lombok.*;
+
+@Getter
+@RequiredArgsConstructor
 public enum BoxState
 {
 	DORMANT(null, null),
@@ -12,22 +16,6 @@ public enum BoxState
 
 	private final String title;
 	private final String detail;
-
-	BoxState(String title, String detail)
-	{
-		this.title = title;
-		this.detail = detail;
-	}
-
-	public String getTitle()
-	{
-		return title;
-	}
-
-	public String getDetail()
-	{
-		return detail;
-	}
 
 	/** Only while the Clue Scroll plugin shows a clue: the box sits under core's and is never on screen alone. */
 	public boolean showsRoutes()

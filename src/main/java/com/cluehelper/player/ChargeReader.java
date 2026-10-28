@@ -29,17 +29,17 @@ public class ChargeReader
 		ItemID.XERIC_TALISMAN, ItemID.RING_OF_SHADOWS, ItemID.CAMULET);
 	private static final Map<Integer, String> ITEM_CHARGES_KEYS = Map.of(ItemID.CHRONICLE, "chronicle");
 
-	private final Client client;
-	private final ConfigManager configManager;
-	private final MemorySlot<RememberedCharges> remembered;
+	@Inject
+	private Client client;
+	@Inject
+	private ConfigManager configManager;
+	private MemorySlot<RememberedCharges> remembered;
 	private final Map<Integer, Integer> chargesInName = new HashMap<>();
 
 	@Inject
-	ChargeReader(Client client, ConfigManager configManager, MemoryStore memory)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.configManager = configManager;
-		this.remembered = memory.slot(MEMORY_KEY, RememberedCharges.class, RememberedCharges::new);
+		remembered = memory.slot(MEMORY_KEY, RememberedCharges.class, RememberedCharges::new);
 	}
 
 	static Collection<Integer> chargeVarbits()

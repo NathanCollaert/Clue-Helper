@@ -2,6 +2,7 @@ package com.cluehelper.hotcold;
 
 import com.cluehelper.step.HotColdTier;
 import java.util.*;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -9,6 +10,7 @@ import net.runelite.api.coords.WorldPoint;
  * the Chebyshev distance, and each comparison against the previous reading of the log. When no tile explains them all,
  * the tiles with the fewest misses are kept instead, so the grid never empties.
  */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Hypotheses
 {
 	/** 133 of 140 cache centres equal core's, so a spot's prior sits mostly on its centre. */
@@ -20,16 +22,6 @@ public final class Hypotheses
 	private final int[] spot;
 	private final double[] weight;
 	private final int misses;
-
-	private Hypotheses(List<Spot> spots, int[] x, int[] y, int[] spot, double[] weight, int misses)
-	{
-		this.spots = spots;
-		this.x = x;
-		this.y = y;
-		this.spot = spot;
-		this.weight = weight;
-		this.misses = misses;
-	}
 
 	/**
 	 * The grid of the newest readings that a spot fits exactly and that keep no spot core has dropped. An older reading
@@ -338,6 +330,7 @@ public final class Hypotheses
 	}
 
 	/** Sampled hypotheses with weights summing to 1; spots are indexed into {@link #names}. */
+	@AllArgsConstructor(access = AccessLevel.PACKAGE)
 	public static final class Samples
 	{
 		final List<String> names;
@@ -345,15 +338,6 @@ public final class Hypotheses
 		final int[] y;
 		final int[] spot;
 		final double[] weight;
-
-		Samples(List<String> names, int[] x, int[] y, int[] spot, double[] weight)
-		{
-			this.names = names;
-			this.x = x;
-			this.y = y;
-			this.spot = spot;
-			this.weight = weight;
-		}
 
 		public int spotCount()
 		{

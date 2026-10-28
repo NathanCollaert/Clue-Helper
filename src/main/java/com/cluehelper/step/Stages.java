@@ -89,28 +89,30 @@ public final class Stages
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
 	}
 
-	/** The task's places drop once the player owns one of the entry's {@code anywhereWith} items (a sacred eel). */
 	/** The step as the player's state leaves it: a task done anywhere once an item is owned, or under way inside its area. */
 	public static Step adjusted(Step step, Predicate<Integer> owns, WorldPoint at)
 	{
 		return underWayInSpan(doneAnywhereWhenOwned(withoutOwnedDrops(step, owns), owns), at);
 	}
 
-	/** A kill for an item the player already owns is skipped; the step keeps its own places alone once no stage is left. */
+	/** A kill for an item the player already owns is skipped. */
 	private static Step withoutOwnedDrops(Step step, Predicate<Integer> owns)
 	{
 		List<Stage> left = step.getStages().stream()
 			.filter(stage -> stage.getSkippedWhenOwned().stream().noneMatch(owns))
 			.collect(Collectors.toUnmodifiableList());
-		if (left.size() == step.getStages().size())
-		{
-			return step;
-		}
+		return left.size() == step.getStages().size() ? step : withStagesLeft(step, left);
+	}
+
+	/** The step with only these stages left; once only its own final stage is, the step keeps its own places alone. */
+	static Step withStagesLeft(Step step, List<Stage> left)
+	{
 		boolean onlyFinal = left.size() == 1 && left.get(0).getKind() == Stage.Kind.FINAL;
-		return step.toBuilder().stages(onlyFinal ? List.of() : left).targets(tiles(left))
+		return step.toBuilder().stages(onlyFinal ? List.of() : List.copyOf(left)).targets(tiles(left))
 			.kind(onlyFinal ? TargetKind.ANY_OF : TargetKind.SEQUENCE).build();
 	}
 
+	/** The task's places drop once the player owns one of the entry's {@code anywhereWith} items (a sacred eel). */
 	private static Step doneAnywhereWhenOwned(Step step, Predicate<Integer> owns)
 	{
 		StepIndex.Entry entry = step.getData();

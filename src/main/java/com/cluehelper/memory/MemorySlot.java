@@ -3,10 +3,12 @@ package com.cluehelper.memory;
 import com.google.gson.*;
 import java.util.Objects;
 import java.util.function.Supplier;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 /** Safe to use from any thread. */
 @Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemorySlot<T>
 {
 	private final String key;
@@ -18,15 +20,6 @@ public final class MemorySlot<T>
 	private boolean loaded;
 	private String loadedProfile;
 	private T value;
-
-	MemorySlot(String key, Class<T> type, Supplier<T> fresh, ProfileConfig profile, Gson gson)
-	{
-		this.key = key;
-		this.type = type;
-		this.fresh = fresh;
-		this.profile = profile;
-		this.gson = gson;
-	}
 
 	public synchronized T get()
 	{

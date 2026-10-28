@@ -133,7 +133,7 @@ public class StepResolver
 			.regions(List.of())
 			.objectIds(List.of())
 			.objectNames(List.of())
-			.requirements(new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), StepRequirements.NO_STASH))
+			.requirements(StepRequirements.none())
 			.build();
 	}
 
@@ -275,9 +275,8 @@ public class StepResolver
 		SpadeNeed spade = clue.isRequiresSpade() ? SpadeNeed.SPADE : SpadeNeed.NONE;
 		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
 		List<ItemRequirement> items = CoreClueReader.challengeCompleted(clue) ? List.of() : CoreClueReader.itemRequirements(clue);
-		StepRequirements requirements = new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
-			CoreClueReader.lightSourceVarbitId(clue), items, stash == null ? StepRequirements.NO_STASH : stash.getObjectId());
 		ItemRequirement charliesItem = CoreClueReader.returnItem(clue);
-		return charliesItem == null ? requirements : requirements.plusOwn(charliesItem);
+		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(), CoreClueReader.lightSourceVarbitId(clue),
+			items, charliesItem == null ? List.of() : List.of(charliesItem), stash == null ? StepRequirements.NO_STASH : stash.getObjectId());
 	}
 }

@@ -14,12 +14,6 @@ import net.runelite.api.coords.WorldPoint;
 @Singleton
 final class LineTargets
 {
-	/** WallObject.getOrientationA's sides of its tile. */
-	private static final int WALL_WEST = 1;
-	private static final int WALL_NORTH = 2;
-	private static final int WALL_EAST = 4;
-	private static final int WALL_SOUTH = 8;
-
 	@Inject
 	private Client client;
 	@Inject
@@ -121,13 +115,13 @@ final class LineTargets
 		WorldPoint at = object.getWorldLocation();
 		switch (((WallObject) object).getOrientationA())
 		{
-			case WALL_WEST:
+			case SceneDoors.WEST:
 				return new WorldPoint[] {at, at.dx(-1)};
-			case WALL_NORTH:
+			case SceneDoors.NORTH:
 				return new WorldPoint[] {at, at.dy(1)};
-			case WALL_EAST:
+			case SceneDoors.EAST:
 				return new WorldPoint[] {at, at.dx(1)};
-			case WALL_SOUTH:
+			case SceneDoors.SOUTH:
 				return new WorldPoint[] {at, at.dy(-1)};
 			default:
 				return null;

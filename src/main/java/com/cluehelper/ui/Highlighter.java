@@ -1,6 +1,7 @@
 package com.cluehelper.ui;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -30,15 +31,15 @@ import net.runelite.client.util.ImageUtil;
 @Slf4j
 public class Highlighter
 {
+	/** Cyan, so nothing of ours can be mistaken for the Clue Scroll plugin's yellow arrow. */
+	static final Color COLOUR = new Color(64, 208, 255);
+	static final Color FILL = new Color(64, 208, 255, 40);
+	static final Color ONE_CLICK_FILL = new Color(64, 208, 255, 90);
 	/** Wide enough to show on the nexus, which is cyan itself. */
 	private static final int OUTLINE_WIDTH = 4;
 	private static final int FEATHER = 4;
 	private static final int ARC = 6;
 	private static final float STROKE = 2f;
-	/** A face the client never draws. */
-	private static final int HIDDEN_FACE = -2;
-	/** RuneLite's outline renderer skips faces this transparent. */
-	private static final int SEE_THROUGH = 254;
 	/**
 	 * A flat click spot (two triangles) laid over scenery drawn by other objects: the Broken bridge's gap. Its outline is a
 	 * sliver no one sees.
@@ -84,10 +85,10 @@ public class Highlighter
 			}
 			if (leftClick)
 			{
-				graphics.setColor(Markers.ONE_CLICK_FILL);
+				graphics.setColor(ONE_CLICK_FILL);
 				graphics.fill(silhouette.of(object));
 			}
-			outlines.drawOutline(object, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
+			outlines.drawOutline(object, OUTLINE_WIDTH, COLOUR, FEATHER);
 			if (FAIRY_RINGS.contains(object.getId()))
 			{
 				groundRing(graphics, object);
@@ -119,7 +120,7 @@ public class Highlighter
 			}
 			ring.addPoint(point.getX(), point.getY());
 		}
-		graphics.setColor(Markers.COLOUR);
+		graphics.setColor(COLOUR);
 		graphics.setStroke(new BasicStroke(STROKE));
 		graphics.draw(ring);
 	}
@@ -147,10 +148,7 @@ public class Highlighter
 		{
 			return true;
 		}
-		byte[] transparencies = model.getFaceTransparencies();
-		int[] colours = model.getFaceColors3();
-		return IntStream.range(0, model.getFaceCount()).allMatch(face ->
-			transparencies != null && (transparencies[face] & 0xFF) >= SEE_THROUGH || colours != null && colours[face] == HIDDEN_FACE);
+		return IntStream.range(0, model.getFaceCount()).noneMatch(face -> ModelSilhouette.isDrawn(model, face));
 	}
 
 	public void npc(Graphics2D graphics, NPC npc, boolean leftClick)
@@ -160,10 +158,10 @@ public class Highlighter
 		{
 			if (leftClick)
 			{
-				graphics.setColor(Markers.ONE_CLICK_FILL);
+				graphics.setColor(ONE_CLICK_FILL);
 				graphics.fill(silhouette.of(npc));
 			}
-			outlines.drawOutline(npc, OUTLINE_WIDTH, Markers.COLOUR, FEATHER);
+			outlines.drawOutline(npc, OUTLINE_WIDTH, COLOUR, FEATHER);
 		}
 	}
 
@@ -178,15 +176,15 @@ public class Highlighter
 		if (leftClick)
 		{
 			BufferedImage image = itemManager.getImage(itemId, quantity, false);
-			graphics.drawImage(ImageUtil.fillImage(image, Markers.ONE_CLICK_FILL), bounds.x, bounds.y, null);
+			graphics.drawImage(ImageUtil.fillImage(image, ONE_CLICK_FILL), bounds.x, bounds.y, null);
 		}
-		graphics.drawImage(itemManager.getItemOutline(itemId, quantity, Markers.COLOUR), bounds.x, bounds.y, null);
+		graphics.drawImage(itemManager.getItemOutline(itemId, quantity, COLOUR), bounds.x, bounds.y, null);
 	}
 
 	/** An item's outline scaled into {@code bounds}, for a picture larger than the inventory icon (a scroll book entry). */
 	public void itemScaled(Graphics2D graphics, int itemId, Rectangle bounds)
 	{
-		BufferedImage outline = itemManager.getItemOutline(itemId, 1, Markers.COLOUR);
+		BufferedImage outline = itemManager.getItemOutline(itemId, 1, COLOUR);
 		double scale = Math.min(bounds.getWidth() / outline.getWidth(), bounds.getHeight() / outline.getHeight());
 		int width = (int) Math.round(outline.getWidth() * scale);
 		int height = (int) Math.round(outline.getHeight() * scale);
@@ -201,9 +199,9 @@ public class Highlighter
 	/** A spell, a tab stone, a fairy ring dial: things without text or a model. */
 	public void box(Graphics2D graphics, Shape shape)
 	{
-		graphics.setColor(Markers.FILL);
+		graphics.setColor(FILL);
 		graphics.fill(shape);
-		graphics.setColor(Markers.COLOUR);
+		graphics.setColor(COLOUR);
 		graphics.setStroke(new BasicStroke(STROKE));
 		graphics.draw(shape);
 	}
@@ -211,7 +209,6 @@ public class Highlighter
 	/** A spot to walk to with nothing on it to outline. */
 	public void tile(Graphics2D graphics, Polygon tile)
 	{
-		OverlayUtil.renderPolygon(graphics, tile, Markers.COLOUR);
+		OverlayUtil.renderPolygon(graphics, tile, COLOUR);
 	}
-
 }

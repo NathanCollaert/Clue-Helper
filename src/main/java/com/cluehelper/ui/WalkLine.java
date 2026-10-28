@@ -17,10 +17,13 @@ final class WalkLine
 	/** A player this far from every tile of the walk still ahead took another way, or went back over an obstacle. */
 	private static final int OFF_WALK_TILES = 2;
 
-	private final Client client;
-	private final RoutePlanner routes;
-	private final WorldWalk walker;
-	private final PlannerRunner runner;
+	@Inject
+	private Client client;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private WorldWalk walker;
+	private PlannerRunner runner;
 
 	private WalkGoal goal;
 	private WalkCosts here;
@@ -30,12 +33,9 @@ final class WalkLine
 	private boolean stale;
 
 	@Inject
-	WalkLine(Client client, RoutePlanner routes, WorldWalk walker, ScheduledExecutorService executor, ClientThread clientThread)
+	void init(ScheduledExecutorService executor, ClientThread clientThread)
 	{
-		this.client = client;
-		this.routes = routes;
-		this.walker = walker;
-		this.runner = new PlannerRunner(executor, clientThread);
+		runner = new PlannerRunner(executor, clientThread);
 	}
 
 	/** Searches the walk to {@code goal} again when it is new, left, or stale; the walk found last stays until then. */

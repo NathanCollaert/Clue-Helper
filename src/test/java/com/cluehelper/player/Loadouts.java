@@ -138,7 +138,6 @@ public final class Loadouts
 			.accountType(ACCOUNT_TYPES.getOrDefault(name, AccountType.NORMAL))
 			.inventory(inventory)
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - carriedItems))
-			.weapon(-1)
 			.boostedLevels(levels)
 			.realLevels(levels)
 			.totalLevel(f.get("maxTotal").getAsBoolean() ? 99 * Skill.values().length

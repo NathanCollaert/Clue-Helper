@@ -43,17 +43,26 @@ public class HotColdService
 	/** A feel this close to where "feel where you stand" was planned tells about the same. */
 	private static final int HERE_DRIFT_TILES = 2;
 
-	private final Client client;
-	private final ClueLink clueLink;
-	private final PlayerModel player;
-	private final RoutePlanner routes;
-	private final ProbeTarget probeTarget;
-	private final StepData stepData;
-	private final StepNeeds stepNeeds;
-	private final AvailabilityService availability;
-	private final ClueHelperConfig config;
-	private final PlannerRunner runner;
-	private final MemorySlot<FeelLogs> logs;
+	@Inject
+	private Client client;
+	@Inject
+	private ClueLink clueLink;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private ProbeTarget probeTarget;
+	@Inject
+	private StepData stepData;
+	@Inject
+	private StepNeeds stepNeeds;
+	@Inject
+	private AvailabilityService availability;
+	@Inject
+	private ClueHelperConfig config;
+	private PlannerRunner runner;
+	private MemorySlot<FeelLogs> logs;
 	private final List<Consumer<String>> traceListeners = new CopyOnWriteArrayList<>();
 	private final List<Consumer<Planned>> planListeners = new CopyOnWriteArrayList<>();
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
@@ -78,21 +87,10 @@ public class HotColdService
 	}
 
 	@Inject
-	HotColdService(Client client, ClueLink clueLink, PlayerModel player, RoutePlanner routes, ProbeTarget probeTarget,
-		StepData stepData, StepNeeds stepNeeds, AvailabilityService availability, ClueHelperConfig config, MemoryStore memory,
-		ScheduledExecutorService executor, ClientThread clientThread)
+	void init(MemoryStore memory, ScheduledExecutorService executor, ClientThread clientThread)
 	{
-		this.stepNeeds = stepNeeds;
-		this.availability = availability;
-		this.client = client;
-		this.clueLink = clueLink;
-		this.player = player;
-		this.routes = routes;
-		this.probeTarget = probeTarget;
-		this.stepData = stepData;
-		this.config = config;
-		this.runner = new PlannerRunner(executor, clientThread);
-		this.logs = memory.slot(KEY, FeelLogs.class, FeelLogs::new);
+		runner = new PlannerRunner(executor, clientThread);
+		logs = memory.slot(KEY, FeelLogs.class, FeelLogs::new);
 	}
 
 	public void start()

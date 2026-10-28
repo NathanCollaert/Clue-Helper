@@ -7,6 +7,7 @@ import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.stream.*;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -42,6 +43,10 @@ public class PohService
 	private static final int NEXUS_ARG_LINE_NUMBER = 4;
 	private static final int[] SETTINGS = {VarbitID.POH_NEXUS_XERIC, VarbitID.POH_NEXUS_DIGSITE, VarbitID.POH_JEWELLERYBOX_MULTI,
 		VarbitID.POH_HOUSE_LOCATION, VarbitID.POH_TELE_TOGGLE};
+	private static final int[] HOUSE_VARBITS = IntStream.concat(Arrays.stream(NEXUS_SLOTS), Arrays.stream(SETTINGS)).toArray();
+	/** The varbits a house is read from. */
+	private static final Set<Integer> WATCHED = IntStream.concat(Arrays.stream(HOUSE_VARBITS), IntStream.of(VarbitID.POH_BUILDING_MODE))
+		.boxed().collect(Collectors.toUnmodifiableSet());
 	private static final int[] BOXES = {ObjectID.POH_JEWELLERY_BOX_1, ObjectID.POH_JEWELLERY_BOX_2, ObjectID.POH_JEWELLERY_BOX_3};
 	/** Box lines 1–9 are on every box, A–J from the fancy one, K–R only on the ornate one; varbit 2308 is 1-based. */
 	private static final int FANCY_FIRST_LINE = 10;
@@ -49,13 +54,14 @@ public class PohService
 	private static final int XERIC_FIRST = ObjectID.POH_AMULET_XERIC_LOOKOUT;
 	private static final int DIGSITE_FIRST = ObjectID.POH_AMULET_DIG_DIGSITE;
 
-	private final Client client;
-	private final PlayerModel player;
-	private final CatalogData catalogData;
-	private final MemorySlot<Profile> stored;
+	@Inject
+	private Client client;
+	@Inject
+	private PlayerModel player;
+	@Inject
+	private CatalogData catalogData;
+	private MemorySlot<Profile> stored;
 	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
-	/** The varbits a house is read from. */
-	private static final Set<Integer> WATCHED = watched();
 	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile Set<Integer> pieces = Set.of();
@@ -68,27 +74,9 @@ public class PohService
 	private boolean nexusLinesDirty;
 
 	@Inject
-	PohService(Client client, PlayerModel player, CatalogData catalogData, MemoryStore memory)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.player = player;
-		this.catalogData = catalogData;
-		this.stored = memory.slot(PROFILE_KEY, Profile.class, Profile::new);
-	}
-
-	private static Set<Integer> watched()
-	{
-		Set<Integer> watched = new HashSet<>();
-		for (int id : NEXUS_SLOTS)
-		{
-			watched.add(id);
-		}
-		for (int id : SETTINGS)
-		{
-			watched.add(id);
-		}
-		watched.add(VarbitID.POH_BUILDING_MODE);
-		return Set.copyOf(watched);
+		stored = memory.slot(PROFILE_KEY, Profile.class, Profile::new);
 	}
 
 	public void start()
@@ -301,13 +289,7 @@ public class PohService
 	{
 		Map<Integer, Integer> values = new HashMap<>();
 		boolean any = false;
-		for (int id : NEXUS_SLOTS)
-		{
-			int value = client.getVarbitValue(id);
-			values.put(id, value);
-			any |= value != 0;
-		}
-		for (int id : SETTINGS)
+		for (int id : HOUSE_VARBITS)
 		{
 			int value = client.getVarbitValue(id);
 			values.put(id, value);

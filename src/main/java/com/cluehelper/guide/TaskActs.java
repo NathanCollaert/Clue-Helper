@@ -177,16 +177,10 @@ final class TaskActs
 	{
 		boolean picked = client.isWidgetSelected();
 		Set<Integer> items = picked ? carried.stream().filter(cast.getOn()::contains).collect(Collectors.toUnmodifiableSet()) : Set.of();
-		int spellWidget = picked ? -1 : cast.getWidgets().stream().filter(this::widgetShown).reduce((first, last) -> last)
+		int spellWidget = picked ? -1 : cast.getWidgets().stream().filter(id -> Widgets.shown(client, id)).reduce((first, last) -> last)
 			.orElse(cast.getWidgets().isEmpty() ? -1 : cast.getWidgets().get(0));
 		return shown.toBuilder().items(items).fillItems(items).spellWidget(spellWidget)
 			.tab(picked ? StepGuide.Tab.INVENTORY : StepGuide.Tab.MAGIC).build();
-	}
-
-	private boolean widgetShown(int widgetId)
-	{
-		Widget widget = client.getWidget(widgetId);
-		return widget != null && !widget.isHidden();
 	}
 
 	/** The furthest making step whose worked-on item is carried; null before any is, or for a task made of nothing. */

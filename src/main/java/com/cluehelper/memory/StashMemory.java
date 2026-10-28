@@ -35,17 +35,17 @@ public class StashMemory
 	private static final Set<Integer> UNIT_OBJECTS = Arrays.stream(STASHUnit.values()).map(STASHUnit::getObjectId)
 		.collect(Collectors.toUnmodifiableSet());
 
-	private final Client client;
-	private final MemorySlot<Units> remembered;
+	@Inject
+	private Client client;
+	private MemorySlot<Units> remembered;
 	private final Map<Integer, Integer> builtVarbits = new HashMap<>();
 	private int lastSearchObject = NOT_SEEN;
 	private int lastSearchTick;
 
 	@Inject
-	StashMemory(Client client, MemoryStore memory)
+	void init(MemoryStore memory)
 	{
-		this.client = client;
-		this.remembered = memory.slot(KEY, Units.class, Units::new);
+		remembered = memory.slot(KEY, Units.class, Units::new);
 	}
 
 	public State state(int objectId)

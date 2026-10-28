@@ -1,11 +1,13 @@
 package com.cluehelper.step;
 
 import java.util.Locale;
+import lombok.Getter;
 
 /**
  * Field names match the "fields" object of the replay fixtures and of {@code ::ch-step}'s fixture
  * lines, so recorded clues replay through the same key rule.
  */
+@Getter
 public final class ClueFacts
 {
 	private static final int NO_ITEM = -1;
@@ -74,49 +76,9 @@ public final class ClueFacts
 		return this;
 	}
 
-	public String getType()
-	{
-		return type;
-	}
-
-	public int getItemId()
-	{
-		return itemId;
-	}
-
-	public String getText()
-	{
-		return text;
-	}
-
 	public int[] getTile()
 	{
 		return tile == null ? null : tile.clone();
-	}
-
-	public int getWidgetGroupId()
-	{
-		return widgetGroupId;
-	}
-
-	public String getTier()
-	{
-		return tier;
-	}
-
-	public String getNpc()
-	{
-		return npc;
-	}
-
-	public String getChallengeType()
-	{
-		return challengeType;
-	}
-
-	public String getRawChallenge()
-	{
-		return rawChallenge;
 	}
 
 	public static String normalise(String text)

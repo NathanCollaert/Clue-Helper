@@ -20,7 +20,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.*;
 
 /** Waypoints are never core's target, so the path ends where core's marker takes over. */
@@ -44,12 +43,28 @@ public class WaypointOverlay extends Overlay
 	private static final int[] CONVERSATION = {InterfaceID.ChatLeft.UNIVERSE, InterfaceID.ChatRight.UNIVERSE, InterfaceID.Chatmenu.UNIVERSE};
 	private static final String NO_STEP = "";
 
-	private final Client client;
-	private final StepGuide guide;
-	private final RoutePlanner routes;
-	private final ClueHelperConfig config;
-	private final Highlighter highlighter;
-	private final ClueLink clueLink;
+	@Inject
+	private Client client;
+	@Inject
+	private StepGuide guide;
+	@Inject
+	private RoutePlanner routes;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private Highlighter highlighter;
+	@Inject
+	private ClueLink clueLink;
+	@Inject
+	private PathObjects paths;
+	@Inject
+	private WalkLine walkLine;
+	@Inject
+	private LineTargets targets;
+	@Inject
+	private WorldWalk walker;
+	@Inject
+	private LeftClicks leftClicks;
 
 	private int crossingFrom = NOT_CROSSING;
 	private List<WorldPoint> drawnWalk = List.of();
@@ -59,27 +74,8 @@ public class WaypointOverlay extends Overlay
 	/** The step the open conversation began on; null with no conversation open. */
 	private String conversationStepKey;
 
-	private final PathObjects paths;
-	private final WalkLine walkLine;
-	private final LineTargets targets;
-	private final WorldWalk walker;
-	private final LeftClicks leftClicks;
-
-	@Inject
-	WaypointOverlay(Client client, StepGuide guide, RoutePlanner routes, ClueHelperConfig config, Highlighter highlighter,
-		ClueLink clueLink, PathObjects paths, WalkLine walkLine, LineTargets targets, WorldWalk walker, LeftClicks leftClicks)
+	WaypointOverlay()
 	{
-		this.leftClicks = leftClicks;
-		this.clueLink = clueLink;
-		this.paths = paths;
-		this.walkLine = walkLine;
-		this.targets = targets;
-		this.walker = walker;
-		this.client = client;
-		this.guide = guide;
-		this.routes = routes;
-		this.config = config;
-		this.highlighter = highlighter;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 	}
@@ -144,18 +140,21 @@ public class WaypointOverlay extends Overlay
 	private Goal goal(WorldView view, WalkCosts here, SubStep current)
 	{
 		WorldPoint waypoint = current == null ? null : current.getWaypoint();
-		if (waypoint == null && current != null && current.getKind() == SubStep.Kind.WALK_TO_CLUE && current.getGoal() != null)
+		if (waypoint == null && current != null)
 		{
-			return pathToClue(view, current);
-		}
-		if (waypoint == null && current != null && current.isPreparation())
-		{
-			return null;
-		}
-		if (waypoint == null && current != null && isActWithoutPlace(current))
-		{
-			WorldPoint act = actTarget(view, current, current.getTab() == StepGuide.Tab.EMOTES ? SubSteps.ARRIVE_TILES : 1);
-			return act == null ? null : Goal.path(WalkGoal.tile(act), false);
+			if (current.getKind() == SubStep.Kind.WALK_TO_CLUE && current.getGoal() != null)
+			{
+				return pathToClue(view, current);
+			}
+			if (current.isPreparation())
+			{
+				return null;
+			}
+			if (isActWithoutPlace(current))
+			{
+				WorldPoint act = actTarget(view, current, current.getTab() == StepGuide.Tab.EMOTES ? SubSteps.ARRIVE_TILES : 1);
+				return act == null ? null : Goal.path(WalkGoal.tile(act), false);
+			}
 		}
 		if (!walkableWaypoint(waypoint, view) && !guide.getHighlightObjects().isEmpty())
 		{
@@ -226,7 +225,7 @@ public class WaypointOverlay extends Overlay
 	{
 		Step step = clueLink.getCurrentStep();
 		Player local = client.getLocalPlayer();
-		if (step == null || local == null || view == null || ClueTypes.HOT_COLD.equals(step.getType()))
+		if (step == null || local == null || ClueTypes.HOT_COLD.equals(step.getType()))
 		{
 			return null;
 		}
@@ -338,15 +337,7 @@ public class WaypointOverlay extends Overlay
 
 	private boolean inConversation()
 	{
-		for (int dialogue : CONVERSATION)
-		{
-			Widget widget = client.getWidget(dialogue);
-			if (widget != null && !widget.isHidden())
-			{
-				return true;
-			}
-		}
-		return false;
+		return Arrays.stream(CONVERSATION).anyMatch(dialogue -> Widgets.shown(client, dialogue));
 	}
 
 	private boolean besideOutlinedNpc(WorldPoint waypoint)
@@ -492,7 +483,7 @@ public class WaypointOverlay extends Overlay
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
 	public List<MenuTarget> pathObjectTargets()
 	{
-		List<MenuTarget> targets = new java.util.ArrayList<>();
+		List<MenuTarget> targets = new ArrayList<>();
 		pathObjects.forEach((object, option) -> targets.add(MenuTarget.builder().objectIds(Set.of(object.getId()))
 			.path(List.of(option)).build()));
 		return targets;
@@ -523,7 +514,7 @@ public class WaypointOverlay extends Overlay
 	private void drawLine(Graphics2D graphics, WorldView view, List<WorldPoint> ahead)
 	{
 		pathObjects.forEach((object, option) -> highlighter.object(graphics, object, leftClicks.isLeftClick(object, option)));
-		graphics.setColor(Markers.COLOUR);
+		graphics.setColor(Highlighter.COLOUR);
 		graphics.setStroke(new BasicStroke(PATH_STROKE));
 		Point previous = null;
 		WorldPoint previousTile = null;
@@ -544,7 +535,8 @@ public class WaypointOverlay extends Overlay
 		}
 	}
 
-	private static Point drawTo(Graphics2D graphics, Point from, Point to)
+	/** The segment from one canvas point to the next, where both are on screen; the point drawn to, for the next segment. */
+	static Point drawTo(Graphics2D graphics, Point from, Point to)
 	{
 		if (from != null && to != null)
 		{
@@ -574,7 +566,7 @@ public class WaypointOverlay extends Overlay
 		List<TileObject> rowEnds = paths.rowObjectsAround(view, table, from, jumpEnd, around(from, to, ROW_ENDS_MARGIN_TILES));
 		List<TileObject> nearestFirst = Stream.concat(outlined, rowEnds.stream())
 			.distinct()
-			.sorted(Comparator.comparingInt(object -> squaredDistance(object.getWorldLocation(), from)))
+			.sorted(Comparator.comparingInt(object -> PathObjects.squaredDistance(object.getWorldLocation(), from)))
 			.collect(Collectors.toList());
 		return crossing ? nearingEnd(nearestFirst, from, jumpEnd) : nearestFirst;
 	}
@@ -582,10 +574,10 @@ public class WaypointOverlay extends Overlay
 	private static List<TileObject> nearingEnd(List<TileObject> nearestFirst, WorldPoint from, WorldPoint end)
 	{
 		List<TileObject> nearing = new ArrayList<>();
-		int left = squaredDistance(from, end);
+		int left = PathObjects.squaredDistance(from, end);
 		for (TileObject object : nearestFirst)
 		{
-			int toEnd = squaredDistance(object.getWorldLocation(), end);
+			int toEnd = PathObjects.squaredDistance(object.getWorldLocation(), end);
 			if (toEnd < left)
 			{
 				nearing.add(object);
@@ -601,12 +593,6 @@ public class WaypointOverlay extends Overlay
 			Math.abs(from.getX() - to.getX()) + 2 * margin + 1, Math.abs(from.getY() - to.getY()) + 2 * margin + 1);
 	}
 
-	private static int squaredDistance(WorldPoint a, WorldPoint b)
-	{
-		int dx = a.getX() - b.getX();
-		int dy = a.getY() - b.getY();
-		return dx * dx + dy * dy;
-	}
 	/** What the line leads to: a tile, an NPC to approach, or the outlined objects' nearest side. */
 	@Value
 	private static class Goal

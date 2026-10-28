@@ -10,19 +10,17 @@ import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
-
-	private final StepGuide guide;
-	private final ClueHelperConfig config;
-	private final Highlighter highlighter;
-	private final LeftClicks leftClicks;
-
 	@Inject
-	ItemHighlightOverlay(StepGuide guide, ClueHelperConfig config, Highlighter highlighter, LeftClicks leftClicks)
+	private StepGuide guide;
+	@Inject
+	private ClueHelperConfig config;
+	@Inject
+	private Highlighter highlighter;
+	@Inject
+	private LeftClicks leftClicks;
+
+	ItemHighlightOverlay()
 	{
-		this.guide = guide;
-		this.config = config;
-		this.highlighter = highlighter;
-		this.leftClicks = leftClicks;
 		showOnInventory();
 		showOnEquipment();
 		showOnBank();
