@@ -228,13 +228,18 @@ public final class Hypotheses
 		return null;
 	}
 
-	/** The tile nearest, by Chebyshev, to the farthest kept tile of the spot: a dig there covers them all if any tile does. */
+	/**
+	 * The spot's centre when a dig there covers every kept tile: the walk table has a node on it, so the route reaches
+	 * it from anywhere, while any other tile is reached only from within the loaded scene. Otherwise the tile nearest,
+	 * by Chebyshev, to the farthest kept tile: a dig there covers them all if any tile does.
+	 */
 	public WorldPoint digTile(String spotName)
 	{
+		Spot target = spot(spotName);
 		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		for (int i = 0; i < x.length; i++)
 		{
-			if (spots.get(spot[i]).getName().equals(spotName))
+			if (spots.get(spot[i]) == target)
 			{
 				minX = Math.min(minX, x[i]);
 				minY = Math.min(minY, y[i]);
@@ -242,7 +247,13 @@ public final class Hypotheses
 				maxY = Math.max(maxY, y[i]);
 			}
 		}
-		return minX == Integer.MAX_VALUE ? null : new WorldPoint((minX + maxX) / 2, (minY + maxY) / 2, 0);
+		if (minX == Integer.MAX_VALUE)
+		{
+			return null;
+		}
+		int fromCentre = Math.max(Math.max(target.getX() - minX, maxX - target.getX()), Math.max(target.getY() - minY, maxY - target.getY()));
+		return fromCentre <= Band.digRadius(target.getTier()) ? new WorldPoint(target.getX(), target.getY(), 0)
+			: new WorldPoint((minX + maxX) / 2, (minY + maxY) / 2, 0);
 	}
 
 	/** Up to {@code perSpot} kept tiles of each spot, the centre first, weighted to keep each spot's share. */
