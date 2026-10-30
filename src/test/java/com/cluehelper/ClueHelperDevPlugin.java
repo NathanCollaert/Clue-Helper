@@ -552,6 +552,7 @@ public class ClueHelperDevPlugin extends Plugin
 	public void onGameTick(GameTick tick)
 	{
 		checkLanding();
+		harness.onGameTick();
 		traceLine();
 		saveLiveFrame();
 		resumeCampaignOnceLoggedIn();

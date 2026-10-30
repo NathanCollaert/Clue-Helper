@@ -323,6 +323,22 @@ public class MenuLines
 		return found;
 	}
 
+	/** Each mushroom on the mushtree's map is a Travel button named after its place, written with non-breaking spaces. */
+	private boolean mushtree(String destination, Found out)
+	{
+		boolean found = false;
+		for (Widget button : dynamicChildren(InterfaceID.FossilMushtrees.UNIVERSE))
+		{
+			String place = button == null || button.getName() == null ? null : button.getName().replace(' ', ' ');
+			if (Widgets.visible(button) && MenuLabels.matches(place, destination))
+			{
+				out.addMapButton(button);
+				found = true;
+			}
+		}
+		return found;
+	}
+
 	/** Each place on the glider map is a button with the place's name as its action. */
 	private boolean glider(String destination, Found out)
 	{
@@ -516,7 +532,8 @@ public class MenuLines
 
 	/**
 	 * The Minigame Teleport spell opens a grid of cards, one per minigame, each with the game's name and its places;
-	 * the card whose name is the row's game is outlined. A row like "Rat Pits: 4. Port Sarim" names the game first.
+	 * the card whose name is the row's game is boxed whole, icon and all. A row like "Rat Pits: 4. Port Sarim" names the
+	 * game first.
 	 */
 	private void minigameCard(String name, Found out)
 	{
@@ -526,7 +543,7 @@ public class MenuLines
 			Widget widget = client.getWidget(card);
 			if (Widgets.visible(widget) && hasTextMatching(widget, game))
 			{
-				out.add(widget);
+				out.addMapButton(widget);
 				return;
 			}
 		}
@@ -589,7 +606,8 @@ public class MenuLines
 	private void labelled(MenuTarget target, Found out)
 	{
 		String destination = target.destination();
-		if (destination == null || charter(destination, out) || glider(destination, out) || atesMap(destination, out))
+		if (destination == null || charter(destination, out) || glider(destination, out) || mushtree(destination, out)
+			|| atesMap(destination, out))
 		{
 			return;
 		}

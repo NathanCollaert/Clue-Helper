@@ -31,6 +31,6 @@ public final class RouteText
 		}
 		String items = route.getWithdraw().stream().map(use -> use.getItemId() + (use.getContainer() == Container.GROUP_STORAGE ? " (group)" : ""))
 			.collect(Collectors.joining(", "));
-		return " withdraw [" + items + "]" + (route.isDepositFirst() ? " deposit first" : "") + (route.isPinIncluded() ? " +PIN" : "");
+		return " withdraw [" + items + "]" + (route.isDepositFirst() ? " deposit first" : "");
 	}
 }

@@ -544,6 +544,12 @@ public class PlayerModel
 		return snapshot == null ? Set.of() : snapshot.getInventory().keySet();
 	}
 
+	public boolean finished(Quest quest)
+	{
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot != null && snapshot.finished(quest);
+	}
+
 	public Set<Integer> wornIds()
 	{
 		PlayerSnapshot snapshot = getSnapshot();

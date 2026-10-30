@@ -31,7 +31,6 @@ public class Route
 	List<ItemUse> withdraw = List.of();
 	/** The withdraw list needs more slots than are free; the extra click is counted in the ticks. */
 	boolean depositFirst;
-	boolean pinIncluded;
 	/** Banked, but with no bank leg: the route starts with the withdraw list. */
 	boolean openBankStart;
 

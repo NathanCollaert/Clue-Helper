@@ -19,6 +19,8 @@ import com.cluehelper.step.StageTarget;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
+import com.cluehelper.transport.CatalogRow;
+import com.cluehelper.transport.Requirements;
 import com.google.gson.Gson;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
@@ -81,7 +84,7 @@ public final class CampaignRecorder
 		recording.onlyInBankedKit = new TreeMap<>();
 		StepNeeds needs = new StepNeeds(tape.client(), id -> recordStash(recording, id),
 			(bonus, owned) -> recordGear(recording, bonus.name(), gearPieces.of(bonus, owned)),
-			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()));
+			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()), input.getPlayer()::finished);
 		RequiredItems required = needs.of(travel);
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
 			input.getSettings()::isScrollBookOutOfWilderness, id -> false);
@@ -108,10 +111,34 @@ public final class CampaignRecorder
 		recording.revertTicksLeft = input.getRevertTicksLeft();
 		recording.refusedChanges = input.getRefusedChanges();
 		recording.foreignHouseStart = input.isForeignHouseStart();
+		recordNamesInNotes(tape, plan, input);
 		recording.client = tape.answers();
 		recording.expected = Outcome.of(plan, guide);
 		WalkCosts walk = input.getStart().getWalk();
 		return new Capture(recording, walk == null ? null : walk.getScene(), tile, problems(tape, travel, input.getStep()));
+	}
+
+	/**
+	 * The engine names the items a no-route note lists (the boat's ecto-tokens, the slope's sled) from its own cache, so
+	 * the ones the notes name go on the tape for the replay to name them alike.
+	 */
+	private void recordNamesInNotes(ClientTape tape, Plan plan, PlanInput input)
+	{
+		List<String> notes = new ArrayList<>(plan.getRequirementNotes());
+		if (plan.getNote() != null)
+		{
+			notes.add(plan.getNote());
+		}
+		Stream<Requirements> rows = input.getCatalog() == null ? Stream.empty()
+			: input.getCatalog().getTeleports().stream().map(CatalogRow::getRequirements);
+		Stream<Requirements> gates = input.getTable() == null ? Stream.empty() : input.getTable().getGates().stream();
+		Stream.concat(rows, gates)
+			.flatMap(requirements -> requirements.getItems().stream())
+			.flatMap(clause -> clause.getBranches().stream())
+			.flatMap(branch -> branch.getIds().stream())
+			.distinct()
+			.filter(id -> notes.stream().anyMatch(note -> note.contains(client.getItemDefinition(id).getName())))
+			.forEach(id -> tape.client().getItemDefinition(id).getName());
 	}
 
 	private static List<String> problems(ClientTape tape, Step travel, Step live)

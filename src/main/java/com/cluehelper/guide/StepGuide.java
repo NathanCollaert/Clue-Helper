@@ -56,6 +56,8 @@ public class StepGuide
 	 * reached act stays while the player is this close to a target on any plane.
 	 */
 	private static final int STAY_AT_ACT_TILES = 20;
+	/** How far a floor up or down weighs against tiles on the same floor when picking the nearest place. */
+	private static final int OTHER_FLOOR_TILES = 50;
 	/** In scene-walk tiles: 20 ticks of running. */
 	private static final int ARRIVED_WALK_TILES = 40;
 	/** Part way in, the line leads on to where the way ends when that is this close on this floor (the cavern, not the pyramid's top). */
@@ -92,6 +94,8 @@ public class StepGuide
 	private SubSteps subSteps;
 	@Inject
 	private SceneObjects sceneObjects;
+	@Inject
+	private AbyssObstacles abyssObstacles;
 	@Inject
 	private ClueLink clueLink;
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
@@ -390,6 +394,8 @@ public class StepGuide
 		if (jumped)
 		{
 			actReachedStepKey = null;
+			// A new scene (out of a cave) is searched at once, not on the slow refresh empty searches fell back to
+			scene = SceneHighlights.NONE;
 		}
 		boolean clickedJustNow = travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= travelStartTicks();
 		travelStarted = isTravelStep() && isAnimating() && (travelStarted || clickedJustNow);
@@ -514,7 +520,8 @@ public class StepGuide
 	private SceneHighlights searchScene(SubStep current, MenuTarget target, boolean bank, int tick)
 	{
 		List<TileObject> objects = bank ? sceneObjects.banksNear(current.getWaypoint(), BANK_TILES)
-			: offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption());
+			: target.getObjectIds().stream().anyMatch(AbyssObstacles::isObstacle) ? abyssObstacle()
+			: onlyPatchToUse(current, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption()));
 		List<NPC> npcs = bank ? sceneObjects.bankersNear(current.getWaypoint(), BANK_TILES) : npcsFor(target);
 		if (!bank)
 		{
@@ -525,6 +532,20 @@ public class StepGuide
 			.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
 			.objects(objects).npcs(npcs).fillObjects(bank ? List.of() : stepHighlights.fillObjects(objects, highlights))
 			.npcOption(npcOption).fillNpcs(stepHighlights.fillNpcs(npcs, npcOption)).build();
+	}
+
+	/** The Abyss's outer ring is crossed by the obstacle the path line leads to, not the one spot the walk data names. */
+	private List<TileObject> abyssObstacle()
+	{
+		TileObject obstacle = abyssObstacles.choose();
+		return obstacle == null ? List.of() : List.of(obstacle);
+	}
+
+	/** A planting task outlines the one patch to plant in, not every patch at the farm. */
+	private List<TileObject> onlyPatchToUse(SubStep current, List<TileObject> objects)
+	{
+		TileObject patch = current != null && current.isTask() ? taskActs.patchToUse(routeStep, objects) : null;
+		return patch == null ? objects : List.of(patch);
 	}
 
 	private List<TileObject> offeringOption(List<TileObject> objects, String option)
@@ -593,7 +614,7 @@ public class StepGuide
 			rest.add(LegSteps.walkToClue(step.getTargets().get(0), SubSteps.ARRIVE_TILES));
 		}
 		rest.addAll(subSteps.acts(step));
-		return SubSteps.withWayInEquipped(rest, step.getData());
+		return SubSteps.withWayInEquipped(rest, step.getData(), player::finished, player.carriedIds());
 	}
 
 	/** Part way up a way in (the pyramid's lower levels), the step points on, not back to its ground-floor start. */
@@ -617,7 +638,10 @@ public class StepGuide
 		return replaceCurrent(current.toBuilder().text(KEEP_GOING + current.getWayIn().getText()).waypoint(toNearby ? to : null).build());
 	}
 
-	/** Part way in, the ground items to pick up first (the Mogre Camp's rocks): to the nearest, then on through the way. */
+	/**
+	 * Part way in, the ground items to pick up first (the Mogre Camp's rocks): to the one that adds least to the way on,
+	 * then on through the way.
+	 */
 	private boolean pickUpOnTheWay(SubStep current, StepIndex.PickUp pickUp, WorldPoint tile)
 	{
 		int counted = pickUp.getVarbit() < 0 ? 0 : client.getVarbitValue(pickUp.getVarbit());
@@ -625,7 +649,18 @@ public class StepGuide
 		boolean done = carried >= pickUp.getCount();
 		return replaceCurrent(current.toBuilder()
 			.text(done ? KEEP_GOING + pickUp.getThen() : "Pick up " + pickUp.getCount() + " " + pickUp.getName() + " (" + carried + "/" + pickUp.getCount() + ")")
-			.detail(null).waypoint(done ? current.getWayIn().getTo() : nearest(tile)).build());
+			.detail(null).waypoint(done ? current.getWayIn().getTo() : onTheWay(tile, current.getWayIn().getTo(), pickUp)).build());
+	}
+
+	/**
+	 * The pick-up tile with the shortest walk from the player through it to {@code on}: of those in sight, else of where
+	 * they lie, as the game shows them only nearby. Null with none known.
+	 */
+	private WorldPoint onTheWay(WorldPoint tile, WorldPoint on, StepIndex.PickUp pickUp)
+	{
+		List<WorldPoint> tiles = pickUpTiles.isEmpty() ? pickUp.spawnTiles() : pickUpTiles;
+		return tile == null || on == null ? null
+			: tiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile) + at.distanceTo2D(on))).orElse(null);
 	}
 
 	/** An act's ground item (king worms): outlined where it lies, the nearest as the waypoint. */
@@ -907,11 +942,17 @@ public class StepGuide
 			moved = true;
 		}
 		SubStep current = index < steps.size() ? steps.get(index) : null;
-		if (current != null && current.getKind() == SubStep.Kind.ACT && routeStep != null)
+		if (isStepAct(current) && routeStep != null)
 		{
 			actReachedStepKey = actKey(routeStep);
 		}
 		return moved;
+	}
+
+	/** An act of the step itself: gear put on at the bank (a lumberjack outfit) is no sign of having reached the step. */
+	private static boolean isStepAct(SubStep sub)
+	{
+		return sub != null && sub.getKind() == SubStep.Kind.ACT && !sub.isPreparation() && sub.getDone() != SubStep.Done.EQUIPPED;
 	}
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
@@ -967,7 +1008,10 @@ public class StepGuide
 		return stageAct.getStage() != null ? SubSteps.stageActs(stageAct.getStage()) : subSteps.acts(step);
 	}
 
-	/** At a step of several places, the act of the stage nearest to the player. */
+	/**
+	 * At a step of several places, the act of the stage nearest to the player. A place on another floor counts as further
+	 * off, not out of reach: the redwood up its rope ladder is still nearer than Sherlock.
+	 */
 	private static SubStep actHere(Step step, WorldPoint tile)
 	{
 		Stage nearest = null;
@@ -976,7 +1020,8 @@ public class StepGuide
 		{
 			for (WorldPoint at : stage.getTiles())
 			{
-				int distance = tile == null || at.getPlane() != tile.getPlane() ? Integer.MAX_VALUE - 1 : at.distanceTo2D(tile);
+				int floors = tile == null ? 0 : Math.abs(at.getPlane() - tile.getPlane());
+				int distance = tile == null ? Integer.MAX_VALUE - 1 : at.distanceTo2D(tile) + floors * OTHER_FLOOR_TILES;
 				if (distance < nearestDistance)
 				{
 					nearest = stage;
@@ -1075,12 +1120,18 @@ public class StepGuide
 		return local != null && local.getAnimation() != NO_ANIMATION;
 	}
 
-	/** A walk to NPCs ends once one of them is rendered close by (an elf in Prifddinas), not at the planned tile. */
+	/**
+	 * A walk to NPCs ends once one of them is close by, not only at the planned tile. Any of the clue's own targets will do
+	 * (waterfiends across the Ancient Cavern from the listed spawn); on a walk to a stage, one of the same kind elsewhere on
+	 * the way (a werewolf before the skullball trapdoor) doesn't end it unless it is also by the walk's goal.
+	 */
 	private boolean stageNpcNearby(SubStep step, WorldPoint tile)
 	{
+		WorldPoint goal = step.getKind() == SubStep.Kind.WALK_TO_CLUE ? null : step.getGoal();
 		return !step.getNpcIds().isEmpty() && tile != null && scene.getNpcs().stream()
-			.anyMatch(npc -> npc.getWorldLocation().getPlane() == tile.getPlane()
-				&& npc.getWorldLocation().distanceTo2D(tile) <= SubSteps.AREA_ARRIVE_TILES);
+			.map(NPC::getWorldLocation)
+			.anyMatch(at -> at.getPlane() == tile.getPlane() && at.distanceTo2D(tile) <= SubSteps.AREA_ARRIVE_TILES
+				&& (goal == null || at.distanceTo2D(goal) <= SubSteps.AREA_ARRIVE_TILES));
 	}
 
 	/**
@@ -1092,6 +1143,36 @@ public class StepGuide
 		return step.getOption() != null && !step.getObjectIds().isEmpty() && scene.getObjects().stream().anyMatch(leftClicks::changesForm);
 	}
 
+	/** A walk to outlined objects ends beside one of them: an allotment patch is wider than the arrival radius. */
+	private boolean besideStageObject(SubStep step, WorldPoint tile)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		return !step.getObjectIds().isEmpty() && tile != null && view != null
+			&& scene.getObjects().stream().anyMatch(object -> tilesFromFootprint(view, object, tile) <= 1);
+	}
+
+	private static int tilesFromFootprint(WorldView view, TileObject object, WorldPoint tile)
+	{
+		WorldPoint southWest = object.getWorldLocation();
+		int width = 1;
+		int height = 1;
+		if (object instanceof GameObject)
+		{
+			GameObject game = (GameObject) object;
+			Point min = game.getSceneMinLocation();
+			southWest = WorldPoint.fromScene(view, min.getX(), min.getY(), game.getPlane());
+			width = game.sizeX();
+			height = game.sizeY();
+		}
+		if (southWest.getPlane() != tile.getPlane())
+		{
+			return Integer.MAX_VALUE;
+		}
+		int dx = Math.max(0, Math.max(southWest.getX() - tile.getX(), tile.getX() - (southWest.getX() + width - 1)));
+		int dy = Math.max(0, Math.max(southWest.getY() - tile.getY(), tile.getY() - (southWest.getY() + height - 1)));
+		return Math.max(dx, dy);
+	}
+
 	private boolean isComplete(SubStep step, WorldPoint tile)
 	{
 		switch (step.getKind())
@@ -1100,7 +1181,7 @@ public class StepGuide
 			case WALK_TO_CLUE:
 				return step.getDone() == SubStep.Done.STASH_DEPOSITED && deposit.getAt() == null || PositionRules.near(tile, step.getGoal(), step.getRadius())
 					|| step.getSpans().stream().anyMatch(place -> place.spans(tile)) || stageNpcNearby(step, tile)
-					|| perPlayerObjectInSight(step);
+					|| perPlayerObjectInSight(step) || besideStageObject(step, tile);
 			case WILDERNESS_EXIT:
 				return tile != null && tile.getY() <= step.getGoal().getY();
 			case FAIRY_RING:
@@ -1152,6 +1233,7 @@ public class StepGuide
 			case WAY_IN_WORN:
 			case GEAR_WORN:
 			case SLOTS_EMPTY:
+			case ITEM_WORN:
 				return gearActs.isDone(act, routeStep);
 			case STASH_DEPOSITED:
 				return deposit.getAt() == null || actWatcher.isDone(act.getDone(), stepSince);
@@ -1175,6 +1257,10 @@ public class StepGuide
 	{
 		scene = SceneHighlights.NONE;
 		highlights = stepHighlights.of(getCurrent(), routeStep);
+		if (stashAhead() != StepRequirements.NO_STASH)
+		{
+			highlights = highlights.toBuilder().objectOption(StepHighlights.SEARCH_OPTION).build();
+		}
 	}
 
 	/** Walking to the STASH unit the next act searches: it is outlined from the walk on, like a bank. */

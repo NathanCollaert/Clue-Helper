@@ -23,6 +23,10 @@ final class LegSteps
 		"the canoe station", Category.MINECART, "the minecart", Category.LEVER, "the lever", Category.BALLOON,
 		"the balloon basket", Category.MUSHTREE, "the mushtree", Category.WILDERNESS_OBELISK, "the obelisk");
 	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
+	/** The mushtree map's places in its hotkey order, 1 to 4: its buttons carry no number. */
+	private static final List<String> MUSHTREE_PLACES = List.of("House on the Hill", "Verdant Valley", "Sticky Swamp", "Mushroom Meadow");
+	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
+	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
 	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
 	private static final Map<String, String> CHANGE_WARNINGS = Map.of(
 		"Ancient Pyramid altar", "Drains your Prayer, and the way in crosses desert heat",
@@ -92,11 +96,7 @@ final class LegSteps
 	static SubStep enter(StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data.getEntry();
-		String needs = data.getRequires().stream().map(StepIndex.Requires::getName).collect(Collectors.joining(", "));
-		String option = way.getOption() == null || way.getOption().isEmpty() ? null : way.getOption();
-		String detail = option == null ? needs : needs.isEmpty() ? option : option + "; needs " + needs;
-		return SubStep.of(SubStep.Kind.ENTER, "Go in: " + way.getText()).detail(detail.isEmpty() ? null : detail)
-			.waypoint(way.getTile()).wayIn(way).build();
+		return SubStep.of(SubStep.Kind.ENTER, "Go in: " + way.getText()).waypoint(way.getTile()).wayIn(way).build();
 	}
 
 	static SubStep exit(Leg leg, Exit exit)
@@ -118,7 +118,8 @@ final class LegSteps
 		CatalogRow row = leg.getRow();
 		WorldPoint standsAt = row.isLocated() && !row.isInHouse() ? leg.getFrom() : null;
 		return SubStep.of(SubStep.Kind.TELEPORT, withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
-			.waypoint(standsAt).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).row(row).build();
+			.waypoint(standsAt).goal(leg.getTo()).radius(SCATTERED_LANDING_TILES.getOrDefault(row.getName(), SubSteps.LANDING_TILES))
+			.row(row).build();
 	}
 
 	/** A chained code (the Fairy Queen's hideout) is dialled one code at a time, each from the ring the last one landed at. */
@@ -261,36 +262,16 @@ final class LegSteps
 
 	private static String teleportDetail(CatalogRow row)
 	{
-		if (row.isInHouse())
-		{
-			return null;
-		}
-		if (row.getCategory() == Category.SPIRIT_TREE)
-		{
-			return "Travel";
-		}
-		if (row.getCategory() == Category.QUETZAL)
-		{
-			return "Renu: Travel, then pick it on the map";
-		}
-		if (row.isQuetzalMap())
-		{
-			return "Signal, then pick it on the map";
-		}
-		switch (row.getCategory())
-		{
-			case SPELL:
-			case HOME:
-				return "Magic tab";
-			case MINIGAME:
-				return "Magic tab: Minigame Teleport";
-			default:
-				return null;
-		}
+		return row.getCategory() == Category.SPIRIT_TREE && !row.isInHouse() ? "Travel" : null;
 	}
 
 	private static char hotkey(CatalogRow row, HouseState house)
 	{
+		if (row.getCategory() == Category.MUSHTREE)
+		{
+			int place = MUSHTREE_PLACES.indexOf(row.getName().substring(row.getName().lastIndexOf(": ") + 2));
+			return place < 0 ? 0 : MenuLines.HOTKEYS.charAt(place);
+		}
 		String menu = row.getMenu();
 		if (menu != null && menu.startsWith("nexus "))
 		{

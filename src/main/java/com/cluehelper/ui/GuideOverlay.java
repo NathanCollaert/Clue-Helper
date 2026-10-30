@@ -72,11 +72,7 @@ public class GuideOverlay extends OverlayPanel
 			gap();
 			hotCold(shown.getHotCold());
 		}
-		if (!shown.getNotes().isEmpty())
-		{
-			gap();
-			shown.getNotes().forEach(note -> line(note, WARNING));
-		}
+		shown.getNotes().forEach(note -> line(note, WARNING));
 		if (shown.getNext() != null)
 		{
 			gap();

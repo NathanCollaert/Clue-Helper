@@ -4,6 +4,7 @@ import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
+import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -25,6 +26,8 @@ public final class SubSteps
 	private static final int ON_WAY_IN_TILES = 40;
 	/** The route is planned a tick behind the player: its first walk may start a step or two from where they stand now. */
 	private static final int START_DRIFT_TILES = 4;
+	private static final Set<SubStep.Kind> BRINGS_WHAT_THE_TASK_NEEDS = EnumSet.of(SubStep.Kind.WITHDRAW, SubStep.Kind.CHANGE_BOOK,
+		SubStep.Kind.SPELLBOOK_SWAP);
 	/** The walk from a landing to the place, a way in (a cave entrance) included. */
 	private static final Set<SubStep.Kind> WALKS_IN = EnumSet.of(SubStep.Kind.WALK, SubStep.Kind.EXIT, SubStep.Kind.ENTER,
 		SubStep.Kind.WALK_TO_CLUE);
@@ -74,10 +77,30 @@ public final class SubSteps
 	{
 		boolean takeFromStash = takeFromStash(step);
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash).build(this::exitOf);
-		List<SubStep> steps = withEntranaDeposits(withWanderNote(withGearOnArrival(withWayInEquipped(legs, step.getData())),
-			step.getData()));
-		boolean wildernessTarget = step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0);
-		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), wildernessTarget) : steps;
+		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(withAreaNpcsOnWalk(legs, step.getData()), step.getData(), this::finished, carriedIds()), step.getData());
+		List<SubStep> steps = withRideGearWorn(route, withEntranaDeposits(withWanderNote(withGearOnArrival(wayIn), step.getData())));
+		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
+			: steps;
+	}
+
+	private Set<Integer> carriedIds()
+	{
+		PlayerSnapshot carrier = snapshot.get();
+		return carrier == null ? Set.of() : carrier.carriedIds();
+	}
+
+	private boolean finished(Quest quest)
+	{
+		PlayerSnapshot carrier = snapshot.get();
+		return carrier != null && carrier.finished(quest);
+	}
+
+	/** Where the route goes, or with no legs yet the step's targets: a step with spawns outside it (green dragons) may not. */
+	private static boolean intoWilderness(Route route, Step step)
+	{
+		List<Leg> legs = route == null ? List.of() : route.getLegs();
+		return legs.isEmpty() ? step.getTargets().stream().anyMatch(tile -> PositionRules.wildernessLevel(tile) > 0)
+			: legs.stream().anyMatch(leg -> leg.getTo() != null && PositionRules.wildernessLevel(leg.getTo()) > 0);
 	}
 
 	/**
@@ -100,6 +123,43 @@ public final class SubSteps
 		List<SubStep> out = new ArrayList<>(steps);
 		out.add(ship, entranaDeposit(banned));
 		return List.copyOf(out);
+	}
+
+	/** A ride that takes worn gear (a ghostspeak amulet for the ghost captain) has it put on first. */
+	private List<SubStep> withRideGearWorn(Route route, List<SubStep> steps)
+	{
+		Set<Integer> withdrawn = route == null ? Set.of() : route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toSet());
+		List<SubStep> out = new ArrayList<>();
+		for (SubStep sub : steps)
+		{
+			Set<Integer> gear = sub.getKind() == SubStep.Kind.TELEPORT ? rideGear(sub.getRow()) : Set.of();
+			if (!gear.isEmpty())
+			{
+				out.add(equipForRide(gear, withdrawn));
+			}
+			out.add(sub);
+		}
+		return List.copyOf(out);
+	}
+
+	private static Set<Integer> rideGear(CatalogRow row)
+	{
+		return row == null ? Set.of() : row.getRequirements().getItems().stream()
+			.filter(CatalogRules::isGhostspeakNeed)
+			.flatMap(clause -> clause.getBranches().stream())
+			.flatMap(branch -> branch.getIds().stream())
+			.filter(CatalogRules.GHOSTSPEAK::contains)
+			.collect(Collectors.toUnmodifiableSet());
+	}
+
+	/** Named by the piece the player has on them or the route withdraws, else by the first the ride takes. */
+	private SubStep equipForRide(Set<Integer> gear, Set<Integer> withdrawn)
+	{
+		PlayerSnapshot carrier = snapshot.get();
+		int piece = gear.stream().filter(id -> carrier != null && carrier.carriedIds().contains(id) || withdrawn.contains(id))
+			.findFirst().orElse(gear.stream().sorted().findFirst().orElseThrow());
+		return SubStep.of(SubStep.Kind.ACT, "Equip the " + client.getItemDefinition(piece).getName()).actItems(gear)
+			.done(SubStep.Done.ITEM_WORN).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
 	private static boolean isEntranaShip(SubStep step)
@@ -275,6 +335,10 @@ public final class SubSteps
 				Stage reached = stage < stages.size() - 1 && stages.get(stage).getTiles().contains(leg.getTo()) ? stages.get(stage) : null;
 				if (reached != null && leg.getKind() == Leg.Kind.WALK && exit == null)
 				{
+					if (entersStepArea(leg, step))
+					{
+						steps.add(LegSteps.enter(step.getData()));
+					}
 					steps.add(LegSteps.walkToStage(leg, reached));
 				}
 				else
@@ -317,8 +381,7 @@ public final class SubSteps
 					steps.add(LegSteps.change(leg));
 					break;
 				case BANK:
-					steps.add(SubStep.of(SubStep.Kind.BANK, "Open the bank")
-						.detail(route.isPinIncluded() ? "Your PIN comes first" : null).waypoint(leg.getTo()).build());
+					steps.add(SubStep.of(SubStep.Kind.BANK, "Open the bank").waypoint(leg.getTo()).build());
 					steps.add(LegSteps.withdraw(route, itemLines));
 					break;
 				default:
@@ -360,13 +423,13 @@ public final class SubSteps
 		}
 	}
 
-	/** After the last bank stop, which may be what brings the task's items. */
+	/** After the last bank stop and book change, which may be what brings the task's items or spellbook. */
 	private static void addActsDoneAnywhere(List<SubStep> steps, Step step)
 	{
 		int at = 0;
 		for (int i = 0; i < steps.size(); i++)
 		{
-			if (steps.get(i).getKind() == SubStep.Kind.WITHDRAW)
+			if (BRINGS_WHAT_THE_TASK_NEEDS.contains(steps.get(i).getKind()))
 			{
 				at = i + 1;
 			}
@@ -414,10 +477,11 @@ public final class SubSteps
 		return stash != null && way != null && !way.isInside(stash);
 	}
 
-	/** An exit leg that is the step's own hand-written way in, named by its text instead of "Take the exit". */
+	/** The way in's own row, or another row through its object to where it lands (the crevice's rows from each tile round it). */
 	static boolean isWayIn(Exit exit, StepIndex.WayIn way)
 	{
-		return way != null && exit.getOrigin().equals(way.getTile()) && exit.getDestination().equals(way.getTo());
+		return way != null && exit.getDestination().equals(way.getTo())
+			&& (exit.getOrigin().equals(way.getTile()) || way.getObject() >= 0 && exit.getObjectId() == way.getObject());
 	}
 
 	static WorldPoint stashTile(Step step)
@@ -425,11 +489,29 @@ public final class SubSteps
 		return step.getData().getStash() == null ? null : step.getData().getStash().getTile();
 	}
 
-	/** The last walk to the step starts outside its hand-written way in. */
+	/**
+	 * A walk from outside the step's hand-written way in to its target, or to anything else inside it (the STASH unit
+	 * below Trollweiss Mountain's slope). A task's way in leads to its places, not to Sherlock.
+	 */
 	private static boolean entersStepArea(Leg leg, Step step)
 	{
 		StepIndex.WayIn way = step.getData().getEntry();
-		return way != null && step.getTargets().contains(leg.getTo()) && !way.isInside(leg.getFrom());
+		boolean toTarget = step.getTargets().contains(leg.getTo()) && !hasPlacedStages(step);
+		return way != null && (toTarget || way.isInside(leg.getTo())) && !way.isInside(leg.getFrom()) && canPass(leg, way);
+	}
+
+	/**
+	 * A walk covers at most a tile a half-tick, so one that starts further from the way in than its time allows goes in
+	 * another way (into the Cosmic Altar out of the Abyss, not through its ruins in Zanaris).
+	 */
+	private static boolean canPass(Leg leg, StepIndex.WayIn way)
+	{
+		return way.getTile() == null || leg.getFrom().distanceTo2D(way.getTile()) <= leg.getHalfTicks();
+	}
+
+	private static boolean hasPlacedStages(Step step)
+	{
+		return step.getStages().stream().anyMatch(stage -> stage.getKind() != Stage.Kind.FINAL && !stage.getTiles().isEmpty());
 	}
 
 	/** Before going in, the gear the way in needs worn is put on. */
@@ -465,6 +547,23 @@ public final class SubSteps
 			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(StepGuide.Tab.INVENTORY).build());
 	}
 
+	/**
+	 * Monsters spread over an area (hellhounds) are walked to until one is close by, as a walk to an NPC is: the walk is
+	 * done and they are outlined on landing, not only near the area's centre.
+	 */
+	private static List<SubStep> withAreaNpcsOnWalk(List<SubStep> steps, StepIndex.Entry data)
+	{
+		Set<Integer> npcs = data == null || data.getArea() == null ? Set.of() : steps.stream()
+			.filter(sub -> sub.getKind() == SubStep.Kind.ACT && !sub.getNpcIds().isEmpty())
+			.map(SubStep::getNpcIds).findFirst().orElse(Set.of());
+		if (npcs.isEmpty())
+		{
+			return steps;
+		}
+		return steps.stream().map(sub -> sub.getKind() == SubStep.Kind.WALK_TO_CLUE ? sub.toBuilder().npcIds(npcs).build() : sub)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
 	/** A wide wanderer is looked for rather than walked to: where it wanders goes under the walk. */
 	private static List<SubStep> withWanderNote(List<SubStep> steps, StepIndex.Entry data)
 	{
@@ -498,9 +597,10 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
-	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data)
+	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data, Predicate<Quest> finished,
+		Set<Integer> carried)
 	{
-		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequires();
+		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequiresFor(finished, carried);
 		if (worn.isEmpty())
 		{
 			return steps;
@@ -518,6 +618,30 @@ public final class SubSteps
 			out.add(sub);
 		}
 		return List.copyOf(out);
+	}
+
+	/**
+	 * On a route to the way in, its gear goes on at the way in: a sled can only be ridden at the top of Trollweiss
+	 * Mountain. Already on the way (diving to the Mogre Camp's rocks), there is nothing to walk back to.
+	 */
+	private static List<SubStep> withWalkToWayIn(List<SubStep> steps, StepIndex.Entry data)
+	{
+		List<SubStep> out = new ArrayList<>();
+		for (SubStep sub : steps)
+		{
+			if (sub.getDone() == SubStep.Done.WAY_IN_WORN && data != null && data.getEntry() != null)
+			{
+				out.add(walkToWayIn(data.getEntry()));
+			}
+			out.add(sub);
+		}
+		return List.copyOf(out);
+	}
+
+	private static SubStep walkToWayIn(StepIndex.WayIn way)
+	{
+		return SubStep.of(SubStep.Kind.WALK, "Walk to " + way.getText()).waypoint(way.getTile()).goal(way.getTile())
+			.radius(ARRIVE_TILES).build();
 	}
 
 	/** Client thread only. Weapons and armour as the Entrana monks see them: any attack, defence or strength bonus. */

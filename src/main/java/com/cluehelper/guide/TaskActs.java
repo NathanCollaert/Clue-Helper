@@ -8,9 +8,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.util.Text;
 
 /**
@@ -20,8 +22,23 @@ import net.runelite.client.util.Text;
 @Singleton
 final class TaskActs
 {
+	/** A farming patch's varbit: below this it still has weeds, above it a crop (as RuneLite's time tracking reads it). */
+	private static final int PATCH_WEEDED = 3;
+	private static final String RAKE = "Rake";
+	private static final String SPADE = "Spade";
+
+	/** In the order a patch is picked to plant in: the least clearing first. */
+	private enum Patch
+	{
+		EMPTY,
+		WEEDS,
+		CROP
+	}
+
 	@Inject
 	private Client client;
+	@Inject
+	private SceneObjects sceneObjects;
 	@Inject
 	private PlayerModel player;
 	@Inject
@@ -43,10 +60,22 @@ final class TaskActs
 		{
 			return shown.toBuilder().items(Set.of(ItemID.HUNTSMANS_KIT)).tab(StepGuide.Tab.INVENTORY).build();
 		}
+		Integer staff = staffToWield(step);
+		if (staff != null)
+		{
+			Set<Integer> wield = Set.of(staff);
+			return shown.toBuilder().items(wield).fillItems(leftClicks.wears(staff) ? wield : Set.of()).tab(StepGuide.Tab.INVENTORY).build();
+		}
 		StepIndex.Cast cast = step.getData().getCast();
 		if (cast != null && cast.getOn().stream().anyMatch(carried::contains))
 		{
 			return withCast(shown, cast, carried);
+		}
+		Set<Integer> forPatch = patchItems(step, carried);
+		if (forPatch != null)
+		{
+			return shown.toBuilder().items(forPatch).fillItems(forPatch.stream().filter(leftClicks::wearsOrUses).collect(Collectors.toUnmodifiableSet()))
+				.tab(StepGuide.Tab.INVENTORY).build();
 		}
 		StepIndex.Making making = makingNow(step, carried);
 		if (current.getStage().getOption() != null && making == null)
@@ -74,8 +103,79 @@ final class TaskActs
 		{
 			return "Take the " + inKit + " out of the huntsman's kit";
 		}
+		Integer staff = staffToWield(step);
+		if (staff != null)
+		{
+			return "Wield the " + client.getItemDefinition(staff).getName() + " first";
+		}
+		Patch patch = nearestPatch(step);
+		if (patch != null)
+		{
+			return patch == Patch.WEEDS ? "Rake the weeds off the patch first"
+				: patch == Patch.CROP ? "Dig the crop out with the spade first" : "Use the seed on the patch";
+		}
 		StepIndex.Making making = makingNow(step, player.carriedIds());
 		return making == null ? null : making.getText();
+	}
+
+	/** What the nearest patch takes next, as carried: the rake on weeds, the spade on a crop, else the seed and dibber. */
+	private Set<Integer> patchItems(Step step, Set<Integer> carried)
+	{
+		Patch patch = nearestPatch(step);
+		if (patch == null)
+		{
+			return null;
+		}
+		if (patch == Patch.CROP)
+		{
+			return step.getData().getRequires().stream().filter(need -> need.getName().equals(SPADE))
+				.flatMap(need -> need.getIds().stream()).filter(carried::contains).collect(Collectors.toUnmodifiableSet());
+		}
+		boolean rake = patch == Patch.WEEDS;
+		return carried.stream().filter(id -> step.getRequirements().getItems().stream()
+				.anyMatch(need -> need.fulfilledBy(id) && RAKE.equals(need.getCollectiveName(client)) == rake))
+			.collect(Collectors.toUnmodifiableSet());
+	}
+
+	/** The state of the patch to plant in; null for other tasks or with none in the scene. */
+	private Patch nearestPatch(Step step)
+	{
+		if (step == null || !step.getData().isPlants())
+		{
+			return null;
+		}
+		Set<Integer> ids = step.getData().getPlaces().stream().flatMap(place -> place.getObjects().stream()).collect(Collectors.toSet());
+		TileObject patch = patchToUse(step, sceneObjects.find(ids));
+		return patch == null ? null : stateOf(patch);
+	}
+
+	/**
+	 * Of a planting task's patches in sight, the one to plant in: an empty one before a weedy one before one with a crop,
+	 * as clearing takes a while, then the nearest. Null for other tasks or none read.
+	 */
+	TileObject patchToUse(Step step, List<TileObject> patches)
+	{
+		Player local = client.getLocalPlayer();
+		if (step == null || !step.getData().isPlants() || local == null)
+		{
+			return null;
+		}
+		WorldPoint at = local.getWorldLocation();
+		return patches.stream().filter(patch -> stateOf(patch) != null)
+			.min(Comparator.comparing(this::stateOf).thenComparingInt(patch -> patch.getWorldLocation().distanceTo2D(at)))
+			.orElse(null);
+	}
+
+	/** Read from the patch's varbit; null for an object that has none. */
+	private Patch stateOf(TileObject patch)
+	{
+		int varbit = client.getObjectDefinition(patch.getId()).getVarbitId();
+		if (varbit < 0)
+		{
+			return null;
+		}
+		int state = client.getVarbitValue(varbit);
+		return state < PATCH_WEEDED ? Patch.WEEDS : state == PATCH_WEEDED ? Patch.EMPTY : Patch.CROP;
 	}
 
 	/**
@@ -181,6 +281,23 @@ final class TaskActs
 			.orElse(cast.getWidgets().isEmpty() ? -1 : cast.getWidgets().get(0));
 		return shown.toBuilder().items(items).fillItems(items).spellWidget(spellWidget)
 			.tab(picked ? StepGuide.Tab.INVENTORY : StepGuide.Tab.MAGIC).build();
+	}
+
+	/** A carried staff the task's runes come from, while no such staff is wielded; null otherwise. */
+	private Integer staffToWield(Step step)
+	{
+		PlayerSnapshot snapshot = player.getSnapshot();
+		RuneModel runes = player.getRuneModel();
+		if (step == null || step.getRequirements() == null || snapshot == null || runes == null)
+		{
+			return null;
+		}
+		Set<Integer> staves = runes.staves();
+		List<ItemRequirement> needs = step.getRequirements().getItems();
+		boolean wielding = snapshot.getWorn().keySet().stream()
+			.anyMatch(id -> staves.contains(id) && needs.stream().anyMatch(need -> need.fulfilledBy(id)));
+		return wielding ? null : snapshot.getInventory().keySet().stream()
+			.filter(id -> staves.contains(id) && needs.stream().anyMatch(need -> need.fulfilledBy(id))).findFirst().orElse(null);
 	}
 
 	/** The furthest making step whose worked-on item is carried; null before any is, or for a task made of nothing. */

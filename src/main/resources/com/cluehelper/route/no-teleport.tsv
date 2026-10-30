@@ -1,2 +1,3 @@
-# Areas where no teleport works. Hand-written; empty until a route is found that reaches one.
-name	minX	minY	maxX	maxY	plane
+# Areas where no teleport works. Hand-written. A varbit and value lift an area once the varbit reaches that value.
+name	minX	minY	maxX	maxY	plane	liftedByVarbit	liftedAt
+swimming by Mogre Camp: the inventory, gear and spellbook are locked until five rocks (HUNDRED_PIRATE_ROCKS) weigh the player down; the anchor (2963 9478) climbs out; the cavern and the crab pen, both entered at y 9515 (walked live 2026-10-30), are outside	2930	9450	3010	9514	1	1869	5

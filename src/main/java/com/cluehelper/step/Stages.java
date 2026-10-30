@@ -180,6 +180,8 @@ public final class Stages
 				.spans(entry == null ? List.of() : spans(entry.getPlaces()))
 				.option(entry == null ? null : entry.getPlaces().stream().map(StepIndex.Place::getOption).filter(option -> option != null)
 					.findFirst().orElse(null))
+				.dialogue(entry == null ? List.of() : entry.getPlaces().stream().map(StepIndex.Place::getDialogue)
+					.filter(dialogue -> !dialogue.isEmpty()).findFirst().orElse(List.of()))
 				.grownOnly(entry == null ? Map.of() : grownOnly(entry.getPlaces()))
 				.houseObjects(entry == null ? Set.of() : entry.getPlaces().stream().filter(place -> PositionRules.POH_NODE.equals(place.getTile()))
 					.flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet()))

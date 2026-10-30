@@ -16,6 +16,8 @@ final class PathObjects
 {
 	/** A large staircase stands a few tiles from the row's origin tile. */
 	private static final int ROW_OBJECT_TILES = 3;
+	/** Outweighs any squared distance within reach, so the distance to the row's origin only breaks ties. */
+	private static final int TIE_BREAK = 100;
 	/** Row objects that open only after another is used each time, by id: Meiyerditch's barricade after its rocky surface. */
 	private static final Map<Integer, Prerequisite> FIRST = Map.of(18054, new Prerequisite(18056, "Search"));
 
@@ -31,9 +33,12 @@ final class PathObjects
 		String option;
 	}
 	private static final String OPEN = "Open";
-
 	@Inject
 	private Client client;
+	@Inject
+	private AbyssObstacles abyss;
+	@Inject
+	private LeftClicks leftClicks;
 	@Inject
 	private SceneDoors doors;
 
@@ -86,6 +91,11 @@ final class PathObjects
 	/** Of the rows joining the same tiles, the object nearest the origin is the one clicked (the rope below the rocks). */
 	private void addRowObject(Map<TileObject, String> objects, WorldView view, List<Exit> rows, WorldPoint origin)
 	{
+		if (rows.stream().anyMatch(row -> AbyssObstacles.isObstacle(row.getObjectId())))
+		{
+			addAbyssObstacle(objects);
+			return;
+		}
 		Exit clicked = null;
 		TileObject object = null;
 		for (Exit row : rows)
@@ -109,6 +119,17 @@ final class PathObjects
 			objects.putIfAbsent(before, first.getOption());
 		}
 		objects.putIfAbsent(object, clicked.getOption());
+	}
+
+	/** Shortest Path names one spot of the Abyss's outer ring for every way through it: the ring takes the one chosen. */
+	private void addAbyssObstacle(Map<TileObject, String> objects)
+	{
+		TileObject obstacle = abyss.choose();
+		String option = obstacle == null ? null : leftClicks.object(obstacle);
+		if (option != null)
+		{
+			objects.putIfAbsent(obstacle, option);
+		}
 	}
 
 	/** A closed trapdoor is another object of the same name, opened first: the row names only its open form. */
@@ -220,8 +241,10 @@ final class PathObjects
 	{
 		WorldPoint end = row.getDestination();
 		boolean hop = end.getPlane() == origin.getPlane() && end.distanceTo2D(origin) <= ROW_OBJECT_TILES;
-		return nearestAround(view, origin, object -> isObject(object, row.getObjectId()),
-			(at, object) -> squaredDistance(at, origin) + (hop ? squaredDistance(at, end) : 0));
+		// Stepping stones put the same rock on both sides of the water: the near one is clicked to jump to the far one
+		return nearestAround(view, origin, object -> isObject(object, row.getObjectId()), (at, object) -> hop
+			? (squaredDistance(at, origin) + squaredDistance(at, end)) * TIE_BREAK + squaredDistance(at, origin)
+			: squaredDistance(at, origin));
 	}
 
 	private TileObject objectNear(WorldView view, int id, WorldPoint origin)

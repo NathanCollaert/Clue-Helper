@@ -196,13 +196,13 @@ public class WaypointOverlay extends Overlay
 
 	/**
 	 * The step's own act, one part of a three-step or the kill for a key, with nothing outlined to walk to and no item to
-	 * click.
+	 * click. An outlined NPC (a hellhound to kill) is walked to instead, the nearest one.
 	 */
 	private boolean isActWithoutPlace(SubStep current)
 	{
 		boolean stepOrPartAct = current.getStage() == null || current.getStage().getKind() == Stage.Kind.PART || isKillForKey(current);
 		return current.getKind() == SubStep.Kind.ACT && stepOrPartAct && current.getActItemNamed() == null
-			&& guide.getHighlightObjects().isEmpty();
+			&& guide.getHighlightObjects().isEmpty() && guide.getHighlightNpcs().isEmpty();
 	}
 
 	private void drawTile(Graphics2D graphics, WorldView view, WorldPoint waypoint)
@@ -448,17 +448,28 @@ public class WaypointOverlay extends Overlay
 		pathObjects = paths.along(view, data == null || view.isInstance() ? null : data.getTable(), walkLine.getAhead());
 	}
 
-	/** A row object on the way that opens only once another is used (Meiyerditch's barricade): the line leads there first. */
+	/**
+	 * A row object on the way that opens only once another is used (Meiyerditch's barricade), or the Abyss obstacle picked
+	 * in place of the spot the walk data names, as the guide outlines it: the line leads there first.
+	 */
 	private List<WorldPoint> toUseFirst(WorldView view, WalkCosts here, List<WorldPoint> ahead)
 	{
-		TileObject first = pathObjects.keySet().stream().filter(object -> PathObjects.isUsedFirst(object.getId())).findFirst().orElse(null);
+		TileObject first = Stream.concat(guide.getHighlightObjects().stream(), pathObjects.keySet().stream())
+			.filter(object -> PathObjects.isUsedFirst(object.getId()) || AbyssObstacles.isObstacle(object.getId()))
+			.findFirst().orElse(null);
 		Player local = client.getLocalPlayer();
-		if (first == null || local == null || here.getScene() == null || besidePlayer(view, first))
+		if (first == null || local == null || besidePlayer(view, first))
 		{
 			return ahead;
 		}
-		List<WorldPoint> there = walker.path(Ground.sceneOnly(here.getScene()), local.getWorldLocation(), LineTargets.objectGoal(view, first));
-		return there.isEmpty() ? ahead : there;
+		List<WorldPoint> there = here.getScene() == null ? List.of()
+			: walker.path(Ground.sceneOnly(here.getScene()), local.getWorldLocation(), LineTargets.objectGoal(view, first));
+		if (!there.isEmpty())
+		{
+			return there;
+		}
+		// The walk data's own spot may be across the ring from the obstacle picked: the line still points at the outlined one
+		return AbyssObstacles.isObstacle(first.getId()) ? List.of(local.getWorldLocation(), first.getWorldLocation()) : ahead;
 	}
 
 	/**

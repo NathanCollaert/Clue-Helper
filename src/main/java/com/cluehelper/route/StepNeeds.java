@@ -9,6 +9,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.Client;
+import net.runelite.api.Quest;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
@@ -31,6 +32,7 @@ public class StepNeeds
 	private final IntFunction<StashMemory.State> stashStates;
 	private final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
 	private final Supplier<Set<Integer>> ownedItemIds;
+	private final Predicate<Quest> finishedQuests;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
@@ -38,20 +40,24 @@ public class StepNeeds
 	@Inject
 	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)
 	{
-		this(client, stash::state, gearPieces::of, () -> ownedItemIds(player.getSnapshot(), availability.getBankedSnapshot()));
+		this(client, stash::state, gearPieces::of, () -> ownedItemIds(player.getSnapshot(), availability.getBankedSnapshot()),
+			player::finished);
 	}
 
 	/**
 	 * @param client names, real levels and varbits
 	 * @param ownedItemIds what gear is picked from: carried, and stored while banking counts
+	 * @param finishedQuests the quests that waive a step's way-in items
 	 */
 	public StepNeeds(Client client, IntFunction<StashMemory.State> stashStates,
-		BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces, Supplier<Set<Integer>> ownedItemIds)
+		BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces, Supplier<Set<Integer>> ownedItemIds,
+		Predicate<Quest> finishedQuests)
 	{
 		this.client = client;
 		this.stashStates = stashStates;
 		this.gearPieces = gearPieces;
 		this.ownedItemIds = ownedItemIds;
+		this.finishedQuests = finishedQuests;
 	}
 
 	public RequiredItems of(Step step)
@@ -66,7 +72,7 @@ public class StepNeeds
 		{
 			needs.add(new RequiredItems.Need("spade", SPADE, false, false));
 		}
-		if (requirements.needsLight() && !firePitLit(requirements))
+		if ((requirements.needsLight() || step.getData().isLight()) && !firePitLit(requirements))
 		{
 			needs.add(new RequiredItems.Need("light source", LIGHT, false, false));
 		}
@@ -83,12 +89,13 @@ public class StepNeeds
 			needs.add(new RequiredItems.Need(item.getCollectiveName(client), item, false, true));
 		}
 		boolean gettingLeft = isGettingLeft(step);
-		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().getRequires())
+		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().requiresFor(finishedQuests))
 		{
 			// An item the route still goes to get (the battered key from its bookcase) isn't brought along
 			if (!(gettingLeft && way.getFrom() != null))
 			{
-				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, false));
+				// Worn gear keeps the player alive or gets them in (a mirror shield, a sled): no route without it
+				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, way.isWear()));
 			}
 		}
 		ItemRequirement key = ownedKey(step);
@@ -112,8 +119,10 @@ public class StepNeeds
 	private boolean isOptional(String name, StepIndex.Entry data)
 	{
 		List<StepIndex.Level> from = data.getOptionalFrom().get(name);
+		List<Integer> with = data.getOptionalWith().get(name);
 		return data.getOptional().contains(name)
-			|| from != null && from.stream().allMatch(level -> client.getRealSkillLevel(level.getSkill()) >= level.getLevel());
+			|| from != null && from.stream().allMatch(level -> client.getRealSkillLevel(level.getSkill()) >= level.getLevel())
+			|| with != null && with.stream().anyMatch(varbit -> client.getVarbitValue(varbit) > 0);
 	}
 
 	/** Core's item, or the hand data's other way to the same thing; core's bank tag then lacks the other items. */

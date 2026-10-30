@@ -48,7 +48,7 @@ final class RouteDump
 			return "";
 		}
 		return " withdraw " + route.getWithdraw().stream().map(use -> String.valueOf(use.getItemId())).collect(Collectors.joining(",", "[", "]"))
-			+ (route.isDepositFirst() ? " depositFirst" : "") + (route.isPinIncluded() ? " +PIN" : "");
+			+ (route.isDepositFirst() ? " depositFirst" : "");
 	}
 
 	private static void line(List<String> lines, String label, Route route)

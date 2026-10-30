@@ -21,9 +21,12 @@ import net.runelite.api.widgets.Widget;
 @Singleton
 final class StepHighlights
 {
-	private static final String SEARCH_OPTION = "Search";
+	static final String SEARCH_OPTION = "Search";
 	private static final String REMOVE_OPTION = "Remove";
 	private static final String OPEN_OPTION = "Open";
+	private static final String USE_OPTION = "Use";
+	private static final Set<SubStep.Done> PUTS_ON = EnumSet.of(SubStep.Done.EQUIPPED, SubStep.Done.WAY_IN_WORN,
+		SubStep.Done.GEAR_WORN, SubStep.Done.ITEM_WORN);
 	private static final String CLOSE_OPTION = "Close";
 	private static final String TELEPORT_TO_DESTINATION = "Teleport to Destination";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Set.of(ObjectID.FAIRYRING_HOMEHUB, ObjectID.FAIRYRING_MINORHUB,
@@ -64,7 +67,8 @@ final class StepHighlights
 				Exit exit = current.getExit();
 				return shown.menuTarget(withDialogue(wayTarget(exit.getObjectId(), exit.getOption()), wayInOf(step, exit))).build();
 			case ENTER:
-				return shown.menuTarget(enterTarget(current)).build();
+				return current.getWayIn().getUse().isEmpty() ? shown.menuTarget(enterTarget(current)).build()
+					: useOnWayIn(shown, current.getWayIn());
 			case SPELLBOOK_SWAP:
 				shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(StepGuide.Tab.MAGIC);
 				break;
@@ -167,6 +171,7 @@ final class StepHighlights
 		{
 			case WAY_IN_WORN:
 			case GEAR_WORN:
+			case ITEM_WORN:
 				return act.getActItems().stream().filter(leftClicks::wears).collect(Collectors.toUnmodifiableSet());
 			case SLOTS_EMPTY:
 				return act.getActItems().stream().filter(leftClicks::removes).collect(Collectors.toUnmodifiableSet());
@@ -199,23 +204,70 @@ final class StepHighlights
 		{
 			boolean takesOff = current.getDone() == SubStep.Done.SLOTS_EMPTY;
 			shown.items(current.getActItems()).fillItems(actItemFill(current)).tab(actItemsTab(current.getDone()));
-			return (takesOff ? shown.menuTarget(rowTargets.items(current.getActItems(), REMOVE_OPTION)) : shown).build();
+			String putOn = PUTS_ON.contains(current.getDone()) ? wearOption(current.getActItems()) : null;
+			String option = takesOff ? REMOVE_OPTION : putOn;
+			return (option != null ? shown.menuTarget(rowTargets.items(current.getActItems(), option)) : shown).build();
 		}
 		String planted = taskActs.plantedTreeLine(current, step);
 		if (planted != null)
 		{
 			shown.menuTarget(rowTargets.plantedTree(current.getObjectIds(), planted));
 		}
+		else if (current.getStage() != null && current.getOption() != null && !current.getStage().getDialogue().isEmpty())
+		{
+			shown.menuTarget(withStageDialogue(current));
+		}
 		return withOneClick(shown.build(), current);
 	}
 
-	/** The way in's object with its option and dialogue; once its items are picked up, the object they are used on. */
+	/**
+	 * The way in's object with its option and dialogue, its closed form opened first; once its items are picked up, the
+	 * object they are used on.
+	 */
 	private static MenuTarget enterTarget(SubStep current)
 	{
-		StepIndex.PickUp pickUp = current.getWayIn().getPickUp();
+		StepIndex.WayIn way = current.getWayIn();
+		StepIndex.PickUp pickUp = way.getPickUp();
 		boolean pickedUp = pickUp != null && current.getText().startsWith(StepGuide.KEEP_GOING);
-		return pickedUp ? MenuTarget.builder().objectIds(Set.copyOf(pickUp.getObjects())).path(List.of(pickUp.getOption())).build()
-			: withDialogue(wayTarget(current.getWayIn().getObject(), current.getWayIn().getOption()), current.getWayIn());
+		if (pickedUp)
+		{
+			return MenuTarget.builder().objectIds(Set.copyOf(pickUp.getObjects())).path(List.of(pickUp.getOption())).build();
+		}
+		MenuTarget target = wayTarget(way.getObject(), way.getOption());
+		if (way.getClosed() >= 0)
+		{
+			target = target.toBuilder().objectIds(Set.of(way.getObject(), way.getClosed())).path(List.of(OPEN_OPTION, way.getOption())).build();
+		}
+		return withDialogue(target, way);
+	}
+
+	/** The carried item to use until one is picked, then the way's object it is used on. */
+	private Highlights useOnWayIn(Highlights.HighlightsBuilder shown, StepIndex.WayIn way)
+	{
+		List<String> use = List.of(USE_OPTION);
+		if (client.isWidgetSelected())
+		{
+			return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(way.getObject())).path(use).build()).build();
+		}
+		PlayerSnapshot carried = player.getSnapshot();
+		Set<Integer> items = carried == null ? Set.of() : way.getUse().stream().filter(carried.getInventory()::containsKey)
+			.collect(Collectors.toUnmodifiableSet());
+		return shown.items(items).menuTarget(MenuTarget.builder().itemIds(items).path(use).build()).tab(StepGuide.Tab.INVENTORY).build();
+	}
+
+	/** How the act's carried gear goes on ("Wear" on a Max cape, whose left click teleports); null for items not worn. */
+	private String wearOption(Set<Integer> items)
+	{
+		return player.inventoryIds().stream().filter(items::contains).map(leftClicks::wearOption).filter(Objects::nonNull)
+			.findFirst().orElse(null);
+	}
+
+	/** The act's click, then its chat options in turn. */
+	private static MenuTarget withStageDialogue(SubStep current)
+	{
+		List<String> path = new ArrayList<>(List.of(current.getOption()));
+		path.addAll(current.getStage().getDialogue());
+		return MenuTarget.builder().npcIds(current.getNpcIds()).objectIds(current.getObjectIds()).path(List.copyOf(path)).build();
 	}
 
 	/** The step's hand-written way in that this exit row is, or null. */

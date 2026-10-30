@@ -31,9 +31,10 @@ public final class LeftClicks
 	static final Set<MenuAction> OBJECT_OPTIONS = EnumSet.of(MenuAction.GAME_OBJECT_FIRST_OPTION,
 		MenuAction.GAME_OBJECT_SECOND_OPTION, MenuAction.GAME_OBJECT_THIRD_OPTION, MenuAction.GAME_OBJECT_FOURTH_OPTION,
 		MenuAction.GAME_OBJECT_FIFTH_OPTION);
-	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold");
+	private static final Set<String> WEAR_OPTIONS = Set.of("Wear", "Wield", "Equip", "Hold", "Ride");
 	private static final String USE_OPTION = "Use";
 	private static final String REMOVE_OPTION = "Remove";
+	private static final int LEFT_CLICK_OBJECT_OPS = 4;
 
 	@Inject
 	private Client client;
@@ -73,6 +74,13 @@ public final class LeftClicks
 		return known != null ? known : firstAction(client.getItemDefinition(itemId).getInventoryActions());
 	}
 
+	/** The option that puts the item on ("Wear", "Wield"), from its inventory menu; null for an item not worn. */
+	String wearOption(int itemId)
+	{
+		String[] actions = client.getItemDefinition(itemId).getInventoryActions();
+		return actions == null ? null : Arrays.stream(actions).filter(Objects::nonNull).filter(WEAR_OPTIONS::contains).findFirst().orElse(null);
+	}
+
 	boolean wears(int itemId)
 	{
 		String click = item(itemId);
@@ -101,7 +109,7 @@ public final class LeftClicks
 		return withdrawClick && client.getVarbitValue(VarbitID.BANK_WITHDRAWNOTES) == 0;
 	}
 
-	String object(TileObject object)
+	public String object(TileObject object)
 	{
 		ObjectComposition shown = shown(object.getId());
 		String known = learned().get(OBJECT + shown.getId());
@@ -110,7 +118,7 @@ public final class LeftClicks
 			return known;
 		}
 		String swapped = swapperClicks.object(shown);
-		return swapped != null ? swapped : firstAction(shown.getActions());
+		return swapped != null ? swapped : firstAction(objectLeftClickActions(shown.getActions()));
 	}
 
 	/** An ornate jewellery box's left click becomes the place it just sent the player to. */
@@ -200,6 +208,12 @@ public final class LeftClicks
 	{
 		ObjectComposition impostor = placed.getImpostorIds() == null ? null : placed.getImpostor();
 		return impostor != null ? impostor : placed;
+	}
+
+	/** An object's fifth option sits below Walk here (the Tarn's Lair pillars, its search walls): never a left click. */
+	private static String[] objectLeftClickActions(String[] actions)
+	{
+		return actions == null ? null : Arrays.copyOf(actions, Math.min(actions.length, LEFT_CLICK_OBJECT_OPS));
 	}
 
 	private static String firstAction(String[] actions)

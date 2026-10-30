@@ -12,6 +12,18 @@ public final class CatalogRules
 		ItemID.XERIC_TALISMAN_EMPTY, ItemID.RING_OF_SHADOWS_UNCHARGED, ItemID.TOME_OF_FIRE_UNCHARGED,
 		ItemID.TOME_OF_WATER_UNCHARGED, ItemID.TOME_OF_EARTH_UNCHARGED);
 
+	/**
+	 * What a ride's ghostspeak need takes, worn: the ghost captain talks only to a player wearing a ghostspeak amulet, or
+	 * Morytania legs 2+ in its place. The legs alone in a clause are a teleport item, not this need.
+	 */
+	public static final Set<Integer> GHOSTSPEAK = Set.of(ItemID.AMULET_OF_GHOSTSPEAK, ItemID.AMULET_OF_GHOSTSPEAK_ENCHANTED,
+		ItemID.MORYTANIA_LEGS_MEDIUM, ItemID.MORYTANIA_LEGS_HARD, ItemID.MORYTANIA_LEGS_ELITE);
+
+	public static boolean isGhostspeakNeed(ItemClause clause)
+	{
+		return clause.getBranches().stream().anyMatch(branch -> branch.getIds().contains(ItemID.AMULET_OF_GHOSTSPEAK));
+	}
+
 	private static final Set<Integer> FAIRY_RING_STAVES = Set.of(ItemID.DRAMEN_STAFF, ItemID.LUNAR_MOONCLAN_LIMINAL_STAFF);
 	private static final VarCheck LUMBRIDGE_ELITE_DONE =
 		new VarCheck(VarCheck.Kind.VARBIT, VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE, VarCheck.Op.EQUAL, 1);

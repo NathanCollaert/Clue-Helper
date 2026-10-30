@@ -39,7 +39,10 @@ final class GearActs
 		}
 	}
 
-	/** For an act done by {@link SubStep.Done#EQUIPPED}, {@code WAY_IN_WORN}, {@code GEAR_WORN} or {@code SLOTS_EMPTY}. */
+	/**
+	 * For an act done by {@link SubStep.Done#EQUIPPED}, {@code WAY_IN_WORN}, {@code GEAR_WORN}, {@code SLOTS_EMPTY} or
+	 * {@code ITEM_WORN}.
+	 */
 	boolean isDone(SubStep act, Step step)
 	{
 		switch (act.getDone())
@@ -52,6 +55,8 @@ final class GearActs
 				return step != null && wearsGear(act, step);
 			case SLOTS_EMPTY:
 				return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
+			case ITEM_WORN:
+				return act.getActItems().stream().anyMatch(player.wornIds()::contains);
 			default:
 				throw new IllegalArgumentException("not a gear act: " + act.getDone());
 		}
@@ -63,7 +68,7 @@ final class GearActs
 	 */
 	private SubStep equipWhatIsCarried(SubStep act, Step step)
 	{
-		List<StepIndex.Requires> worn = step.getData().wornRequires();
+		List<StepIndex.Requires> worn = step.getData().wornRequiresFor(player::finished, player.carriedIds());
 		Set<Integer> carried = player.carriedIds();
 		Integer coversAll = worn.get(0).getIds().stream().filter(carried::contains)
 			.filter(id -> worn.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
@@ -116,7 +121,7 @@ final class GearActs
 			return true;
 		}
 		Set<Integer> on = player.wornIds();
-		return step.getData().wornRequires().stream().allMatch(need -> need.getIds().stream().anyMatch(on::contains));
+		return step.getData().wornRequiresFor(player::finished, player.carriedIds()).stream().allMatch(need -> need.getIds().stream().anyMatch(on::contains));
 	}
 
 	private boolean wearsGear(SubStep act, Step step)

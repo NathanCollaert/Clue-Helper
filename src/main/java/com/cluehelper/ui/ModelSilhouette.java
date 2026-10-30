@@ -58,7 +58,7 @@ final class ModelSilhouette
 		WorldView view = npc.getWorldView();
 		if (at != null && view != null)
 		{
-			int z = Perspective.getTileHeight(client, at, view.getPlane()) - npc.getAnimationHeightOffset();
+			int z = Perspective.getFootprintTileHeight(client, at, view.getPlane(), npc.getFootprintSize()) - npc.getAnimationHeightOffset();
 			addFaces(shape, view, npc, at.getX(), at.getY(), z, npc.getCurrentOrientation());
 		}
 		return shape;

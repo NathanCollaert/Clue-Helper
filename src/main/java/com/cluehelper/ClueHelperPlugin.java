@@ -62,7 +62,7 @@ public class ClueHelperPlugin extends Plugin
 	private GrownPatches grownPatches;
 
 	@Inject
-	private XericsHonourMemory xericsHonour;
+	private UnlockMemory unlocks;
 
 	@Inject
 	private KeyRingMemory keyRing;
@@ -175,7 +175,7 @@ public class ClueHelperPlugin extends Plugin
 		clientThread.invokeLater(spiritTrees::publish);
 		clientThread.invokeLater(grownPatches::publish);
 		clientThread.invokeLater(fairyRings::publish);
-		clientThread.invokeLater(xericsHonour::publish);
+		clientThread.invokeLater(unlocks::publish);
 		clientThread.invokeLater(keyRing::publish);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
@@ -238,7 +238,7 @@ public class ClueHelperPlugin extends Plugin
 		menuLines.takeFreshList(spiritTrees::onListMenu);
 		spiritTrees.onGameTick();
 		fairyRings.onGameTick();
-		xericsHonour.onGameTick();
+		unlocks.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
 		routes.onGameTick();
@@ -355,7 +355,7 @@ public class ClueHelperPlugin extends Plugin
 		playerModel.onGameStateChanged(event);
 		bankMemory.onGameStateChanged(event);
 		poh.onGameStateChanged(event);
-		xericsHonour.onGameStateChanged(event);
+		unlocks.onGameStateChanged(event);
 		guide.onGameStateChanged(event);
 	}
 
@@ -366,7 +366,7 @@ public class ClueHelperPlugin extends Plugin
 		actWatcher.onChatMessage(event);
 		guide.onChatMessage(event);
 		stashMemory.onChatMessage(event);
-		xericsHonour.onChatMessage(event);
+		unlocks.onChatMessage(event);
 		sceneDoors.onChatMessage(event);
 		if (checkLines.onChatMessage(event))
 		{
@@ -406,7 +406,7 @@ public class ClueHelperPlugin extends Plugin
 		spiritTrees.publish();
 		grownPatches.publish();
 		fairyRings.publish();
-		xericsHonour.publish();
+		unlocks.publish();
 		keyRing.publish();
 	}
 

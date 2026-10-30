@@ -9,5 +9,7 @@ public enum GearBonus
 	GUTHIX_ITEMS,
 	ZAMORAK_ITEMS,
 	/** Any armour or weapon, one piece each. */
-	ANY_EQUIPMENT
+	ANY_EQUIPMENT,
+	/** Minus the prayer bonus: a total above zero is a negative prayer bonus (Abbot Langley's anger). */
+	NEGATIVE_PRAYER
 }

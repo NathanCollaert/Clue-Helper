@@ -38,7 +38,9 @@ public class GearPieces
 			return Optional.empty();
 		}
 		int value = value(bonus, equipment, itemId);
-		return value > 0 ? Optional.of(new GearPicker.Piece(itemId, equipment.getSlot(), equipment.isTwoHanded(), value))
+		// A worn piece with a positive prayer bonus counts against the total, so it is a piece too
+		boolean counts = value > 0 || bonus == GearBonus.NEGATIVE_PRAYER && value != 0;
+		return counts ? Optional.of(new GearPicker.Piece(itemId, equipment.getSlot(), equipment.isTwoHanded(), value))
 			: Optional.empty();
 	}
 
@@ -58,6 +60,8 @@ public class GearPieces
 				return isZamorak(name(itemId)) ? 1 : 0;
 			case ANY_EQUIPMENT:
 				return equipment.getSlot() != AMMO ? 1 : 0;
+			case NEGATIVE_PRAYER:
+				return -equipment.getPrayer();
 			default:
 				throw new IllegalArgumentException("unhandled gear bonus " + bonus);
 		}

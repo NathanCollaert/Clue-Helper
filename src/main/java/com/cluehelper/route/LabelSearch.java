@@ -214,19 +214,20 @@ final class LabelSearch
 
 	private void arrive(Label from, int k)
 	{
-		Book needed = ctx.stageBook(from.node);
+		boolean lastLeg = from.leg + 1 >= legTargets.size();
+		Book needed = ctx.stageBook(from.node) == null && lastLeg ? ctx.anywhereBook() : ctx.stageBook(from.node);
 		if (ctx.stageNeedsBank(from.node, from.b) || needed != null && bookOf(k) != needed)
 		{
 			return;
 		}
 		int[] staged = sortedUnion(from.withdrawn, ctx.stageWithdraw(from.node, from.b));
-		if (from.leg + 1 < legTargets.size())
+		if (!lastLeg)
 		{
 			int half = PlanContext.WITHDRAW_HALF_TICKS * (staged.length - from.withdrawn.length);
 			offer(from, from.node, from.b, from.c, k, from.t, from.leg + 1, half, half, null, null, null, from.spent, staged);
 			return;
 		}
-		if (from.b == PlanContext.NOT_BANKED && !ctx.arrivesWithoutBank())
+		if (from.b == PlanContext.NOT_BANKED && !ctx.arrivesWithoutBank(from.node))
 		{
 			return;
 		}
@@ -508,7 +509,7 @@ final class LabelSearch
 			spent = spend(spent, second.res, second.amounts, from.b);
 			withdrawn = sortedUnion(withdrawn, second.withdraw);
 		}
-		if (spent != null && !pointlessAfterBank(from, withdrawn))
+		if (spent != null && (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(node)))
 		{
 			int total = half + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
 			offer(from, node, from.b, c, k, t, from.leg, total, total, kind, tele, second, spent, withdrawn);

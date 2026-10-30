@@ -45,6 +45,8 @@ public class Highlighter
 	 * sliver no one sees.
 	 */
 	private static final int FLAT_MARKER_FACES = 2;
+	/** A model this low lies flat on the ground (an empty, raked farming patch): its outline draws nothing to see. */
+	private static final int FLAT_MODEL_HEIGHT = 8;
 	/**
 	 * The outline takes only a world ring's butterflies, not its mushrooms: a circle on the ground marks them. A house's
 	 * ring and spirit tree outline their mushrooms themselves.
@@ -133,8 +135,8 @@ public class Highlighter
 	}
 
 	/**
-	 * A scenery object with no model at all, a flat click spot, or one whose every face is skipped by the outline renderer
-	 * (see-through) or never drawn by the client.
+	 * A scenery object with no model at all, a flat click spot or flat ground (an empty farming patch), or one whose every
+	 * face is skipped by the outline renderer (see-through) or never drawn by the client.
 	 */
 	private static boolean isHidden(TileObject object)
 	{
@@ -144,7 +146,7 @@ public class Highlighter
 		}
 		Renderable renderable = ((GameObject) object).getRenderable();
 		Model model = renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
-		if (model == null || model.getFaceCount() <= FLAT_MARKER_FACES)
+		if (model == null || model.getFaceCount() <= FLAT_MARKER_FACES || model.getModelHeight() <= FLAT_MODEL_HEIGHT)
 		{
 			return true;
 		}

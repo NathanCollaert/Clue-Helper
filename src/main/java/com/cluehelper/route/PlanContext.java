@@ -60,6 +60,8 @@ final class PlanContext
 	private final List<RequiredItems.Verdict> missingEverywhere = new ArrayList<>();
 	/** Stage target nodes that must be reached on a given book (the Arceuus lectern). */
 	private final Map<Integer, Book> stageBooks = new HashMap<>();
+	/** The book a task done anywhere needs (Sherlock's enchanting): the route reaches its last target on it; or null. */
+	private Book anywhereBook;
 	private final int[] stageWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
@@ -98,6 +100,7 @@ final class PlanContext
 		Set<RequiredItems.Need> atStages = judgeStageNeeds(bankedPlayer);
 		required = in.getRequired().toBuilder()
 			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(Collectors.toList()))
+			.staves(in.getEngine().getRunes().staves())
 			.build().judge(in.getPlayer(), bankedPlayer);
 		requiredWithdraw = TransportOptions.ids(required.getWithdraw());
 		stageWithdraw = stageNeeds.values().stream().flatMap(verdict -> verdict.getWithdraw().stream()).mapToInt(ItemUse::getItemId)
@@ -123,6 +126,7 @@ final class PlanContext
 			if (stage.getBook() != null)
 			{
 				stage.getTiles().forEach(tile -> stageBooks.put(nodeAt(tile), stage.getBook()));
+				anywhereBook = stage.getTiles().isEmpty() ? stage.getBook() : anywhereBook;
 			}
 			List<RequiredItems.Need> wanted = in.getRequired().getNeeds().stream()
 				.filter(need -> stage.getWorn().contains(need.getName()) || stage.isTakesStepItems() && need.isStepItem())
@@ -136,7 +140,8 @@ final class PlanContext
 			for (WorldPoint tile : stage.getTiles())
 			{
 				List<RequiredItems.Need> here = withPlaceUses(wanted, stage.getUses().getOrDefault(tile, List.of()));
-				RequiredItems needs = in.getRequired().toBuilder().stash(StashMemory.State.NONE).needs(here).build();
+				RequiredItems needs = in.getRequired().toBuilder().stash(StashMemory.State.NONE).needs(here)
+					.staves(in.getEngine().getRunes().staves()).build();
 				RequiredItems.Verdict verdict = needs.judge(in.getPlayer(), bankedPlayer);
 				stageNeeds.put(nodeAt(tile), verdict);
 				verdicts.add(verdict);
@@ -182,6 +187,11 @@ final class PlanContext
 		return stageBooks.get(node);
 	}
 
+	Book anywhereBook()
+	{
+		return anywhereBook;
+	}
+
 	/** A stage tile whose items are owned nowhere while another place's are: routes skip it. */
 	boolean lacksItems(WorldPoint tile)
 	{
@@ -214,7 +224,16 @@ final class PlanContext
 		return !depositsBook && !required.isFromBank();
 	}
 
-	/** After a bank stop with nothing withdrawn yet, these are the only nodes worth walking to. */
+	/** Arriving at this target: the book is deposited first only where the target is in the Wilderness. */
+	boolean arrivesWithoutBank(int node)
+	{
+		WorldPoint at = tile(node);
+		boolean depositsBook = depositsBookFirst && options[BANKED] != null
+			&& (at == null || OriginClass.of(at, in.getNoTeleport()).isWilderness());
+		return !depositsBook && !required.isFromBank();
+	}
+
+	/** After a bank stop with nothing withdrawn yet, these are the only nodes worth walking or teleporting to. */
 	boolean usesBankItems(int node)
 	{
 		TransportOptions banked = options[BANKED];
@@ -228,6 +247,7 @@ final class PlanContext
 			banked.fairyEntries.forEach((at, entry) -> bankItemUses[at] |= entry.withdraw.length > 0
 				|| banked.fairyLandings.stream().anyMatch(landing -> landing.withdraw.length > 0));
 			banked.changes.forEach((at, changes) -> changes.forEach(change -> bankItemUses[at] |= change.withdraw.length > 0));
+			banked.located.forEach((at, rides) -> rides.forEach(ride -> bankItemUses[at] |= ride.withdraw.length > 0));
 		}
 		return node < bankItemUses.length && bankItemUses[node];
 	}

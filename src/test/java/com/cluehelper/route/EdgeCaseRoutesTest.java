@@ -14,10 +14,12 @@ import com.cluehelper.player.RuneModel;
 import com.cluehelper.player.SpellbookState;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
 import com.cluehelper.transport.CatalogLoader;
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +37,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
@@ -407,6 +411,14 @@ public class EdgeCaseRoutesTest
 		PlayerSnapshot bridgeUnbuilt = withVarbits(maxed, Map.of(VarbitID.FENK_BUILT_BRIDGE_NORTH, 1, VarbitID.FENK_BUILT_BRIDGE_SOUTH, 1));
 		lines.add(line("gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave",
 			checked(input(bridgeUnbuilt, step("emote:10256"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		Map<Quest, QuestState> elvesUnfinished = new HashMap<>(maxed.getQuests());
+		elvesUnfinished.put(Quest.SONG_OF_THE_ELVES, QuestState.IN_PROGRESS);
+		lines.add(line("quest gate: maxed without Song of the Elves, to Prifddinas: no route, the quest named",
+			checked(input(maxed.toBuilder().quests(elvesUnfinished).build(), step("cryptic:elvish onions."), PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		String anglerfish ="skill:SHERLOCK:angle for an anglerfish whilst sporting the finest fishing gear.";
+		Step anglerfishWithData = step(anglerfish).toBuilder().data(StepIndex.read(new Gson()).entry(anglerfish)).build();
+		lines.add(line("skill level: maxed at 70 Fishing, Sherlock's anglerfish: no route, the level named",
+			checked(input(withLevel(maxed, Skill.FISHING, 70), anglerfishWithData, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 	}
 
 	private static PlayerSnapshot ridesOnly(PlayerSnapshot player)

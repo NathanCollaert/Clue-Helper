@@ -19,6 +19,10 @@ public final class AvailabilityEngine
 	private static final List<Container> WORN_ONLY = List.of(Container.WORN, Container.BANK, Container.GROUP_STORAGE);
 	/** Shortest Path lists every charge of an item as its own alternative: glory(1) to glory(t6) is 12. */
 	private static final int MAX_ALTERNATIVES_NAMED = 2;
+	/** What makes the plugin see an unlock it learns from play (UnlockMemory), told to a player who has it. */
+	private static final Map<String, String> UNLOCK_HINTS = Map.of(
+		"DRAGONTOOTH", "if unlocked, speak with the ghost captain",
+		"XERICS_HONOUR", "if unlocked, use the Honour teleport once");
 
 	private final RuneModel runes;
 	private final IntFunction<String> itemNames;
@@ -70,7 +74,7 @@ public final class AvailabilityEngine
 		int have = need.have(player);
 		if (have < need.getLevel())
 		{
-			v.no("needs " + need.describe() + " (has " + have + ")");
+			v.level(need.describe() + " (has " + have + ")");
 		}
 	}
 
@@ -82,7 +86,7 @@ public final class AvailabilityEngine
 		}
 		else if (!player.finished(quest))
 		{
-			v.no(quest.getName() + " not finished");
+			v.quest(quest.getName());
 		}
 	}
 
@@ -165,12 +169,16 @@ public final class AvailabilityEngine
 		}
 		else if (unread != null)
 		{
-			v.unread(unread);
+			List<String> ways = new ArrayList<>(shortfalls);
+			ways.add(unread);
+			v.unread = true;
+			v.item(ways);
 		}
 		else
 		{
-			v.no(shortfalls.size() <= MAX_ALTERNATIVES_NAMED ? String.join(" or ", shortfalls)
-				: shortfalls.get(0) + " or one of " + (shortfalls.size() - 1) + " other variants");
+			List<String> ways = shortfalls.size() <= MAX_ALTERNATIVES_NAMED ? shortfalls
+				: List.of(shortfalls.get(0), "one of " + (shortfalls.size() - 1) + " other variants");
+			v.item(ways);
 		}
 	}
 
@@ -209,10 +217,16 @@ public final class AvailabilityEngine
 
 	private Paid pay(ItemClause.Branch branch, boolean mustBeWorn, boolean spendsCharges, PlayerSnapshot player)
 	{
+		if (branch.isQuest())
+		{
+			return !player.isQuestsRead() ? Paid.unread("quests not read yet")
+				: player.finished(branch.getQuest()) ? Paid.with(List.of(), false) : Paid.missing(branch.getQuest().getName() + " (quest)");
+		}
 		if (branch.isUnlock())
 		{
 			return player.getUnlocks().contains(branch.getUnlock()) ? Paid.with(List.of(), false)
-				: Paid.unread("unlock " + branch.getUnlock() + " not seen yet");
+				: Paid.unread("the " + branch.getUnlock().toLowerCase(Locale.ROOT).replace('_', ' ') + " unlock ("
+				+ UNLOCK_HINTS.getOrDefault(branch.getUnlock(), "not seen yet") + ")");
 		}
 		List<Integer> ids = branch.getIds();
 		if (ids.size() == 1 && runes.isRune(ids.get(0)) && !mustBeWorn)
@@ -298,6 +312,10 @@ public final class AvailabilityEngine
 	private static final class Verdict
 	{
 		final List<String> whyNot = new ArrayList<>();
+		final List<List<String>> missingItems = new ArrayList<>();
+		final List<String> missingLevels = new ArrayList<>();
+		final List<String> missingQuests = new ArrayList<>();
+		final List<String> otherReasons = new ArrayList<>();
 		final List<ItemUse> witness = new ArrayList<>();
 		boolean unread;
 		boolean chargesUnknown;
@@ -306,12 +324,31 @@ public final class AvailabilityEngine
 		void no(String reason)
 		{
 			whyNot.add(reason);
+			otherReasons.add(reason);
 		}
 
 		void unread(String reason)
 		{
 			unread = true;
-			whyNot.add(reason);
+			no(reason);
+		}
+
+		void item(List<String> ways)
+		{
+			whyNot.add(String.join(" or ", ways));
+			missingItems.add(List.copyOf(ways));
+		}
+
+		void level(String shortBy)
+		{
+			whyNot.add("needs " + shortBy);
+			missingLevels.add(shortBy);
+		}
+
+		void quest(String name)
+		{
+			whyNot.add(name + " not finished");
+			missingQuests.add(name);
 		}
 
 		RowAvailability result(CatalogRow row)
@@ -320,7 +357,8 @@ public final class AvailabilityEngine
 			RowAvailability.Confidence confidence = unread ? RowAvailability.Confidence.UNREAD
 				: available && chargesUnknown ? RowAvailability.Confidence.CHARGES_UNKNOWN : RowAvailability.Confidence.SURE;
 			return new RowAvailability(row, available, confidence, available ? List.copyOf(witness) : List.of(),
-				List.copyOf(whyNot), passesFrom);
+				List.copyOf(whyNot), List.copyOf(missingItems), List.copyOf(missingLevels), List.copyOf(missingQuests),
+				List.copyOf(otherReasons), passesFrom);
 		}
 	}
 }

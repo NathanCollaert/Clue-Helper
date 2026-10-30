@@ -199,7 +199,7 @@ public class StepResolver
 		}
 		if (entry != null && entry.getArea() != null && entry.getArea().getTile() != null)
 		{
-			return List.of(entry.getArea().getTile());
+			return entry.getArea().getTiles();
 		}
 		List<WorldPoint> core = CoreClueReader.locations(clue, plugin);
 		List<WorldPoint> cache = entry == null ? List.of() : tiles(entry);

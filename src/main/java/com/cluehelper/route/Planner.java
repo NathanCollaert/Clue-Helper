@@ -1,9 +1,12 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.PositionRules;
+import com.cluehelper.player.*;
 import com.cluehelper.step.*;
+import com.cluehelper.transport.*;
 import java.util.*;
+import java.util.regex.*;
 import java.util.stream.*;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /** Pure, so it runs on the executor with snapshot data only. */
@@ -11,6 +14,16 @@ public final class Planner
 {
 	/** A route with a bank stop or a walked change must beat its reference by this much: near-ties stay on fewer steps. */
 	private static final int MARGIN_HALF_TICKS = 4;
+	/** A transport landing this near a target unreached is taken as its way in when the note says what is missing. */
+	private static final int BLOCKED_RIDE_TILES = 50;
+	/** The engine words each shortfall as "needs 25 x Ecto-token"; under a "needs:" heading the word goes. */
+	private static final String NEEDS = "needs ";
+	private static final String NOT_FOUND = "Not found on you or in your bank:";
+	private static final String LEVELS_SHORT = "Levels too low:";
+	private static final String QUESTS_UNFINISHED = "Quests not finished:";
+	private static final String NOT_YET = "Not possible yet:";
+	/** A hand-written need named with its other ways: "Chef's hat (or cooking cape, Max cape, Varrock armour 3)". */
+	private static final Pattern OTHER_WAYS = Pattern.compile("(.+) \\(or (?:an? )?(.+)\\)");
 	private static final int REGION_SIZE = 64;
 	private static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
 	/** Catalog landings of one place spread 0–2 tiles. */
@@ -42,12 +55,17 @@ public final class Planner
 		Step step = in.getStep();
 		if (step != null && step.getData().isHidden())
 		{
-			return Plan.builder().stepKey(step.getKey()).note("not guided: a Leagues step").build();
+			return Plan.builder().stepKey(step.getKey()).note("not guided: a step outside the normal game (Leagues, or removed)").build();
 		}
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
 			return Plan.builder().stepKey(step == null ? null : step.getKey()).note(step == null ? "no step"
 				: ClueTypes.HOT_COLD.equals(step.getType()) ? "choosing where to feel" : "no target tile for this step yet").build();
+		}
+		List<String> shortLevels = shortLevels(step, in.getPlayer());
+		if (!shortLevels.isEmpty())
+		{
+			return Plan.builder().stepKey(step.getKey()).requirementNotes(shortLevels).build();
 		}
 		PlanContext ctx = new PlanContext(in);
 		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty())
@@ -81,8 +99,13 @@ public final class Planner
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
 		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
 		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
-		plan.note(probes ? null : picks.best == null ? noRouteNote(ctx, orders) : ctx.onlyInWilderness ? "Wilderness target" : null);
-		plan.requirementNotes(requirementNotes(ctx));
+		List<String> requirementNotes = requirementNotes(ctx);
+		boolean missingNamed = requirementNotes.contains(NOT_FOUND);
+		List<String> noRoute = probes || picks.best != null || missingNamed ? List.of() : noRouteNotes(ctx, orders);
+		plan.note(!noRoute.isEmpty() ? noRoute.get(0) : picks.best != null && ctx.onlyInWilderness ? "Wilderness target" : null);
+		List<String> notes = new ArrayList<>(noRoute.subList(Math.min(1, noRoute.size()), noRoute.size()));
+		notes.addAll(requirementNotes);
+		plan.requirementNotes(List.copyOf(notes));
 		return plan.searchNanos(System.nanoTime() - started).labels(searches.labels).build();
 	}
 
@@ -314,29 +337,63 @@ public final class Planner
 	/** One line per missing item; an item with another way to it lists that way's missing parts after an "or". */
 	private static List<String> missingList(List<RequiredItems.Verdict> verdicts)
 	{
-		List<String> lines = new ArrayList<>();
+		Set<List<String>> needs = new LinkedHashSet<>();
 		for (RequiredItems.Verdict verdict : verdicts)
 		{
 			for (RequiredItems.Need need : verdict.getMissing())
 			{
-				if (lines.contains("- " + need.getName()))
+				List<String> ways = new ArrayList<>(waysNamed(need.getName()));
+				List<String> otherWay = verdict.getMissingParts().getOrDefault(need, List.of());
+				if (!otherWay.isEmpty())
 				{
-					continue;
+					ways.add(String.join(" and ", otherWay));
 				}
-				lines.add("- " + need.getName());
-				List<String> parts = verdict.getMissingParts().getOrDefault(need, List.of());
-				if (!parts.isEmpty())
-				{
-					lines.add("or");
-					parts.forEach(part -> lines.add("- " + part));
-				}
+				needs.add(List.copyOf(ways));
 			}
 		}
-		if (!lines.isEmpty())
+		return section(NOT_FOUND, List.copyOf(needs));
+	}
+
+	/**
+	 * A need's name split into its ways, as the list shows them: "Mirror shield (or V's shield)" and core's "Pure essence
+	 * or Daeyalt essence" are two lines each.
+	 */
+	private static List<String> waysNamed(String name)
+	{
+		Matcher others = OTHER_WAYS.matcher(name);
+		List<String> ways = new ArrayList<>();
+		if (others.matches())
 		{
-			lines.add(0, "Not found on you or in your bank:");
+			ways.add(others.group(1));
+			ways.addAll(Arrays.asList(others.group(2).split(", ")));
 		}
-		return List.copyOf(lines);
+		else
+		{
+			Arrays.stream(name.split(",? or ")).forEach(ways::add);
+		}
+		return ways.stream().map(Planner::wayLine).collect(Collectors.toList());
+	}
+
+	/** A level the task needs and the player lacks: the step can't be done, so nothing routes to it. */
+	private static List<String> shortLevels(Step step, PlayerSnapshot player)
+	{
+		List<String> tooLow = new ArrayList<>();
+		for (StepIndex.Level level : step.getData().getLevels())
+		{
+			LevelNeed need = LevelNeed.ofSkill(level.getSkill(), level.getLevel());
+			int have = levelHad(player, level.getSkill());
+			if (have < need.getLevel())
+			{
+				tooLow.add(need.describe() + " (has " + have + "; boosts count)");
+			}
+		}
+		return section(LEVELS_SHORT, each(tooLow));
+	}
+
+	/** Prayer's boosted level is its points left: a drained level comes back, so only a boost raises it. */
+	private static int levelHad(PlayerSnapshot player, Skill skill)
+	{
+		return Math.max(player.boosted(skill), player.getRealLevels().getOrDefault(skill, 1));
 	}
 
 	static List<String> requirementNotes(PlanContext ctx)
@@ -353,25 +410,159 @@ public final class Planner
 		return notes;
 	}
 
-	/** The walk table holds walks up to 200 tiles only, so a target no entry reaches is too far to walk. */
-	private static String noRouteNote(PlanContext ctx, List<List<int[]>> orders)
+	/**
+	 * The note on a step with no route, then what the player lacks for it listed as missing items are. A target with no
+	 * walk node, or one no entry within the table's 200-tile walks reaches, is a gap in the walk data, not the player's.
+	 */
+	private static List<String> noRouteNotes(PlanContext ctx, List<List<int[]>> orders)
 	{
 		Step step = ctx.in.getStep();
 		if (step.getData().getReach() != null)
 		{
-			return step.getData().getReach();
+			return List.of(step.getData().getReach());
 		}
-		Set<Integer> reachable = new HashSet<>();
 		WalkTable table = ctx.table;
-		for (int node = 0; node < table.nodeCount(); node++)
+		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(Collectors.toSet());
+		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || table.reverseEnd(n) == table.reverseFrom(n));
+		if (noWalkData)
 		{
-			for (int e = table.entriesFrom(node); e < table.entriesEnd(node); e++)
+			return List.of("No route: the plugin has no way to this spot yet");
+		}
+		Set<String> quests = lockingQuests(ctx, targets);
+		if (!quests.isEmpty())
+		{
+			return section(QUESTS_UNFINISHED, List.of(List.copyOf(quests)));
+		}
+		List<List<String>> items = lockingItems(ctx, targets);
+		return !items.isEmpty() ? section(NOT_FOUND, items) : blockedRideNotes(ctx);
+	}
+
+	/**
+	 * The items owned nowhere that shut every way into the targets, each with its ways round (the sled down Trollweiss
+	 * Mountain): only gates that items alone keep shut.
+	 */
+	private static List<List<String>> lockingItems(PlanContext ctx, Set<Integer> targets)
+	{
+		PlayerSnapshot judged = ctx.in.getBanked() != null ? ctx.in.getBanked() : ctx.in.getPlayer();
+		WalkTable table = ctx.table;
+		WalkGates gates = ctx.gates(PlanContext.BANKED);
+		Set<List<String>> missing = new LinkedHashSet<>();
+		for (int target : targets)
+		{
+			for (int i = table.reverseFrom(target); i < table.reverseEnd(target); i++)
 			{
-				reachable.add(table.entryTo(e));
+				gates.shutWays(table.reverseEntry(i)).stream().flatMap(List::stream)
+					.map(gate -> ctx.in.getEngine().judge(CatalogRow.builder().name("gate").requirements(gate).build(), judged,
+						ctx.in.getNowMinutes()))
+					.filter(verdict -> !verdict.isAvailable() && verdict.getMissingItems().size() == verdict.getWhyNot().size())
+					.forEach(verdict -> missing.addAll(verdict.getMissingItems()));
 			}
 		}
-		boolean walkTooLong = orders.get(0).stream().flatMapToInt(Arrays::stream).anyMatch(n -> !reachable.contains(n));
-		return walkTooLong ? "walk too long" : "no route from what you have";
+		return List.copyOf(missing);
+	}
+
+	/** The way in the player lacks, from the nearest transport landing by a target (the Dragontooth boat's fare). */
+	private static List<String> blockedRideNotes(PlanContext ctx)
+	{
+		PlayerSnapshot judged = ctx.in.getBanked() != null ? ctx.in.getBanked() : ctx.in.getPlayer();
+		List<WorldPoint> targets = ctx.in.getStep().getTargets();
+		return ctx.in.getCatalog().getTeleports().stream()
+			.filter(row -> row.getDestination() != null && distanceToNearest(row.getDestination(), targets) <= BLOCKED_RIDE_TILES)
+			.sorted(Comparator.comparingInt(row -> distanceToNearest(row.getDestination(), targets)))
+			.map(row -> ctx.in.getEngine().judge(row, judged, ctx.in.getNowMinutes()))
+			.filter(verdict -> !verdict.isAvailable() && !verdict.getWhyNot().isEmpty())
+			.findFirst()
+			.map(Planner::blockedRideLines)
+			.orElse(List.of("no route from what you have"));
+	}
+
+	/** What shuts the ride, as every missing note reads: items, levels, quests, then anything else. */
+	private static List<String> blockedRideLines(RowAvailability verdict)
+	{
+		List<String> lines = new ArrayList<>(section(NOT_FOUND, verdict.getMissingItems()));
+		lines.addAll(section(LEVELS_SHORT, each(verdict.getMissingLevels())));
+		lines.addAll(section(QUESTS_UNFINISHED, each(verdict.getMissingQuests())));
+		lines.addAll(section(NOT_YET, each(verdict.getOtherReasons())));
+		return lines;
+	}
+
+	/**
+	 * Every missing note's form: a heading, then a line per need, each need's ways round it split by "or" ("25 x
+	 * Ecto-token", or "The dragontooth unlock").
+	 */
+	private static List<String> section(String heading, List<List<String>> needs)
+	{
+		if (needs.isEmpty())
+		{
+			return List.of();
+		}
+		List<String> lines = new ArrayList<>(List.of(heading));
+		needs.forEach(ways -> lines.addAll(alternativeLines(ways.stream().map(Planner::wayLine).collect(Collectors.toList()))));
+		return lines;
+	}
+
+	/** Needs with one way each, all of them wanted. */
+	private static List<List<String>> each(List<String> needs)
+	{
+		return needs.stream().map(List::of).collect(Collectors.toList());
+	}
+
+	private static String wayLine(String way)
+	{
+		String bare = way.startsWith(NEEDS) ? way.substring(NEEDS.length()) : way;
+		return bare.isEmpty() ? bare : Character.toUpperCase(bare.charAt(0)) + bare.substring(1);
+	}
+
+	private static List<String> alternativeLines(List<String> ways)
+	{
+		List<String> lines = new ArrayList<>();
+		for (String way : ways)
+		{
+			if (!lines.isEmpty())
+			{
+				lines.add("or");
+			}
+			lines.add("- " + way);
+		}
+		return lines;
+	}
+
+	private static int distanceToNearest(WorldPoint tile, List<WorldPoint> targets)
+	{
+		return targets.stream().filter(target -> target.getPlane() == tile.getPlane()).mapToInt(target -> target.distanceTo2D(tile))
+			.min().orElse(Integer.MAX_VALUE);
+	}
+
+	/**
+	 * Regicide, or Mourning's End Part I: the unfinished quests on each shut way into the targets. Open walks into them
+	 * don't clear it: inside a gated city they start from landings nothing reached. None while quests aren't read, since
+	 * every quest gate fails until then.
+	 */
+	private static Set<String> lockingQuests(PlanContext ctx, Set<Integer> targets)
+	{
+		PlayerSnapshot player = ctx.in.getPlayer();
+		if (!player.isQuestsRead())
+		{
+			return Set.of();
+		}
+		WalkTable table = ctx.table;
+		WalkGates gates = ctx.gates(PlanContext.NOT_BANKED);
+		Set<String> ways = new TreeSet<>();
+		for (int target : targets)
+		{
+			for (int i = table.reverseFrom(target); i < table.reverseEnd(target); i++)
+			{
+				gates.shutWays(table.reverseEntry(i)).stream().map(way -> unfinishedQuests(way, player)).filter(quests -> !quests.isEmpty())
+					.forEach(ways::add);
+			}
+		}
+		return ways;
+	}
+
+	private static String unfinishedQuests(List<Requirements> gates, PlayerSnapshot player)
+	{
+		return gates.stream().flatMap(gate -> gate.getQuests().stream()).filter(quest -> !player.finished(quest))
+			.map(Quest::getName).distinct().sorted().collect(Collectors.joining(" and "));
 	}
 
 	private static final class Searches

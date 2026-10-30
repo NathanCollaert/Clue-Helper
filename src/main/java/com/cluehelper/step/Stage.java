@@ -70,4 +70,7 @@ public class Stage
 	Book book;
 	/** The menu option that does the task on them ("Chop down"); null when there is nothing to click. */
 	String option;
+	/** The chat options picked after the option, in order. */
+	@Builder.Default
+	List<String> dialogue = List.of();
 }

@@ -25,6 +25,9 @@ public class RequiredItems
 	StashMemory.State stash = StashMemory.State.NONE;
 	/** The planner doesn't route to the tool leprechaun, it only notes it. */
 	boolean spadeAtLeprechaun;
+	/** Rune staves, of which only one can be wielded: a withdraw takes one at most (water and earth by one mud staff). */
+	@Builder.Default
+	Set<Integer> staves = Set.of();
 
 	@Value
 	public static class Need
@@ -96,15 +99,51 @@ public class RequiredItems
 				.collect(Collectors.toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
 			return Verdict.missing(missing, parts);
 		}
-		return Verdict.fromBank(minimalWithdraw(open, player, carried, banked));
+		return Verdict.fromBank(withOneStaff(open, player, carried, banked));
+	}
+
+	/**
+	 * The fewest items to withdraw with at most one staff among them and the carried ones, when there is such a set; else
+	 * the fewest at all. A staff already carried (taken a moment ago) is the one: no other is added.
+	 */
+	private List<ItemUse> withOneStaff(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried, PlayerSnapshot banked)
+	{
+		Set<Integer> held = carried.keySet().stream().filter(staves::contains).collect(Collectors.toSet());
+		if (!held.isEmpty())
+		{
+			Set<Integer> others = staves.stream().filter(staff -> !held.contains(staff)).collect(Collectors.toSet());
+			List<ItemUse> withHeld = minimalWithdraw(open, player, carried, banked, others);
+			if (allMet(open, with(carried, withHeld)))
+			{
+				return withHeld;
+			}
+		}
+		List<ItemUse> fewest = minimalWithdraw(open, player, carried, banked, Set.of());
+		List<Integer> picked = fewest.stream().map(ItemUse::getItemId).filter(staves::contains).collect(Collectors.toList());
+		if (picked.size() <= 1)
+		{
+			return fewest;
+		}
+		List<ItemUse> best = null;
+		for (int kept : picked)
+		{
+			Set<Integer> others = staves.stream().filter(staff -> staff != kept).collect(Collectors.toSet());
+			List<ItemUse> withdraw = minimalWithdraw(open, player, carried, banked, others);
+			if (allMet(open, with(carried, withdraw)) && (best == null || withdraw.size() < best.size()))
+			{
+				best = withdraw;
+			}
+		}
+		return best != null ? best : fewest;
 	}
 
 	/**
 	 * Drops what isn't needed, trying the gear picker's own picks last so they are the ones kept, and before them the items
-	 * meeting the most needs alone: a made item (a net trap, an unfinished potion) is kept over its parts.
+	 * meeting the most needs alone: a made item (a net trap, an unfinished potion) is kept over its parts. The
+	 * {@code left} items stay in the bank.
 	 */
 	private static List<ItemUse> minimalWithdraw(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried,
-		PlayerSnapshot banked)
+		PlayerSnapshot banked, Set<Integer> left)
 	{
 		List<ItemUse> candidates = new ArrayList<>();
 		addCandidates(open, Container.BANK, banked.getBank(), candidates);
@@ -115,6 +154,7 @@ public class RequiredItems
 			banked.getBank().forEach((id, qty) -> candidates.add(new ItemUse(Container.BANK, id, qty)));
 			banked.getGroupStorage().forEach((id, qty) -> candidates.add(new ItemUse(Container.GROUP_STORAGE, id, qty)));
 		}
+		candidates.removeIf(candidate -> left.contains(candidate.getItemId()));
 		Set<Integer> picked = gearPicks(open, player, banked);
 		candidates.sort(Comparator.comparing((ItemUse candidate) -> picked.contains(candidate.getItemId()))
 			.thenComparingLong(candidate -> needsMetAlone(open, candidate.getItemId())));

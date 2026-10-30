@@ -3,7 +3,7 @@ package com.cluehelper.route;
 import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.stream.*;
 import net.runelite.api.gameval.ItemID;
 
 /** An unread var fails its gate, so an unread account walks the always-open way. */
@@ -77,6 +77,25 @@ public final class WalkGates
 			return table.entryFull(entry) + setExtra[set];
 		}
 		return set == 0 ? table.entryOpen(entry) : table.entryAlternative(entry) + setExtra[set];
+	}
+
+	/** For an entry no walk takes, each of its gated ways as the gates that shut it: the full path's, then the alternative's. */
+	public List<List<Requirements>> shutWays(int entry)
+	{
+		if (cost(entry) != WalkTable.NO_PATH)
+		{
+			return List.of();
+		}
+		List<List<Requirements>> ways = new ArrayList<>();
+		for (int set : new int[] {table.entryGateSet(entry), table.entryAlternativeGateSet(entry)})
+		{
+			if (set != 0)
+			{
+				ways.add(IntStream.of(table.gateSet(set)).filter(gate -> !gatePass[gate])
+					.mapToObj(gate -> table.getGates().get(gate - 1)).collect(Collectors.toList()));
+			}
+		}
+		return ways;
 	}
 
 	/** Sorted item ids to take from the bank for {@link #cost}'s walk. */

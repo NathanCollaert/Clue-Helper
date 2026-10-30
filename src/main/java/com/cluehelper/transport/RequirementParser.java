@@ -26,6 +26,7 @@ public final class RequirementParser
 	private static final int MAX_COMBAT_LEVEL = 126;
 	private static final String MAX = "Max";
 	private static final String UNLOCK_PREFIX = "UNLOCK_";
+	private static final String QUEST_PREFIX = "QUEST_";
 	private static final Pattern VAR_CLAUSE = Pattern.compile("(\\d+)\\s*([=<>&@])\\s*(-?\\d+)");
 	private static final Pattern HOUSE_NEED = Pattern.compile("(object|nexus):(\\d+(?:\\|\\d+)*)");
 	private static final Pattern ITEM_BRANCH = Pattern.compile("([A-Z0-9_]+)=(\\d+)");
@@ -135,7 +136,11 @@ public final class RequirementParser
 		}
 		if (name.startsWith(UNLOCK_PREFIX))
 		{
-			return new ItemClause.Branch(List.of(), quantity, name.substring(UNLOCK_PREFIX.length()));
+			return new ItemClause.Branch(List.of(), quantity, name.substring(UNLOCK_PREFIX.length()), null);
+		}
+		if (name.startsWith(QUEST_PREFIX))
+		{
+			return questBranch(name.substring(QUEST_PREFIX.length()), quantity, out);
 		}
 		List<Integer> ids = itemIds(name);
 		if (ids == null || ids.isEmpty())
@@ -143,7 +148,20 @@ public final class RequirementParser
 			out.errors.add("Items: unknown item '" + name + "'");
 			return null;
 		}
-		return new ItemClause.Branch(ids, quantity, null);
+		return new ItemClause.Branch(ids, quantity, null, null);
+	}
+
+	private static ItemClause.Branch questBranch(String name, int quantity, Parsed out)
+	{
+		try
+		{
+			return new ItemClause.Branch(List.of(), quantity, null, Quest.valueOf(name));
+		}
+		catch (IllegalArgumentException e)
+		{
+			out.errors.add("Items: unknown quest '" + name + "'");
+			return null;
+		}
 	}
 
 	private List<Integer> itemIds(String name)

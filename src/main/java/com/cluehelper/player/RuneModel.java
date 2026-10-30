@@ -1,6 +1,7 @@
 package com.cluehelper.player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
@@ -96,6 +97,14 @@ public final class RuneModel
 		payersByRune.values().forEach(ids::addAll);
 		unlimitingWornItemsByRune.values().forEach(ids::addAll);
 		return Set.copyOf(ids);
+	}
+
+	/** The staves that stand in for runes, all wielded in the one weapon slot; the tomes go in the shield slot. */
+	public Set<Integer> staves()
+	{
+		Set<Integer> tomes = Arrays.stream(TOMES).map(tome -> tome[0]).collect(Collectors.toSet());
+		return unlimitingWornItemsByRune.values().stream().flatMap(Set::stream).filter(id -> !tomes.contains(id))
+			.collect(Collectors.toUnmodifiableSet());
 	}
 
 	/** -1 for an unknown pouch type. */

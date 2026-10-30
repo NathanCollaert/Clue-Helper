@@ -4,7 +4,7 @@ boat	Boat: Fishing Platform	2720 3301 0	2782 3273 0		Travel Jeb 4803			Sea Slug	
 boat	Boat: Witchaven	2782 3273 0	2720 3301 0		Travel Holgart 5070			Sea Slug			-1	9	1	F	none	any	Y		npc Travel		npc:5070=HOLGARTPLATFORM
 boat	Boat: Braindeath Island	3680 3536 0	2162 5114 1		Talk-to Pirate Pete 601			Rum Deal			-1	9	1	F	none	any	Y		npc Talk-to		npc:601=DEAL_PETE
 boat	Boat: Port Phasmatys	2162 5114 1	3680 3536 0		Talk-to Pirate Pete 602			Rum Deal			-1	9	1	F	none	any	Y		npc Talk-to		npc:602=DEAL_ISLAND_PETE
-boat	Boat: Dragontooth Island	3703 3487 0	3792 3560 0		Travel Ghost captain 3005	4278=25|UNLOCK_DRAGONTOOTH=1					-1	6	1	T	item	any	Y		npc Travel		item:4278=ECTOTOKEN npc:3005=AHOY_GHOST_CAPTAIN_1
+boat	Boat: Dragontooth Island	3703 3487 0	3792 3560 0		Travel Ghost captain 3005	4278=25|UNLOCK_DRAGONTOOTH=1&552=1|4250=1|13113=1|13114=1|13115=1					-1	6	1	T	item	any	Y		npc Travel		item:4278=ECTOTOKEN item:552=AMULET_OF_GHOSTSPEAK item:4250=AMULET_OF_GHOSTSPEAK_ENCHANTED item:13113=MORYTANIA_LEGS_MEDIUM item:13114=MORYTANIA_LEGS_HARD item:13115=MORYTANIA_LEGS_ELITE npc:3005=AHOY_GHOST_CAPTAIN_1
 boat	Boat: Port Phasmatys	3792 3560 0	3703 3487 0		Travel Ghost captain 3005						-1	6	1	F	none	any	Y		npc Travel		npc:3005=AHOY_GHOST_CAPTAIN_1
 boat	Boat: Mort'ton	3498 3380 0	3522 3285 0		Board Swamp Boaty 6970			Nature Spirit			-1	18	1	F	none	any	Y		op Board		object:6970=ROUTE_ROWBOAT_HOLLOWS
 boat	Boat: Mort Myre	3522 3284 0	3498 3380 0		Quick-board Swamp Boaty 6969	995=10		Nature Spirit			-1	18	1	T	item	any	Y		op Quick-board		item:995=COINS object:6969=ROUTE_ROWBOAT_MORTTON
@@ -43,11 +43,24 @@ boat	Boat: the Stranglewood	1194 3452 0	1229 3469 0		Travel Rowboat 48720			Dese
 boat	Boat: Molch Island	1384 3665 0	1369 3639 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch Island		object:33614=AERIAL_FISHING_BOAT
 boat	Boat: Molch	1384 3665 0	1341 3645 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch		object:33614=AERIAL_FISHING_BOAT
 boat	Boat: Shayzien	1384 3665 0	1408 3612 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Shayzien		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Molch Island	1342 3645 0	1369 3639 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch Island		object:33614=AERIAL_FISHING_BOAT
 boat	Boat: Battlefront	1342 3645 0	1384 3665 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Battlefront		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Shayzien	1342 3645 0	1408 3612 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Shayzien		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Molch Island	1408 3612 0	1369 3639 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch Island		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Battlefront	1408 3612 0	1384 3665 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Battlefront		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Molch	1408 3612 0	1341 3645 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Battlefront	1369 3639 0	1384 3665 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Battlefront		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Molch	1369 3639 0	1341 3645 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Molch		object:33614=AERIAL_FISHING_BOAT
+boat	Boat: Shayzien	1369 3639 0	1408 3612 0		Board Boaty 33614						-1	4	1	F	none	any	Y		op Board > Shayzien		object:33614=AERIAL_FISHING_BOAT
 boat	Boat: Meiyerditch	3525 3170 0	3605 3161 1		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Icyene Graveyard	3525 3170 0	3684 3176 0		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Slepe	3525 3170 0	3663 3277 0		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Burgh de Rott	3605 3163 1	3525 3170 0		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
+boat	Boat: Icyene Graveyard	3605 3163 1	3684 3176 0		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
+boat	Boat: Slepe	3605 3163 1	3663 3277 0		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
+boat	Boat: Burgh de Rott	3684 3176 0	3525 3170 0		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
+boat	Boat: Meiyerditch	3684 3176 0	3605 3161 1		Board Boat 38089				7255>41		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
+boat	Boat: Slepe	3684 3176 0	3663 3277 0		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Burgh de Rott	3663 3277 0	3525 3170 0		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Meiyerditch	3663 3277 0	3605 3161 1		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
 boat	Boat: Icyene Graveyard	3663 3277 0	3684 3176 0		Board Boat 38089				7255>87		-1	13	1	F	none	any	Y		op Board		varbit:7255=MYQ5 object:38089=MYQ5_BOAT_VIS
@@ -920,18 +933,18 @@ balloon	Balloon: Taverley	2481 3459 0	2941 3420 0		Use Basket 19129	1511=1	20 Fi
 balloon	Balloon: Crafting Guild	2481 3459 0	2923 3302 0		Use Basket 19129	1521=1	30 Firemaking	Enlightened Journey	2870=1;2871=1		-1	5	2	T	item	any	Y		op Use		item:1521=OAK_LOGS varbit:2870=ZEP_MULTI_GNO varbit:2871=ZEP_MULTI_CRAFT object:19129=ZEP_BASKET
 balloon	Balloon: Varrock	2481 3459 0	3299 3482 0		Use Basket 19129	1519=1	40 Firemaking	Enlightened Journey	2870=1;2872=1		-1	5	2	T	item	any	Y		op Use		item:1519=WILLOW_LOGS varbit:2870=ZEP_MULTI_GNO varbit:2872=ZEP_MULTI_VARR object:19129=ZEP_BASKET
 balloon	Balloon: Castle Wars	2481 3459 0	2459 3110 0		Use Basket 19129	1515=1	50 Firemaking	Enlightened Journey	2870=1;2869=1		-1	5	2	T	item	any	Y		op Use		item:1515=YEW_LOGS varbit:2870=ZEP_MULTI_GNO varbit:2869=ZEP_MULTI_CAST object:19129=ZEP_BASKET
-mushtree	Mushtree: Verdant Valley	3764 3879 1	3760 3758 0		Use Magic Mushtree 30920						-1	6	2	F	none	any	Y		op Use		object:30920=FOSSIL_MAGIC_MUSHTREE_TRUNK1
-mushtree	Mushtree: Sticky Swamp	3764 3879 1	3676 3755 0		Use Magic Mushtree 30920						-1	6	2	F	none	any	Y		op Use		object:30920=FOSSIL_MAGIC_MUSHTREE_TRUNK1
-mushtree	Mushtree: Mushroom Meadow	3764 3879 1	3676 3871 0		Use Magic Mushtree 30920						-1	6	2	F	none	any	Y		op Use		object:30920=FOSSIL_MAGIC_MUSHTREE_TRUNK1
-mushtree	Mushtree: House on the Hill	3757 3756 0	3764 3879 1		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: Sticky Swamp	3757 3756 0	3676 3755 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: Mushroom Meadow	3757 3756 0	3676 3871 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: House on the Hill	3676 3755 0	3764 3879 1		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: Verdant Valley	3676 3755 0	3760 3758 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: Mushroom Meadow	3676 3755 0	3676 3871 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: House on the Hill	3676 3871 0	3764 3879 1		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: Verdant Valley	3676 3871 0	3760 3758 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
-mushtree	Mushtree: Sticky Swamp	3676 3871 0	3676 3755 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Verdant Valley	3764 3879 1	3760 3758 0		Use Magic Mushtree 30920						-1	6	2	F	none	any	Y		op Use > Verdant Valley		object:30920=FOSSIL_MAGIC_MUSHTREE_TRUNK1
+mushtree	Mushtree: Sticky Swamp	3764 3879 1	3676 3755 0		Use Magic Mushtree 30920						-1	6	2	F	none	any	Y		op Use > Sticky Swamp		object:30920=FOSSIL_MAGIC_MUSHTREE_TRUNK1
+mushtree	Mushtree: Mushroom Meadow	3764 3879 1	3676 3871 0		Use Magic Mushtree 30920						-1	6	2	F	none	any	Y		op Use > Mushroom Meadow		object:30920=FOSSIL_MAGIC_MUSHTREE_TRUNK1
+mushtree	Mushtree: House on the Hill	3757 3756 0	3764 3879 1		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > House on the Hill		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Sticky Swamp	3757 3756 0	3676 3755 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > Sticky Swamp		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Mushroom Meadow	3757 3756 0	3676 3871 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > Mushroom Meadow		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: House on the Hill	3676 3755 0	3764 3879 1		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > House on the Hill		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Verdant Valley	3676 3755 0	3760 3758 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > Verdant Valley		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Mushroom Meadow	3676 3755 0	3676 3871 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > Mushroom Meadow		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: House on the Hill	3676 3871 0	3764 3879 1		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > House on the Hill		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Verdant Valley	3676 3871 0	3760 3758 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > Verdant Valley		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
+mushtree	Mushtree: Sticky Swamp	3676 3871 0	3676 3755 0		Use Magic Mushtree 30924						-1	6	2	F	none	any	Y		op Use > Sticky Swamp		object:30924=FOSSIL_MAGIC_MUSHTREE_TRUNK3
 wilderness obelisk	Obelisk: Level 19 Wilderness	3155 3619 0	3227 3667 0		Set Destination Obelisk 14829				4468=1		-1	10	3	F	none	any	Y		op Set Destination > 2: Level 19 Wilderness		varbit:4468=WILDERNESS_DIARY_HARD_COMPLETE object:14829=WILDERNESS_PORTAL_STONE_3
 wilderness obelisk	Obelisk: Level 27 Wilderness	3155 3619 0	3035 3732 0		Set Destination Obelisk 14829				4468=1		-1	10	3	F	none	any	Y		op Set Destination > 3: Level 27 Wilderness		varbit:4468=WILDERNESS_DIARY_HARD_COMPLETE object:14829=WILDERNESS_PORTAL_STONE_3
 wilderness obelisk	Obelisk: Level 35 Wilderness	3155 3619 0	3106 3794 0		Set Destination Obelisk 14829				4468=1		-1	10	3	F	none	any	Y		op Set Destination > 4: Level 35 Wilderness		varbit:4468=WILDERNESS_DIARY_HARD_COMPLETE object:14829=WILDERNESS_PORTAL_STONE_3

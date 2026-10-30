@@ -101,8 +101,8 @@ public final class CampaignReplay
 		Step travel = StageTarget.travelStep(asLive(resolve(recording, client), player, recording.banked),
 			StageTarget.owned(player, recording.banked));
 		StepNeeds needs = new StepNeeds(client, id -> stashState(recording, id), (bonus, owned) -> gearPieces(recording, bonus.name(), owned),
-			() -> StepNeeds.ownedItemIds(player, recording.banked));
-		AvailabilityEngine engine = new AvailabilityEngine(runes, id -> "item " + id);
+			() -> StepNeeds.ownedItemIds(player, recording.banked), player::finished);
+		AvailabilityEngine engine = new AvailabilityEngine(runes, id -> recordedName(recording, id));
 		PlanStart start = start(recording, folder, engine);
 		PlanInput input = PlanInput.builder()
 			.step(travel)
@@ -206,6 +206,13 @@ public final class CampaignReplay
 			default:
 				return PlanStart.teleportOnly(tile, walk);
 		}
+	}
+
+	/** The recorder tapes the names of the items the live notes listed. */
+	private static String recordedName(CampaignRecording recording, int itemId)
+	{
+		Object name = recording.client.get("getItemDefinition(" + itemId + ").getName()");
+		return name != null ? name.toString() : "item " + itemId;
 	}
 
 	/** The step as the live client hands it on: a kill for a key the player owns, carried or banked, is dropped. */

@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import java.util.function.Predicate;
+import net.runelite.api.Quest;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
@@ -59,8 +61,24 @@ public final class StepIndex
 
 	static StepIndex read(Gson gson, Reader reader)
 	{
-		StepIndex index = gson.fromJson(reader, StepIndex.class);
+		Gson withSkills = gson.newBuilder()
+			.registerTypeAdapter(Skill.class, (JsonDeserializer<Skill>) (json, type, context) -> skill(json.getAsString()))
+			.create();
+		StepIndex index = withSkills.fromJson(reader, StepIndex.class);
 		return index == null ? empty() : index;
+	}
+
+	/** The cache spells skills "Fishing", the hand data "FISHING". */
+	private static Skill skill(String name)
+	{
+		try
+		{
+			return Skill.valueOf(name.toUpperCase(Locale.ROOT));
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new JsonParseException("unknown skill " + name, e);
+		}
 	}
 
 	public static StepIndex empty()
@@ -105,12 +123,18 @@ public final class StepIndex
 		private List<String> optional = List.of();
 		/** Core's items the task does without from these skill levels on (a harpoon, fishing barehanded), by core's names. */
 		private Map<String, List<Level>> optionalFrom = Map.of();
+		/** Core's items the task does without once one of these varbits is set (a rake after buying auto-weed), by core's names. */
+		private Map<String, List<Integer>> optionalWith = Map.of();
 		/** What is done at the place before the task, in order: Alry's bird, then king worms for aerial fishing. */
 		private List<Before> before = List.of();
 		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
 		private List<Integer> anywhereWith = List.of();
 		/** The task travels to one of the player's planted spirit trees, picked in the tree's list. */
 		private boolean toPlantedTree;
+		/** The task plants a seed in a farming patch, cleared first of weeds or a crop. */
+		private boolean plants;
+		/** The step is in the dark, where core asks for no light source: the Genie's cave below Nardah. */
+		private boolean light;
 		/** Other items that do what one of core's items does (a vial of water and a cadantine for the unfinished potion). */
 		private List<Alternative> alternatives = List.of();
 		/** How the task's item is made from what is carried, step by step (clean the herb, then make the potion). */
@@ -125,6 +149,8 @@ public final class StepIndex
 		private String note;
 		/** Quest steps: never guided. */
 		private boolean hidden;
+		@Getter(AccessLevel.NONE)
+		private Prerequisites requirements;
 
 		static Entry of(String tier, List<CacheRow> rows)
 		{
@@ -165,6 +191,26 @@ public final class StepIndex
 		public List<Requires> wornRequires()
 		{
 			return getRequires().stream().filter(Requires::isWear).collect(Collectors.toList());
+		}
+
+		/** The requirements the player still has to meet: none a finished quest waives. */
+		public List<Requires> requiresFor(Predicate<Quest> finished)
+		{
+			return getRequires().stream().filter(need -> !need.isWaivedBy(finished)).collect(Collectors.toList());
+		}
+
+		/** The gear to wear the player still has to meet. */
+		/** The requirements to wear going in, but those the player meets by what they carry (a talisman). */
+		public List<Requires> wornRequiresFor(Predicate<Quest> finished, Set<Integer> carriedIds)
+		{
+			return requiresFor(finished).stream().filter(need -> need.isWear() && !need.isCarriedInstead(carriedIds))
+				.collect(Collectors.toList());
+		}
+
+		/** The skill levels the task itself needs (Sherlock's 82 Fishing); boosts count. */
+		public List<Level> getLevels()
+		{
+			return requirements == null ? List.of() : requirements.stats;
 		}
 
 		/** Hand data: how to get to a target no route reaches (a Sailing island); null for the rest. */
@@ -270,10 +316,22 @@ public final class StepIndex
 		private int[] tile;
 		private int radius;
 		private String text;
+		/** Other spawns the route may go to instead (green dragons outside the Wilderness), each as x, y, plane. */
+		@Getter(AccessLevel.NONE)
+		private List<int[]> also = List.of();
 
 		public WorldPoint getTile()
 		{
 			return point(tile);
+		}
+
+		/** The main spawn first, then the others. */
+		public List<WorldPoint> getTiles()
+		{
+			List<WorldPoint> tiles = new ArrayList<>();
+			tiles.add(getTile());
+			also.forEach(other -> tiles.add(point(other)));
+			return List.copyOf(tiles);
 		}
 	}
 
@@ -350,6 +408,12 @@ public final class StepIndex
 		private int level;
 	}
 
+	/** The cache's requirements of the task; its items come from core instead. */
+	private static final class Prerequisites
+	{
+		private List<Level> stats = List.of();
+	}
+
 	/** An interface's option, found by its text since its slot varies, and the button that confirms it. */
 	@Getter
 	public static final class Choose
@@ -409,8 +473,24 @@ public final class StepIndex
 		private String name;
 		/** Worn to go in (a diving helmet), not just carried (a spade). */
 		private boolean wear;
+		/** Of a worn requirement, the items that do as well just carried (a talisman beside the tiara); empty for none. */
+		@Getter(AccessLevel.NONE)
+		private List<Integer> carried = List.of();
 		/** Who drops it for a player owning none (the Mercenary Captain's Metal key); null when it can't be got there. */
 		private From from;
+		/** A quest whose finishing makes it unneeded (Monkey Madness II, for the Elder Guard's greegree); null for none. */
+		@Getter(AccessLevel.NONE)
+		private String unlessQuest;
+
+		public boolean isWaivedBy(Predicate<Quest> finished)
+		{
+			return unlessQuest != null && finished.test(Quest.valueOf(unlessQuest));
+		}
+
+		private boolean isCarriedInstead(Set<Integer> carriedIds)
+		{
+			return carried.stream().anyMatch(carriedIds::contains);
+		}
 	}
 
 	/**
@@ -422,6 +502,10 @@ public final class StepIndex
 	{
 		private int object = -1;
 		private String option;
+		/** The object's closed form, a separate object opened first (the werewolf trapdoor); -1 when none. */
+		private int closed = -1;
+		/** Items used on the object to go in, each time (a rope on the Genie's crevice); empty when it is clicked. */
+		private List<Integer> use = List.of();
 		private int[] tile;
 		private int[] to;
 		@Getter(AccessLevel.NONE)
@@ -486,6 +570,13 @@ public final class StepIndex
 		private String then;
 		/** Where the game counts them when they don't go to the inventory (under water); -1 for none. */
 		private int varbit = -1;
+		/** Where they lie: the game shows ground items only near the player, so these lead the way until they show. */
+		private List<int[]> spawns = List.of();
+
+		public List<WorldPoint> spawnTiles()
+		{
+			return spawns.stream().map(StepIndex::point).collect(Collectors.toList());
+		}
 	}
 
 	private static final class Reach
@@ -510,6 +601,8 @@ public final class StepIndex
 		private String grown;
 		/** The area the task works anywhere in, {west, south, east, north, plane} (the Dark Altar's reanimation ground). */
 		private int[] span;
+		/** The chat options to pick, in order, after the click (the Skullball Boss's "I would like to do the course"). */
+		private List<String> dialogue = List.of();
 
 		public boolean hasSpan()
 		{

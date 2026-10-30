@@ -58,7 +58,6 @@ final class RouteBuilder
 			.banked(banked)
 			.withdraw(withdraw)
 			.depositFirst(depositFirst)
-			.pinIncluded(bankLeg && ctx.in.isPinPending())
 			.openBankStart(banked && !bankLeg)
 			.changed(goal.c != LabelSearch.NONE)
 			.startBook(ctx.homeBook)

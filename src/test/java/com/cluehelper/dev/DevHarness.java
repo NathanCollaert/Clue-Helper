@@ -128,6 +128,12 @@ public class DevHarness
 		routeDump.summary(plan).forEach(line -> log.info("{}   {}", RouteDump.TAG, line));
 	}
 
+	/** Client thread. The guide line again every tick: a change the guide doesn't announce (a highlight) shows too. */
+	public void onGameTick()
+	{
+		onGuideChanged();
+	}
+
 	private void onGuideChanged()
 	{
 		String line = guideLine();

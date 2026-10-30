@@ -13,6 +13,7 @@ final class Acts
 {
 	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
 	private static final String TALK_OPTION = "Talk-to";
+	private static final String ATTACK_OPTION = "Attack";
 	/** By ids: core doesn't mark Uri, and a target by name is left to core while the clue's tile is in view. */
 	private static final Set<Integer> URI_IDS = Set.of(NpcID.TRAIL_BEGINNER_URI, NpcID.TRAIL_EASY_URI, NpcID.TRAIL_MEDIUM_URI,
 		NpcID.TRAIL_HARD_URI, NpcID.TRAIL_ELITE_URI, NpcID.TRAIL_MASTER_URI, NpcID.URI_EMOTE);
@@ -147,7 +148,9 @@ final class Acts
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KILL).findFirst().orElse(null);
 		if (kill != null)
 		{
-			return List.of(act(kill.getText() != null ? kill.getText() : "Kill the monster", area(data)));
+			String text = kill.getText() != null ? kill.getText() : "Kill the monster";
+			return List.of(SubStep.of(SubStep.Kind.ACT, text).detail(area(data)).option(ATTACK_OPTION)
+				.npcIds(Set.copyOf(kill.getNpcs())).build());
 		}
 		if (isDig(step))
 		{

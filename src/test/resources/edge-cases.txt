@@ -83,10 +83,10 @@ bank tipping point: mid-ironman, coordinate:3556
   alt       92t: Ring of dueling: Ferox Enclave → walk 87 {charge:2552=1}
   note      Wilderness target
 bank tipping point with the PIN still to come: mid-ironman, coordinate:3556
-  best      68t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166] +PIN
+  best      68t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
   direct    76t: Games necklace: Corporeal Beast → walk 71 {charge:3853=1}
   alt       92t: Ring of dueling: Ferox Enclave → walk 87 {charge:2552=1}
-  alt       93t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 68 {charge:1712=1, charge:21166=1} withdraw [21166] +PIN
+  alt       93t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 68 {charge:1712=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 bank tipping point: mid-ironman, map:3599
   best      69t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011]
@@ -94,7 +94,7 @@ bank tipping point: mid-ironman, map:3599
   alt       94t: Nightmare Zone Minigame Teleport → walk 68 {cooldown:888=1}
   alt       102t: Skills necklace: Fishing Guild → walk 97 {charge:11968=1}
 bank tipping point with the PIN still to come: mid-ironman, map:3599
-  best      73t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011] +PIN
+  best      73t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011]
   direct    80t: Fishing Trawler Minigame Teleport → walk 54 {cooldown:888=1}
   alt       94t: Nightmare Zone Minigame Teleport → walk 68 {cooldown:888=1}
   alt       102t: Skills necklace: Fishing Guild → walk 97 {charge:11968=1}
@@ -105,8 +105,8 @@ bank tipping point: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
   alt       66t: Skills necklace: Cooking Guild → walk 61 {charge:11968=1}
 bank tipping point with the PIN still to come: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      42t: Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
-  alt       44t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 20 {charge:2552=1, charge:11972=1} withdraw [11972] +PIN
-  alt       63t: Amulet of glory: Edgeville → walk 5 → bank → Varrock tablet → walk 38 {charge:1712=1, item:8007=1} withdraw [8007] +PIN
+  alt       44t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 20 {charge:2552=1, charge:11972=1} withdraw [11972]
+  alt       63t: Amulet of glory: Edgeville → walk 5 → bank → Varrock tablet → walk 38 {charge:1712=1, item:8007=1} withdraw [8007]
 required spade: glory(1) carried, a spade in the bank, to Draynor (dig)
   best      37t: Amulet of glory: Draynor Village → walk 9 → bank → walk 17 {charge:1706=1} withdraw [952]
 required spade: carried, to Draynor (dig)
@@ -116,7 +116,7 @@ required spade: nowhere, at a tool leprechaun
   best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
   alt       36t: Necklace of passage: Wizards' Tower → walk 31 {charge:21146=1}
   needs     Not found on you or in your bank:
-  needs     - spade
+  needs     - Spade
   needs     Your spade is with a tool leprechaun
 emote item in the bank, STASH filled
   best      57t: Necklace of passage: Wizards' Tower → walk 52 {charge:21146=1}
@@ -271,6 +271,14 @@ gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkens
   best      97t: Teleport to House → Portal nexus: Fenken' Castle → walk 83 {item:556=1, item:557=1, item:563=1}
   alt       89t (rank 97): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
   alt       103t: Teleport to House → Fairy ring ALQ: Morytania: Haunted Woods → walk 85 {item:556=1, item:557=1, item:563=1}
+quest gate: maxed without Song of the Elves, to Prifddinas: no route, the quest named
+  best      none
+  note      Quests not finished:
+  needs     - Song of the Elves
+skill level: maxed at 70 Fishing, Sherlock's anglerfish: no route, the level named
+  best      none
+  needs     Levels too low:
+  needs     - 82 Fishing (has 70; boosts count)
 start on a node: standing at the Varrock Teleport landing, to Varrock bank crates
   best      28t: walk 28
   alt       32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}

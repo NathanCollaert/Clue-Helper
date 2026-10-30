@@ -158,7 +158,8 @@ public class AvailabilityService
 		return System.currentTimeMillis() / MILLIS_PER_MINUTE;
 	}
 
-	private String itemName(int id)
+	/** Any thread: the catalog's items are named on the client thread when it loads. */
+	public String itemName(int id)
 	{
 		return itemNames.getOrDefault(id, "item " + id);
 	}
