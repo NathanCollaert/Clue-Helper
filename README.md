@@ -1,14 +1,10 @@
-<p align="center">
-  <img src="icon.png" width="72" alt="Clue Helper icon">
-</p>
+<h1>Clue Helper</h1>
 
-<h1 align="center">Clue Helper</h1>
-
-<p align="center">
+<p>
   <b>A click-by-click guide to every clue step, routed from the teleports you own.</b>
 </p>
 
-<p align="center">
+<p>
   <a href="https://runelite.net/plugin-hub/show/clue-helper"><img src="https://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/clue-helper" alt="Plugin Hub installs"></a>
   <a href="https://github.com/NathanCollaert/Clue-Helper/issues/new?template=route-report.yml"><img src="https://img.shields.io/badge/report-slow%20route-orange" alt="Report a slow route"></a>
   <a href="https://github.com/NathanCollaert/Clue-Helper/issues/new?template=bug-report.yml"><img src="https://img.shields.io/badge/report-bug-red" alt="Report a bug"></a>
@@ -32,12 +28,12 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 
 | | |
 |---|---|
-| 🧭 **Routes from what you own** | Teleports carried, worn or banked, your spellbook, your house (portal nexus, jewellery box, fairy ring, spirit tree, mounted items, altar), fairy rings, spirit trees, quetzals, boats, charters, minecarts, gliders, the master scroll book and more. Charges you've checked count. |
-| 🏦 **Bank stops only when they pay off** | A route through the bank is picked only when it beats going straight there. The box lists what to withdraw (and what to deposit first when you're full), and the bank opens on a tab with just those items. |
-| 📖 **Spellbook changes** | Routes switch spellbook on the way when that's faster and you have the runes. |
-| 🖱️ **Click-by-click guidance** | The item, spell, menu line, teleport option or fairy ring code to click is highlighted. A path line leads you on and outlines the doors, stairs and ladders on the way. Menu Entry Swapper's swaps are taken into account. |
-| 📜 **Every step type** | Emotes with their items and STASH units, Charlie's items, Sherlock's skill tasks, keys dropped by monsters, gear to wear on arrival. Ways in are guided too: the trapdoor to open, the rope to use on a crevice, the Abyss obstacle to cross and the chat options to pick. |
-| 🔥 **Hot/cold planner** | On beginner and master hot/cold steps it suggests where to feel the strange device next, from your feels so far, and routes you there. Once the spot is known, it routes you to the dig from anywhere. |
+| 🧭 **Routes** | Teleports carried, worn or banked, your spellbook, your house (portal nexus, jewellery box, fairy ring, spirit tree, mounted items, altar), fairy rings, spirit trees, quetzals, boats, charters, minecarts, gliders, the master scroll book and more. Charges you've checked count. |
+| 🏦 **Bank stops** | A route through the bank is picked only when it beats going straight there. The box lists what to withdraw (and what to deposit first when you're full), and the bank opens on a tab with just those items. |
+| 📖 **Spellbook** | Routes switch spellbook on the way when that's faster and you have the runes. |
+| 🖱️ **Guidance** | The item, spell, menu line, teleport option or fairy ring code to click is highlighted. A path line leads you on and outlines the doors, stairs and ladders on the way. Menu Entry Swapper's swaps are taken into account. |
+| 📜 **Every type** | Emotes with their items and STASH units, Charlie's items, Sherlock's skill tasks, keys dropped by monsters, gear to wear on arrival. Ways in are guided too: the trapdoor to open, the rope to use on a crevice, the Abyss obstacle to cross and the chat options to pick. |
+| 🔥 **Hot/cold** | On beginner and master hot/cold steps it suggests where to feel the strange device next, from your feels so far, and routes you there. Once the spot is known, it routes you to the dig from anywhere. |
 
 
 ## Report a slow route or a bug
