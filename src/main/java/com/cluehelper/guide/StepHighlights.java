@@ -30,9 +30,10 @@ final class StepHighlights
 	private static final String CLOSE_OPTION = "Close";
 	private static final String TELEPORT_TO_DESTINATION = "Teleport to Destination";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Set.of(ObjectID.FAIRYRING_HOMEHUB, ObjectID.FAIRYRING_MINORHUB,
-		ObjectID.POH_FAIRY_RING, ObjectID.POH_SPIRIT_RING);
+		ObjectID.POH_FAIRY_RING, ObjectID.POH_SPIRIT_RING, ObjectID.LEAGUE_5_POH_SPIRIT_RING, ObjectID.XMAS20_POH_SPIRIT_RING);
 	/** The house's spiritual fairy tree lists its ring options above "Tree", so a left click never opens the tree list. */
-	private static final Set<Integer> NOT_FILLED_UNHOVERED = Set.of(ObjectID.POH_SPIRIT_RING);
+	private static final Set<Integer> NOT_FILLED_UNHOVERED = Set.of(ObjectID.POH_SPIRIT_RING, ObjectID.LEAGUE_5_POH_SPIRIT_RING,
+		ObjectID.XMAS20_POH_SPIRIT_RING);
 
 	@Inject
 	private Client client;
