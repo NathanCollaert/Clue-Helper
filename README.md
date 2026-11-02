@@ -28,12 +28,12 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 
 | | |
 |---|---|
-| 🧭 **Routes** | Teleports carried, worn or banked, your spellbook, your house (portal nexus, jewellery box, fairy ring, spirit tree, mounted items, altar), fairy rings, spirit trees, quetzals, boats, charters, minecarts, gliders, the master scroll book and more. Charges you've checked count. |
-| 🏦 **Bank stops** | A route through the bank is picked only when it beats going straight there. The box lists what to withdraw (and what to deposit first when you're full), and the bank opens on a tab with just those items. |
-| 📖 **Spellbook** | Routes switch spellbook on the way when that's faster and you have the runes. |
-| 🖱️ **Guidance** | The item, spell, menu line, teleport option or fairy ring code to click is highlighted. A path line leads you on and outlines the doors, stairs and ladders on the way. Menu Entry Swapper's swaps are taken into account. |
-| 📜 **Every type** | Emotes with their items and STASH units, Charlie's items, Sherlock's skill tasks, keys dropped by monsters, gear to wear on arrival. Ways in are guided too: the trapdoor to open, the rope to use on a crevice, the Abyss obstacle to cross and the chat options to pick. |
-| 🔥 **Hot/cold** | On beginner and master hot/cold steps it suggests where to feel the strange device next, from your feels so far, and routes you there. Once the spot is known, it routes you to the dig from anywhere. |
+| 🧭 **Routes** | The fastest way there from every teleport you carry, wear, bank or have in your house. |
+| 🏦 **Bank stops** | A bank trip only when it's faster, with a tab of just the items to withdraw. |
+| 📖 **Spellbook** | Switches spellbook on the way when that's faster and you have the runes. |
+| 🖱️ **Guidance** | Every click highlighted, with a path line to where to go next. |
+| 📜 **Every type** | Emotes, STASH units, Charlie, Falo, Sherlock, keys and the ways in, all guided. |
+| 🔥 **Hot/cold** | Where to feel the strange device next, then the route to the dig. |
 
 
 ## Report a slow route or a bug
