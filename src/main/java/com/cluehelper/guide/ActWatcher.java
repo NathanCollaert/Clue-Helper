@@ -128,6 +128,7 @@ public class ActWatcher
 			case WAY_IN_WORN:
 			case GEAR_WORN:
 			case SLOTS_EMPTY:
+			case WAY_IN_SLOTS_EMPTY:
 			case ITEM_HELD:
 			case ITEM_WORN:
 				return false;

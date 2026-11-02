@@ -8,7 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/** Collects step frequencies to weight loadouts later. Records only while enabled, which is developer mode. */
+/** Collects step frequencies. Records only while enabled, which is developer mode. */
 @Singleton
 public class StepLogger
 {

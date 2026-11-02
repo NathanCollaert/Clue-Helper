@@ -33,7 +33,7 @@ public class StepGuide
 {
 	public enum Tab
 	{
-		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC
+		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC, QUESTS
 	}
 
 	static final String KEEP_GOING = "Keep going: ";
@@ -44,11 +44,13 @@ public class StepGuide
 	private static final int LANDING_TICKS = 3;
 	/** A teleport animates on its click's tick or within two: any other animation (a block while being hit) isn't travel. */
 	private static final int TRAVEL_START_TICKS = 2;
-	/** The Grouping teleport starts its animation 3-6 ticks after the click (8 of 8 in the step campaign). */
+	/** The Grouping teleport starts its animation 3-6 ticks after the click. */
 	private static final int MINIGAME_TRAVEL_START_TICKS = 7;
 	private static final int OBJECT_REFRESH_TICKS = 5;
 	/** A bank node sits on the walkable tile in front of its booth, chest or banker. */
 	private static final int BANK_TILES = 3;
+	/** An exit's object stands beside the tile it is taken from; a staircase spans a few tiles. */
+	private static final int EXIT_OBJECT_TILES = 3;
 	/** How far from its boarding tile a ride's NPC may stand. */
 	private static final int RIDE_NPC_TILES = 8;
 	/**
@@ -129,6 +131,10 @@ public class StepGuide
 	 */
 	private boolean ringVanished;
 	private WorldPoint lastTile;
+	/** Where the player stood before the last teleport. */
+	private WorldPoint jumpedFrom;
+	/** The step whose task the player has started on its object (a pyre built), or null. */
+	private String taskStartedKey;
 	/** A route that came while a teleport was under way, followed once it lands. */
 	private Waiting waiting;
 	/** While an enemy attacks during a dig or an emote. */
@@ -359,13 +365,42 @@ public class StepGuide
 			}
 			return;
 		}
+		if (isPlannedBeforeJump(start))
+		{
+			return;
+		}
 		Route committed = routes.getCommitted();
+		if (committed != null && committed.isBanked() && isTaskUnderway())
+		{
+			return;
+		}
 		if (isTravelling())
 		{
 			waiting = new Waiting(committed, player.getPosition().getTile());
 			return;
 		}
 		follow(committed);
+	}
+
+	/**
+	 * A task begun on its object goes on there, not back to a bank: its items are in the object now (the pyre logs, built
+	 * into the pyre), so the step's needs no longer read as carried.
+	 */
+	private boolean isTaskUnderway()
+	{
+		SubStep current = getCurrent();
+		return current != null && current.isTask() && routeStep != null && routeStep.getKey().equals(taskStartedKey);
+	}
+
+	/**
+	 * A plan searched while a teleport was cast, from where it started, lands after it: its start's items are spent
+	 * (Camelot's runes) and its first leg is behind the player. The plan from the landing follows.
+	 */
+	private boolean isPlannedBeforeJump(PlanStart start)
+	{
+		WorldPoint here = player.getPosition().getTile();
+		return start != null && jumpedFrom != null && !PositionRules.teleported(start.getTile(), jumpedFrom)
+			&& PositionRules.teleported(start.getTile(), here);
 	}
 
 	/** Call from a PostMenuSort handler that runs after Menu Entry Swapper's. */
@@ -389,12 +424,14 @@ public class StepGuide
 	{
 		WorldPoint tile = player.getPosition().getTile();
 		boolean jumped = PositionRules.teleported(lastTile, tile);
+		WorldPoint from = lastTile;
 		lastTile = tile;
 		jumpedThisSubStep |= jumped;
 		if (jumped)
 		{
+			jumpedFrom = from;
 			actReachedStepKey = null;
-			// A new scene (out of a cave) is searched at once, not on the slow refresh empty searches fell back to
+			// A new scene (out of a cave) is searched at once, not on the slow refresh
 			scene = SceneHighlights.NONE;
 		}
 		boolean clickedJustNow = travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= travelStartTicks();
@@ -465,7 +502,13 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean bank = isBankStop();
-		List<String> option = current == null || current.getOption() == null ? List.of() : List.of(current.getOption());
+		SubStep ahead = objectActAhead(current);
+		SubStep optionOf = ahead != null ? ahead : current;
+		List<String> option = optionOf == null || optionOf.getOption() == null ? List.of() : List.of(optionOf.getOption());
+		if (ahead != null)
+		{
+			highlights = highlights.toBuilder().objectOption(ahead.getOption()).build();
+		}
 		MenuTarget target = outlineTarget(current, option);
 		boolean ownOption = !option.isEmpty() && highlights.getMenuTarget() == MenuTarget.NONE;
 		highlights = highlights.toBuilder().optionTarget(ownOption ? target : MenuTarget.NONE).build();
@@ -481,6 +524,18 @@ public class StepGuide
 		{
 			scene = searchScene(current, target, bank, tick);
 		}
+	}
+
+	/**
+	 * The act after the walk to the clue when it is on an object core doesn't mark (Juna, which core takes for an NPC):
+	 * outlined, filled and its option coloured from afar, as the act would; else null.
+	 */
+	private SubStep objectActAhead(SubStep current)
+	{
+		SubStep next = getNext();
+		boolean ahead = current != null && current.getKind() == SubStep.Kind.WALK_TO_CLUE && next != null
+			&& next.getKind() == SubStep.Kind.ACT && !next.getObjectIds().isEmpty() && !isCoresOwnObject(next);
+		return ahead ? next : null;
 	}
 
 	/** An act on the clue's own object (the spirit tree), which core marks already: only its option is coloured. */
@@ -512,6 +567,11 @@ public class StepGuide
 		{
 			return rowTargets.located(getNext().getRow());
 		}
+		SubStep ahead = objectActAhead(current);
+		if (ahead != null)
+		{
+			return MenuTarget.builder().objectIds(ahead.getObjectIds()).path(option).build();
+		}
 		int stash = stashAhead();
 		return stash != StepRequirements.NO_STASH ? MenuTarget.builder().objectIds(Set.of(stash)).build() : highlights.getMenuTarget();
 	}
@@ -521,7 +581,7 @@ public class StepGuide
 	{
 		List<TileObject> objects = bank ? sceneObjects.banksNear(current.getWaypoint(), BANK_TILES)
 			: target.getObjectIds().stream().anyMatch(AbyssObstacles::isObstacle) ? abyssObstacle()
-			: onlyPatchToUse(current, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption()));
+			: onlyPatchToUse(current, atExit(current, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption())));
 		List<NPC> npcs = bank ? sceneObjects.bankersNear(current.getWaypoint(), BANK_TILES) : npcsFor(target);
 		if (!bank)
 		{
@@ -541,6 +601,18 @@ public class StepGuide
 		return obstacle == null ? List.of() : List.of(obstacle);
 	}
 
+	/**
+	 * An exit's own object, not another of the same id (the Mos Le'Harmless cave's two staircases): the one by the tile
+	 * the exit is taken from, or all of them when none stands there.
+	 */
+	private static List<TileObject> atExit(SubStep current, List<TileObject> objects)
+	{
+		WorldPoint from = current != null && current.getKind() == SubStep.Kind.EXIT ? current.getExit().getOrigin() : null;
+		List<TileObject> near = from == null ? List.of() : objects.stream()
+			.filter(object -> object.getWorldLocation().distanceTo(from) <= EXIT_OBJECT_TILES).collect(Collectors.toUnmodifiableList());
+		return near.isEmpty() ? objects : near;
+	}
+
 	/** A planting task outlines the one patch to plant in, not every patch at the farm. */
 	private List<TileObject> onlyPatchToUse(SubStep current, List<TileObject> objects)
 	{
@@ -556,10 +628,9 @@ public class StepGuide
 
 	/**
 	 * An act's NPC given by name (Fycie) is outlined only where core can't mark it. Shortest Path names one NPC per ride
-	 * (a charter's Trader Crewmember), but a port's crew have several ids: when the
-	 * named one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC
-	 * there with that option (Port Sarim's boat to Port Piscarilius is Cabin Boy Herbert's, not Veos'). Its menu is
-	 * coloured too.
+	 * (a charter's Trader Crewmember), but a port's crew have several ids: when the named
+	 * one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC there
+	 * with that option (Port Sarim's boat to Port Piscarilius is Cabin Boy Herbert's, not Veos').
 	 */
 	private List<NPC> npcsFor(MenuTarget target)
 	{
@@ -733,6 +804,10 @@ public class StepGuide
 			travelClickTick = client.getTickCount();
 		}
 		SubStep current = getCurrent();
+		if (current != null && current.isTask() && routeStep != null && current.getObjectIds().contains(event.getId()))
+		{
+			taskStartedKey = routeStep.getKey();
+		}
 		if (current == null || current.getKind() != SubStep.Kind.TELEPORT || current.getRow() == null)
 		{
 			return;
@@ -741,13 +816,13 @@ public class StepGuide
 		boolean onItem = menuTarget.getItemIds().contains(event.getItemId())
 			|| menuTarget.getItemNames().contains(MenuLabels.normalise(event.getMenuTarget()));
 		boolean onObject = menuTarget.getObjectIds().contains(event.getId());
-		if (onItem || onObject)
+		if ((onItem || onObject) && !current.getRow().opensMenu())
 		{
 			teleportRefusal.clicked(client.getTickCount(), player.getPosition().getTile());
 		}
 	}
 
-	/** MESBOX lines during a book change are the refusal backstop. */
+	/** Game and MESBOX lines that may mean the game refused the current teleport or book change. */
 	public void onChatMessage(ChatMessage message)
 	{
 		SubStep current = getCurrent();
@@ -1233,6 +1308,7 @@ public class StepGuide
 			case WAY_IN_WORN:
 			case GEAR_WORN:
 			case SLOTS_EMPTY:
+			case WAY_IN_SLOTS_EMPTY:
 			case ITEM_WORN:
 				return gearActs.isDone(act, routeStep);
 			case STASH_DEPOSITED:
@@ -1310,7 +1386,7 @@ public class StepGuide
 		return true;
 	}
 
-	/** A task act made in steps says the step it is at under the act. */
+	/** A task act shows what to do first, or the making step it is at, under the act. */
 	private boolean showMaking()
 	{
 		SubStep current = getCurrent();
@@ -1347,7 +1423,7 @@ public class StepGuide
 		SubStep again;
 	}
 
-	/** Client thread only. A refused book change leaves the book as it was; the next tick shows whether it changed. */
+	/** Client thread only. A refused book change leaves the book as it was; two ticks later shows whether it changed. */
 	private static final class ChangeRefusal
 	{
 		private static final int CHECK_TICKS = 2;

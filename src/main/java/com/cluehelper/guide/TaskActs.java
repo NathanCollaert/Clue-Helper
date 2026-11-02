@@ -90,7 +90,10 @@ final class TaskActs
 			.tab(items.isEmpty() ? shown.getTab() : StepGuide.Tab.INVENTORY).build();
 	}
 
-	/** The book to switch to first, else the making step reached; null when the task needs neither. */
+	/**
+	 * What to do first (switch book, take out of the kit, wield the staff, see to the patch), else the making step
+	 * reached; null when none applies.
+	 */
 	String detail(Step step)
 	{
 		String book = step == null ? null : step.getData().getBook();
@@ -220,12 +223,23 @@ final class TaskActs
 		return List.copyOf(widgets);
 	}
 
-	/** The making step's product in the "How many do you wish to make?" box: its option, A to R. */
+	/**
+	 * The making step's product in the "How many do you wish to make?" box (its option, A to R), or in the furnace's
+	 * jewellery screen.
+	 */
 	private Widget makeOption(Step step)
 	{
-		Widget box = client.getWidget(InterfaceID.Skillmulti.UNIVERSE);
-		StepIndex.Making making = box == null || box.isHidden() || step == null ? null : makingNow(step, player.carriedIds());
+		StepIndex.Making making = step == null ? null : makingNow(step, player.carriedIds());
 		if (making == null || making.getMake() < 0)
+		{
+			return null;
+		}
+		if (Widgets.shown(client, InterfaceID.CraftingGold.UNIVERSE))
+		{
+			return Widgets.descendants(client.getWidget(InterfaceID.CraftingGold.UNIVERSE)).stream()
+				.filter(shown -> Widgets.visible(shown) && shown.getItemId() == making.getMake()).findFirst().orElse(null);
+		}
+		if (!Widgets.shown(client, InterfaceID.Skillmulti.UNIVERSE))
 		{
 			return null;
 		}

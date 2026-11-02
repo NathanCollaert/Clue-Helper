@@ -16,7 +16,8 @@ public class MenuTarget
 		BOX,
 		FAIRY_CODE,
 		MINIGAME,
-		QUETZAL
+		QUETZAL,
+		BOAT
 	}
 
 	@Builder.Default
@@ -42,7 +43,7 @@ public class MenuTarget
 	int lineId;
 	/** Set by the line factories below: a map region shield or a fairy ring code. */
 	String lineKey;
-	/** Set by the line factories below: the cache's name of a nexus destination, or a minigame. */
+	/** Set by the line factories below: the cache's name of a nexus destination, a minigame or a boat's dock. */
 	String lineName;
 	/** The same landing through another house menu (the jewellery box for the glory), so its lines are coloured too. */
 	@Builder.Default
@@ -54,7 +55,6 @@ public class MenuTarget
 		return builder().line(Line.NEXUS).lineId(structId).lineKey(region).lineName(placeName).build();
 	}
 
-	/** A jewellery box line by its index. */
 	public static MenuTarget box(int lineIndex)
 	{
 		return builder().line(Line.BOX).lineId(lineIndex).build();
@@ -72,10 +72,15 @@ public class MenuTarget
 		return builder().line(Line.MINIGAME).lineName(name).build();
 	}
 
-	/** A quetzal map site by its Quetzal table id. */
 	public static MenuTarget quetzal(int tableId)
 	{
 		return builder().line(Line.QUETZAL).lineId(tableId).build();
+	}
+
+	/** The Teleport to Boat list's row of the boat moored at the dock. */
+	public static MenuTarget boat(String dock)
+	{
+		return builder().line(Line.BOAT).lineName(dock).build();
 	}
 
 	public boolean isEmpty()

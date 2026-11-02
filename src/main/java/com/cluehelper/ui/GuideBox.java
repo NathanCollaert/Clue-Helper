@@ -130,7 +130,7 @@ public class GuideBox
 	/**
 	 * Every teleport reads alike, ITEM: DESTINATION HOTKEY: the item or object in the text's white, what to click in it
 	 * ("POH Portals: Yanille") in the item lines' grey, and its hotkey last in the menu's blue. A step with no item
-	 * ("Cast Varrock Teleport") keeps its words, the place in grey.
+	 * reads as VERB: THING instead (see actionText), the thing in grey.
 	 */
 	private static String travelText(SubStep step)
 	{

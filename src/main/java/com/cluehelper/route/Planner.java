@@ -423,7 +423,7 @@ public final class Planner
 		}
 		WalkTable table = ctx.table;
 		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(Collectors.toSet());
-		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || table.reverseEnd(n) == table.reverseFrom(n));
+		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || !ctx.isTableNode(n) || table.reverseEnd(n) == table.reverseFrom(n));
 		if (noWalkData)
 		{
 			return List.of("No route: the plugin has no way to this spot yet");

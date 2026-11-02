@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -46,6 +47,13 @@ public class MenuLines
 	private static final String MAP_TELEPORT = "Teleport";
 	private static final String MAP_REGION = "Select";
 	private static final String OPEN_OPTION = "Open";
+	private static final int[] BOAT_LISTS = {InterfaceID.SailingBoatSelection.BOATS_CONTAINER_RECENT,
+		InterfaceID.SailingBoatSelection.BOATS_CONTAINER};
+	private static final String BOAT_LOCATION = "location ";
+	private static final String BOAT_TELEPORT = "Teleport To";
+	/** A button's frame is at most this much wider than its text; the boat's row around it is far wider. */
+	private static final int FRAME_WIDTH_RATIO = 2;
+	private static final int SAME_ROW_PIXELS = 4;
 	private static final String CLOSE_OPTION = "Close";
 	/** Same cyan as {@code Highlighter.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
@@ -410,6 +418,9 @@ public class MenuLines
 			case QUETZAL:
 				quetzal(target.getLineId(), out);
 				break;
+			case BOAT:
+				boat(target.getLineName(), out);
+				break;
 			default:
 				labelled(target, out);
 				break;
@@ -603,6 +614,58 @@ public class MenuLines
 		out.add(QuetzalIcons.nearest(icons.getDynamicChildren(), at));
 	}
 
+	/**
+	 * Each boat in the Teleport to Boat list is a flat run of widgets: its name, a "Location: <dock>" line and a
+	 * Teleport To button level with them. The button nearest the dock's line in height is that boat's.
+	 */
+	private void boat(String dock, Found out)
+	{
+		for (int list : BOAT_LISTS)
+		{
+			List<Widget> widgets = Widgets.descendants(client.getWidget(list));
+			for (Widget location : widgets)
+			{
+				if (Widgets.visible(location) && Widgets.hasText(location) && isLocation(location.getText(), dock))
+				{
+					nearestTeleportButtons(widgets, location).forEach(out::add);
+				}
+			}
+		}
+	}
+
+	private static boolean isLocation(String text, String dock)
+	{
+		String shown = MenuLabels.normalise(text);
+		return shown.startsWith(BOAT_LOCATION) && shown.endsWith(MenuLabels.normalise(dock));
+	}
+
+	/** The button's text and its frame, when they are separate widgets at the same height. */
+	private static List<Widget> nearestTeleportButtons(List<Widget> widgets, Widget location)
+	{
+		double rowMiddle = location.getBounds().getCenterY();
+		List<Widget> buttons = widgets.stream().filter(Widgets::visible).filter(MenuLines::isBoatTeleportButton)
+			.collect(Collectors.toList());
+		double nearest = buttons.stream().mapToDouble(button -> Math.abs(button.getBounds().getCenterY() - rowMiddle)).min()
+			.orElse(Double.MAX_VALUE);
+		return buttons.stream().filter(button -> Math.abs(button.getBounds().getCenterY() - rowMiddle) <= nearest + SAME_ROW_PIXELS)
+			.map(button -> buttonFrame(widgets, button)).collect(Collectors.toList());
+	}
+
+	/** The button's frame around its text, a separate widget with neither action nor text; the text when there is none. */
+	private static Widget buttonFrame(List<Widget> widgets, Widget text)
+	{
+		Rectangle bounds = text.getBounds();
+		return widgets.stream().filter(Widgets::visible).filter(frame -> frame != text && frame.getBounds().contains(bounds)
+				&& frame.getBounds().width <= bounds.width * FRAME_WIDTH_RATIO)
+			.min(Comparator.comparingDouble(frame -> frame.getBounds().getWidth() * frame.getBounds().getHeight())).orElse(text);
+	}
+
+	private static boolean isBoatTeleportButton(Widget widget)
+	{
+		return Widgets.hasAction(widget.getActions(), BOAT_TELEPORT)
+			|| widget.getText() != null && BOAT_TELEPORT.equalsIgnoreCase(Text.removeTags(widget.getText()).trim());
+	}
+
 	private void labelled(MenuTarget target, Found out)
 	{
 		String destination = target.destination();
@@ -738,8 +801,7 @@ public class MenuLines
 			return true;
 		}
 		NPC npc = entry.getNpc();
-		return npc != null && (target.getNpcIds().contains(npc.getId())
-			|| npc.getTransformedComposition() != null && target.getNpcIds().contains(npc.getTransformedComposition().getId())
+		return npc != null && (SceneObjects.isNpcOf(npc, sceneObjects.withNpcForms(target.getNpcIds()))
 			|| npc.getName() != null && target.getNpcNames().contains(MenuLabels.normalise(npc.getName())));
 	}
 
@@ -765,7 +827,6 @@ public class MenuLines
 		return parent == null ? null : parent.getChild(at[1]);
 	}
 
-	/** The target's lines. */
 	private static final class Found
 	{
 		final List<Widget> widgets = new ArrayList<>();

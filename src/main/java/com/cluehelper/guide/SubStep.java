@@ -37,6 +37,8 @@ public class SubStep
 		GEAR_WORN,
 		/** Core's {@code emptied} slot requirements are met by what is worn. */
 		SLOTS_EMPTY,
+		/** As {@code SLOTS_EMPTY}, or the way in's worn requirements are on already (the suit Larry puts in the cape slot). */
+		WAY_IN_SLOTS_EMPTY,
 		/** One of {@code heldWhenDone} is carried or worn. */
 		ITEM_HELD,
 		/** One of {@code actItems} is worn (a ghostspeak amulet before the ghost captain's boat). */
@@ -137,8 +139,14 @@ public class SubStep
 	/** Gear put on or taken off, or something fetched before the act: done where the player stands, no line to the place. */
 	public boolean isPreparation()
 	{
-		return done == Done.GEAR_WORN || done == Done.WAY_IN_WORN || done == Done.SLOTS_EMPTY || done == Done.ITEM_HELD
+		return done == Done.GEAR_WORN || done == Done.WAY_IN_WORN || done == Done.SLOTS_EMPTY || done == Done.WAY_IN_SLOTS_EMPTY || done == Done.ITEM_HELD
 			|| done == Done.ITEM_WORN;
+	}
+
+	/** Its items go into a bank or deposit box (the master scroll book, weapons before Entrana). */
+	public boolean isDeposit()
+	{
+		return done == Done.ITEM_GONE || done == Done.ITEMS_GONE;
 	}
 
 	public boolean isTravel()

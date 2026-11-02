@@ -35,9 +35,16 @@ public class LevelNeed
 		return new LevelNeed(null, aggregate, level);
 	}
 
-	/** The player's own level the need is held against. */
+	/**
+	 * The player's own level the need is held against: boosts count, but Hitpoints' boosted level is the health left,
+	 * and a Hitpoints need (the God Wars ice bridge's 70) is on the level itself.
+	 */
 	public int have(PlayerSnapshot player)
 	{
+		if (skill == Skill.HITPOINTS)
+		{
+			return Math.max(player.real(skill), player.boosted(skill));
+		}
 		if (skill != null)
 		{
 			return player.boosted(skill);

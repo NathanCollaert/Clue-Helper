@@ -246,7 +246,7 @@ final class PohTrace
 		log.info("{} t{} nexus {} layer: {} children {}", MENU_TAG, client.getTickCount(), name, children == null ? 0 : children.length, lines);
 	}
 
-	/** Every widget of an interface we don't read yet, to learn where its lines and map markers are. */
+	/** Every widget of an interface the plugin doesn't read, to learn where its lines and map markers are. */
 	private void logTree(int group)
 	{
 		for (int child = 0; child < TREE_CHILDREN; child++)

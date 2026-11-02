@@ -38,7 +38,7 @@ public class HotColdSimulationTest
 	private static final int LOCAL_TILES = 32;
 	private static final int LOCAL_STRIDE = 4;
 	private static final int MOST_FEELS = 12;
-	/** Regression bounds, a little above this planner's numbers on 2026-10-25: beginner 1.80, master 4.04. */
+	/** Regression bounds, a little above the planner's current means. */
 	private static final double BEGINNER_MEAN_FEELS = 2.0;
 	private static final double MASTER_MEAN_FEELS = 4.2;
 	private static final Path OUT = Paths.get("build/hotcold/simulation.tsv");

@@ -26,6 +26,8 @@ public final class RequirementParser
 	private static final int MAX_COMBAT_LEVEL = 126;
 	private static final String MAX = "Max";
 	private static final String UNLOCK_PREFIX = "UNLOCK_";
+	/** {@code VARBIT_<id>=<value>}: the varbit at that value does without the clause's items. */
+	private static final String VARBIT_PREFIX = "VARBIT_";
 	private static final String QUEST_PREFIX = "QUEST_";
 	private static final Pattern VAR_CLAUSE = Pattern.compile("(\\d+)\\s*([=<>&@])\\s*(-?\\d+)");
 	private static final Pattern HOUSE_NEED = Pattern.compile("(object|nexus):(\\d+(?:\\|\\d+)*)");
@@ -129,18 +131,24 @@ public final class RequirementParser
 		}
 		String name = m.group(1);
 		int quantity = Integer.parseInt(m.group(2));
-		if (quantity < 1)
+		if (quantity < 1 && !name.startsWith(VARBIT_PREFIX))
 		{
 			out.errors.add("Items: '" + branch + "' needs a positive quantity");
 			return null;
 		}
 		if (name.startsWith(UNLOCK_PREFIX))
 		{
-			return new ItemClause.Branch(List.of(), quantity, name.substring(UNLOCK_PREFIX.length()), null);
+			return new ItemClause.Branch(List.of(), quantity, name.substring(UNLOCK_PREFIX.length()), null, null);
 		}
 		if (name.startsWith(QUEST_PREFIX))
 		{
 			return questBranch(name.substring(QUEST_PREFIX.length()), quantity, out);
+		}
+		if (name.startsWith(VARBIT_PREFIX) && name.substring(VARBIT_PREFIX.length()).chars().allMatch(Character::isDigit))
+		{
+			VarCheck check = new VarCheck(VarCheck.Kind.VARBIT, Integer.parseInt(name.substring(VARBIT_PREFIX.length())), VarCheck.Op.EQUAL,
+				quantity);
+			return new ItemClause.Branch(List.of(), 1, null, null, check);
 		}
 		List<Integer> ids = itemIds(name);
 		if (ids == null || ids.isEmpty())
@@ -148,14 +156,14 @@ public final class RequirementParser
 			out.errors.add("Items: unknown item '" + name + "'");
 			return null;
 		}
-		return new ItemClause.Branch(ids, quantity, null, null);
+		return new ItemClause.Branch(ids, quantity, null, null, null);
 	}
 
 	private static ItemClause.Branch questBranch(String name, int quantity, Parsed out)
 	{
 		try
 		{
-			return new ItemClause.Branch(List.of(), quantity, null, Quest.valueOf(name));
+			return new ItemClause.Branch(List.of(), quantity, null, Quest.valueOf(name), null);
 		}
 		catch (IllegalArgumentException e)
 		{

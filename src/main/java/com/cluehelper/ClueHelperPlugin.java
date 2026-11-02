@@ -29,7 +29,7 @@ import net.runelite.client.ui.overlay.*;
 @PluginDescriptor(
 	name = "Clue Helper",
 	description = "Fastest clue routes from the teleports you own, hot/cold planning and step-by-step guidance, alongside the Clue Scroll plugin",
-	tags = {"clue", "clues", "treasure", "trails", "teleport", "route", "hot", "cold", "stash", "guide"}
+	tags = {"clue", "clues", "scroll", "treasure", "trails", "guide", "helper", "route", "teleport", "fastest", "step", "navigation", "highlight", "hot", "cold", "stash"}
 )
 @PluginDependency(ClueScrollPlugin.class)
 @PluginDependency(BankTagsPlugin.class)
@@ -66,6 +66,9 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	private KeyRingMemory keyRing;
+
+	@Inject
+	private NpcPlaceMemory npcPlaces;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -153,6 +156,9 @@ public class ClueHelperPlugin extends Plugin
 	@Inject
 	private RouteReport routeReport;
 
+	@Inject
+	private JournalScroll journalScroll;
+
 
 	private Runnable unregisterRoutes;
 	private Runnable unregisterGuide;
@@ -229,6 +235,8 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe(priority = -1)
 	public void onGameTick(GameTick tick)
 	{
+		npcPlaces.onGameTick();
+		journalScroll.onGameTick();
 		if (clueLink.onGameTick())
 		{
 			box.refresh();
@@ -327,6 +335,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		stashMemory.onMenuOptionClicked(event);
 		keyRing.onMenuOptionClicked(event);
+		npcPlaces.onMenuOptionClicked(event);
 		sceneDoors.onMenuOptionClicked(event);
 		fairyRings.onMenuOptionClicked(event);
 		bankMemory.onMenuOptionClicked(event);

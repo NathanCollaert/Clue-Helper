@@ -76,7 +76,7 @@ public final class CampaignRecorder
 		CampaignRecording recording = new CampaignRecording();
 		ClientTape tape = ClientTape.recording(client);
 		ClueScroll clue = CoreClues.entry(coreClue);
-		Step step = new StepResolver(() -> index).resolve(clue, CoreClues.plugin(tape.client()));
+		Step step = new StepResolver(() -> index, id -> StepResolver.isShown(tape.client(), id)).resolve(clue, CoreClues.plugin(tape.client()));
 		Step travel = StageTarget.travelStep(CampaignReplay.asLive(step, input.getPlayer(), input.getBanked()),
 			StageTarget.owned(input.getPlayer(), input.getBanked()));
 		recording.stashStates = new TreeMap<>();
@@ -89,6 +89,12 @@ public final class CampaignRecorder
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
 			input.getSettings()::isScrollBookOutOfWilderness, id -> false);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
+		// A replay that plans another route asks about other items: every owned one is on the recording
+		StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()).forEach(id ->
+		{
+			recordKit(recording, id);
+			tape.client().getItemDefinition(id).getName();
+		});
 
 		Set<Integer> usable = UsableItems.of(input, runes.get(), required, travel);
 		recording.gearPieces.values().forEach(pieces -> usable.addAll(pieces.keySet()));

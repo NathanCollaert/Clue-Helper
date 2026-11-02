@@ -114,8 +114,7 @@ public final class SceneDoors
 		return new LoadedScene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides);
 	}
 
-	/** Client thread only. */
-	/** A door, web, fence or doorway the path can go through with one click. */
+	/** Client thread only. A door, web, fence or doorway the path can go through with one click. */
 	public boolean opensOnClick(WallObject wall)
 	{
 		return opens(wall.getId()) && !locked.contains(new Door(wall.getId(), wall.getWorldLocation()));

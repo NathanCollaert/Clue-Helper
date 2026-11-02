@@ -15,8 +15,10 @@ public class Route
 
 	List<Leg> legs;
 	int halfTicks;
-	/** Half-ticks plus the ranking-only consumable, cape-use and stranding penalties. */
+	/** Half-ticks plus the ranking-only cape-use, stranding and teleport tie-break penalties. */
 	int rankHalfTicks;
+	/** The part of {@link #rankHalfTicks} that only breaks near-ties by teleport count. */
+	int tieBreakHalfTicks;
 	boolean banked;
 	/** Spellbook Swap included. */
 	boolean changed;

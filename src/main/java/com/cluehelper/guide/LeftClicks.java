@@ -25,6 +25,8 @@ public final class LeftClicks
 	private static final String OBJECT = "object:";
 	private static final String NPC = "npc:";
 	private static final String BANK = "bank:";
+	private static final String SPELL = "spell:";
+	private static final String CAST_OPTION = "Cast";
 	private static final String WITHDRAW_OPTION = "Withdraw";
 	private static final Set<MenuAction> NPC_OPTIONS = EnumSet.of(MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION,
 		MenuAction.NPC_THIRD_OPTION, MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION);
@@ -99,6 +101,12 @@ public final class LeftClicks
 	{
 		String click = item(itemId);
 		return click != null && (WEAR_OPTIONS.contains(click) || USE_OPTION.equals(click));
+	}
+
+	/** A spell's left click: Cast, or the landing set with Configure (Seers' for Camelot Teleport), once hovered. */
+	String spell(int spellWidgetId)
+	{
+		return learned().getOrDefault(SPELL + spellWidgetId, CAST_OPTION);
 	}
 
 	/** A bank item's left click withdraws it, whatever the quantity, unless the bank hands out notes. */
@@ -239,6 +247,10 @@ public final class LeftClicks
 		if (group == InterfaceID.INVENTORY && entry.getItemId() > 0)
 		{
 			return ITEM + entry.getItemId();
+		}
+		if (group == InterfaceID.MAGIC_SPELLBOOK)
+		{
+			return SPELL + widget.getId();
 		}
 		if (group == InterfaceID.BANKMAIN && entry.getItemId() > 0)
 		{

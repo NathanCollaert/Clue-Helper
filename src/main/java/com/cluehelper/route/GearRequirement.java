@@ -41,6 +41,6 @@ public class GearRequirement implements ItemRequirement
 
 	public boolean isWorn(Set<Integer> worn)
 	{
-		return choose(worn, Set.of(), Set.of()).map(choice -> choice.getEquip().isEmpty()).orElse(false);
+		return choose(worn, Set.of(), Set.of()).map(choice -> choice.getEquip().isEmpty() && choice.getRemove().isEmpty()).orElse(false);
 	}
 }

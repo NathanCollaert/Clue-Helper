@@ -16,7 +16,8 @@ public final class RouteText
 		{
 			return "none";
 		}
-		String extras = route.getRankHalfTicks() != route.getHalfTicks() ? " (rank " + (route.getRankHalfTicks() + 1) / 2 + ")" : "";
+		int rank = route.getRankHalfTicks() - route.getTieBreakHalfTicks();
+		String extras = rank != route.getHalfTicks() ? " (rank " + (rank + 1) / 2 + ")" : "";
 		String spent = route.getSpent().isEmpty() ? "" : " " + route.getSpent();
 		String ends = route.getEndBook() != route.getStartBook() ? " leaves you on " + route.getEndBook() : "";
 		return route.getTicks() + "t" + extras + ": " + (route.isOpenBankStart() ? "(at the open bank) " : "") + route.describe() + spent

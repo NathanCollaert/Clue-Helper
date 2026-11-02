@@ -22,6 +22,8 @@ public class Highlights
 	Set<Integer> bankItems = Set.of();
 	@Builder.Default
 	int spellWidget = -1;
+	/** The spell's teleport is its right-click option (Seers' on Camelot Teleport), so it is outlined, not filled. */
+	boolean spellRightClick;
 	/** A scroll book entry, or {@link ScrollBook#NO_WIDGET}. */
 	@Builder.Default
 	int menuWidget = ScrollBook.NO_WIDGET;

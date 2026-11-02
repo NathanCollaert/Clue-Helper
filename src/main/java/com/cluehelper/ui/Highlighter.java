@@ -135,16 +135,18 @@ public class Highlighter
 	}
 
 	/**
-	 * A scenery object with no model at all, a flat click spot or flat ground (an empty farming patch), or one whose every
+	 * A scenery or ground object (God Wars' ice bridge) with no model at all, a flat click spot or flat ground (an empty
+	 * farming patch), or one whose every
 	 * face is skipped by the outline renderer (see-through) or never drawn by the client.
 	 */
 	private static boolean isHidden(TileObject object)
 	{
-		if (!(object instanceof GameObject))
+		Renderable renderable = object instanceof GameObject ? ((GameObject) object).getRenderable()
+			: object instanceof GroundObject ? ((GroundObject) object).getRenderable() : null;
+		if (renderable == null && !(object instanceof GameObject))
 		{
 			return false;
 		}
-		Renderable renderable = ((GameObject) object).getRenderable();
 		Model model = renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
 		if (model == null || model.getFaceCount() <= FLAT_MARKER_FACES || model.getModelHeight() <= FLAT_MODEL_HEIGHT)
 		{
@@ -203,6 +205,20 @@ public class Highlighter
 	{
 		graphics.setColor(FILL);
 		graphics.fill(shape);
+		graphics.setColor(COLOUR);
+		graphics.setStroke(new BasicStroke(STROKE));
+		graphics.draw(shape);
+	}
+
+	/** A spell: filled when its left click casts the step's teleport, outlined when its right-click menu does. */
+	public void spell(Graphics2D graphics, Rectangle bounds, boolean leftClick)
+	{
+		Shape shape = new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC);
+		if (leftClick)
+		{
+			graphics.setColor(ONE_CLICK_FILL);
+			graphics.fill(shape);
+		}
 		graphics.setColor(COLOUR);
 		graphics.setStroke(new BasicStroke(STROKE));
 		graphics.draw(shape);

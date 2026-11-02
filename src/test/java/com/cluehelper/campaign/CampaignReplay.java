@@ -129,11 +129,24 @@ public final class CampaignReplay
 		return Outcome.of(plan, guide);
 	}
 
+	/** A recording without taped NPC shows resolves with every NPC shown. */
+	private static boolean shownOnTape(Client client, int npcId)
+	{
+		try
+		{
+			return StepResolver.isShown(client, npcId);
+		}
+		catch (IllegalStateException notOnTape)
+		{
+			return true;
+		}
+	}
+
 	private Step resolve(CampaignRecording recording, Client client)
 	{
 		try
 		{
-			StepResolver resolver = new StepResolver(() -> index);
+			StepResolver resolver = new StepResolver(() -> index, id -> shownOnTape(client, id));
 			Step step = resolveAsRecorded(resolver, CoreClues.entry(recording.coreClue), recording.challengeCompleted, client);
 			if (step.getKey().equals(recording.key))
 			{

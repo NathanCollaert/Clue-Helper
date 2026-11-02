@@ -115,6 +115,7 @@ public class RoutePlanner
 			if (loaded != null)
 			{
 				watchGateVars(loaded.getTable());
+				availability.nameItemsOf(loaded.getTable().getGates());
 				walk = loaded;
 			}
 		});
@@ -141,7 +142,7 @@ public class RoutePlanner
 		return () -> listeners.remove(listener);
 	}
 
-	/** Like {@link #addListener}, with what each plan was planned from: the dev launcher records slow ones. */
+	/** Like {@link #addListener}, with what each plan was planned from. */
 	public Runnable addInputListener(BiConsumer<Plan, PlanInput> listener)
 	{
 		inputListeners.add(listener);
@@ -541,7 +542,10 @@ public class RoutePlanner
 		Set<Integer> varps = new HashSet<>();
 		for (Requirements gate : table.getGates())
 		{
-			for (VarCheck check : gate.getVars())
+			List<VarCheck> checks = new ArrayList<>(gate.getVars());
+			gate.getItems().forEach(clause -> clause.getBranches().stream().filter(ItemClause.Branch::isVar)
+				.forEach(branch -> checks.add(branch.getVar())));
+			for (VarCheck check : checks)
 			{
 				(check.getKind() == VarCheck.Kind.VARBIT ? varbits : varps).add(check.getId());
 			}

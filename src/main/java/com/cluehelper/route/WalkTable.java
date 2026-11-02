@@ -305,7 +305,7 @@ public final class WalkTable
 		for (String[] c : rows)
 		{
 			Exit row = rowAction(c);
-			byRow.putIfAbsent(exitKey(row.getOrigin(), row.getDestination()), row);
+			byRow.merge(exitKey(row.getOrigin(), row.getDestination()), row, WalkTable::withOtherForm);
 		}
 		return byRow;
 	}
@@ -325,7 +325,19 @@ public final class WalkTable
 	private static Exit rowAction(String[] c)
 	{
 		int objectId = c[4].isEmpty() ? -1 : Integer.parseInt(c[4]);
-		return new Exit(parseTile(c[0]), parseTile(c[1]), c[2], c[3], objectId);
+		return new Exit(parseTile(c[0]), parseTile(c[1]), c[2], c[3], objectId, Set.of(), c.length > 5 ? c[5] : "");
+	}
+
+	/** The first row's action stays the exit's; a later row's object is another form of it. */
+	private static Exit withOtherForm(Exit first, Exit later)
+	{
+		if (later.getObjectId() < 0 || later.getObjectId() == first.getObjectId())
+		{
+			return first;
+		}
+		Set<Integer> forms = new HashSet<>(first.getOtherForms());
+		forms.add(later.getObjectId());
+		return first.withOtherForms(Set.copyOf(forms));
 	}
 
 	private static long exitKey(WorldPoint origin, WorldPoint destination)

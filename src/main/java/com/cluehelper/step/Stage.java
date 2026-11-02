@@ -19,6 +19,8 @@ public class Stage
 		PART,
 		/** A skill challenge's task; done once core marks the challenge completed. */
 		TASK,
+		/** Read where the step's NPC is (a quest journal); done once its place is learned. */
+		LEARN,
 		/** The step's own target, done last. */
 		FINAL
 	}
@@ -37,9 +39,19 @@ public class Stage
 	/** Any of these owned anywhere, the bank too, skips the stage: the way in's requires bring it from there. */
 	@Builder.Default
 	Set<Integer> skippedWhenOwned = Set.of();
+
+	/** The stage as done at one of its places: that place's text, not the first place's. */
+	public Stage atPlace(WorldPoint tile)
+	{
+		String text = placeTexts.get(tile);
+		return text == null || text.equals(detail) ? this : toBuilder().detail(text).build();
+	}
 	/** Tiles that count only while the named patch is grown (a Farming Guild redwood), by tile. */
 	@Builder.Default
 	Map<WorldPoint, String> grownOnly = Map.of();
+	/** Each place's own text by its tile, where places differ (the Slayer Tower's top floor or its basement). */
+	@Builder.Default
+	Map<WorldPoint, String> placeTexts = Map.of();
 	/** The objects of a place in the player's house (its spirit tree): the place counts only while the house has one. */
 	@Builder.Default
 	Set<Integer> houseObjects = Set.of();

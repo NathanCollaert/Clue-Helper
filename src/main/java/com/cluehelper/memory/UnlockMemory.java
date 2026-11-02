@@ -33,7 +33,7 @@ public class UnlockMemory
 	/** The ghost captain's landing on Dragontooth Island in rides.tsv. */
 	static final WorldPoint DRAGONTOOTH_LANDING = new WorldPoint(3792, 3560, 0);
 	private static final String TABLET_USED = "As the talisman and tablet are held together, a surge of power connects the two.";
-	/** The real Honour landing is 3 tiles north of the catalog's (1254 3563); a little more allows for a spread. */
+	/** The real Honour landing (1254 3563) is 3 tiles north of the catalog's; a little more allows for a spread. */
 	private static final int LANDING_TILES = 5;
 
 	@Inject

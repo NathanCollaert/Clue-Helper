@@ -99,17 +99,17 @@ public class EdgeCaseRoutesTest
 		assertTrue("walks on: " + best.describe(), best.getLegs().stream().allMatch(leg -> leg.getKind() == Leg.Kind.WALK));
 	}
 
+	private static final WorldPoint KHARAZI_CLUE = new WorldPoint(2954, 2933, 0);
+	/** Not a walk-table node, beside the clue. */
+	private static final WorldPoint KHARAZI_STASH = new WorldPoint(2952, 2932, 0);
+	private static final int AT_HOLE_TILES = 2;
+
 	/**
 	 * The path line leads all the way, past the loaded scene: on the ledge below the Kharazi cliff, with no axe and
 	 * machete for the jungle's bushes, it never heads east into the ledge's dead end past the vine, it takes the hole
 	 * down to Gu'Tanoth's cave rather than the glider landing's walk, and it leads on to Tyras Camp from a tile past the
 	 * Isafdar landing.
 	 */
-	private static final WorldPoint KHARAZI_CLUE = new WorldPoint(2954, 2933, 0);
-	/** Not a walk-table node, beside the clue. */
-	private static final WorldPoint KHARAZI_STASH = new WorldPoint(2952, 2932, 0);
-	private static final int AT_HOLE_TILES = 2;
-
 	@Test
 	public void lineLeadsTheWholeWay() throws IOException
 	{

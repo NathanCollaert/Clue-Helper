@@ -64,7 +64,6 @@ public class PrayerFilters
 		found = Map.copyOf(now);
 	}
 
-	/** The tier filters hiding prayers now. */
 	public List<Filter> hidingTiers()
 	{
 		return TIERS.stream().filter(filter -> client.getVarbitValue(filter.varbit) == filter.hidingValue)

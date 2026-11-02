@@ -1,5 +1,6 @@
 package com.cluehelper.link;
 
+import com.cluehelper.memory.NpcPlaceMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
@@ -40,6 +41,8 @@ public class ClueLink
 	private AvailabilityService availability;
 	@Inject
 	private PlayerModel player;
+	@Inject
+	private NpcPlaceMemory npcPlaces;
 	private final LinkState state = new LinkState();
 	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
@@ -162,7 +165,7 @@ public class ClueLink
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : Stages.adjusted(resolve(clue), this::owns, playerTile());
+		Step step = clue == null ? null : Stages.adjusted(npcPlaces.adjusted(resolve(clue)), this::owns, playerTile());
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
 			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && carriesClue());
 		if (change != StepChange.UNCHANGED)

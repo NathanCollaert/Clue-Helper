@@ -43,7 +43,6 @@ public final class SceneObjects
 		return npcsNear(at, radius, BANK);
 	}
 
-	/** The NPCs within {@code radius} of {@code at} that have {@code option}. */
 	List<NPC> npcsNear(WorldPoint at, int radius, String option)
 	{
 		return at == null ? List.of() : npcs(npc -> offers(npc, option) && npc.getWorldLocation().distanceTo2D(at) <= radius);
@@ -57,11 +56,34 @@ public final class SceneObjects
 
 	List<NPC> npcs(Set<Integer> ids)
 	{
-		return npcs(npc -> ids.contains(npc.getId())
-			|| npc.getTransformedComposition() != null && ids.contains(npc.getTransformedComposition().getId()));
+		Set<Integer> forms = withNpcForms(ids);
+		return npcs(npc -> isNpcOf(npc, forms));
 	}
 
-	/** The loaded NPCs that {@code wanted} accepts. */
+	/**
+	 * The ids with the NPCs their multi-NPC forms show as: a clue's Viggora (6122) is the Mysterious ghost (3455) that
+	 * spawns.
+	 */
+	Set<Integer> withNpcForms(Set<Integer> ids)
+	{
+		Set<Integer> forms = new HashSet<>(ids);
+		for (int id : ids)
+		{
+			NPCComposition npc = client.getNpcDefinition(id);
+			int[] configs = npc == null ? null : npc.getConfigs();
+			if (configs != null)
+			{
+				Arrays.stream(configs).filter(form -> form >= 0).forEach(forms::add);
+			}
+		}
+		return forms;
+	}
+
+	static boolean isNpcOf(NPC npc, Set<Integer> ids)
+	{
+		return ids.contains(npc.getId()) || npc.getTransformedComposition() != null && ids.contains(npc.getTransformedComposition().getId());
+	}
+
 	List<NPC> npcs(Predicate<NPC> wanted)
 	{
 		List<NPC> found = new ArrayList<>();

@@ -14,13 +14,18 @@ final class PlanContext
 {
 	static final int NOT_BANKED = 0;
 	static final int BANKED = 1;
-	/** Arrival to the next transport's first click, items aside: 4 ticks over the step campaign's bank stops. */
+	/** Arrival to the next transport's first click, items aside: 4 ticks, as measured at bank stops. */
 	private static final int BANK_STOP_HALF_TICKS = 8;
 	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
 	private static final int PIN_HALF_TICKS = 8;
 	/** Ranking only: Magic and Max cape changes are limited per day. */
 	static final int CAPE_USE_PENALTY_HALF_TICKS = 6;
+	/**
+	 * Ranking only, per teleport or fairy ring: routes about a tick apart go the way with fewer teleports, the same way each
+	 * time (Falo the Bard's Camelot, diary cape and fairy ring from a bank).
+	 */
+	static final int TELEPORT_TIE_HALF_TICKS = 2;
 	/** Ranking only: the route leaves you on another book with no way back left today. */
 	private static final int STRAND_PENALTY_HALF_TICKS = 60;
 	/** One more click when the withdraw list needs more slots than are free. */

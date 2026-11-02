@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import com.cluehelper.step.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.NpcID;
 
@@ -14,6 +15,7 @@ final class Acts
 	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
 	private static final String TALK_OPTION = "Talk-to";
 	private static final String ATTACK_OPTION = "Attack";
+	static final String USE_OPTION = "Use";
 	/** By ids: core doesn't mark Uri, and a target by name is left to core while the clue's tile is in view. */
 	private static final Set<Integer> URI_IDS = Set.of(NpcID.TRAIL_BEGINNER_URI, NpcID.TRAIL_EASY_URI, NpcID.TRAIL_MEDIUM_URI,
 		NpcID.TRAIL_HARD_URI, NpcID.TRAIL_ELITE_URI, NpcID.TRAIL_MASTER_URI, NpcID.URI_EMOTE);
@@ -58,13 +60,22 @@ final class Acts
 		}
 		SubStep.SubStepBuilder act = SubStep.of(SubStep.Kind.ACT, actText(step));
 		String npc = talkedTo(step);
-		if (npc != null)
+		String option = npc == null ? null : step.getData().getNpcOption();
+		if (option != null)
 		{
-			return talkTo(act, npc).build();
+			return act.text(option + " with " + npc).option(option).npcNames(Set.of(MenuLabels.normalise(npc)))
+				.npcIds(targetNpcs(step)).build();
 		}
+		// Core names some talking objects as NPCs (Juna, the Tears of Guthix's guardian): the cache's object wins
 		String object = talkedToObject(step);
-		return object == null ? act.build() : act.text("Talk to the " + object.toLowerCase()).option(TALK_OPTION)
-			.objectIds(Set.copyOf(step.getObjectIds())).build();
+		if (object != null)
+		{
+			Set<Integer> objects = new HashSet<>(step.getObjectIds());
+			step.getData().getTargets().forEach(target -> objects.addAll(target.locs()));
+			return act.text("Talk to " + (object.equals(npc) ? object : "the " + object.toLowerCase())).option(TALK_OPTION)
+				.objectIds(Set.copyOf(objects)).build();
+		}
+		return npc == null ? act.build() : talkTo(act, npc).npcIds(targetNpcs(step)).build();
 	}
 
 	/** The object the step's act talks to (the spirit tree); null for a step whose act is something else. */
@@ -73,6 +84,12 @@ final class Acts
 		boolean ownAct = TYPES_WITH_OWN_ACT.contains(step.getType());
 		return ownAct ? null : step.getData().getTargets().stream().map(StepIndex.Target::getTalkTo).filter(Objects::nonNull)
 			.findFirst().orElse(null);
+	}
+
+	/** By id too: a ghost goes by another name in the game than in the clue (Viggora is a Mysterious ghost). */
+	private static Set<Integer> targetNpcs(Step step)
+	{
+		return step.getData().getTargets().stream().flatMap(target -> target.getNpcs().stream()).collect(Collectors.toUnmodifiableSet());
 	}
 
 	/** The NPC the step's own act talks to; null for a step whose act is something else. */
@@ -137,7 +154,8 @@ final class Acts
 			case ClueTypes.MUSIC:
 				return List.of(music(step));
 			case ClueTypes.FALO:
-				return List.of(act("Talk to Falo the Bard", "With the item the Clue Scroll plugin lists"));
+				return List.of(SubStep.of(SubStep.Kind.ACT, "Use the item on Falo the Bard").detail("The item the Clue Scroll plugin lists")
+					.option(USE_OPTION).npcIds(targetNpcs(step)).build());
 			case ClueTypes.SKILL:
 				return List.of(handIn(step));
 			default:

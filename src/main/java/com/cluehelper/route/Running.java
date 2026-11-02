@@ -1,8 +1,8 @@
 package com.cluehelper.route;
 
 /**
- * Running covers two tiles a tick on a straight path; corners, doors and stops brought the step campaign's walks to
- * 1.77 (929 walks, run on in all but 8), so a walked tile costs 13% more than half a tick.
+ * Running covers two tiles a tick on a straight path; corners, doors and stops brought 929 measured walks (run on in
+ * all but 8) to 1.77, so a walked tile costs 13% more than half a tick.
  */
 public final class Running
 {

@@ -56,7 +56,9 @@ import net.runelite.api.Player;
 import net.runelite.api.Renderable;
 import net.runelite.api.NPC;
 import net.runelite.api.Model;
+import net.runelite.api.DecorativeObject;
 import net.runelite.api.GameObject;
+import net.runelite.api.GroundObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
@@ -88,7 +90,7 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File ROUTE_FRAMES = new File("build/routes");
 	private static final File SCENES = new File("build/scenes");
 	private static final File GUIDE_FRAMES = new File("build/guide");
-	/** About 5 s, to see highlights between sub-step changes. */
+	/** About 10 s, to see highlights between sub-step changes. */
 	private static final int LIVE_FRAME_TICKS = 16;
 	private static final int OBJECT_DUMP_TILES = 30;
 	private static final String CHALLENGE_COMPLETED = "Skill challenge completed.";
@@ -420,6 +422,17 @@ public class ClueHelperDevPlugin extends Plugin
 				{
 					logObject("wall", at.dx(dx).dy(dy), wall.getId(), wall.getConfig(), "orientation " + wall.getOrientationA() + "/" + wall.getOrientationB());
 				}
+				GroundObject ground = tile.getGroundObject();
+				if (ground != null)
+				{
+					logObject("ground", at.dx(dx).dy(dy), ground.getId(), ground.getConfig(), "renderable "
+						+ (ground.getRenderable() == null ? "none" : ground.getRenderable().getClass().getSimpleName()));
+				}
+				DecorativeObject decoration = tile.getDecorativeObject();
+				if (decoration != null)
+				{
+					logObject("decoration", at.dx(dx).dy(dy), decoration.getId(), decoration.getConfig(), "");
+				}
 				for (GameObject object : tile.getGameObjects())
 				{
 					if (object != null && object.getSceneMinLocation().equals(tile.getSceneLocation()))
@@ -658,7 +671,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 	}
 
-	/** Lets a run's reads be checked against core's overlay afterwards. */
+	/** A faked key counts as carried only until the step changes. */
 	private void forgetFakeKey(StepChange change)
 	{
 		if (change == StepChange.NEW || change == StepChange.CLEARED)

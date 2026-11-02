@@ -106,6 +106,11 @@ public final class PlayerSnapshot
 		return boostedLevels.getOrDefault(skill, 1);
 	}
 
+	public int real(Skill skill)
+	{
+		return realLevels.getOrDefault(skill, 1);
+	}
+
 	/** Whether an inventory item's name starts with {@code nameStart}, lower case. */
 	public boolean carriesItemNamed(String nameStart, IntFunction<String> names)
 	{

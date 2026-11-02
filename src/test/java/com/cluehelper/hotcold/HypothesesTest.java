@@ -14,8 +14,8 @@ import org.junit.Test;
 public class HypothesesTest
 {
 	/**
-	 * Seen live: the last clue's anchor at Falador made Ice Mountain's "cold, but colder than last time" rule out the
-	 * Lumbridge cow field, and the wheat field dug was wrong.
+	 * A carried anchor (the last clue's Falador reading) must not let Ice Mountain's "cold, but colder than last time"
+	 * rule out the Lumbridge cow field.
 	 */
 	@Test
 	public void carriedAnchorRulesNoSpotOut() throws IOException

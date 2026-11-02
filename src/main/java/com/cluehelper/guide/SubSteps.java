@@ -16,7 +16,7 @@ import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStats;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 @Singleton
 public final class SubSteps
@@ -223,9 +223,8 @@ public final class SubSteps
 		return from.getWalk().exitTo(leg.getTo());
 	}
 
-	/** "Green dragon leather x2" while more than one is still to take, else the name alone. */
 	/**
-	 * A step need's use carries the whole banked stack, so its amount is what the need still lacks; a teleport's use
+	 * "2 x Green dragon leather" while more than one is still to take, else the name alone. A step need's use carries the whole banked stack, so its amount is what the need still lacks; a teleport's use
 	 * carries what the teleport spends (its runes).
 	 */
 	private String withdrawLine(Step step, ItemUse use)
@@ -347,7 +346,7 @@ public final class SubSteps
 				}
 				if (reached != null)
 				{
-					addStageAct(steps, reached);
+					addStageAct(steps, reached.atPlace(leg.getTo()));
 					stage++;
 				}
 			}
@@ -447,7 +446,7 @@ public final class SubSteps
 	static SubStep stageAct(Stage stage)
 	{
 		return SubStep.of(SubStep.Kind.ACT, stage.getAct()).detail(stage.getDetail()).stage(stage)
-			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
+			.tab(stage.getKind() == Stage.Kind.LEARN ? StepGuide.Tab.QUESTS : StepGuide.Tab.NONE).npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
 	/** The step's way in, when the player is on it: near its start, any floor, and not yet inside. */
@@ -514,7 +513,6 @@ public final class SubSteps
 		return step.getStages().stream().anyMatch(stage -> stage.getKind() != Stage.Kind.FINAL && !stage.getTiles().isEmpty());
 	}
 
-	/** Before going in, the gear the way in needs worn is put on. */
 	private static void addStageAct(List<SubStep> steps, Stage stage)
 	{
 		steps.addAll(stageActs(stage));
@@ -540,10 +538,13 @@ public final class SubSteps
 			.tab(StepGuide.Tab.EQUIPMENT).build());
 	}
 
-	/** Put on the needs named, done once worn items alone meet them. */
+	/**
+	 * Put on the needs named, done once worn items alone meet them. A need is listed by name ("A negative prayer bonus")
+	 * until the pieces that meet it are picked.
+	 */
 	static List<SubStep> equip(List<String> wornNeeds)
 	{
-		return List.of(SubStep.of(SubStep.Kind.ACT, "Equip the " + String.join(" and ", wornNeeds))
+		return List.of(SubStep.of(SubStep.Kind.ACT, "Equip:").items(wornNeeds)
 			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(StepGuide.Tab.INVENTORY).build());
 	}
 
@@ -605,31 +606,54 @@ public final class SubSteps
 		{
 			return steps;
 		}
-		SubStep equip = SubStep.of(SubStep.Kind.ACT, "Equip the " + worn.stream().map(StepIndex.Requires::getName).collect(Collectors.joining(" and ")))
-			.actItems(worn.stream().flatMap(need -> need.getIds().stream()).collect(Collectors.toUnmodifiableSet()))
-			.done(SubStep.Done.WAY_IN_WORN).tab(StepGuide.Tab.INVENTORY).build();
+		List<SubStep> equip = new ArrayList<>();
+		worn.stream().filter(need -> need.getPutOn() != null).forEach(need -> equip.addAll(putOn(need)));
+		List<StepIndex.Requires> ownWear = worn.stream().filter(need -> need.getPutOn() == null).collect(Collectors.toList());
+		if (!ownWear.isEmpty())
+		{
+			equip.add(SubStep.of(SubStep.Kind.ACT, "Equip the " + ownWear.stream().map(StepIndex.Requires::getName).collect(Collectors.joining(" and ")))
+				.actItems(ownWear.stream().flatMap(need -> need.getIds().stream()).collect(Collectors.toUnmodifiableSet()))
+				.done(SubStep.Done.WAY_IN_WORN).tab(StepGuide.Tab.INVENTORY).build());
+		}
 		List<SubStep> out = new ArrayList<>();
 		for (SubStep sub : steps)
 		{
 			if (sub.getKind() == SubStep.Kind.ENTER)
 			{
-				out.add(equip);
+				out.addAll(equip);
 			}
 			out.add(sub);
 		}
 		return List.copyOf(out);
 	}
 
+	/** The slots the NPC's gear goes in are emptied first; the NPC then puts it on, so the gear itself is never clicked. */
+	private static List<SubStep> putOn(StepIndex.Requires need)
+	{
+		StepIndex.PutOn by = need.getPutOn();
+		List<SubStep> acts = new ArrayList<>();
+		if (!by.getFree().isEmpty())
+		{
+			List<ItemRequirement> emptied = List.of(new SlotLimitationRequirement(by.getText(), by.getFree().toArray(EquipmentInventorySlot[]::new)));
+			acts.add(SubStep.of(SubStep.Kind.ACT, "Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied)
+				.done(SubStep.Done.WAY_IN_SLOTS_EMPTY).tab(StepGuide.Tab.EQUIPMENT).build());
+		}
+		acts.add(SubStep.of(SubStep.Kind.ACT, by.getText()).detail(by.getDetail()).npcIds(Set.copyOf(by.getNpcs())).option(by.getOption())
+			.done(SubStep.Done.WAY_IN_WORN).build());
+		return acts;
+	}
+
 	/**
 	 * On a route to the way in, its gear goes on at the way in: a sled can only be ridden at the top of Trollweiss
-	 * Mountain. Already on the way (diving to the Mogre Camp's rocks), there is nothing to walk back to.
+	 * Mountain. Already on the way (diving to the Mogre Camp's rocks), there is nothing to walk back to. Gear an NPC puts
+	 * on goes on where the NPC stands (Larry, at the Iceberg's landing).
 	 */
 	private static List<SubStep> withWalkToWayIn(List<SubStep> steps, StepIndex.Entry data)
 	{
 		List<SubStep> out = new ArrayList<>();
 		for (SubStep sub : steps)
 		{
-			if (sub.getDone() == SubStep.Done.WAY_IN_WORN && data != null && data.getEntry() != null)
+			if (sub.getDone() == SubStep.Done.WAY_IN_WORN && sub.getNpcIds().isEmpty() && data != null && data.getEntry() != null)
 			{
 				out.add(walkToWayIn(data.getEntry()));
 			}

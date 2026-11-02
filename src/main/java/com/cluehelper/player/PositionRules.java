@@ -1,5 +1,6 @@
 package com.cluehelper.player;
 
+import java.util.Arrays;
 import net.runelite.api.coords.WorldPoint;
 
 public final class PositionRules
@@ -27,6 +28,8 @@ public final class PositionRules
 	private static final int[][] NOT_WILDERNESS = {{3123, 3622, 2, 10}, {3125, 3617, 16, 23}, {3138, 3636, 18, 10},
 		{3141, 3625, 14, 11}, {3141, 3619, 7, 6}, {2997, 3525, 34, 9}, {3005, 3534, 21, 10}, {3000, 3534, 5, 5},
 		{3031, 3525, 2, 2}};
+	/** Inside the underground box but Morytania: the Slayer Tower basement (its map region). */
+	private static final int[] SLAYER_TOWER_BASEMENT = {3392, 9920, 64, 64};
 
 	private PositionRules()
 	{
@@ -96,7 +99,7 @@ public final class PositionRules
 		{
 			return (y - SURFACE_LEVEL_BASE_Y) / TILES_PER_LEVEL + 1;
 		}
-		if (y >= UNDERGROUND_MIN_Y && y <= UNDERGROUND_MAX_Y && x <= WILDERNESS_MAX_X_UNDERGROUND)
+		if (y >= UNDERGROUND_MIN_Y && y <= UNDERGROUND_MAX_Y && x <= WILDERNESS_MAX_X_UNDERGROUND && !isIn(SLAYER_TOWER_BASEMENT, x, y))
 		{
 			return (y - UNDERGROUND_LEVEL_BASE_Y) / TILES_PER_LEVEL + 1;
 		}
@@ -105,13 +108,12 @@ public final class PositionRules
 
 	private static boolean isSafeInsideSurfaceArea(int x, int y)
 	{
-		for (int[] box : NOT_WILDERNESS)
-		{
-			if (x >= box[0] && x < box[0] + box[2] && y >= box[1] && y < box[1] + box[3])
-			{
-				return true;
-			}
-		}
-		return false;
+		return Arrays.stream(NOT_WILDERNESS).anyMatch(box -> isIn(box, x, y));
+	}
+
+	/** {@code box} is x, y, width, height. */
+	private static boolean isIn(int[] box, int x, int y)
+	{
+		return x >= box[0] && x < box[0] + box[2] && y >= box[1] && y < box[1] + box[3];
 	}
 }

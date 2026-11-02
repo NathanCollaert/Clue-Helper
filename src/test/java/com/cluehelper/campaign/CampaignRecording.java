@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * One finished campaign step: what its first plan was planned from, cut down to what the planner reads, and the route
- * and guide lines Nathan signed off. The step itself is not in it: a replay resolves the core clue again with today's
+ * and guide lines the tester signed off. The step itself is not in it: a replay resolves the core clue again with today's
  * step data, so a step-data change is caught like a planner change.
  */
 final class CampaignRecording
@@ -16,7 +16,7 @@ final class CampaignRecording
 	String key;
 	/** Core's list and the clue's place in it ({@code CrypticClue#12}); the key finds it when the list moved. */
 	String coreClue;
-	/** A Sherlock task's state at capture; null for other clues and for recordings made before it was kept. */
+	/** A Sherlock task's state at capture; null for other clues and for older recordings. */
 	Boolean challengeCompleted;
 	String tier;
 	String type;

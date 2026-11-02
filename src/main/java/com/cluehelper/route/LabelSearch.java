@@ -512,8 +512,13 @@ final class LabelSearch
 		if (spent != null && (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(node)))
 		{
 			int total = half + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
-			offer(from, node, from.b, c, k, t, from.leg, total, total, kind, tele, second, spent, withdrawn);
+			offer(from, node, from.b, c, k, t, from.leg, total, total + PlanContext.TELEPORT_TIE_HALF_TICKS, kind, tele, second, spent, withdrawn);
 		}
+	}
+
+	private static boolean isTeleport(Leg.Kind kind)
+	{
+		return kind == Leg.Kind.TELEPORT || kind == Leg.Kind.SWAP_TELEPORT || kind == Leg.Kind.FAIRY_RING;
 	}
 
 	private void change(Label from, int node, int c, int k, TransportOptions.Change change)
@@ -686,6 +691,7 @@ final class LabelSearch
 		label.ref = ref;
 		label.ref2 = ref2;
 		label.edgeHalf = addHalf;
+		label.teleports = (from == null ? 0 : from.teleports) + (isTeleport(kind) ? 1 : 0);
 		slots[free] = label;
 		queue.add(label);
 		labels++;
@@ -857,6 +863,8 @@ final class LabelSearch
 		TransportOptions.Edge ref;
 		TransportOptions.Edge ref2;
 		int edgeHalf;
+		/** Teleports and fairy rings so far, each ranked {@link PlanContext#TELEPORT_TIE_HALF_TICKS} more. */
+		int teleports;
 		Book endBook;
 		boolean dead;
 

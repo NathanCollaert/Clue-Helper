@@ -58,6 +58,8 @@ public class GearPieces
 				return isGuthix(name(itemId)) ? 1 : 0;
 			case ZAMORAK_ITEMS:
 				return isZamorak(name(itemId)) ? 1 : 0;
+			case SARADOMIN_ITEMS:
+				return isSaradomin(name(itemId)) ? 1 : 0;
 			case ANY_EQUIPMENT:
 				return equipment.getSlot() != AMMO ? 1 : 0;
 			case NEGATIVE_PRAYER:
@@ -76,6 +78,12 @@ public class GearPieces
 	private static boolean isGuthix(String name)
 	{
 		return name.contains("guthix") || name.startsWith("void ") || name.startsWith("elite void") || name.equals("book of balance");
+	}
+
+	/** Assumed from item names: Saradomin's own gear and the Holy book. */
+	private static boolean isSaradomin(String name)
+	{
+		return name.contains("saradomin") || name.equals("holy book");
 	}
 
 	/** Assumed from item names: Zamorak's own gear (Zamorakian spear and hasta too) and the Unholy book. */

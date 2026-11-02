@@ -91,8 +91,12 @@ public class StepNeeds
 		boolean gettingLeft = isGettingLeft(step);
 		for (StepIndex.Requires way : taskDone(step) ? List.<StepIndex.Requires>of() : step.getData().requiresFor(finishedQuests))
 		{
-			// An item the route still goes to get (the battered key from its bookcase) isn't brought along
-			if (!(gettingLeft && way.getFrom() != null))
+			if (way.isWaivedByVarbits(client::getVarbitValue))
+			{
+				continue;
+			}
+			boolean fetchedOnTheWay = gettingLeft && way.getFrom() != null;
+			if (!fetchedOnTheWay)
 			{
 				// Worn gear keeps the player alive or gets them in (a mirror shield, a sled): no route without it
 				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, way.isWear()));

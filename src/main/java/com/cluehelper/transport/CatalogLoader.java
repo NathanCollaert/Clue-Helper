@@ -8,8 +8,7 @@ import java.util.regex.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**
- * A requirement that doesn't parse stays on its row as an error; a malformed tile or number fails the whole load,
- * which the schema test catches before release.
+ * A requirement that doesn't parse stays on its row as an error; a malformed tile or number fails the whole load.
  */
 public final class CatalogLoader
 {

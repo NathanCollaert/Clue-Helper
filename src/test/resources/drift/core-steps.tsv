@@ -842,7 +842,7 @@ skill:SHERLOCK:equip a dragon scimitar.	*	skill	elite	SEQUENCE	2733,3415,0	Sherl
 skill:SHERLOCK:equip an abyssal whip in front of the abyssal demons of the slayer tower.	*	skill	master	SEQUENCE	3418,3567,2|3411,3570,2|3418,9941,3|2733,3415,0	Sherlock				1 item requirement	1843	equip an abyssal whip in front of the abyssal demons of the slayer tower.
 skill:SHERLOCK:fix a magical lamp in dorgesh-kaan.	*	skill	elite	SEQUENCE	2723,5314,0|2735,5278,0|2733,3415,0	Sherlock	10834|10835		Broken lamp	1 item requirement	1836	fix a magical lamp in dorgesh-kaan.
 skill:SHERLOCK:fletch a rune dart.	*	skill	master	SEQUENCE	2733,3415,0	Sherlock				2 item requirements	1859	fletch a rune dart.
-skill:SHERLOCK:kill a fiyr shade inside mort'tons shade catacombs.	*	skill	master	SEQUENCE	3485,3321,0|3463,9709,0|3463,9697,0|2733,3415,0	Sherlock				1 item requirement	1867	kill a fiyr shade inside mort'tons shade catacombs.
+skill:SHERLOCK:kill a fiyr shade inside mort'tons shade catacombs.	*	skill	master	SEQUENCE	3463,9709,0|3463,9697,0|2733,3415,0	Sherlock				1 item requirement	1867	kill a fiyr shade inside mort'tons shade catacombs.
 skill:SHERLOCK:kill a lizardman shaman.	*	skill	master	SEQUENCE	1424,3718,0|1434,3711,0|1424,3700,0|2733,3415,0	Sherlock				none	1862	kill a lizardman shaman.
 skill:SHERLOCK:kill a reanimated abyssal.	*	skill	master	SEQUENCE	1700,3882,0|1666,3880,0|1745,3890,0|2733,3415,0	Sherlock				4 item requirements	1866	kill a reanimated abyssal.
 skill:SHERLOCK:kill the spiritual, magic and godly whilst representing their own god.	*	skill	master	SEQUENCE	2882,5311,2|2898,5307,2|2733,3415,0	Sherlock				none	1848	kill the spiritual, magic and godly whilst representing their own god.

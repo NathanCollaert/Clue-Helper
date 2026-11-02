@@ -22,8 +22,6 @@ final class RowTargets
 	private static final String TRAVEL_OPTION = "Travel";
 	private static final String TREE_OPTION = "Tree";
 	private static final String SPELLBOOK_OPTION = "Spellbook";
-	/** Between a menu cell's option and the list line it opens. */
-	static final String MENU_STEP = " > ";
 	private static final int PARAM_SPELL_WIDGET = 596;
 	/** Catalog landings spread 0–2 tiles, so another menu's line within this lands at the same place. */
 	private static final int SAME_LANDING_TILES = 3;
@@ -76,9 +74,9 @@ final class RowTargets
 				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objects)
 					.path(List.of(row.destination())).build();
 			case "npc":
-				return MenuTarget.builder().npcIds(Set.of(row.getObjectId())).path(List.of(parts[1].split(MENU_STEP))).build();
+				return MenuTarget.builder().npcIds(Set.of(row.getObjectId())).path(List.of(parts[1].split(CatalogRow.MENU_STEP))).build();
 			default:
-				return target.path(List.of(parts[1].split(MENU_STEP))).build();
+				return target.path(List.of(parts[1].split(CatalogRow.MENU_STEP))).build();
 		}
 	}
 
@@ -88,7 +86,10 @@ final class RowTargets
 		return located(teleport.getRow()).toBuilder().alternatives(sameLanding(teleport)).build();
 	}
 
-	/** The held items with the teleport's option, or Signal for a quetzal; house furniture landing there as alternatives. */
+	/**
+	 * The held items with the teleport's option, or Signal for a quetzal; a boat teleport's list row; house furniture
+	 * landing there as alternatives.
+	 */
 	MenuTarget heldTeleport(SubStep teleport, Set<Integer> held)
 	{
 		CatalogRow row = teleport.getRow();
@@ -96,6 +97,10 @@ final class RowTargets
 		MenuTarget.MenuTargetBuilder target = row.isQuetzalMap()
 			? MenuTarget.quetzal(row.quetzalTableId()).toBuilder().path(List.of(SIGNAL_OPTION))
 			: MenuTarget.builder().path(path.isEmpty() ? wornOption(held) : path);
+		if (row.boatDock() != null)
+		{
+			target.line(MenuTarget.Line.BOAT).lineName(row.boatDock());
+		}
 		return withItems(target, held).alternatives(sameLanding(teleport)).build();
 	}
 

@@ -15,6 +15,10 @@ import net.runelite.api.coords.WorldPoint;
 public class CatalogRow
 {
 	private static final String QUETZAL_MENU = "quetzal ";
+	private static final String BOAT_MENU = "boat ";
+	private static final Pattern OPENS_MENU = Pattern.compile("^(nexus|box|list|quetzal|boat) ");
+	/** Between a menu cell's option and the list line it opens. */
+	public static final String MENU_STEP = " > ";
 	private static final String MINIGAME_SUFFIX = " Minigame Teleport";
 	private static final Pattern BRACKETED_NOTE = Pattern.compile(" \\([^)]*\\)$");
 	/** A jewellery box's or mounted item's "7. " before its place. */
@@ -40,7 +44,8 @@ public class CatalogRow
 	 * How to find the row's line in the menu it opens: {@code nexus 466 Wilderness} (struct id, map region),
 	 * {@code box 10} (script 1688's index), {@code list Xeric's Inferno} (a 187 line), {@code op Karamja} (the
 	 * object's own option; {@code op Set Destination > 1: Level 13 Wilderness} picks a 187 line after it),
-	 * {@code npc Charter} (the option of the NPC whose id is in objectId); null otherwise.
+	 * {@code npc Charter} (the option of the NPC whose id is in objectId), {@code boat Brittle Isle} (the dock the
+	 * Teleport to Boat list names as the boat's location); null otherwise.
 	 */
 	String menu;
 	/** -1 when none. */
@@ -68,6 +73,18 @@ public class CatalogRow
 	public int quetzalTableId()
 	{
 		return isQuetzalMap() ? Integer.parseInt(menu.substring(QUETZAL_MENU.length())) : -1;
+	}
+
+	/** Its first click opens a list or map the place is picked from (the portal nexus), so that click teleports nowhere yet. */
+	public boolean opensMenu()
+	{
+		return menu != null && (OPENS_MENU.matcher(menu).find() || menu.contains(MENU_STEP));
+	}
+
+	/** The dock a boat teleport's list names as the boat's location, or null when the row isn't a boat teleport. */
+	public String boatDock()
+	{
+		return menu != null && menu.startsWith(BOAT_MENU) ? menu.substring(BOAT_MENU.length()) : null;
 	}
 
 	public String minigameName()

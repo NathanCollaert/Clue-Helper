@@ -40,7 +40,7 @@ public final class Widgets
 	}
 
 	/** Not hidden, and with a width on screen. */
-	static boolean visible(Widget widget)
+	public static boolean visible(Widget widget)
 	{
 		return widget != null && !widget.isHidden() && widget.getBounds() != null && widget.getBounds().width > 0;
 	}

@@ -30,7 +30,7 @@ import net.runelite.client.callback.ClientThread;
 
 /**
  * The step campaign: every clue step, one mocked clue at a time. Finish saves the step's first plan as a golden
- * recording once it replays offline to what was shown; Bug saves a report for Claude; Previous and Next move without a
+ * recording once it replays offline to what was shown; Bug saves a bug report beside the step; Previous and Next move without a
  * verdict. Steps waiting for a retest come first, then untested ones in order; reported bugs wait for their fix. No clue is
  * mocked until Next is pressed: the first Next of a session opens the saved step. Stop clears the clue and leaves the
  * step as it was, so the next Next opens it again.
@@ -191,6 +191,11 @@ public final class Campaign
 				return;
 			}
 			String key = progress.current;
+			if (key == null)
+			{
+				say("No step to report: every step is finished or waiting for a fix");
+				return;
+			}
 			CampaignRecorder.Capture reported = capture != null && capture.getRecording().key.equals(key) ? capture : null;
 			List<String> guide = guideNow.get();
 			Path folder = CampaignFiles.BUGS.resolve(CampaignFiles.slug(key));
@@ -216,7 +221,7 @@ public final class Campaign
 				return;
 			}
 			started = true;
-			if (progress.current == null)
+			if (progress.current == null || isDone(progress.current))
 			{
 				advance();
 				return;
@@ -261,6 +266,13 @@ public final class Campaign
 		});
 	}
 
+	/** Finished, or reported and waiting for a fix. */
+	private boolean isDone(String key)
+	{
+		CampaignProgress.Status status = progress.status(key);
+		return status == CampaignProgress.Status.FINISHED || status == CampaignProgress.Status.BUG;
+	}
+
 	private boolean startedOrSay()
 	{
 		if (!started)
@@ -275,6 +287,12 @@ public final class Campaign
 		String next = next(progress.current);
 		if (next == null)
 		{
+			// The last step left is done: nothing stays current, or the next session would play it again
+			if (progress.current != null && isDone(progress.current))
+			{
+				progress.history.add(progress.current);
+				progress.current = null;
+			}
 			say("Every step is finished or waiting for a fix");
 			saveProgress();
 			showState();

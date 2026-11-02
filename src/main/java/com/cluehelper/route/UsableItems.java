@@ -33,7 +33,7 @@ public final class UsableItems
 		{
 			for (int id : input.getBanked().storedIds())
 			{
-				if (meetsANeed(required, id) || travel.getStages().stream().anyMatch(stage -> meets(stage, id)))
+				if (meetsANeed(required, id) || travel.getStages().stream().anyMatch(stage -> meets(stage, id) || usedAtAPlace(stage, id)))
 				{
 					usable.add(id);
 				}
@@ -71,6 +71,13 @@ public final class UsableItems
 	{
 		ItemRequirement item = stage.getItem();
 		return item != null && item.fulfilledBy(itemId);
+	}
+
+	/** An item a place takes instead of the step's (pure essence at the True Blood Altar). */
+	private static boolean usedAtAPlace(Stage stage, int itemId)
+	{
+		return stage.getUses().values().stream().flatMap(List::stream).flatMap(use -> use.getAll().stream())
+			.anyMatch(group -> group.contains(itemId));
 	}
 
 	private static void addItems(Requirements requirements, Set<Integer> ids)

@@ -24,20 +24,20 @@ pending revert, window unknown: plans from Lunar
   alt       43t: Construction cape: Tele to POH → Portal nexus: Varrock → walk 28
 pending revert on Standard, Ancient target: the cape from a pending revert
   best      44t: Teleport to House → Portal nexus: Senntisten → walk 30 {item:556=1, item:557=1, item:563=1}
-  alt       44t: Varrock Teleport → Spellbook Swap · Senntisten Teleport → walk 30 {item:556=3, item:554=1, item:563=4, item:566=1, item:9075=3, item:564=2}
-  alt       44t: Lumbridge Teleport → Spellbook Swap · Senntisten Teleport → walk 30 {item:556=3, item:557=1, item:563=4, item:566=1, item:9075=3, item:564=2}
+  alt       37t (rank 45): Max cape: Spellbook → ANCIENT → Senntisten Teleport → walk 30 {cape=1, item:563=2, item:566=1} leaves you on ANCIENT
+  alt       48t: Civitas illa Fortis Teleport → walk 44 {item:557=1, item:554=1, item:563=2}
 99 Magic, no cape uses left today, Ancient target
   best      44t: Teleport to House → Portal nexus: Senntisten → walk 30 {item:556=1, item:557=1, item:563=1}
   alt       48t: Civitas illa Fortis Teleport → walk 44 {item:557=1, item:554=1, item:563=2}
-  alt       56t: Ring of dueling: Fortis Colosseum → walk 9 → Quetzal: Civitas illa Fortis → walk 35 {charge:2552=1}
+  alt       56t: Master scroll book: Digsite teleport → walk 51 {charge:21389=1}
 Lunar, swap runes only in the bank (bank on)
   best      40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
   alt       34t (rank 42): Max cape: Spellbook → STANDARD → Varrock Teleport → walk 28 {cape=1, item:556=3, item:554=1, item:563=1} leaves you on STANDARD
   alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
   best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
-  alt       56t: Ring of dueling: Fortis Colosseum → walk 9 → Quetzal: Civitas illa Fortis → walk 35 {charge:2552=1}
   alt       56t: Master scroll book: Digsite teleport → walk 51 {charge:21389=1}
+  alt       56t: Ring of dueling: Fortis Colosseum → walk 9 → Quetzal: Civitas illa Fortis → walk 35 {charge:2552=1}
 Wilderness start at level 26 (3100,3720), to Varrock
   best      37t: Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
   alt       37t: Slayer ring: Slayer Tower → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
@@ -79,8 +79,8 @@ Fountain of Rune case: elite coordinate 12101, no cape uses left, Wilderness swo
 bank tipping point: mid-ironman, coordinate:3556
   best      64t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
   direct    76t: Games necklace: Corporeal Beast → walk 71 {charge:3853=1}
-  alt       89t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 68 {charge:1712=1, charge:21166=1} withdraw [21166]
   alt       92t: Ring of dueling: Ferox Enclave → walk 87 {charge:2552=1}
+  alt       89t: Amulet of glory: Edgeville → walk 5 → bank → Burning amulet: Bandit Camp → walk 68 {charge:1712=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 bank tipping point with the PIN still to come: mid-ironman, coordinate:3556
   best      68t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
@@ -106,7 +106,7 @@ bank tipping point: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
 bank tipping point with the PIN still to come: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      42t: Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
   alt       44t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 20 {charge:2552=1, charge:11972=1} withdraw [11972]
-  alt       63t: Amulet of glory: Edgeville → walk 5 → bank → Varrock tablet → walk 38 {charge:1712=1, item:8007=1} withdraw [8007]
+  alt       66t: Skills necklace: Cooking Guild → walk 61 {charge:11968=1}
 required spade: glory(1) carried, a spade in the bank, to Draynor (dig)
   best      37t: Amulet of glory: Draynor Village → walk 9 → bank → walk 17 {charge:1706=1} withdraw [952]
 required spade: carried, to Draynor (dig)
@@ -133,7 +133,7 @@ scroll book kept out of the Wilderness: banked, to the Lava Maze
   best      92t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw [21389] deposit first
   direct    102t: Teleport to House → House obelisk: Level 35 Wilderness → walk 87 {item:556=1, item:557=1, item:563=1}
   alt       103t: Teleport to House → House obelisk: Level 44 Wilderness → walk 88 {item:556=1, item:557=1, item:563=1}
-  alt       104t: Teleport to House → Portal nexus: Ghorrock → walk 90 {item:556=1, item:557=1, item:563=1}
+  alt       105t: Max cape: Other Teleports: Black chinchompa → walk 100 {daily:4819=1}
   note      Wilderness target
 at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required
   best      34t: (at the open bank) Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1} withdraw [952]
@@ -160,8 +160,8 @@ house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
   best      77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62
-  alt       90t: Construction cape: Tele to POH → Portal nexus: Ghorrock → walk 4 → Obelisk: Level 50 Wilderness → walk 58
   alt       91t: Games necklace: Corporeal Beast → walk 15 → Obelisk: Level 50 Wilderness → walk 58 {charge:3853=1}
+  alt       90t: Construction cape: Tele to POH → Portal nexus: Ghorrock → walk 4 → Obelisk: Level 50 Wilderness → walk 58
   note      Wilderness target
 house: standing in the own house, Burthorpe castle steps
   best      18t: Games necklace: Burthorpe → walk 13 {charge:3853=1}
@@ -268,9 +268,10 @@ sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium
   best      9t: Max cape: Other Teleports: The Pandemonium → walk 4
   alt       14t: Sailors' amulet: The Pandemonium → walk 9 {charge:32399=1}
 gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave
-  best      97t: Teleport to House → Portal nexus: Fenken' Castle → walk 83 {item:556=1, item:557=1, item:563=1}
-  alt       89t (rank 97): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  best      89t (rank 97): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  same book 97t: Teleport to House → Portal nexus: Fenken' Castle → walk 83 {item:556=1, item:557=1, item:563=1}
   alt       103t: Teleport to House → Fairy ring ALQ: Morytania: Haunted Woods → walk 85 {item:556=1, item:557=1, item:563=1}
+  alt       123t: Ectophial → walk 116
 quest gate: maxed without Song of the Elves, to Prifddinas: no route, the quest named
   best      none
   note      Quests not finished:

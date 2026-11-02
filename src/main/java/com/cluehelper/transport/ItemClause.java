@@ -21,6 +21,8 @@ public class ItemClause
 		String unlock;
 		/** The quest after {@code QUEST_} whose finishing does without the items (Ghosts Ahoy, Port Phasmatys' toll). */
 		Quest quest;
+		/** The varbit after {@code VARBIT_} whose value does without the items (the Viyeldi caves' long rope, tied). */
+		VarCheck var;
 
 		public boolean isUnlock()
 		{
@@ -30,6 +32,11 @@ public class ItemClause
 		public boolean isQuest()
 		{
 			return quest != null;
+		}
+
+		public boolean isVar()
+		{
+			return var != null;
 		}
 	}
 

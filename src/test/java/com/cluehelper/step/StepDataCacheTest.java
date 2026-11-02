@@ -21,8 +21,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Hand-written click targets and walk row objects against the cache's names and options. Copied ids went wrong
- * silently three times (an ivy that was a corpse, a ladder top that was its bottom). Needs the local cache dump, which
+ * Hand-written click targets and walk row objects against the cache's names and options. A copied id can be
+ * silently wrong (an ivy that is a corpse, a ladder top that is its bottom). Needs the local cache dump, which
  * isn't committed: without it the test is skipped.
  */
 public class StepDataCacheTest

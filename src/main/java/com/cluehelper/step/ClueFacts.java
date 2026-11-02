@@ -4,8 +4,8 @@ import java.util.Locale;
 import lombok.Getter;
 
 /**
- * Field names match the "fields" object of the replay fixtures and of {@code ::ch-step}'s fixture
- * lines, so recorded clues replay through the same key rule.
+ * Field names match the "fields" object of the replay fixtures and of the dev harness's step-dump
+ * log lines, so recorded clues replay through the same key rule.
  */
 @Getter
 public final class ClueFacts

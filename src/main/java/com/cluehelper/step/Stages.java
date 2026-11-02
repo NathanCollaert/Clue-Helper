@@ -104,6 +104,24 @@ public final class Stages
 		return left.size() == step.getStages().size() ? step : withStagesLeft(step, left);
 	}
 
+	/** Before any travel, the act that learns which of the step's targets its NPC is at. */
+	public static Step learnFirst(Step step, String act, String detail)
+	{
+		Stage learn = Stage.builder().kind(Stage.Kind.LEARN).act(act).detail(detail).tiles(List.of()).build();
+		return withStagesLeft(step, List.of(learn, Stage.builder().kind(Stage.Kind.FINAL).tiles(step.getTargets()).build()));
+	}
+
+	/** Only the targets the NPC stands at; all of them when the data has none for it. */
+	public static Step atNpc(Step step, int npcId)
+	{
+		List<WorldPoint> spots = step.getData().getTargets().stream()
+			.filter(target -> target.getTile() != null && target.getNpcs().contains(npcId))
+			.map(StepIndex.Target::getTile).collect(Collectors.toUnmodifiableList());
+		List<WorldPoint> kept = step.getTargets().stream().filter(tile -> spots.stream().anyMatch(spot -> spot.distanceTo(tile) <= 1))
+			.collect(Collectors.toUnmodifiableList());
+		return kept.isEmpty() ? step : step.toBuilder().targets(kept).build();
+	}
+
 	/** The step with only these stages left; once only its own final stage is, the step keeps its own places alone. */
 	static Step withStagesLeft(Step step, List<Stage> left)
 	{
@@ -173,7 +191,7 @@ public final class Stages
 			List<WorldPoint> places = entry == null ? List.of() : placeTiles(entry.getPlaces());
 			String where = entry == null || !entry.hasPlaces() ? null
 				: entry.getPlaces().isEmpty() ? ANYWHERE : entry.getPlaces().get(0).getText();
-			stages.add(Stage.builder().kind(Stage.Kind.TASK).act(sentence(task)).detail(where).tiles(places)
+			stages.add(Stage.builder().kind(Stage.Kind.TASK).act(entry == null || entry.getAct() == null ? sentence(task) : entry.getAct()).detail(where).tiles(places)
 				.ourMarker(true).objectIds(entry == null ? Set.of() : objectsOf(entry.getPlaces()))
 				.npcIds(entry == null ? Set.of() : npcsOf(entry.getPlaces())).takesStepItems(true)
 				.worn(entry == null ? List.of() : entry.getWear()).emptied(emptied).before(entry == null ? List.of() : entry.getBefore())
@@ -183,6 +201,7 @@ public final class Stages
 				.dialogue(entry == null ? List.of() : entry.getPlaces().stream().map(StepIndex.Place::getDialogue)
 					.filter(dialogue -> !dialogue.isEmpty()).findFirst().orElse(List.of()))
 				.grownOnly(entry == null ? Map.of() : grownOnly(entry.getPlaces()))
+				.placeTexts(entry == null || !entry.hasPlaces() ? Map.of() : placeTexts(entry.getPlaces()))
 				.houseObjects(entry == null ? Set.of() : entry.getPlaces().stream().filter(place -> PositionRules.POH_NODE.equals(place.getTile()))
 					.flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet()))
 				.uses(entry == null ? Map.of() : usesByTile(entry.getPlaces()))
@@ -223,6 +242,12 @@ public final class Stages
 		}
 		String trimmed = task.trim().replaceAll("[.!]+$", "");
 		return Character.toUpperCase(trimmed.charAt(0)) + trimmed.substring(1);
+	}
+
+	private static Map<WorldPoint, String> placeTexts(List<StepIndex.Place> places)
+	{
+		return places.stream().filter(place -> place.getText() != null)
+			.collect(Collectors.toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getText, (first, same) -> first));
 	}
 
 	private static Map<WorldPoint, String> grownOnly(List<StepIndex.Place> places)

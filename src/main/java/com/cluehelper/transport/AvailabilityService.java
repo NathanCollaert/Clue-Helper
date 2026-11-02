@@ -24,6 +24,8 @@ public class AvailabilityService
 	@Inject
 	private ClueHelperConfig config;
 	private final Set<Integer> catalogItems = new HashSet<>();
+	/** Items that walk gates ask for (a long rope), named with the catalog's for no-route notes. */
+	private final Set<Integer> gateItems = ConcurrentHashMap.newKeySet();
 	private final Map<Integer, String> itemNames = new ConcurrentHashMap<>();
 	private final List<Consumer<AvailabilitySet>> listeners = new CopyOnWriteArrayList<>();
 
@@ -69,6 +71,13 @@ public class AvailabilityService
 		stale = true;
 	}
 
+	/** Any thread. */
+	public void nameItemsOf(List<Requirements> gates)
+	{
+		gates.forEach(gate -> gate.getItems().forEach(clause -> clause.getBranches().forEach(branch -> gateItems.addAll(branch.getIds()))));
+		stale = true;
+	}
+
 	public List<CatalogRow> getCatalog()
 	{
 		return catalog;
@@ -99,7 +108,6 @@ public class AvailabilityService
 		}
 	}
 
-	/** Null when no bank counts. */
 	/** The bank is part of planning while the setting is on and the account has one. */
 	public boolean bankCounts(PlayerSnapshot snapshot)
 	{
@@ -158,7 +166,7 @@ public class AvailabilityService
 		return System.currentTimeMillis() / MILLIS_PER_MINUTE;
 	}
 
-	/** Any thread: the catalog's items are named on the client thread when it loads. */
+	/** Any thread: the catalog's items are named on the client thread on the first tick after it loads. */
 	public String itemName(int id)
 	{
 		return itemNames.getOrDefault(id, "item " + id);
@@ -166,6 +174,7 @@ public class AvailabilityService
 
 	private void nameCatalogItems()
 	{
+		gateItems.forEach(id -> itemNames.computeIfAbsent(id, i -> client.getItemDefinition(i).getName()));
 		for (CatalogRow row : catalog)
 		{
 			for (ItemClause clause : row.getRequirements().getItems())

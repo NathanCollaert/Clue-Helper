@@ -15,6 +15,7 @@ import net.runelite.client.plugins.cluescrolls.clues.item.*;
 final class GearActs
 {
 	private static final String EQUIP_TEXT = "Equip:";
+	private static final String TAKE_OFF_TEXT = "Take off:";
 
 	@Inject
 	private Client client;
@@ -22,6 +23,8 @@ final class GearActs
 	private PlayerModel player;
 	@Inject
 	private StepNeeds stepNeeds;
+	@Inject
+	private LeftClicks leftClicks;
 
 	/** A gear act as the pieces to put on or take off now; any other sub-step, or one there is no step for, as it is. */
 	SubStep refresh(SubStep act, Step step)
@@ -29,10 +32,11 @@ final class GearActs
 		switch (act.getDone())
 		{
 			case WAY_IN_WORN:
-				return step == null ? act : equipWhatIsCarried(act, step);
+				return step == null || !act.getNpcIds().isEmpty() ? act : equipWhatIsCarried(act, step);
 			case GEAR_WORN:
 				return step == null ? act : equipGear(act, step);
 			case SLOTS_EMPTY:
+			case WAY_IN_SLOTS_EMPTY:
 				return removeGear(act);
 			default:
 				return act;
@@ -40,8 +44,8 @@ final class GearActs
 	}
 
 	/**
-	 * For an act done by {@link SubStep.Done#EQUIPPED}, {@code WAY_IN_WORN}, {@code GEAR_WORN}, {@code SLOTS_EMPTY} or
-	 * {@code ITEM_WORN}.
+	 * For an act done by {@link SubStep.Done#EQUIPPED}, {@code WAY_IN_WORN}, {@code WAY_IN_SLOTS_EMPTY}, {@code GEAR_WORN},
+	 * {@code SLOTS_EMPTY} or {@code ITEM_WORN}.
 	 */
 	boolean isDone(SubStep act, Step step)
 	{
@@ -53,6 +57,8 @@ final class GearActs
 				return wearsWayInGear(step);
 			case GEAR_WORN:
 				return step != null && wearsGear(act, step);
+			case WAY_IN_SLOTS_EMPTY:
+				return wearsWayInGear(step) || act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
 			case SLOTS_EMPTY:
 				return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
 			case ITEM_WORN:
@@ -78,11 +84,20 @@ final class GearActs
 		return equipping(act, chosen);
 	}
 
-	/** The gear a part's act wants, from what is carried: the fewest pieces to put on, listed by name. */
+	/**
+	 * The gear a part's act wants, from what is carried: the fewest pieces to put on, listed by name. Worn pieces that
+	 * count against a bonus come off first; what to put on is picked again once they are off.
+	 */
 	private SubStep equipGear(SubStep act, Step step)
 	{
 		Set<Integer> worn = player.wornIds();
 		Set<Integer> inventory = player.inventoryIds();
+		List<Integer> off = wornNeeds(act, step).stream().flatMap(need -> toRemove(need.getRequirement(), worn, inventory).stream())
+			.distinct().collect(Collectors.toList());
+		if (!off.isEmpty())
+		{
+			return act.toBuilder().text(TAKE_OFF_TEXT).items(names(off)).actItems(Set.copyOf(off)).tab(StepGuide.Tab.EQUIPMENT).build();
+		}
 		List<Integer> chosen = wornNeeds(act, step).stream().flatMap(need -> toEquip(need.getRequirement(), worn, inventory).stream())
 			.distinct().collect(Collectors.toList());
 		return chosen.isEmpty() ? act : equipping(act, chosen);
@@ -103,15 +118,34 @@ final class GearActs
 
 	private SubStep equipping(SubStep act, List<Integer> itemIds)
 	{
-		List<String> names = itemIds.stream().map(id -> client.getItemDefinition(id).getName()).collect(Collectors.toList());
-		return act.toBuilder().text(EQUIP_TEXT).items(names).actItems(Set.copyOf(itemIds)).build();
+		return act.toBuilder().text(EQUIP_TEXT).items(names(itemIds)).actItems(Set.copyOf(itemIds)).build();
 	}
 
+	private List<String> names(List<Integer> itemIds)
+	{
+		return itemIds.stream().map(id -> client.getItemDefinition(id).getName()).collect(Collectors.toList());
+	}
+
+	/** Core lists items that can't be worn among an emote's (the axe hut's lockpick): carrying those is enough. */
 	private boolean wearsStepItems(Step step)
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
-		return step != null && step.getRequirements() != null && snapshot != null
-			&& step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(snapshot.getWorn()));
+		if (step == null || step.getRequirements() == null || snapshot == null)
+		{
+			return false;
+		}
+		Map<Integer, Integer> wornOrUnwearable = new HashMap<>(snapshot.getWorn());
+		snapshot.getInventory().forEach((id, count) ->
+		{
+			if (!leftClicks.wears(id))
+			{
+				wornOrUnwearable.merge(id, count, Integer::sum);
+			}
+		});
+		Item[] items = PlayerSnapshot.items(wornOrUnwearable);
+		Item[] bySlot = wornBySlot();
+		return step.getRequirements().getItems().stream().allMatch(requirement -> EmptySlots.metByEmptySlots(requirement)
+			? requirement.fulfilledBy(bySlot) : requirement.fulfilledBy(items));
 	}
 
 	private boolean wearsWayInGear(Step step)
@@ -135,6 +169,13 @@ final class GearActs
 	{
 		return stepNeeds.of(step).getNeeds().stream().filter(need -> act.getWornNeeds().contains(need.getName()))
 			.collect(Collectors.toList());
+	}
+
+	private static List<Integer> toRemove(ItemRequirement requirement, Set<Integer> worn, Set<Integer> inventory)
+	{
+		return requirement instanceof GearRequirement
+			? ((GearRequirement) requirement).choose(worn, inventory, Set.of()).map(GearPicker.Choice::getRemove).orElse(List.of())
+			: List.of();
 	}
 
 	private static List<Integer> toEquip(ItemRequirement requirement, Set<Integer> worn, Set<Integer> inventory)

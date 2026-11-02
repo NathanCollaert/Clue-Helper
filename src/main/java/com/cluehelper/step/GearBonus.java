@@ -8,6 +8,7 @@ public enum GearBonus
 	RANGED_ATTACK,
 	GUTHIX_ITEMS,
 	ZAMORAK_ITEMS,
+	SARADOMIN_ITEMS,
 	/** Any armour or weapon, one piece each. */
 	ANY_EQUIPMENT,
 	/** Minus the prayer bonus: a total above zero is a negative prayer bonus (Abbot Langley's anger). */

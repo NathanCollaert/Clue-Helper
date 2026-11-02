@@ -5,17 +5,19 @@ import com.google.gson.annotations.SerializedName;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
+import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Quest;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 
 /**
  * Gson fills this from the generated step files (Clue-Helper-Tools/tools/steps/generate.py), one per clue type: field
- * names are their JSON keys. Fields the plugin doesn't use yet (outfits, requirement groups) stay in the files only.
+ * names are their JSON keys. Fields the plugin doesn't use (outfits, requirement groups) stay in the files only.
  * Keys iterate in sorted order, which the golden routes' sample depends on.
  */
 @Slf4j
@@ -98,6 +100,12 @@ public final class StepIndex
 		public static final Entry NONE = new Entry();
 
 		private String tier;
+		/** The task as the box says it, when the clue's own wording is too long; null to use the clue's. */
+		private String act;
+		/** The option the step's NPC is clicked with when it isn't Talk-to (the Monk of Entrana's Take-boat); null for a talk. */
+		private String npcOption;
+		/** Where the game put the step's NPC for this player, to be learned (Viggora); null for an NPC always at its targets. */
+		private LearnPlace learnPlace;
 		private List<CacheRow> rows = List.of();
 		/** Each tile as x, y, plane. */
 		private List<int[]> tiles = List.of();
@@ -199,7 +207,6 @@ public final class StepIndex
 			return getRequires().stream().filter(need -> !need.isWaivedBy(finished)).collect(Collectors.toList());
 		}
 
-		/** The gear to wear the player still has to meet. */
 		/** The requirements to wear going in, but those the player meets by what they carry (a talisman). */
 		public List<Requires> wornRequiresFor(Predicate<Quest> finished, Set<Integer> carriedIds)
 		{
@@ -258,10 +265,20 @@ public final class StepIndex
 		private String text;
 		/** An object's name when talking is all it does (the spirit tree); null otherwise. */
 		private String talkTo;
+		@Getter(AccessLevel.NONE)
+		private Integer loc;
+		@Getter(AccessLevel.NONE)
+		private Integer fallbackLoc;
 
 		public WorldPoint getTile()
 		{
 			return point(tile);
+		}
+
+		/** A loc target's object ids: its own and the cache's fallback form. */
+		public Set<Integer> locs()
+		{
+			return Stream.of(loc, fallbackLoc).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
 		}
 
 		public int getKey()
@@ -465,10 +482,42 @@ public final class StepIndex
 		}
 	}
 
+	/** A quest journal that names, in its words, which of the step's targets the NPC stands at. */
+	@Getter
+	public static final class LearnPlace
+	{
+		/** A {@link net.runelite.api.Quest} name. */
+		private String quest;
+		private String journal;
+		private List<LearnSpot> spots = List.of();
+	}
+
+	@Getter
+	public static final class LearnSpot
+	{
+		/** The NPC id of the target it stands at. */
+		private int npc;
+		private List<String> words = List.of();
+	}
+
+	/** An NPC's option that puts a worn requirement on, where the item has no Wear of its own (Larry's Tuxedo-time). */
+	@Getter
+	public static final class PutOn
+	{
+		private List<Integer> npcs = List.of();
+		private String option;
+		private String text;
+		private String detail;
+		/** The slots the gear goes in, emptied before the NPC is asked (the suit's cape slot, and gloves). */
+		private List<EquipmentInventorySlot> free = List.of();
+	}
+
 	/** Items the way in needs; any one of {@link #getIds()} does. */
 	@Getter
 	public static final class Requires
 	{
+		/** Null when the item goes on by its own Wear. */
+		private PutOn putOn;
 		private List<Integer> ids = List.of();
 		private String name;
 		/** Worn to go in (a diving helmet), not just carried (a spade). */
@@ -481,10 +530,18 @@ public final class StepIndex
 		/** A quest whose finishing makes it unneeded (Monkey Madness II, for the Elder Guard's greegree); null for none. */
 		@Getter(AccessLevel.NONE)
 		private String unlessQuest;
+		/** {@code [varbit, value]} pairs that, all met, make it unneeded (God Wars' ropes, tied for good); empty for none. */
+		@Getter(AccessLevel.NONE)
+		private List<int[]> unlessVarbits = List.of();
 
 		public boolean isWaivedBy(Predicate<Quest> finished)
 		{
 			return unlessQuest != null && finished.test(Quest.valueOf(unlessQuest));
+		}
+
+		public boolean isWaivedByVarbits(IntUnaryOperator varbit)
+		{
+			return !unlessVarbits.isEmpty() && unlessVarbits.stream().allMatch(pair -> varbit.applyAsInt(pair[0]) == pair[1]);
 		}
 
 		private boolean isCarriedInstead(Set<Integer> carriedIds)

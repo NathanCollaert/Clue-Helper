@@ -68,7 +68,6 @@ final class DevPanel extends PluginPanel
 		void stop();
 	}
 
-	/** A dev action: its label and what it runs. */
 	static final class Action
 	{
 		final String label;

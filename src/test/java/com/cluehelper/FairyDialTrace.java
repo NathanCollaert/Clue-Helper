@@ -36,7 +36,7 @@ final class FairyDialTrace extends Overlay
 	static final String TAG = "[CH-DIAL]";
 	private static final int GROUP = InterfaceID.Fairyrings.CONFIRM >>> 16;
 	private static final int[] DIAL_VARBITS = {VarbitID.FAIRYRING_1, VarbitID.FAIRYRING_2, VarbitID.FAIRYRING_3};
-	/** Copies of MenuLineOverlay's colours: ui.Markers is package-private. */
+	/** Copies of ui.Highlighter's colours, which are package-private. */
 	private static final Color COLOUR = new Color(64, 208, 255);
 	private static final Color FILL = new Color(64, 208, 255, 40);
 

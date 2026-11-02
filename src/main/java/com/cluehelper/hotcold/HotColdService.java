@@ -151,7 +151,7 @@ public class HotColdService
 		planPending = true;
 	}
 
-	/** 3544 is set earlier in the same tick as the line, so any priority reads it. */
+	/** {@code TRAIL_HOTCOLD_LAST_CHECK_COORD} is set earlier in the same tick as the line, so any priority reads it. */
 	public void onChatMessage(ChatMessage event)
 	{
 		if (event.getType() != ChatMessageType.GAMEMESSAGE)
@@ -504,7 +504,7 @@ public class HotColdService
 		return spots(tier);
 	}
 
-	/** For the verdict "did the grid keep a spot core dropped". */
+	/** Trace suffix: the spots the grid kept that core has dropped. */
 	private String coreComparison(HotColdPlan planned)
 	{
 		Set<String> core = coreSpots;

@@ -2,9 +2,10 @@ package com.cluehelper.step;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import java.util.function.*;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.*;
@@ -20,19 +21,35 @@ public class StepResolver
 
 
 	private final Supplier<StepIndex> index;
+	/** Whether an NPC id shows for the player: a multiloc NPC is hidden in the form its quest state doesn't use. */
+	private final IntPredicate npcShown;
 	private final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
 	/** One requirement per key or tool entry, so a re-read step equals the last one. */
 	private final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
 
 	@Inject
-	StepResolver(StepData data)
+	StepResolver(StepData data, Client client)
 	{
-		this(data::index);
+		this(data::index, id -> isShown(client, id));
 	}
 
 	public StepResolver(Supplier<StepIndex> index)
 	{
+		this(index, id -> true);
+	}
+
+	/** @param npcShown whether an NPC id shows for this player now (a recording's tape answers it) */
+	public StepResolver(Supplier<StepIndex> index, IntPredicate npcShown)
+	{
 		this.index = index;
+		this.npcShown = npcShown;
+	}
+
+	/** Client thread. */
+	public static boolean isShown(Client client, int npcId)
+	{
+		NPCComposition npc = client.getNpcDefinition(npcId);
+		return npc == null || npc.getConfigs() == null || npc.transform() != null;
 	}
 
 	/** @param plugin core's real instance: several entries throw on null */
@@ -191,7 +208,7 @@ public class StepResolver
 	 * one, so a coordinate clue keeps only the tile the cache names. A step core gives no tile (Falo,
 	 * skill challenges) gets the cache's.
 	 */
-	private static List<WorldPoint> targets(ClueScroll clue, ClueScrollPlugin plugin, ClueFacts facts, StepIndex.Entry entry)
+	private List<WorldPoint> targets(ClueScroll clue, ClueScrollPlugin plugin, ClueFacts facts, StepIndex.Entry entry)
 	{
 		if (entry != null && entry.getStand() != null)
 		{
@@ -220,7 +237,34 @@ public class StepResolver
 			WorldPoint primary = CoreClueReader.primaryLocation(clue, plugin);
 			return primary == null ? core : List.of(primary);
 		}
-		return withWander(core.isEmpty() ? cache : core, entry);
+		List<WorldPoint> named = core.isEmpty() ? cache : core;
+		List<WorldPoint> shown = shownNpcTiles(named, entry);
+		List<WorldPoint> shownInCache = shown.isEmpty() ? shownNpcTiles(cache, entry) : List.of();
+		return withWander(!shown.isEmpty() ? shown : !shownInCache.isEmpty() ? shownInCache : named, entry);
+	}
+
+	/**
+	 * An NPC met at either of two tiles by quest state (Radimus Erkle in his house, then in the Legends' Guild) is only at
+	 * the tile whose NPC shows: core names the house alone, the cache both.
+	 */
+	private List<WorldPoint> shownNpcTiles(List<WorldPoint> tiles, StepIndex.Entry entry)
+	{
+		if (entry == null)
+		{
+			return tiles;
+		}
+		List<WorldPoint> shown = new ArrayList<>();
+		for (WorldPoint tile : tiles)
+		{
+			boolean hidden = entry.getTargets().stream()
+				.filter(target -> target.getTile() != null && !target.getNpcs().isEmpty() && nearAny(tile, List.of(target.getTile())))
+				.anyMatch(target -> target.getNpcs().stream().noneMatch(npcShown::test));
+			if (!hidden)
+			{
+				shown.add(tile);
+			}
+		}
+		return List.copyOf(shown);
 	}
 
 	/** An NPC that wanders far is met wherever the route reaches its range first. */

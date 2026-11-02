@@ -68,57 +68,57 @@ id	Skills	Quests	Varbits	VarPlayers	Items
 66		Sins of the Father			
 67		Song of the Elves			
 68		Swan Song			
-69		The Final Dawn			
-70		The Heart of Darkness			
-71		The Lost Tribe			
-72		Troll Stronghold			
-73		Underground Pass			
-74		Watchtower			
-75		Waterfall Quest	4476=1		
-76	1 Agility				
-77	1 Agility	Mourning's End Part II			
-78	10 Agility				
-79	13 Agility				
-80	13 Agility		532>3		
-81	14 Agility		4462=1		
-82	15 Agility				
-83	15 Agility		6076=1		
-84	16 Agility				
-85	17 Agility				
-86	18 Agility				
-87	20 Agility				
-88	21 Agility				
-89	23 Agility;24 Ranged;28 Strength		5810=1		
-90	23 Agility;28 Strength;24 Ranged	Observatory Quest			
-91	23 Thieving				
-92	24 Agility				
-93	25 Agility				
-94	25 Agility		1990>39		
-95	26 Agility				
-96	28 Agility				
-97	29 Agility				
-98	30 Agility				
-99	30 Agility			176=10	
-100	31 Agility				
-101	31 Prayer				
-102	32 Agility				
-103	32 Cooking				
-104	33 Agility				
-105	35 Agility				
-106	35 Agility	Garden of Tranquillity			
-107	36 Agility				
-108	37 Agility			150=160	
-109	38 Agility				
-110	4 Agility				
-111	40 Agility				
-112	41 Agility				
-113	42 Agility				
-114	43 Agility				
-115	44 Agility				
-116	45 Agility				
-117	45 Farming				
-118	46 Agility				
-119	46 Agility		6312=1		
+69		The Blood Moon Rises			
+70		The Final Dawn			
+71		The Heart of Darkness			
+72		The Lost Tribe			
+73		Troll Stronghold			
+74		Underground Pass			
+75		Watchtower			
+76		Waterfall Quest	4476=1		
+77	1 Agility				
+78	1 Agility	Mourning's End Part II			
+79	10 Agility				
+80	13 Agility				
+81	13 Agility		532>3		
+82	14 Agility		4462=1		
+83	15 Agility				
+84	15 Agility		6076=1		
+85	16 Agility				
+86	17 Agility				
+87	18 Agility				
+88	20 Agility				
+89	21 Agility				
+90	23 Agility;24 Ranged;28 Strength		5810=1		
+91	23 Agility;28 Strength;24 Ranged	Observatory Quest			
+92	23 Thieving				
+93	24 Agility				
+94	25 Agility				
+95	25 Agility		1990>39		
+96	26 Agility				
+97	28 Agility				
+98	29 Agility				
+99	30 Agility				
+100	30 Agility			176=10	
+101	31 Agility				
+102	31 Prayer				
+103	32 Agility				
+104	32 Cooking				
+105	33 Agility				
+106	35 Agility				
+107	35 Agility	Garden of Tranquillity			
+108	36 Agility				
+109	37 Agility			150=160	
+110	38 Agility				
+111	4 Agility				
+112	40 Agility				
+113	41 Agility				
+114	42 Agility				
+115	43 Agility				
+116	44 Agility				
+117	45 Agility				
+118	45 Farming				
+119	46 Agility				
 120	47 Agility				
 121	47 Agility			328=15	
 122	48 Agility				
@@ -185,6 +185,6 @@ id	Skills	Quests	Varbits	VarPlayers	Items
 183	85 Agility				
 184	86 Agility				
 185	86 Agility		7255=138		
-186	91 Agility	Legends' Quest			24790=1
+186	91 Agility	Legends' Quest			24790=1|VARBIT_11799=1
 187	93 Agility;78 Mining	Darkness of Hallowvale			
 188	96 Agility	Legends' Quest			

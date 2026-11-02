@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import net.runelite.api.Quest;
+import net.runelite.api.gameval.ItemID;
 
 /**
  * Pure, so it runs on any thread. Spell rows are never filtered by their book: the planner decides which book a
@@ -19,6 +20,8 @@ public final class AvailabilityEngine
 	private static final List<Container> WORN_ONLY = List.of(Container.WORN, Container.BANK, Container.GROUP_STORAGE);
 	/** Shortest Path lists every charge of an item as its own alternative: glory(1) to glory(t6) is 12. */
 	private static final int MAX_ALTERNATIVES_NAMED = 2;
+	/** Worn, these turn the player into a penguin, whose side panel has no spellbook tab. */
+	private static final Set<Integer> HIDE_SPELLBOOK = Set.of(ItemID.PENG_SUIT_UNWOUND, ItemID.PENG_SUIT_WOUND);
 	/** What makes the plugin see an unlock it learns from play (UnlockMemory), told to a player who has it. */
 	private static final Map<String, String> UNLOCK_HINTS = Map.of(
 		"DRAGONTOOTH", "if unlocked, speak with the ghost captain",
@@ -55,6 +58,11 @@ public final class AvailabilityEngine
 		if (req.isMembers() && !player.isMembersWorld())
 		{
 			v.no("members world only");
+		}
+		boolean cast = row.getCategory() == Category.SPELL || row.getCategory() == Category.HOME;
+		if (cast && HIDE_SPELLBOOK.stream().anyMatch(player.getWorn()::containsKey))
+		{
+			v.no("the penguin suit hides the spellbook: take it off first");
 		}
 		if (player.getWildernessLevel() > req.getMaxWildernessLevel())
 		{
@@ -221,6 +229,13 @@ public final class AvailabilityEngine
 		{
 			return !player.isQuestsRead() ? Paid.unread("quests not read yet")
 				: player.finished(branch.getQuest()) ? Paid.with(List.of(), false) : Paid.missing(branch.getQuest().getName() + " (quest)");
+		}
+		if (branch.isVar())
+		{
+			Integer value = branch.getVar().getKind() == VarCheck.Kind.VARBIT ? player.varbit(branch.getVar().getId())
+				: player.varp(branch.getVar().getId());
+			return value == null ? Paid.unread(branch.getVar().describe() + ": not read")
+				: branch.getVar().test(value, 0) ? Paid.with(List.of(), false) : Paid.missing(branch.getVar().describe());
 		}
 		if (branch.isUnlock())
 		{

@@ -55,6 +55,7 @@ final class RouteBuilder
 			.legs(List.copyOf(legs))
 			.halfTicks(goal.half + extra)
 			.rankHalfTicks(rank + extra)
+			.tieBreakHalfTicks(goal.teleports * PlanContext.TELEPORT_TIE_HALF_TICKS)
 			.banked(banked)
 			.withdraw(withdraw)
 			.depositFirst(depositFirst)

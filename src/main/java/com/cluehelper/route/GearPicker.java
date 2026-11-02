@@ -7,7 +7,8 @@ import net.runelite.api.EquipmentInventorySlot;
 
 /**
  * Worn gear adding up to a bonus total, from what the player wears, carries and has stored: as few items out of the
- * bank as can do it, then as few to put on. One item per slot; a two-handed weapon leaves the shield slot empty.
+ * bank as can do it, then as few to put on. One item per slot; a two-handed weapon leaves the shield slot empty. While
+ * the worn total falls short, worn pieces that count against it come off.
  */
 public final class GearPicker
 {
@@ -29,6 +30,8 @@ public final class GearPicker
 		/** Not yet worn, the withdrawn ones included. */
 		List<Integer> equip;
 		List<Integer> withdraw;
+		/** Worn pieces that count against the total (a Max cape's prayer bonus) and nothing replaces. */
+		List<Integer> remove;
 	}
 
 	@Value
@@ -61,10 +64,12 @@ public final class GearPicker
 	private static Choice pick(Collection<Piece> pieces, boolean twoHanded, Set<Integer> worn, Set<Integer> inventory,
 		Set<Integer> stored, int atLeast)
 	{
-		Map<Integer, Piece> current = bestPerSlot(pieces, twoHanded, worn);
+		Map<Integer, Piece> wornBest = bestPerSlot(pieces, twoHanded, worn);
+		boolean enough = total(wornBest) >= atLeast;
+		Map<Integer, Piece> current = enough ? wornBest : withoutNegatives(wornBest);
 		Map<Integer, Piece> carried = bestPerSlot(pieces, twoHanded, union(worn, inventory));
 		Map<Integer, Piece> storedBest = bestPerSlot(pieces, twoHanded, stored);
-		int need = atLeast - current.values().stream().mapToInt(Piece::getValue).sum();
+		int need = atLeast - total(current);
 		List<Upgrade> fromCarried = upgrades(carried, current, Map.of());
 		List<Upgrade> fromStorage = upgrades(storedBest, current, carried);
 		for (int withdrawn = 0; withdrawn <= fromStorage.size(); withdrawn++)
@@ -79,6 +84,7 @@ public final class GearPicker
 			}
 			List<Integer> equip = new ArrayList<>();
 			taken.forEach(upgrade -> equip.add(upgrade.piece.itemId));
+			Set<Integer> equipSlots = new HashSet<>(takenSlots);
 			for (Upgrade upgrade : fromCarried)
 			{
 				if (left <= 0)
@@ -88,13 +94,16 @@ public final class GearPicker
 				if (!takenSlots.contains(upgrade.piece.slot))
 				{
 					equip.add(upgrade.piece.itemId);
+					equipSlots.add(upgrade.piece.slot);
 					left -= upgrade.gain;
 				}
 			}
 			if (left <= 0)
 			{
 				List<Integer> withdraw = taken.stream().map(upgrade -> upgrade.piece.itemId).collect(Collectors.toUnmodifiableList());
-				return new Choice(List.copyOf(equip), withdraw);
+				List<Integer> remove = wornBest.values().stream().filter(piece -> !current.containsKey(piece.slot))
+					.filter(piece -> !equipSlots.contains(piece.slot)).map(Piece::getItemId).sorted().collect(Collectors.toUnmodifiableList());
+				return new Choice(List.copyOf(equip), withdraw, remove);
 			}
 		}
 		return null;
@@ -123,10 +132,16 @@ public final class GearPicker
 		{
 			if (owned.contains(piece.itemId) && fits(piece, twoHanded))
 			{
-				best.merge(piece.slot, piece, (a, b) -> b.value > a.value ? b : a);
+				best.merge(piece.slot, piece, GearPicker::better);
 			}
 		}
 		return best;
+	}
+
+	/** Equal pieces go by item id, so a pick doesn't hang on the order the bank lists them in. */
+	private static Piece better(Piece a, Piece b)
+	{
+		return b.value > a.value || b.value == a.value && b.itemId < a.itemId ? b : a;
 	}
 
 	private static boolean fits(Piece piece, boolean twoHanded)
@@ -145,6 +160,18 @@ public final class GearPicker
 			return a.withdraw.size() < b.withdraw.size();
 		}
 		return a.equip.size() < b.equip.size();
+	}
+
+	private static int total(Map<Integer, Piece> perSlot)
+	{
+		return perSlot.values().stream().mapToInt(Piece::getValue).sum();
+	}
+
+	private static Map<Integer, Piece> withoutNegatives(Map<Integer, Piece> perSlot)
+	{
+		Map<Integer, Piece> kept = new HashMap<>(perSlot);
+		kept.values().removeIf(piece -> piece.value < 0);
+		return kept;
 	}
 
 	private static int value(Piece piece)

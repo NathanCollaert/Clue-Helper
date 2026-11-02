@@ -10,7 +10,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Every campaign step Nathan finished must replay to the outcome he signed off. A changed step fails the build: a
+ * Every finished campaign step must replay to the outcome the tester signed off. A changed step fails the build: a
  * route or guide change is played again in the campaign, a tick-only one is accepted with {@code acceptTickChanges}
  * after reading {@code build/campaign/changed.html}.
  */

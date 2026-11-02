@@ -5,6 +5,7 @@ import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.HouseState;
 import com.cluehelper.player.PlayerModel;
@@ -48,12 +49,15 @@ public class DevHarness
 	private final List<Runnable> unregister = new ArrayList<>();
 	private volatile DevCommands commands;
 	private final HotColdService hotCold;
+	private final MemoryStore memory;
 
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, StepLogger stepLogger, ClueLink clueLink, Gson gson, PlayerModel player,
-		AvailabilityService availability, RoutePlanner routes, StepGuide guide, PohService poh, StashMemory stash, HotColdService hotCold)
+		AvailabilityService availability, RoutePlanner routes, StepGuide guide, PohService poh, StashMemory stash, HotColdService hotCold,
+		MemoryStore memory)
 	{
 		this.hotCold = hotCold;
+		this.memory = memory;
 		this.poh = poh;
 		this.stash = stash;
 		this.client = client;
@@ -73,6 +77,7 @@ public class DevHarness
 		DevCommands c = new DevCommands(this::reply);
 		c.register("steplog", "[clear] show or clear this profile's step log", this::stepLog);
 		c.register("poh", "[forget] show what is known about your house, or forget it", this::house);
+		c.register("forget", "<key> forget what this profile remembers under the key (npcPlaces: where Viggora was learned)", this::forget);
 		c.register("stash", "compare every STASH unit's built varbit, the core check (script 1479) and what we remember",
 			args -> clientThread.invokeLater(this::stashes));
 		c.register("hotcold", "[reset] show the hot/cold step's feel log, or restart it keeping its last reading as the anchor",
@@ -197,6 +202,21 @@ public class DevHarness
 			log.info("[CH-STASH] unit {} built {} script1479 {} remembered {}", unit, isBuilt, check, stash.state(unit));
 		}
 		reply(StashMemory.unitObjects().size() + " units: " + built + " built, " + core + " ticked by script 1479 (details in the log)");
+	}
+
+	private void forget(String[] args)
+	{
+		if (args.length == 0)
+		{
+			reply("usage: ::ch-forget <key>, e.g. npcPlaces");
+			return;
+		}
+		clientThread.invoke(() ->
+		{
+			memory.slot(args[0], Object.class, Object::new).clear();
+			memory.reload();
+			reply("forgot " + args[0]);
+		});
 	}
 
 	private void house(String[] args)

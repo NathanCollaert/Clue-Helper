@@ -262,6 +262,10 @@ final class LegSteps
 
 	private static String teleportDetail(CatalogRow row)
 	{
+		if (row.getCategory() == Category.SPELL && row.boatDock() == null && row.getName().contains(": "))
+		{
+			return row.getName().substring(row.getName().lastIndexOf(": ") + 2) + ": its right-click option, unless Configure made it the left click";
+		}
 		return row.getCategory() == Category.SPIRIT_TREE && !row.isInHouse() ? "Travel" : null;
 	}
 
@@ -285,7 +289,7 @@ final class LegSteps
 			return line < MenuLines.HOTKEYS.length() ? MenuLines.HOTKEYS.charAt(line) : 0;
 		}
 		String label = menu != null && menu.startsWith("list ") ? menu.substring("list ".length())
-			: menu != null && menu.contains(RowTargets.MENU_STEP) ? menu.substring(menu.lastIndexOf(RowTargets.MENU_STEP) + RowTargets.MENU_STEP.length())
+			: menu != null && menu.contains(CatalogRow.MENU_STEP) ? menu.substring(menu.lastIndexOf(CatalogRow.MENU_STEP) + CatalogRow.MENU_STEP.length())
 			: row.getName().substring(row.getName().lastIndexOf(": ") + 2);
 		Matcher key = LIST_HOTKEY.matcher(label);
 		return key.find() ? key.group(1).charAt(0) : 0;
