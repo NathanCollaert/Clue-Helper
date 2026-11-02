@@ -30,7 +30,7 @@ import net.runelite.client.util.Text;
 @Singleton
 public class HotColdService
 {
-	static final String KEY = "hotColdLogs";
+	public static final String KEY = "hotColdLogs";
 	private static final int NO_CHECK = -1;
 	/** Ranking-only ticks on a feel in the Wilderness while the Wilderness is avoided. */
 	static final int WILDERNESS_PENALTY_TICKS = 20;
@@ -63,7 +63,6 @@ public class HotColdService
 	private ClueHelperConfig config;
 	private PlannerRunner runner;
 	private MemorySlot<FeelLogs> logs;
-	private final List<Consumer<String>> traceListeners = new CopyOnWriteArrayList<>();
 	private final List<Consumer<Planned>> planListeners = new CopyOnWriteArrayList<>();
 	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 
@@ -118,13 +117,6 @@ public class HotColdService
 		return () -> listeners.remove(listener);
 	}
 
-	/** Dev trace lines. */
-	public Runnable addTraceListener(Consumer<String> listener)
-	{
-		traceListeners.add(listener);
-		return () -> traceListeners.remove(listener);
-	}
-
 	public Runnable addPlanListener(Consumer<Planned> listener)
 	{
 		planListeners.add(listener);
@@ -173,7 +165,7 @@ public class HotColdService
 			logs.set(logs.get().solved(key));
 			probeTarget.clear();
 			plan = null;
-			trace("found: log of " + key + " cleared, last reading kept as the anchor");
+			log.debug("hot/cold found: log of {} cleared, last reading kept as the anchor", key);
 			return;
 		}
 		if (line.getKind() != DeviceLine.Kind.READING)
@@ -184,8 +176,7 @@ public class HotColdService
 		FeelLogs updated = logs.get().with(key, reading);
 		logs.set(updated);
 		planPending = true;
-		trace("reading " + key + " " + reading.getX() + "," + reading.getY() + "," + reading.getPlane() + " " + line.getBand().getText()
-			+ (line.getComparison() == null ? "" : ", " + line.getComparison().getText()) + " (log " + updated.get(key).size() + ")");
+		log.debug("hot/cold reading {} {} (log {})", key, reading, updated.get(key).size());
 	}
 
 	/** Call from a GameTick handler at priority -1, after the route planner's. */
@@ -256,7 +247,7 @@ public class HotColdService
 		if (last != null && tile != null && standsOnSpot(tile, last.getTier()))
 		{
 			logs.set(logs.get().solved(last.getStepKey()));
-			trace("dug at " + tile + ": log of " + last.getStepKey() + " cleared, last reading kept as the anchor");
+			log.debug("hot/cold dug at {}: log of {} cleared, last reading kept as the anchor", tile, last.getStepKey());
 		}
 	}
 
@@ -310,7 +301,6 @@ public class HotColdService
 				.wildernessPenaltyTicks(landingSearch.getSettings().isAvoidWilderness() ? WILDERNESS_PENALTY_TICKS : 0).build())
 			.avoidWilderness(landingSearch.getSettings().isAvoidWilderness())
 			.build();
-		trace("plan " + step.getKey() + " from " + job.getReadings().size() + " readings");
 		runner.submit(job::run, result -> onPlanned(job, result));
 	}
 
@@ -323,7 +313,6 @@ public class HotColdService
 		}
 		plan = planned;
 		probeTarget.set(target(planned));
-		trace(describe(planned) + coreComparison(planned));
 		planListeners.forEach(listener -> listener.accept(new Planned(job, planned)));
 		listeners.forEach(Runnable::run);
 	}
@@ -464,36 +453,6 @@ public class HotColdService
 		return step != null && ClueTypes.HOT_COLD.equals(step.getType());
 	}
 
-	/** Dev only: starts the current hot/cold step's log again, its last reading kept as the anchor. */
-	public String restartLog()
-	{
-		Step step = clueLink.getCurrentStep();
-		if (!isHotCold(step))
-		{
-			return "No hot/cold step";
-		}
-		logs.set(logs.get().solved(step.getKey()));
-		planPending = true;
-		return "Feel log of " + step.getKey() + " restarted";
-	}
-
-	/** Dev only. */
-	public List<String> describeLog()
-	{
-		Step step = clueLink.getCurrentStep();
-		if (!isHotCold(step))
-		{
-			return List.of("No hot/cold step");
-		}
-		List<String> lines = new ArrayList<>();
-		List<Reading> readings = logs.get().get(step.getKey());
-		lines.add(step.getKey() + ": " + readings.size() + " readings");
-		readings.forEach(reading -> lines.add("  " + reading));
-		HotColdPlan current = plan;
-		lines.add(current == null ? "no plan" : describe(current));
-		return lines;
-	}
-
 	public int hitpoints()
 	{
 		return client.getBoostedSkillLevel(Skill.HITPOINTS);
@@ -502,43 +461,5 @@ public class HotColdService
 	public List<Spot> spotsOf(HotColdTier tier)
 	{
 		return spots(tier);
-	}
-
-	/** Trace suffix: the spots the grid kept that core has dropped. */
-	private String coreComparison(HotColdPlan planned)
-	{
-		Set<String> core = coreSpots;
-		List<String> dropped = new ArrayList<>();
-		for (String spot : planned.getKept().keySet())
-		{
-			if (!core.contains(spot))
-			{
-				dropped.add(spot);
-			}
-		}
-		return "; core " + core.size() + (coreReset ? " (reset)" : "") + (dropped.isEmpty() ? "" : ", core dropped " + dropped);
-	}
-
-	private static String describe(HotColdPlan planned)
-	{
-		StringBuilder line = new StringBuilder(planned.getAction().name()).append(' ').append(planned.getTile())
-			.append(" kept ").append(planned.getKept().size()).append(planned.isExact() ? "" : " (closest fits)")
-			.append(" from ").append(planned.getReadings()).append(" readings");
-		if (planned.getChoice() != null)
-		{
-			ProbePlanner.Choice choice = planned.getChoice();
-			line.append(" probe ").append(choice.getProbe().getKind()).append(' ').append(choice.getProbe().getTicks()).append('t')
-				.append(String.format(" %.2f bits cost %d", choice.getBits(), choice.getCostTicks()))
-				.append(" branches ").append(choice.getBranches().size());
-		}
-		return line.append(" probes ").append(planned.getProbes()).append(" landings ").append(planned.getLandings())
-			.append(" in ").append(planned.getNanos() / 1_000_000).append(" ms (landings ").append(planned.getLandingNanos() / 1_000_000)
-			.append(" ms)").toString();
-	}
-
-	private void trace(String line)
-	{
-		log.debug("hot/cold {}", line);
-		traceListeners.forEach(listener -> listener.accept(line));
 	}
 }

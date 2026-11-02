@@ -1,7 +1,5 @@
 package com.cluehelper;
 
-import com.cluehelper.memory.FairyRingMemory;
-import com.cluehelper.memory.SpiritTreeMemory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +20,6 @@ import net.runelite.client.eventbus.Subscribe;
 @Slf4j
 final class NetworkTrace
 {
-	static final String TREE_TAG = "[CH-TREE]";
-	static final String RING_TAG = "[CH-RING]";
 	static final String TIME_TAG = "[CH-TIME]";
 	static final String QUETZAL_TAG = "[CH-QUETZAL]";
 	static final String BOAT_TAG = "[CH-BOAT]";
@@ -39,29 +35,16 @@ final class NetworkTrace
 
 	private final Client client;
 	private final Consumer<File> saveFrame;
-	private final Runnable unregister;
 	private int watching;
 	private WorldPoint lastTile;
 	private int lastAnimation = -2;
 	private int pendingQuetzal = -1;
 	private String lastBoats;
 
-	NetworkTrace(Client client, SpiritTreeMemory trees, FairyRingMemory rings, Consumer<File> saveFrame)
+	NetworkTrace(Client client, Consumer<File> saveFrame)
 	{
 		this.client = client;
 		this.saveFrame = saveFrame;
-		Runnable untrees = trees.addListener(line -> log.info("{} t{} {}", TREE_TAG, client.getTickCount(), line));
-		Runnable unrings = rings.addListener(line -> log.info("{} t{} {}", RING_TAG, client.getTickCount(), line));
-		unregister = () ->
-		{
-			untrees.run();
-			unrings.run();
-		};
-	}
-
-	void stop()
-	{
-		unregister.run();
 	}
 
 	@Subscribe(priority = -3)

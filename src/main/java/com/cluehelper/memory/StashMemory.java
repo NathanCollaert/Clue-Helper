@@ -29,7 +29,6 @@ public class StashMemory
 	/** A Search line lands 0–3 ticks after the click, or 8 when the first Search of a session asks for the PIN. */
 	private static final int SEARCH_LINE_TICKS = 8;
 	private static final String SEARCH = "Search";
-	private static final int CORE_STASH_SCRIPT = 1479;
 	private static final int BUILT = 1;
 	private static final int NOT_SEEN = -1;
 	private static final Set<Integer> UNIT_OBJECTS = Arrays.stream(STASHUnit.values()).map(STASHUnit::getObjectId)
@@ -56,21 +55,6 @@ public class StashMemory
 		}
 		Seen seen = remembered.get().units.get(objectId);
 		return seen == null || seen.filled ? State.FILLED : State.EMPTY;
-	}
-
-	/**
-	 * Client thread, outside any script: scripts don't nest, and a call from a chat command's handler trips the
-	 * client's assertion.
-	 */
-	public int coreCheck(int objectId)
-	{
-		client.runScript(CORE_STASH_SCRIPT, objectId, 0, 0, 0);
-		return client.getIntStack()[0];
-	}
-
-	public static Set<Integer> unitObjects()
-	{
-		return UNIT_OBJECTS;
 	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)

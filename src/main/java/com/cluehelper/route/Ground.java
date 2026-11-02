@@ -2,12 +2,14 @@ package com.cluehelper.route;
 
 import java.util.Arrays;
 import java.util.function.IntPredicate;
+import lombok.*;
 
 /**
  * Where a walk can step: the loaded scene as the client has it, its closed doors opened at a cost, and Shortest Path's
  * world map past the scene's edge. The open walk rows (stairs, ladders, shortcuts) join tiles apart. In an instance,
  * whose tiles are on no map, only its scene. Any thread once built.
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Ground
 {
 	private static final int[] NO_ROWS = new int[0];
@@ -17,14 +19,6 @@ public final class Ground
 	private final LoadedScene scene;
 	private final WalkTable table;
 	private final IntPredicate rowOpen;
-
-	private Ground(WorldMap map, LoadedScene scene, WalkTable table, IntPredicate rowOpen)
-	{
-		this.map = map;
-		this.scene = scene;
-		this.table = table;
-		this.rowOpen = rowOpen;
-	}
 
 	/** {@code scene}: the loaded scene with its doors open, or null; {@code rowOpen}: by row of {@code table}. */
 	public static Ground world(WorldMap map, LoadedScene scene, WalkTable table, IntPredicate rowOpen)

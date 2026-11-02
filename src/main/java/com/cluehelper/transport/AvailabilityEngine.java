@@ -4,6 +4,7 @@ import com.cluehelper.player.*;
 import java.util.*;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
+import lombok.*;
 import net.runelite.api.Quest;
 import net.runelite.api.gameval.ItemID;
 
@@ -11,6 +12,7 @@ import net.runelite.api.gameval.ItemID;
  * Pure, so it runs on any thread. Spell rows are never filtered by their book: the planner decides which book a
  * route casts from.
  */
+@RequiredArgsConstructor
 public final class AvailabilityEngine
 {
 	/** Carried first, so a banked snapshot withdraws only what the player lacks (its bank maps are empty otherwise). */
@@ -27,20 +29,11 @@ public final class AvailabilityEngine
 		"DRAGONTOOTH", "if unlocked, speak with the ghost captain",
 		"XERICS_HONOUR", "if unlocked, use the Honour teleport once");
 
+	@Getter
 	private final RuneModel runes;
+	/** Called from any thread. */
 	private final IntFunction<String> itemNames;
 
-	/** @param itemNames called from any thread */
-	public AvailabilityEngine(RuneModel runes, IntFunction<String> itemNames)
-	{
-		this.runes = runes;
-		this.itemNames = itemNames;
-	}
-
-	public RuneModel getRunes()
-	{
-		return runes;
-	}
 
 	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */
 	public AvailabilitySet carried(List<CatalogRow> rows, PlayerSnapshot player, long nowMinutes)

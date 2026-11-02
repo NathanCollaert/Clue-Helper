@@ -6,6 +6,7 @@ import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.*;
+import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -565,19 +566,13 @@ public final class Planner
 			.map(Quest::getName).distinct().sorted().collect(Collectors.joining(" and "));
 	}
 
+	@RequiredArgsConstructor
 	private static final class Searches
 	{
 		final PlanContext ctx;
 		final int area;
 		final boolean probes;
 		int labels;
-
-		Searches(PlanContext ctx, int area, boolean probes)
-		{
-			this.ctx = ctx;
-			this.area = area;
-			this.probes = probes;
-		}
 
 		/**
 		 * Each order after the first stops at the best rank so far, which leaves out its slower direct and same-book

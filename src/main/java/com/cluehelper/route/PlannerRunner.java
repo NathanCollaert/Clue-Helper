@@ -4,6 +4,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.*;
 import javax.inject.*;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.callback.ClientThread;
 
@@ -14,6 +15,7 @@ import net.runelite.client.callback.ClientThread;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PlannerRunner
 {
 	private final Executor background;
@@ -25,12 +27,6 @@ public class PlannerRunner
 	public PlannerRunner(ScheduledExecutorService executor, ClientThread clientThread)
 	{
 		this(executor, clientThread::invoke);
-	}
-
-	PlannerRunner(Executor background, Executor clientThread)
-	{
-		this.background = background;
-		this.clientThread = clientThread;
 	}
 
 	/**

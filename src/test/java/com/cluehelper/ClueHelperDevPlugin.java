@@ -1,5 +1,7 @@
 package com.cluehelper;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.cluehelper.campaign.Campaign;
 import com.cluehelper.campaign.CampaignRecorder;
 import com.cluehelper.campaign.Outcome;
@@ -7,7 +9,10 @@ import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.SubStep;
+import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.memory.FairyRingMemory;
+import com.cluehelper.memory.SpiritTreeMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.Position;
 import com.cluehelper.player.PositionRules;
@@ -76,6 +81,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.DrawManager;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
+import org.slf4j.LoggerFactory;
 
 /** Dev launcher only: the step campaign, mock clues, traces and game frames, which the plugin jar must not hold. */
 @Slf4j
@@ -159,6 +165,7 @@ public class ClueHelperDevPlugin extends Plugin
 		clueHelper = find(ClueHelperPlugin.class);
 		harness = clueHelper.getInjector().getInstance(DevHarness.class);
 		harness.start();
+		logDebug(HotColdService.class, FairyRingMemory.class, SpiritTreeMemory.class);
 		frameWriter = Executors.newSingleThreadExecutor(runnable ->
 		{
 			Thread thread = new Thread(runnable, "clue-helper-dev-frames");
@@ -193,14 +200,9 @@ public class ClueHelperDevPlugin extends Plugin
 			eventBus.unregister(pohTrace);
 			pohTrace.stop();
 		});
-		NetworkTrace networkTrace = new NetworkTrace(client, clueHelper.getSpiritTrees(), clueHelper.getFairyRings(),
-			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
+		NetworkTrace networkTrace = new NetworkTrace(client, file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(networkTrace);
-		unregister.add(() ->
-		{
-			eventBus.unregister(networkTrace);
-			networkTrace.stop();
-		});
+		unregister.add(() -> eventBus.unregister(networkTrace));
 		FairyDialTrace dialTrace = new FairyDialTrace(client, clueHelper.getMenuLines(), fairyDials,
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(dialTrace);
@@ -217,6 +219,15 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(planTrace::stop);
 		addDevPanel();
 		log.info("{} dev plugin up", TAG);
+	}
+
+	/** Their debug lines are what the hot/cold, fairy ring and spirit tree traces read in the log. */
+	private static void logDebug(Class<?>... sources)
+	{
+		for (Class<?> source : sources)
+		{
+			((Logger) LoggerFactory.getLogger(source)).setLevel(Level.DEBUG);
+		}
 	}
 
 	private void addDevPanel()

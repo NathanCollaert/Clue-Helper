@@ -157,7 +157,7 @@ public class CoreLinkFixtureTest
 	{
 		List<JsonObject> all = allEvents(resource);
 		Replay replay = new Replay();
-		LinkState state = new LinkState();
+		ClueLink.LinkState state = new ClueLink.LinkState();
 		boolean coreActive = false;
 		String key = null;
 		Object targets = null;

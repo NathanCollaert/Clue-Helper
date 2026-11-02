@@ -2,10 +2,9 @@ package com.cluehelper.memory;
 
 import com.cluehelper.player.PlayerModel;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.inject.*;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
@@ -16,6 +15,7 @@ import net.runelite.client.util.Text;
  * Client thread. Learned as Shortest Path does: the spirit tree menu greys a planted tree that can't be used, and
  * inside a patch's region its {@code FARMING_TRANSMIT_*} varbit reads {@link #GROWN} for a grown tree.
  */
+@Slf4j
 @Singleton
 public class SpiritTreeMemory
 {
@@ -38,7 +38,6 @@ public class SpiritTreeMemory
 	@Inject
 	private PlayerModel player;
 	private MemorySlot<Patches> remembered;
-	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 	private Set<String> published;
 	private int lastRegion = -1;
 	private int lastRegionTick = -1;
@@ -55,12 +54,6 @@ public class SpiritTreeMemory
 			.map(Map.Entry::getKey).collect(Collectors.toUnmodifiableSet());
 	}
 
-	public Runnable addListener(Consumer<String> devTraceLines)
-	{
-		listeners.add(devTraceLines);
-		return () -> listeners.remove(devTraceLines);
-	}
-
 	/** Call on start and after a profile change. */
 	public void publish()
 	{
@@ -69,7 +62,7 @@ public class SpiritTreeMemory
 		{
 			published = now;
 			player.setPlantedTrees(now);
-			tell("grown " + now);
+			log.debug("spirit trees grown {}", now);
 		}
 	}
 
@@ -80,7 +73,7 @@ public class SpiritTreeMemory
 		{
 			return;
 		}
-		tell("menu " + rawLines);
+		log.debug("spirit tree menu {}", rawLines);
 		for (String raw : rawLines)
 		{
 			String name = placeOf(raw);
@@ -141,7 +134,7 @@ public class SpiritTreeMemory
 		seen.seenAt = System.currentTimeMillis();
 		next.patches.put(patch, seen);
 		remembered.set(next);
-		tell(patch + " = " + value + " (" + source + ")");
+		log.debug("spirit tree {} = {} ({})", patch, value, source);
 	}
 
 	private boolean modalOpen()
@@ -161,10 +154,6 @@ public class SpiritTreeMemory
 		return false;
 	}
 
-	private void tell(String line)
-	{
-		listeners.forEach(listener -> listener.accept(line));
-	}
 
 	static final class Patches
 	{

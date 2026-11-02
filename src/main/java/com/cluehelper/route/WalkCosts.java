@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -8,6 +9,7 @@ import net.runelite.api.coords.WorldPoint;
  * goes on from that landing's node and the guide can name the exit. Costs are tiles, half-ticks when running.
  * Immutable once built; any thread.
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WalkCosts
 {
 	public static final int UNREACHED = WalkSearch.UNREACHED;
@@ -19,13 +21,6 @@ public final class WalkCosts
 	private final Ground ground;
 	private final WorldPoint start;
 	private final WalkSearch search;
-
-	private WalkCosts(Ground ground, WorldPoint start, WalkSearch search)
-	{
-		this.ground = ground;
-		this.start = start;
-		this.search = search;
-	}
 
 	public static WalkCosts from(Ground ground, WorldPoint start)
 	{

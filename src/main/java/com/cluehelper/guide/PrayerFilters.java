@@ -4,6 +4,7 @@ import com.cluehelper.step.Step;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.*;
+import lombok.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.VarbitID;
 
@@ -15,6 +16,7 @@ import net.runelite.api.gameval.VarbitID;
 public class PrayerFilters
 {
 	/** Each filter's varbit and a phrase of its line in the filter menu. */
+	@AllArgsConstructor
 	public enum Filter
 	{
 		LOWER_TIERS(VarbitID.PRAYER_FILTER_BLOCKLOWTIER, "lower tiers", 1),
@@ -24,20 +26,9 @@ public class PrayerFilters
 		LACK_REQUIREMENTS(VarbitID.PRAYER_FILTER_BLOCKLOCKED, "requirements", 1);
 
 		private final int varbit;
+		@Getter
 		private final String phrase;
 		private final int hidingValue;
-
-		Filter(int varbit, String phrase, int hidingValue)
-		{
-			this.varbit = varbit;
-			this.phrase = phrase;
-			this.hidingValue = hidingValue;
-		}
-
-		public String getPhrase()
-		{
-			return phrase;
-		}
 	}
 
 	/** Only these can hide a prayer the player could turn on: the level and requirement filters hide ones they can't. */

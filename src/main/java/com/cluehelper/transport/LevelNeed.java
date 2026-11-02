@@ -1,10 +1,11 @@
 package com.cluehelper.transport;
 
 import com.cluehelper.player.PlayerSnapshot;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.Skill;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LevelNeed
 {
 	public enum Aggregate
@@ -17,13 +18,6 @@ public class LevelNeed
 	/** Null for a skill. */
 	Aggregate aggregate;
 	int level;
-
-	private LevelNeed(Skill skill, Aggregate aggregate, int level)
-	{
-		this.skill = skill;
-		this.aggregate = aggregate;
-		this.level = level;
-	}
 
 	public static LevelNeed ofSkill(Skill skill, int level)
 	{

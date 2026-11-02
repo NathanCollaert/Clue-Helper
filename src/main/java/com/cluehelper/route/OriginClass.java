@@ -1,8 +1,10 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.PositionRules;
+import lombok.AllArgsConstructor;
 import net.runelite.api.coords.WorldPoint;
 
+@AllArgsConstructor
 public enum OriginClass
 {
 	/** Minigame rows work only outside the Wilderness, so level 0 needs an exit too. */
@@ -24,12 +26,6 @@ public enum OriginClass
 	OriginClass(int highestLevel)
 	{
 		this(highestLevel, NO_EXIT);
-	}
-
-	OriginClass(int highestLevel, int exitY)
-	{
-		this.highestLevel = highestLevel;
-		this.exitY = exitY;
 	}
 
 	int exitY()

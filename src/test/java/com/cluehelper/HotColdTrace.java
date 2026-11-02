@@ -1,9 +1,11 @@
 package com.cluehelper;
 
+import com.cluehelper.hotcold.CoreSpots;
 import com.cluehelper.hotcold.HotColdPlan;
 import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.hotcold.Probe;
 import com.cluehelper.hotcold.ProbeJob;
+import com.cluehelper.hotcold.ProbePlanner;
 import com.cluehelper.hotcold.Reading;
 import com.cluehelper.step.HotColdTier;
 import com.google.gson.Gson;
@@ -13,17 +15,18 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 
 /**
- * {@code [CH-HOTCOLD]} lines, and each plan with what it was planned from in {@link #DECISIONS}, which
+ * {@code [CH-HOTCOLD]} lines, one per plan, and each plan with what it was planned from in {@link #DECISIONS}, which
  * {@code HotColdDecisionReplayTest} replays. Nothing while the bank PIN keypad is open.
  */
 @Slf4j
-final class HotColdTrace
+public final class HotColdTrace
 {
 	static final String TAG = "[CH-HOTCOLD]";
 	static final File FRAMES = new File("build/hotcold");
@@ -41,26 +44,12 @@ final class HotColdTrace
 		this.client = client;
 		this.saveFrames = saveFrames;
 		FRAMES.mkdirs();
-		Runnable untrace = hotCold.addTraceListener(this::line);
-		Runnable unplan = hotCold.addPlanListener(this::record);
-		unregister = () ->
-		{
-			untrace.run();
-			unplan.run();
-		};
+		unregister = hotCold.addPlanListener(this::record);
 	}
 
 	void stop()
 	{
 		unregister.run();
-	}
-
-	private void line(String text)
-	{
-		if (!pinOpen())
-		{
-			log.info("{} t{} {}", TAG, client.getTickCount(), text);
-		}
 	}
 
 	private void record(HotColdService.Planned planned)
@@ -71,6 +60,8 @@ final class HotColdTrace
 		}
 		ProbeJob job = planned.getJob();
 		HotColdPlan plan = planned.getPlan();
+		log.info("{} t{} {} from {} readings, last {}: {}{}", TAG, client.getTickCount(), job.getStepKey(), job.getReadings().size(),
+			job.getReadings().isEmpty() ? "-" : job.getReadings().get(job.getReadings().size() - 1), describe(plan), coreComparison(plan, job.getCore()));
 		Decision decision = new Decision(job.getStepKey(), job.getTier() == HotColdTier.BEGINNER, job.getReadings(), plan.getConsidered(),
 			job.getCosts().getWildernessPenaltyTicks(), plan.getAction().name(),
 			plan.getTile() == null ? null : new int[]{plan.getTile().getX(), plan.getTile().getY(), plan.getTile().getPlane()});
@@ -88,6 +79,30 @@ final class HotColdTrace
 	private boolean pinOpen()
 	{
 		return client.getWidget(InterfaceID.BANKPIN_KEYPAD, 0) != null;
+	}
+
+	public static String describe(HotColdPlan planned)
+	{
+		StringBuilder line = new StringBuilder(planned.getAction().name()).append(' ').append(planned.getTile())
+			.append(" kept ").append(planned.getKept().size()).append(planned.isExact() ? "" : " (closest fits)")
+			.append(" from ").append(planned.getReadings()).append(" readings");
+		if (planned.getChoice() != null)
+		{
+			ProbePlanner.Choice choice = planned.getChoice();
+			line.append(" probe ").append(choice.getProbe().getKind()).append(' ').append(choice.getProbe().getTicks()).append('t')
+				.append(String.format(" %.2f bits cost %d", choice.getBits(), choice.getCostTicks()))
+				.append(" branches ").append(choice.getBranches().size());
+		}
+		return line.append(" probes ").append(planned.getProbes()).append(" landings ").append(planned.getLandings())
+			.append(" in ").append(planned.getNanos() / 1_000_000).append(" ms (landings ").append(planned.getLandingNanos() / 1_000_000)
+			.append(" ms)").toString();
+	}
+
+	/** The spots the grid kept that core has dropped. */
+	private static String coreComparison(HotColdPlan planned, CoreSpots core)
+	{
+		List<String> dropped = planned.getKept().keySet().stream().filter(spot -> !core.getNames().contains(spot)).collect(Collectors.toList());
+		return "; core " + core.getNames().size() + (core.isFelt() ? "" : " (reset)") + (dropped.isEmpty() ? "" : ", core dropped " + dropped);
 	}
 
 	/** One line of {@link #DECISIONS}. */

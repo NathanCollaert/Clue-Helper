@@ -5,14 +5,11 @@ import com.google.gson.annotations.SerializedName;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import java.util.function.IntUnaryOperator;
-import java.util.function.Predicate;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.Quest;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**

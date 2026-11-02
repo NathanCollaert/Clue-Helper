@@ -21,7 +21,7 @@ public class LateDepositsTest
 
 	private static Map<Integer, Integer> run(boolean clicked, boolean bankAfter, boolean bankBefore)
 	{
-		LateDeposits deposits = new LateDeposits();
+		BankMemory.LateDeposits deposits = new BankMemory.LateDeposits();
 		deposits.onCarried(Map.of(MAX_CAPE, 1, COINS, 100), 10);
 		if (clicked)
 		{

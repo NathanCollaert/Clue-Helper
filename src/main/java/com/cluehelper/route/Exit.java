@@ -1,8 +1,7 @@
 package com.cluehelper.route;
 
 import java.util.Set;
-import lombok.Value;
-import lombok.With;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**

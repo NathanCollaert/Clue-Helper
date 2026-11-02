@@ -1,10 +1,15 @@
 package com.cluehelper.dev;
 
+import com.cluehelper.HotColdTrace;
 import com.cluehelper.guide.StepGuide;
+import com.cluehelper.hotcold.FeelLogs;
+import com.cluehelper.hotcold.HotColdPlan;
 import com.cluehelper.hotcold.HotColdService;
+import com.cluehelper.hotcold.Reading;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.memory.MemorySlot;
 import com.cluehelper.memory.MemoryStore;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.HouseState;
@@ -12,10 +17,12 @@ import com.cluehelper.player.PlayerModel;
 import com.cluehelper.poh.PohService;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.RoutePlanner;
+import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,12 +32,14 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 
 @Slf4j
 @Singleton
 public class DevHarness
 {
 	private static final int STEP_LOG_LINES = 5;
+	private static final int CORE_STASH_SCRIPT = 1479;
 	private static final String GUIDE_TAG = "[CH-GUIDE]";
 
 	private final Client client;
@@ -165,12 +174,26 @@ public class DevHarness
 
 	private void hotColdLog(String[] args)
 	{
-		if (args.length > 0 && args[0].equalsIgnoreCase("reset"))
+		Step step = clueLink.getCurrentStep();
+		if (step == null || !ClueTypes.HOT_COLD.equals(step.getType()))
 		{
-			reply(hotCold.restartLog());
+			reply("No hot/cold step");
 			return;
 		}
-		hotCold.describeLog().forEach(this::reply);
+		MemorySlot<FeelLogs> logs = memory.slot(HotColdService.KEY, FeelLogs.class, FeelLogs::new);
+		if (args.length > 0 && args[0].equalsIgnoreCase("reset"))
+		{
+			logs.set(logs.get().solved(step.getKey()));
+			memory.reload();
+			hotCold.onProfileChanged();
+			reply("Feel log of " + step.getKey() + " restarted");
+			return;
+		}
+		List<Reading> readings = logs.get().get(step.getKey());
+		reply(step.getKey() + ": " + readings.size() + " readings");
+		readings.forEach(reading -> reply("  " + reading));
+		HotColdPlan plan = hotCold.getPlan();
+		reply(plan == null ? "no plan" : HotColdTrace.describe(plan));
 	}
 
 	private void stepLog(String[] args)
@@ -193,15 +216,26 @@ public class DevHarness
 	{
 		int built = 0;
 		int core = 0;
-		for (int unit : StashMemory.unitObjects())
+		int[] units = Arrays.stream(STASHUnit.values()).mapToInt(STASHUnit::getObjectId).distinct().toArray();
+		for (int unit : units)
 		{
 			boolean isBuilt = stash.isBuilt(unit);
-			int check = stash.coreCheck(unit);
+			int check = coreStashCheck(unit);
 			built += isBuilt ? 1 : 0;
 			core += check == 1 ? 1 : 0;
 			log.info("[CH-STASH] unit {} built {} script1479 {} remembered {}", unit, isBuilt, check, stash.state(unit));
 		}
-		reply(StashMemory.unitObjects().size() + " units: " + built + " built, " + core + " ticked by script 1479 (details in the log)");
+		reply(units.length + " units: " + built + " built, " + core + " ticked by script 1479 (details in the log)");
+	}
+
+	/**
+	 * Core's tick on a unit. Client thread, outside any script: scripts don't nest, and a call from a chat command's
+	 * handler trips the client's assertion.
+	 */
+	private int coreStashCheck(int objectId)
+	{
+		client.runScript(CORE_STASH_SCRIPT, objectId, 0, 0, 0);
+		return client.getIntStack()[0];
 	}
 
 	private void forget(String[] args)

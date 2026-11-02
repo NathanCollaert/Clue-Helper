@@ -13,9 +13,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
-import net.runelite.client.game.ItemEquipmentStats;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemStats;
+import net.runelite.client.game.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 
 @Singleton

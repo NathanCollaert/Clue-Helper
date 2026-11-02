@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import javax.inject.*;
+import lombok.*;
 import net.runelite.client.config.ConfigManager;
 
 /**
@@ -13,6 +14,7 @@ import net.runelite.client.config.ConfigManager;
  * holds its fresh value in memory only.
  */
 @Singleton
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class MemoryStore
 {
 	private final ProfileConfig profile;
@@ -23,12 +25,6 @@ public class MemoryStore
 	MemoryStore(ConfigManager configManager, Gson gson)
 	{
 		this(new RuneLiteProfileConfig(configManager), gson);
-	}
-
-	MemoryStore(ProfileConfig profile, Gson gson)
-	{
-		this.profile = profile;
-		this.gson = gson;
 	}
 
 	/**

@@ -55,7 +55,6 @@ public class ClueHelperPlugin extends Plugin
 	private CheckLines checkLines;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private SpiritTreeMemory spiritTrees;
 
 	@Inject
@@ -71,7 +70,6 @@ public class ClueHelperPlugin extends Plugin
 	private NpcPlaceMemory npcPlaces;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private FairyRingMemory fairyRings;
 
 	@Inject

@@ -37,12 +37,12 @@ public class CatalogSchemaTest
 		List<String> failures = new ArrayList<>();
 		for (String file : CatalogLoader.TELEPORT_FILES)
 		{
-			for (TsvTable.Line line : CatalogLoader.read(file))
+			for (CatalogLoader.TsvTable.Line line : CatalogLoader.read(file))
 			{
 				teleportRules(line, failures::add, file + ":" + line.getNumber() + " " + line.get(CatalogLoader.NAME) + ": ");
 			}
 		}
-		for (TsvTable.Line line : CatalogLoader.read(CatalogLoader.SPELLBOOK_FILE))
+		for (CatalogLoader.TsvTable.Line line : CatalogLoader.read(CatalogLoader.SPELLBOOK_FILE))
 		{
 			sharedRules(line, failures::add, CatalogLoader.SPELLBOOK_FILE + ":" + line.getNumber() + " " + line.get(CatalogLoader.NAME) + ": ");
 		}
@@ -55,7 +55,7 @@ public class CatalogSchemaTest
 		assertTrue(catalog.getTeleports().size() > MIN_TELEPORT_ROWS);
 	}
 
-	private static void teleportRules(TsvTable.Line line, Failures fail, String at)
+	private static void teleportRules(CatalogLoader.TsvTable.Line line, Failures fail, String at)
 	{
 		sharedRules(line, fail, at);
 		Category category = Category.of(line.get(CatalogLoader.CATEGORY));
@@ -85,7 +85,7 @@ public class CatalogSchemaTest
 		}
 	}
 
-	private static void sharedRules(TsvTable.Line line, Failures fail, String at)
+	private static void sharedRules(CatalogLoader.TsvTable.Line line, Failures fail, String at)
 	{
 		Map<String, Integer> named = new HashMap<>();
 		Matcher m = NAMED_ID.matcher(line.get("Gameval"));
@@ -122,7 +122,7 @@ public class CatalogSchemaTest
 		}
 	}
 
-	private static List<String> referencedIds(TsvTable.Line line)
+	private static List<String> referencedIds(CatalogLoader.TsvTable.Line line)
 	{
 		List<String> refs = new ArrayList<>();
 		collect(ITEM_ID, line.get(RequirementParser.ITEMS), "item:", refs);

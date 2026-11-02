@@ -1,11 +1,9 @@
 package com.cluehelper.memory;
 
 import com.cluehelper.player.*;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.regex.*;
 import javax.inject.*;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuOptionClicked;
@@ -17,6 +15,7 @@ import net.runelite.client.util.Text;
  * Client thread. Turning the dials without travelling doesn't change a ring's Last-destination, so the code is the
  * dials as they stood at the confirm, kept once the player lands. A "Last-destination (XYZ)" menu entry corrects it.
  */
+@Slf4j
 @Singleton
 public class FairyRingMemory
 {
@@ -34,7 +33,6 @@ public class FairyRingMemory
 	@Inject
 	private PlayerModel player;
 	private MemorySlot<Last> remembered;
-	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 	private String pending;
 	private int pendingTick;
 	private WorldPoint pendingFrom;
@@ -46,12 +44,6 @@ public class FairyRingMemory
 		remembered = memory.slot(KEY, Last.class, Last::new);
 	}
 
-	public Runnable addListener(Consumer<String> devTraceLines)
-	{
-		listeners.add(devTraceLines);
-		return () -> listeners.remove(devTraceLines);
-	}
-
 	/** Call on start and after a profile change. */
 	public void publish()
 	{
@@ -60,7 +52,7 @@ public class FairyRingMemory
 		{
 			published = code;
 			player.setLastFairyRing(code);
-			tell("last destination " + code);
+			log.debug("fairy ring last destination {}", code);
 		}
 	}
 
@@ -122,7 +114,7 @@ public class FairyRingMemory
 		pending = code;
 		pendingTick = client.getTickCount();
 		pendingFrom = position();
-		tell("travelling to " + code + " (dials " + dials() + ")");
+		log.debug("fairy ring travelling to {} (dials {})", code, dials());
 	}
 
 	private void remember(String code, String source)
@@ -133,7 +125,7 @@ public class FairyRingMemory
 			next.code = code;
 			next.seenAt = System.currentTimeMillis();
 			remembered.set(next);
-			tell(code + " (" + source + ")");
+			log.debug("fairy ring {} ({})", code, source);
 		}
 		publish();
 	}
@@ -144,10 +136,6 @@ public class FairyRingMemory
 		return local == null ? null : WorldPoint.fromLocalInstance(client, local.getLocalLocation());
 	}
 
-	private void tell(String line)
-	{
-		listeners.forEach(listener -> listener.accept(line));
-	}
 
 	static final class Last
 	{
