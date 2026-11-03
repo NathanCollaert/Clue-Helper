@@ -23,7 +23,7 @@ final class PlanContext
 	static final int CAPE_USE_PENALTY_HALF_TICKS = 6;
 	/**
 	 * Ranking only, per teleport or fairy ring: routes about a tick apart go the way with fewer teleports, the same way each
-	 * time (Falo the Bard's Camelot, diary cape and fairy ring from a bank).
+	 * time.
 	 */
 	static final int TELEPORT_TIE_HALF_TICKS = 2;
 	/** Ranking only: the route leaves you on another book with no way back left today. */
@@ -63,7 +63,7 @@ final class PlanContext
 	/** By target node: what a part's act wants worn (Ghommal's +100 melee strength), on the player on arrival there. */
 	private final Map<Integer, RequiredItems.Verdict> stageNeeds = new HashMap<>();
 	private final List<RequiredItems.Verdict> missingEverywhere = new ArrayList<>();
-	/** Stage target nodes that must be reached on a given book (the Arceuus lectern). */
+	/** Stage target nodes that must be reached on a given book. */
 	private final Map<Integer, Book> stageBooks = new HashMap<>();
 	/** The book a task done anywhere needs (Sherlock's enchanting): the route reaches its last target on it; or null. */
 	private Book anywhereBook;

@@ -50,14 +50,14 @@ public final class MenuLabels
 		return same(line, label) || same(withoutRegionPrefix(line), label);
 	}
 
-	/** Diary Masters lines name the region first: "7: Karamja: Kaleb Paramaya (retired)". */
+	/** Diary Masters lines name the region first: the master is after the last colon. */
 	private static String withoutRegionPrefix(String line)
 	{
 		int lastColon = line == null ? -1 : line.lastIndexOf(':');
 		return lastColon > 0 ? line.substring(lastColon + 1) : null;
 	}
 
-	/** A prefix matches plurals ("Black chinchompas"), never a name inside another: "Ardougne" isn't "West Ardougne". */
+	/** A prefix matches plurals ("Black chinchompas"), never a name inside another. */
 	private static boolean same(String line, String label)
 	{
 		String a = normalise(line);
@@ -79,13 +79,13 @@ public final class MenuLabels
 			|| startsWithWord(a, b) || startsWithWord(b, a);
 	}
 
-	/** A short name that is the label's first word: the ring of the elements' "Air" for the game's "Air Altar". */
+	/** A short name that is the label's first word. */
 	private static boolean startsWithWord(String label, String word)
 	{
 		return label.startsWith(word + " ");
 	}
 
-	/** Item options like the Ardougne cloak's "Monastery Teleport" for the catalog's "Kandarin Monastery". */
+	/** An item option of a place's words and then Teleport, for a catalog label that has all those words. */
 	private static boolean namesPlaceOf(String option, String label)
 	{
 		if (!option.endsWith(TELEPORT_SUFFIX) || option.length() == TELEPORT_SUFFIX.length())
@@ -97,8 +97,8 @@ public final class MenuLabels
 	}
 
 	/**
-	 * The diary cape's sub-menu and list name a line differently ("Morytania: Le-sabrè") but keep the hotkey order, so a
-	 * label's hotkey ("C. Le-sabrè") gives its line, or -1.
+	 * The diary cape's sub-menu and list name a line differently but keep the hotkey order, so a
+	 * label's hotkey gives its line, or -1.
 	 */
 	static int hotkeyIndex(String label)
 	{
@@ -111,7 +111,7 @@ public final class MenuLabels
 		return TELEPORT_LIST_OPENERS.contains(normalise(option));
 	}
 
-	/** Rings also offer Zanaris as an option of its own: "Zanaris", or "Ring-Zanaris" on the house's spiritual fairy tree. */
+	/** Rings also offer a place as an option of its own, prefixed Ring- on the house's spiritual fairy tree. */
 	static boolean isRingDestination(String option, String code)
 	{
 		String plain = normalise(option);

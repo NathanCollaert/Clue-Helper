@@ -393,7 +393,7 @@ public class StepGuide
 
 	/**
 	 * A plan searched while a teleport was cast, from where it started, lands after it: its start's items are spent
-	 * (Camelot's runes) and its first leg is behind the player. The plan from the landing follows.
+	 * (the spell's runes) and its first leg is behind the player. The plan from the landing follows.
 	 */
 	private boolean isPlannedBeforeJump(PlanStart start)
 	{
@@ -629,7 +629,7 @@ public class StepGuide
 	 * An act's NPC given by name (Fycie) is outlined only where core can't mark it. Shortest Path names one NPC per ride
 	 * (a charter's Trader Crewmember), but a port's crew have several ids: when the named
 	 * one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC there
-	 * with that option (Port Sarim's boat to Port Piscarilius is Cabin Boy Herbert's, not Veos').
+	 * with that option (a boat's ride may be another NPC's than the one the row names).
 	 */
 	private List<NPC> npcsFor(MenuTarget target)
 	{
@@ -1084,7 +1084,7 @@ public class StepGuide
 
 	/**
 	 * At a step of several places, the act of the stage nearest to the player. A place on another floor counts as further
-	 * off, not out of reach: the redwood up its rope ladder is still nearer than Sherlock.
+	 * off, not out of reach: a tree up a ladder is still nearer than an NPC across the map.
 	 */
 	private static SubStep actHere(Step step, WorldPoint tile)
 	{
@@ -1293,7 +1293,7 @@ public class StepGuide
 		return local != null && local.getAnimation() == AnimationID.HUMAN_FAIRY_VANISH;
 	}
 
-	/** Any floor: Shortest Path puts some landings on the wrong one (the diary cape's Kaleb, Slepe). */
+	/** Any floor: Shortest Path puts some landings on the wrong one. */
 	private boolean hasLanded(SubStep step, WorldPoint tile)
 	{
 		return jumpedThisSubStep && tile != null && tile.distanceTo2D(step.getGoal()) <= step.getRadius();

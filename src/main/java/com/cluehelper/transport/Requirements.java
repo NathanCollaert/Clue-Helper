@@ -29,7 +29,7 @@ public class Requirements
 	boolean spendsCharges;
 	/** Null for rows outside the house. */
 	HouseNeed house;
-	/** Patch names like "Port Sarim"; each must be known grown. */
+	/** Patch names; each must be known grown. */
 	@Builder.Default
 	Set<String> plantedTrees = Set.of();
 	@Builder.Default

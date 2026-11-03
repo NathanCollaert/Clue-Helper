@@ -9,7 +9,7 @@ import net.runelite.client.events.ConfigChanged;
 
 /**
  * Client thread. Patches the Time Tracking plugin remembers for this account, as core stores them: "region.varbit" to
- * "value:seconds" in its group. A grown Farming Guild redwood is a place for Sherlock's redwood task.
+ * "value:seconds" in its group. A grown patch is a place for a Sherlock task that needs it.
  */
 @Singleton
 public class GrownPatches

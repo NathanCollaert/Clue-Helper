@@ -23,7 +23,7 @@ public class CatalogRow
 	private static final Pattern BRACKETED_NOTE = Pattern.compile(" \\([^)]*\\)$");
 	/** A jewellery box's or mounted item's "7. " before its place. */
 	private static final Pattern HOTKEY_LABEL = Pattern.compile("^[0-9A-Z]\\. ");
-	/** The words round a place: "Teleport to House tablet", "Kharyrll Teleport", "Watson teleport"; all of "Teleport". */
+	/** The teleport words before or after a place, or a name that is "Teleport" alone. */
 	private static final Pattern TELEPORT_WORDS = Pattern.compile(
 		"^Teleport to |^Teleport$|(" + MINIGAME_SUFFIX + "| [Tt]eleport( scroll)?| tablet)$");
 
@@ -41,11 +41,10 @@ public class CatalogRow
 	List<Spend> spends = List.of();
 	Requirements requirements;
 	/**
-	 * How to find the row's line in the menu it opens: {@code nexus 466 Wilderness} (struct id, map region),
-	 * {@code box 10} (script 1688's index), {@code list Xeric's Inferno} (a 187 line), {@code op Karamja} (the
-	 * object's own option; {@code op Set Destination > 1: Level 13 Wilderness} picks a 187 line after it),
-	 * {@code npc Charter} (the option of the NPC whose id is in objectId), {@code boat Brittle Isle} (the dock the
-	 * Teleport to Boat list names as the boat's location); null otherwise.
+	 * How to find the row's line in the menu it opens, as a kind and what to look for: {@code nexus} (struct id, map
+	 * region), {@code box} (script 1688's index), {@code list} (a 187 line), {@code op} (the object's own option; a
+	 * {@code >} after it picks a 187 line next), {@code npc} (the option of the NPC whose id is in objectId),
+	 * {@code boat} (the dock the Teleport to Boat list names as the boat's location); null otherwise.
 	 */
 	String menu;
 	/** -1 when none. */
@@ -94,7 +93,7 @@ public class CatalogRow
 
 	/**
 	 * Where the row goes, as its name says it: the part after the last colon, without the teleport words round it;
-	 * empty when the name doesn't say ("Farming cape: Teleport", "Ectophial").
+	 * empty when the name doesn't say.
 	 */
 	public String destination()
 	{

@@ -46,7 +46,7 @@ public class Stage
 		String text = placeTexts.get(tile);
 		return text == null || text.equals(detail) ? this : toBuilder().detail(text).build();
 	}
-	/** Tiles that count only while the named patch is grown (a Farming Guild redwood), by tile. */
+	/** Tiles that count only while the named patch is grown, by tile. */
 	@Builder.Default
 	Map<WorldPoint, String> grownOnly = Map.of();
 	/** Each place's own text by its tile, where places differ (the Slayer Tower's top floor or its basement). */
@@ -72,7 +72,7 @@ public class Stage
 	/** Objects the stage is done on (an anvil): outlined, and the walk ends beside them. */
 	@Builder.Default
 	Set<Integer> objectIds = Set.of();
-	/** NPCs the stage is done with (the Grand Exchange clerks): outlined, and the walk ends on them. */
+	/** NPCs the stage is done with: outlined, and the walk ends on them. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
 	/** Per tile, core's items that place takes others in place of (the True Blood Altar takes pure essence). */

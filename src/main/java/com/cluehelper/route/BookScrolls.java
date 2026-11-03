@@ -5,7 +5,7 @@ import com.cluehelper.transport.CatalogRow;
 import net.runelite.api.gameval.ItemID;
 
 /**
- * The master scroll book need not be risked in the Wilderness: a scroll for a Wilderness landing (Revenant caves) is
+ * The master scroll book need not be risked in the Wilderness: a scroll for a Wilderness landing is
  * taken out of it, and the book banked, before the teleport; any teleport into the Wilderness banks a carried book.
  * In the bank interface a click on an inventory item deposits it, so the scroll comes out with the bank closed.
  */

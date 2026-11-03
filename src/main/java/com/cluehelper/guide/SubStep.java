@@ -86,7 +86,7 @@ public class SubStep
 	/** Objects to outline and walk up to, from the stage: an anvil. */
 	@Builder.Default
 	Set<Integer> objectIds = Set.of();
-	/** NPCs to outline and walk up to, from the stage: the Grand Exchange clerks. */
+	/** NPCs to outline and walk up to, from the stage. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
 	/** The step's own NPC by name, whose option is coloured only: core outlines it. */

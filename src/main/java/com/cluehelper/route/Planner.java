@@ -110,7 +110,7 @@ public final class Planner
 		return plan.searchNanos(System.nanoTime() - started).labels(searches.labels).build();
 	}
 
-	/** Avoiding the Wilderness never hides the only way to a step outside it, such as the King Black Dragon's lair. */
+	/** Avoiding the Wilderness never hides the only way to a step outside it. */
 	private static PlanInput wildernessAllowed(PlanInput in)
 	{
 		return in.toBuilder().settings(in.getSettings().toBuilder().avoidWilderness(false).build()).build();
@@ -163,7 +163,7 @@ public final class Planner
 	}
 
 	/**
-	 * A place that needs a grown patch (a Farming Guild redwood) counts only while the player has it grown, one in the
+	 * A place that needs a grown patch counts only while the player has it grown, one in the
 	 * house (its spirit tree) only while the house has it.
 	 */
 	private static boolean isThere(PlanContext ctx, Stage stage, WorldPoint tile)
@@ -305,7 +305,7 @@ public final class Planner
 	}
 
 	/**
-	 * Fishing cape and Max cape to Otto's Grotto are one alternative, while a free home teleport beside a paid spell
+	 * Two capes to the same place are one alternative, while a free home teleport beside a paid spell
 	 * stays.
 	 */
 	private static boolean repeats(Route route, List<Route> shown)

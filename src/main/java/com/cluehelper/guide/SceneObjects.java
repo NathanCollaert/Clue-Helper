@@ -11,7 +11,7 @@ import net.runelite.api.coords.WorldPoint;
 public final class SceneObjects
 {
 	private static final String BANK = "Bank";
-	/** Some bank chests (the Crafting Guild's) open with Use. */
+	/** Some bank chests open with Use. */
 	private static final String USE = "Use";
 
 	@Inject

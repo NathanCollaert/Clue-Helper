@@ -18,7 +18,7 @@ import net.runelite.api.events.*;
 public final class SceneDoors
 {
 	private static final String OPEN = "Open";
-	/** A web across a way (the Wilderness lever's room) is slashed through like a door is opened. */
+	/** A web across a way is slashed through like a door is opened. */
 	private static final String SLASH = "Slash";
 	/** A fence or railing squeezed through (King Lathas' camp) is passed like an opened door. */
 	private static final String SQUEEZE = "Squeeze-through";

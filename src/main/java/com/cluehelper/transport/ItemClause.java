@@ -19,7 +19,7 @@ public class ItemClause
 		int quantity;
 		/** The name after {@code UNLOCK_}; null for an item branch. */
 		String unlock;
-		/** The quest after {@code QUEST_} whose finishing does without the items (Ghosts Ahoy, Port Phasmatys' toll). */
+		/** The quest after {@code QUEST_} whose finishing does without the items. */
 		Quest quest;
 		/** The varbit after {@code VARBIT_} whose value does without the items (the Viyeldi caves' long rope, tied). */
 		VarCheck var;

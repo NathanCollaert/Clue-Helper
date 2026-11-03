@@ -449,7 +449,7 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/**
-	 * A row object on the way that opens only once another is used (Meiyerditch's barricade), or the Abyss obstacle picked
+	 * A row object on the way that opens only once another is used, or the Abyss obstacle picked
 	 * in place of the spot the walk data names, as the guide outlines it: the line leads there first.
 	 */
 	private List<WorldPoint> toUseFirst(WorldView view, WalkCosts here, List<WorldPoint> ahead)

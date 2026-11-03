@@ -400,7 +400,7 @@ public class RoutePlanner
 		return walk.reachedTiles() <= 1;
 	}
 
-	/** Mid-obstacle in a pocket with no node (south of Kaleb's, anim 741), a few tiles from a start that had nodes. */
+	/** Mid-obstacle in a pocket with no node, a few tiles from a start that had nodes. */
 	private boolean isInPocket(int nearestHere, boolean targetInScene, WorldPoint tile)
 	{
 		return nearestHere == WalkTable.NO_NODE && !targetInScene && start != null && start.getKind() == PlanStart.Kind.SCENE
@@ -486,7 +486,7 @@ public class RoutePlanner
 		return hold ? walk : best;
 	}
 
-	/** The player is still on the walk's way, not teleported off it (back to the Crafting Guild). */
+	/** The player is still on the walk's way, not teleported off it. */
 	private boolean isAlong(Route walk)
 	{
 		PlanStart from = start;

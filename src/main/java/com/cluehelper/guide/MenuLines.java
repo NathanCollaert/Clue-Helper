@@ -543,8 +543,8 @@ public class MenuLines
 
 	/**
 	 * The Minigame Teleport spell opens a grid of cards, one per minigame, each with the game's name and its places;
-	 * the card whose name is the row's game is boxed whole, icon and all. A row like "Rat Pits: 4. Port Sarim" names the
-	 * game first.
+	 * the card whose name is the row's game is boxed whole, icon and all. A row names the game before
+	 * its place.
 	 */
 	private void minigameCard(String name, Found out)
 	{
@@ -560,7 +560,7 @@ public class MenuLines
 		}
 	}
 
-	/** A game with several places asks which one next, e.g. "Port Sarim (wily cats)" for "Rat Pits: 4. Port Sarim". */
+	/** A game with several places asks which one next. */
 	private boolean minigamePlace(String name, Found out)
 	{
 		String[] parts = name.split(": ", 2);
@@ -615,7 +615,7 @@ public class MenuLines
 	}
 
 	/**
-	 * Each boat in the Teleport to Boat list is a flat run of widgets: its name, a "Location: <dock>" line and a
+	 * Each boat in the Teleport to Boat list is a flat run of widgets: its name, a line naming its dock and a
 	 * Teleport To button level with them. The button nearest the dock's line in height is that boat's.
 	 */
 	private void boat(String dock, Found out)

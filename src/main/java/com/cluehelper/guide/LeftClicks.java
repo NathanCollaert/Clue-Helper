@@ -103,7 +103,7 @@ public final class LeftClicks
 		return click != null && (WEAR_OPTIONS.contains(click) || USE_OPTION.equals(click));
 	}
 
-	/** A spell's left click: Cast, or the landing set with Configure (Seers' for Camelot Teleport), once hovered. */
+	/** A spell's left click: Cast, or the landing set with Configure, once hovered. */
 	String spell(int spellWidgetId)
 	{
 		return learned().getOrDefault(SPELL + spellWidgetId, CAST_OPTION);
@@ -200,8 +200,8 @@ public final class LeftClicks
 	}
 
 	/**
-	 * A multiloc's own definition has no actions: its shown form's do, and each form clicks differently (Doris' trapdoor,
-	 * 12266, opens as 12267 and goes down as 12268), so left clicks are learned per shown form.
+	 * A multiloc's own definition has no actions: its shown form's do, and each form clicks differently (a trapdoor opens
+	 * on one form and goes down on the next), so left clicks are learned per shown form.
 	 */
 	private ObjectComposition shown(int objectId)
 	{

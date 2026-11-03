@@ -153,7 +153,7 @@ final class StepHighlights
 			.collect(Collectors.toUnmodifiableList());
 	}
 
-	/** Someone opened it already, so its left click now goes on through it ("Go-down" on Doris' trapdoor), unless it shuts it. */
+	/** Someone opened it already, so its left click now goes on through it ("Go-down" on an open trapdoor), unless it shuts it. */
 	private boolean isOpenedAlready(TileObject object, String firstClick)
 	{
 		return OPEN_OPTION.equalsIgnoreCase(firstClick) && !leftClicks.offers(object, OPEN_OPTION)
@@ -554,7 +554,7 @@ final class StepHighlights
 		"inspect", "read");
 
 	/**
-	 * A list opener's click only opens the list, unless the row ends on that very option ("Quest point cape: Teleport"):
+	 * A list opener's click only opens the list, unless the row ends on that very option:
 	 * then nothing follows it.
 	 */
 	private static boolean teleportsTo(String option, String destination)
@@ -568,7 +568,7 @@ final class StepHighlights
 	}
 
 	/**
-	 * An item with one destination names no option in its row ("Skull sceptre" left-clicks "Invoke" or "Teleport"), so
+	 * An item with one destination names no option in its row (its left click may be "Invoke" or "Teleport"), so
 	 * any left click that is an action of its own is its teleport: with one destination there is no list to open.
 	 */
 	private static boolean isOwnTeleport(String option)

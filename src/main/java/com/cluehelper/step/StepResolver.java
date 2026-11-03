@@ -244,7 +244,7 @@ public class StepResolver
 	}
 
 	/**
-	 * An NPC met at either of two tiles by quest state (Radimus Erkle in his house, then in the Legends' Guild) is only at
+	 * An NPC met at either of two tiles by quest state is only at
 	 * the tile whose NPC shows: core names the house alone, the cache both.
 	 */
 	private List<WorldPoint> shownNpcTiles(List<WorldPoint> tiles, StepIndex.Entry entry)

@@ -99,7 +99,7 @@ final class ModelSilhouette
 			boolean onScreen = y[a] != OFF_SCREEN && y[b] != OFF_SCREEN && y[c] != OFF_SCREEN;
 			if (onScreen && isDrawn(model, face))
 			{
-				// Turned to wind as the faces facing the camera do: a flat model wound the other way (Doris' trapdoor) still fills
+				// Turned to wind as the faces facing the camera do: a flat model wound the other way still fills
 				boolean facing = facesCamera(x[a], y[a], x[b], y[b], x[c], y[c]);
 				int next = facing ? b : c;
 				int last = facing ? c : b;

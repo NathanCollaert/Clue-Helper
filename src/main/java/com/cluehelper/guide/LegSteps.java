@@ -170,8 +170,8 @@ final class LegSteps
 	}
 
 	/**
-	 * The hotkey in the menu line's colour: the list label's own ("diary cape: B. Mikasi"), else put before
-	 * the destination as a list label shows it ("Jewellery box: 7. Burthorpe").
+	 * The hotkey in the menu line's colour: the one the list label already carries, else put before
+	 * the destination as a list label shows it.
 	 */
 	static String withKey(String text, char key)
 	{

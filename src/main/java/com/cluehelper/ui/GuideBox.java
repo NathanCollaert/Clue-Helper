@@ -21,7 +21,7 @@ public class GuideBox
 	private static final String NO_PLAN_YET = "Waiting for the first plan";
 	/** The withdraw step's item lines' grey: what to click, apart from the white item it is clicked on. */
 	private static final Color DESTINATION = new Color(190, 190, 190);
-	/** A hotkey the guide coloured, with the ". " after it: "<col=40d0ff>M</col>. Falador Park". */
+	/** A hotkey the guide coloured, with the ". " after it. */
 	private static final Pattern HOTKEY_LABEL = Pattern.compile("(<col=[0-9a-f]{6}>[^<]+</col>)\\. ");
 	private static final String FAIRY_RING = "Fairy ring";
 	private static final String HOTKEY_DASH = " - ";
@@ -32,7 +32,7 @@ public class GuideBox
 	private static final String TABLET = " tablet";
 	private static final String TAB = " tab";
 	private static final String TELEPORT_TO = "Teleport to ";
-	/** "Break the Varrock tablet", "Read the Watson teleport scroll", "Use the ectophial". */
+	/** A verb, then "the" and what it is done to. */
 	private static final Pattern VERB_THE = Pattern.compile("^(\\w+) the (.+)$");
 	private static final Set<String> ROUTE_NOTES = Set.of(NO_ROUTE, NO_PLAN_YET, "Walk too long", "No target tile for this step yet");
 
@@ -129,7 +129,7 @@ public class GuideBox
 
 	/**
 	 * Every teleport reads alike, ITEM: DESTINATION HOTKEY: the item or object in the text's white, what to click in it
-	 * ("POH Portals: Yanille") in the item lines' grey, and its hotkey last in the menu's blue. A step with no item
+	 * in the item lines' grey, and its hotkey last in the menu's blue. A step with no item
 	 * reads as VERB: THING instead (see actionText), the thing in grey.
 	 */
 	private static String travelText(SubStep step)
@@ -160,8 +160,7 @@ public class GuideBox
 	}
 
 	/**
-	 * A teleport with no item, as VERB: THING: "Cast: Varrock", "Break: Varrock teleport tab", "Use: Mort'ton teleport
-	 * scroll", "Enter: Lumbridge portal".
+	 * A teleport with no item, as VERB: THING.
 	 */
 	private static String actionText(String text, String destination)
 	{
@@ -183,7 +182,7 @@ public class GuideBox
 		return (READ.equals(verb) ? USE : verb) + ": " + coloured(capitalise(thing));
 	}
 
-	/** A tablet as its item is called: "Varrock tablet" is the Varrock teleport tab. */
+	/** A tablet as its item is called: a teleport tab. */
 	private static String tabName(String tablet)
 	{
 		if (!tablet.contains(TABLET))
@@ -193,7 +192,7 @@ public class GuideBox
 		return tablet.replace(TABLET, tablet.startsWith(TELEPORT_TO) ? TAB : " teleport" + TAB);
 	}
 
-	/** "Falador Park - M": the dash in the text's white. */
+	/** The place, then the hotkey after a dash in the text's white. */
 	private static String withHotkey(String place, String hotkey)
 	{
 		return place.isEmpty() ? hotkey : place + HOTKEY_DASH + hotkey;

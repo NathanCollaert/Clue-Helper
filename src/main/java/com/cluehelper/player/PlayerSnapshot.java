@@ -51,11 +51,11 @@ public final class PlayerSnapshot
 	/** Empty except in a banked snapshot. */
 	private final Map<Integer, Integer> groupStorage;
 	private final HouseState house;
-	/** Patch names known to be grown: spirit trees, and the grown patches read from Time Tracking (a Farming Guild redwood). */
+	/** Patch names known to be grown: spirit trees, and the grown patches read from Time Tracking. */
 	private final Set<String> plantedTrees;
 	/** Account unlocks seen in play, named as the catalog's {@code UNLOCK_} tokens name them (without the prefix). */
 	private final Set<String> unlocks;
-	/** A code like "CKS", where a ring's Last-destination goes; null when unknown. */
+	/** The three-letter code where a ring's Last-destination goes; null when unknown. */
 	private final String lastFairyRing;
 
 	@Builder(toBuilder = true)

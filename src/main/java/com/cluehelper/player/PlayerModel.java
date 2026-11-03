@@ -62,7 +62,7 @@ public class PlayerModel
 	private Set<String> unlocks = Set.of();
 	/** Items owned but known not to do what their id promises: a steel key ring the Metal key was taken off. */
 	private Set<Integer> uncounted = Set.of();
-	/** Grown patches other than spirit trees (a Farming Guild redwood), named as the step data names them. */
+	/** Grown patches other than spirit trees, named as the step data names them. */
 	private Set<String> grownPatches = Set.of();
 	private String lastFairyRing;
 	private String dirtyBecause;

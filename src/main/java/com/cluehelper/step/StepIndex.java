@@ -138,7 +138,7 @@ public final class StepIndex
 		private boolean toPlantedTree;
 		/** The task plants a seed in a farming patch, cleared first of weeds or a crop. */
 		private boolean plants;
-		/** The step is in the dark, where core asks for no light source: the Genie's cave below Nardah. */
+		/** The step is in the dark, where core asks for no light source. */
 		private boolean light;
 		/** Other items that do what one of core's items does (a vial of water and a cadantine for the unfinished potion). */
 		private List<Alternative> alternatives = List.of();
@@ -146,9 +146,9 @@ public final class StepIndex
 		private List<Making> making = List.of();
 		/** The spell the task casts (Lvl-5 Enchant), or null. */
 		private Cast cast;
-		/** The spellbook the task is done on (ARCEUUS for the Barrows tablet), or null for any. */
+		/** The spellbook the task is done on, or null for any. */
 		private String book;
-		/** The option the task picks in an interface (Barrows at the lectern), or null. */
+		/** The option the task picks in an interface, or null. */
 		private Choose choose;
 		private String floor;
 		private String note;
@@ -211,7 +211,7 @@ public final class StepIndex
 				.collect(Collectors.toList());
 		}
 
-		/** The skill levels the task itself needs (Sherlock's 82 Fishing); boosts count. */
+		/** The skill levels the task itself needs; boosts count. */
 		public List<Level> getLevels()
 		{
 			return requirements == null ? List.of() : requirements.stats;
@@ -330,7 +330,7 @@ public final class StepIndex
 		private int[] tile;
 		private int radius;
 		private String text;
-		/** Other spawns the route may go to instead (green dragons outside the Wilderness), each as x, y, plane. */
+		/** Other spawns the route may go to instead, each as x, y, plane. */
 		@Getter(AccessLevel.NONE)
 		private List<int[]> also = List.of();
 
@@ -350,7 +350,7 @@ public final class StepIndex
 	}
 
 	/**
-	 * An NPC's wander range: the box it walks in, less a box inside it never enters (Lumbridge Castle's keep for Hans),
+	 * An NPC's wander range: the box it walks in, less a box inside it never enters,
 	 * and tiles across it that routes may end on.
 	 */
 	public static final class Wander
@@ -358,7 +358,7 @@ public final class StepIndex
 		private int[] area;
 		private int[] exclude;
 		private List<int[]> tiles;
-		/** Where to look, shown under the walk: "He wanders the desert between Nardah and the Agility Pyramid". */
+		/** Where to look, shown under the walk. */
 		@Getter
 		private String text;
 
@@ -651,11 +651,11 @@ public final class StepIndex
 		private List<String> click;
 		/** Core's items this place takes others in place of (pure essence for fragments at the True Blood Altar). */
 		private List<Alternative> uses = List.of();
-		/** A patch that must be grown for this place to count (a Farming Guild redwood); null for a place always there. */
+		/** A patch that must be grown for this place to count; null for a place always there. */
 		private String grown;
 		/** The area the task works anywhere in, {west, south, east, north, plane} (the Dark Altar's reanimation ground). */
 		private int[] span;
-		/** The chat options to pick, in order, after the click (the Skullball Boss's "I would like to do the course"). */
+		/** The chat options to pick, in order, after the click. */
 		private List<String> dialogue = List.of();
 
 		public boolean hasSpan()

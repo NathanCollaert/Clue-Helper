@@ -16,7 +16,7 @@ public class Spot
 	int radius;
 	/** Core's description, without its full stop. */
 	String description;
-	/** Core's area name, e.g. "Zeah". */
+	/** Core's area name. */
 	String area;
 	/** On the single/multi border, where the master's enemy can be one Brassican Mage or three wizards. */
 	boolean border;

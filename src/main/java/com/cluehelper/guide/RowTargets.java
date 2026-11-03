@@ -143,7 +143,7 @@ final class RowTargets
 		return withItems(MenuTarget.builder(), itemIds).path(List.of(option)).build();
 	}
 
-	/** The options after the row name's item: "Ardougne cloak: Kandarin Monastery" is Kandarin Monastery. */
+	/** The options the row's name lists after its item, one per colon. */
 	List<String> optionPath(CatalogRow row)
 	{
 		String[] parts = row.getName().split(": ");

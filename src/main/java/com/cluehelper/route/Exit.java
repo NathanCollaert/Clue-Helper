@@ -22,6 +22,6 @@ public class Exit
 	/** The other objects a row between the same tiles goes through (the Viyeldi winch before its rope is tied). */
 	@With
 	Set<Integer> otherForms;
-	/** The chat option the talk picks (the Vyrewatch's "Could you escort me to the mines?"); empty for none. */
+	/** The chat option the talk picks; empty for none. */
 	String chat;
 }

@@ -12,7 +12,7 @@ import net.runelite.client.util.Text;
 /**
  * Client thread. Which keys hang on the steel key ring is in no var the client gets, so the Metal key's place is learned
  * from the player's clicks: Remove on it in the ring's Check-keys window takes it off, using it on the ring puts it back.
- * Until either is seen the key counts as on the ring. A ring without it doesn't open the Desert Mining Camp's gate.
+ * Until either is seen the key counts as on the ring. A ring without it doesn't open the gate the key is for.
  */
 @Singleton
 public class KeyRingMemory

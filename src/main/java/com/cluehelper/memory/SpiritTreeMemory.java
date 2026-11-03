@@ -112,7 +112,7 @@ public class SpiritTreeMemory
 		}
 	}
 
-	/** "<col=735a28>7</col>: Port Sarim" → "Port Sarim". */
+	/** A list line's place, without its coloured hotkey. */
 	private static String placeOf(String raw)
 	{
 		String text = Text.removeTags(raw).trim();

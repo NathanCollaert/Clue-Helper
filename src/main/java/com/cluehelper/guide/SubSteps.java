@@ -487,8 +487,8 @@ public final class SubSteps
 	}
 
 	/**
-	 * A walk from outside the step's hand-written way in to its target, or to anything else inside it (the STASH unit
-	 * below Trollweiss Mountain's slope). A task's way in leads to its places, not to Sherlock.
+	 * A walk from outside the step's hand-written way in to its target, or to anything else inside it (a STASH unit
+	 * behind the same slope). A task's way in leads to its places, not to Sherlock.
 	 */
 	private static boolean entersStepArea(Leg leg, Step step)
 	{
@@ -499,7 +499,7 @@ public final class SubSteps
 
 	/**
 	 * A walk covers at most a tile a half-tick, so one that starts further from the way in than its time allows goes in
-	 * another way (into the Cosmic Altar out of the Abyss, not through its ruins in Zanaris).
+	 * another way (into an altar out of the Abyss, not through its ruins).
 	 */
 	private static boolean canPass(Leg leg, StepIndex.WayIn way)
 	{

@@ -151,7 +151,7 @@ public class NpcPlaceMemory
 		remembered.set(places);
 	}
 
-	/** The journal writes "Rogues' Castle" with tags and its own breaks: compared lower case, tags and apostrophes off. */
+	/** The journal writes place names with tags and its own breaks: compared lower case, tags and apostrophes off. */
 	private static String plain(String text)
 	{
 		return Text.removeTags(text.replace("<br>", " ")).replace("'", "").toLowerCase(Locale.ROOT);
