@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 nexus	Portal nexus: Varrock	1858 7051 0	3213 3424 0								20	1	4	F	none	any	Y	nexus:1	nexus 450 Misthalin		
 nexus	Portal nexus: Grand Exchange	1858 7051 0	3165 3479 0						4480=1		20	1	4	F	none	any	Y	nexus:1	nexus 451 Misthalin		varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE

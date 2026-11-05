@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 quetzal	Quetzal: Auburnvale	1389 2901 0	1411 3361 0					Twilight's Promise			20	6	2	F	none	any	Y		quetzal 13		
 quetzal	Quetzal: Civitas illa Fortis	1389 2901 0	1697 3140 0					Twilight's Promise			20	6	2	F	none	any	Y		quetzal 1		

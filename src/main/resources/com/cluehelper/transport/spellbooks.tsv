@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Display info	Kind	Where	From	To	Items	Skills	Quests	Varbits	Duration	Menu ticks	Spends	Members	Note	Gameval
 Spellbook Swap	temporary	anywhere	Lunar	any	ASTRAL_RUNE=3&COSMIC_RUNE=2&LAW_RUNE=1	96 Magic	Dream Mentor		4	1	runes	Y	right-click the book; the left-click Cast opens a chooser (2 clicks)	
 Magic cape: Spellbook	persistent	anywhere	any	any	9762=1|9763=1	99 Magic		4816<5	1	1	cape-use	Y	per-book sub-menu; shares the daily counter with the Max cape	item:9762=SKILLCAPE_MAGIC item:9763=SKILLCAPE_MAGIC_TRIMMED varbit:4816=SB_SWAP_CHECK

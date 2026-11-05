@@ -208,7 +208,7 @@ final class StepHighlights
 				.collect(Collectors.toUnmodifiableList());
 	}
 
-	/** An act's own items, its STASH unit, the gear to put on, or a planted tree's line; else only its one-click fill. */
+	/** An act's own items, its STASH unit or the gear to put on; else only its one-click fill. */
 	private Highlights actHighlights(Highlights.HighlightsBuilder shown, SubStep current, Step step)
 	{
 		shown.tab(current.getTab());
@@ -234,12 +234,7 @@ final class StepHighlights
 		{
 			return useOnNpc(shown, current, step);
 		}
-		String planted = taskActs.plantedTreeLine(current, step);
-		if (planted != null)
-		{
-			shown.menuTarget(rowTargets.plantedTree(current.getObjectIds(), planted));
-		}
-		else if (current.getStage() != null && current.getOption() != null && !current.getStage().getDialogue().isEmpty())
+		if (current.getStage() != null && current.getOption() != null && !current.getStage().getDialogue().isEmpty())
 		{
 			shown.menuTarget(withStageDialogue(current));
 		}

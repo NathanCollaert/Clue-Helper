@@ -124,7 +124,7 @@ public final class CampaignReplay
 			.build();
 		Plan plan = Planner.withoutAlternatives(input);
 		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start,
-			recording.settings::isScrollBookOutOfWilderness, id -> false);
+			recording.settings::isScrollBookOutOfWilderness, id -> false, catalog::getTeleports);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 		return Outcome.of(plan, guide);
 	}

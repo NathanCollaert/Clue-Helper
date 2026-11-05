@@ -134,7 +134,7 @@ public final class StepIndex
 		private List<Before> before = List.of();
 		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
 		private List<Integer> anywhereWith = List.of();
-		/** The task travels to one of the player's planted spirit trees, picked in the tree's list. */
+		/** The task travels to one of the player's planted spirit trees: the route ends with the teleport to the first grown one. */
 		private boolean toPlantedTree;
 		/** The task plants a seed in a farming patch, cleared first of weeds or a crop. */
 		private boolean plants;

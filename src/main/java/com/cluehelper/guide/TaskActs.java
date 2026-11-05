@@ -181,20 +181,6 @@ final class TaskActs
 		return state < PATCH_WEEDED ? Patch.WEEDS : state == PATCH_WEEDED ? Patch.EMPTY : Patch.CROP;
 	}
 
-	/**
-	 * At a spirit tree for the planted-tree task: the player's first planted tree, as its line in the tree's list, reached
-	 * by Travel or, on the house's spiritual fairy tree, by Tree.
-	 */
-	String plantedTreeLine(SubStep current, Step step)
-	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		if (!current.isTask() || step == null || !step.getData().isToPlantedTree() || snapshot == null)
-		{
-			return null;
-		}
-		return snapshot.getPlantedTrees().stream().sorted().findFirst().orElse(null);
-	}
-
 	/** An interface option the task picks and its confirm button, outlined while the interface is open. */
 	List<Widget> choice(SubStep current, Step step)
 	{

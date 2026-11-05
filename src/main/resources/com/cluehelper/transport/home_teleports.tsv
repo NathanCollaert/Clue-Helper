@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 home	Lumbridge Home Teleport		3221 3218 0							4560=0;892@30	20	24	0	F	cooldown:892	Standard	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER
 home	Lumbridge Home Teleport		3221 3218 0							4560&1;892@30	20	24	0	F	cooldown:892	Standard	N				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:892=AIDE_TELE_TIMER

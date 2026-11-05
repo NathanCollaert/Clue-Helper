@@ -292,4 +292,4 @@ SEQUENCE skill: cryptic:a graceful man of many colours, his crates must be full 
   alt       111t: Skills necklace: Farming Guild → walk 26 → Minecart: Shayzien West → walk 37 → Book of the dead: History and Hearsay → walk 33 {charge:11968=1, charge:25818=1}
 SEQUENCE three-step (6 orders)
   best      103t: Skills necklace: Mining Guild → walk 35 → Lumbridge Teleport → walk 28 → Varrock Teleport → walk 28 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
-PROBES (hot/cold spots): {2860,3562,0=30, 2915,3425,0=66, 2917,3295,0=14, 2972,3486,0=65, 2976,3239,0=43, 3030,3364,0=34, 3031,3304,0=66, 3033,3438,0=57}
+PROBES (hot/cold spots): {2860,3562,0=30, 2915,3425,0=66, 2917,3295,0=14, 2972,3486,0=65, 2975,3238,0=43, 3030,3364,0=34, 3031,3304,0=66, 3033,3438,0=57}

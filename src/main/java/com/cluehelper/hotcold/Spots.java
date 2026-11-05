@@ -41,12 +41,7 @@ public final class Spots
 		int x = tile == null ? core.getX() : tile[0];
 		int y = tile == null ? core.getY() : tile[1];
 		int radius = Math.max(MIN_RADIUS, Math.max(Math.abs(core.getX() - x), Math.abs(core.getY() - y)));
-		String description = location.getArea();
-		if (description.endsWith("."))
-		{
-			description = description.substring(0, description.length() - 1);
-		}
-		return new Spot(location.name(), tier, x, y, radius, description,
+		return new Spot(location.name(), tier, x, y, radius,
 			location.getHotColdArea().getName(), location.getEnemy() == Enemy.BRASSICAN_OR_WIZARDS);
 	}
 }

@@ -46,20 +46,24 @@ public final class SubSteps
 	private final Supplier<PlanStart> start;
 	private final BooleanSupplier scrollBookOutOfWilderness;
 	private final IntPredicate weaponOrArmour;
+	private final Supplier<List<CatalogRow>> catalog;
 
 	@Inject
-	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear)
+	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear,
+		AvailabilityService availability)
 	{
 		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
-			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour);
+			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog);
 	}
 
 	/**
 	 * @param client item names
 	 * @param weaponOrArmour what the Entrana monks turn away
+	 * @param catalog the teleports, for the spirit tree a planted-tree task travels to
 	 */
 	public SubSteps(Client client, Supplier<PlayerSnapshot> snapshot, IntPredicate onlyInBankedKit, StepNeeds stepNeeds,
-		Supplier<PlanStart> start, BooleanSupplier scrollBookOutOfWilderness, IntPredicate weaponOrArmour)
+		Supplier<PlanStart> start, BooleanSupplier scrollBookOutOfWilderness, IntPredicate weaponOrArmour,
+		Supplier<List<CatalogRow>> catalog)
 	{
 		this.client = client;
 		this.snapshot = snapshot;
@@ -68,17 +72,33 @@ public final class SubSteps
 		this.start = start;
 		this.scrollBookOutOfWilderness = scrollBookOutOfWilderness;
 		this.weaponOrArmour = weaponOrArmour;
+		this.catalog = catalog;
 	}
 
 	/** Client thread only. The route's legs as sub-steps, then the step's own acts. */
 	public List<SubStep> of(Route route, Step step)
 	{
 		boolean takeFromStash = takeFromStash(step);
-		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash).build(this::exitOf);
+		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash)
+			.build(this::exitOf, this::plantedTreeTeleport);
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(withAreaNpcsOnWalk(legs, step.getData()), step.getData(), this::finished, carriedIds()), step.getData());
 		List<SubStep> steps = withRideGearWorn(route, withEntranaDeposits(withWanderNote(withGearOnArrival(wayIn), step.getData())));
 		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
 			: steps;
+	}
+
+	/**
+	 * From the spirit tree at this tile, the teleport to the first of the player's grown trees in the tree's list; null
+	 * when none is known grown.
+	 */
+	private CatalogRow plantedTreeTeleport(WorldPoint tree)
+	{
+		PlayerSnapshot player = snapshot.get();
+		Set<String> grown = player == null ? Set.of() : player.getPlantedTrees();
+		return catalog.get().stream()
+			.filter(row -> row.getCategory() == Category.SPIRIT_TREE && tree.equals(row.getOrigin()))
+			.filter(row -> row.getRequirements().getPlantedTrees().stream().anyMatch(grown::contains))
+			.min(Comparator.comparing(CatalogRow::getMenu)).orElse(null);
 	}
 
 	private Set<Integer> carriedIds()
@@ -315,7 +335,7 @@ public final class SubSteps
 			this.stashFirst = takeFromStash && stashOutsideWayIn(step);
 		}
 
-		List<SubStep> build(Function<Leg, Exit> exits)
+		List<SubStep> build(Function<Leg, Exit> exits, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
 		{
 			if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 			{
@@ -344,7 +364,15 @@ public final class SubSteps
 				}
 				if (reached != null)
 				{
-					addStageAct(steps, reached.atPlace(leg.getTo()));
+					CatalogRow toPlanted = step.getData().isToPlantedTree() ? plantedTreeTeleport.apply(leg.getTo()) : null;
+					if (toPlanted != null)
+					{
+						steps.add(LegSteps.teleport(Leg.teleport(leg.getTo(), toPlanted, toPlanted.getDuration(), leg.getBookAfter()), house));
+					}
+					else
+					{
+						addStageAct(steps, reached.atPlace(leg.getTo()));
+					}
 					stage++;
 				}
 			}

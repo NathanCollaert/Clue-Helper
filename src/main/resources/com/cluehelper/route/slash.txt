@@ -1,4 +1,4 @@
-# Shortest Path 300e8de ItemVariations.SLASH (BSD-2, see NOTICE), written by tools/catalog/seed.py.
+# Shortest Path 6f8eab1 ItemVariations.SLASH (BSD-2, see NOTICE), written by tools/catalog/seed.py.
 35
 667
 746

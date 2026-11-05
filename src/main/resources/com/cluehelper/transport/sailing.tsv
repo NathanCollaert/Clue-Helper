@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 spell	Teleport to Boat		3050 3192 0			LAW_RUNE=2&EARTH_RUNE=2&WATER_RUNE=2	67 Magic	Pandemonium	19258=1;19260=0;19270=2		20	4	1	F	runes	Standard	Y		boat Port Sarim		varbit:19258=SAILING_BOAT_1_OWNED varbit:19260=SAILING_BOAT_1_PORT varbit:19270=SAILING_BOAT_1_TELEPORT_FOCUS
 tablet	Teleport to boat		3050 3192 0			31443=1			19258=1;19260=0;19270=2		20	5	1	T	item	any	Y		boat Port Sarim		item:31443=POH_TABLET_TELEPORTMETOBOAT varbit:19258=SAILING_BOAT_1_OWNED varbit:19260=SAILING_BOAT_1_PORT varbit:19270=SAILING_BOAT_1_TELEPORT_FOCUS

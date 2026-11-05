@@ -4652,6 +4652,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3205 3523 0	3205 3520 0	Cross	Wilderness Ditch	23271	
 3205 9378 0	3310 2961 0	Climb-up	Rope	6439	
 3205 9380 0	3310 2961 0	Climb-up	Rope	6439	
+3206 2395 0	3212 2395 0	Cross	Stepping stone	57936	
 3206 3208 0	3205 3209 1	Climb-up	Staircase	56230	
 3206 3208 1	3205 3209 2	Climb-up	Staircase	16672	
 3206 3208 1	3206 3208 0	Climb-down	Staircase	16672	
@@ -4693,6 +4694,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3211 3243 1	3211 3243 0	Climb-down	Ladder	16679	
 3211 3520 0	3211 3523 0	Cross	Wilderness Ditch	23271	
 3211 3523 0	3211 3520 0	Cross	Wilderness Ditch	23271	
+3212 2395 0	3206 2395 0	Cross	Stepping stone	57936	
 3212 3138 0	3214 3130 0	Jump-to	Stepping stone	16513	
 3212 3138 0	3214 3131 0	Jump-to	Stepping stone	16513	
 3212 3221 0	3213 3221 0	Open	Large door	12349	
@@ -4875,6 +4877,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3234 3523 0	3234 3520 0	Cross	Wilderness Ditch	23271	
 3234 9323 0	3234 9325 0	Open	Doorway	6553	
 3234 9325 0	3234 9323 0	Open	Doorway	6553	
+3235 2386 0	3235 2390 0	Climb	Rocks	57932	
+3235 2390 0	3235 2386 0	Climb	Rocks	57931	
 3235 3520 0	3235 3523 0	Cross	Wilderness Ditch	23271	
 3235 3523 0	3235 3520 0	Cross	Wilderness Ditch	23271	
 3236 3408 3	3236 3410 3	Hurdle	Ledge	14836	
@@ -4959,6 +4963,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3253 3446 2	3253 3442 1	Climb-down	Staircase	11799	
 3253 3520 0	3253 3523 0	Cross	Wilderness Ditch	23271	
 3253 3523 0	3253 3520 0	Cross	Wilderness Ditch	23271	
+3254 2398 0	3260 2398 0	Climb	Rocks	57933	
 3254 3442 1	3254 3446 2	Climb-up	Staircase	11797	
 3254 3446 2	3254 3442 1	Climb-down	Staircase	11799	
 3254 3520 0	3254 3523 0	Cross	Wilderness Ditch	23271	
@@ -4992,6 +4997,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3259 3520 0	3259 3523 0	Cross	Wilderness Ditch	23271	
 3259 3523 0	3259 3520 0	Cross	Wilderness Ditch	23271	
 3259 3663 0	3385 10052 0	Walk-down	Stairs	40388	
+3260 2398 0	3254 2398 0	Climb	Rocks	57934	
 3260 3520 0	3260 3523 0	Cross	Wilderness Ditch	23271	
 3260 3523 0	3260 3520 0	Cross	Wilderness Ditch	23271	
 3260 3663 0	3385 10052 0	Walk-down	Stairs	40388	
@@ -5051,6 +5057,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3271 2817 0	3263 2817 0	Jump-to	Stepping stone	62401	
 3271 3520 0	3271 3523 0	Cross	Wilderness Ditch	23271	
 3271 3523 0	3271 3520 0	Cross	Wilderness Ditch	23271	
+3272 2327 0	3272 2333 0	Climb	Rocks	57930	
+3272 2333 0	3272 2327 0	Climb	Rocks	57929	
 3272 3182 3	3272 3172 3	Cross	Tightrope	14398	
 3272 3520 0	3272 3523 0	Cross	Wilderness Ditch	23271	
 3272 3523 0	3272 3520 0	Cross	Wilderness Ditch	23271	

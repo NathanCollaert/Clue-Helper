@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 spell	Varrock Teleport		3213 3424 0			AIR_RUNE=3&FIRE_RUNE=1&LAW_RUNE=1	25 Magic				20	4	0	F	runes	Standard	N				
 spell	Varrock Teleport: Grand Exchange		3165 3479 0			AIR_RUNE=3&FIRE_RUNE=1&LAW_RUNE=1	25 Magic		4480=1		20	4	1	F	runes	Standard	N				varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE

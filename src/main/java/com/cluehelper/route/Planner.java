@@ -328,8 +328,9 @@ public final class Planner
 			Route pick = new Picks(Picks.routes(ctx, best)).best;
 			if (pick != null)
 			{
-				ticks.put(ctx.tile(node), pick.getTicks());
-				ranks.put(ctx.tile(node), (pick.getRankHalfTicks() + 1) / 2);
+				WorldPoint tile = ctx.standTile(node);
+				ticks.put(tile, pick.getTicks());
+				ranks.put(tile, (pick.getRankHalfTicks() + 1) / 2);
 			}
 		});
 		return ticks;

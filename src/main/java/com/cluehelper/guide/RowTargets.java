@@ -133,11 +133,6 @@ final class RowTargets
 		return MenuTarget.builder().objectIds(Set.of(change.getObjectId())).path(List.of(SPELLBOOK_OPTION, book.label())).build();
 	}
 
-	MenuTarget plantedTree(Set<Integer> treeIds, String line)
-	{
-		return MenuTarget.builder().objectIds(treeIds).path(List.of(TRAVEL_OPTION, TREE_OPTION, line)).build();
-	}
-
 	MenuTarget items(Set<Integer> itemIds, String option)
 	{
 		return withItems(MenuTarget.builder(), itemIds).path(List.of(option)).build();

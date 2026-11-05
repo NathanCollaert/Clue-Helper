@@ -72,6 +72,10 @@ public class GuideOverlay extends OverlayPanel
 			gap();
 			hotCold(shown.getHotCold());
 		}
+		if (!shown.getNotes().isEmpty() && hasTextUnderTitle())
+		{
+			gap();
+		}
 		shown.getNotes().forEach(note -> line(note, WARNING));
 		if (shown.getNext() != null)
 		{
@@ -96,6 +100,11 @@ public class GuideOverlay extends OverlayPanel
 	{
 		line(view.getTitle(), TEXT);
 		view.getWarnings().forEach(warning -> line(warning, WARNING));
+	}
+
+	private boolean hasTextUnderTitle()
+	{
+		return panelComponent.getChildren().size() > 1;
 	}
 
 	private void gap()

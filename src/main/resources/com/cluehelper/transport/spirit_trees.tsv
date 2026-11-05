@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 300e8de (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 spirit tree	Spirit tree: Gnome Stronghold	2542 3170 0	2461 3444 0		Travel Spirit tree 26261			Tree Gnome Village			20	5	4	F	none	any	Y		list 2: Gnome Stronghold		object:26261=SPIRITTREE_BIG_2OPS_ORBS
 spirit tree	Spirit tree: Battlefield of Khazard	2542 3170 0	2555 3259 0		Travel Spirit tree 26261			Tree Gnome Village			20	5	4	F	none	any	Y		list 3: Battlefield of Khazard		object:26261=SPIRITTREE_BIG_2OPS_ORBS

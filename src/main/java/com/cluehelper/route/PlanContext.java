@@ -333,6 +333,13 @@ final class PlanContext
 		return node > goal ? extraTiles.get(node - goal - 1) : null;
 	}
 
+	/** Where the player stands at the node: a table node's own tile can be an NPC's or an object's, off the walkable floor. */
+	WorldPoint standTile(int node)
+	{
+		WorldPoint placed = isTableNode(node) ? table.placed(node) : null;
+		return placed != null ? placed : tile(node);
+	}
+
 	/** Call once every node exists, after the targets are added. */
 	void freezeNodes()
 	{

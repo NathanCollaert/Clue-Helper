@@ -6,7 +6,7 @@ import lombok.Value;
 
 /**
  * The box's hot/cold lines. Where to feel or dig is the route's own guidance, so this adds only what the route can't
- * say: which spot a dig is for, why there is no next feel, and what can hurt you.
+ * say: why there is no next feel, and what can hurt you.
  */
 @Value
 public class HotColdView
@@ -45,19 +45,18 @@ public class HotColdView
 		{
 			warnings.add("Dig on the single-combat side to face one Brassican Mage");
 		}
-		String title = title(plan, dug);
+		String title = title(plan);
 		return title == null && warnings.isEmpty() ? null : new HotColdView(title, List.copyOf(warnings));
 	}
 
-	private static String title(HotColdPlan plan, Spot dug)
+	private static String title(HotColdPlan plan)
 	{
 		switch (plan.getAction())
 		{
 			case FEEL:
 			case DIG_HERE:
-				return null;
 			case DIG_SPOT:
-				return dug == null ? null : "Dig: " + dug.getDescription();
+				return null;
 			case NONE:
 				return plan.getKept().size() + " spots left, and no feel tells them apart";
 			default:
