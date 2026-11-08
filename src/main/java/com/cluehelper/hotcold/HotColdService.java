@@ -313,6 +313,7 @@ public class HotColdService
 		}
 		plan = planned;
 		probeTarget.set(target(planned));
+		routes.onTravelStepChanged();
 		planListeners.forEach(listener -> listener.accept(new Planned(job, planned)));
 		listeners.forEach(Runnable::run);
 	}

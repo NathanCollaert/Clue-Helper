@@ -38,4 +38,7 @@ public class PlanInput
 	boolean foreignHouseStart;
 	/** The followed route's first transport key; null when no route of this step is followed. */
 	String followedFirstTransport;
+	/** PROBES steps only: the search stops past this many ranking ticks, so tiles farther away may be missing. */
+	@Builder.Default
+	int probeRankLimitTicks = Integer.MAX_VALUE;
 }

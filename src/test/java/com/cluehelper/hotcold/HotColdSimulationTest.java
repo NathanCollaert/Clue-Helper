@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdLocation;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdSolver;
@@ -136,7 +138,7 @@ public class HotColdSimulationTest
 		int ticks = 0;
 		for (int feels = 0; feels <= MOST_FEELS; feels++)
 		{
-			HotColdPlan plan = ProbeJob.decide("sim", spots, tier, readings, coreSpots(core), probes(at, landings), costs);
+			HotColdPlan plan = ProbeJob.decide("sim", spots, tier, readings, coreSpots(core), nearby(at), landingsWithin(landings), costs);
 			if (plan.isDig())
 			{
 				boolean found = plan.getTile().distanceTo2D(centre) <= Band.digRadius(tier);
@@ -197,7 +199,7 @@ public class HotColdSimulationTest
 		core.signal(new WorldPoint(reading.getX(), reading.getY(), reading.getPlane()), temperature, change);
 	}
 
-	private static List<Probe> probes(WorldPoint at, List<WorldPoint> landings)
+	private static List<Probe> nearby(WorldPoint at)
 	{
 		List<Probe> probes = new ArrayList<>();
 		probes.add(new Probe(at, Probe.Kind.HERE, 0, 0, false));
@@ -212,11 +214,13 @@ public class HotColdSimulationTest
 				}
 			}
 		}
-		for (WorldPoint landing : landings)
-		{
-			probes.add(new Probe(landing, Probe.Kind.LANDING, LANDING_TICKS, LANDING_TICKS, false));
-		}
 		return probes;
+	}
+
+	private static IntFunction<List<Probe>> landingsWithin(List<WorldPoint> landings)
+	{
+		return limit -> LANDING_TICKS > limit ? List.of() : landings.stream()
+			.map(landing -> new Probe(landing, Probe.Kind.LANDING, LANDING_TICKS, LANDING_TICKS, false)).collect(Collectors.toList());
 	}
 
 	private static List<WorldPoint> landings() throws IOException

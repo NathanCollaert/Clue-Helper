@@ -99,7 +99,7 @@ final class LabelSearch
 			{
 				continue;
 			}
-			if (!probes && (label.f > rankLimit || pastEverythingUseful(label.f)))
+			if (label.f > rankLimit || !probes && pastEverythingUseful(label.f))
 			{
 				break;
 			}

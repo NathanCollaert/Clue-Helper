@@ -80,7 +80,7 @@ public final class Planner
 		boolean probes = step.getKind() == TargetKind.PROBES;
 		Searches searches = new Searches(ctx, area, probes);
 
-		LabelSearch first = searches.bestOrder(orders, Set.of(), Integer.MAX_VALUE);
+		LabelSearch first = searches.bestOrder(orders, Set.of(), probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
 		Plan.PlanBuilder plan = Plan.builder().stepKey(step.getKey());
 		Picks picks = new Picks(ctx, first);
 		if (picks.best == null && ctx.avoidsWilderness && !probes)
@@ -317,6 +317,12 @@ public final class Planner
 			return at != null && at.getPlane() == landing.getPlane() && at.distanceTo2D(landing) <= SAME_LANDING_TILES
 				&& route.getSpent().keySet().containsAll(other.getSpent().keySet());
 		});
+	}
+
+	private static int probeRankLimitHalfTicks(PlanInput in)
+	{
+		int ticks = in.getProbeRankLimitTicks();
+		return ticks >= Integer.MAX_VALUE / 2 ? Integer.MAX_VALUE : 2 * ticks + 1;
 	}
 
 	/** Fills {@code ranks} with each tile's ranking ticks, rounded up. */

@@ -161,6 +161,12 @@ public class RoutePlanner
 		refresh();
 	}
 
+	/** Client thread. Plans now rather than on the next tick, after something off the tick changed {@link #travelStep()}. */
+	public void onTravelStepChanged()
+	{
+		refresh();
+	}
+
 	/** The start walk from a new tile first, then a plan once any of its inputs changed. */
 	private void refresh()
 	{

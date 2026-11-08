@@ -3,6 +3,7 @@ package com.cluehelper.hotcold;
 import com.cluehelper.route.Running;
 import com.cluehelper.step.HotColdTier;
 import java.util.*;
+import java.util.function.IntFunction;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -27,6 +28,11 @@ public final class ProbePlanner
 	private static final double LOG2 = Math.log(2);
 	/** With this few spots left the next feel can end the solve, so the trip from the probe to the dig counts too. */
 	private static final int ONWARD_SPOTS = 3;
+	/**
+	 * The first landing search's reach when no nearby feel sets a bar. In recorded master solves the bar came out at
+	 * 15 ticks or less, so one search usually does; past it a second search runs to the bar the first one set.
+	 */
+	private static final int FIRST_LANDING_TICKS = 15;
 
 	private ProbePlanner()
 	{
@@ -98,6 +104,57 @@ public final class ProbePlanner
 			return null;
 		}
 		return new Choice(best, bestBits, bestCost, branches(samples, tier, before, best.getTile()));
+	}
+
+	/**
+	 * The nearby probes and only the landings that could still beat the best of them, so the landing search can stop
+	 * early. With no nearby feel to go by, the landings within {@link #FIRST_LANDING_TICKS} set the bar first. With
+	 * {@link #ONWARD_SPOTS} or fewer spots left it takes every landing, since each probe's cost then depends on all of them.
+	 *
+	 * @param landingsWithin landing probes whose ranking ticks are at most the given number
+	 */
+	public static List<Probe> worthTrying(Hypotheses.Samples samples, HotColdTier tier, Reading previous, List<Probe> nearby,
+		IntFunction<List<Probe>> landingsWithin, Costs costs)
+	{
+		List<Probe> probes = new ArrayList<>(nearby);
+		if (samples.spotCount() <= ONWARD_SPOTS)
+		{
+			probes.addAll(landingsWithin.apply(Integer.MAX_VALUE));
+			return probes;
+		}
+		double mostBits = mostBits(samples, previous);
+		int limit = rankTicksWorthTrying(mostBits, choose(samples, tier, previous, probes, costs));
+		if (limit > FIRST_LANDING_TICKS)
+		{
+			probes.addAll(landingsWithin.apply(FIRST_LANDING_TICKS));
+			limit = rankTicksWorthTrying(mostBits, choose(samples, tier, previous, probes, costs));
+			if (limit <= FIRST_LANDING_TICKS)
+			{
+				return probes;
+			}
+			probes = new ArrayList<>(nearby);
+		}
+		probes.addAll(landingsWithin.apply(limit));
+		return probes;
+	}
+
+	/** The most ranking ticks a probe can take and still beat {@code best}, even if it told {@code mostBits}. */
+	private static int rankTicksWorthTrying(double mostBits, Choice best)
+	{
+		if (best == null)
+		{
+			return Integer.MAX_VALUE;
+		}
+		double bestScore = best.getBits() / best.getCostTicks();
+		return (int) Math.ceil(mostBits / bestScore) - FEEL_TICKS - FEEL_PENALTY_TICKS;
+	}
+
+	/** No feel tells more than the spots' uncertainty, nor more than its possible readings can tell apart. */
+	private static double mostBits(Hypotheses.Samples samples, Reading previous)
+	{
+		int bands = Band.values().length;
+		int readings = previous == null ? bands : 1 + (bands - 1) * Comparison.values().length;
+		return Math.min(entropy(spotMasses(samples)), Math.log(readings) / LOG2);
 	}
 
 	static int cost(Probe probe, Costs costs)

@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
@@ -42,8 +43,10 @@ public class HotColdDecisionReplayTest
 				List<Reading> readings = Arrays.asList(gson.fromJson(recorded.get("readings"), Reading[].class));
 				ProbePlanner.Costs costs = ProbePlanner.Costs.builder()
 					.wildernessPenaltyTicks(recorded.get("wildernessPenaltyTicks").getAsInt()).build();
+				List<Probe> probes = probes(recorded.getAsJsonArray("probes"));
 				HotColdPlan plan = ProbeJob.decide(recorded.get("stepKey").getAsString(), Spots.of(index, tier), tier, readings,
-					CoreSpots.UNKNOWN, probes(recorded.getAsJsonArray("probes")), costs);
+					CoreSpots.UNKNOWN, ofKind(probes, false), limit -> ofKind(probes, true).stream()
+						.filter(probe -> probe.getRankTicks() <= limit).collect(Collectors.toList()), costs);
 				String expected = recorded.get("action").getAsString() + " " + tile(recorded.getAsJsonArray("tile"));
 				String replayed = plan.getAction() + " " + plan.getTile();
 				if (!expected.equals(replayed))
@@ -55,6 +58,11 @@ public class HotColdDecisionReplayTest
 		}
 		assertTrue("a live run's decisions are recorded", decisions > 0);
 		assertEquals(List.of(), differences);
+	}
+
+	private static List<Probe> ofKind(List<Probe> probes, boolean landing)
+	{
+		return probes.stream().filter(probe -> (probe.getKind() == Probe.Kind.LANDING) == landing).collect(Collectors.toList());
 	}
 
 	private static List<Probe> probes(JsonArray recorded)
