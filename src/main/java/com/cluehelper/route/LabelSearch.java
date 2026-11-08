@@ -19,6 +19,8 @@ final class LabelSearch
 	static final int CHANGED = 1;
 	static final int WALKED = 2;
 	static final int CATEGORIES = 3;
+	/** A bank stop or a walked change is taken only when it beats the route without it by more than this. */
+	static final int MARGIN_HALF_TICKS = 4;
 	private static final int BOOKS = 7;
 	private static final int FIRST_PENDING = 4;
 	private static final int LUNAR = Book.LUNAR.ordinal();
@@ -146,21 +148,27 @@ final class LabelSearch
 	}
 
 	/**
-	 * A route needing the margin must beat the best plain route, so nothing past it matters; while that route uses a
-	 * change, Same book is still worth a slack past it.
+	 * A route needing the margin must beat the best plain route, so nothing past it matters. Nor does a plain route
+	 * past the best banked one by more than the margin: the banked one is taken over it. While the route judged
+	 * against uses a change, Same book is still worth a slack past it.
 	 */
 	private boolean pastEverythingUseful(int f)
 	{
 		Label plain = bestPlainGoal();
-		if (plain == null)
+		if (plain != null && f > usefulUpTo(plain, goals[plainBankState][NONE] != null))
 		{
-			return false;
+			return true;
 		}
-		if (goals[plainBankState][NONE] != null || !wantSameBook)
-		{
-			return f > plain.rank;
-		}
-		return f > plain.rank + Math.max(plain.rank, SAME_BOOK_SLACK_HALF_TICKS);
+		Label[] banked = goals[PlanContext.BANKED];
+		Label bankOnly = banked[NONE] != null ? banked[NONE] : banked[CHANGED];
+		return plainBankState == PlanContext.NOT_BANKED && bankOnly != null
+			&& f > usefulUpTo(bankOnly, banked[NONE] != null) + MARGIN_HALF_TICKS;
+	}
+
+	private int usefulUpTo(Label judgedAgainst, boolean withoutChange)
+	{
+		return withoutChange || !wantSameBook ? judgedAgainst.rank
+			: judgedAgainst.rank + Math.max(judgedAgainst.rank, SAME_BOOK_SLACK_HALF_TICKS);
 	}
 
 	/** Past the best plain route only Same book can still be found, so changed labels are dropped there. */

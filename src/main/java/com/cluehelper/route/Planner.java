@@ -14,7 +14,6 @@ import net.runelite.api.coords.WorldPoint;
 public final class Planner
 {
 	/** A route with a bank stop or a walked change must beat its reference by this much: near-ties stay on fewer steps. */
-	private static final int MARGIN_HALF_TICKS = 4;
 	/** A transport landing this near a target unreached is taken as its way in when the note says what is missing. */
 	private static final int BLOCKED_RIDE_TILES = 50;
 	/** The engine words each shortfall as "needs 25 x Ecto-token"; under a "needs:" heading the word goes. */
@@ -722,7 +721,7 @@ public final class Planner
 			{
 				return true;
 			}
-			return route.getRankHalfTicks() < reference.getRankHalfTicks() - MARGIN_HALF_TICKS;
+			return route.getRankHalfTicks() < reference.getRankHalfTicks() - LabelSearch.MARGIN_HALF_TICKS;
 		}
 	}
 }
