@@ -47,6 +47,8 @@ final class LabelSearch
 	private final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : a.half - b.half);
 
 	final Label[][] goals = new Label[2][CATEGORIES];
+	/** The bank state of the plain routes the margin is judged against: banked when no route can skip the bank. */
+	private final int plainBankState;
 	final Map<Integer, Label[][]> probeBest = new HashMap<>();
 	int labels;
 
@@ -87,6 +89,30 @@ final class LabelSearch
 				targets[leg][target] = true;
 			}
 		}
+		this.plainBankState = noRouteWithoutBankStop() ? PlanContext.BANKED : PlanContext.NOT_BANKED;
+	}
+
+	/** At an open bank, or with a leg none of whose targets can be reached without one, every route takes a bank stop. */
+	private boolean noRouteWithoutBankStop()
+	{
+		if (startBankState() == PlanContext.BANKED)
+		{
+			return true;
+		}
+		for (int leg = 0; leg < legTargets.size(); leg++)
+		{
+			boolean lastLeg = leg == legTargets.size() - 1;
+			boolean anyWithoutBank = false;
+			for (int target : legTargets.get(leg))
+			{
+				anyWithoutBank |= !ctx.stageNeedsBank(target, PlanContext.NOT_BANKED) && (!lastLeg || ctx.arrivesWithoutBank(target));
+			}
+			if (!anyWithoutBank)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void run()
@@ -130,7 +156,7 @@ final class LabelSearch
 		{
 			return false;
 		}
-		if (goals[0][NONE] != null || !wantSameBook)
+		if (goals[plainBankState][NONE] != null || !wantSameBook)
 		{
 			return f > plain.rank;
 		}
@@ -146,8 +172,8 @@ final class LabelSearch
 
 	private Label bestPlainGoal()
 	{
-		Label[] noBankStop = goals[PlanContext.NOT_BANKED];
-		return noBankStop[NONE] != null ? noBankStop[NONE] : noBankStop[CHANGED];
+		Label[] plain = goals[plainBankState];
+		return plain[NONE] != null ? plain[NONE] : plain[CHANGED];
 	}
 
 	private int startNode()
