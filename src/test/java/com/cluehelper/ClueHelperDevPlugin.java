@@ -217,6 +217,13 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(hotColdTrace::stop);
 		PlanTrace planTrace = new PlanTrace(client, clueHelper.getRoutes());
 		unregister.add(planTrace::stop);
+		LagTrace lagTrace = new LagTrace(client, clueHelper.getClueLink(), clueHelper.getRoutes(), clueHelper.getGuide());
+		eventBus.register(lagTrace);
+		unregister.add(() ->
+		{
+			eventBus.unregister(lagTrace);
+			lagTrace.stop();
+		});
 		addDevPanel();
 		log.info("{} dev plugin up", TAG);
 	}

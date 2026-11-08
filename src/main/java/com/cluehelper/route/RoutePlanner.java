@@ -16,6 +16,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 
@@ -159,6 +160,19 @@ public class RoutePlanner
 	public void onGameTick()
 	{
 		refresh();
+	}
+
+	/**
+	 * A teleport's scene loads after the tick that moved the player, so the walk from the new tile is redone as soon as it
+	 * has loaded rather than on the next tick. Skipped while the player model still holds the tile from before the jump.
+	 */
+	public void onGameStateChanged(GameStateChanged event)
+	{
+		Player local = client.getLocalPlayer();
+		if (event.getGameState() == GameState.LOGGED_IN && local != null && local.getWorldLocation().equals(player.getPosition().getTile()))
+		{
+			refresh();
+		}
 	}
 
 	/** Client thread. Plans now rather than on the next tick, after something off the tick changed {@link #travelStep()}. */

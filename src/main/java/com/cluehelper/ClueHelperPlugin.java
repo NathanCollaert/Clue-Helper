@@ -360,6 +360,7 @@ public class ClueHelperPlugin extends Plugin
 	public void onGameStateChanged(GameStateChanged event)
 	{
 		playerModel.onGameStateChanged(event);
+		routes.onGameStateChanged(event);
 		bankMemory.onGameStateChanged(event);
 		poh.onGameStateChanged(event);
 		unlocks.onGameStateChanged(event);
