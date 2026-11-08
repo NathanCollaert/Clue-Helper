@@ -69,11 +69,17 @@ final class WalkLine
 		}
 		WorldPoint at = local.getWorldLocation();
 		int nearestDistance = Integer.MAX_VALUE;
+		LoadedScene live = null;
 		for (int i = passed; i < walk.size(); i++)
 		{
 			WorldPoint tile = walk.get(i);
 			int distance = tile.getPlane() == at.getPlane() ? tile.distanceTo2D(at) : Integer.MAX_VALUE;
-			if (distance < nearestDistance || distance == nearestDistance && !isClosedOff(at, tile))
+			boolean neighbourTie = distance == nearestDistance && distance == 1;
+			if (neighbourTie && live == null)
+			{
+				live = LoadedScene.capture(client.getTopLevelWorldView());
+			}
+			if (distance < nearestDistance || distance == nearestDistance && !(neighbourTie && isClosedOff(live, at, tile)))
 			{
 				passed = i;
 				nearestDistance = distance;
@@ -86,13 +92,8 @@ final class WalkLine
 	 * miss the tile in front of the door: standing there, the tile behind a door not yet opened is as near as the one
 	 * before it, but not passed.
 	 */
-	private boolean isClosedOff(WorldPoint at, WorldPoint tile)
+	private static boolean isClosedOff(LoadedScene live, WorldPoint at, WorldPoint tile)
 	{
-		if (tile.getPlane() != at.getPlane() || tile.distanceTo2D(at) != 1)
-		{
-			return false;
-		}
-		LoadedScene live = LoadedScene.capture(client.getTopLevelWorldView());
 		return live != null && live.contains(at) && live.contains(tile) && !live.canStep(at, tile);
 	}
 
