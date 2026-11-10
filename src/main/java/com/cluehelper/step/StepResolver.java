@@ -3,6 +3,7 @@ package com.cluehelper.step;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -18,7 +19,6 @@ public class StepResolver
 {
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
-
 
 	private final Supplier<StepIndex> index;
 	/** Whether an NPC id shows for the player: a multiloc NPC is hidden in the form its quest state doesn't use. */
@@ -57,13 +57,14 @@ public class StepResolver
 	{
 		ClueFacts facts = CoreClueReader.facts(clue, plugin);
 		String key = StepKey.of(facts);
-		StepIndex.Entry entry = clue instanceof ThreeStepCrypticClue
+		StepIndex.Entry found = clue instanceof ThreeStepCrypticClue
 			? threeStepEntry((ThreeStepCrypticClue) clue)
 			: index.get().entry(key);
-		if (entry == null && loggedUnknown.add(key))
+		if (found == null && loggedUnknown.add(key))
 		{
 			log.info("No step data for {}: using the Clue Scroll plugin's targets only", key);
 		}
+		StepIndex.Entry entry = found == null ? StepIndex.Entry.NONE : found;
 		String tier = tier(facts, entry);
 		List<WorldPoint> targets = targets(clue, plugin, facts, entry);
 		List<String> npcs = NpcAliases.withAliases(CoreClueReader.npcs(clue, plugin));
@@ -81,7 +82,7 @@ public class StepResolver
 			.objectNames(CoreClueReader.objectNames(clue))
 			.requirements(requirements(clue))
 			.stages(stages)
-			.data(entry == null ? StepIndex.Entry.NONE : entry)
+			.data(entry)
 			.otherTiles(otherTiles(entry, targets))
 			.emotes(CoreClueReader.emotes(clue))
 			.build();
@@ -94,15 +95,14 @@ public class StepResolver
 		{
 			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::wornFor);
 		}
-		StepIndex.Target key = entry == null ? null : entry.getTargets().stream()
+		StepIndex.Target key = entry.getTargets().stream()
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
 		if (key != null)
 		{
 			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
 				Stages::keyItem), targets);
 		}
-		StepIndex.Requires dropped = entry == null ? null
-			: entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
+		StepIndex.Requires dropped = entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
 		if (dropped != null)
 		{
 			ItemRequirement item = ItemRequirements.any(dropped.getName(), dropped.getIds().stream().map(ItemRequirements::item)
@@ -120,19 +120,7 @@ public class StepResolver
 	/** Cache tiles the step is also done at, off core's targets: Brimstail inside his cave, Martin Thwait in the den. */
 	private static List<WorldPoint> otherTiles(StepIndex.Entry entry, List<WorldPoint> targets)
 	{
-		if (entry == null)
-		{
-			return List.of();
-		}
-		List<WorldPoint> other = new ArrayList<>();
-		for (WorldPoint tile : tiles(entry))
-		{
-			if (!nearAny(tile, targets))
-			{
-				other.add(tile);
-			}
-		}
-		return List.copyOf(other);
+		return tiles(entry).stream().filter(tile -> !nearAny(tile, targets)).collect(Collectors.toUnmodifiableList());
 	}
 
 	/** For a clue whose getters threw: only its class, so it still shows as a step. */
@@ -199,8 +187,7 @@ public class StepResolver
 		{
 			return TargetKind.SEQUENCE;
 		}
-		boolean killArea = entry != null && entry.getArea() != null;
-		return CoreClueReader.regions(clue).isEmpty() && !killArea ? TargetKind.ANY_OF : TargetKind.AREA;
+		return CoreClueReader.regions(clue).isEmpty() && entry.getArea() == null ? TargetKind.ANY_OF : TargetKind.AREA;
 	}
 
 	/**
@@ -210,29 +197,22 @@ public class StepResolver
 	 */
 	private List<WorldPoint> targets(ClueScroll clue, ClueScrollPlugin plugin, ClueFacts facts, StepIndex.Entry entry)
 	{
-		if (entry != null && entry.getStand() != null)
+		if (entry.getStand() != null)
 		{
 			return List.of(entry.getStand());
 		}
-		if (entry != null && entry.getArea() != null && entry.getArea().getTile() != null)
+		if (entry.getArea() != null && entry.getArea().getTile() != null)
 		{
 			return entry.getArea().getTiles();
 		}
 		List<WorldPoint> core = CoreClueReader.locations(clue, plugin);
-		List<WorldPoint> cache = entry == null ? List.of() : tiles(entry);
+		List<WorldPoint> cache = tiles(entry);
 		if (ClueTypes.COORDINATE.equals(facts.getType()) && !cache.isEmpty())
 		{
-			List<WorldPoint> named = new ArrayList<>();
-			for (WorldPoint tile : core)
-			{
-				if (nearAny(tile, cache))
-				{
-					named.add(tile);
-				}
-			}
+			List<WorldPoint> named = core.stream().filter(tile -> nearAny(tile, cache)).collect(Collectors.toUnmodifiableList());
 			if (!named.isEmpty())
 			{
-				return List.copyOf(named);
+				return named;
 			}
 			WorldPoint primary = CoreClueReader.primaryLocation(clue, plugin);
 			return primary == null ? core : List.of(primary);
@@ -249,28 +229,21 @@ public class StepResolver
 	 */
 	private List<WorldPoint> shownNpcTiles(List<WorldPoint> tiles, StepIndex.Entry entry)
 	{
-		if (entry == null)
-		{
-			return tiles;
-		}
-		List<WorldPoint> shown = new ArrayList<>();
-		for (WorldPoint tile : tiles)
-		{
-			boolean hidden = entry.getTargets().stream()
-				.filter(target -> target.getTile() != null && !target.getNpcs().isEmpty() && nearAny(tile, List.of(target.getTile())))
-				.anyMatch(target -> target.getNpcs().stream().noneMatch(npcShown::test));
-			if (!hidden)
-			{
-				shown.add(tile);
-			}
-		}
-		return List.copyOf(shown);
+		return tiles.stream().filter(tile -> !hidesNpc(tile, entry)).collect(Collectors.toUnmodifiableList());
+	}
+
+	/** A target NPC at the tile none of whose ids shows. */
+	private boolean hidesNpc(WorldPoint tile, StepIndex.Entry entry)
+	{
+		return entry.getTargets().stream()
+			.filter(target -> target.getTile() != null && !target.getNpcs().isEmpty() && target.getTile().distanceTo(tile) <= 1)
+			.anyMatch(target -> target.getNpcs().stream().noneMatch(npcShown::test));
 	}
 
 	/** An NPC that wanders far is met wherever the route reaches its range first. */
 	private static List<WorldPoint> withWander(List<WorldPoint> targets, StepIndex.Entry entry)
 	{
-		if (entry == null || entry.getWander() == null)
+		if (entry.getWander() == null)
 		{
 			return targets;
 		}
@@ -281,33 +254,17 @@ public class StepResolver
 
 	private static boolean nearAny(WorldPoint tile, List<WorldPoint> others)
 	{
-		for (WorldPoint other : others)
-		{
-			if (other.getPlane() == tile.getPlane() && Math.max(Math.abs(other.getX() - tile.getX()), Math.abs(other.getY() - tile.getY())) <= 1)
-			{
-				return true;
-			}
-		}
-		return false;
+		return others.stream().anyMatch(other -> other.distanceTo(tile) <= 1);
 	}
 
 	private static List<WorldPoint> tiles(StepIndex.Entry entry)
 	{
-		List<WorldPoint> tiles = new ArrayList<>();
-		for (int[] tile : entry.getTiles())
-		{
-			WorldPoint point = new WorldPoint(tile[0], tile[1], tile[2]);
-			if (!tiles.contains(point))
-			{
-				tiles.add(point);
-			}
-		}
-		return List.copyOf(tiles);
+		return entry.getTiles().stream().distinct().collect(Collectors.toUnmodifiableList());
 	}
 
 	private static String tier(ClueFacts facts, StepIndex.Entry entry)
 	{
-		if (entry != null && entry.getTier() != null)
+		if (entry.getTier() != null)
 		{
 			return entry.getTier();
 		}

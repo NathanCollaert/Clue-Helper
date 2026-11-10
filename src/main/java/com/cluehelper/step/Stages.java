@@ -27,9 +27,7 @@ public final class Stages
 	/** Every stage's tiles in order: the step's targets. */
 	public static List<WorldPoint> tiles(List<Stage> stages)
 	{
-		List<WorldPoint> tiles = new ArrayList<>();
-		stages.forEach(stage -> tiles.addAll(stage.getTiles()));
-		return List.copyOf(tiles);
+		return stages.stream().flatMap(stage -> stage.getTiles().stream()).collect(Collectors.toUnmodifiableList());
 	}
 
 	static List<Stage> parts(List<CrypticClue> parts, ClueScrollPlugin plugin, Function<CrypticClue, List<String>> wornFor)
@@ -181,38 +179,31 @@ public final class Stages
 	 * Sherlock: the task (at its places, or anywhere when the data has none) until core marks it completed, then
 	 * Sherlock. Empty when only the hand-in is left, and for Charlie, whose item is a need of the step like Sherlock's
 	 * items: the player brings it.
+	 *
+	 * @param entry {@link StepIndex.Entry#NONE} when the data lacks the step
 	 */
-	static List<Stage> challenge(StepIndex.Entry entry, String task, boolean completed, ItemRequirement returnItem,
+	static List<Stage> challenge(StepIndex.Entry entry, String taskText, boolean completed, ItemRequirement returnItem,
 		List<WorldPoint> targets, List<ItemRequirement> emptied)
 	{
-		List<Stage> stages = new ArrayList<>();
-		if (returnItem == null && !completed)
-		{
-			List<WorldPoint> places = entry == null ? List.of() : placeTiles(entry.getPlaces());
-			String where = entry == null || !entry.hasPlaces() ? null
-				: entry.getPlaces().isEmpty() ? ANYWHERE : entry.getPlaces().get(0).getText();
-			stages.add(Stage.builder().kind(Stage.Kind.TASK).act(entry == null || entry.getAct() == null ? sentence(task) : entry.getAct()).detail(where).tiles(places)
-				.ourMarker(true).objectIds(entry == null ? Set.of() : objectsOf(entry.getPlaces()))
-				.npcIds(entry == null ? Set.of() : npcsOf(entry.getPlaces())).takesStepItems(true)
-				.worn(entry == null ? List.of() : entry.getWear()).emptied(emptied).before(entry == null ? List.of() : entry.getBefore())
-				.spans(entry == null ? List.of() : spans(entry.getPlaces()))
-				.option(entry == null ? null : entry.getPlaces().stream().map(StepIndex.Place::getOption).filter(option -> option != null)
-					.findFirst().orElse(null))
-				.dialogue(entry == null ? List.of() : entry.getPlaces().stream().map(StepIndex.Place::getDialogue)
-					.filter(dialogue -> !dialogue.isEmpty()).findFirst().orElse(List.of()))
-				.grownOnly(entry == null ? Map.of() : grownOnly(entry.getPlaces()))
-				.placeTexts(entry == null || !entry.hasPlaces() ? Map.of() : placeTexts(entry.getPlaces()))
-				.houseObjects(entry == null ? Set.of() : entry.getPlaces().stream().filter(place -> PositionRules.POH_NODE.equals(place.getTile()))
-					.flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet()))
-				.uses(entry == null ? Map.of() : usesByTile(entry.getPlaces()))
-				.book(entry == null || entry.getBook() == null ? null : Book.valueOf(entry.getBook())).build());
-		}
-		if (stages.isEmpty())
+		if (returnItem != null || completed)
 		{
 			return List.of();
 		}
-		stages.add(Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
-		return List.copyOf(stages);
+		List<StepIndex.Place> places = entry.getPlaces();
+		String where = !entry.hasPlaces() ? null : places.isEmpty() ? ANYWHERE : places.get(0).getText();
+		Stage task = Stage.builder().kind(Stage.Kind.TASK).act(entry.getAct() == null ? sentence(taskText) : entry.getAct()).detail(where)
+			.tiles(placeTiles(places)).ourMarker(true).objectIds(objectsOf(places)).npcIds(npcsOf(places)).takesStepItems(true)
+			.worn(entry.getWear()).emptied(emptied).before(entry.getBefore()).spans(spans(places))
+			.option(places.stream().map(StepIndex.Place::getOption).filter(option -> option != null).findFirst().orElse(null))
+			.dialogue(places.stream().map(StepIndex.Place::getDialogue).filter(dialogue -> !dialogue.isEmpty()).findFirst()
+				.orElse(List.of()))
+			.grownOnly(grownOnly(places))
+			.placeTexts(placeTexts(places))
+			.houseObjects(places.stream().filter(place -> PositionRules.POH_NODE.equals(place.getTile()))
+				.flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet()))
+			.uses(usesByTile(places))
+			.book(entry.getBook() == null ? null : Book.valueOf(entry.getBook())).build();
+		return List.of(task, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
 	}
 
 	/** The prayer a Sherlock task turns on ("activate the chivalry prayer."), or null. */

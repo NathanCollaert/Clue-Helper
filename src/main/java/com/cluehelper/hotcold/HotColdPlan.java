@@ -39,27 +39,6 @@ public class HotColdPlan
 	@Builder.Default
 	List<Probe> considered = List.of();
 
-	/** The next feel, at the probe the choice picked. */
-	static HotColdPlan feel(HotColdPlanBuilder base, ProbePlanner.Choice choice)
-	{
-		return base.action(Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
-	}
-
-	static HotColdPlan digHere(HotColdPlanBuilder base, WorldPoint tile)
-	{
-		return base.action(Action.DIG_HERE).tile(tile).build();
-	}
-
-	static HotColdPlan digSpot(HotColdPlanBuilder base, WorldPoint tile)
-	{
-		return base.action(Action.DIG_SPOT).tile(tile).build();
-	}
-
-	static HotColdPlan none(HotColdPlanBuilder base)
-	{
-		return base.action(Action.NONE).build();
-	}
-
 	public boolean isDig()
 	{
 		return action == Action.DIG_HERE || action == Action.DIG_SPOT;

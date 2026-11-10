@@ -58,12 +58,12 @@ public class ProbeJob
 			.exact(grid.isExact()).readings(FeelLogs.feels(readings)).probes(nearby.size()).considered(List.copyOf(nearby));
 		if (shook && core.isFelt())
 		{
-			return HotColdPlan.digHere(plan, new WorldPoint(last.getX(), last.getY(), last.getPlane()));
+			return plan.action(HotColdPlan.Action.DIG_HERE).tile(new WorldPoint(last.getX(), last.getY(), last.getPlane())).build();
 		}
 		List<Spot> kept = grid.keptSpots();
 		if (kept.size() == 1)
 		{
-			return HotColdPlan.digSpot(plan, grid.digTile(kept.get(0).getName()));
+			return plan.action(HotColdPlan.Action.DIG_SPOT).tile(grid.digTile(kept.get(0).getName())).build();
 		}
 		Hypotheses.Samples samples = grid.sample(SAMPLES_PER_SPOT);
 		List<Probe> probes = ProbePlanner.worthTrying(samples, tier, last, nearby, landingsWithin, costs);
@@ -71,9 +71,9 @@ public class ProbeJob
 		ProbePlanner.Choice choice = ProbePlanner.choose(samples, tier, last, probes, costs);
 		if (choice == null)
 		{
-			return HotColdPlan.none(plan);
+			return plan.action(HotColdPlan.Action.NONE).build();
 		}
-		return HotColdPlan.feel(plan, choice);
+		return plan.action(HotColdPlan.Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
 	}
 
 	private List<Probe> nearby()

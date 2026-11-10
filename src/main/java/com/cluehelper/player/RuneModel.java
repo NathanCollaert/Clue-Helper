@@ -13,14 +13,8 @@ import net.runelite.api.gameval.ItemID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RuneModel
 {
-	private static final int PARAM_RUNE_1 = 365;
-	private static final int PARAM_RUNE_COUNT_1 = 366;
-	private static final int PARAM_RUNE_2 = 367;
-	private static final int PARAM_RUNE_COUNT_2 = 368;
-	private static final int PARAM_RUNE_3 = 369;
-	private static final int PARAM_RUNE_COUNT_3 = 370;
-	private static final int[][] RUNE_PARAMS = {
-		{PARAM_RUNE_1, PARAM_RUNE_COUNT_1}, {PARAM_RUNE_2, PARAM_RUNE_COUNT_2}, {PARAM_RUNE_3, PARAM_RUNE_COUNT_3}};
+	/** A spell's three {rune, rune count} item params. */
+	private static final int[][] RUNE_PARAMS = {{365, 366}, {367, 368}, {369, 370}};
 	private static final int PARAM_NAME = 601;
 	private static final int PARAM_MEMBERS = 603;
 	private static final int PARAM_LEVEL = 604;
@@ -220,11 +214,6 @@ public final class RuneModel
 
 	private static List<Integer> keysOf(CacheView cache, int enumId)
 	{
-		List<Integer> keys = new ArrayList<>();
-		for (int key : cache.enumKeys(enumId))
-		{
-			keys.add(key);
-		}
-		return keys;
+		return Arrays.stream(cache.enumKeys(enumId)).boxed().collect(Collectors.toList());
 	}
 }

@@ -21,14 +21,13 @@ public class Spend
 	static List<Spend> parse(String cell)
 	{
 		List<Spend> spends = new ArrayList<>();
-		for (String token : cell.split(";"))
+		for (String clause : RequirementParser.clauses(cell))
 		{
-			String trimmed = token.trim();
-			if (trimmed.isEmpty() || trimmed.equals(NONE))
+			if (clause.equals(NONE))
 			{
 				continue;
 			}
-			String[] parts = trimmed.split(":", 2);
+			String[] parts = clause.split(":", 2);
 			Kind kind = Kind.valueOf(parts[0].toUpperCase(Locale.ROOT).replace('-', '_'));
 			spends.add(new Spend(kind, parts.length == 2 ? Integer.parseInt(parts[1]) : NO_VAR));
 		}

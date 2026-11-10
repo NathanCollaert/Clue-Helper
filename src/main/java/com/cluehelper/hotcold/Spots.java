@@ -2,6 +2,7 @@ package com.cluehelper.hotcold;
 
 import com.cluehelper.step.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.Enemy;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdLocation;
@@ -18,15 +19,8 @@ public final class Spots
 	public static List<Spot> of(StepIndex index, HotColdTier tier)
 	{
 		Map<String, StepIndex.Spot> cache = index.getHotColdSpots();
-		List<Spot> spots = new ArrayList<>();
-		for (HotColdLocation location : HotColdLocation.values())
-		{
-			if (tierOf(location) == tier)
-			{
-				spots.add(spot(location, tier, cache.get(location.name())));
-			}
-		}
-		return List.copyOf(spots);
+		return Arrays.stream(HotColdLocation.values()).filter(location -> tierOf(location) == tier)
+			.map(location -> spot(location, tier, cache.get(location.name()))).collect(Collectors.toUnmodifiableList());
 	}
 
 	private static HotColdTier tierOf(HotColdLocation location)
@@ -40,7 +34,7 @@ public final class Spots
 		int[] tile = cached == null ? null : cached.getTile();
 		int x = tile == null ? core.getX() : tile[0];
 		int y = tile == null ? core.getY() : tile[1];
-		int radius = Math.max(MIN_RADIUS, Math.max(Math.abs(core.getX() - x), Math.abs(core.getY() - y)));
+		int radius = Math.max(MIN_RADIUS, Hypotheses.distance(core, x, y));
 		return new Spot(location.name(), tier, x, y, radius,
 			location.getHotColdArea().getName(), location.getEnemy() == Enemy.BRASSICAN_OR_WIZARDS);
 	}

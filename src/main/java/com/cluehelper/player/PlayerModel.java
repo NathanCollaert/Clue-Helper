@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 import javax.inject.*;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -48,7 +49,8 @@ public class PlayerModel
 	@Inject
 	private CheckLines checkLines;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
-	private final Queue<int[]> pendingWatches = new ConcurrentLinkedQueue<>();
+	private final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
+	private final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
 
 	private final Set<Integer> watchedVarbits = new HashSet<>();
 	private final Set<Integer> watchedVarps = new HashSet<>();
@@ -69,9 +71,23 @@ public class PlayerModel
 	private long version;
 	private Map<Integer, Integer> fakeCarried = Map.of();
 
+	/** Null until the first tick after login. */
+	@Getter
 	private volatile RuneModel runeModel;
+	/** Null while logged out. */
+	@Getter
 	private volatile PlayerSnapshot snapshot;
+	/**
+	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
+	 * new snapshot version.
+	 */
+	@Getter
 	private volatile Position position = Position.NONE;
+	/**
+	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
+	 * when first seen.
+	 */
+	@Getter
 	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	public void start()
@@ -96,36 +112,6 @@ public class PlayerModel
 		position = Position.NONE;
 	}
 
-	/** Null while logged out. */
-	public PlayerSnapshot getSnapshot()
-	{
-		return snapshot;
-	}
-
-	/**
-	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
-	 * new snapshot version.
-	 */
-	public Position getPosition()
-	{
-		return position;
-	}
-
-	/**
-	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
-	 * when first seen.
-	 */
-	public int getPendingRevertSinceTick()
-	{
-		return pendingRevertSinceTick;
-	}
-
-	/** Null until the first tick after login. */
-	public RuneModel getRuneModel()
-	{
-		return runeModel;
-	}
-
 	public Runnable addListener(Consumer<PlayerSnapshot> listener)
 	{
 		listeners.add(listener);
@@ -135,14 +121,8 @@ public class PlayerModel
 	/** Any thread; the vars are watched from the next tick on. */
 	public void watch(Collection<Integer> varbits, Collection<Integer> varps)
 	{
-		for (int id : varbits)
-		{
-			pendingWatches.add(new int[]{0, id});
-		}
-		for (int id : varps)
-		{
-			pendingWatches.add(new int[]{1, id});
-		}
+		pendingVarbits.addAll(varbits);
+		pendingVarps.addAll(varps);
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
@@ -227,13 +207,6 @@ public class PlayerModel
 	{
 		grownPatches = Set.copyOf(next);
 		markDirty("grown patches");
-	}
-
-	private static Set<String> union(Set<String> a, Set<String> b)
-	{
-		Set<String> all = new HashSet<>(a);
-		all.addAll(b);
-		return Set.copyOf(all);
 	}
 
 	/** Client thread. */
@@ -342,12 +315,11 @@ public class PlayerModel
 
 	private void resolveWatches()
 	{
-		int[] watch;
+		Integer id;
 		boolean added = false;
-		while ((watch = pendingWatches.poll()) != null)
+		while ((id = pendingVarbits.poll()) != null)
 		{
-			int id = watch[1];
-			if (watch[0] == 0 && watchedVarbits.add(id))
+			if (watchedVarbits.add(id))
 			{
 				VarbitComposition varbit = client.getVarbit(id);
 				if (varbit != null)
@@ -356,7 +328,10 @@ public class PlayerModel
 				}
 				added = true;
 			}
-			else if (watch[0] == 1 && watchedVarps.add(id))
+		}
+		while ((id = pendingVarps.poll()) != null)
+		{
+			if (watchedVarps.add(id))
 			{
 				watchedVarpIndices.add(id);
 				added = true;
@@ -421,6 +396,8 @@ public class PlayerModel
 		Set<Integer> held = new HashSet<>(inventory.keySet());
 		held.addAll(worn.keySet());
 		Set<WorldType> worldTypes = client.getWorldType();
+		Set<String> grown = new HashSet<>(plantedTrees);
+		grown.addAll(grownPatches);
 		return PlayerSnapshot.builder()
 			.version(++version)
 			.tick(client.getTickCount())
@@ -448,7 +425,7 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
-			.plantedTrees(grownPatches.isEmpty() ? plantedTrees : union(plantedTrees, grownPatches))
+			.plantedTrees(grown)
 			.unlocks(unlocks)
 			.lastFairyRing(lastFairyRing)
 			.build();
@@ -500,14 +477,8 @@ public class PlayerModel
 
 	private static String dormantReason(Set<WorldType> worldTypes)
 	{
-		for (WorldType type : worldTypes)
-		{
-			if (DORMANT_WORLDS.contains(type))
-			{
-				return type.name().toLowerCase().replace('_', ' ') + " world";
-			}
-		}
-		return null;
+		return worldTypes.stream().filter(DORMANT_WORLDS::contains).findFirst()
+			.map(type -> type.name().toLowerCase().replace('_', ' ') + " world").orElse(null);
 	}
 
 	private <T> T timed(String what, Supplier<T> read)
@@ -564,6 +535,7 @@ public class PlayerModel
 	}
 
 	/** Client thread only. */
+	@RequiredArgsConstructor
 	static final class ClientCacheView implements CacheView
 	{
 		private static final int MULTIRUNES_TABLE = 91;
@@ -571,11 +543,6 @@ public class PlayerModel
 		private static final int ALSO_COUNTS_COLUMN = 1;
 
 		private final Client client;
-
-		ClientCacheView(Client client)
-		{
-			this.client = client;
-		}
 
 		@Override
 		public int[] enumKeys(int enumId)
@@ -595,14 +562,19 @@ public class PlayerModel
 		public int itemIntParam(int itemId, int param, int absent)
 		{
 			ItemComposition item = client.getItemDefinition(itemId);
-			return item.getParams() != null && item.getParams().get(param) != null ? item.getIntValue(param) : absent;
+			return hasParam(item, param) ? item.getIntValue(param) : absent;
 		}
 
 		@Override
 		public String itemStringParam(int itemId, int param)
 		{
 			ItemComposition item = client.getItemDefinition(itemId);
-			return item.getParams() != null && item.getParams().get(param) != null ? item.getStringValue(param) : null;
+			return hasParam(item, param) ? item.getStringValue(param) : null;
+		}
+
+		private static boolean hasParam(ItemComposition item, int param)
+		{
+			return item.getParams() != null && item.getParams().get(param) != null;
 		}
 
 		@Override

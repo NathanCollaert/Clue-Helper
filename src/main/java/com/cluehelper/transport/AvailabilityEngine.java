@@ -117,7 +117,7 @@ public final class AvailabilityEngine
 
 	private static void checkVar(VarCheck check, PlayerSnapshot player, long nowMinutes, Verdict v)
 	{
-		Integer value = check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
+		Integer value = value(check, player);
 		if (value == null)
 		{
 			if (player.getUnknownVars() == PlayerSnapshot.UnknownVars.FAIL)
@@ -225,8 +225,7 @@ public final class AvailabilityEngine
 		}
 		if (branch.isVar())
 		{
-			Integer value = branch.getVar().getKind() == VarCheck.Kind.VARBIT ? player.varbit(branch.getVar().getId())
-				: player.varp(branch.getVar().getId());
+			Integer value = value(branch.getVar(), player);
 			return value == null ? Paid.unread(branch.getVar().describe() + ": not read")
 				: branch.getVar().test(value, 0) ? Paid.with(List.of(), false) : Paid.missing(branch.getVar().describe());
 		}
@@ -279,7 +278,7 @@ public final class AvailabilityEngine
 
 	private static boolean passes(VarCheck check, PlayerSnapshot player, long nowMinutes)
 	{
-		Integer value = check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
+		Integer value = value(check, player);
 		if (value == null)
 		{
 			return player.getUnknownVars() == PlayerSnapshot.UnknownVars.PASS;
@@ -287,33 +286,33 @@ public final class AvailabilityEngine
 		return check.test(value, nowMinutes);
 	}
 
+	/** Null when the snapshot didn't read the var. */
+	private static Integer value(VarCheck check, PlayerSnapshot player)
+	{
+		return check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
+	}
+
+	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	private static final class Paid
 	{
-		List<ItemUse> witness;
-		boolean chargesUnknown;
-		String shortfall;
-		String unread;
+		final List<ItemUse> witness;
+		final boolean chargesUnknown;
+		final String shortfall;
+		final String unread;
 
 		static Paid with(List<ItemUse> witness, boolean chargesUnknown)
 		{
-			Paid p = new Paid();
-			p.witness = witness;
-			p.chargesUnknown = chargesUnknown;
-			return p;
+			return new Paid(witness, chargesUnknown, null, null);
 		}
 
 		static Paid missing(String shortfall)
 		{
-			Paid p = new Paid();
-			p.shortfall = shortfall;
-			return p;
+			return new Paid(null, false, shortfall, null);
 		}
 
 		static Paid unread(String what)
 		{
-			Paid p = new Paid();
-			p.unread = what;
-			return p;
+			return new Paid(null, false, null, what);
 		}
 	}
 

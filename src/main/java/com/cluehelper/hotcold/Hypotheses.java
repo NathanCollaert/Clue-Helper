@@ -2,6 +2,8 @@ package com.cluehelper.hotcold;
 
 import com.cluehelper.step.HotColdTier;
 import java.util.*;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -189,6 +191,12 @@ public final class Hypotheses
 			mass[spot[i]] += weight[i];
 			total += weight[i];
 		}
+		return sharesLargestFirst(mass, total, s -> spots.get(s).getName());
+	}
+
+	/** Each index with mass, by its name, to its share of {@code total}; largest first, ties in index order. */
+	static Map<String, Double> sharesLargestFirst(double[] mass, double total, IntFunction<String> name)
+	{
 		List<Integer> order = new ArrayList<>();
 		for (int s = 0; s < mass.length; s++)
 		{
@@ -201,31 +209,19 @@ public final class Hypotheses
 		Map<String, Double> shares = new LinkedHashMap<>();
 		for (int s : order)
 		{
-			shares.put(spots.get(s).getName(), mass[s] / total);
+			shares.put(name.apply(s), mass[s] / total);
 		}
 		return shares;
 	}
 
 	public List<Spot> keptSpots()
 	{
-		List<Spot> kept = new ArrayList<>();
-		for (String name : spotShares().keySet())
-		{
-			kept.add(spot(name));
-		}
-		return kept;
+		return spotShares().keySet().stream().map(this::spot).collect(Collectors.toList());
 	}
 
 	public Spot spot(String name)
 	{
-		for (Spot candidate : spots)
-		{
-			if (candidate.getName().equals(name))
-			{
-				return candidate;
-			}
-		}
-		return null;
+		return spots.stream().filter(candidate -> candidate.getName().equals(name)).findFirst().orElse(null);
 	}
 
 	/**

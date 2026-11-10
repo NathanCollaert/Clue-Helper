@@ -10,6 +10,7 @@ import com.cluehelper.route.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
+import java.util.stream.*;
 import javax.inject.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -106,8 +107,7 @@ public class HotColdService
 			unregisterStep.run();
 		}
 		runner.cancelAll();
-		probeTarget.clear();
-		plan = null;
+		clearPlan();
 	}
 
 	/** Runs on the client thread after each plan. */
@@ -129,8 +129,7 @@ public class HotColdService
 		if (!config.hotColdPlanner())
 		{
 			runner.cancelAll();
-			probeTarget.clear();
-			plan = null;
+			clearPlan();
 		}
 		planPending = true;
 	}
@@ -138,8 +137,7 @@ public class HotColdService
 	/** Call after a profile change: each profile has its own logs. */
 	public void onProfileChanged()
 	{
-		probeTarget.clear();
-		plan = null;
+		clearPlan();
 		planPending = true;
 	}
 
@@ -163,8 +161,7 @@ public class HotColdService
 		if (line.getKind() == DeviceLine.Kind.FOUND)
 		{
 			logs.set(logs.get().solved(key));
-			probeTarget.clear();
-			plan = null;
+			clearPlan();
 			log.debug("hot/cold found: log of {} cleared, last reading kept as the anchor", key);
 			return;
 		}
@@ -194,7 +191,7 @@ public class HotColdService
 		HotColdPlan current = plan;
 		boolean stale = current == null || !current.getStepKey().equals(step.getKey());
 		if (jumped && current != null && current.getTile() != null
-			&& (tile.getPlane() != current.getTile().getPlane() || tile.distanceTo2D(current.getTile()) > NEAR_PROBE_TILES))
+			&& !PositionRules.near(tile, current.getTile(), NEAR_PROBE_TILES))
 		{
 			planPending = true;
 		}
@@ -208,10 +205,16 @@ public class HotColdService
 		}
 	}
 
+	private void clearPlan()
+	{
+		probeTarget.clear();
+		plan = null;
+	}
+
 	private static boolean walkedOffHere(HotColdPlan current, WorldPoint tile)
 	{
 		boolean here = current != null && current.getChoice() != null && current.getChoice().getProbe().getKind() == Probe.Kind.HERE;
-		return here && tile != null && (tile.getPlane() != current.getTile().getPlane() || tile.distanceTo2D(current.getTile()) > HERE_DRIFT_TILES);
+		return here && tile != null && !PositionRules.near(tile, current.getTile(), HERE_DRIFT_TILES);
 	}
 
 	private void onStepChange(StepChange change, Step step)
@@ -219,8 +222,7 @@ public class HotColdService
 		if (change == StepChange.CLEARED || change == StepChange.NEW)
 		{
 			forgetIfDug(plan);
-			probeTarget.clear();
-			plan = null;
+			clearPlan();
 		}
 		if (change == StepChange.NEW && isHotCold(step))
 		{
@@ -253,8 +255,8 @@ public class HotColdService
 
 	private boolean standsOnSpot(WorldPoint tile, HotColdTier tier)
 	{
-		return tile.getPlane() == 0 && spots(tier).stream().anyMatch(spot ->
-			Math.max(Math.abs(tile.getX() - spot.getX()), Math.abs(tile.getY() - spot.getY())) <= Band.digRadius(tier) + spot.getRadius());
+		return tile.getPlane() == 0 && spotsOf(tier).stream().anyMatch(spot ->
+			Hypotheses.distance(tile, spot.getX(), spot.getY()) <= Band.digRadius(tier) + spot.getRadius());
 	}
 
 	private void readCore()
@@ -267,12 +269,7 @@ public class HotColdService
 			coreReset = true;
 			return;
 		}
-		Set<String> names = new HashSet<>();
-		for (HotColdLocation location : new HashSet<>(solver.getPossibleLocations()))
-		{
-			names.add(location.name());
-		}
-		coreSpots = Set.copyOf(names);
+		coreSpots = new HashSet<>(solver.getPossibleLocations()).stream().map(HotColdLocation::name).collect(Collectors.toUnmodifiableSet());
 		coreReset = solver.getLastWorldPoint() == null;
 	}
 
@@ -291,7 +288,7 @@ public class HotColdService
 		ProbeJob job = ProbeJob.builder()
 			.stepKey(step.getKey())
 			.tier(tier)
-			.spots(spots(tier))
+			.spots(spotsOf(tier))
 			.readings(logs.get().get(step.getKey()))
 			.core(new CoreSpots(coreReset ? Set.of() : coreSpots, !coreReset))
 			.here(carried && player.getPosition().getKind() == Position.Kind.WORLD ? player.getPosition().getTile() : null)
@@ -341,16 +338,8 @@ public class HotColdService
 	{
 		if (landingTiles == null)
 		{
-			List<WorldPoint> tiles = new ArrayList<>();
-			for (int node = 0; node < table.nodeCount(); node++)
-			{
-				WorldPoint tile = table.tile(node);
-				if (tile != null && tile.getPlane() == 0 && tile.getY() < OVERWORLD_MAX_Y)
-				{
-					tiles.add(tile);
-				}
-			}
-			landingTiles = List.copyOf(tiles);
+			landingTiles = IntStream.range(0, table.nodeCount()).mapToObj(table::tile)
+				.filter(tile -> tile != null && tile.getPlane() == 0 && tile.getY() < OVERWORLD_MAX_Y).collect(Collectors.toUnmodifiableList());
 		}
 		return step.toBuilder().kind(TargetKind.PROBES).targets(landingTiles)
 			.requirements(step.getRequirements().plus(HotColdTier.of(step.getTier()).getDevice())).build();
@@ -388,7 +377,7 @@ public class HotColdService
 		return probes;
 	}
 
-	private List<Spot> spots(HotColdTier tier)
+	public List<Spot> spotsOf(HotColdTier tier)
 	{
 		if (beginnerSpots == null)
 		{
@@ -459,8 +448,4 @@ public class HotColdService
 		return client.getBoostedSkillLevel(Skill.HITPOINTS);
 	}
 
-	public List<Spot> spotsOf(HotColdTier tier)
-	{
-		return spots(tier);
-	}
 }

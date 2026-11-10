@@ -1,6 +1,8 @@
 package com.cluehelper.transport;
 
 import com.cluehelper.player.PlayerSnapshot;
+import java.util.Locale;
+import java.util.function.ToIntFunction;
 import lombok.*;
 import net.runelite.api.Skill;
 
@@ -8,9 +10,15 @@ import net.runelite.api.Skill;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LevelNeed
 {
+	@RequiredArgsConstructor
 	public enum Aggregate
 	{
-		TOTAL, COMBAT, QUEST_POINTS
+		TOTAL("%d total level", PlayerSnapshot::getTotalLevel),
+		COMBAT("combat level %d", PlayerSnapshot::getCombatLevel),
+		QUEST_POINTS("%d quest points", PlayerSnapshot::getQuestPoints);
+
+		private final String format;
+		private final ToIntFunction<PlayerSnapshot> have;
 	}
 
 	/** Null for an aggregate. */
@@ -39,39 +47,11 @@ public class LevelNeed
 		{
 			return Math.max(player.real(skill), player.boosted(skill));
 		}
-		if (skill != null)
-		{
-			return player.boosted(skill);
-		}
-		switch (aggregate)
-		{
-			case TOTAL:
-				return player.getTotalLevel();
-			case COMBAT:
-				return player.getCombatLevel();
-			case QUEST_POINTS:
-				return player.getQuestPoints();
-			default:
-				throw new IllegalArgumentException("unhandled aggregate " + aggregate);
-		}
+		return skill != null ? player.boosted(skill) : aggregate.have.applyAsInt(player);
 	}
 
 	public String describe()
 	{
-		if (skill != null)
-		{
-			return level + " " + skill.getName();
-		}
-		switch (aggregate)
-		{
-			case TOTAL:
-				return level + " total level";
-			case COMBAT:
-				return "combat level " + level;
-			case QUEST_POINTS:
-				return level + " quest points";
-			default:
-				throw new IllegalArgumentException("unhandled aggregate " + aggregate);
-		}
+		return skill != null ? level + " " + skill.getName() : String.format(Locale.ROOT, aggregate.format, level);
 	}
 }

@@ -38,7 +38,7 @@ public final class CatalogLoader
 	private static final String IN_HOUSE = "poh";
 	private static final String TEMPORARY = "temporary";
 	private static final String TOGGLE = "toggle ";
-	private static final Pattern WHERE_REF = Pattern.compile("(object|npc):(\\d+)");
+	private static final Pattern WHERE_OBJECT = Pattern.compile("object:(\\d+)");
 
 	private CatalogLoader()
 	{
@@ -115,18 +115,10 @@ public final class CatalogLoader
 		{
 			change.tile(tile(where.replaceAll("\\s*[a-z]+:\\d+", "")));
 		}
-		Matcher ref = WHERE_REF.matcher(where);
+		Matcher ref = WHERE_OBJECT.matcher(where);
 		while (ref.find())
 		{
-			int id = Integer.parseInt(ref.group(2));
-			if (ref.group(1).equals("object"))
-			{
-				change.objectId(id);
-			}
-			else
-			{
-				change.npcId(id);
-			}
+			change.objectId(Integer.parseInt(ref.group(1)));
 		}
 		SpellbookChange built = change.build();
 		if (built.isInHouse() && built.getObjectId() != SpellbookChange.NO_ID)
