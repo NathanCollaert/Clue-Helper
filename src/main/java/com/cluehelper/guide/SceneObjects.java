@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.*;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -86,20 +87,8 @@ public final class SceneObjects
 
 	List<NPC> npcs(Predicate<NPC> wanted)
 	{
-		List<NPC> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
-		if (view == null)
-		{
-			return found;
-		}
-		for (NPC npc : view.npcs())
-		{
-			if (wanted.test(npc))
-			{
-				found.add(npc);
-			}
-		}
-		return found;
+		return view == null ? List.of() : view.npcs().stream().filter(wanted).collect(Collectors.toList());
 	}
 
 	private static boolean offers(NPC npc, String option)
@@ -123,56 +112,20 @@ public final class SceneObjects
 	/** A house entry lands on one floor and moves up the next tick, so every floor is searched. */
 	List<TileObject> find(Set<Integer> ids)
 	{
-		List<TileObject> found = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
 		if (ids.isEmpty() || view == null)
 		{
-			return found;
+			return List.of();
 		}
-		Scene scene = view.getScene();
-		for (Tile[][] plane : scene.getTiles())
-		{
-			collect(plane, ids, found);
-		}
-		return found;
-	}
-
-	private void collect(Tile[][] plane, Set<Integer> ids, List<TileObject> found)
-	{
-		for (Tile[] column : plane)
-		{
-			for (Tile tile : column)
-			{
-				for (TileObject object : tile == null ? List.<TileObject>of() : objectsOn(tile))
-				{
-					if (isFormOf(object.getId(), ids) && !found.contains(object))
-					{
-						found.add(object);
-					}
-				}
-			}
-		}
+		return Arrays.stream(view.getScene().getTiles()).flatMap(SceneObjects::loaded).flatMap(tile -> objectsOn(tile).stream())
+			.filter(object -> isFormOf(object.getId(), ids)).distinct().collect(Collectors.toList());
 	}
 
 	/** The tile's game objects, then its wall, ground and decorative object: a large object is on each tile it covers. */
 	public static List<TileObject> objectsOn(Tile tile)
 	{
-		List<TileObject> objects = new ArrayList<>();
-		for (GameObject object : tile.getGameObjects())
-		{
-			if (object != null)
-			{
-				objects.add(object);
-			}
-		}
-		for (TileObject object : new TileObject[]{tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject()})
-		{
-			if (object != null)
-			{
-				objects.add(object);
-			}
-		}
-		return objects;
+		Stream<TileObject> others = Stream.of(tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject());
+		return Stream.concat(Arrays.stream(tile.getGameObjects()), others).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	/**
@@ -192,37 +145,20 @@ public final class SceneObjects
 	/** Every loaded tile on the player's floor with that item on the ground. */
 	List<WorldPoint> groundItemTiles(int itemId)
 	{
-		List<WorldPoint> found = new ArrayList<>();
-		for (Tile tile : tilesOnFloor())
-		{
-			List<TileItem> items = tile.getGroundItems();
-			if (items != null && items.stream().anyMatch(item -> item.getId() == itemId))
-			{
-				found.add(tile.getWorldLocation());
-			}
-		}
-		return List.copyOf(found);
+		return tilesOnFloor().stream()
+			.filter(tile -> tile.getGroundItems() != null && tile.getGroundItems().stream().anyMatch(item -> item.getId() == itemId))
+			.map(Tile::getWorldLocation).collect(Collectors.toUnmodifiableList());
 	}
 
 	/** The loaded tiles on the player's floor; none while no scene is loaded. */
 	private List<Tile> tilesOnFloor()
 	{
-		List<Tile> tiles = new ArrayList<>();
 		WorldView view = client.getTopLevelWorldView();
-		if (view == null)
-		{
-			return tiles;
-		}
-		for (Tile[] column : view.getScene().getTiles()[view.getPlane()])
-		{
-			for (Tile tile : column)
-			{
-				if (tile != null)
-				{
-					tiles.add(tile);
-				}
-			}
-		}
-		return tiles;
+		return view == null ? List.of() : loaded(view.getScene().getTiles()[view.getPlane()]).collect(Collectors.toList());
+	}
+
+	private static Stream<Tile> loaded(Tile[][] plane)
+	{
+		return Arrays.stream(plane).flatMap(Arrays::stream).filter(Objects::nonNull);
 	}
 }

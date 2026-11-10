@@ -58,9 +58,9 @@ final class GearActs
 			case GEAR_WORN:
 				return step != null && wearsGear(act, step);
 			case WAY_IN_SLOTS_EMPTY:
-				return wearsWayInGear(step) || act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
+				return wearsWayInGear(step) || slotsEmptied(act);
 			case SLOTS_EMPTY:
-				return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
+				return slotsEmptied(act);
 			case ITEM_WORN:
 				return act.getActItems().stream().anyMatch(player.wornIds()::contains);
 			default:
@@ -114,6 +114,11 @@ final class GearActs
 			.map(slot -> worn[slot.getSlotIdx()].getId())
 			.collect(Collectors.toUnmodifiableSet());
 		return act.toBuilder().actItems(off).build();
+	}
+
+	private boolean slotsEmptied(SubStep act)
+	{
+		return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
 	}
 
 	private SubStep equipping(SubStep act, List<Integer> itemIds)

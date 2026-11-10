@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.InterfaceID.Bookofscrolls;
+import static net.runelite.api.gameval.InterfaceID.Bookofscrolls.*;
 
 /** The master scroll book: its interface's widget per scroll, and the bank stops that keep it out of the Wilderness. */
 public final class ScrollBook
@@ -31,26 +31,26 @@ public final class ScrollBook
 	}
 
 	private static final List<Scroll> SCROLLS = List.of(
-		new Scroll("Ardeaglais teleport", Bookofscrolls.TELEPORTSCROLL_ARDEAGLAIS, Bookofscrolls.GFX_ARDEAGLAIS, Bookofscrolls.TEXT_ARDEAGLAIS, Bookofscrolls.TITLE_ARDEAGLAIS),
-		new Scroll("Chasm teleport scroll", Bookofscrolls.TELEPORTSCROLL_CHASMOFFIRE, Bookofscrolls.GFX_CHASMOFFIRE, Bookofscrolls.TEXT_CHASMOFFIRE, Bookofscrolls.TITLE_CHASMOFFIRE),
-		new Scroll("Colossal wyrm teleport scroll", Bookofscrolls.TELEPORTSCROLL_COLOSSAL_WYRM, Bookofscrolls.GFX_COLOSSAL_WYRM, Bookofscrolls.TEXT_COLOSSAL_WYRM, Bookofscrolls.TITLE_COLOSSAL_WYRM),
-		new Scroll("Digsite teleport", Bookofscrolls.TELEPORTSCROLL_DIGSITE, Bookofscrolls.GFX_DIGSITE, Bookofscrolls.TEXT_DIGSITE, Bookofscrolls.TITLE_DIGSITE),
-		new Scroll("Feldip hills teleport", Bookofscrolls.TELEPORTSCROLL_FELDIP, Bookofscrolls.GFX_FELDIP, Bookofscrolls.TEXT_FELDIP, Bookofscrolls.TITLE_FELDIP),
-		new Scroll("Guthixian temple teleport", Bookofscrolls.TELEPORTSCROLL_GUTHIXIAN_TEMPLE, Bookofscrolls.GFX_GUTHIXIAN_TEMPLE, Bookofscrolls.TEXT_GUTHIXIAN_TEMPLE, Bookofscrolls.TITLE_GUTHIXIAN_TEMPLE),
-		new Scroll("Iorwerth camp teleport", Bookofscrolls.TELEPORTSCROLL_ELF, Bookofscrolls.GFX_ELF, Bookofscrolls.TEXT_ELF, Bookofscrolls.TITLE_ELF),
-		new Scroll("Key master teleport", Bookofscrolls.TELEPORTSCROLL_CERBERUS, Bookofscrolls.GFX_CERBERUS, Bookofscrolls.TEXT_CERBERUS, Bookofscrolls.TITLE_CERBERUS),
-		new Scroll("Lumberyard teleport", Bookofscrolls.TELEPORTSCROLL_LUMBERYARD, Bookofscrolls.GFX_LUMBERYARD, Bookofscrolls.TEXT_LUMBERYARD, Bookofscrolls.TITLE_LUMBERYARD),
-		new Scroll("Lunar isle teleport", Bookofscrolls.TELEPORTSCROLL_LUNARISLE, Bookofscrolls.GFX_LUNARISLE, Bookofscrolls.TEXT_LUNARISLE, Bookofscrolls.TITLE_LUNAR),
-		new Scroll("Mort'ton teleport", Bookofscrolls.TELEPORTSCROLL_MORTTON, Bookofscrolls.GFX_MORTTON, Bookofscrolls.TEXT_MORTTON, Bookofscrolls.TITLE_MORTTON),
-		new Scroll("Mos le'harmless teleport", Bookofscrolls.TELEPORTSCROLL_MOSLES, Bookofscrolls.GFX_MOSLES, Bookofscrolls.TEXT_MOSLES, Bookofscrolls.TITLE_MOSLES),
-		new Scroll("Nardah teleport", Bookofscrolls.TELEPORTSCROLL_NARDAH, Bookofscrolls.GFX_NARDAH, Bookofscrolls.TEXT_NARDAH, Bookofscrolls.TITLE_NARDAH),
-		new Scroll("Pest control teleport", Bookofscrolls.TELEPORTSCROLL_PESTCONTROL, Bookofscrolls.GFX_PESTCONTROL, Bookofscrolls.TEXT_PESTCONTROL, Bookofscrolls.TITLE_PESTCONTROL),
-		new Scroll("Piscatoris teleport", Bookofscrolls.TELEPORTSCROLL_PISCATORIS, Bookofscrolls.GFX_PISCATORIS, Bookofscrolls.TEXT_PISCATORIS, Bookofscrolls.TITLE_PISCATORIS),
-		new Scroll("Revenant cave teleport", Bookofscrolls.TELEPORTSCROLL_REVENANTS, Bookofscrolls.GFX_REVENANTS, Bookofscrolls.TEXT_REVENANTS, Bookofscrolls.TITLE_REVENANTS),
-		new Scroll("Spider cave teleport", Bookofscrolls.TELEPORTSCROLL_SPIDERCAVE, Bookofscrolls.GFX_SPIDERCAVE, Bookofscrolls.TEXT_SPIDERCAVE, Bookofscrolls.TITLE_SPIDERCAVE),
-		new Scroll("Tai bwo wannai teleport", Bookofscrolls.TELEPORTSCROLL_TAIBWO, Bookofscrolls.GFX_TAIBWO, Bookofscrolls.TEXT_TAIBWO, Bookofscrolls.TITLE_TAIBWO),
-		new Scroll("Watson teleport", Bookofscrolls.TELEPORTSCROLL_WATSON, Bookofscrolls.GFX_WATSON, Bookofscrolls.TEXT_WATSON, Bookofscrolls.TITLE_WATSON),
-		new Scroll("Zul-andra teleport", Bookofscrolls.TELEPORTSCROLL_ZULANDRA, Bookofscrolls.GFX_ZULANDRA, Bookofscrolls.TEXT_ZULANDRA, Bookofscrolls.TITLE_ZULANDRA));
+		new Scroll("Ardeaglais teleport", TELEPORTSCROLL_ARDEAGLAIS, GFX_ARDEAGLAIS, TEXT_ARDEAGLAIS, TITLE_ARDEAGLAIS),
+		new Scroll("Chasm teleport scroll", TELEPORTSCROLL_CHASMOFFIRE, GFX_CHASMOFFIRE, TEXT_CHASMOFFIRE, TITLE_CHASMOFFIRE),
+		new Scroll("Colossal wyrm teleport scroll", TELEPORTSCROLL_COLOSSAL_WYRM, GFX_COLOSSAL_WYRM, TEXT_COLOSSAL_WYRM, TITLE_COLOSSAL_WYRM),
+		new Scroll("Digsite teleport", TELEPORTSCROLL_DIGSITE, GFX_DIGSITE, TEXT_DIGSITE, TITLE_DIGSITE),
+		new Scroll("Feldip hills teleport", TELEPORTSCROLL_FELDIP, GFX_FELDIP, TEXT_FELDIP, TITLE_FELDIP),
+		new Scroll("Guthixian temple teleport", TELEPORTSCROLL_GUTHIXIAN_TEMPLE, GFX_GUTHIXIAN_TEMPLE, TEXT_GUTHIXIAN_TEMPLE, TITLE_GUTHIXIAN_TEMPLE),
+		new Scroll("Iorwerth camp teleport", TELEPORTSCROLL_ELF, GFX_ELF, TEXT_ELF, TITLE_ELF),
+		new Scroll("Key master teleport", TELEPORTSCROLL_CERBERUS, GFX_CERBERUS, TEXT_CERBERUS, TITLE_CERBERUS),
+		new Scroll("Lumberyard teleport", TELEPORTSCROLL_LUMBERYARD, GFX_LUMBERYARD, TEXT_LUMBERYARD, TITLE_LUMBERYARD),
+		new Scroll("Lunar isle teleport", TELEPORTSCROLL_LUNARISLE, GFX_LUNARISLE, TEXT_LUNARISLE, TITLE_LUNAR),
+		new Scroll("Mort'ton teleport", TELEPORTSCROLL_MORTTON, GFX_MORTTON, TEXT_MORTTON, TITLE_MORTTON),
+		new Scroll("Mos le'harmless teleport", TELEPORTSCROLL_MOSLES, GFX_MOSLES, TEXT_MOSLES, TITLE_MOSLES),
+		new Scroll("Nardah teleport", TELEPORTSCROLL_NARDAH, GFX_NARDAH, TEXT_NARDAH, TITLE_NARDAH),
+		new Scroll("Pest control teleport", TELEPORTSCROLL_PESTCONTROL, GFX_PESTCONTROL, TEXT_PESTCONTROL, TITLE_PESTCONTROL),
+		new Scroll("Piscatoris teleport", TELEPORTSCROLL_PISCATORIS, GFX_PISCATORIS, TEXT_PISCATORIS, TITLE_PISCATORIS),
+		new Scroll("Revenant cave teleport", TELEPORTSCROLL_REVENANTS, GFX_REVENANTS, TEXT_REVENANTS, TITLE_REVENANTS),
+		new Scroll("Spider cave teleport", TELEPORTSCROLL_SPIDERCAVE, GFX_SPIDERCAVE, TEXT_SPIDERCAVE, TITLE_SPIDERCAVE),
+		new Scroll("Tai bwo wannai teleport", TELEPORTSCROLL_TAIBWO, GFX_TAIBWO, TEXT_TAIBWO, TITLE_TAIBWO),
+		new Scroll("Watson teleport", TELEPORTSCROLL_WATSON, GFX_WATSON, TEXT_WATSON, TITLE_WATSON),
+		new Scroll("Zul-andra teleport", TELEPORTSCROLL_ZULANDRA, GFX_ZULANDRA, TEXT_ZULANDRA, TITLE_ZULANDRA));
 	private static final Map<String, Scroll> BY_NAME = SCROLLS.stream().collect(Collectors.toUnmodifiableMap(Scroll::getName, Function.identity()));
 	private static final Map<Integer, Scroll> BY_ENTRY = SCROLLS.stream().collect(Collectors.toUnmodifiableMap(Scroll::getEntry, Function.identity()));
 
@@ -102,33 +102,21 @@ public final class ScrollBook
 				return bookBanked(steps, i, bookRow);
 			}
 		}
-		return carriesBook && wildernessTarget ? withBookDeposited(steps) : steps;
+		return carriesBook && wildernessTarget ? bookBanked(steps, steps.size(), false) : steps;
 	}
 
-	/** Walking into the Wilderness: the plan's bank stop takes the book. */
-	private static List<SubStep> withBookDeposited(List<SubStep> steps)
-	{
-		List<SubStep> out = new ArrayList<>(steps);
-		int bank = lastBefore(out, out.size(), SubStep.Kind.BANK);
-		if (bank >= 0)
-		{
-			out.add(bank + 1, deposit());
-		}
-		else
-		{
-			out.addAll(0, List.of(bankAgain(null), deposit(), closeBank()));
-		}
-		return List.copyOf(out);
-	}
-
+	/**
+	 * The book banked before the teleport at {@code teleportAt}. Walking into the Wilderness, {@code teleportAt} is the
+	 * route's end: the plan's bank stop takes the book.
+	 */
 	private static List<SubStep> bookBanked(List<SubStep> steps, int teleportAt, boolean bookRow)
 	{
 		List<SubStep> out = new ArrayList<>(steps);
-		SubStep teleport = out.get(teleportAt);
-		String scroll = bookRow ? BookScrolls.scrollName(teleport.getRow()) : null;
+		CatalogRow row = bookRow ? out.get(teleportAt).getRow() : null;
 		if (bookRow)
 		{
-			out.set(teleportAt, teleport.toBuilder().text("Read the " + scroll + " scroll").actItemNamed(scroll.toLowerCase())
+			String scroll = BookScrolls.scrollName(row);
+			out.set(teleportAt, out.get(teleportAt).toBuilder().text("Read the " + scroll + " scroll").actItemNamed(scroll.toLowerCase())
 				.actOption(READ_OPTION).build());
 		}
 		int bank = lastBefore(out, teleportAt, SubStep.Kind.BANK);
@@ -137,7 +125,7 @@ public final class ScrollBook
 		WorldPoint bankTile = bank >= 0 ? out.get(bank).getWaypoint() : null;
 		if (bookRow && (bookFromBank || bank < 0))
 		{
-			out.addAll(withdraw >= 0 ? withdraw + 1 : 0, List.of(takeOut(teleport.getRow()), bankAgain(bankTile), deposit(), closeBank()));
+			out.addAll(withdraw >= 0 ? withdraw + 1 : 0, List.of(takeOut(row), bankAgain(bankTile), deposit(), closeBank()));
 			return List.copyOf(out);
 		}
 		if (bank < 0)
@@ -148,7 +136,7 @@ public final class ScrollBook
 		out.add(bank + 1, deposit());
 		if (bookRow)
 		{
-			out.add(bank, takeOut(teleport.getRow()));
+			out.add(bank, takeOut(row));
 		}
 		return List.copyOf(out);
 	}

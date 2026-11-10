@@ -67,13 +67,8 @@ final class StepHighlights
 				return actHighlights(shown, current, step);
 			case EXIT:
 				Exit exit = current.getExit();
-				MenuTarget way = wayTarget(exit.getObjectId(), exit.getOption());
-				if (!exit.getChat().isEmpty())
-				{
-					List<String> path = new ArrayList<>(way.getPath());
-					path.add(exit.getChat());
-					way = way.toBuilder().path(List.copyOf(path)).build();
-				}
+				MenuTarget way = thenClicks(wayTarget(exit.getObjectId(), exit.getOption()),
+					exit.getChat().isEmpty() ? List.of() : List.of(exit.getChat()));
 				Set<Integer> forms = new HashSet<>(way.getObjectIds());
 				forms.addAll(exit.getOtherForms());
 				return shown.menuTarget(withDialogue(way.toBuilder().objectIds(Set.copyOf(forms)).build(), wayInOf(step, exit))).build();
@@ -165,25 +160,10 @@ final class StepHighlights
 		return !leftClicks.isLearned(object) && !NOT_FILLED_UNHOVERED.contains(object.getId());
 	}
 
-	/** Deposited items are clicked in the deposit box, which shows the inventory and worn items itself. */
-	private static StepGuide.Tab actItemsTab(SubStep.Done done)
-	{
-		switch (done)
-		{
-			case SLOTS_EMPTY:
-			case WAY_IN_SLOTS_EMPTY:
-				return StepGuide.Tab.EQUIPMENT;
-			case ITEMS_GONE:
-				return StepGuide.Tab.NONE;
-			default:
-				return StepGuide.Tab.INVENTORY;
-		}
-	}
-
 	/** The act's items whose left click does the act: put on, taken off (a Max cape left-clicking "Home" isn't), else all. */
 	private Set<Integer> actItemFill(SubStep act)
 	{
-		if (takesGearOff(act))
+		if (takesOff(act))
 		{
 			return act.getActItems().stream().filter(leftClicks::removes).collect(Collectors.toUnmodifiableSet());
 		}
@@ -193,12 +173,14 @@ final class StepHighlights
 			case GEAR_WORN:
 			case ITEM_WORN:
 				return act.getActItems().stream().filter(leftClicks::wears).collect(Collectors.toUnmodifiableSet());
-			case SLOTS_EMPTY:
-			case WAY_IN_SLOTS_EMPTY:
-				return act.getActItems().stream().filter(leftClicks::removes).collect(Collectors.toUnmodifiableSet());
 			default:
 				return act.getActItems();
 		}
+	}
+
+	private boolean takesOff(SubStep act)
+	{
+		return act.getDone() == SubStep.Done.SLOTS_EMPTY || act.getDone() == SubStep.Done.WAY_IN_SLOTS_EMPTY || takesGearOff(act);
 	}
 
 	List<NPC> fillNpcs(List<NPC> npcs, String npcOption)
@@ -223,9 +205,11 @@ final class StepHighlights
 		}
 		if (!current.getActItems().isEmpty() && !waitsForDepositBox(current))
 		{
-			boolean takesOff = current.getDone() == SubStep.Done.SLOTS_EMPTY || current.getDone() == SubStep.Done.WAY_IN_SLOTS_EMPTY || takesGearOff(current);
+			boolean takesOff = takesOff(current);
+			// Deposited items are clicked in the deposit box, which shows the inventory and worn items itself
+			boolean deposits = current.getDone() == SubStep.Done.ITEMS_GONE;
 			shown.items(current.getActItems()).fillItems(actItemFill(current))
-				.tab(takesOff ? StepGuide.Tab.EQUIPMENT : actItemsTab(current.getDone()));
+				.tab(takesOff ? StepGuide.Tab.EQUIPMENT : deposits ? StepGuide.Tab.NONE : StepGuide.Tab.INVENTORY);
 			String putOn = PUTS_ON.contains(current.getDone()) ? wearOption(current.getActItems()) : null;
 			String option = takesOff ? REMOVE_OPTION : putOn;
 			return (option != null ? shown.menuTarget(rowTargets.items(current.getActItems(), option)) : shown).build();
@@ -317,7 +301,7 @@ final class StepHighlights
 			&& !current.getNpcIds().isEmpty();
 	}
 
-	private static boolean isStepItem(Step step, int itemId)
+	static boolean isStepItem(Step step, int itemId)
 	{
 		return step.getRequirements().getItems().stream().anyMatch(item -> item.fulfilledBy(itemId));
 	}
@@ -332,9 +316,9 @@ final class StepHighlights
 	/** The act's click, then its chat options in turn. */
 	private static MenuTarget withStageDialogue(SubStep current)
 	{
-		List<String> path = new ArrayList<>(List.of(current.getOption()));
-		path.addAll(current.getStage().getDialogue());
-		return MenuTarget.builder().npcIds(current.getNpcIds()).objectIds(current.getObjectIds()).path(List.copyOf(path)).build();
+		MenuTarget act = MenuTarget.builder().npcIds(current.getNpcIds()).objectIds(current.getObjectIds())
+			.path(List.of(current.getOption())).build();
+		return thenClicks(act, current.getStage().getDialogue());
 	}
 
 	/** The step's hand-written way in that this exit row is, or null. */
@@ -347,12 +331,18 @@ final class StepHighlights
 	/** A conversation's chat options follow its option, so each menu's pick is coloured in turn. */
 	private static MenuTarget withDialogue(MenuTarget target, StepIndex.WayIn way)
 	{
-		if (way == null || way.getDialogue().isEmpty())
+		return way == null ? target : thenClicks(target, way.getDialogue());
+	}
+
+	/** The target's path with {@code clicks} after it, each coloured in its menu in turn. */
+	private static MenuTarget thenClicks(MenuTarget target, List<String> clicks)
+	{
+		if (clicks.isEmpty())
 		{
 			return target;
 		}
 		List<String> path = new ArrayList<>(target.getPath());
-		path.addAll(way.getDialogue());
+		path.addAll(clicks);
 		return target.toBuilder().path(List.copyOf(path)).build();
 	}
 
@@ -492,7 +482,7 @@ final class StepHighlights
 			return shown;
 		}
 		Set<Integer> wanted = player.inventoryIds().stream().filter(leftClicks::wears)
-			.filter(id -> step.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
+			.filter(id -> isStepItem(step, id))
 			.collect(Collectors.toUnmodifiableSet());
 		return shown.toBuilder().items(wanted).fillItems(wanted).build();
 	}

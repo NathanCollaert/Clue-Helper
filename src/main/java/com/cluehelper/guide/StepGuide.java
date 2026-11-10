@@ -8,7 +8,7 @@ import com.cluehelper.step.*;
 import com.cluehelper.transport.Category;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 import javax.inject.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,6 @@ import net.runelite.api.gameval.AnimationID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.*;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.util.Text;
 
 /**
@@ -112,11 +111,13 @@ public class StepGuide
 	private ObeliskDestination obelisk;
 
 	private Runnable unregister;
+	@Getter
 	private Route route;
 	private Step routeStep;
 	/** When the guided step began: an act's event counts from then. */
 	private int stepSince = ActWatcher.NEVER;
 	private String actReachedStepKey;
+	@Getter
 	private List<SubStep> steps = List.of();
 	private int index;
 	private boolean jumpedThisSubStep;
@@ -142,7 +143,9 @@ public class StepGuide
 	/** After a talk that hands over a puzzle or light box: open it (core solves it), then talk again. */
 	private SubStep boxView;
 	/** Ground items to pick up now, by tile. */
+	@Getter
 	private List<WorldPoint> pickUpTiles = List.of();
+	@Getter
 	private Highlights highlights = Highlights.NONE;
 	private SceneHighlights scene = SceneHighlights.NONE;
 
@@ -168,11 +171,6 @@ public class StepGuide
 		return () -> listeners.remove(listener);
 	}
 
-	public Route getRoute()
-	{
-		return route;
-	}
-
 	/** While an enemy attacks during a dig or an emote, the fight; after it, the act again. */
 	public SubStep getCurrent()
 	{
@@ -180,21 +178,19 @@ public class StepGuide
 		{
 			return fight.getView();
 		}
-		if (boxView != null)
-		{
-			return boxView;
-		}
-		return index < steps.size() ? steps.get(index) : null;
+		return boxView != null ? boxView : listedAt(index);
 	}
 
 	/** During a fight, the act to do again. */
 	public SubStep getNext()
 	{
-		if (fight != null && fight.getAgain() != null)
-		{
-			return fight.getAgain();
-		}
-		return index + 1 < steps.size() ? steps.get(index + 1) : null;
+		return fight != null && fight.getAgain() != null ? fight.getAgain() : listedAt(index + 1);
+	}
+
+	/** The listed sub-step at {@code at}, or null past the end. */
+	private SubStep listedAt(int at)
+	{
+		return at < steps.size() ? steps.get(at) : null;
 	}
 
 	/**
@@ -264,14 +260,8 @@ public class StepGuide
 		{
 			return false;
 		}
-		for (int i = index + 1; i < steps.size(); i++)
-		{
-			if (steps.get(i).getKind() != SubStep.Kind.ACT)
-			{
-				return steps.get(i).getKind() == SubStep.Kind.BANK;
-			}
-		}
-		return false;
+		return steps.stream().skip(index + 1L).map(SubStep::getKind).filter(kind -> kind != SubStep.Kind.ACT).findFirst()
+			.map(kind -> kind == SubStep.Kind.BANK).orElse(false);
 	}
 
 	/**
@@ -282,9 +272,8 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		SubStep next = getNext();
-		boolean toNpc = current != null && current.getKind() == SubStep.Kind.WALK && !current.getNpcIds().isEmpty();
-		return toNpc || current != null && current.getKind() == SubStep.Kind.WALK && next != null && next.getKind() == SubStep.Kind.TELEPORT
-			&& next.getRow() != null && next.getRow().isLocated();
+		boolean toTeleport = next != null && next.getKind() == SubStep.Kind.TELEPORT && next.getRow() != null && next.getRow().isLocated();
+		return current != null && current.getKind() == SubStep.Kind.WALK && (!current.getNpcIds().isEmpty() || toTeleport);
 	}
 
 	/** A staircase, ladder, door or NPC that is the way out or in: outlined and walked to like a bank. */
@@ -292,16 +281,6 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		return current != null && (current.getKind() == SubStep.Kind.EXIT || current.getKind() == SubStep.Kind.ENTER);
-	}
-
-	public List<SubStep> getSteps()
-	{
-		return steps;
-	}
-
-	public Highlights getHighlights()
-	{
-		return highlights;
 	}
 
 	public List<TileObject> getHighlightObjects()
@@ -443,7 +422,6 @@ public class StepGuide
 		// Before the early returns below: a follow on every tick near the step would starve them (a deposit never seen)
 		actWatcher.onGameTick(routeStep);
 		deposit.onGameTick(tile);
-		boolean changed = false;
 		if (waiting != null && !isTravelling())
 		{
 			Waiting next = waiting;
@@ -460,7 +438,7 @@ public class StepGuide
 			follow(route);
 			return;
 		}
-		changed |= advance(tile);
+		boolean changed = advance(tile);
 		changed |= refreshFight();
 		changed |= refreshBox();
 		changed |= watchDestinationSet();
@@ -550,17 +528,18 @@ public class StepGuide
 	 */
 	private MenuTarget outlineTarget(SubStep current, List<String> option)
 	{
+		MenuTarget.MenuTargetBuilder withOption = MenuTarget.builder().path(option);
 		if (current != null && !current.getNpcIds().isEmpty())
 		{
-			return MenuTarget.builder().npcIds(current.getNpcIds()).path(option).build();
+			return withOption.npcIds(current.getNpcIds()).build();
 		}
 		if (current != null && !current.getObjectIds().isEmpty())
 		{
-			return MenuTarget.builder().objectIds(current.getObjectIds()).path(option).build();
+			return withOption.objectIds(current.getObjectIds()).build();
 		}
 		if (current != null && !current.getNpcNames().isEmpty())
 		{
-			return MenuTarget.builder().npcNames(current.getNpcNames()).path(option).build();
+			return withOption.npcNames(current.getNpcNames()).build();
 		}
 		if (isApproach())
 		{
@@ -569,7 +548,7 @@ public class StepGuide
 		SubStep ahead = objectActAhead(current);
 		if (ahead != null)
 		{
-			return MenuTarget.builder().objectIds(ahead.getObjectIds()).path(option).build();
+			return withOption.objectIds(ahead.getObjectIds()).build();
 		}
 		int stash = stashAhead();
 		return stash != StepRequirements.NO_STASH ? MenuTarget.builder().objectIds(Set.of(stash)).build() : highlights.getMenuTarget();
@@ -691,21 +670,22 @@ public class StepGuide
 	private boolean partWayIn(WorldPoint tile)
 	{
 		SubStep current = getCurrent();
-		boolean onWay = current != null && current.getKind() == SubStep.Kind.ENTER && current.getWayIn().isPartWay(tile);
-		pickUpTiles = onWay && current.getWayIn().getPickUp() != null ? sceneObjects.groundItemTiles(current.getWayIn().getPickUp().getId()) : List.of();
-		if (onWay && current.getWayIn().getPickUp() != null)
+		StepIndex.WayIn way = current != null && current.getKind() == SubStep.Kind.ENTER && current.getWayIn().isPartWay(tile)
+			? current.getWayIn() : null;
+		StepIndex.PickUp pickUp = way == null ? null : way.getPickUp();
+		pickUpTiles = pickUp != null ? sceneObjects.groundItemTiles(pickUp.getId()) : List.of();
+		if (pickUp != null)
 		{
-			return pickUpOnTheWay(current, current.getWayIn().getPickUp(), tile);
+			return pickUpOnTheWay(current, pickUp, tile);
 		}
-		boolean partWay = onWay && !current.getText().startsWith(KEEP_GOING);
-		if (!partWay)
+		if (way == null || current.getText().startsWith(KEEP_GOING))
 		{
 			return false;
 		}
-		WorldPoint to = current.getWayIn().getTo();
-		boolean toNearby = !current.getWayIn().isNoLine() && to != null && tile != null && to.getPlane() == tile.getPlane()
+		WorldPoint to = way.getTo();
+		boolean toNearby = !way.isNoLine() && to != null && tile != null && to.getPlane() == tile.getPlane()
 			&& to.distanceTo2D(tile) <= PART_WAY_LINE_TILES;
-		return replaceCurrent(current.toBuilder().text(KEEP_GOING + current.getWayIn().getText()).waypoint(toNearby ? to : null).build());
+		return replaceCurrent(current.toBuilder().text(KEEP_GOING + way.getText()).waypoint(toNearby ? to : null).build());
 	}
 
 	/**
@@ -755,11 +735,6 @@ public class StepGuide
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
 		return snapshot == null ? 0 : snapshot.count(Container.INVENTORY, itemId);
-	}
-
-	public List<WorldPoint> getPickUpTiles()
-	{
-		return pickUpTiles;
 	}
 
 	/** The charter list's key for the port is known only once it is open: the step's text names it from then on. */
@@ -893,7 +868,7 @@ public class StepGuide
 
 	private boolean refreshFight()
 	{
-		SubStep act = index < steps.size() ? steps.get(index) : null;
+		SubStep act = listedAt(index);
 		SubStep view = null;
 		SubStep again = null;
 		if (act != null && act.isFights())
@@ -942,12 +917,10 @@ public class StepGuide
 			return List.of();
 		}
 		Set<Integer> carried = player.carriedIds();
-		List<String> back = new ArrayList<>();
-		for (ItemRequirement need : ended.getRequirements().getItems())
-		{
-			carried.stream().filter(need::fulfilledBy).findFirst().ifPresent(id -> back.add(client.getItemDefinition(id).getName()));
-		}
-		return List.copyOf(back);
+		return ended.getRequirements().getItems().stream()
+			.flatMap(need -> carried.stream().filter(need::fulfilledBy).findFirst().stream())
+			.map(id -> client.getItemDefinition(id).getName())
+			.collect(Collectors.toUnmodifiableList());
 	}
 
 	/** The box's left click is the place last taken from it, until a hover shows otherwise. */
@@ -992,16 +965,13 @@ public class StepGuide
 	/** The first of the chain's earlier codes at or after {@code from}, or -1. */
 	private int indexOfRingHop(List<SubStep> in, int from)
 	{
-		for (int i = from; i < in.size(); i++)
-		{
-			SubStep step = in.get(i);
-			if (step.getKind() == SubStep.Kind.FAIRY_RING && step.getGoal() == null
-				&& step.getRow().getName().equals(ringChain.getLandingName()))
-			{
-				return i;
-			}
-		}
-		return -1;
+		return IntStream.range(from, in.size()).filter(i -> isEarlierRingHop(in.get(i))).findFirst().orElse(-1);
+	}
+
+	private boolean isEarlierRingHop(SubStep step)
+	{
+		return step.getKind() == SubStep.Kind.FAIRY_RING && step.getGoal() == null
+			&& step.getRow().getName().equals(ringChain.getLandingName());
 	}
 
 	private boolean advance(WorldPoint tile)
@@ -1015,7 +985,7 @@ public class StepGuide
 			resetTravel();
 			moved = true;
 		}
-		SubStep current = index < steps.size() ? steps.get(index) : null;
+		SubStep current = listedAt(index);
 		if (isStepAct(current) && routeStep != null)
 		{
 			actReachedStepKey = actKey(routeStep);
@@ -1064,15 +1034,8 @@ public class StepGuide
 		{
 			return false;
 		}
-		for (WorldPoint other : step.getOtherTiles())
-		{
-			if (walk.costNear(other) <= ARRIVED_WALK_TILES)
-			{
-				return true;
-			}
-		}
 		List<String> npcs = step.getNpcsAtStep();
-		return !sceneObjects.npcs(npc -> npc.getName() != null && npcs.contains(npc.getName())
+		return step.getOtherTiles().stream().anyMatch(other -> walk.costNear(other) <= ARRIVED_WALK_TILES) || !sceneObjects.npcs(npc -> npc.getName() != null && npcs.contains(npc.getName())
 			&& walk.costNear(npc.getWorldLocation()) <= ARRIVED_WALK_TILES).isEmpty();
 	}
 
@@ -1348,7 +1311,7 @@ public class StepGuide
 
 	private boolean refreshBox()
 	{
-		SubStep act = index < steps.size() ? steps.get(index) : null;
+		SubStep act = listedAt(index);
 		boolean talk = act != null && act.getKind() == SubStep.Kind.ACT && act.getActItemNamed() == null && routeStep != null
 			&& routeStep.getNpcs() != null && act.getText().startsWith(TALK_TO)
 			&& routeStep.getNpcs().contains(act.getText().substring(TALK_TO.length()));

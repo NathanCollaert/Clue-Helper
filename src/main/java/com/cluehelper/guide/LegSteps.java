@@ -46,8 +46,14 @@ final class LegSteps
 		}
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
-		return SubStep.of(SubStep.Kind.WALK, text).waypoint(leg.getTo()).goal(leg.getTo()).radius(radius)
+		return walkTo(text, leg.getTo(), radius)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
+	}
+
+	/** A walk that ends within {@code radius} of {@code to}, with the line leading there. */
+	static SubStep.SubStepBuilder walkTo(String text, WorldPoint to, int radius)
+	{
+		return SubStep.of(SubStep.Kind.WALK, text).waypoint(to).goal(to).radius(radius);
 	}
 
 	static SubStep walkToClue(WorldPoint goal, int radius)
@@ -77,20 +83,18 @@ final class LegSteps
 		}
 		if (step.getWaypointAct() != null && step.getTargets().contains(leg.getTo()))
 		{
-			return SubStep.of(SubStep.Kind.WALK, "Walk to the marker")
-				.waypoint(leg.getTo()).goal(leg.getTo()).radius(step.isActAnywhere() ? SubSteps.ARRIVE_TILES : PROBE_ARRIVE_TILES).build();
+			return walkTo("Walk to the marker", leg.getTo(), step.isActAnywhere() ? SubSteps.ARRIVE_TILES : PROBE_ARRIVE_TILES).build();
 		}
 		if (step.getTargets().contains(leg.getTo()))
 		{
 			return walkToClue(leg.getTo(), step.getKind() == TargetKind.AREA ? SubSteps.AREA_ARRIVE_TILES : SubSteps.ARRIVE_TILES);
 		}
-		return SubStep.of(SubStep.Kind.WALK, "Walk to " + walkGoal(next))
-			.waypoint(leg.getTo()).goal(leg.getTo()).radius(SubSteps.ARRIVE_TILES).build();
+		return walkTo("Walk to " + walkGoal(next), leg.getTo(), SubSteps.ARRIVE_TILES).build();
 	}
 
 	static SubStep stashWalk(WorldPoint stash)
 	{
-		return SubStep.of(SubStep.Kind.WALK, "Walk to the STASH unit").waypoint(stash).goal(stash).radius(SubSteps.ARRIVE_TILES).build();
+		return walkTo("Walk to the STASH unit", stash, SubSteps.ARRIVE_TILES).build();
 	}
 
 	static SubStep enter(StepIndex.Entry data)
@@ -264,7 +268,7 @@ final class LegSteps
 	{
 		if (row.getCategory() == Category.SPELL && row.boatDock() == null && row.getName().contains(": "))
 		{
-			return row.getName().substring(row.getName().lastIndexOf(": ") + 2) + ": its right-click option, unless Configure made it the left click";
+			return lastOption(row) + ": its right-click option, unless Configure made it the left click";
 		}
 		return row.getCategory() == Category.SPIRIT_TREE && !row.isInHouse() ? "Travel" : null;
 	}
@@ -273,7 +277,7 @@ final class LegSteps
 	{
 		if (row.getCategory() == Category.MUSHTREE)
 		{
-			int place = MUSHTREE_PLACES.indexOf(row.getName().substring(row.getName().lastIndexOf(": ") + 2));
+			int place = MUSHTREE_PLACES.indexOf(lastOption(row));
 			return place < 0 ? 0 : MenuLines.HOTKEYS.charAt(place);
 		}
 		String menu = row.getMenu();
@@ -290,7 +294,7 @@ final class LegSteps
 		}
 		String label = menu != null && menu.startsWith("list ") ? menu.substring("list ".length())
 			: menu != null && menu.contains(CatalogRow.MENU_STEP) ? menu.substring(menu.lastIndexOf(CatalogRow.MENU_STEP) + CatalogRow.MENU_STEP.length())
-			: row.getName().substring(row.getName().lastIndexOf(": ") + 2);
+			: lastOption(row);
 		Matcher key = LIST_HOTKEY.matcher(label);
 		return key.find() ? key.group(1).charAt(0) : 0;
 	}
@@ -308,17 +312,25 @@ final class LegSteps
 
 	private static String capeName(SpellbookChange change)
 	{
-		String name = change.getName();
-		int colon = name.indexOf(':');
-		return (colon < 0 ? name : name.substring(0, colon)).replace(" (worn)", "");
+		return beforeColon(change.getName()).replace(" (worn)", "");
 	}
 
 	private static String place(SpellbookChange change)
 	{
-		String name = change.getName();
-		int colon = name.indexOf(':');
-		String where = colon < 0 ? name : name.substring(0, colon);
+		String where = beforeColon(change.getName());
 		return where.startsWith("Tyss") ? "Tyss" : "the " + where;
+	}
+
+	private static String beforeColon(String name)
+	{
+		int colon = name.indexOf(':');
+		return colon < 0 ? name : name.substring(0, colon);
+	}
+
+	/** The row's last option: its name after the last ": ". */
+	private static String lastOption(CatalogRow row)
+	{
+		return row.getName().substring(row.getName().lastIndexOf(": ") + 2);
 	}
 
 	private static String warning(SpellbookChange change)

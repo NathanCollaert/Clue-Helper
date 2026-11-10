@@ -59,18 +59,7 @@ public final class Widgets
 	/** Whether a widget's, object's or NPC's actions list the option, ignoring case; never when they are null. */
 	public static boolean hasAction(String[] actions, String option)
 	{
-		if (actions == null)
-		{
-			return false;
-		}
-		for (String action : actions)
-		{
-			if (option.equalsIgnoreCase(action))
-			{
-				return true;
-			}
-		}
-		return false;
+		return actions != null && Arrays.stream(actions).anyMatch(option::equalsIgnoreCase);
 	}
 
 	/**

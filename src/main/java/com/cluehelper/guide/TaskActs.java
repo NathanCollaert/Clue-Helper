@@ -5,6 +5,7 @@ import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
@@ -12,7 +13,6 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.util.Text;
 
 /**
@@ -74,20 +74,24 @@ final class TaskActs
 		Set<Integer> forPatch = patchItems(step, carried);
 		if (forPatch != null)
 		{
-			return shown.toBuilder().items(forPatch).fillItems(forPatch.stream().filter(leftClicks::wearsOrUses).collect(Collectors.toUnmodifiableSet()))
-				.tab(StepGuide.Tab.INVENTORY).build();
+			return outlined(shown, forPatch, StepGuide.Tab.INVENTORY);
 		}
 		StepIndex.Making making = makingNow(step, carried);
 		if (current.getStage().getOption() != null && making == null)
 		{
 			return shown;
 		}
-		Set<Integer> items = making != null
-			? carried.stream().filter(id -> making.getItems().stream().anyMatch(group -> group.contains(id))).collect(Collectors.toUnmodifiableSet())
-			: carried.stream().filter(id -> step.getRequirements().getItems().stream().anyMatch(need -> need.fulfilledBy(id)))
+		Set<Integer> items = carried.stream().filter(id -> making != null
+				? making.getItems().stream().anyMatch(group -> group.contains(id)) : StepHighlights.isStepItem(step, id))
 			.collect(Collectors.toUnmodifiableSet());
+		return outlined(shown, items, items.isEmpty() ? shown.getTab() : StepGuide.Tab.INVENTORY);
+	}
+
+	/** The items outlined, filled where their left click puts them on or uses them. */
+	private Highlights outlined(Highlights shown, Set<Integer> items, StepGuide.Tab tab)
+	{
 		return shown.toBuilder().items(items).fillItems(items.stream().filter(leftClicks::wearsOrUses).collect(Collectors.toUnmodifiableSet()))
-			.tab(items.isEmpty() ? shown.getTab() : StepGuide.Tab.INVENTORY).build();
+			.tab(tab).build();
 	}
 
 	/**
@@ -293,11 +297,9 @@ final class TaskActs
 			return null;
 		}
 		Set<Integer> staves = runes.staves();
-		List<ItemRequirement> needs = step.getRequirements().getItems();
-		boolean wielding = snapshot.getWorn().keySet().stream()
-			.anyMatch(id -> staves.contains(id) && needs.stream().anyMatch(need -> need.fulfilledBy(id)));
-		return wielding ? null : snapshot.getInventory().keySet().stream()
-			.filter(id -> staves.contains(id) && needs.stream().anyMatch(need -> need.fulfilledBy(id))).findFirst().orElse(null);
+		Predicate<Integer> stepStaff = id -> staves.contains(id) && StepHighlights.isStepItem(step, id);
+		boolean wielding = snapshot.getWorn().keySet().stream().anyMatch(stepStaff);
+		return wielding ? null : snapshot.getInventory().keySet().stream().filter(stepStaff).findFirst().orElse(null);
 	}
 
 	/** The furthest making step whose worked-on item is carried; null before any is, or for a task made of nothing. */

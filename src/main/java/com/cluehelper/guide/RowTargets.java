@@ -217,18 +217,10 @@ final class RowTargets
 		{
 			return List.of();
 		}
-		List<MenuTarget> same = new ArrayList<>();
-		for (RowAvailability judged : availability.getCarried().available())
-		{
-			CatalogRow row = judged.getRow();
-			boolean house = row.isInHouse() && row.getMenu() != null;
-			if (house && row != current.getRow() && row.getDestination() != null
+		return availability.getCarried().available().stream().map(RowAvailability::getRow)
+			.filter(row -> row.isInHouse() && row.getMenu() != null && row != current.getRow() && row.getDestination() != null
 				&& PositionRules.near(row.getDestination(), landing, SAME_LANDING_TILES))
-			{
-				same.add(located(row));
-			}
-		}
-		return List.copyOf(same);
+			.map(this::located).collect(Collectors.toUnmodifiableList());
 	}
 
 	/** On the house's spiritual fairy tree "Ring-configure" opens a list too, so the Tree option is named. */
