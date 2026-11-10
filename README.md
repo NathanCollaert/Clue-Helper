@@ -31,7 +31,7 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 | 🧭 **Routes** | The fastest way there from every teleport you carry, wear, bank or have in your house. |
 | 🏦 **Bank stops** | A bank trip only when it's faster, with a tab of just the items to withdraw. |
 | 📖 **Spellbook** | Switches spellbook on the way when that's faster and you have the runes. |
-| 🖱️ **Guidance** | Every click highlighted, with a path line to where to go next. |
+| 🖱️ **Guidance** | Every click highlighted, with a path line to where to go next, in the scene and on the minimap. |
 | 📜 **Every type** | Emotes, STASH units, Charlie, Falo, Sherlock, keys and the ways in, all guided. |
 | 🔥 **Hot/cold** | Where to feel the strange device next, then the route to the dig. |
 
@@ -64,7 +64,7 @@ Something else wrong? [Open a bug report](https://github.com/NathanCollaert/Clue
 | Spellbook changes | Which spellbook changes routes may use | All |
 | Highlight items / spells / menu lines | What gets highlighted for the current action | On |
 | Withdraw tab | Open a bank tab with only the items to withdraw (uses Bank Tags) | On |
-| Path | Draw the path line to where to go next | On |
+| Path | Draw the path line to where to go next, in the scene and on the minimap | On |
 | Show the box | Show the Clue Helper box under Clue Scroll's | On |
 | Show the next step | Show the action after the current one in the box | On |
 | Probe planner | Suggest where to feel next on hot/cold steps | On |
