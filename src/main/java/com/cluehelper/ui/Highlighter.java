@@ -35,9 +35,8 @@ public class Highlighter
 	static final Color COLOUR = new Color(64, 208, 255);
 	static final Color FILL = new Color(64, 208, 255, 40);
 	static final Color ONE_CLICK_FILL = new Color(64, 208, 255, 90);
-	/** Wide enough to show on the nexus, which is cyan itself. */
-	private static final int OUTLINE_WIDTH = 4;
-	private static final int FEATHER = 4;
+	private static final int OUTLINE_WIDTH = 2;
+	private static final int FEATHER = 0;
 	private static final int ARC = 6;
 	private static final float STROKE = 2f;
 	/**
