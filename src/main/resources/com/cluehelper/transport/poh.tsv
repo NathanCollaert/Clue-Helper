@@ -196,21 +196,21 @@ obelisk	House obelisk: Level 27 Wilderness	1858 7051 0	3035 3732 0								20	3	3
 obelisk	House obelisk: Level 35 Wilderness	1858 7051 0	3106 3794 0								20	3	3	F	none	any	Y	object:31554	op Set Destination > 4: Level 35 Wilderness		object:31554=POH_WILDERNESS_OBELISK
 obelisk	House obelisk: Level 44 Wilderness	1858 7051 0	2980 3866 0								20	3	3	F	none	any	Y	object:31554	op Set Destination > 5: Level 44 Wilderness		object:31554=POH_WILDERNESS_OBELISK
 obelisk	House obelisk: Level 50 Wilderness	1858 7051 0	3307 3916 0								20	3	3	F	none	any	Y	object:31554	op Set Destination > 6: Level 50 Wilderness		object:31554=POH_WILDERNESS_OBELISK
-portal	House portal: Home	2953 3224 0	1858 7051 0		Home Portal 15478				2187=1		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15478=POH_RIMMINGTON_PORTAL
+portal	House portal: Home	2953 3224 0	1858 7051 0		Home Portal 15478				2187=1		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15478=POH_RIMMINGTON_PORTAL
 portal	House portal: Exit	1858 7051 0	2953 3224 0						2187=1		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	2893 3465 0	1858 7051 0		Home Portal 15477				2187=2		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15477=POH_TAVERLY_PORTAL
+portal	House portal: Home	2893 3465 0	1858 7051 0		Home Portal 15477				2187=2		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15477=POH_TAVERLY_PORTAL
 portal	House portal: Exit	1858 7051 0	2893 3465 0						2187=2		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	3340 3003 0	1858 7051 0		Home Portal 15479				2187=3		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15479=POH_POLLNIVNEACH_PORTAL
+portal	House portal: Home	3340 3003 0	1858 7051 0		Home Portal 15479				2187=3		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15479=POH_POLLNIVNEACH_PORTAL
 portal	House portal: Exit	1858 7051 0	3340 3003 0						2187=3		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	2670 3631 0	1858 7051 0		Home Portal 15480				2187=4		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15480=POH_RELLEKKA_PORTAL
+portal	House portal: Home	2670 3631 0	1858 7051 0		Home Portal 15480				2187=4		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15480=POH_RELLEKKA_PORTAL
 portal	House portal: Exit	1858 7051 0	2670 3631 0						2187=4		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	2757 3178 0	1858 7051 0		Home Portal 15481				2187=5		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15481=POH_BRIMHAVEN_PORTAL
+portal	House portal: Home	2757 3178 0	1858 7051 0		Home Portal 15481				2187=5		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15481=POH_BRIMHAVEN_PORTAL
 portal	House portal: Exit	1858 7051 0	2757 3178 0						2187=5		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	2544 3096 0	1858 7051 0		Home Portal 15482				2187=6		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15482=POH_YANILLE_PORTAL
+portal	House portal: Home	2544 3096 0	1858 7051 0		Home Portal 15482				2187=6		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:15482=POH_YANILLE_PORTAL
 portal	House portal: Exit	1858 7051 0	2544 3096 0						2187=6		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	1743 3517 0	1858 7051 0		Home Portal 28822				2187=8		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:28822=POH_KOUREND_PORTAL
+portal	House portal: Home	1743 3517 0	1858 7051 0		Home Portal 28822				2187=8		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:28822=POH_KOUREND_PORTAL
 portal	House portal: Exit	1858 7051 0	1743 3517 0						2187=8		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	3239 6076 0	1858 7051 0		Home Portal 34947				2187=9		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:34947=POH_PRIFDDINAS_PORTAL
+portal	House portal: Home	3239 6076 0	1858 7051 0		Home Portal 34947				2187=9		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:34947=POH_PRIFDDINAS_PORTAL
 portal	House portal: Exit	1858 7051 0	3239 6076 0						2187=9		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION
-portal	House portal: Home	1422 2963 0	1858 7051 0		Home Portal 55353				2187=13		20	4	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:55353=POH_ALDARIN_PORTAL
+portal	House portal: Home	1422 2963 0	1858 7051 0		Home Portal 55353				2187=13		20	2	1	F	none	any	Y		op Home		varbit:2187=POH_HOUSE_LOCATION object:55353=POH_ALDARIN_PORTAL
 portal	House portal: Exit	1858 7051 0	1422 2963 0						2187=13		20	4	0	F	none	any	Y		op Enter		varbit:2187=POH_HOUSE_LOCATION

@@ -174,8 +174,8 @@ house: Yanille upstairs house, the Yanille twin of the Watchtower slot, no law r
   alt       42t: Construction cape: Yanille → walk 30 → walk 7
   alt       52t: Nightmare Zone Minigame Teleport → walk 19 → walk 7 {cooldown:888=1}
 house: standing at the house portal in Hosidius with house tabs only, Burthorpe castle steps
-  best      28t: House portal: Home → Jewellery box: 5. Burthorpe → walk 13
-  alt       40t: House portal: Home → Jewellery box: A. Warriors' Guild → walk 25
+  best      26t: House portal: Home → Jewellery box: 5. Burthorpe → walk 13
+  alt       38t: House portal: Home → Jewellery box: A. Warriors' Guild → walk 25
 house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)
   best      37t: Teleport to House → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 25 {item:556=1, item:557=1, item:563=1}
   alt       64t: Desert amulet 4: Kalphite cave → walk 59
