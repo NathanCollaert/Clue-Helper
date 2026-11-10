@@ -344,6 +344,12 @@ public final class SubSteps
 			List<Stage> stages = step.getStages().stream().filter(stage -> !stage.getTiles().isEmpty()).collect(Collectors.toList());
 			List<Leg> legs = route.getLegs();
 			int stage = 0;
+			WorldPoint start = legs.isEmpty() ? null : legs.get(0).getFrom();
+			if (start != null && stages.size() > 1 && stages.get(0).getTiles().contains(start))
+			{
+				addStageReached(start, stages.get(0), route.getStartBook(), plantedTreeTeleport);
+				stage++;
+			}
 			for (int i = 0; i < legs.size(); i++)
 			{
 				Leg leg = legs.get(i);
@@ -364,21 +370,30 @@ public final class SubSteps
 				}
 				if (reached != null)
 				{
-					CatalogRow toPlanted = step.getData().isToPlantedTree() ? plantedTreeTeleport.apply(leg.getTo()) : null;
-					if (toPlanted != null)
-					{
-						steps.add(LegSteps.teleport(Leg.teleport(leg.getTo(), toPlanted, toPlanted.getDuration(), leg.getBookAfter()), house));
-					}
-					else
-					{
-						addStageAct(steps, reached.atPlace(leg.getTo()));
-					}
+					addStageReached(leg.getTo(), reached, leg.getBookAfter(), plantedTreeTeleport);
 					stage++;
 				}
 			}
 			addLastActs(stages);
 			addActsDoneAnywhere(steps, step);
 			return steps;
+		}
+
+		/**
+		 * The stage's act where the route reaches it; a route can also start on it (planned again on arriving in the house
+		 * whose spirit tree is the stage).
+		 */
+		private void addStageReached(WorldPoint at, Stage reached, Book book, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
+		{
+			CatalogRow toPlanted = step.getData().isToPlantedTree() ? plantedTreeTeleport.apply(at) : null;
+			if (toPlanted != null)
+			{
+				steps.add(LegSteps.teleport(Leg.teleport(at, toPlanted, toPlanted.getDuration(), book), house));
+			}
+			else
+			{
+				addStageAct(steps, reached.atPlace(at));
+			}
 		}
 
 		private void addLeg(Leg leg, Leg next, Exit exit)
