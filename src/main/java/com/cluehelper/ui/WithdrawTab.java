@@ -3,10 +3,12 @@ package com.cluehelper.ui;
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.StepGuide;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
-import net.runelite.api.ScriptID;
+import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.plugins.banktags.*;
 import net.runelite.client.plugins.banktags.tabs.*;
@@ -22,6 +24,8 @@ public class WithdrawTab
 {
 	private static final String TAG = "clue helper";
 
+	@Inject
+	private Client client;
 	@Inject
 	private StepGuide guide;
 	@Inject
@@ -83,7 +87,10 @@ public class WithdrawTab
 		}
 	}
 
-	/** Opens or updates the tab for the items the sub-step withdraws now, while the bank is open. */
+	/**
+	 * Opens or updates the tab for the items the sub-step withdraws now, while the bank is open. An item the plan no longer
+	 * wants leaves the tab unless it was withdrawn: the plan can change once the bank's real contents load.
+	 */
 	public void refresh()
 	{
 		if (!bankOpen)
@@ -94,15 +101,32 @@ public class WithdrawTab
 		if (wanted.isEmpty())
 		{
 			close();
+			return;
 		}
-		else if (!shownItems.containsAll(wanted))
+		List<Integer> kept = shownItems.stream().filter(id -> wanted.contains(id) || isCarried(id)).collect(Collectors.toList());
+		boolean joins = !kept.containsAll(wanted);
+		wanted.stream().filter(id -> !kept.contains(id)).sorted().forEach(kept::add);
+		if (kept.equals(shownItems))
 		{
-			List<Integer> joined = new ArrayList<>(shownItems);
-			wanted.stream().filter(id -> !joined.contains(id)).sorted().forEach(joined::add);
-			shownItems = List.copyOf(joined);
-			layoutManager.saveLayout(new Layout(TAG, shownItems.stream().mapToInt(Integer::intValue).toArray()));
+			return;
+		}
+		shownItems = List.copyOf(kept);
+		layoutManager.saveLayout(new Layout(TAG, shownItems.stream().mapToInt(Integer::intValue).toArray()));
+		if (joins || TAG.equals(bankTags.getActiveTag()))
+		{
 			bankTags.openBankTag(TAG, 0);
 		}
+	}
+
+	private boolean isCarried(int itemId)
+	{
+		return isIn(InventoryID.INV, itemId) || isIn(InventoryID.WORN, itemId);
+	}
+
+	private boolean isIn(int containerId, int itemId)
+	{
+		ItemContainer container = client.getItemContainer(containerId);
+		return container != null && container.contains(itemId);
 	}
 
 	private void close()
