@@ -59,10 +59,10 @@ public class FairyRingMemory
 	/** At the confirm the dials show where the ring sends the player, also after picking a travel-log line. */
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		Matcher last = LAST_DESTINATION.matcher(Text.removeTags(event.getMenuOption()));
-		if (last.find())
+		String last = lastDestination(event.getMenuOption());
+		if (last != null)
 		{
-			arm(last.group(1).toUpperCase());
+			arm(last);
 		}
 		else if (event.getParam1() == InterfaceID.Fairyrings.CONFIRM)
 		{
@@ -75,13 +75,20 @@ public class FairyRingMemory
 	{
 		for (MenuEntry entry : entries)
 		{
-			Matcher last = LAST_DESTINATION.matcher(Text.removeTags(entry.getOption() == null ? "" : entry.getOption()));
-			if (last.find())
+			String last = lastDestination(entry.getOption());
+			if (last != null)
 			{
-				remember(last.group(1).toUpperCase(), "menu");
+				remember(last, "menu");
 				return;
 			}
 		}
+	}
+
+	/** The code a "Last-destination (XYZ)" option names; null for any other option. */
+	private static String lastDestination(String option)
+	{
+		Matcher last = LAST_DESTINATION.matcher(Text.removeTags(option == null ? "" : option));
+		return last.find() ? last.group(1).toUpperCase() : null;
 	}
 
 	/** A confirmed teleport counts once the player has jumped; one the game refused never does. */

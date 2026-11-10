@@ -3,6 +3,7 @@ package com.cluehelper.memory;
 import com.cluehelper.player.AccountType;
 import java.util.*;
 import javax.inject.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -42,8 +43,11 @@ public class BankMemory
 	private boolean unsaved;
 	/** The PIN is asked once per login: a bank or PIN screen seen since then means it's done. */
 	private volatile boolean pinDoneThisSession;
+	/** Changes whenever the remembered contents or the PIN state change, so a plan can tell it is stale. */
+	@Getter
 	private volatile long version;
 	/** Tracked from the bank's own load and close events: the bank widget can outlive a closed bank. */
+	@Getter
 	private volatile boolean bankOpen;
 
 	@Inject
@@ -59,22 +63,19 @@ public class BankMemory
 	/** Null when this profile has never opened it. Any thread. */
 	public Seen getBank()
 	{
-		Seen live = liveBank;
-		return live != null ? live : seenOrNull(storedBank.get());
+		return latest(liveBank, storedBank);
 	}
 
 	/** Null when never seen or not a group account. Any thread. */
 	public Seen getGroupStorage()
 	{
-		Seen live = liveGroup;
-		return live != null ? live : seenOrNull(storedGroup.get());
+		return latest(liveGroup, storedGroup);
 	}
 
 	/** The huntsman's kit's traps and tools, as last sent when it was opened; null when never. Any thread. */
 	public Seen getKit()
 	{
-		Seen live = liveKit;
-		return live != null ? live : seenOrNull(storedKit.get());
+		return latest(liveKit, storedKit);
 	}
 
 	/**
@@ -107,17 +108,6 @@ public class BankMemory
 		return pin.get().seen && !pinDoneThisSession;
 	}
 
-	/** Changes whenever the remembered contents or the PIN state change, so a plan can tell it is stale. */
-	public long getVersion()
-	{
-		return version;
-	}
-
-	public boolean isBankOpen()
-	{
-		return bankOpen;
-	}
-
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
 		if (event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN)
@@ -129,21 +119,18 @@ public class BankMemory
 			lateDeposits.onBankSeen(client.getTickCount());
 			liveBank = seen(event.getItemContainer());
 			pinDoneThisSession = true;
-			unsaved = true;
-			version++;
+			changed();
 		}
 		else if (event.getContainerId() == InventoryID.INV_GROUP_TEMP && AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)).isGroup()
 			&& client.getVarbitValue(VarbitID.GIM_SHARED_BANK_HASEDITED) != 1)
 		{
 			liveGroup = seen(event.getItemContainer());
-			unsaved = true;
-			version++;
+			changed();
 		}
 		else if (event.getContainerId() == InventoryID.HUNTSMANS_KIT)
 		{
 			liveKit = seen(event.getItemContainer());
-			unsaved = true;
-			version++;
+			changed();
 			if (!bankOpen)
 			{
 				save();
@@ -190,8 +177,7 @@ public class BankMemory
 		updated.items = new HashMap<>(bank.items);
 		deposited.forEach((id, quantity) -> updated.items.merge(id, quantity, Integer::sum));
 		liveBank = updated;
-		unsaved = true;
-		version++;
+		changed();
 		if (!bankOpen)
 		{
 			save();
@@ -242,19 +228,25 @@ public class BankMemory
 		}
 		unsaved = false;
 		long started = System.nanoTime();
-		if (liveBank != null)
-		{
-			storedBank.set(liveBank);
-		}
-		if (liveGroup != null)
-		{
-			storedGroup.set(liveGroup);
-		}
-		if (liveKit != null)
-		{
-			storedKit.set(liveKit);
-		}
+		store(storedBank, liveBank);
+		store(storedGroup, liveGroup);
+		store(storedKit, liveKit);
 		log.debug("bank memory saved in {} ms", (System.nanoTime() - started) / 1e6);
+	}
+
+	private static void store(MemorySlot<Seen> slot, Seen live)
+	{
+		if (live != null)
+		{
+			slot.set(live);
+		}
+	}
+
+	/** The remembered contents changed: saved later, and a plan made from them is stale. */
+	private void changed()
+	{
+		unsaved = true;
+		version++;
 	}
 
 	/** Placeholders arrive as quantity 1 under a placeholder id, so they are told apart by definition. */
@@ -308,9 +300,14 @@ public class BankMemory
 		return placeholders.computeIfAbsent(id, i -> client.getItemDefinition(i).getPlaceholderTemplateId() != NO_PLACEHOLDER);
 	}
 
-	private static Seen seenOrNull(Seen stored)
+	private static Seen latest(Seen live, MemorySlot<Seen> stored)
 	{
-		return stored == null || stored.seenAt == 0 ? null : stored;
+		if (live != null)
+		{
+			return live;
+		}
+		Seen saved = stored.get();
+		return saved == null || saved.seenAt == 0 ? null : saved;
 	}
 
 	public static final class Seen

@@ -1,5 +1,6 @@
 package com.cluehelper.poh;
 
+import com.cluehelper.guide.SceneObjects;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
@@ -9,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.*;
 import javax.inject.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
@@ -65,6 +67,8 @@ public class PohService
 	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile Set<Integer> pieces = Set.of();
+	/** Any thread. */
+	@Getter
 	private volatile HouseState house = HouseState.NONE;
 	private boolean seenATick;
 	private boolean wasInside;
@@ -84,19 +88,12 @@ public class PohService
 		catalogData.get().thenAccept(this::learnPieces);
 		seenATick = false;
 		wasInside = false;
-		varsDirty = true;
-		houseDirty = true;
+		readHouseAgain();
 	}
 
 	public void stop()
 	{
 		scanAtTick = -1;
-	}
-
-	/** Any thread. */
-	public HouseState getHouse()
-	{
-		return house;
 	}
 
 	public HouseOwnership.Ownership getOwnership()
@@ -165,15 +162,13 @@ public class PohService
 	/** Call on {@code RuneScapeProfileChanged}, after the store reloads. */
 	public void onProfileChanged()
 	{
-		varsDirty = true;
-		houseDirty = true;
+		readHouseAgain();
 	}
 
 	public void forget()
 	{
 		stored.clear();
-		varsDirty = true;
-		houseDirty = true;
+		readHouseAgain();
 		tell("forgot the learned house");
 	}
 
@@ -240,6 +235,12 @@ public class PohService
 		{
 			tell("no scan: " + ownership.getOwnership() + " house");
 		}
+	}
+
+	private void readHouseAgain()
+	{
+		varsDirty = true;
+		houseDirty = true;
 	}
 
 	private void readVarsWhenDirty()
@@ -344,6 +345,7 @@ public class PohService
 			added, before, (System.nanoTime() - started) / 1e6));
 	}
 
+	/** By piece, its scene tiles: a large piece is on each tile it covers. */
 	private Map<Integer, List<WorldPoint>> findPieces(Scene scene)
 	{
 		Map<Integer, List<WorldPoint>> found = new HashMap<>();
@@ -355,29 +357,9 @@ public class PohService
 				for (int y = 0; y < tiles[z][x].length; y++)
 				{
 					Tile tile = tiles[z][x][y];
-					if (tile == null)
+					for (TileObject object : tile == null ? List.<TileObject>of() : SceneObjects.objectsOn(tile))
 					{
-						continue;
-					}
-					for (GameObject object : tile.getGameObjects())
-					{
-						if (object != null && pieces.contains(object.getId()))
-						{
-							for (int ox = object.getSceneMinLocation().getX(); ox <= object.getSceneMaxLocation().getX(); ox++)
-							{
-								for (int oy = object.getSceneMinLocation().getY(); oy <= object.getSceneMaxLocation().getY(); oy++)
-								{
-									found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(new WorldPoint(ox, oy, z));
-								}
-							}
-						}
-					}
-					WallObject wall = tile.getWallObject();
-					DecorativeObject decoration = tile.getDecorativeObject();
-					GroundObject ground = tile.getGroundObject();
-					for (TileObject object : new TileObject[]{wall, decoration, ground})
-					{
-						if (object != null && pieces.contains(object.getId()))
+						if (pieces.contains(object.getId()))
 						{
 							found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(new WorldPoint(x, y, z));
 						}
@@ -471,16 +453,8 @@ public class PohService
 
 	private static Set<Integer> nexusKeys(Profile profile)
 	{
-		Set<Integer> keys = new HashSet<>();
-		for (int id : NEXUS_SLOTS)
-		{
-			int key = profile.vars.getOrDefault(id, 0);
-			if (key > 0)
-			{
-				keys.add(key);
-			}
-		}
-		return Set.copyOf(keys);
+		return Arrays.stream(NEXUS_SLOTS).mapToObj(id -> profile.vars.getOrDefault(id, 0)).filter(key -> key > 0)
+			.collect(Collectors.toUnmodifiableSet());
 	}
 
 	private void tell(String line)

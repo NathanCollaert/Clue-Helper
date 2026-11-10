@@ -72,8 +72,9 @@ public class NpcPlaceMemory
 		String shownTitle = plain(title.getText());
 		String text = Widgets.descendants(client.getWidget(InterfaceID.Questjournal.UNIVERSE)).stream()
 			.map(Widget::getText).filter(Objects::nonNull).map(NpcPlaceMemory::plain).collect(Collectors.joining(" "));
-		for (StepIndex.LearnPlace learn : learnPlaces())
+		for (StepIndex.Entry entry : learnable())
 		{
+			StepIndex.LearnPlace learn = entry.getLearnPlace();
 			if (shownTitle.contains(plain(learn.getJournal())))
 			{
 				learn.getSpots().stream().filter(spot -> spot.getWords().stream().map(NpcPlaceMemory::plain).anyMatch(text::contains))
@@ -131,11 +132,6 @@ public class NpcPlaceMemory
 				.collect(Collectors.toUnmodifiableList());
 		}
 		return learnable;
-	}
-
-	private List<StepIndex.LearnPlace> learnPlaces()
-	{
-		return learnable().stream().map(StepIndex.Entry::getLearnPlace).collect(Collectors.toUnmodifiableList());
 	}
 
 	private void remember(StepIndex.LearnPlace learn, int npc)

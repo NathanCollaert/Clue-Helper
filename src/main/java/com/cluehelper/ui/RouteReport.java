@@ -114,9 +114,9 @@ public class RouteReport
 			out.append("  none\n");
 			return;
 		}
-		out.append("  ").append(step.getTier()).append(' ').append(step.getType()).append(": ").append(step.getText()).append('\n');
-		out.append("  key: ").append(step.getKey()).append('\n');
-		out.append("  targets: ").append(tiles(step.getTargets())).append('\n');
+		line(out, step.getTier() + " " + step.getType(), step.getText());
+		line(out, "key", step.getKey());
+		line(out, "targets", tiles(step.getTargets()));
 	}
 
 	private void writePlayer(StringBuilder out)
@@ -129,11 +129,10 @@ public class RouteReport
 			return;
 		}
 		PlayerSnapshot player = input.getPlayer();
-		out.append("  at: ").append(tile(input.getStart().getTile())).append(" (").append(input.getStart().getKind()).append(")\n");
-		out.append("  account: ").append(player.getAccountType())
-			.append(player.isMembersWorld() ? ", members world" : ", free-to-play world").append('\n');
-		out.append("  spellbook: ").append(player.getSpellbook() == null ? "unknown" : player.getSpellbook().getBook()).append('\n');
-		out.append("  bank counted: ").append(input.getBanked() == null ? "no" : "yes").append('\n');
+		line(out, "at", tile(input.getStart().getTile()) + " (" + input.getStart().getKind() + ")");
+		line(out, "account", player.getAccountType() + (player.isMembersWorld() ? ", members world" : ", free-to-play world"));
+		line(out, "spellbook", player.getSpellbook() == null ? "unknown" : player.getSpellbook().getBook());
+		line(out, "bank counted", input.getBanked() == null ? "no" : "yes");
 	}
 
 	private void writeSettings(StringBuilder out)
@@ -141,9 +140,7 @@ public class RouteReport
 		out.append("\nSettings\n");
 		for (ConfigItemDescriptor item : configManager.getConfigDescriptor(config).getItems())
 		{
-			String key = item.getItem().keyName();
-			out.append("  ").append(item.getItem().name()).append(": ")
-				.append(configManager.getConfiguration(ClueHelperConfig.GROUP, key)).append('\n');
+			line(out, item.getItem().name(), configManager.getConfiguration(ClueHelperConfig.GROUP, item.getItem().keyName()));
 		}
 	}
 
@@ -152,7 +149,7 @@ public class RouteReport
 		out.append("\nRoutes\n");
 		if (plan.getNote() != null)
 		{
-			out.append("  note: ").append(plan.getNote()).append('\n');
+			line(out, "note", plan.getNote());
 		}
 		route(out, "followed", routes.getCommitted());
 		route(out, "best", plan.getBest());
@@ -161,15 +158,14 @@ public class RouteReport
 		route(out, "faster but within the margin", plan.getFasterUnqualified());
 		plan.getAlternatives().forEach(alternative -> route(out, "alternative", alternative));
 		plan.getCandidates().forEach(candidate -> route(out, "candidate " + candidate.getCategory(), candidate.getRoute()));
-		plan.getRequirementNotes().forEach(note -> out.append("  requirement: ").append(note).append('\n'));
+		plan.getRequirementNotes().forEach(note -> line(out, "requirement", note));
 	}
 
 	private static void route(StringBuilder out, String label, Route route)
 	{
 		if (route != null)
 		{
-			out.append("  ").append(label).append(": ").append(route.describe()).append(" (").append(route.getTicks()).append(" ticks")
-				.append(route.isBanked() ? ", banks" : "").append(")\n");
+			line(out, label, route.describe() + " (" + route.getTicks() + " ticks" + (route.isBanked() ? ", banks" : "") + ")");
 		}
 	}
 
@@ -187,7 +183,7 @@ public class RouteReport
 			.forEach(row -> statusByTeleport.merge(row.getRow().getName() + " (" + row.getRow().getCategory() + ")",
 				status(row, banked.get(row.getRow())), RouteReport::better));
 		statusByTeleport.entrySet().stream().limit(MOST_NEARBY)
-			.forEach(teleport -> out.append("  ").append(teleport.getKey()).append(": ").append(teleport.getValue()).append('\n'));
+			.forEach(teleport -> line(out, teleport.getKey(), teleport.getValue()));
 	}
 
 	private static String status(RowAvailability carried, RowAvailability banked)
@@ -242,6 +238,11 @@ public class RouteReport
 			throw new UncheckedIOException("compressing the route report's replay data", e);
 		}
 		return Base64.getMimeEncoder().encodeToString(bytes.toByteArray());
+	}
+
+	private static void line(StringBuilder out, String label, Object value)
+	{
+		out.append("  ").append(label).append(": ").append(value).append('\n');
 	}
 
 	private static String tiles(List<WorldPoint> tiles)

@@ -6,7 +6,6 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.step.Step;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.util.List;
 import javax.inject.Inject;
 import net.runelite.api.*;
 import net.runelite.client.ui.overlay.*;
@@ -57,7 +56,6 @@ public class FurnitureOverlay extends Overlay
 	private boolean isMarkedByCore(NPC npc)
 	{
 		Step step = clueLink.getCurrentStep();
-		List<String> named = step == null || step.getNpcs() == null ? List.of() : step.getNpcs();
-		return npc.getName() != null && named.stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName()));
+		return step != null && step.getNpcs() != null && WaypointOverlay.isNamed(npc, step.getNpcs());
 	}
 }

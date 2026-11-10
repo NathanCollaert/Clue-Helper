@@ -163,8 +163,7 @@ public class WidgetHighlightOverlay extends Overlay
 	private void outlineToggles(Graphics2D graphics, List<PrayerFilters.Filter> filters)
 	{
 		List<Widget> toggles = Widgets.descendants(client.getWidget(InterfaceID.Prayerbook.FILTERMENU)).stream()
-			.filter(widget -> widget.getText() != null && filters.stream()
-				.anyMatch(filter -> Text.removeTags(widget.getText()).toLowerCase().contains(filter.getPhrase())))
+			.filter(widget -> filters.stream().anyMatch(filter -> plainText(widget).contains(filter.getPhrase())))
 			.collect(Collectors.toList());
 		if (toggles.isEmpty())
 		{
@@ -223,9 +222,14 @@ public class WidgetHighlightOverlay extends Overlay
 	private void outlineLines(Graphics2D graphics, int parentId, List<String> phrases)
 	{
 		Widgets.descendants(client.getWidget(parentId)).stream()
-			.filter(widget -> Widgets.visible(widget) && widget.getText() != null && phrases.stream()
-				.anyMatch(phrase -> Text.removeTags(widget.getText()).toLowerCase().contains(phrase)))
+			.filter(widget -> Widgets.visible(widget) && phrases.stream().anyMatch(phrase -> plainText(widget).contains(phrase)))
 			.forEach(widget -> highlighter.box(graphics, widget.getBounds()));
+	}
+
+	/** Lower case without tags; "" for a widget without text. */
+	private static String plainText(Widget widget)
+	{
+		return widget.getText() == null ? "" : Text.removeTags(widget.getText()).toLowerCase();
 	}
 
 	/** The prayer's own button, found by its name: the book's component order isn't the prayers' order. */

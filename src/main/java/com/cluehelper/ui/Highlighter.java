@@ -38,7 +38,7 @@ public class Highlighter
 	private static final int OUTLINE_WIDTH = 2;
 	private static final int FEATHER = 0;
 	private static final int ARC = 6;
-	private static final float STROKE = 2f;
+	private static final BasicStroke STROKE = new BasicStroke(2f);
 	/**
 	 * A flat click spot (two triangles) laid over scenery drawn by other objects: the Broken bridge's gap. Its outline is a
 	 * sliver no one sees.
@@ -121,9 +121,7 @@ public class Highlighter
 			}
 			ring.addPoint(point.getX(), point.getY());
 		}
-		graphics.setColor(COLOUR);
-		graphics.setStroke(new BasicStroke(STROKE));
-		graphics.draw(ring);
+		outline(graphics, ring);
 	}
 
 	/** Where an object the outline renderer can't draw is clicked: its clickbox, else its tile. */
@@ -196,7 +194,7 @@ public class Highlighter
 
 	public void box(Graphics2D graphics, Rectangle bounds)
 	{
-		box(graphics, new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC));
+		box(graphics, rounded(bounds));
 	}
 
 	/** A spell, a tab stone, a fairy ring dial: things without text or a model. */
@@ -204,22 +202,30 @@ public class Highlighter
 	{
 		graphics.setColor(FILL);
 		graphics.fill(shape);
-		graphics.setColor(COLOUR);
-		graphics.setStroke(new BasicStroke(STROKE));
-		graphics.draw(shape);
+		outline(graphics, shape);
 	}
 
 	/** A spell: filled when its left click casts the step's teleport, outlined when its right-click menu does. */
 	public void spell(Graphics2D graphics, Rectangle bounds, boolean leftClick)
 	{
-		Shape shape = new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC);
+		Shape shape = rounded(bounds);
 		if (leftClick)
 		{
 			graphics.setColor(ONE_CLICK_FILL);
 			graphics.fill(shape);
 		}
+		outline(graphics, shape);
+	}
+
+	private static Shape rounded(Rectangle bounds)
+	{
+		return new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC);
+	}
+
+	private static void outline(Graphics2D graphics, Shape shape)
+	{
 		graphics.setColor(COLOUR);
-		graphics.setStroke(new BasicStroke(STROKE));
+		graphics.setStroke(STROKE);
 		graphics.draw(shape);
 	}
 

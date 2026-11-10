@@ -66,11 +66,7 @@ public final class MemorySlot<T>
 
 	private T read(String currentProfile)
 	{
-		if (currentProfile == null)
-		{
-			return fresh.get();
-		}
-		String json = profile.get(key);
+		String json = currentProfile == null ? null : profile.get(key);
 		if (json == null)
 		{
 			return fresh.get();
