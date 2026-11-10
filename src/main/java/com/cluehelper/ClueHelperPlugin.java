@@ -141,6 +141,9 @@ public class ClueHelperPlugin extends Plugin
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
+	private MinimapPathOverlay minimapPathOverlay;
+
+	@Inject
 	private GuideOverlay guideOverlay;
 	@Inject
 	private GuideBoxPresenter box;
@@ -420,6 +423,6 @@ public class ClueHelperPlugin extends Plugin
 
 	private Overlay[] overlays()
 	{
-		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, wanderAreaOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
+		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, minimapPathOverlay, wanderAreaOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
 	}
 }

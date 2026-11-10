@@ -11,10 +11,11 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.*;
-import javax.inject.Inject;
+import javax.inject.*;
 import lombok.Value;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
@@ -23,6 +24,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.ui.overlay.*;
 
 /** Waypoints are never core's target, so the path ends where core's marker takes over. */
+@Singleton
 public class WaypointOverlay extends Overlay
 {
 	private static final int NOT_CROSSING = -1;
@@ -36,10 +38,11 @@ public class WaypointOverlay extends Overlay
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	private static final int OBELISK_PLATFORM_TILES = 3;
 	private static final float PATH_STROKE = 2f;
+	private static final int COVER_STEP_PIXELS = 3;
 	/** A climb's far end can stand a few tiles off the walk data's landing tile (the Observatory's rocks). */
 	private static final int ROW_ENDS_MARGIN_TILES = 3;
 	/** A longer jump (a cave entrance into another region) crosses nothing between its ends: only its start is looked at. */
-	private static final int CROSSING_JUMP_TILES = 20;
+	static final int CROSSING_JUMP_TILES = 20;
 	private static final int[] CONVERSATION = {InterfaceID.ChatLeft.UNIVERSE, InterfaceID.ChatRight.UNIVERSE, InterfaceID.Chatmenu.UNIVERSE};
 	private static final String NO_STEP = "";
 
@@ -65,10 +68,14 @@ public class WaypointOverlay extends Overlay
 	private WorldWalk walker;
 	@Inject
 	private LeftClicks leftClicks;
+	@Inject
+	private ModelSilhouette silhouette;
 
 	private int crossingFrom = NOT_CROSSING;
 	private List<WorldPoint> drawnWalk = List.of();
 	private List<WorldPoint> line = List.of();
+	/** The tiles drawn this frame; empty when no line shows. */
+	private List<WorldPoint> shownLine = List.of();
 	private Map<TileObject, String> pathObjects = Map.of();
 	private int lineTick = -1;
 	/** The step the open conversation began on; null with no conversation open. */
@@ -83,6 +90,7 @@ public class WaypointOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		shownLine = List.of();
 		noteConversationStep();
 		if (!config.pathLine() || isTalkingOnThisStep())
 		{
@@ -123,7 +131,8 @@ public class WaypointOverlay extends Overlay
 			case PATH:
 				if (here != null)
 				{
-					drawPath(graphics, view, here, goal.getWalk());
+					drawPath(graphics, view, here, goal.getWalk(),
+						goal.getObject() == null ? endOn(view, goal.getWalk()) : endIn(view, goal.getObject()));
 				}
 				if (goal.isMarkTile())
 				{
@@ -183,8 +192,9 @@ public class WaypointOverlay extends Overlay
 		{
 			return null;
 		}
-		WalkGoal goal = object == null ? WalkGoal.tile(waypoint) : LineTargets.objectGoal(view, object);
-		return Goal.path(goal, !outlined() && !awaitsNpc() && waypoint.getPlane() == view.getPlane());
+		boolean markTile = !outlined() && !awaitsNpc() && waypoint.getPlane() == view.getPlane();
+		return object == null ? Goal.path(WalkGoal.tile(waypoint), markTile)
+			: Goal.pathTo(object, LineTargets.objectGoal(view, object), markTile);
 	}
 
 	/** Core marks the clue itself; only the way there is ours. */
@@ -386,7 +396,7 @@ public class WaypointOverlay extends Overlay
 		}
 		if (here != null)
 		{
-			drawPath(graphics, view, here, WalkGoal.tile(at));
+			drawPath(graphics, view, here, WalkGoal.tile(at), endIn(npc));
 		}
 	}
 
@@ -407,26 +417,51 @@ public class WaypointOverlay extends Overlay
 		TileObject object = targets.object(view);
 		if (object != null && !besidePlayer(view, object))
 		{
-			drawPath(graphics, view, here, LineTargets.objectGoal(view, object));
+			drawPath(graphics, view, here, LineTargets.objectGoal(view, object), endIn(view, object));
 		}
 	}
 
 	private boolean besidePlayer(WorldView view, TileObject object)
 	{
 		Player local = client.getLocalPlayer();
-		if (local == null)
-		{
-			return false;
-		}
-		WorldPoint at = local.getWorldLocation();
-		WalkGoal goal = LineTargets.objectGoal(view, object);
-		WorldPoint southWest = goal.getSouthWest();
-		return at.getPlane() == southWest.getPlane()
-			&& at.getX() >= southWest.getX() - 1 && at.getX() <= southWest.getX() + goal.getSizeX()
-			&& at.getY() >= southWest.getY() - 1 && at.getY() <= southWest.getY() + goal.getSizeY();
+		return local != null && isBeside(local.getWorldLocation(), LineTargets.objectGoal(view, object));
 	}
 
-	private void drawPath(Graphics2D graphics, WorldView view, WalkCosts here, WalkGoal goal)
+	/** On the area or one tile round it, diagonals included. */
+	private static boolean isBeside(WorldPoint at, WalkGoal area)
+	{
+		WorldPoint southWest = area.getSouthWest();
+		return at.getPlane() == southWest.getPlane()
+			&& at.getX() >= southWest.getX() - 1 && at.getX() <= southWest.getX() + area.getSizeX()
+			&& at.getY() >= southWest.getY() - 1 && at.getY() <= southWest.getY() + area.getSizeY();
+	}
+
+	/**
+	 * Null when the object's model can't be read this frame (see Highlighter#object): the line then stops beside it, as
+	 * it would be drawn over the model otherwise.
+	 */
+	private LineEnd endIn(WorldView view, TileObject object)
+	{
+		try
+		{
+			return new LineEnd(object.getLocalLocation(), silhouette.of(object), LineTargets.objectGoal(view, object));
+		}
+		catch (NullPointerException e)
+		{
+			return null;
+		}
+	}
+
+	private LineEnd endIn(NPC npc)
+	{
+		NPCComposition composition = npc.getTransformedComposition();
+		int size = composition == null ? 1 : composition.getSize();
+		return npc.getModel() == null ? null
+			: new LineEnd(npc.getLocalLocation(), silhouette.of(npc), WalkGoal.area(npc.getWorldLocation(), size, size));
+	}
+
+	/** @param end what the line ends in; null when it ends on a plain tile */
+	private void drawPath(Graphics2D graphics, WorldView view, WalkCosts here, WalkGoal goal, LineEnd end)
 	{
 		walkLine.follow(view, here, goal);
 		List<WorldPoint> walk = walkLine.getWalk();
@@ -438,6 +473,88 @@ public class WaypointOverlay extends Overlay
 			line = toUseFirst(view, here, walkLine.getAhead());
 		}
 		drawLine(graphics, view, line);
+		if (end != null && !line.isEmpty())
+		{
+			drawInto(graphics, view, line.get(line.size() - 1), end);
+		}
+	}
+
+	/** From the line's last tile on to the middle of what it ends in, where that tile is beside it. */
+	private void drawInto(Graphics2D graphics, WorldView view, WorldPoint last, LineEnd end)
+	{
+		LocalPoint lastLocal = last.getPlane() == view.getPlane() ? LocalPoint.fromWorld(view, last) : null;
+		if (lastLocal == null || end.getMiddle() == null || !isBeside(last, end.getFootprint()))
+		{
+			return;
+		}
+		Point from = Perspective.localToCanvas(client, lastLocal, view.getPlane());
+		Point to = Perspective.localToCanvas(client, end.getMiddle(), view.getPlane());
+		if (from != null && to != null)
+		{
+			drawTo(graphics, from, end.getModel() == null ? to : untilCovered(from, to, end.getModel()));
+		}
+	}
+
+	/**
+	 * A single tile the walk can't stand on, such as core's clue tile under a crate: the line runs on to its middle,
+	 * hidden under what stands there. Null for an area, which the walk ends inside.
+	 */
+	private LineEnd endOn(WorldView view, WalkGoal goal)
+	{
+		WorldPoint tile = goal.getSouthWest();
+		LocalPoint middle = goal.getSizeX() == 1 && goal.getSizeY() == 1 && tile.getPlane() == view.getPlane()
+			? LocalPoint.fromWorld(view, tile) : null;
+		if (middle == null)
+		{
+			return null;
+		}
+		TileObject standing = objectStandingOn(view, middle);
+		try
+		{
+			return new LineEnd(middle, standing == null ? null : silhouette.of(standing), goal);
+		}
+		catch (NullPointerException e)
+		{
+			return null;
+		}
+	}
+
+	private static TileObject objectStandingOn(WorldView view, LocalPoint middle)
+	{
+		Tile tile = view.getScene().getTiles()[view.getPlane()][middle.getSceneX()][middle.getSceneY()];
+		if (tile == null)
+		{
+			return null;
+		}
+		for (GameObject object : tile.getGameObjects())
+		{
+			if (object != null && object.getRenderable() != null && !(object.getRenderable() instanceof Actor))
+			{
+				return object;
+			}
+		}
+		return tile.getWallObject() != null ? tile.getWallObject() : tile.getDecorativeObject();
+	}
+
+	/**
+	 * Where the segment first meets the model, so the line seems to pass under it. Stepped along a few pixels at a time:
+	 * a model's shape holds thousands of faces, too many to cut out of the clip each frame.
+	 */
+	private static Point untilCovered(Point from, Point to, Shape model)
+	{
+		double length = Math.hypot(to.getX() - from.getX(), to.getY() - from.getY());
+		int steps = Math.max(1, (int) Math.ceil(length / COVER_STEP_PIXELS));
+		Point reached = from;
+		for (int i = 1; i <= steps; i++)
+		{
+			Point at = new Point(from.getX() + (to.getX() - from.getX()) * i / steps, from.getY() + (to.getY() - from.getY()) * i / steps);
+			if (model.contains(at.getX(), at.getY()))
+			{
+				return reached;
+			}
+			reached = at;
+		}
+		return to;
 	}
 
 	/** The line moves on with the player, and the objects it still leads through are found again. */
@@ -491,6 +608,12 @@ public class WaypointOverlay extends Overlay
 		return line;
 	}
 
+	/** Client thread, after this overlay's render in the same frame. The tiles the line shows now. */
+	List<WorldPoint> getShownLine()
+	{
+		return shownLine;
+	}
+
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
 	public List<MenuTarget> pathObjectTargets()
 	{
@@ -525,6 +648,7 @@ public class WaypointOverlay extends Overlay
 	private void drawLine(Graphics2D graphics, WorldView view, List<WorldPoint> ahead)
 	{
 		pathObjects.forEach((object, option) -> highlighter.object(graphics, object, leftClicks.isLeftClick(object, option)));
+		shownLine = ahead;
 		graphics.setColor(Highlighter.COLOUR);
 		graphics.setStroke(new BasicStroke(PATH_STROKE));
 		Point previous = null;
@@ -616,22 +740,38 @@ public class WaypointOverlay extends Overlay
 		Kind kind;
 		WalkGoal walk;
 		NPC npc;
+		/** The object a path leads to; null for a plain tile. */
+		TileObject object;
 		/** The goal's tile is marked, as nothing on it is outlined. */
 		boolean markTile;
 
 		static Goal path(WalkGoal walk, boolean markTile)
 		{
-			return new Goal(Kind.PATH, walk, null, markTile);
+			return new Goal(Kind.PATH, walk, null, null, markTile);
+		}
+
+		static Goal pathTo(TileObject object, WalkGoal walk, boolean markTile)
+		{
+			return new Goal(Kind.PATH, walk, null, object, markTile);
 		}
 
 		static Goal approach(NPC npc)
 		{
-			return new Goal(Kind.APPROACH, null, npc, false);
+			return new Goal(Kind.APPROACH, null, npc, null, false);
 		}
 
 		private static Goal toObject()
 		{
-			return new Goal(Kind.TO_OBJECT, null, null, false);
+			return new Goal(Kind.TO_OBJECT, null, null, null, false);
 		}
+	}
+
+	/** The object or NPC the line ends in: it runs on from the tile beside it to its middle, hidden under its model. */
+	@Value
+	private static class LineEnd
+	{
+		LocalPoint middle;
+		Shape model;
+		WalkGoal footprint;
 	}
 }
