@@ -146,8 +146,12 @@ public final class SceneDoors
 	private boolean opens(int id)
 	{
 		String option = openOption(id);
-		return (OPEN.equals(option) || SQUEEZE.equalsIgnoreCase(option) || WALK_THROUGH.equalsIgnoreCase(option)
-			|| SLASH.equals(option) && canSlash);
+		return isOpening(option) && (canSlash || !SLASH.equals(option));
+	}
+
+	private static boolean isOpening(String action)
+	{
+		return OPEN.equals(action) || SLASH.equals(action) || SQUEEZE.equalsIgnoreCase(action) || WALK_THROUGH.equalsIgnoreCase(action);
 	}
 
 	/** Client thread only. The option that opens a door, web, fence to squeeze through or doorway, or "" for anything else. */
@@ -167,8 +171,7 @@ public final class SceneDoors
 				{
 					return NONE;
 				}
-				option = OPEN.equals(action) || SLASH.equals(action) || SQUEEZE.equalsIgnoreCase(action) || WALK_THROUGH.equalsIgnoreCase(action)
-					? action : option;
+				option = isOpening(action) ? action : option;
 			}
 			return option;
 		});
@@ -176,12 +179,8 @@ public final class SceneDoors
 
 	private static Set<Integer> slashItems()
 	{
-		try (InputStream in = SceneDoors.class.getResourceAsStream("slash.txt"))
+		try (InputStream in = WalkTable.open("slash.txt"))
 		{
-			if (in == null)
-			{
-				throw new IllegalStateException("slash.txt is missing");
-			}
 			Set<Integer> ids = new HashSet<>();
 			for (String line : new String(in.readAllBytes(), StandardCharsets.UTF_8).split("\\R"))
 			{

@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NoTeleportAreas
 {
 	public static final NoTeleportAreas NONE = new NoTeleportAreas(List.of());
@@ -16,11 +18,6 @@ public final class NoTeleportAreas
 	private static final int LIFTED_AT = 6;
 
 	private final List<int[]> boxes;
-
-	private NoTeleportAreas(List<int[]> boxes)
-	{
-		this.boxes = boxes;
-	}
 
 	public static NoTeleportAreas load() throws IOException
 	{

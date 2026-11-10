@@ -1,7 +1,7 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.PositionRules;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @AllArgsConstructor
@@ -21,16 +21,12 @@ public enum OriginClass
 
 	private final int highestLevel;
 	/** Walking due south to this surface y reaches the class. */
+	@Getter(AccessLevel.PACKAGE)
 	private final int exitY;
 
 	OriginClass(int highestLevel)
 	{
 		this(highestLevel, NO_EXIT);
-	}
-
-	int exitY()
-	{
-		return exitY;
 	}
 
 	public static OriginClass of(WorldPoint tile, NoTeleportAreas noTeleport)

@@ -76,14 +76,14 @@ public final class GearPicker
 		{
 			List<Upgrade> taken = fromStorage.subList(0, withdrawn);
 			Set<Integer> takenSlots = new HashSet<>();
+			List<Integer> equip = new ArrayList<>();
 			int left = need;
 			for (Upgrade upgrade : taken)
 			{
 				takenSlots.add(upgrade.piece.slot);
+				equip.add(upgrade.piece.itemId);
 				left -= upgrade.piece.value - value(current.get(upgrade.piece.slot));
 			}
-			List<Integer> equip = new ArrayList<>();
-			taken.forEach(upgrade -> equip.add(upgrade.piece.itemId));
 			Set<Integer> equipSlots = new HashSet<>(takenSlots);
 			for (Upgrade upgrade : fromCarried)
 			{

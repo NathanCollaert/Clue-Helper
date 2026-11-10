@@ -90,12 +90,7 @@ public final class PlanRecording
 	private static List<RecordedNeed> needs(PlanInput input)
 	{
 		Set<Integer> owned = StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked());
-		List<RecordedNeed> needs = new ArrayList<>();
-		for (RequiredItems.Need need : input.getRequired().getNeeds())
-		{
-			needs.add(RecordedNeed.of(need, owned));
-		}
-		return needs;
+		return input.getRequired().getNeeds().stream().map(need -> RecordedNeed.of(need, owned)).collect(Collectors.toList());
 	}
 
 	private static int[] xyz(WorldPoint tile)

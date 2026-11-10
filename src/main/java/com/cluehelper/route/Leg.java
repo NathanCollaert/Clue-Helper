@@ -17,7 +17,12 @@ public class Leg
 		SWAP_TELEPORT,
 		FAIRY_RING,
 		SPELLBOOK_CHANGE,
-		BANK
+		BANK;
+
+		public boolean isTransport()
+		{
+			return this == TELEPORT || this == SWAP_TELEPORT || this == FAIRY_RING;
+		}
 	}
 
 	Kind kind;
@@ -75,7 +80,7 @@ public class Leg
 
 	public boolean isTransport()
 	{
-		return kind == Kind.TELEPORT || kind == Kind.SWAP_TELEPORT || kind == Kind.FAIRY_RING;
+		return kind.isTransport();
 	}
 
 	public String describe()

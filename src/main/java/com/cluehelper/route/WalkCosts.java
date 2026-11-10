@@ -19,6 +19,7 @@ public final class WalkCosts
 	private static final int BESIDE_TILES = 2;
 
 	private final Ground ground;
+	@Getter
 	private final WorldPoint start;
 	private final WalkSearch search;
 
@@ -27,11 +28,6 @@ public final class WalkCosts
 		WalkSearch search = new WalkSearch(ground, MAX_TILES, true);
 		search.run(WalkTable.pack(start), (tile, cost) -> UNREACHED);
 		return new WalkCosts(ground, start, search);
-	}
-
-	public WorldPoint getStart()
-	{
-		return start;
 	}
 
 	/** The loaded scene the walk was searched over, its doors open; null when none was. */
@@ -43,11 +39,12 @@ public final class WalkCosts
 	/** The walk to the tile, or to the landing of an exit within 2 tiles of it (the exit's node); else UNREACHED. */
 	public int cost(WorldPoint tile)
 	{
-		if (tile == null)
-		{
-			return UNREACHED;
-		}
-		int cost = search.cost(WalkTable.pack(tile));
+		return tile == null ? UNREACHED : costOf(WalkTable.pack(tile));
+	}
+
+	private int costOf(int tile)
+	{
+		int cost = search.cost(tile);
 		if (cost != UNREACHED)
 		{
 			return cost;
@@ -69,7 +66,7 @@ public final class WalkCosts
 			int via = search.via(packed);
 			return via != WalkSearch.NONE && ground.isExitRow(via) ? ground.exit(via) : null;
 		}
-		int landing = exitLandingBy(tile);
+		int landing = exitLandingBy(packed);
 		return landing == WalkSearch.NONE ? null : ground.exit(search.via(landing));
 	}
 
@@ -83,23 +80,8 @@ public final class WalkCosts
 		{
 			return cost(tile);
 		}
-		int best = UNREACHED;
-		int bestDistance = Integer.MAX_VALUE;
-		for (int dx = -BESIDE_TILES; dx <= BESIDE_TILES; dx++)
-		{
-			for (int dy = -BESIDE_TILES; dy <= BESIDE_TILES; dy++)
-			{
-				WorldPoint near = tile.dx(dx).dy(dy);
-				int c = cost(near);
-				int distance = opensOnto(near, tile) ? 0 : Math.max(Math.abs(dx), Math.abs(dy));
-				if (c != UNREACHED && (distance < bestDistance || distance == bestDistance && c < best))
-				{
-					best = c;
-					bestDistance = distance;
-				}
-			}
-		}
-		return best;
+		int near = ground.nearestBeside(tile, BESIDE_TILES, this::costOf);
+		return near == WalkSearch.NONE ? UNREACHED : costOf(near);
 	}
 
 	/**
@@ -119,8 +101,8 @@ public final class WalkCosts
 				boolean outsideY = y == -1 || y == sizeY;
 				WorldPoint tile = southWest.dx(x).dy(y);
 				int c = outsideX != outsideY ? cost(tile) : UNREACHED;
-				boolean open = c != UNREACHED
-					&& opensOnto(tile, southWest.dx(Math.max(0, Math.min(sizeX - 1, x))).dy(Math.max(0, Math.min(sizeY - 1, y))));
+				boolean open = c != UNREACHED && ground.opensOnto(tile.getX(), tile.getY(), tile.getPlane(),
+					southWest.dx(Math.max(0, Math.min(sizeX - 1, x))).dy(Math.max(0, Math.min(sizeY - 1, y))));
 				if (c != UNREACHED && (open && !bestOpen || open == bestOpen && c < bestCost))
 				{
 					best = tile;
@@ -137,23 +119,15 @@ public final class WalkCosts
 		return search.reachedTiles();
 	}
 
-	private boolean opensOnto(WorldPoint from, WorldPoint to)
-	{
-		int dx = to.getX() - from.getX();
-		int dy = to.getY() - from.getY();
-		return from.getPlane() == to.getPlane() && Math.abs(dx) + Math.abs(dy) == 1
-			&& !ground.isWallBetween(from.getX(), from.getY(), from.getPlane(), dx, dy);
-	}
-
-	/** The cheapest reached exit landing within 2 tiles of the tile. */
-	private int exitLandingBy(WorldPoint tile)
+	/** The cheapest reached exit landing within 2 tiles of the packed tile. */
+	private int exitLandingBy(int tile)
 	{
 		int best = WalkSearch.NONE;
 		int bestCost = UNREACHED;
 		for (int landing : search.exitLandings())
 		{
-			boolean near = WalkSearch.plane(landing) == tile.getPlane()
-				&& Math.max(Math.abs(WalkSearch.x(landing) - tile.getX()), Math.abs(WalkSearch.y(landing) - tile.getY())) <= BESIDE_TILES;
+			boolean near = WalkSearch.plane(landing) == WalkSearch.plane(tile)
+				&& Math.max(Math.abs(WalkSearch.x(landing) - WalkSearch.x(tile)), Math.abs(WalkSearch.y(landing) - WalkSearch.y(tile))) <= BESIDE_TILES;
 			if (near && search.cost(landing) < bestCost)
 			{
 				best = landing;
