@@ -7,9 +7,9 @@ import com.cluehelper.route.*;
 import java.awt.Color;
 import java.util.*;
 import java.util.regex.*;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.client.util.ColorUtil;
+import static java.util.stream.Collectors.*;
 
 /** Built on the client thread and handed to the overlay as one immutable value. */
 @Value
@@ -80,7 +80,7 @@ public class GuideBox
 	/** At the step itself nothing is travelled: no notes about routes. */
 	public GuideBox atTheStep()
 	{
-		List<String> kept = notes.stream().filter(note -> !ROUTE_NOTES.contains(note)).collect(Collectors.toList());
+		List<String> kept = notes.stream().filter(note -> !ROUTE_NOTES.contains(note)).collect(toList());
 		return toBuilder().notes(List.copyOf(kept)).build();
 	}
 

@@ -9,6 +9,7 @@ import java.util.stream.*;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /** Pure, so it runs on the executor with snapshot data only. */
 public final class Planner
@@ -125,7 +126,7 @@ public final class Planner
 		{
 			return List.of(List.of(step.getTargets().stream().mapToInt(ctx::nodeAt).toArray()));
 		}
-		List<int[]> nodes = step.getTargets().stream().map(tile -> new int[]{ctx.nodeAt(tile)}).collect(Collectors.toList());
+		List<int[]> nodes = step.getTargets().stream().map(tile -> new int[]{ctx.nodeAt(tile)}).collect(toList());
 		return ClueTypes.THREE_STEP.equals(step.getType()) ? permutations(nodes) : List.of(nodes);
 	}
 
@@ -422,7 +423,7 @@ public final class Planner
 			return List.of(step.getData().getReach());
 		}
 		WalkTable table = ctx.table;
-		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(Collectors.toSet());
+		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(toSet());
 		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || !ctx.isTableNode(n) || table.reverseEnd(n) == table.reverseFrom(n));
 		if (noWalkData)
 		{
@@ -509,7 +510,7 @@ public final class Planner
 	/** Needs with one way each, all of them wanted. */
 	private static List<List<String>> each(List<String> needs)
 	{
-		return needs.stream().map(List::of).collect(Collectors.toList());
+		return needs.stream().map(List::of).collect(toList());
 	}
 
 	private static String wayLine(String way)
@@ -550,13 +551,13 @@ public final class Planner
 			return Set.of();
 		}
 		return shutWaysInto(ctx, ctx.gates[PlanContext.NOT_BANKED], targets).map(way -> unfinishedQuests(way, player))
-			.filter(quests -> !quests.isEmpty()).collect(Collectors.toCollection(TreeSet::new));
+			.filter(quests -> !quests.isEmpty()).collect(toCollection(TreeSet::new));
 	}
 
 	private static String unfinishedQuests(List<Requirements> gates, PlayerSnapshot player)
 	{
 		return gates.stream().flatMap(gate -> gate.getQuests().stream()).filter(quest -> !player.finished(quest))
-			.map(Quest::getName).distinct().sorted().collect(Collectors.joining(" and "));
+			.map(Quest::getName).distinct().sorted().collect(joining(" and "));
 	}
 
 	@RequiredArgsConstructor

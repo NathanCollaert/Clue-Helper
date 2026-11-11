@@ -6,13 +6,13 @@ import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 /** Client thread only: reads varbits. */
 @Singleton
@@ -127,13 +127,13 @@ public class StepNeeds
 			return item;
 		}
 		return widened.computeIfAbsent(other, alternative -> new AlternativeRequirement(item, alternative.getAll().stream()
-			.map(this::part).collect(Collectors.toList())));
+			.map(this::part).collect(toList())));
 	}
 
 	/** Any of these ids, named by them: "Grimy cadantine or Cadantine". */
 	private AlternativeRequirement.Part part(List<Integer> ids)
 	{
-		String name = ids.stream().map(id -> client.getItemDefinition(id).getName()).distinct().collect(Collectors.joining(" or "));
+		String name = ids.stream().map(id -> client.getItemDefinition(id).getName()).distinct().collect(joining(" or "));
 		return new AlternativeRequirement.Part(name, anyOf(name, ids));
 	}
 

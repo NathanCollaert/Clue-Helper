@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import java.util.*;
 import java.util.regex.*;
 
@@ -9,13 +10,9 @@ import java.util.regex.*;
  */
 public final class MenuLabels
 {
-	private static final Set<String> TELEPORT_LIST_OPENERS = Set.of("rub", "open", "teleport", "teleports", "teleport menu", "operate",
-		"travel", "tree", "activate", "configure", "ring configure", "perks", "spellbook", "commune");
+	private static final Set<String> TELEPORT_LIST_OPENERS = Set.copyOf(Tables.keys("teleport list openers"));
 	/** Catalog (Shortest Path) labels that the worn Max cape's options name differently. */
-	private static final Map<String, String> GAME_NAMES = Map.of(
-		"feldip hills", "carnivorous chinchompas",
-		"tele to poh", "home",
-		"bandit camp quarry", "enakhras temple entrance");
+	private static final Map<String, String> GAME_NAMES = Tables.byKey("max cape game names", Tables.Row::text);
 	private static final Pattern APOSTROPHE = Pattern.compile("['’]");
 	private static final Pattern HOTKEY_LABEL = Pattern.compile("^([0-9A-Z])[.:] ");
 	private static final Pattern TAGS = Pattern.compile("<[^>]*>");

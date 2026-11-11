@@ -2,10 +2,10 @@ package com.cluehelper.hotcold;
 
 import com.cluehelper.step.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.Enemy;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdLocation;
+import static java.util.stream.Collectors.*;
 
 /** Core's spots, read from its enum, never from its solver. */
 public final class Spots
@@ -20,7 +20,7 @@ public final class Spots
 	{
 		Map<String, StepIndex.Spot> cache = index.getHotColdSpots();
 		return Arrays.stream(HotColdLocation.values()).filter(location -> tierOf(location) == tier)
-			.map(location -> spot(location, tier, cache.get(location.name()))).collect(Collectors.toUnmodifiableList());
+			.map(location -> spot(location, tier, cache.get(location.name()))).collect(toUnmodifiableList());
 	}
 
 	private static HotColdTier tierOf(HotColdLocation location)

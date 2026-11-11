@@ -1,17 +1,18 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.*;
+import static java.util.stream.Collectors.*;
 
 /**
  * Teleport interfaces are read from their scripts' arguments, before better-teleport-menu rewrites them. Lines and menu
@@ -35,13 +36,7 @@ public class MenuLines
 	private static final int BOX_GROUP = 590;
 	private static final int LOG_FIRST_CODE = 12;
 	/** The Pendant of Ates' map has one button per place, by the place its catalog line names. */
-	private static final Map<String, Integer> ATES_BUTTONS = Map.of(
-		"The Darkfrost", InterfaceID.PendantOfAtes.TELEPORT_DARKFROST,
-		"Twilight Temple", InterfaceID.PendantOfAtes.TELEPORT_TWILIGHT,
-		"Ralos' Rise", InterfaceID.PendantOfAtes.TELEPORT_RALOS,
-		"North Aldarin", InterfaceID.PendantOfAtes.TELEPORT_ALDARIN,
-		"Kastori", InterfaceID.PendantOfAtes.TELEPORT_TLATI,
-		"Nemus Retreat", InterfaceID.PendantOfAtes.TELEPORT_AUBURN);
+	private static final Map<String, Integer> ATES_BUTTONS = Tables.byKey("ates buttons", row -> row.id(0));
 	/** Each code in the travel log is followed by its favourite star. */
 	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String MAP_TELEPORT = "Teleport";
@@ -146,7 +141,7 @@ public class MenuLines
 		}
 		listFresh = false;
 		List<String> texts = rawListLines.stream().map(this::child).filter(line -> line != null && line.getText() != null)
-			.map(Widget::getText).collect(Collectors.toList());
+			.map(Widget::getText).collect(toList());
 		reader.accept(listTitle, texts);
 	}
 
@@ -595,11 +590,11 @@ public class MenuLines
 	{
 		double rowMiddle = location.getBounds().getCenterY();
 		List<Widget> buttons = widgets.stream().filter(Widgets::visible).filter(MenuLines::isBoatTeleportButton)
-			.collect(Collectors.toList());
+			.collect(toList());
 		double nearest = buttons.stream().mapToDouble(button -> Math.abs(button.getBounds().getCenterY() - rowMiddle)).min()
 			.orElse(Double.MAX_VALUE);
 		return buttons.stream().filter(button -> Math.abs(button.getBounds().getCenterY() - rowMiddle) <= nearest + SAME_ROW_PIXELS)
-			.map(button -> buttonFrame(widgets, button)).collect(Collectors.toList());
+			.map(button -> buttonFrame(widgets, button)).collect(toList());
 	}
 
 	/** The button's frame around its text, a separate widget with neither action nor text; the text when there is none. */

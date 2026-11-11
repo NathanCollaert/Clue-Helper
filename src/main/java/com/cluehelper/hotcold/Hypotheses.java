@@ -3,9 +3,9 @@ package com.cluehelper.hotcold;
 import com.cluehelper.step.HotColdTier;
 import java.util.*;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /**
  * Every tile within each spot's radius of its centre, kept while it explains the step's readings exactly: the band from
@@ -216,7 +216,7 @@ public final class Hypotheses
 
 	public List<Spot> keptSpots()
 	{
-		return spotShares().keySet().stream().map(this::spot).collect(Collectors.toList());
+		return spotShares().keySet().stream().map(this::spot).collect(toList());
 	}
 
 	public Spot spot(String name)

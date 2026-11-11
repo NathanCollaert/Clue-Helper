@@ -6,7 +6,6 @@ import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -14,6 +13,8 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
+import static java.util.stream.Collectors.*;
+import com.cluehelper.guide.StepGuide.Tab;
 
 /**
  * A skill challenge's task act: the items it is done with, the making step reached, the spell cast on an item and the
@@ -58,13 +59,13 @@ final class TaskActs
 		Set<Integer> carried = player.carriedIds();
 		if (neededFromCarriedKit(step) != null)
 		{
-			return shown.toBuilder().items(Set.of(ItemID.HUNTSMANS_KIT)).tab(StepGuide.Tab.INVENTORY).build();
+			return shown.toBuilder().items(Set.of(ItemID.HUNTSMANS_KIT)).tab(Tab.INVENTORY).build();
 		}
 		Integer staff = staffToWield(step);
 		if (staff != null)
 		{
 			Set<Integer> wield = Set.of(staff);
-			return shown.toBuilder().items(wield).fillItems(leftClicks.wears(staff) ? wield : Set.of()).tab(StepGuide.Tab.INVENTORY).build();
+			return shown.toBuilder().items(wield).fillItems(leftClicks.wears(staff) ? wield : Set.of()).tab(Tab.INVENTORY).build();
 		}
 		StepIndex.Cast cast = step.getData().getCast();
 		if (cast != null && cast.getOn().stream().anyMatch(carried::contains))
@@ -74,7 +75,7 @@ final class TaskActs
 		Set<Integer> forPatch = patchItems(step, carried);
 		if (forPatch != null)
 		{
-			return outlined(shown, forPatch, StepGuide.Tab.INVENTORY);
+			return outlined(shown, forPatch, Tab.INVENTORY);
 		}
 		StepIndex.Making making = makingNow(step, carried);
 		if (current.getStage().getOption() != null && making == null)
@@ -83,14 +84,14 @@ final class TaskActs
 		}
 		Set<Integer> items = carried.stream().filter(id -> making != null
 				? making.getItems().stream().anyMatch(group -> group.contains(id)) : StepHighlights.isStepItem(step, id))
-			.collect(Collectors.toUnmodifiableSet());
-		return outlined(shown, items, items.isEmpty() ? shown.getTab() : StepGuide.Tab.INVENTORY);
+			.collect(toUnmodifiableSet());
+		return outlined(shown, items, items.isEmpty() ? shown.getTab() : Tab.INVENTORY);
 	}
 
 	/** The items outlined, filled where their left click puts them on or uses them. */
-	private Highlights outlined(Highlights shown, Set<Integer> items, StepGuide.Tab tab)
+	private Highlights outlined(Highlights shown, Set<Integer> items, Tab tab)
 	{
-		return shown.toBuilder().items(items).fillItems(items.stream().filter(leftClicks::wearsOrUses).collect(Collectors.toUnmodifiableSet()))
+		return shown.toBuilder().items(items).fillItems(items.stream().filter(leftClicks::wearsOrUses).collect(toUnmodifiableSet()))
 			.tab(tab).build();
 	}
 
@@ -136,12 +137,12 @@ final class TaskActs
 		if (patch == Patch.CROP)
 		{
 			return step.getData().getRequires().stream().filter(need -> need.getName().equals(SPADE))
-				.flatMap(need -> need.getIds().stream()).filter(carried::contains).collect(Collectors.toUnmodifiableSet());
+				.flatMap(need -> need.getIds().stream()).filter(carried::contains).collect(toUnmodifiableSet());
 		}
 		boolean rake = patch == Patch.WEEDS;
 		return carried.stream().filter(id -> step.getRequirements().getItems().stream()
 				.anyMatch(need -> need.fulfilledBy(id) && RAKE.equals(need.getCollectiveName(client)) == rake))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 	}
 
 	/** The state of the patch to plant in; null for other tasks or with none in the scene. */
@@ -151,7 +152,7 @@ final class TaskActs
 		{
 			return null;
 		}
-		Set<Integer> ids = step.getData().getPlaces().stream().flatMap(place -> place.getObjects().stream()).collect(Collectors.toSet());
+		Set<Integer> ids = step.getData().getPlaces().stream().flatMap(place -> place.getObjects().stream()).collect(toSet());
 		TileObject patch = patchToUse(step, sceneObjects.find(ids));
 		return patch == null ? null : stateOf(patch);
 	}
@@ -280,11 +281,11 @@ final class TaskActs
 	private Highlights withCast(Highlights shown, StepIndex.Cast cast, Set<Integer> carried)
 	{
 		boolean picked = client.isWidgetSelected();
-		Set<Integer> items = picked ? carried.stream().filter(cast.getOn()::contains).collect(Collectors.toUnmodifiableSet()) : Set.of();
+		Set<Integer> items = picked ? carried.stream().filter(cast.getOn()::contains).collect(toUnmodifiableSet()) : Set.of();
 		int spellWidget = picked ? -1 : cast.getWidgets().stream().filter(id -> Widgets.shown(client, id)).reduce((first, last) -> last)
 			.orElse(cast.getWidgets().isEmpty() ? -1 : cast.getWidgets().get(0));
 		return shown.toBuilder().items(items).fillItems(items).spellWidget(spellWidget)
-			.tab(picked ? StepGuide.Tab.INVENTORY : StepGuide.Tab.MAGIC).build();
+			.tab(picked ? Tab.INVENTORY : Tab.MAGIC).build();
 	}
 
 	/** A carried staff the task's runes come from, while no such staff is wielded; null otherwise. */

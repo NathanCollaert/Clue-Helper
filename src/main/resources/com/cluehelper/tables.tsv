@@ -1,0 +1,204 @@
+# Lookup tables for com.cluehelper.Tables: table, key, cells. A gameval cell is NAME=value; write the name and run
+# gradlew bakeData to fill in the value (BakedDataTest fails while a value is missing or out of date).
+nexus slots		VarbitID.POH_NEXUS_TELE_1=6654
+nexus slots		VarbitID.POH_NEXUS_TELE_2=6655
+nexus slots		VarbitID.POH_NEXUS_TELE_3=6656
+nexus slots		VarbitID.POH_NEXUS_TELE_4=6657
+nexus slots		VarbitID.POH_NEXUS_TELE_5=6658
+nexus slots		VarbitID.POH_NEXUS_TELE_6=6659
+nexus slots		VarbitID.POH_NEXUS_TELE_7=6660
+nexus slots		VarbitID.POH_NEXUS_TELE_8=6661
+nexus slots		VarbitID.POH_NEXUS_TELE_9=6662
+nexus slots		VarbitID.POH_NEXUS_TELE_10=6663
+nexus slots		VarbitID.POH_NEXUS_TELE_11=6664
+nexus slots		VarbitID.POH_NEXUS_TELE_12=6665
+nexus slots		VarbitID.POH_NEXUS_TELE_13=6666
+nexus slots		VarbitID.POH_NEXUS_TELE_14=6667
+nexus slots		VarbitID.POH_NEXUS_TELE_15=6668
+nexus slots		VarbitID.POH_NEXUS_TELE_16=6554
+nexus slots		VarbitID.POH_NEXUS_TELE_17=6555
+nexus slots		VarbitID.POH_NEXUS_TELE_18=6556
+nexus slots		VarbitID.POH_NEXUS_TELE_19=10080
+nexus slots		VarbitID.POH_NEXUS_TELE_20=10081
+nexus slots		VarbitID.POH_NEXUS_TELE_21=10082
+nexus slots		VarbitID.POH_NEXUS_TELE_22=10083
+nexus slots		VarbitID.POH_NEXUS_TELE_23=10084
+nexus slots		VarbitID.POH_NEXUS_TELE_24=10085
+nexus slots		VarbitID.POH_NEXUS_TELE_25=10086
+nexus slots		VarbitID.POH_NEXUS_TELE_26=10087
+nexus slots		VarbitID.POH_NEXUS_TELE_27=10088
+nexus slots		VarbitID.POH_NEXUS_TELE_28=10089
+nexus slots		VarbitID.POH_NEXUS_TELE_29=10090
+nexus slots		VarbitID.POH_NEXUS_TELE_30=10091
+nexus slots		VarbitID.POH_NEXUS_TELE_31=10019
+nexus slots		VarbitID.POH_NEXUS_TELE_32=10020
+nexus slots		VarbitID.POH_NEXUS_TELE_33=10021
+nexus slots		VarbitID.POH_NEXUS_TELE_34=10022
+nexus slots		VarbitID.POH_NEXUS_TELE_35=10023
+nexus slots		VarbitID.POH_NEXUS_TELE_36=20111
+nexus slots		VarbitID.POH_NEXUS_TELE_37=20112
+nexus slots		VarbitID.POH_NEXUS_TELE_38=20113
+nexus slots		VarbitID.POH_NEXUS_TELE_39=20114
+nexus slots		VarbitID.POH_NEXUS_TELE_40=20115
+nexus slots		VarbitID.POH_NEXUS_TELE_41=20116
+nexus slots		VarbitID.POH_NEXUS_TELE_42=20117
+nexus slots		VarbitID.POH_NEXUS_TELE_43=20118
+nexus slots		VarbitID.POH_NEXUS_TELE_44=20119
+nexus slots		VarbitID.POH_NEXUS_TELE_45=20120
+house settings		VarbitID.POH_NEXUS_XERIC=6617
+house settings		VarbitID.POH_NEXUS_DIGSITE=6651
+house settings		VarbitID.POH_JEWELLERYBOX_MULTI=2308
+house settings		VarbitID.POH_HOUSE_LOCATION=2187
+house settings		VarbitID.POH_TELE_TOGGLE=4744
+uncharged		ItemID.AMULET_OF_GLORY=1704
+uncharged		ItemID.TRAIL_AMULET_OF_GLORY=10362
+uncharged		ItemID.RING_OF_WEALTH=2572
+uncharged		ItemID.JEWL_NECKLACE_OF_SKILLS=11113
+uncharged		ItemID.JEWL_BRACELET_OF_COMBAT=11126
+uncharged		ItemID.XERIC_TALISMAN_EMPTY=13392
+uncharged		ItemID.RING_OF_SHADOWS_UNCHARGED=28329
+uncharged		ItemID.TOME_OF_FIRE_UNCHARGED=20716
+uncharged		ItemID.TOME_OF_WATER_UNCHARGED=25576
+uncharged		ItemID.TOME_OF_EARTH_UNCHARGED=30066
+ghostspeak		ItemID.AMULET_OF_GHOSTSPEAK=552
+ghostspeak		ItemID.AMULET_OF_GHOSTSPEAK_ENCHANTED=4250
+ghostspeak		ItemID.MORYTANIA_LEGS_MEDIUM=13113
+ghostspeak		ItemID.MORYTANIA_LEGS_HARD=13114
+ghostspeak		ItemID.MORYTANIA_LEGS_ELITE=13115
+abyss obstacles		ObjectID.RCU_OUTER_MULTI1=26187
+abyss obstacles		ObjectID.RCU_OUTER_MULTI2=26188
+abyss obstacles		ObjectID.RCU_OUTER_MULTI3=26189
+abyss obstacles		ObjectID.RCU_OUTER_MULTI4=26190
+abyss obstacles		ObjectID.RCU_OUTER_MULTI5=26191
+abyss obstacles		ObjectID.RCU_OUTER_MULTI6=26192
+abyss obstacles		ObjectID.RCU_OUTER_MULTI7=26208
+abyss obstacles		ObjectID.RCU_OUTER_MULTI8=26250
+abyss obstacles		ObjectID.RCU_OUTER_MULTI9=26251
+abyss obstacles		ObjectID.RCU_OUTER_MULTI10=26252
+abyss obstacles		ObjectID.RCU_OUTER_MULTI11=26253
+planted spirit trees		ObjectID.FARMING_SPIRIT_TREE_PATCH_1=8338
+planted spirit trees		ObjectID.FARMING_SPIRIT_TREE_PATCH_2=8382
+planted spirit trees		ObjectID.FARMING_SPIRIT_TREE_PATCH_3=8383
+planted spirit trees		ObjectID.FARMING_SPIRIT_TREE_PATCH_4=27116
+planted spirit trees		ObjectID.FARMING_SPIRIT_TREE_PATCH_5=33733
+planted spirit trees		ObjectID.SPIRIT_TREE_FULLYGROWN=8355
+fairy ring objects		ObjectID.FAIRYRING_HOMEHUB=29560
+fairy ring objects		ObjectID.FAIRYRING_MINORHUB=29495
+fairy ring objects		ObjectID.POH_FAIRY_RING=29228
+fairy ring objects		ObjectID.POH_SPIRIT_RING=29229
+fairy ring objects		ObjectID.LEAGUE_5_POH_SPIRIT_RING=27097
+fairy ring objects		ObjectID.XMAS20_POH_SPIRIT_RING=40779
+uri		NpcID.TRAIL_BEGINNER_URI=8638
+uri		NpcID.TRAIL_EASY_URI=1774
+uri		NpcID.TRAIL_MEDIUM_URI=1775
+uri		NpcID.TRAIL_HARD_URI=1776
+uri		NpcID.TRAIL_ELITE_URI=6584
+uri		NpcID.TRAIL_MASTER_URI=7311
+uri		NpcID.URI_EMOTE=7313
+rune pouches		ItemID.BH_RUNE_POUCH=12791
+rune pouches		ItemID.BH_RUNE_POUCH_TROUVER=24416
+rune pouches		ItemID.DIVINE_RUNE_POUCH=27281
+rune pouches		ItemID.DIVINE_RUNE_POUCH_TROUVER=27509
+player varbits		VarbitID.SPELLBOOK=4070
+player varbits		VarbitID.LUNAR_SPELLBOOK_CHANGE=3617
+player varbits		VarbitID.SB_SWAP_CHECK=4816
+player varbits		VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED=9631
+player varbits		VarbitID.IRONMAN=1777
+player varbits		VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE=4498
+rune pouch slots	1	VarbitID.RUNE_POUCH_TYPE_1=29	VarbitID.RUNE_POUCH_QUANTITY_1=1624
+rune pouch slots	2	VarbitID.RUNE_POUCH_TYPE_2=1622	VarbitID.RUNE_POUCH_QUANTITY_2=1625
+rune pouch slots	3	VarbitID.RUNE_POUCH_TYPE_3=1623	VarbitID.RUNE_POUCH_QUANTITY_3=1626
+rune pouch slots	4	VarbitID.RUNE_POUCH_TYPE_4=14285	VarbitID.RUNE_POUCH_QUANTITY_4=14286
+rune pouch slots	5	VarbitID.RUNE_POUCH_TYPE_5=15373	VarbitID.RUNE_POUCH_QUANTITY_5=15375
+rune pouch slots	6	VarbitID.RUNE_POUCH_TYPE_6=15374	VarbitID.RUNE_POUCH_QUANTITY_6=15376
+tab content	INVENTORY	InterfaceID.Inventory.ITEMS=9764864
+tab content	EQUIPMENT	InterfaceID.Wornitems.UNIVERSE=25362432
+tab content	MAGIC	InterfaceID.MagicSpellbook.UNIVERSE=14286848
+tab content	EMOTES	InterfaceID.Emote.UNIVERSE=14155776
+tab content	MUSIC	InterfaceID.Music.UNIVERSE=15663104
+tab content	QUESTS	InterfaceID.Questlist.UNIVERSE=26148864
+tab stones	INVENTORY	InterfaceID.Toplevel.STONE3=35913795	InterfaceID.ToplevelOsrsStretch.STONE3=10551358	InterfaceID.ToplevelPreEoc.STONE3=10747959
+tab stones	EQUIPMENT	InterfaceID.Toplevel.STONE4=35913796	InterfaceID.ToplevelOsrsStretch.STONE4=10551359	InterfaceID.ToplevelPreEoc.STONE4=10747960
+tab stones	MAGIC	InterfaceID.Toplevel.STONE6=35913798	InterfaceID.ToplevelOsrsStretch.STONE6=10551361	InterfaceID.ToplevelPreEoc.STONE6=10747962
+tab stones	EMOTES	InterfaceID.Toplevel.STONE12=35913781	InterfaceID.ToplevelOsrsStretch.STONE12=10551344	InterfaceID.ToplevelPreEoc.STONE12=10747946
+tab stones	MUSIC	InterfaceID.Toplevel.STONE13=35913782	InterfaceID.ToplevelOsrsStretch.STONE13=10551345	InterfaceID.ToplevelPreEoc.STONE13=10747947
+tab stones	QUESTS	InterfaceID.Toplevel.STONE2=35913794	InterfaceID.ToplevelOsrsStretch.STONE2=10551357	InterfaceID.ToplevelPreEoc.STONE2=10747958
+ates buttons	The Darkfrost	InterfaceID.PendantOfAtes.TELEPORT_DARKFROST=57606174
+ates buttons	Twilight Temple	InterfaceID.PendantOfAtes.TELEPORT_TWILIGHT=57606173
+ates buttons	Ralos' Rise	InterfaceID.PendantOfAtes.TELEPORT_RALOS=57606175
+ates buttons	North Aldarin	InterfaceID.PendantOfAtes.TELEPORT_ALDARIN=57606176
+ates buttons	Kastori	InterfaceID.PendantOfAtes.TELEPORT_TLATI=57606177
+ates buttons	Nemus Retreat	InterfaceID.PendantOfAtes.TELEPORT_AUBURN=57606172
+minigame spells	STANDARD	InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD=14286855
+minigame spells	ANCIENT	InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ANCIENT=14286856
+minigame spells	LUNAR	InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_LUNAR=14286858
+minigame spells	ARCEUUS	InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ARCEUUS=14286857
+spirit tree patches	Port Sarim	12082	VarbitID.FARMING_TRANSMIT_A=4771
+spirit tree patches	Etceteria	10300	VarbitID.FARMING_TRANSMIT_B=4772
+spirit tree patches	Brimhaven	11058	VarbitID.FARMING_TRANSMIT_B=4772
+spirit tree patches	Hosidius	6711	VarbitID.FARMING_TRANSMIT_F=7904
+spirit tree patches	Farming Guild	4922	VarbitID.FARMING_TRANSMIT_A=4771
+scrolls	Ardeaglais teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_ARDEAGLAIS=39125067	InterfaceID.Bookofscrolls.GFX_ARDEAGLAIS=39125074	InterfaceID.Bookofscrolls.TEXT_ARDEAGLAIS=39125075	InterfaceID.Bookofscrolls.TITLE_ARDEAGLAIS=39125076
+scrolls	Chasm teleport scroll	InterfaceID.Bookofscrolls.TELEPORTSCROLL_CHASMOFFIRE=39125066	InterfaceID.Bookofscrolls.GFX_CHASMOFFIRE=39125071	InterfaceID.Bookofscrolls.TEXT_CHASMOFFIRE=39125072	InterfaceID.Bookofscrolls.TITLE_CHASMOFFIRE=39125073
+scrolls	Colossal wyrm teleport scroll	InterfaceID.Bookofscrolls.TELEPORTSCROLL_COLOSSAL_WYRM=39125065	InterfaceID.Bookofscrolls.GFX_COLOSSAL_WYRM=39125068	InterfaceID.Bookofscrolls.TEXT_COLOSSAL_WYRM=39125069	InterfaceID.Bookofscrolls.TITLE_COLOSSAL_WYRM=39125070
+scrolls	Digsite teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_DIGSITE=39125001	InterfaceID.Bookofscrolls.GFX_DIGSITE=39125002	InterfaceID.Bookofscrolls.TEXT_DIGSITE=39125003	InterfaceID.Bookofscrolls.TITLE_DIGSITE=39125004
+scrolls	Feldip hills teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_FELDIP=39125005	InterfaceID.Bookofscrolls.GFX_FELDIP=39125006	InterfaceID.Bookofscrolls.TEXT_FELDIP=39125007	InterfaceID.Bookofscrolls.TITLE_FELDIP=39125008
+scrolls	Guthixian temple teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_GUTHIXIAN_TEMPLE=39125054	InterfaceID.Bookofscrolls.GFX_GUTHIXIAN_TEMPLE=39125059	InterfaceID.Bookofscrolls.TEXT_GUTHIXIAN_TEMPLE=39125060	InterfaceID.Bookofscrolls.TITLE_GUTHIXIAN_TEMPLE=39125061
+scrolls	Iorwerth camp teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_ELF=39125029	InterfaceID.Bookofscrolls.GFX_ELF=39125030	InterfaceID.Bookofscrolls.TEXT_ELF=39125031	InterfaceID.Bookofscrolls.TITLE_ELF=39125032
+scrolls	Key master teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_CERBERUS=39125048	InterfaceID.Bookofscrolls.GFX_CERBERUS=39125045	InterfaceID.Bookofscrolls.TEXT_CERBERUS=39125046	InterfaceID.Bookofscrolls.TITLE_CERBERUS=39125047
+scrolls	Lumberyard teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_LUMBERYARD=39125037	InterfaceID.Bookofscrolls.GFX_LUMBERYARD=39125038	InterfaceID.Bookofscrolls.TEXT_LUMBERYARD=39125039	InterfaceID.Bookofscrolls.TITLE_LUMBERYARD=39125040
+scrolls	Lunar isle teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_LUNARISLE=39125009	InterfaceID.Bookofscrolls.GFX_LUNARISLE=39125010	InterfaceID.Bookofscrolls.TEXT_LUNARISLE=39125011	InterfaceID.Bookofscrolls.TITLE_LUNAR=39125012
+scrolls	Mort'ton teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_MORTTON=39125013	InterfaceID.Bookofscrolls.GFX_MORTTON=39125014	InterfaceID.Bookofscrolls.TEXT_MORTTON=39125015	InterfaceID.Bookofscrolls.TITLE_MORTTON=39125016
+scrolls	Mos le'harmless teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_MOSLES=39125033	InterfaceID.Bookofscrolls.GFX_MOSLES=39125034	InterfaceID.Bookofscrolls.TEXT_MOSLES=39125035	InterfaceID.Bookofscrolls.TITLE_MOSLES=39125036
+scrolls	Nardah teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_NARDAH=39124997	InterfaceID.Bookofscrolls.GFX_NARDAH=39124998	InterfaceID.Bookofscrolls.TEXT_NARDAH=39124999	InterfaceID.Bookofscrolls.TITLE_NARDAH=39125000
+scrolls	Pest control teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_PESTCONTROL=39125017	InterfaceID.Bookofscrolls.GFX_PESTCONTROL=39125018	InterfaceID.Bookofscrolls.TEXT_PESTCONTROL=39125019	InterfaceID.Bookofscrolls.TITLE_PESTCONTROL=39125020
+scrolls	Piscatoris teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_PISCATORIS=39125021	InterfaceID.Bookofscrolls.GFX_PISCATORIS=39125022	InterfaceID.Bookofscrolls.TEXT_PISCATORIS=39125023	InterfaceID.Bookofscrolls.TITLE_PISCATORIS=39125024
+scrolls	Revenant cave teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_REVENANTS=39125049	InterfaceID.Bookofscrolls.GFX_REVENANTS=39125051	InterfaceID.Bookofscrolls.TEXT_REVENANTS=39125052	InterfaceID.Bookofscrolls.TITLE_REVENANTS=39125053
+scrolls	Spider cave teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_SPIDERCAVE=39125055	InterfaceID.Bookofscrolls.GFX_SPIDERCAVE=39125062	InterfaceID.Bookofscrolls.TEXT_SPIDERCAVE=39125063	InterfaceID.Bookofscrolls.TITLE_SPIDERCAVE=39125064
+scrolls	Tai bwo wannai teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_TAIBWO=39125025	InterfaceID.Bookofscrolls.GFX_TAIBWO=39125026	InterfaceID.Bookofscrolls.TEXT_TAIBWO=39125027	InterfaceID.Bookofscrolls.TITLE_TAIBWO=39125028
+scrolls	Watson teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_WATSON=39125050	InterfaceID.Bookofscrolls.GFX_WATSON=39125056	InterfaceID.Bookofscrolls.TEXT_WATSON=39125057	InterfaceID.Bookofscrolls.TITLE_WATSON=39125058
+scrolls	Zul-andra teleport	InterfaceID.Bookofscrolls.TELEPORTSCROLL_ZULANDRA=39125041	InterfaceID.Bookofscrolls.GFX_ZULANDRA=39125042	InterfaceID.Bookofscrolls.TEXT_ZULANDRA=39125043	InterfaceID.Bookofscrolls.TITLE_ZULANDRA=39125044
+ride places	BOAT	the boat
+ride places	CANOE	the canoe station
+ride places	MINECART	the minecart
+ride places	LEVER	the lever
+ride places	BALLOON	the balloon basket
+ride places	MUSHTREE	the mushtree
+ride places	WILDERNESS_OBELISK	the obelisk
+spellbook change warnings	Ancient Pyramid altar	"Drains your Prayer
+spellbook change warnings	and the way in crosses desert heat"	Astral altar
+spellbook change warnings	Aggressive suqahs nearby	Tyss
+mushtree places	House on the Hill
+mushtree places	Verdant Valley
+mushtree places	Sticky Swamp
+mushtree places	Mushroom Meadow
+teleport list openers	rub
+teleport list openers	open
+teleport list openers	teleport
+teleport list openers	teleports
+teleport list openers	teleport menu
+teleport list openers	operate
+teleport list openers	travel
+teleport list openers	tree
+teleport list openers	activate
+teleport list openers	configure
+teleport list openers	ring configure
+teleport list openers	perks
+teleport list openers	spellbook
+teleport list openers	commune
+max cape game names	feldip hills	carnivorous chinchompas
+max cape game names	tele to poh	home
+max cape game names	bandit camp quarry	enakhras temple entrance
+unlock hints	DRAGONTOOTH	"if unlocked
+unlock hints	speak with the ghost captain"	XERICS_HONOUR
+unlock hints	"if unlocked	use the Honour teleport once"
+not teleports	wield
+not teleports	wear
+not teleports	equip
+not teleports	remove
+not teleports	use
+not teleports	drop
+not teleports	examine
+not teleports	check
+not teleports	inspect
+not teleports	read

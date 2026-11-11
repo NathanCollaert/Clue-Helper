@@ -1,10 +1,10 @@
 package com.cluehelper.player;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
+import static java.util.stream.Collectors.*;
 
 /**
  * Everything except the tomes comes from the cache, so a game update that adds a staff or a rune carries
@@ -96,9 +96,9 @@ public final class RuneModel
 	/** The staves that stand in for runes, all wielded in the one weapon slot; the tomes go in the shield slot. */
 	public Set<Integer> staves()
 	{
-		Set<Integer> tomes = Arrays.stream(TOMES).map(tome -> tome[0]).collect(Collectors.toSet());
+		Set<Integer> tomes = Arrays.stream(TOMES).map(tome -> tome[0]).collect(toSet());
 		return unlimitingWornItemsByRune.values().stream().flatMap(Set::stream).filter(id -> !tomes.contains(id))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 	}
 
 	/** -1 for an unknown pouch type. */
@@ -214,6 +214,6 @@ public final class RuneModel
 
 	private static List<Integer> keysOf(CacheView cache, int enumId)
 	{
-		return Arrays.stream(cache.enumKeys(enumId)).boxed().collect(Collectors.toList());
+		return Arrays.stream(cache.enumKeys(enumId)).boxed().collect(toList());
 	}
 }

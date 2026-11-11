@@ -1,18 +1,19 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.route.Exit;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.ObjectID;
-import net.runelite.api.widgets.Widget;
+import static java.util.stream.Collectors.*;
+import com.cluehelper.guide.StepGuide.Tab;
 
 /**
  * What the overlays mark for a sub-step: its items, tab, spell, menu target, and the one-click fill of the items,
@@ -30,8 +31,7 @@ final class StepHighlights
 		SubStep.Done.GEAR_WORN, SubStep.Done.ITEM_WORN);
 	private static final String CLOSE_OPTION = "Close";
 	private static final String TELEPORT_TO_DESTINATION = "Teleport to Destination";
-	private static final Set<Integer> FAIRY_RING_OBJECTS = Set.of(ObjectID.FAIRYRING_HOMEHUB, ObjectID.FAIRYRING_MINORHUB,
-		ObjectID.POH_FAIRY_RING, ObjectID.POH_SPIRIT_RING, ObjectID.LEAGUE_5_POH_SPIRIT_RING, ObjectID.XMAS20_POH_SPIRIT_RING);
+	private static final Set<Integer> FAIRY_RING_OBJECTS = Tables.idSet("fairy ring objects");
 	/** The house's spiritual fairy tree lists its ring options above "Tree", so a left click never opens the tree list. */
 	private static final Set<Integer> NOT_FILLED_UNHOVERED = Set.of(ObjectID.POH_SPIRIT_RING, ObjectID.LEAGUE_5_POH_SPIRIT_RING,
 		ObjectID.XMAS20_POH_SPIRIT_RING);
@@ -60,7 +60,7 @@ final class StepHighlights
 			return Highlights.NONE;
 		}
 		Highlights.HighlightsBuilder shown = Highlights.builder().objectOption(current.getOption()).bankItems(current.getBankItems().stream()
-			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(Collectors.toUnmodifiableSet()));
+			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(toUnmodifiableSet()));
 		switch (current.getKind())
 		{
 			case ACT:
@@ -76,7 +76,7 @@ final class StepHighlights
 				return current.getWayIn().getUse().isEmpty() ? shown.menuTarget(enterTarget(current)).build()
 					: useOnWayIn(shown, current.getWayIn());
 			case SPELLBOOK_SWAP:
-				shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(StepGuide.Tab.MAGIC);
+				shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(Tab.MAGIC);
 				break;
 			case TELEPORT:
 				teleportHighlights(shown, current);
@@ -134,7 +134,7 @@ final class StepHighlights
 		if (objectOption != null)
 		{
 			return objects.stream().filter(object -> isFilledUnhovered(object) || leftClicks.isLeftClick(object, objectOption))
-				.collect(Collectors.toUnmodifiableList());
+				.collect(toUnmodifiableList());
 		}
 		MenuTarget menuTarget = shown.getMenuTarget();
 		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
@@ -145,7 +145,7 @@ final class StepHighlights
 			.filter(object -> isFilledUnhovered(object) || (ring ? ringGoesTo(leftClicks.object(object), menuTarget.getLineKey())
 				: oneClickTo(leftClicks.object(object), label, firstClick) || isOpenedAlready(object, firstClick)
 				|| houseList && MenuLabels.isOpener(leftClicks.object(object))))
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 	}
 
 	/** Someone opened it already, so its left click now goes on through it ("Go-down" on an open trapdoor), unless it shuts it. */
@@ -165,14 +165,14 @@ final class StepHighlights
 	{
 		if (takesOff(act))
 		{
-			return act.getActItems().stream().filter(leftClicks::removes).collect(Collectors.toUnmodifiableSet());
+			return act.getActItems().stream().filter(leftClicks::removes).collect(toUnmodifiableSet());
 		}
 		switch (act.getDone())
 		{
 			case WAY_IN_WORN:
 			case GEAR_WORN:
 			case ITEM_WORN:
-				return act.getActItems().stream().filter(leftClicks::wears).collect(Collectors.toUnmodifiableSet());
+				return act.getActItems().stream().filter(leftClicks::wears).collect(toUnmodifiableSet());
 			default:
 				return act.getActItems();
 		}
@@ -187,7 +187,7 @@ final class StepHighlights
 	{
 		return npcOption == null ? List.of()
 			: npcs.stream().filter(npc -> !leftClicks.isLearned(npc) || npcOption.equalsIgnoreCase(leftClicks.npc(npc)))
-				.collect(Collectors.toUnmodifiableList());
+				.collect(toUnmodifiableList());
 	}
 
 	/** An act's own items, its STASH unit or the gear to put on; else only its one-click fill. */
@@ -209,7 +209,7 @@ final class StepHighlights
 			// Deposited items are clicked in the deposit box, which shows the inventory and worn items itself
 			boolean deposits = current.getDone() == SubStep.Done.ITEMS_GONE;
 			shown.items(current.getActItems()).fillItems(actItemFill(current))
-				.tab(takesOff ? StepGuide.Tab.EQUIPMENT : deposits ? StepGuide.Tab.NONE : StepGuide.Tab.INVENTORY);
+				.tab(takesOff ? Tab.EQUIPMENT : deposits ? Tab.NONE : Tab.INVENTORY);
 			String putOn = PUTS_ON.contains(current.getDone()) ? wearOption(current.getActItems()) : null;
 			String option = takesOff ? REMOVE_OPTION : putOn;
 			return (option != null ? shown.menuTarget(rowTargets.items(current.getActItems(), option)) : shown).build();
@@ -269,8 +269,8 @@ final class StepHighlights
 		}
 		PlayerSnapshot carried = player.getSnapshot();
 		Set<Integer> items = carried == null ? Set.of() : way.getUse().stream().filter(carried.getInventory()::containsKey)
-			.collect(Collectors.toUnmodifiableSet());
-		return shown.items(items).menuTarget(MenuTarget.builder().itemIds(items).path(use).build()).tab(StepGuide.Tab.INVENTORY).build();
+			.collect(toUnmodifiableSet());
+		return shown.items(items).menuTarget(MenuTarget.builder().itemIds(items).path(use).build()).tab(Tab.INVENTORY).build();
 	}
 
 	/** The carried item the step names until one is picked, then the NPC it is used on (Falo the Bard). */
@@ -281,18 +281,18 @@ final class StepHighlights
 		{
 			return shown.menuTarget(MenuTarget.builder().npcIds(current.getNpcIds()).path(use).build()).build();
 		}
-		Set<Integer> items = player.inventoryIds().stream().filter(id -> isStepItem(step, id)).collect(Collectors.toUnmodifiableSet());
-		Set<Integer> worn = player.wornIds().stream().filter(id -> isStepItem(step, id)).collect(Collectors.toUnmodifiableSet());
+		Set<Integer> items = player.inventoryIds().stream().filter(id -> isStepItem(step, id)).collect(toUnmodifiableSet());
+		Set<Integer> worn = player.wornIds().stream().filter(id -> isStepItem(step, id)).collect(toUnmodifiableSet());
 		if (items.isEmpty() && !worn.isEmpty())
 		{
 			// A worn item can't be used on him: off first (Falo's gloves)
-			return shown.items(worn).fillItems(worn.stream().filter(leftClicks::removes).collect(Collectors.toUnmodifiableSet()))
-				.menuTarget(rowTargets.items(worn, REMOVE_OPTION)).tab(StepGuide.Tab.EQUIPMENT).build();
+			return shown.items(worn).fillItems(worn.stream().filter(leftClicks::removes).collect(toUnmodifiableSet()))
+				.menuTarget(rowTargets.items(worn, REMOVE_OPTION)).tab(Tab.EQUIPMENT).build();
 		}
 		Set<Integer> useOnLeftClick = items.stream().filter(id -> USE_OPTION.equals(leftClicks.item(id)))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 		return shown.items(items).fillItems(useOnLeftClick).menuTarget(MenuTarget.builder().itemIds(items).path(use).build())
-			.tab(StepGuide.Tab.INVENTORY).build();
+			.tab(Tab.INVENTORY).build();
 	}
 
 	private static boolean usesItemOnNpc(SubStep current, Step step)
@@ -360,7 +360,7 @@ final class StepHighlights
 		if (isSpell(row))
 		{
 			int spell = rowTargets.spellWidget(row);
-			shown.spellWidget(spell).tab(StepGuide.Tab.MAGIC);
+			shown.spellWidget(spell).tab(Tab.MAGIC);
 			if (row.boatDock() != null)
 			{
 				shown.menuTarget(MenuTarget.boat(row.boatDock()));
@@ -372,7 +372,7 @@ final class StepHighlights
 		}
 		else if (row.getCategory() == Category.MINIGAME)
 		{
-			shown.spellWidget(rowTargets.minigameSpellWidget(player.currentBook())).tab(StepGuide.Tab.MAGIC)
+			shown.spellWidget(rowTargets.minigameSpellWidget(player.currentBook())).tab(Tab.MAGIC)
 				.menuTarget(MenuTarget.minigame(row.minigameName()));
 		}
 		else if (row.isLocated())
@@ -383,7 +383,7 @@ final class StepHighlights
 		}
 		else if (current.getActItemNamed() != null)
 		{
-			shown.tab(StepGuide.Tab.INVENTORY);
+			shown.tab(Tab.INVENTORY);
 		}
 		else
 		{
@@ -433,10 +433,10 @@ final class StepHighlights
 	 */
 	private static Set<Integer> withHeld(Highlights.HighlightsBuilder shown, List<ItemUse> held)
 	{
-		Set<Integer> items = held.stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet());
+		Set<Integer> items = held.stream().map(ItemUse::getItemId).collect(toUnmodifiableSet());
 		boolean worn = !held.isEmpty() && held.stream().allMatch(use -> use.getContainer() == Container.WORN);
 		shown.heldUses(held).items(items)
-			.tab(held.isEmpty() ? StepGuide.Tab.NONE : worn ? StepGuide.Tab.EQUIPMENT : StepGuide.Tab.INVENTORY);
+			.tab(held.isEmpty() ? Tab.NONE : worn ? Tab.EQUIPMENT : Tab.INVENTORY);
 		return items;
 	}
 
@@ -470,7 +470,7 @@ final class StepHighlights
 			.filter(use -> signals ? RowTargets.SIGNAL_OPTION.equalsIgnoreCase(leftClicks.item(use))
 				: oneDestination ? isOwnTeleport(leftClicks.item(use)) : teleportsTo(leftClicks.swappedOrLearned(use), label))
 			.map(ItemUse::getItemId)
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 	}
 
 	/** The carried items the emote step wants on, refreshed every tick as they are put on. */
@@ -483,7 +483,7 @@ final class StepHighlights
 		}
 		Set<Integer> wanted = player.inventoryIds().stream().filter(leftClicks::wears)
 			.filter(id -> isStepItem(step, id))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 		return shown.toBuilder().items(wanted).fillItems(wanted).build();
 	}
 
@@ -497,11 +497,11 @@ final class StepHighlights
 		}
 		Set<Integer> named = player.inventoryIds().stream()
 			.filter(id -> client.getItemDefinition(id).getName().toLowerCase().startsWith(current.getActItemNamed()))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 		String option = current.getActOption();
 		Highlights.HighlightsBuilder next = shown.toBuilder().items(named)
-			.fillItems(option == null ? named : named.stream().filter(id -> option.equalsIgnoreCase(leftClicks.item(id))).collect(Collectors.toUnmodifiableSet()))
-			.tab(named.isEmpty() ? shown.getTab() : StepGuide.Tab.INVENTORY);
+			.fillItems(option == null ? named : named.stream().filter(id -> option.equalsIgnoreCase(leftClicks.item(id))).collect(toUnmodifiableSet()))
+			.tab(named.isEmpty() ? shown.getTab() : Tab.INVENTORY);
 		return option == null ? next.build() : takeOutFromBook(next, named, current, option);
 	}
 
@@ -535,8 +535,7 @@ final class StepHighlights
 	}
 
 	/** Left clicks of teleport items that don't teleport. */
-	private static final Set<String> NOT_TELEPORTS = Set.of("wield", "wear", "equip", "remove", "use", "drop", "examine", "check",
-		"inspect", "read");
+	private static final Set<String> NOT_TELEPORTS = Set.copyOf(Tables.keys("not teleports"));
 
 	/**
 	 * A list opener's click only opens the list, unless the row ends on that very option:

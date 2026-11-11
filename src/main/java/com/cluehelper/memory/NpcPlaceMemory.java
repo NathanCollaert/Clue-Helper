@@ -4,7 +4,6 @@ import com.cluehelper.guide.Widgets;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.step.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -12,6 +11,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
+import static java.util.stream.Collectors.*;
 
 /**
  * Client thread. Where the game put a clue's NPC for this player (Viggora: one of three places, named in the Curse of the
@@ -71,7 +71,7 @@ public class NpcPlaceMemory
 		}
 		String shownTitle = plain(title.getText());
 		String text = Widgets.descendants(client.getWidget(InterfaceID.Questjournal.UNIVERSE)).stream()
-			.map(Widget::getText).filter(Objects::nonNull).map(NpcPlaceMemory::plain).collect(Collectors.joining(" "));
+			.map(Widget::getText).filter(Objects::nonNull).map(NpcPlaceMemory::plain).collect(joining(" "));
 		for (StepIndex.Entry entry : learnable())
 		{
 			StepIndex.LearnPlace learn = entry.getLearnPlace();
@@ -129,7 +129,7 @@ public class NpcPlaceMemory
 		if (learnable == null)
 		{
 			learnable = data.index().getSteps().values().stream().filter(entry -> entry.getLearnPlace() != null)
-				.collect(Collectors.toUnmodifiableList());
+				.collect(toUnmodifiableList());
 		}
 		return learnable;
 	}

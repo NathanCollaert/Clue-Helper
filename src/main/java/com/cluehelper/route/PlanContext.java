@@ -6,9 +6,9 @@ import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 final class PlanContext
 {
@@ -102,7 +102,7 @@ final class PlanContext
 		PlayerSnapshot bankedPlayer = options[BANKED] == null ? null : in.getBanked();
 		Set<RequiredItems.Need> atStages = judgeStageNeeds(bankedPlayer);
 		required = in.getRequired().toBuilder()
-			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(Collectors.toList()))
+			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(toList()))
 			.staves(in.getEngine().getRunes().staves())
 			.build().judge(in.getPlayer(), bankedPlayer);
 		requiredWithdraw = TransportOptions.ids(required.getWithdraw());
@@ -137,7 +137,7 @@ final class PlanContext
 			}
 			List<RequiredItems.Need> wanted = in.getRequired().getNeeds().stream()
 				.filter(need -> stage.getWorn().contains(need.getName()) || stage.isTakesStepItems() && need.isStepItem())
-				.collect(Collectors.toList());
+				.collect(toList());
 			if (wanted.isEmpty() || stage.getTiles().isEmpty())
 			{
 				continue;

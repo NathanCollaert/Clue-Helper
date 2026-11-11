@@ -18,7 +18,7 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogLoader;
+import com.cluehelper.transport.CatalogData;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,6 +47,7 @@ import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirements;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import net.runelite.http.api.RuneLiteAPI;
 
 /**
  * Hand-built cases that fail quietly: consumption, spellbook changes, Wilderness starts, bank tipping points, the house,
@@ -80,9 +81,9 @@ public class EdgeCaseRoutesTest
 	@BeforeClass
 	public static void load() throws IOException
 	{
-		table = WalkTable.load();
+		table = WalkTable.load(RuneLiteAPI.GSON);
 		map = WorldMap.load();
-		catalog = CatalogLoader.load();
+		catalog = CatalogData.read(RuneLiteAPI.GSON);
 		runes = Loadouts.runeModel();
 		steps = DriftSteps.read();
 	}

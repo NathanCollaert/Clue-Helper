@@ -6,6 +6,7 @@ import java.util.stream.*;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /** Client thread only. */
 @Singleton
@@ -88,7 +89,7 @@ public final class SceneObjects
 	List<NPC> npcs(Predicate<NPC> wanted)
 	{
 		WorldView view = client.getTopLevelWorldView();
-		return view == null ? List.of() : view.npcs().stream().filter(wanted).collect(Collectors.toList());
+		return view == null ? List.of() : view.npcs().stream().filter(wanted).collect(toList());
 	}
 
 	private static boolean offers(NPC npc, String option)
@@ -118,14 +119,14 @@ public final class SceneObjects
 			return List.of();
 		}
 		return Arrays.stream(view.getScene().getTiles()).flatMap(SceneObjects::loaded).flatMap(tile -> objectsOn(tile).stream())
-			.filter(object -> isFormOf(object.getId(), ids)).distinct().collect(Collectors.toList());
+			.filter(object -> isFormOf(object.getId(), ids)).distinct().collect(toList());
 	}
 
 	/** The tile's game objects, then its wall, ground and decorative object: a large object is on each tile it covers. */
 	public static List<TileObject> objectsOn(Tile tile)
 	{
 		Stream<TileObject> others = Stream.of(tile.getWallObject(), tile.getGroundObject(), tile.getDecorativeObject());
-		return Stream.concat(Arrays.stream(tile.getGameObjects()), others).filter(Objects::nonNull).collect(Collectors.toList());
+		return Stream.concat(Arrays.stream(tile.getGameObjects()), others).filter(Objects::nonNull).collect(toList());
 	}
 
 	/**
@@ -147,14 +148,14 @@ public final class SceneObjects
 	{
 		return tilesOnFloor().stream()
 			.filter(tile -> tile.getGroundItems() != null && tile.getGroundItems().stream().anyMatch(item -> item.getId() == itemId))
-			.map(Tile::getWorldLocation).collect(Collectors.toUnmodifiableList());
+			.map(Tile::getWorldLocation).collect(toUnmodifiableList());
 	}
 
 	/** The loaded tiles on the player's floor; none while no scene is loaded. */
 	private List<Tile> tilesOnFloor()
 	{
 		WorldView view = client.getTopLevelWorldView();
-		return view == null ? List.of() : loaded(view.getScene().getTiles()[view.getPlane()]).collect(Collectors.toList());
+		return view == null ? List.of() : loaded(view.getScene().getTiles()[view.getPlane()]).collect(toList());
 	}
 
 	private static Stream<Tile> loaded(Tile[][] plane)

@@ -30,11 +30,6 @@ public class HotColdPlan
 	/** Kept spot names to their share, largest first. */
 	Map<String, Double> kept;
 	boolean exact;
-	int readings;
-	int probes;
-	int landings;
-	long nanos;
-	long landingNanos;
 	/** Every probe the choice weighed, for replays. */
 	@Builder.Default
 	List<Probe> considered = List.of();

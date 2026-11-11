@@ -22,11 +22,6 @@ public final class CacheRow
 		private Integer equals;
 		private Integer notEquals;
 
-		public boolean holdsFor(int value)
-		{
-			return equals != null ? value == equals : notEquals == null || value != notEquals;
-		}
-
 		@Override
 		public String toString()
 		{

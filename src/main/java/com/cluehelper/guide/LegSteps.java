@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
@@ -7,8 +8,9 @@ import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
+import com.cluehelper.guide.SubStep.Kind;
 
 /** The sub-step for each kind of route leg: what it says, where it leads and where it lands. */
 final class LegSteps
@@ -19,19 +21,14 @@ final class LegSteps
 	private static final String CODE_SEPARATOR = "-";
 	private static final String TALK_TO = "Talk to";
 	private static final String NPC_MENU = "npc ";
-	private static final Map<Category, String> RIDE_PLACES = Map.of(Category.BOAT, "the boat", Category.CANOE,
-		"the canoe station", Category.MINECART, "the minecart", Category.LEVER, "the lever", Category.BALLOON,
-		"the balloon basket", Category.MUSHTREE, "the mushtree", Category.WILDERNESS_OBELISK, "the obelisk");
+	private static final Map<Category, String> RIDE_PLACES = Tables.byKey("ride places", Category::valueOf, Tables.Row::text);
 	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
 	/** The mushtree map's places in its hotkey order, 1 to 4: its buttons carry no number. */
-	private static final List<String> MUSHTREE_PLACES = List.of("House on the Hill", "Verdant Valley", "Sticky Swamp", "Mushroom Meadow");
+	private static final List<String> MUSHTREE_PLACES = Tables.keys("mushtree places");
 	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
 	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
 	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
-	private static final Map<String, String> CHANGE_WARNINGS = Map.of(
-		"Ancient Pyramid altar", "Drains your Prayer, and the way in crosses desert heat",
-		"Astral altar", "Aggressive suqahs nearby",
-		"Tyss", "Right-click Tyss: Spellbook");
+	private static final Map<String, String> CHANGE_WARNINGS = Tables.byKey("spellbook change warnings", Tables.Row::text);
 
 	private LegSteps()
 	{
@@ -53,12 +50,12 @@ final class LegSteps
 	/** A walk that ends within {@code radius} of {@code to}, with the line leading there. */
 	static SubStep.SubStepBuilder walkTo(String text, WorldPoint to, int radius)
 	{
-		return SubStep.of(SubStep.Kind.WALK, text).waypoint(to).goal(to).radius(radius);
+		return SubStep.of(Kind.WALK, text).waypoint(to).goal(to).radius(radius);
 	}
 
 	static SubStep walkToClue(WorldPoint goal, int radius)
 	{
-		return SubStep.of(SubStep.Kind.WALK_TO_CLUE, "Walk to the clue").goal(goal).radius(radius).build();
+		return SubStep.of(Kind.WALK_TO_CLUE, "Walk to the clue").goal(goal).radius(radius).build();
 	}
 
 	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
@@ -66,12 +63,12 @@ final class LegSteps
 	{
 		if (route.getWithdraw().isEmpty())
 		{
-			return SubStep.of(SubStep.Kind.WITHDRAW, "Close the bank").build();
+			return SubStep.of(Kind.WITHDRAW, "Close the bank").build();
 		}
-		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemLines)).collect(Collectors.toList());
+		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemLines)).collect(toList());
 		String text = route.isDepositFirst() ? "Deposit to free slots, then withdraw:" : "Withdraw from the bank:";
-		return SubStep.of(SubStep.Kind.WITHDRAW, text).items(List.copyOf(items))
-			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(Collectors.toUnmodifiableSet())).build();
+		return SubStep.of(Kind.WITHDRAW, text).items(List.copyOf(items))
+			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(toUnmodifiableSet())).build();
 	}
 
 	static SubStep walk(Leg leg, Leg next, Step step, boolean takeFromStash)
@@ -100,12 +97,12 @@ final class LegSteps
 	static SubStep enter(StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data.getEntry();
-		return SubStep.of(SubStep.Kind.ENTER, "Go in: " + way.getText()).waypoint(way.getTile()).wayIn(way).build();
+		return SubStep.of(Kind.ENTER, "Go in: " + way.getText()).waypoint(way.getTile()).wayIn(way).build();
 	}
 
 	static SubStep exit(Leg leg, Exit exit)
 	{
-		return SubStep.of(SubStep.Kind.EXIT, exitText(exit))
+		return SubStep.of(Kind.EXIT, exitText(exit))
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).exit(exit).build();
 	}
 
@@ -113,7 +110,7 @@ final class LegSteps
 	static SubStep swap(Leg leg)
 	{
 		Book book = leg.getRow().getRequirements().getBook();
-		return SubStep.of(SubStep.Kind.SPELLBOOK_SWAP, "Spellbook Swap to " + book.label())
+		return SubStep.of(Kind.SPELLBOOK_SWAP, "Spellbook Swap to " + book.label())
 			.detail("Right-click Spellbook Swap, then pick the book").book(book).change(leg.getChange()).build();
 	}
 
@@ -121,7 +118,7 @@ final class LegSteps
 	{
 		CatalogRow row = leg.getRow();
 		WorldPoint standsAt = row.isLocated() && !row.isInHouse() ? leg.getFrom() : null;
-		return SubStep.of(SubStep.Kind.TELEPORT, withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
+		return SubStep.of(Kind.TELEPORT, withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
 			.waypoint(standsAt).goal(leg.getTo()).radius(SCATTERED_LANDING_TILES.getOrDefault(row.getName(), SubSteps.LANDING_TILES))
 			.row(row).build();
 	}
@@ -140,7 +137,7 @@ final class LegSteps
 		for (int i = 0; i < hops.length; i++)
 		{
 			boolean last = i == hops.length - 1;
-			steps.add(SubStep.of(SubStep.Kind.FAIRY_RING, "Fairy ring " + MenuLines.menuColoured(hops[i]))
+			steps.add(SubStep.of(Kind.FAIRY_RING, "Fairy ring " + MenuLines.menuColoured(hops[i]))
 				.detail("Code " + (i + 1) + " of " + hops.length + (last ? "" : ", then dial the next where you land"))
 				.waypoint(i == 0 ? leg.getFrom() : null).goal(last ? leg.getTo() : null).radius(SubSteps.LANDING_TILES)
 				.row(landing.toBuilder().code(hops[i]).build()).build());
@@ -155,7 +152,7 @@ final class LegSteps
 		int colon = place.indexOf(": ");
 		String where = place.startsWith(FAIRY_RING_PREFIX) && colon >= 0 ? place.substring(colon + 2) : place;
 		boolean coded = landing.getCode() != null && landing.getCode().length() == 3;
-		return SubStep.of(SubStep.Kind.FAIRY_RING, coded ? "Fairy ring " + MenuLines.menuColoured(landing.getCode()) : "Fairy ring to " + where)
+		return SubStep.of(Kind.FAIRY_RING, coded ? "Fairy ring " + MenuLines.menuColoured(landing.getCode()) : "Fairy ring to " + where)
 			.waypoint(leg.getFrom()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).row(landing).build();
 	}
 
@@ -165,11 +162,11 @@ final class LegSteps
 		String book = leg.getBookAfter().label();
 		if (change.isAnywhere())
 		{
-			return SubStep.of(SubStep.Kind.CHANGE_BOOK, capeName(change) + ": Spellbook → " + book)
+			return SubStep.of(Kind.CHANGE_BOOK, capeName(change) + ": Spellbook → " + book)
 				.detail(change.getName().contains("(worn)") ? "Right-click the worn cape in the equipment tab" : "Right-click the cape: Spellbook")
 				.book(leg.getBookAfter()).change(change).build();
 		}
-		return SubStep.of(SubStep.Kind.CHANGE_BOOK, change.getName() + " → " + book)
+		return SubStep.of(Kind.CHANGE_BOOK, change.getName() + " → " + book)
 			.detail(warning(change)).waypoint(change.getTile()).book(leg.getBookAfter()).change(change).build();
 	}
 

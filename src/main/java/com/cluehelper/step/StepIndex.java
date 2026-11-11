@@ -11,6 +11,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /**
  * Gson fills this from the generated step files (Clue-Helper-Tools/tools/steps/generate.py), one per clue type: field
@@ -171,8 +172,8 @@ public final class StepIndex
 		static Entry ofParts(String tier, List<CacheRow> rows, List<Entry> unsolved)
 		{
 			Entry entry = of(tier, rows);
-			entry.requires = unsolved.stream().flatMap(part -> part.getRequires().stream()).collect(Collectors.toUnmodifiableList());
-			entry.gear = unsolved.stream().flatMap(part -> part.getGear().stream()).collect(Collectors.toUnmodifiableList());
+			entry.requires = unsolved.stream().flatMap(part -> part.getRequires().stream()).collect(toUnmodifiableList());
+			entry.gear = unsolved.stream().flatMap(part -> part.getGear().stream()).collect(toUnmodifiableList());
 			return entry;
 		}
 
@@ -191,20 +192,20 @@ public final class StepIndex
 		/** The requirements that are gear to wear. */
 		public List<Requires> wornRequires()
 		{
-			return getRequires().stream().filter(Requires::isWear).collect(Collectors.toList());
+			return getRequires().stream().filter(Requires::isWear).collect(toList());
 		}
 
 		/** The requirements the player still has to meet: none a finished quest waives. */
 		public List<Requires> requiresFor(Predicate<Quest> finished)
 		{
-			return getRequires().stream().filter(need -> !need.isWaivedBy(finished)).collect(Collectors.toList());
+			return getRequires().stream().filter(need -> !need.isWaivedBy(finished)).collect(toList());
 		}
 
 		/** The requirements to wear going in, but those the player meets by what they carry (a talisman). */
 		public List<Requires> wornRequiresFor(Predicate<Quest> finished, Set<Integer> carriedIds)
 		{
 			return requiresFor(finished).stream().filter(need -> need.isWear() && !need.isCarriedInstead(carriedIds))
-				.collect(Collectors.toList());
+				.collect(toList());
 		}
 
 		/** The skill levels the task itself needs; boosts count. */
@@ -267,7 +268,7 @@ public final class StepIndex
 		/** A loc target's object ids: its own and the cache's fallback form. */
 		public Set<Integer> locs()
 		{
-			return Stream.of(loc, fallbackLoc).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
+			return Stream.of(loc, fallbackLoc).filter(Objects::nonNull).collect(toUnmodifiableSet());
 		}
 
 		public int getKey()

@@ -227,11 +227,9 @@ public class BankMemory
 			return;
 		}
 		unsaved = false;
-		long started = System.nanoTime();
 		store(storedBank, liveBank);
 		store(storedGroup, liveGroup);
 		store(storedKit, liveKit);
-		log.debug("bank memory saved in {} ms", (System.nanoTime() - started) / 1e6);
 	}
 
 	private static void store(MemorySlot<Seen> slot, Seen live)

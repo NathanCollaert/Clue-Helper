@@ -3,9 +3,9 @@ package com.cluehelper.route;
 import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 @Value
 @Builder
@@ -61,7 +61,7 @@ public class Route
 		String changes = legs.stream()
 			.filter(leg -> leg.getKind() == Leg.Kind.SPELLBOOK_CHANGE || leg.getKind() == Leg.Kind.SWAP_TELEPORT)
 			.map(leg -> leg.getKind() == Leg.Kind.SWAP_TELEPORT ? "Spellbook Swap" : leg.getChange().getName() + "→" + leg.getBookAfter())
-			.collect(Collectors.joining(", "));
+			.collect(joining(", "));
 		return changes.isEmpty() ? id.toString() : id + " | " + changes;
 	}
 
@@ -77,7 +77,7 @@ public class Route
 	 */
 	public Leg getFirstTransport()
 	{
-		List<Leg> transports = legs.stream().filter(Leg::isTransport).collect(Collectors.toList());
+		List<Leg> transports = legs.stream().filter(Leg::isTransport).collect(toList());
 		if (transports.isEmpty())
 		{
 			return null;
@@ -126,6 +126,6 @@ public class Route
 
 	public String describe()
 	{
-		return legs.stream().map(Leg::describe).collect(Collectors.joining(" → "));
+		return legs.stream().map(Leg::describe).collect(joining(" → "));
 	}
 }

@@ -1,9 +1,9 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -11,6 +11,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.NpcID;
 import net.runelite.api.gameval.ObjectID;
+import static java.util.stream.Collectors.*;
 
 /** What to click for a catalog row: its object or NPC and menu path, its held items, or its spell's button. Client thread only. */
 @Slf4j
@@ -26,15 +27,9 @@ final class RowTargets
 	/** Catalog landings spread 0–2 tiles, so another menu's line within this lands at the same place. */
 	private static final int SAME_LANDING_TILES = 3;
 	/** The patch objects are multilocs on their transmit varbits; the grown tree is the form they show. */
-	private static final Set<Integer> PLANTED_SPIRIT_TREES = Set.of(ObjectID.FARMING_SPIRIT_TREE_PATCH_1,
-		ObjectID.FARMING_SPIRIT_TREE_PATCH_2, ObjectID.FARMING_SPIRIT_TREE_PATCH_3, ObjectID.FARMING_SPIRIT_TREE_PATCH_4,
-		ObjectID.FARMING_SPIRIT_TREE_PATCH_5, ObjectID.SPIRIT_TREE_FULLYGROWN);
+	private static final Set<Integer> PLANTED_SPIRIT_TREES = Tables.idSet("planted spirit trees");
 	/** Minigame Teleport is a spell on every book, so it is cast rather than picked from the Grouping tab. */
-	private static final Map<Book, Integer> MINIGAME_SPELLS = Map.of(
-		Book.STANDARD, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_STANDARD,
-		Book.ANCIENT, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ANCIENT,
-		Book.LUNAR, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_LUNAR,
-		Book.ARCEUUS, InterfaceID.MagicSpellbook.TELEPORT_MINIGAME_ARCEUUS);
+	private static final Map<Book, Integer> MINIGAME_SPELLS = Tables.byKey("minigame spells", Book::valueOf, row -> row.id(0));
 
 	@Inject
 	private Client client;
@@ -164,7 +159,7 @@ final class RowTargets
 		return judged.getWitness().stream()
 			.filter(use -> use.getContainer().isCarried())
 			.filter(use -> !runes.isRune(use.getItemId()))
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 	}
 
 	List<ItemUse> heldUses(SpellbookChange change)
@@ -205,7 +200,7 @@ final class RowTargets
 	private MenuTarget.MenuTargetBuilder withItems(MenuTarget.MenuTargetBuilder target, Set<Integer> itemIds)
 	{
 		Set<String> names = itemIds.stream().map(id -> MenuLabels.normalise(client.getItemDefinition(id).getName()))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 		return target.itemIds(itemIds).itemNames(names);
 	}
 
@@ -220,7 +215,7 @@ final class RowTargets
 		return availability.getCarried().available().stream().map(RowAvailability::getRow)
 			.filter(row -> row.isInHouse() && row.getMenu() != null && row != current.getRow() && row.getDestination() != null
 				&& PositionRules.near(row.getDestination(), landing, SAME_LANDING_TILES))
-			.map(this::located).collect(Collectors.toUnmodifiableList());
+			.map(this::located).collect(toUnmodifiableList());
 	}
 
 	/** On the house's spiritual fairy tree "Ring-configure" opens a list too, so the Tree option is named. */

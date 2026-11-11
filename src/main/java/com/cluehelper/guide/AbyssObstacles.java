@@ -1,11 +1,11 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import java.util.*;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ObjectID;
 
 /**
  * The Abyss's outer ring: one obstacle a spot, its form (passage, gap, eyes, rock, tendrils, boil) set per visit, while
@@ -15,10 +15,7 @@ import net.runelite.api.gameval.ObjectID;
 @Singleton
 public class AbyssObstacles
 {
-	private static final Set<Integer> IDS = Set.of(ObjectID.RCU_OUTER_MULTI1, ObjectID.RCU_OUTER_MULTI2,
-		ObjectID.RCU_OUTER_MULTI3, ObjectID.RCU_OUTER_MULTI4, ObjectID.RCU_OUTER_MULTI5, ObjectID.RCU_OUTER_MULTI6,
-		ObjectID.RCU_OUTER_MULTI7, ObjectID.RCU_OUTER_MULTI8, ObjectID.RCU_OUTER_MULTI9, ObjectID.RCU_OUTER_MULTI10,
-		ObjectID.RCU_OUTER_MULTI11);
+	private static final Set<Integer> IDS = Tables.idSet("abyss obstacles");
 	/** The forms crossed without a pickaxe, an axe or a tinderbox. */
 	private static final Set<String> WITHOUT_TOOLS = Set.of("Passage", "Gap", "Eyes");
 	/** The tool each other form takes, as the last word of the tool's name: a rune pickaxe mines, an infernal axe chops. */

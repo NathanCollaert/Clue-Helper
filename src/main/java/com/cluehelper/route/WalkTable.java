@@ -1,11 +1,12 @@
 package com.cluehelper.route;
 
 import com.cluehelper.transport.*;
+import com.google.gson.Gson;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /** Immutable once loaded; any thread. Costs are tiles, which are half-ticks when running. */
 public final class WalkTable
@@ -14,6 +15,7 @@ public final class WalkTable
 	public static final int NO_PATH = -1;
 	static final String DIRECTORY = "walk/";
 	private static final String KIND_BANK = "bank";
+	static final String REQUIREMENTS = "requirements.json";
 
 	private WorldPoint[] tiles;
 	private WorldPoint[] placed;
@@ -46,23 +48,35 @@ public final class WalkTable
 	/** Each row object's id by the packed tiles its rows start from. */
 	private Map<Integer, Set<Integer>> rowObjectsAt;
 
+	/** The gates' and banks' requirements in their tables' row order, baked from the walk generator's columns. */
+	static final class BakedRequirements
+	{
+		List<Requirements> gates = List.of();
+		List<Requirements> banks = List.of();
+	}
+
 	private WalkTable()
 	{
 	}
 
-	public static WalkTable load() throws IOException
+	public static WalkTable load(Gson gson) throws IOException
 	{
 		WalkTable table = new WalkTable();
+		BakedRequirements requirements;
+		try (Reader in = new InputStreamReader(open(DIRECTORY + REQUIREMENTS), StandardCharsets.UTF_8))
+		{
+			requirements = gson.fromJson(in, BakedRequirements.class);
+		}
 		table.readNodes(lines(DIRECTORY + "nodes.tsv"));
-		table.readGates(lines(DIRECTORY + "gates.tsv"));
+		table.gates = List.copyOf(requirements.gates);
 		table.readTable(new Varints(bytes(DIRECTORY + "table.bin")));
 		table.readRows(new Varints(bytes(DIRECTORY + "rows.bin")));
-		table.readBanks(lines(DIRECTORY + "banks.tsv"));
+		table.readBanks(lines(DIRECTORY + "banks.tsv"), requirements.banks);
 		table.exits = rowActions(lines(DIRECTORY + "exits.tsv"));
 		table.markExitRows();
 		table.rowObjects = rowsByTiles(lines(DIRECTORY + "row-objects.tsv"));
-		table.rowObjectsAt = table.rowObjects.values().stream().flatMap(List::stream).collect(Collectors.groupingBy(
-			exit -> pack(exit.getOrigin()), Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
+		table.rowObjectsAt = table.rowObjects.values().stream().flatMap(List::stream).collect(groupingBy(
+			exit -> pack(exit.getOrigin()), mapping(Exit::getObjectId, toUnmodifiableSet())));
 		table.indexReverse();
 		return table;
 	}
@@ -239,11 +253,6 @@ public final class WalkTable
 		return false;
 	}
 
-	public int entryCount()
-	{
-		return entryTo.length;
-	}
-
 	/** Entries that walk into {@code node}: {@code reverseEntry(i)} for i in [reverseFrom, reverseEnd). */
 	public int reverseFrom(int node)
 	{
@@ -387,31 +396,22 @@ public final class WalkTable
 		}
 	}
 
-	private void readGates(List<String[]> rows)
+	private void readBanks(List<String[]> rows, List<Requirements> requirements)
 	{
-		RequirementParser parser = new RequirementParser();
-		List<Requirements> parsed = new ArrayList<>();
-		for (String[] c : rows)
+		if (rows.size() != requirements.size())
 		{
-			parsed.add(parse(parser, c, 1, RequirementParser.SKILLS, RequirementParser.QUESTS, RequirementParser.VARBITS,
-				RequirementParser.VARPS, RequirementParser.ITEMS));
+			throw new IllegalStateException("banks.tsv has " + rows.size() + " rows, " + REQUIREMENTS + " " + requirements.size());
 		}
-		gates = List.copyOf(parsed);
-	}
-
-	private void readBanks(List<String[]> rows)
-	{
-		RequirementParser parser = new RequirementParser();
 		Map<Integer, List<Bank>> byNode = new HashMap<>();
-		for (String[] c : rows)
+		for (int i = 0; i < rows.size(); i++)
 		{
+			String[] c = rows.get(i);
 			int node = node(parseTile(c[0]));
 			if (node == NO_NODE)
 			{
 				throw new IllegalStateException("banks.tsv: no node at " + c[0]);
 			}
-			Bank bank = new Bank(c[1], c[2], parse(parser, c, 3, RequirementParser.MEMBERS, RequirementParser.SKILLS,
-				RequirementParser.QUESTS, RequirementParser.VARBITS, RequirementParser.VARPS));
+			Bank bank = new Bank(c[1], c[2], requirements.get(i));
 			byNode.computeIfAbsent(node, n -> new ArrayList<>()).add(bank);
 		}
 		banks = byNode;
@@ -483,24 +483,8 @@ public final class WalkTable
 		{
 			byOrigin.computeIfAbsent(rowOrigin[i], tile -> new ArrayList<>()).add(i);
 		}
-		rowsByOrigin = byOrigin.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+		rowsByOrigin = byOrigin.entrySet().stream().collect(toUnmodifiableMap(Map.Entry::getKey,
 			entry -> entry.getValue().stream().mapToInt(Integer::intValue).toArray()));
-	}
-
-	/** The requirement columns from {@code first} on, one per key; a short row leaves the rest empty. */
-	private static Requirements parse(RequirementParser parser, String[] c, int first, String... keys)
-	{
-		Map<String, String> cells = new HashMap<>();
-		for (int i = 0; i < keys.length; i++)
-		{
-			cells.put(keys[i], cell(c, first + i));
-		}
-		return parser.parse(cells);
-	}
-
-	private static String cell(String[] cells, int index)
-	{
-		return index < cells.length ? cells[index] : "";
 	}
 
 	/** A resource of this package; missing is an error. */

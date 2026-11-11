@@ -20,6 +20,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.*;
 import net.runelite.client.util.Text;
+import com.cluehelper.guide.SubStep.Kind;
 
 /**
  * Client thread only. While a teleport or book change is under way, a new route waits: the cast spends runes or starts
@@ -236,15 +237,15 @@ public class StepGuide
 	private int shownIndex(int at)
 	{
 		SubStep step = steps.get(at);
-		boolean walkToBank = step.getKind() == SubStep.Kind.WALK && at + 1 < steps.size()
-			&& steps.get(at + 1).getKind() == SubStep.Kind.BANK;
-		int bank = step.getKind() == SubStep.Kind.BANK ? at : walkToBank ? at + 1 : -1;
+		boolean walkToBank = step.getKind() == Kind.WALK && at + 1 < steps.size()
+			&& steps.get(at + 1).getKind() == Kind.BANK;
+		int bank = step.getKind() == Kind.BANK ? at : walkToBank ? at + 1 : -1;
 		if (bank < 0 || bank + 1 >= steps.size())
 		{
 			return at;
 		}
 		SubStep task = steps.get(bank + 1);
-		boolean onlyCloses = task.getKind() == SubStep.Kind.WITHDRAW && task.getItems().isEmpty();
+		boolean onlyCloses = task.getKind() == Kind.WITHDRAW && task.getItems().isEmpty();
 		return onlyCloses ? at : bank + 1;
 	}
 
@@ -252,16 +253,16 @@ public class StepGuide
 	private boolean isBankStop()
 	{
 		SubStep current = getCurrent();
-		if (current == null || current.getKind() == SubStep.Kind.BANK)
+		if (current == null || current.getKind() == Kind.BANK)
 		{
 			return current != null;
 		}
-		if (current.getKind() != SubStep.Kind.WALK || fight != null && fight.getAgain() != null)
+		if (current.getKind() != Kind.WALK || fight != null && fight.getAgain() != null)
 		{
 			return false;
 		}
-		return steps.stream().skip(index + 1L).map(SubStep::getKind).filter(kind -> kind != SubStep.Kind.ACT).findFirst()
-			.map(kind -> kind == SubStep.Kind.BANK).orElse(false);
+		return steps.stream().skip(index + 1L).map(SubStep::getKind).filter(kind -> kind != Kind.ACT).findFirst()
+			.map(kind -> kind == Kind.BANK).orElse(false);
 	}
 
 	/**
@@ -272,15 +273,15 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		SubStep next = getNext();
-		boolean toTeleport = next != null && next.getKind() == SubStep.Kind.TELEPORT && next.getRow() != null && next.getRow().isLocated();
-		return current != null && current.getKind() == SubStep.Kind.WALK && (!current.getNpcIds().isEmpty() || toTeleport);
+		boolean toTeleport = next != null && next.getKind() == Kind.TELEPORT && next.getRow() != null && next.getRow().isLocated();
+		return current != null && current.getKind() == Kind.WALK && (!current.getNpcIds().isEmpty() || toTeleport);
 	}
 
 	/** A staircase, ladder, door or NPC that is the way out or in: outlined and walked to like a bank. */
 	public boolean isExit()
 	{
 		SubStep current = getCurrent();
-		return current != null && (current.getKind() == SubStep.Kind.EXIT || current.getKind() == SubStep.Kind.ENTER);
+		return current != null && (current.getKind() == Kind.EXIT || current.getKind() == Kind.ENTER);
 	}
 
 	public List<TileObject> getHighlightObjects()
@@ -510,15 +511,15 @@ public class StepGuide
 	private SubStep objectActAhead(SubStep current)
 	{
 		SubStep next = getNext();
-		boolean ahead = current != null && current.getKind() == SubStep.Kind.WALK_TO_CLUE && next != null
-			&& next.getKind() == SubStep.Kind.ACT && !next.getObjectIds().isEmpty() && !isCoresOwnObject(next);
+		boolean ahead = current != null && current.getKind() == Kind.WALK_TO_CLUE && next != null
+			&& next.getKind() == Kind.ACT && !next.getObjectIds().isEmpty() && !isCoresOwnObject(next);
 		return ahead ? next : null;
 	}
 
 	/** An act on the clue's own object (the spirit tree), which core marks already: only its option is coloured. */
 	private boolean isCoresOwnObject(SubStep current)
 	{
-		return current != null && current.getKind() == SubStep.Kind.ACT && !current.getObjectIds().isEmpty()
+		return current != null && current.getKind() == Kind.ACT && !current.getObjectIds().isEmpty()
 			&& routeStep != null && routeStep.getObjectIds().containsAll(current.getObjectIds());
 	}
 
@@ -585,7 +586,7 @@ public class StepGuide
 	 */
 	private static List<TileObject> atExit(SubStep current, List<TileObject> objects)
 	{
-		WorldPoint from = current != null && current.getKind() == SubStep.Kind.EXIT ? current.getExit().getOrigin() : null;
+		WorldPoint from = current != null && current.getKind() == Kind.EXIT ? current.getExit().getOrigin() : null;
 		List<TileObject> near = from == null ? List.of() : objects.stream()
 			.filter(object -> object.getWorldLocation().distanceTo(from) <= EXIT_OBJECT_TILES).collect(Collectors.toUnmodifiableList());
 		return near.isEmpty() ? objects : near;
@@ -670,7 +671,7 @@ public class StepGuide
 	private boolean partWayIn(WorldPoint tile)
 	{
 		SubStep current = getCurrent();
-		StepIndex.WayIn way = current != null && current.getKind() == SubStep.Kind.ENTER && current.getWayIn().isPartWay(tile)
+		StepIndex.WayIn way = current != null && current.getKind() == Kind.ENTER && current.getWayIn().isPartWay(tile)
 			? current.getWayIn() : null;
 		StepIndex.PickUp pickUp = way == null ? null : way.getPickUp();
 		pickUpTiles = pickUp != null ? sceneObjects.groundItemTiles(pickUp.getId()) : List.of();
@@ -717,7 +718,7 @@ public class StepGuide
 	private boolean pickUpForAct(WorldPoint tile)
 	{
 		SubStep current = getCurrent();
-		if (current == null || current.getKind() != SubStep.Kind.ACT || current.getGroundItem() < 0)
+		if (current == null || current.getKind() != Kind.ACT || current.getGroundItem() < 0)
 		{
 			return false;
 		}
@@ -782,7 +783,7 @@ public class StepGuide
 		{
 			taskStartedKey = routeStep.getKey();
 		}
-		if (current == null || current.getKind() != SubStep.Kind.TELEPORT || current.getRow() == null)
+		if (current == null || current.getKind() != Kind.TELEPORT || current.getRow() == null)
 		{
 			return;
 		}
@@ -801,7 +802,7 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean gameLine = message.getType() == ChatMessageType.GAMEMESSAGE || message.getType() == ChatMessageType.MESBOX;
-		if (gameLine && current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null)
+		if (gameLine && current != null && current.getKind() == Kind.TELEPORT && current.getRow() != null)
 		{
 			teleportRefusal.onGameLine(current.getRow().getName(), client.getTickCount());
 		}
@@ -877,7 +878,7 @@ public class StepGuide
 			if (enemy != null)
 			{
 				boolean emote = act.getDone() == SubStep.Done.URI_HERE;
-				view = SubStep.of(SubStep.Kind.ACT, "Kill the " + (enemy.getName() == null ? "enemy" : enemy.getName()))
+				view = SubStep.of(Kind.ACT, "Kill the " + (enemy.getName() == null ? "enemy" : enemy.getName()))
 					.detail(emote ? "Stay equipped" : null).build();
 				again = act.toBuilder().text(act.getAgain()).build();
 			}
@@ -927,7 +928,7 @@ public class StepGuide
 	private void noteBoxUsed(SubStep done)
 	{
 		MenuTarget target = highlights.getMenuTarget();
-		if (done.getKind() == SubStep.Kind.TELEPORT && done.getRow() != null && target.getLine() == MenuTarget.Line.BOX)
+		if (done.getKind() == Kind.TELEPORT && done.getRow() != null && target.getLine() == MenuTarget.Line.BOX)
 		{
 			leftClicks.learnBoxUsed(target.getObjectIds(), done.getRow().destination());
 		}
@@ -935,7 +936,7 @@ public class StepGuide
 
 	private void noteRingHop(SubStep done)
 	{
-		if (done.getKind() != SubStep.Kind.FAIRY_RING)
+		if (done.getKind() != Kind.FAIRY_RING)
 		{
 			return;
 		}
@@ -970,7 +971,7 @@ public class StepGuide
 
 	private boolean isEarlierRingHop(SubStep step)
 	{
-		return step.getKind() == SubStep.Kind.FAIRY_RING && step.getGoal() == null
+		return step.getKind() == Kind.FAIRY_RING && step.getGoal() == null
 			&& step.getRow().getName().equals(ringChain.getLandingName());
 	}
 
@@ -996,7 +997,7 @@ public class StepGuide
 	/** An act of the step itself: gear put on at the bank (a lumberjack outfit) is no sign of having reached the step. */
 	private static boolean isStepAct(SubStep sub)
 	{
-		return sub != null && sub.getKind() == SubStep.Kind.ACT && !sub.isPreparation() && sub.getDone() != SubStep.Done.EQUIPPED;
+		return sub != null && sub.getKind() == Kind.ACT && !sub.isPreparation() && sub.getDone() != SubStep.Done.EQUIPPED;
 	}
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
@@ -1078,7 +1079,7 @@ public class StepGuide
 	/** The box shows the acts alone: nothing to travel. */
 	public boolean isAtStep()
 	{
-		return !steps.isEmpty() && steps.stream().allMatch(sub -> sub.getKind() == SubStep.Kind.ACT);
+		return !steps.isEmpty() && steps.stream().allMatch(sub -> sub.getKind() == Kind.ACT);
 	}
 
 	private void clear()
@@ -1164,7 +1165,7 @@ public class StepGuide
 	 */
 	private boolean stageNpcNearby(SubStep step, WorldPoint tile)
 	{
-		WorldPoint goal = step.getKind() == SubStep.Kind.WALK_TO_CLUE ? null : step.getGoal();
+		WorldPoint goal = step.getKind() == Kind.WALK_TO_CLUE ? null : step.getGoal();
 		return !step.getNpcIds().isEmpty() && tile != null && scene.getNpcs().stream()
 			.map(NPC::getWorldLocation)
 			.anyMatch(at -> at.getPlane() == tile.getPlane() && at.distanceTo2D(tile) <= SubSteps.AREA_ARRIVE_TILES
@@ -1247,7 +1248,7 @@ public class StepGuide
 	private boolean isRingStep()
 	{
 		SubStep current = getCurrent();
-		return current != null && current.getKind() == SubStep.Kind.FAIRY_RING;
+		return current != null && current.getKind() == Kind.FAIRY_RING;
 	}
 
 	private boolean isVanishing()
@@ -1306,13 +1307,13 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		SubStep next = getNext();
-		return current != null && current.getKind() == SubStep.Kind.WALK && next != null ? stepHighlights.stashOf(next, routeStep) : StepRequirements.NO_STASH;
+		return current != null && current.getKind() == Kind.WALK && next != null ? stepHighlights.stashOf(next, routeStep) : StepRequirements.NO_STASH;
 	}
 
 	private boolean refreshBox()
 	{
 		SubStep act = listedAt(index);
-		boolean talk = act != null && act.getKind() == SubStep.Kind.ACT && act.getActItemNamed() == null && routeStep != null
+		boolean talk = act != null && act.getKind() == Kind.ACT && act.getActItemNamed() == null && routeStep != null
 			&& routeStep.getNpcs() != null && act.getText().startsWith(TALK_TO)
 			&& routeStep.getNpcs().contains(act.getText().substring(TALK_TO.length()));
 		String box = talk ? carriedBox() : null;

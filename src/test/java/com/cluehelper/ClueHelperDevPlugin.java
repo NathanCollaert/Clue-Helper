@@ -20,7 +20,6 @@ import com.cluehelper.memory.SpiritTreeMemory;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.Position;
-import com.cluehelper.poh.PohService;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.route.GearPieces;
 import com.cluehelper.route.LoadedScene;
@@ -200,7 +199,7 @@ public class ClueHelperDevPlugin extends Plugin
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(bankTrace);
 		unregister.add(() -> eventBus.unregister(bankTrace));
-		PohTrace pohTrace = new PohTrace(client, service(PohService.class), service(StepGuide.class), service(MenuLines.class),
+		PohTrace pohTrace = new PohTrace(client, service(StepGuide.class), service(MenuLines.class),
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(pohTrace);
 		unregister.add(() ->

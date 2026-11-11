@@ -75,6 +75,13 @@ tasks.register('spellbookTimings', JavaExec) {
 	args project.findProperty('log') ?: 'src/test/resources/spellbook/run1-swap-and-occult.jsonl'
 }
 
+tasks.register('bakeData', JavaExec) {
+	group = 'tools'
+	description = 'Parse the catalog and walk requirement tables into the JSON the plugin loads: gradlew bakeData'
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.cluehelper.transport.DataBake'
+}
+
 tasks.register('acceptTickChanges', JavaExec) {
 	group = 'tools'
 	description = "Take the new tick counts of the campaign steps the last test run marked ticks-only, after reading build/campaign/changed.html"

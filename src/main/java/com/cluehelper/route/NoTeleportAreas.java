@@ -3,9 +3,9 @@ package com.cluehelper.route;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.IntUnaryOperator;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NoTeleportAreas
@@ -39,7 +39,7 @@ public final class NoTeleportAreas
 	{
 		return new NoTeleportAreas(boxes.stream()
 			.filter(box -> box[VARBIT] == ALWAYS || varbitValue.applyAsInt(box[VARBIT]) < box[LIFTED_AT])
-			.collect(Collectors.toUnmodifiableList()));
+			.collect(toUnmodifiableList()));
 	}
 
 	public boolean contains(WorldPoint tile)

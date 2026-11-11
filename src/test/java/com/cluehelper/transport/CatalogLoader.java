@@ -8,9 +8,13 @@ import java.util.function.Supplier;
 import java.util.regex.*;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarbitID;
 
 /**
- * A requirement that doesn't parse stays on its row as an error; a malformed tile or number fails the whole load.
+ * Reads the catalog's source tables, written by Clue-Helper-Tools/tools/catalog/seed.py, for {@link DataBake} and the
+ * schema checks. A requirement that doesn't parse stays on its row as an error; a malformed tile or number fails the
+ * whole load.
  */
 public final class CatalogLoader
 {
@@ -39,6 +43,10 @@ public final class CatalogLoader
 	private static final String TEMPORARY = "temporary";
 	private static final String TOGGLE = "toggle ";
 	private static final Pattern WHERE_OBJECT = Pattern.compile("object:(\\d+)");
+	private static final String NO_SPEND = "none";
+	private static final Set<Integer> FAIRY_RING_STAVES = Set.of(ItemID.DRAMEN_STAFF, ItemID.LUNAR_MOONCLAN_LIMINAL_STAFF);
+	private static final VarCheck LUMBRIDGE_ELITE_DONE =
+		new VarCheck(VarCheck.Kind.VARBIT, VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE, VarCheck.Op.EQUAL, 1);
 
 	private CatalogLoader()
 	{
@@ -91,8 +99,8 @@ public final class CatalogLoader
 			.code(code.isEmpty() ? null : code)
 			.duration(Integer.parseInt(line.get(DURATION)))
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))
-			.spends(Spend.parse(line.get(SPENDS)))
-			.requirements(CatalogRules.fairyRingStaff(parser.parse(line.getCells())))
+			.spends(spends(line.get(SPENDS)))
+			.requirements(fairyRingStaff(parser.parse(line.getCells())))
 			.menu(menu.isEmpty() ? null : menu)
 			.objectId(objectId(line.get(OBJECT)))
 			.build();
@@ -109,7 +117,7 @@ public final class CatalogLoader
 			.toggles(line.get(TO).startsWith(TOGGLE) ? book(line.get(TO).substring(TOGGLE.length())) : null)
 			.duration(Integer.parseInt(line.get(DURATION)))
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))
-			.spends(Spend.parse(line.get(SPENDS)))
+			.spends(spends(line.get(SPENDS)))
 			.requirements(parser.parse(line.getCells()));
 		if (!where.equals(ANYWHERE) && !where.startsWith(IN_HOUSE))
 		{
@@ -127,6 +135,35 @@ public final class CatalogLoader
 			return built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
 		}
 		return built;
+	}
+
+	static List<Spend> spends(String cell)
+	{
+		List<Spend> spends = new ArrayList<>();
+		for (String clause : RequirementParser.clauses(cell))
+		{
+			if (clause.equals(NO_SPEND))
+			{
+				continue;
+			}
+			String[] parts = clause.split(":", 2);
+			Spend.Kind kind = Spend.Kind.valueOf(parts[0].toUpperCase(Locale.ROOT).replace('-', '_'));
+			spends.add(new Spend(kind, parts.length == 2 ? Integer.parseInt(parts[1]) : Spend.NO_VAR));
+		}
+		return List.copyOf(spends);
+	}
+
+	/** A fairy-ring staff clause counts only when wielded, and not at all once the Lumbridge elite diary is done. */
+	static Requirements fairyRingStaff(Requirements requirements)
+	{
+		List<ItemClause> clauses = new ArrayList<>();
+		for (ItemClause clause : requirements.getItems())
+		{
+			boolean staffClause = clause.getBranches().stream()
+				.anyMatch(branch -> branch.getIds().stream().anyMatch(FAIRY_RING_STAVES::contains));
+			clauses.add(staffClause ? clause.wornOnly(LUMBRIDGE_ELITE_DONE) : clause);
+		}
+		return requirements.toBuilder().items(List.copyOf(clauses)).build();
 	}
 
 	/** The last word of "Travel Spirit tree 26261"; -1 for an empty cell. */

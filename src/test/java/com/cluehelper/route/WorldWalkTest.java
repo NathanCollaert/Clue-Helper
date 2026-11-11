@@ -9,6 +9,7 @@ import java.util.List;
 import net.runelite.api.CollisionDataFlag;
 import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
+import net.runelite.http.api.RuneLiteAPI;
 
 public class WorldWalkTest
 {
@@ -101,7 +102,7 @@ public class WorldWalkTest
 	@Test
 	public void walksPastTheSceneTileByTile() throws IOException
 	{
-		WalkTable table = WalkTable.load();
+		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 		WorldMap map = WorldMap.load();
 		LoadedScene sanctuary = SceneFiles.resource("3760_9648_1").getScene();
 		WorldWalk walk = new WorldWalk();

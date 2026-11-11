@@ -13,7 +13,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 import javax.inject.*;
 import net.runelite.api.ChatMessageType;
@@ -22,6 +21,7 @@ import net.runelite.client.RuneLiteProperties;
 import net.runelite.client.chat.*;
 import net.runelite.client.config.*;
 import net.runelite.client.util.LinkBrowser;
+import static java.util.stream.Collectors.*;
 
 /**
  * Everything about the current step and its routes, copied to the clipboard for a GitHub issue: a readable summary,
@@ -247,7 +247,7 @@ public class RouteReport
 
 	private static String tiles(List<WorldPoint> tiles)
 	{
-		return tiles.stream().map(RouteReport::tile).collect(Collectors.joining(", "));
+		return tiles.stream().map(RouteReport::tile).collect(joining(", "));
 	}
 
 	private static String tile(WorldPoint tile)

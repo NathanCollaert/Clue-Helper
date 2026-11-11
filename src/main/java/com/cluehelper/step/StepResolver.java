@@ -3,7 +3,6 @@ package com.cluehelper.step;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -12,6 +11,7 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Singleton
@@ -120,7 +120,7 @@ public class StepResolver
 	/** Cache tiles the step is also done at, off core's targets: Brimstail inside his cave, Martin Thwait in the den. */
 	private static List<WorldPoint> otherTiles(StepIndex.Entry entry, List<WorldPoint> targets)
 	{
-		return tiles(entry).stream().filter(tile -> !nearAny(tile, targets)).collect(Collectors.toUnmodifiableList());
+		return tiles(entry).stream().filter(tile -> !nearAny(tile, targets)).collect(toUnmodifiableList());
 	}
 
 	/** For a clue whose getters threw: only its class, so it still shows as a step. */
@@ -209,7 +209,7 @@ public class StepResolver
 		List<WorldPoint> cache = tiles(entry);
 		if (ClueTypes.COORDINATE.equals(facts.getType()) && !cache.isEmpty())
 		{
-			List<WorldPoint> named = core.stream().filter(tile -> nearAny(tile, cache)).collect(Collectors.toUnmodifiableList());
+			List<WorldPoint> named = core.stream().filter(tile -> nearAny(tile, cache)).collect(toUnmodifiableList());
 			if (!named.isEmpty())
 			{
 				return named;
@@ -229,7 +229,7 @@ public class StepResolver
 	 */
 	private List<WorldPoint> shownNpcTiles(List<WorldPoint> tiles, StepIndex.Entry entry)
 	{
-		return tiles.stream().filter(tile -> !hidesNpc(tile, entry)).collect(Collectors.toUnmodifiableList());
+		return tiles.stream().filter(tile -> !hidesNpc(tile, entry)).collect(toUnmodifiableList());
 	}
 
 	/** A target NPC at the tile none of whose ids shows. */
@@ -259,7 +259,7 @@ public class StepResolver
 
 	private static List<WorldPoint> tiles(StepIndex.Entry entry)
 	{
-		return entry.getTiles().stream().distinct().collect(Collectors.toUnmodifiableList());
+		return entry.getTiles().stream().distinct().collect(toUnmodifiableList());
 	}
 
 	private static String tier(ClueFacts facts, StepIndex.Entry entry)

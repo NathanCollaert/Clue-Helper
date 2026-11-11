@@ -7,6 +7,7 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /**
  * Public getters only, never the methods that change core's state ({@code forText}, {@code update},
@@ -117,7 +118,7 @@ public final class CoreClueReader
 		}
 		String[] npcs = ((NpcClueScroll) clue).getNpcs(plugin);
 		return npcs == null ? List.of() : Arrays.stream(npcs).filter(npc -> npc != null && !npc.isEmpty()).distinct()
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	static List<Integer> regions(ClueScroll clue)
@@ -146,7 +147,7 @@ public final class CoreClueReader
 	{
 		int[] objectIds = clue instanceof ObjectClueScroll ? ((ObjectClueScroll) clue).getObjectIds() : null;
 		return objectIds == null ? List.of()
-			: Arrays.stream(objectIds).filter(id -> id > 0).distinct().boxed().collect(Collectors.toUnmodifiableList());
+			: Arrays.stream(objectIds).filter(id -> id > 0).distinct().boxed().collect(toUnmodifiableList());
 	}
 
 	static List<String> objectNames(ClueScroll clue)
@@ -181,7 +182,7 @@ public final class CoreClueReader
 	static List<CrypticClue> unsolvedParts(ThreeStepCrypticClue clue)
 	{
 		return List.copyOf(clue.getClueSteps()).stream().filter(part -> !part.getValue()).map(Map.Entry::getKey)
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	static List<String> emotes(ClueScroll clue)
@@ -192,7 +193,7 @@ public final class CoreClueReader
 		}
 		EmoteClue emote = (EmoteClue) clue;
 		return Stream.of(emote.getFirstEmote(), emote.getSecondEmote()).filter(Objects::nonNull).map(Emote::getName)
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 	}
 
 	static boolean challengeCompleted(ClueScroll clue)
@@ -235,6 +236,6 @@ public final class CoreClueReader
 
 	private static <T> List<T> distinct(List<T> values)
 	{
-		return values.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
+		return values.stream().filter(Objects::nonNull).distinct().collect(toList());
 	}
 }

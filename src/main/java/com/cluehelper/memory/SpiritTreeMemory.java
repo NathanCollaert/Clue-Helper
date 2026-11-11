@@ -1,15 +1,15 @@
 package com.cluehelper.memory;
 
+import com.cluehelper.Tables;
 import com.cluehelper.player.PlayerModel;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.WidgetModalMode;
 import net.runelite.client.util.Text;
+import static java.util.stream.Collectors.*;
 
 /**
  * Client thread. Learned as Shortest Path does: the spirit tree menu greys a planted tree that can't be used, and
@@ -26,12 +26,7 @@ public class SpiritTreeMemory
 	private static final String GREYED = "5f5f5f";
 
 	/** Patch name → {region, transmit varbit}; the varbit describes the patch only inside its region. */
-	private static final Map<String, int[]> PATCHES = Map.of(
-		"Port Sarim", new int[]{12082, VarbitID.FARMING_TRANSMIT_A},
-		"Etceteria", new int[]{10300, VarbitID.FARMING_TRANSMIT_B},
-		"Brimhaven", new int[]{11058, VarbitID.FARMING_TRANSMIT_B},
-		"Hosidius", new int[]{6711, VarbitID.FARMING_TRANSMIT_F},
-		"Farming Guild", new int[]{4922, VarbitID.FARMING_TRANSMIT_A});
+	private static final Map<String, int[]> PATCHES = Tables.byKey("spirit tree patches", Tables.Row::ids);
 
 	@Inject
 	private Client client;
@@ -51,7 +46,7 @@ public class SpiritTreeMemory
 	public Set<String> grown()
 	{
 		return remembered.get().patches.entrySet().stream().filter(e -> e.getValue().value == GROWN)
-			.map(Map.Entry::getKey).collect(Collectors.toUnmodifiableSet());
+			.map(Map.Entry::getKey).collect(toUnmodifiableSet());
 	}
 
 	/** Call on start and after a profile change. */

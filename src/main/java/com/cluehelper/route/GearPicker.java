@@ -1,9 +1,9 @@
 package com.cluehelper.route;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Value;
 import net.runelite.api.EquipmentInventorySlot;
+import static java.util.stream.Collectors.*;
 
 /**
  * Worn gear adding up to a bonus total, from what the player wears, carries and has stored: as few items out of the
@@ -100,9 +100,9 @@ public final class GearPicker
 			}
 			if (left <= 0)
 			{
-				List<Integer> withdraw = taken.stream().map(upgrade -> upgrade.piece.itemId).collect(Collectors.toUnmodifiableList());
+				List<Integer> withdraw = taken.stream().map(upgrade -> upgrade.piece.itemId).collect(toUnmodifiableList());
 				List<Integer> remove = wornBest.values().stream().filter(piece -> !current.containsKey(piece.slot))
-					.filter(piece -> !equipSlots.contains(piece.slot)).map(Piece::getItemId).sorted().collect(Collectors.toUnmodifiableList());
+					.filter(piece -> !equipSlots.contains(piece.slot)).map(Piece::getItemId).sorted().collect(toUnmodifiableList());
 				return new Choice(List.copyOf(equip), withdraw, remove);
 			}
 		}

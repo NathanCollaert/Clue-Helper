@@ -1,10 +1,10 @@
 package com.cluehelper.route;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Value;
 import net.runelite.api.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /** Core's item, or every one of the parts that make it (a vial of water and a cadantine for the unfinished potion). */
 final class AlternativeRequirement implements ItemRequirement
@@ -52,6 +52,6 @@ final class AlternativeRequirement implements ItemRequirement
 	/** The parts these items lack, by name. */
 	List<String> missingParts(Item[] items)
 	{
-		return parts.stream().filter(part -> !part.requirement.fulfilledBy(items)).map(Part::getName).collect(Collectors.toList());
+		return parts.stream().filter(part -> !part.requirement.fulfilledBy(items)).map(Part::getName).collect(toList());
 	}
 }

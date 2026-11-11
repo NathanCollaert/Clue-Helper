@@ -1,12 +1,13 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import java.util.*;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.Quest;
 import net.runelite.api.gameval.ItemID;
+import static java.util.stream.Collectors.*;
 
 /**
  * Pure, so it runs on any thread. Spell rows are never filtered by their book: the planner decides which book a
@@ -25,9 +26,7 @@ public final class AvailabilityEngine
 	/** Worn, these turn the player into a penguin, whose side panel has no spellbook tab. */
 	private static final Set<Integer> HIDE_SPELLBOOK = Set.of(ItemID.PENG_SUIT_UNWOUND, ItemID.PENG_SUIT_WOUND);
 	/** What makes the plugin see an unlock it learns from play (UnlockMemory), told to a player who has it. */
-	private static final Map<String, String> UNLOCK_HINTS = Map.of(
-		"DRAGONTOOTH", "if unlocked, speak with the ghost captain",
-		"XERICS_HONOUR", "if unlocked, use the Honour teleport once");
+	private static final Map<String, String> UNLOCK_HINTS = Tables.byKey("unlock hints", Tables.Row::text);
 
 	@Getter
 	private final RuneModel runes;
@@ -38,7 +37,7 @@ public final class AvailabilityEngine
 	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */
 	public AvailabilitySet carried(List<CatalogRow> rows, PlayerSnapshot player, long nowMinutes)
 	{
-		List<RowAvailability> judged = rows.stream().map(row -> judge(row, player, nowMinutes)).collect(Collectors.toList());
+		List<RowAvailability> judged = rows.stream().map(row -> judge(row, player, nowMinutes)).collect(toList());
 		long validUntil = judged.stream().mapToLong(RowAvailability::getPassesFrom).min().orElse(Long.MAX_VALUE);
 		return new AvailabilitySet(player.getVersion(), List.copyOf(judged), validUntil);
 	}

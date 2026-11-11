@@ -41,7 +41,6 @@ public class MemoryStoreTest
 	@Test
 	public void beforeLoginNothingIsReadOrWritten()
 	{
-		assertFalse(store.hasProfile());
 		Bank early = bank.get();
 		early.items.add(1);
 		bank.set(early);

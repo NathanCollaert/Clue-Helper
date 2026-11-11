@@ -1,5 +1,6 @@
 package com.cluehelper.player;
 
+import com.cluehelper.Tables;
 import com.cluehelper.memory.BankMemory;
 import java.util.*;
 import java.util.concurrent.*;
@@ -11,7 +12,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 
@@ -23,13 +23,9 @@ import net.runelite.api.gameval.VarbitID;
 @Singleton
 public class PlayerModel
 {
-	private static final Set<Integer> RUNE_POUCHES = Set.of(
-		ItemID.BH_RUNE_POUCH, ItemID.BH_RUNE_POUCH_TROUVER, ItemID.DIVINE_RUNE_POUCH, ItemID.DIVINE_RUNE_POUCH_TROUVER);
-	private static final int[] POUCH_TYPES = {VarbitID.RUNE_POUCH_TYPE_1, VarbitID.RUNE_POUCH_TYPE_2,
-		VarbitID.RUNE_POUCH_TYPE_3, VarbitID.RUNE_POUCH_TYPE_4, VarbitID.RUNE_POUCH_TYPE_5, VarbitID.RUNE_POUCH_TYPE_6};
-	private static final int[] POUCH_QUANTITIES = {VarbitID.RUNE_POUCH_QUANTITY_1, VarbitID.RUNE_POUCH_QUANTITY_2,
-		VarbitID.RUNE_POUCH_QUANTITY_3, VarbitID.RUNE_POUCH_QUANTITY_4, VarbitID.RUNE_POUCH_QUANTITY_5,
-		VarbitID.RUNE_POUCH_QUANTITY_6};
+	private static final Set<Integer> RUNE_POUCHES = Tables.idSet("rune pouches");
+	private static final int[] POUCH_TYPES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(0)).toArray();
+	private static final int[] POUCH_QUANTITIES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(1)).toArray();
 	private static final List<Integer> OWN_VARPS = List.of(VarPlayerID.QP, VarPlayerID.AIDE_TELE_TIMER,
 		VarPlayerID.SLUG2_REGIONUID);
 	/** Last Man Standing worlds aren't here: outside the arena they play as ordinary worlds. */
@@ -92,9 +88,7 @@ public class PlayerModel
 
 	public void start()
 	{
-		List<Integer> varbits = new ArrayList<>(List.of(VarbitID.SPELLBOOK, VarbitID.LUNAR_SPELLBOOK_CHANGE,
-			VarbitID.SB_SWAP_CHECK, VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, VarbitID.IRONMAN,
-			VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE));
+		List<Integer> varbits = new ArrayList<>(Tables.idSet("player varbits"));
 		for (int i = 0; i < POUCH_TYPES.length; i++)
 		{
 			varbits.add(POUCH_TYPES[i]);
@@ -252,7 +246,7 @@ public class PlayerModel
 		}
 		if (runeModel == null)
 		{
-			runeModel = timed("rune model", () -> RuneModel.load(new ClientCacheView(client)));
+			runeModel = RuneModel.load(new ClientCacheView(client));
 			markDirty("rune model");
 		}
 		resolveWatches();
@@ -267,17 +261,16 @@ public class PlayerModel
 		if (questsDirty)
 		{
 			questsDirty = false;
-			quests = timed("quests", this::readQuests);
+			quests = readQuests();
 			questsRead = true;
 			markDirty("quests");
 		}
 		if (dirty)
 		{
 			dirty = false;
-			long started = System.nanoTime();
 			PlayerSnapshot built = build(now);
 			trackPendingRevert(last, built);
-			log.debug("snapshot rebuilt ({}) in {} ms", dirtyBecause, (System.nanoTime() - started) / 1_000_000.0);
+			log.debug("snapshot rebuilt ({})", dirtyBecause);
 			snapshot = built;
 			listeners.forEach(listener -> listener.accept(built));
 		}
@@ -481,13 +474,6 @@ public class PlayerModel
 			.map(type -> type.name().toLowerCase().replace('_', ' ') + " world").orElse(null);
 	}
 
-	private <T> T timed(String what, Supplier<T> read)
-	{
-		long started = System.nanoTime();
-		T value = read.get();
-		log.debug("read {} in {} ms", what, (System.nanoTime() - started) / 1_000_000.0);
-		return value;
-	}
 	/** Client thread. Whether an inventory item's name starts with {@code nameStart}, lower case. */
 	public boolean carriesItemNamed(String nameStart)
 	{

@@ -1,10 +1,10 @@
 package com.cluehelper.route;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Value;
 import net.runelite.api.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /** Worn gear adding up to a bonus total, as a need: any owned piece that adds to it counts as one of its items. */
 @Value
@@ -24,7 +24,7 @@ public class GearRequirement implements ItemRequirement
 	@Override
 	public boolean fulfilledBy(Item[] items)
 	{
-		Set<Integer> ids = Arrays.stream(items).map(Item::getId).collect(Collectors.toSet());
+		Set<Integer> ids = Arrays.stream(items).map(Item::getId).collect(toSet());
 		return choose(Set.of(), ids, Set.of()).isPresent();
 	}
 

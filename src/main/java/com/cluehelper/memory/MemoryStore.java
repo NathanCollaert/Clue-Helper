@@ -39,11 +39,6 @@ public class MemoryStore
 		return slot;
 	}
 
-	public boolean hasProfile()
-	{
-		return profile.profileKey() != null;
-	}
-
 	/** Call on {@code RuneScapeProfileChanged}. */
 	public void reload()
 	{

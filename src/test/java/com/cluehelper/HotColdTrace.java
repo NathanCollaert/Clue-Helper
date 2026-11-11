@@ -84,8 +84,7 @@ public final class HotColdTrace
 	public static String describe(HotColdPlan planned)
 	{
 		StringBuilder line = new StringBuilder(planned.getAction().name()).append(' ').append(planned.getTile())
-			.append(" kept ").append(planned.getKept().size()).append(planned.isExact() ? "" : " (closest fits)")
-			.append(" from ").append(planned.getReadings()).append(" readings");
+			.append(" kept ").append(planned.getKept().size()).append(planned.isExact() ? "" : " (closest fits)");
 		if (planned.getChoice() != null)
 		{
 			ProbePlanner.Choice choice = planned.getChoice();
@@ -93,9 +92,7 @@ public final class HotColdTrace
 				.append(String.format(" %.2f bits cost %d", choice.getBits(), choice.getCostTicks()))
 				.append(" branches ").append(choice.getBranches().size());
 		}
-		return line.append(" probes ").append(planned.getProbes()).append(" landings ").append(planned.getLandings())
-			.append(" in ").append(planned.getNanos() / 1_000_000).append(" ms (landings ").append(planned.getLandingNanos() / 1_000_000)
-			.append(" ms)").toString();
+		return line.append(" probes ").append(planned.getConsidered().size()).toString();
 	}
 
 	/** The spots the grid kept that core has dropped. */
