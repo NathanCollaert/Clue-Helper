@@ -393,8 +393,7 @@ public class StepGuide
 		if (entries.length > 0 && leftClicks.learn(entries[entries.length - 1]))
 		{
 			highlights = stepHighlights.withItemFill(highlights, getCurrent(), routeStep);
-			scene = scene.toBuilder().fillObjects(stepHighlights.fillObjects(scene.getObjects(), highlights))
-				.fillNpcs(stepHighlights.fillNpcs(scene.getNpcs(), scene.getNpcOption())).build();
+			scene = withFills(scene);
 		}
 	}
 
@@ -567,10 +566,21 @@ public class StepGuide
 			colourCrewMenus(target, npcs);
 		}
 		String npcOption = bank || target.getPath().isEmpty() ? null : target.getPath().get(0);
-		return SceneHighlights.builder().foundTick(tick)
+		return withFills(SceneHighlights.builder().foundTick(tick)
 			.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
-			.objects(objects).npcs(npcs).fillObjects(bank ? List.of() : stepHighlights.fillObjects(objects, highlights))
-			.npcOption(npcOption).fillNpcs(stepHighlights.fillNpcs(npcs, npcOption)).build();
+			.objects(objects).npcs(npcs).bank(bank).npcOption(npcOption).build());
+	}
+
+	/** The found objects and NPCs whose left click does what the step needs: at a bank stop, opens the bank. */
+	private SceneHighlights withFills(SceneHighlights found)
+	{
+		if (found.isBank())
+		{
+			return found.toBuilder().fillObjects(stepHighlights.fillBanks(found.getObjects()))
+				.fillNpcs(stepHighlights.fillBankers(found.getNpcs())).build();
+		}
+		return found.toBuilder().fillObjects(stepHighlights.fillObjects(found.getObjects(), highlights))
+			.fillNpcs(stepHighlights.fillNpcs(found.getNpcs(), found.getNpcOption())).build();
 	}
 
 	/** The Abyss's outer ring is crossed by the obstacle the path line leads to, not the one spot the walk data names. */
@@ -1437,6 +1447,8 @@ public class StepGuide
 		List<TileObject> fillObjects = List.of();
 		@Builder.Default
 		List<NPC> fillNpcs = List.of();
+		/** The bank booths, chests and bankers of a bank stop, filled when their left click opens the bank. */
+		boolean bank;
 		/** The option an outlined NPC is filled for when it is its left click (the Guardian mummy's Start-minigame). */
 		String npcOption;
 		/** The tick of the last search; {@link ActWatcher#NEVER} forces one. */

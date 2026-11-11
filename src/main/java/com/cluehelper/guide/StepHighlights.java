@@ -26,6 +26,7 @@ final class StepHighlights
 	private static final String REMOVE_OPTION = "Remove";
 	private static final String OPEN_OPTION = "Open";
 	private static final String USE_OPTION = "Use";
+	private static final String BANK_OPTION = "Bank";
 	private static final String CAST_OPTION = "Cast";
 	private static final Set<SubStep.Done> PUTS_ON = EnumSet.of(SubStep.Done.EQUIPPED, SubStep.Done.WAY_IN_WORN,
 		SubStep.Done.GEAR_WORN, SubStep.Done.ITEM_WORN);
@@ -181,6 +182,19 @@ final class StepHighlights
 	private boolean takesOff(SubStep act)
 	{
 		return act.getDone() == SubStep.Done.SLOTS_EMPTY || act.getDone() == SubStep.Done.WAY_IN_SLOTS_EMPTY || takesGearOff(act);
+	}
+
+	/** Booths and chests whose left click opens the bank: "Bank", or "Use" on a chest. */
+	List<TileObject> fillBanks(List<TileObject> banks)
+	{
+		return banks.stream().filter(bank -> leftClicks.isLeftClick(bank, BANK_OPTION) || leftClicks.isLeftClick(bank, USE_OPTION))
+			.collect(toUnmodifiableList());
+	}
+
+	/** Bankers whose left click is "Bank": "Talk-to" until a swap puts it first. */
+	List<NPC> fillBankers(List<NPC> bankers)
+	{
+		return bankers.stream().filter(banker -> BANK_OPTION.equalsIgnoreCase(leftClicks.npc(banker))).collect(toUnmodifiableList());
 	}
 
 	List<NPC> fillNpcs(List<NPC> npcs, String npcOption)
