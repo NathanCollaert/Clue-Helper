@@ -49,6 +49,9 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.IntSummaryStatistics;
+import java.util.stream.Collectors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -435,32 +438,38 @@ public class ClueHelperDevPlugin extends Plugin
 				{
 					continue;
 				}
+				boolean beside = Math.abs(dx) <= 2 && Math.abs(dy) <= 2;
 				WallObject wall = tile.getWallObject();
 				if (wall != null)
 				{
-					logObject("wall", at.dx(dx).dy(dy), wall.getId(), wall.getConfig(), "orientation " + wall.getOrientationA() + "/" + wall.getOrientationB());
+					logObject("wall", beside, at.dx(dx).dy(dy), wall.getId(), wall.getConfig(), "orientation " + wall.getOrientationA() + "/" + wall.getOrientationB());
 				}
 				GroundObject ground = tile.getGroundObject();
 				if (ground != null)
 				{
-					logObject("ground", at.dx(dx).dy(dy), ground.getId(), ground.getConfig(), "renderable "
-						+ (ground.getRenderable() == null ? "none" : ground.getRenderable().getClass().getSimpleName()));
+					logObject("ground", beside, at.dx(dx).dy(dy), ground.getId(), ground.getConfig(), renderableText(ground.getRenderable()));
 				}
 				DecorativeObject decoration = tile.getDecorativeObject();
 				if (decoration != null)
 				{
-					logObject("decoration", at.dx(dx).dy(dy), decoration.getId(), decoration.getConfig(), "");
+					logObject("decoration", beside, at.dx(dx).dy(dy), decoration.getId(), decoration.getConfig(), renderableText(decoration.getRenderable()));
 				}
 				for (GameObject object : tile.getGameObjects())
 				{
 					if (object != null && object.getSceneMinLocation().equals(tile.getSceneLocation()))
 					{
-						logObject("game", at.dx(dx).dy(dy), object.getId(), object.getConfig(), "size " + object.sizeX() + "x" + object.sizeY()
+						logObject("game", beside, at.dx(dx).dy(dy), object.getId(), object.getConfig(), "size " + object.sizeX() + "x" + object.sizeY()
 							+ " " + modelText(object));
 					}
 				}
 			}
 		}
+	}
+
+	private static String renderableText(Renderable renderable)
+	{
+		Model model = renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
+		return model == null ? "model none" : "faces " + model.getFaceCount() + " by transparency " + facesByTransparency(model);
 	}
 
 	/** Why an object might not outline: no model, faces the outline renderer skips, or no clickbox. */
@@ -478,16 +487,39 @@ public class ClueHelperDevPlugin extends Plugin
 		long seeThrough = java.util.stream.IntStream.range(0, model.getFaceCount())
 			.filter(face -> transparencies != null && (transparencies[face] & 0xFF) >= 254).count();
 		long undrawn = java.util.stream.IntStream.range(0, model.getFaceCount()).filter(face -> colours != null && colours[face] == -2).count();
-		return "faces " + model.getFaceCount() + " see-through " + seeThrough + " undrawn " + undrawn + " clickbox " + clickbox;
+		return "faces " + model.getFaceCount() + " see-through " + seeThrough + " undrawn " + undrawn + " clickbox " + clickbox
+			+ " by transparency " + facesByTransparency(model);
 	}
 
-	private void logObject(String kind, WorldPoint at, int id, int config, String shape)
+	/**
+	 * Per transparency value (0 solid, 255 invisible): the face count, the height range (y grows downwards, 0 is the
+	 * ground) and the horizontal reach from the centre, which tells a model's parts apart.
+	 */
+	private static Map<Integer, String> facesByTransparency(Model model)
+	{
+		byte[] transparencies = model.getFaceTransparencies();
+		Map<Integer, List<Integer>> faces = java.util.stream.IntStream.range(0, model.getFaceCount()).boxed()
+			.collect(Collectors.groupingBy(face -> transparencies == null ? 0 : transparencies[face] & 0xFF, TreeMap::new, Collectors.toList()));
+		Map<Integer, String> described = new TreeMap<>();
+		faces.forEach((transparency, group) ->
+		{
+			int[] vertices = group.stream().flatMapToInt(face -> java.util.stream.IntStream.of(model.getFaceIndices1()[face],
+				model.getFaceIndices2()[face], model.getFaceIndices3()[face])).toArray();
+			IntSummaryStatistics heights = java.util.Arrays.stream(vertices).map(v -> (int) model.getVerticesY()[v]).summaryStatistics();
+			int reach = java.util.Arrays.stream(vertices).map(v -> (int) Math.hypot(model.getVerticesX()[v], model.getVerticesZ()[v])).max().orElse(0);
+			described.put(transparency, group.size() + " faces, height " + heights.getMin() + ".." + heights.getMax() + ", reach " + reach);
+		});
+		return described;
+	}
+
+	/** Objects without actions are logged only within two tiles of the centre, where scenery may belong to what is outlined. */
+	private void logObject(String kind, boolean beside, WorldPoint at, int id, int config, String shape)
 	{
 		ObjectComposition definition = client.getObjectDefinition(id);
 		ObjectComposition shown = definition.getImpostorIds() != null ? definition.getImpostor() : null;
 		ObjectComposition named = shown != null ? shown : definition;
 		boolean usable = named.getActions() != null && java.util.Arrays.stream(named.getActions()).anyMatch(java.util.Objects::nonNull);
-		if (!usable)
+		if (!usable && !beside)
 		{
 			return;
 		}
