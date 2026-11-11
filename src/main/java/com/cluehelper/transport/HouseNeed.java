@@ -1,8 +1,8 @@
 package com.cluehelper.transport;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Value;
+import static java.util.stream.Collectors.*;
 
 @Value
 public class HouseNeed
@@ -19,6 +19,6 @@ public class HouseNeed
 	public String describe()
 	{
 		return kind == Kind.NEXUS ? "nexus destination " + ids.get(0)
-			: "house object " + ids.stream().map(String::valueOf).collect(Collectors.joining(" or "));
+			: "house object " + ids.stream().map(String::valueOf).collect(joining(" or "));
 	}
 }

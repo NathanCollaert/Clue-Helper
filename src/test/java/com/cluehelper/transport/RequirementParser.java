@@ -3,6 +3,7 @@ package com.cluehelper.transport;
 import com.cluehelper.player.Book;
 import java.util.*;
 import java.util.regex.*;
+import java.util.stream.Collectors;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
@@ -82,18 +83,14 @@ public final class RequirementParser
 			out.errors.add("House: can't read '" + cell + "'");
 			return null;
 		}
-		List<Integer> ids = new ArrayList<>();
-		for (String id : m.group(2).split("\\|"))
-		{
-			ids.add(Integer.parseInt(id));
-		}
+		List<Integer> ids = Arrays.stream(m.group(2).split("\\|")).map(Integer::valueOf).collect(Collectors.toUnmodifiableList());
 		HouseNeed.Kind kind = m.group(1).equals("nexus") ? HouseNeed.Kind.NEXUS : HouseNeed.Kind.FURNITURE;
 		if (kind == HouseNeed.Kind.NEXUS && ids.size() != 1)
 		{
 			out.errors.add("House: one nexus destination per row, not '" + cell + "'");
 			return null;
 		}
-		return new HouseNeed(kind, List.copyOf(ids));
+		return new HouseNeed(kind, ids);
 	}
 
 	private void parseItems(String cell, Parsed out)
@@ -184,17 +181,13 @@ public final class RequirementParser
 
 	private static void parseLevels(String cell, Parsed out)
 	{
-		for (String clause : cell.split(";"))
+		for (String clause : clauses(cell))
 		{
-			if (clause.trim().isEmpty())
-			{
-				continue;
-			}
-			String[] parts = clause.trim().split(" ", 2);
+			String[] parts = clause.split(" ", 2);
 			LevelNeed need = parts.length == 2 ? levelNeed(parts[0], parts[1].trim()) : null;
 			if (need == null)
 			{
-				out.errors.add("Skills: can't read '" + clause.trim() + "'");
+				out.errors.add("Skills: can't read '" + clause + "'");
 			}
 			else
 			{
@@ -236,16 +229,12 @@ public final class RequirementParser
 
 	private static void parseQuests(String cell, Parsed out)
 	{
-		for (String name : cell.split(";"))
+		for (String name : clauses(cell))
 		{
-			if (name.trim().isEmpty())
-			{
-				continue;
-			}
-			Quest quest = QUESTS_BY_NAME.get(name.trim());
+			Quest quest = QUESTS_BY_NAME.get(name);
 			if (quest == null)
 			{
-				out.errors.add("Quests: unknown quest '" + name.trim() + "'");
+				out.errors.add("Quests: unknown quest '" + name + "'");
 			}
 			else
 			{
@@ -258,16 +247,12 @@ public final class RequirementParser
 	private static Book parseVars(String cell, VarCheck.Kind kind, Parsed out)
 	{
 		Book book = null;
-		for (String clause : cell.split(";"))
+		for (String clause : clauses(cell))
 		{
-			if (clause.trim().isEmpty())
-			{
-				continue;
-			}
-			Matcher m = VAR_CLAUSE.matcher(clause.trim());
+			Matcher m = VAR_CLAUSE.matcher(clause);
 			if (!m.matches())
 			{
-				out.errors.add((kind == VarCheck.Kind.VARBIT ? VARBITS : VARPS) + ": can't read '" + clause.trim() + "'");
+				out.errors.add((kind == VarCheck.Kind.VARBIT ? VARBITS : VARPS) + ": can't read '" + clause + "'");
 				continue;
 			}
 			VarCheck check = new VarCheck(kind, Integer.parseInt(m.group(1)), VarCheck.Op.of(m.group(2).charAt(0)),
@@ -332,6 +317,12 @@ public final class RequirementParser
 		final List<VarCheck> vars = new ArrayList<>();
 		final List<String> errors = new ArrayList<>();
 		int maxWildernessLevel = Requirements.NO_WILDERNESS_LIMIT;
+	}
+
+	/** The cell's {@code ;}-separated clauses, trimmed, empty ones left out. */
+	static List<String> clauses(String cell)
+	{
+		return Arrays.stream(cell.split(";")).map(String::trim).filter(clause -> !clause.isEmpty()).collect(Collectors.toList());
 	}
 
 	private static boolean isTrue(String cell)

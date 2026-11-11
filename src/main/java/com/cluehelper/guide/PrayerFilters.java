@@ -2,11 +2,11 @@ package com.cluehelper.guide;
 
 import com.cluehelper.step.Step;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.VarbitID;
+import static java.util.stream.Collectors.*;
 
 /**
  * The prayer book's filters as a step found them, so a Sherlock prayer task that had to change them can set them back.
@@ -58,13 +58,13 @@ public class PrayerFilters
 	public List<Filter> hidingTiers()
 	{
 		return TIERS.stream().filter(filter -> client.getVarbitValue(filter.varbit) == filter.hidingValue)
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 	}
 
 	/** The filters set otherwise than the step found them. */
 	public List<Filter> changed()
 	{
 		return found.entrySet().stream().filter(entry -> client.getVarbitValue(entry.getKey().varbit) != entry.getValue())
-			.map(Map.Entry::getKey).sorted().collect(Collectors.toUnmodifiableList());
+			.map(Map.Entry::getKey).sorted().collect(toUnmodifiableList());
 	}
 }

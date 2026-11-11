@@ -4,9 +4,9 @@ import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /**
  * The stored items a route could use. A recording keeps only these of the bank, so it plans the same route without
@@ -95,6 +95,6 @@ public final class UsableItems
 	private static <V> Map<Integer, V> only(Map<Integer, V> items, Set<Integer> ids)
 	{
 		return items.entrySet().stream().filter(item -> ids.contains(item.getKey()))
-			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, TreeMap::new));
+			.collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, TreeMap::new));
 	}
 }

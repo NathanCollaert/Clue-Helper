@@ -32,12 +32,8 @@ public final class WorldMap
 	public static WorldMap load() throws IOException
 	{
 		WorldMap map = new WorldMap();
-		try (InputStream resource = WorldMap.class.getResourceAsStream(RESOURCE))
+		try (InputStream resource = WalkTable.open(RESOURCE))
 		{
-			if (resource == null)
-			{
-				throw new IOException("missing resource " + RESOURCE);
-			}
 			ZipInputStream in = new ZipInputStream(resource);
 			ZipEntry entry;
 			while ((entry = in.getNextEntry()) != null)

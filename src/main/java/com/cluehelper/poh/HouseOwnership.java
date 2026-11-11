@@ -2,13 +2,14 @@ package com.cluehelper.poh;
 
 import java.util.Locale;
 import java.util.function.LongSupplier;
-import lombok.Getter;
+import lombok.*;
 
 /**
  * A player can't log in inside a house, so every entry follows a click outside; build mode is a hard confirm. Anything
  * else is UNCERTAIN, which never learns. Clicks are classified by their option, not their target: the bank's
  * {@code Withdraw-All} on "Teleport to house" would otherwise read as an own entry.
  */
+@RequiredArgsConstructor
 public final class HouseOwnership
 {
 	/** Far longer than a click-to-load (1.6–5.9 s), far shorter than any other way into a house. */
@@ -36,11 +37,6 @@ public final class HouseOwnership
 	private Entry pending = Entry.UNKNOWN;
 	private String pendingClick;
 	private long pendingAt;
-
-	public HouseOwnership(LongSupplier clock)
-	{
-		this.clock = clock;
-	}
 
 	/** Only clicks outside a house count: inside, a stranger's portal offers the owner's options. */
 	public void observeClick(String option, String target)

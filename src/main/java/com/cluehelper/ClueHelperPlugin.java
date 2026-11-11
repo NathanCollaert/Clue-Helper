@@ -10,9 +10,8 @@ import com.cluehelper.route.*;
 import com.cluehelper.transport.*;
 import com.cluehelper.ui.*;
 import com.google.inject.Provides;
-import java.util.Set;
+import java.util.*;
 import javax.inject.Inject;
-import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -38,14 +37,12 @@ public class ClueHelperPlugin extends Plugin
 	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private ClueLink clueLink;
 
 	@Inject
 	private MemoryStore memory;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private BankMemory bankMemory;
 
 	@Inject
@@ -73,15 +70,12 @@ public class ClueHelperPlugin extends Plugin
 	private FairyRingMemory fairyRings;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private PohService poh;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private PlayerModel playerModel;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private AvailabilityService availability;
 
 	@Inject
@@ -91,18 +85,15 @@ public class ClueHelperPlugin extends Plugin
 	private PlannerRunner planner;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private RoutePlanner routes;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private StepGuide guide;
 
 	@Inject
 	private ActWatcher actWatcher;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private HotColdService hotCold;
 
 	@Inject
@@ -133,11 +124,9 @@ public class ClueHelperPlugin extends Plugin
 	private WanderAreaOverlay wanderAreaOverlay;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private MenuLines menuLines;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
@@ -161,9 +150,7 @@ public class ClueHelperPlugin extends Plugin
 	private JournalScroll journalScroll;
 
 
-	private Runnable unregisterRoutes;
-	private Runnable unregisterGuide;
-	private Runnable unregisterHotCold;
+	private final List<Runnable> unregister = new ArrayList<>();
 	private boolean shownWorking;
 
 	@Provides
@@ -179,11 +166,7 @@ public class ClueHelperPlugin extends Plugin
 		clueLink.start();
 		playerModel.start();
 		poh.start();
-		clientThread.invokeLater(spiritTrees::publish);
-		clientThread.invokeLater(grownPatches::publish);
-		clientThread.invokeLater(fairyRings::publish);
-		clientThread.invokeLater(unlocks::publish);
-		clientThread.invokeLater(keyRing::publish);
+		clientThread.invokeLater(this::publishMemories);
 		availability.start();
 		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
@@ -191,9 +174,9 @@ public class ClueHelperPlugin extends Plugin
 		hotCold.start();
 		withdrawTab.start();
 		routeReport.start();
-		unregisterRoutes = routes.addListener(plan -> box.refresh());
-		unregisterGuide = guide.addListener(box::refresh);
-		unregisterHotCold = hotCold.addListener(box::refresh);
+		unregister.add(routes.addListener(plan -> box.refresh()));
+		unregister.add(guide.addListener(box::refresh));
+		unregister.add(hotCold.addListener(box::refresh));
 		for (Overlay overlay : overlays())
 		{
 			overlayManager.add(overlay);
@@ -208,9 +191,8 @@ public class ClueHelperPlugin extends Plugin
 		{
 			overlayManager.remove(overlay);
 		}
-		unregisterHotCold.run();
-		unregisterGuide.run();
-		unregisterRoutes.run();
+		unregister.forEach(Runnable::run);
+		unregister.clear();
 		routeReport.stop();
 		withdrawTab.stop();
 		hotCold.stop();
@@ -414,6 +396,11 @@ public class ClueHelperPlugin extends Plugin
 		bankMemory.onProfileChanged();
 		poh.onProfileChanged();
 		hotCold.onProfileChanged();
+		publishMemories();
+	}
+
+	private void publishMemories()
+	{
 		spiritTrees.publish();
 		grownPatches.publish();
 		fairyRings.publish();

@@ -53,11 +53,6 @@ public final class FeelLogs
 	}
 
 	/** Readings of the step, anchors left out. */
-	public static int feels(List<Reading> readings)
-	{
-		return (int) readings.stream().filter(reading -> !reading.isAnchor()).count();
-	}
-
 	/** The most recent step of the tier with a log, or null. */
 	public String latestKey(String tierPrefix)
 	{

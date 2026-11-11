@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.*;
 import javax.inject.*;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.MenuOptionClicked;
@@ -37,7 +37,7 @@ public class WaypointOverlay extends Overlay
 	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	private static final int OBELISK_PLATFORM_TILES = 3;
-	private static final float PATH_STROKE = 2f;
+	private static final BasicStroke PATH_STROKE = new BasicStroke(2f);
 	private static final int COVER_STEP_PIXELS = 3;
 	/** A climb's far end can stand a few tiles off the walk data's landing tile (the Observatory's rocks). */
 	private static final int ROW_ENDS_MARGIN_TILES = 3;
@@ -73,8 +73,11 @@ public class WaypointOverlay extends Overlay
 
 	private int crossingFrom = NOT_CROSSING;
 	private List<WorldPoint> drawnWalk = List.of();
+	/** Client thread. The tiles the line was last drawn through. */
+	@Getter
 	private List<WorldPoint> line = List.of();
-	/** The tiles drawn this frame; empty when no line shows. */
+	/** Client thread, after this overlay's render in the same frame. The tiles the line shows now; empty when none does. */
+	@Getter(AccessLevel.PACKAGE)
 	private List<WorldPoint> shownLine = List.of();
 	private Map<TileObject, String> pathObjects = Map.of();
 	private int lineTick = -1;
@@ -211,8 +214,7 @@ public class WaypointOverlay extends Overlay
 	private boolean isActWithoutPlace(SubStep current)
 	{
 		boolean stepOrPartAct = current.getStage() == null || current.getStage().getKind() == Stage.Kind.PART || isKillForKey(current);
-		return current.getKind() == SubStep.Kind.ACT && stepOrPartAct && current.getActItemNamed() == null
-			&& guide.getHighlightObjects().isEmpty() && guide.getHighlightNpcs().isEmpty();
+		return current.getKind() == SubStep.Kind.ACT && stepOrPartAct && current.getActItemNamed() == null && !outlined();
 	}
 
 	private void drawTile(Graphics2D graphics, WorldView view, WorldPoint waypoint)
@@ -234,13 +236,12 @@ public class WaypointOverlay extends Overlay
 	private WorldPoint actTarget(WorldView view, SubStep current, int here)
 	{
 		Step step = clueLink.getCurrentStep();
-		Player local = client.getLocalPlayer();
-		if (step == null || local == null || ClueTypes.HOT_COLD.equals(step.getType()))
+		WorldPoint at = playerTile();
+		if (step == null || at == null || ClueTypes.HOT_COLD.equals(step.getType()))
 		{
 			return null;
 		}
 		boolean killForKey = isKillForKey(current);
-		WorldPoint at = local.getWorldLocation();
 		WorldPoint target = killForKey ? nearestKeyHolder(view, step, current.getStage(), at) : nearestNamedNpc(view, step.getNpcsAtStep(), at);
 		StepIndex.Wander range = step.getData().getWander();
 		if (target == null && !killForKey && range != null && range.contains(at))
@@ -276,8 +277,8 @@ public class WaypointOverlay extends Overlay
 		{
 			return npc;
 		}
-		Player local = client.getLocalPlayer();
-		boolean looking = range != null && local != null && range.contains(local.getWorldLocation());
+		WorldPoint at = playerTile();
+		boolean looking = range != null && at != null && range.contains(at);
 		return looking ? null : goal;
 	}
 
@@ -294,7 +295,12 @@ public class WaypointOverlay extends Overlay
 		{
 			return null;
 		}
-		return nearestNpc(view, npc -> npc.getName() != null && names.stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName())), at);
+		return nearestNpc(view, npc -> isNamed(npc, names), at);
+	}
+
+	static boolean isNamed(NPC npc, List<String> names)
+	{
+		return npc.getName() != null && names.stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName()));
 	}
 
 	private static WorldPoint nearestNpc(WorldView view, Predicate<NPC> wanted, WorldPoint at)
@@ -352,8 +358,8 @@ public class WaypointOverlay extends Overlay
 
 	private boolean besideOutlinedNpc(WorldPoint waypoint)
 	{
-		Player local = client.getLocalPlayer();
-		return outlined() && local != null && local.getWorldLocation().distanceTo2D(waypoint) <= NEAR_OUTLINED_NPC_TILES;
+		WorldPoint at = playerTile();
+		return outlined() && at != null && at.distanceTo2D(waypoint) <= NEAR_OUTLINED_NPC_TILES;
 	}
 
 	/** The step's bank, portal, ladder or NPC is outlined, which marks the spot better than its tile. */
@@ -388,9 +394,9 @@ public class WaypointOverlay extends Overlay
 	/** Renu, NPCs that teleport and NPCs that are the way in or out (the Guardian mummy): the path leads to the NPC. */
 	private void drawApproach(Graphics2D graphics, WorldView view, WalkCosts here, NPC npc)
 	{
-		Player local = client.getLocalPlayer();
+		WorldPoint from = playerTile();
 		WorldPoint at = npc.getWorldLocation();
-		if (local == null || local.getWorldLocation().distanceTo2D(at) <= 1)
+		if (from == null || from.distanceTo2D(at) <= 1)
 		{
 			return;
 		}
@@ -423,8 +429,8 @@ public class WaypointOverlay extends Overlay
 
 	private boolean besidePlayer(WorldView view, TileObject object)
 	{
-		Player local = client.getLocalPlayer();
-		return local != null && isBeside(local.getWorldLocation(), LineTargets.objectGoal(view, object));
+		WorldPoint at = playerTile();
+		return at != null && isBeside(at, LineTargets.objectGoal(view, object));
 	}
 
 	/** On the area or one tile round it, diagonals included. */
@@ -482,7 +488,7 @@ public class WaypointOverlay extends Overlay
 	/** From the line's last tile on to the middle of what it ends in, where that tile is beside it. */
 	private void drawInto(Graphics2D graphics, WorldView view, WorldPoint last, LineEnd end)
 	{
-		LocalPoint lastLocal = last.getPlane() == view.getPlane() ? LocalPoint.fromWorld(view, last) : null;
+		LocalPoint lastLocal = onFloor(view, last);
 		if (lastLocal == null || end.getMiddle() == null || !isBeside(last, end.getFootprint()))
 		{
 			return;
@@ -502,8 +508,7 @@ public class WaypointOverlay extends Overlay
 	private LineEnd endOn(WorldView view, WalkGoal goal)
 	{
 		WorldPoint tile = goal.getSouthWest();
-		LocalPoint middle = goal.getSizeX() == 1 && goal.getSizeY() == 1 && tile.getPlane() == view.getPlane()
-			? LocalPoint.fromWorld(view, tile) : null;
+		LocalPoint middle = goal.getSizeX() == 1 && goal.getSizeY() == 1 ? onFloor(view, tile) : null;
 		if (middle == null)
 		{
 			return null;
@@ -574,19 +579,25 @@ public class WaypointOverlay extends Overlay
 		TileObject first = Stream.concat(guide.getHighlightObjects().stream(), pathObjects.keySet().stream())
 			.filter(object -> PathObjects.isUsedFirst(object.getId()) || AbyssObstacles.isObstacle(object.getId()))
 			.findFirst().orElse(null);
-		Player local = client.getLocalPlayer();
-		if (first == null || local == null || besidePlayer(view, first))
+		WorldPoint at = playerTile();
+		if (first == null || at == null || besidePlayer(view, first))
 		{
 			return ahead;
 		}
 		List<WorldPoint> there = here.getScene() == null ? List.of()
-			: walker.path(Ground.sceneOnly(here.getScene()), local.getWorldLocation(), LineTargets.objectGoal(view, first));
+			: walker.path(Ground.sceneOnly(here.getScene()), at, LineTargets.objectGoal(view, first));
 		if (!there.isEmpty())
 		{
 			return there;
 		}
 		// The walk data's own spot may be across the ring from the obstacle picked: the line still points at the outlined one
-		return AbyssObstacles.isObstacle(first.getId()) ? List.of(local.getWorldLocation(), first.getWorldLocation()) : ahead;
+		return AbyssObstacles.isObstacle(first.getId()) ? List.of(at, first.getWorldLocation()) : ahead;
+	}
+
+	private WorldPoint playerTile()
+	{
+		Player local = client.getLocalPlayer();
+		return local == null ? null : local.getWorldLocation();
 	}
 
 	/**
@@ -600,18 +611,6 @@ public class WaypointOverlay extends Overlay
 		{
 			crossingFrom = client.getTickCount();
 		}
-	}
-
-	/** Client thread. The tiles the line was last drawn through. */
-	public List<WorldPoint> getLine()
-	{
-		return line;
-	}
-
-	/** Client thread, after this overlay's render in the same frame. The tiles the line shows now. */
-	List<WorldPoint> getShownLine()
-	{
-		return shownLine;
 	}
 
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
@@ -650,7 +649,7 @@ public class WaypointOverlay extends Overlay
 		pathObjects.forEach((object, option) -> highlighter.object(graphics, object, leftClicks.isLeftClick(object, option)));
 		shownLine = ahead;
 		graphics.setColor(Highlighter.COLOUR);
-		graphics.setStroke(new BasicStroke(PATH_STROKE));
+		graphics.setStroke(PATH_STROKE);
 		Point previous = null;
 		WorldPoint previousTile = null;
 		for (WorldPoint tile : ahead)
@@ -663,11 +662,17 @@ public class WaypointOverlay extends Overlay
 					previous = drawTo(graphics, previous, over);
 				}
 			}
-			LocalPoint local = tile.getPlane() == view.getPlane() ? LocalPoint.fromWorld(view, tile) : null;
+			LocalPoint local = onFloor(view, tile);
 			Point at = local == null ? null : Perspective.localToCanvas(client, local, view.getPlane());
 			previous = drawTo(graphics, previous, at);
 			previousTile = tile;
 		}
+	}
+
+	/** Null off the view's floor or outside its scene. */
+	static LocalPoint onFloor(WorldView view, WorldPoint tile)
+	{
+		return tile.getPlane() == view.getPlane() ? LocalPoint.fromWorld(view, tile) : null;
 	}
 
 	/** The segment from one canvas point to the next, where both are on screen; the point drawn to, for the next segment. */

@@ -30,10 +30,7 @@ public class ProbeJob
 
 	public HotColdPlan run()
 	{
-		long started = System.nanoTime();
-		Landings landings = new Landings();
-		HotColdPlan plan = decide(stepKey, spots, tier, readings, core, nearby(), landings, costs);
-		return plan.toBuilder().landings(landings.count).landingNanos(landings.nanos).nanos(System.nanoTime() - started).build();
+		return decide(stepKey, spots, tier, readings, core, nearby(), this::landingsWithin, costs);
 	}
 
 	/**
@@ -55,25 +52,25 @@ public class ProbeJob
 			grid = Hypotheses.filter(spots, tier, List.of(last.asAnchor()));
 		}
 		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares())
-			.exact(grid.isExact()).readings(FeelLogs.feels(readings)).probes(nearby.size()).considered(List.copyOf(nearby));
+			.exact(grid.isExact()).considered(List.copyOf(nearby));
 		if (shook && core.isFelt())
 		{
-			return HotColdPlan.digHere(plan, new WorldPoint(last.getX(), last.getY(), last.getPlane()));
+			return plan.action(HotColdPlan.Action.DIG_HERE).tile(new WorldPoint(last.getX(), last.getY(), last.getPlane())).build();
 		}
 		List<Spot> kept = grid.keptSpots();
 		if (kept.size() == 1)
 		{
-			return HotColdPlan.digSpot(plan, grid.digTile(kept.get(0).getName()));
+			return plan.action(HotColdPlan.Action.DIG_SPOT).tile(grid.digTile(kept.get(0).getName())).build();
 		}
 		Hypotheses.Samples samples = grid.sample(SAMPLES_PER_SPOT);
 		List<Probe> probes = ProbePlanner.worthTrying(samples, tier, last, nearby, landingsWithin, costs);
-		plan.probes(probes.size()).considered(List.copyOf(probes));
+		plan.considered(List.copyOf(probes));
 		ProbePlanner.Choice choice = ProbePlanner.choose(samples, tier, last, probes, costs);
 		if (choice == null)
 		{
-			return HotColdPlan.none(plan);
+			return plan.action(HotColdPlan.Action.NONE).build();
 		}
-		return HotColdPlan.feel(plan, choice);
+		return plan.action(HotColdPlan.Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
 	}
 
 	private List<Probe> nearby()
@@ -98,34 +95,24 @@ public class ProbeJob
 		return landingSearch != null && OriginClass.of(tile, landingSearch.getNoTeleport()).isWilderness();
 	}
 
-	/** The PROBES search, with how many landings it gave and how long it took. */
-	private final class Landings implements IntFunction<List<Probe>>
+	/** The PROBES search: landing probes whose ranking ticks are at most the limit. */
+	private List<Probe> landingsWithin(int rankTicksLimit)
 	{
-		int count;
-		long nanos;
-
-		@Override
-		public List<Probe> apply(int rankTicksLimit)
+		if (landingSearch == null)
 		{
-			if (landingSearch == null)
-			{
-				return List.of();
-			}
-			long started = System.nanoTime();
-			Plan landings = Planner.plan(landingSearch.toBuilder().probeRankLimitTicks(rankTicksLimit).build());
-			Map<WorldPoint, Integer> ranks = landings.getProbeRanks();
-			List<Probe> probes = new ArrayList<>();
-			landings.getProbeTicks().forEach((tile, ticks) ->
-			{
-				int rank = ranks.getOrDefault(tile, ticks);
-				if (rank <= rankTicksLimit)
-				{
-					probes.add(new Probe(tile, Probe.Kind.LANDING, ticks, rank, wilderness(tile)));
-				}
-			});
-			count = probes.size();
-			nanos += System.nanoTime() - started;
-			return probes;
+			return List.of();
 		}
+		Plan landings = Planner.plan(landingSearch.toBuilder().probeRankLimitTicks(rankTicksLimit).build());
+		Map<WorldPoint, Integer> ranks = landings.getProbeRanks();
+		List<Probe> probes = new ArrayList<>();
+		landings.getProbeTicks().forEach((tile, ticks) ->
+		{
+			int rank = ranks.getOrDefault(tile, ticks);
+			if (rank <= rankTicksLimit)
+			{
+				probes.add(new Probe(tile, Probe.Kind.LANDING, ticks, rank, wilderness(tile)));
+			}
+		});
+		return probes;
 	}
 }

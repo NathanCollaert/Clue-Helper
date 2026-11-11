@@ -51,17 +51,7 @@ public class HotColdView
 
 	private static String title(HotColdPlan plan)
 	{
-		switch (plan.getAction())
-		{
-			case FEEL:
-			case DIG_HERE:
-			case DIG_SPOT:
-				return null;
-			case NONE:
-				return plan.getKept().size() + " spots left, and no feel tells them apart";
-			default:
-				throw new IllegalArgumentException("unhandled action " + plan.getAction());
-		}
+		return plan.getAction() == HotColdPlan.Action.NONE ? plan.getKept().size() + " spots left, and no feel tells them apart" : null;
 	}
 
 	private static Spot spot(List<Spot> spots, HotColdPlan plan)

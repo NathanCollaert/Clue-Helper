@@ -1,10 +1,10 @@
 package com.cluehelper.player;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
+import static java.util.stream.Collectors.*;
 
 /**
  * Everything except the tomes comes from the cache, so a game update that adds a staff or a rune carries
@@ -13,14 +13,8 @@ import net.runelite.api.gameval.ItemID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RuneModel
 {
-	private static final int PARAM_RUNE_1 = 365;
-	private static final int PARAM_RUNE_COUNT_1 = 366;
-	private static final int PARAM_RUNE_2 = 367;
-	private static final int PARAM_RUNE_COUNT_2 = 368;
-	private static final int PARAM_RUNE_3 = 369;
-	private static final int PARAM_RUNE_COUNT_3 = 370;
-	private static final int[][] RUNE_PARAMS = {
-		{PARAM_RUNE_1, PARAM_RUNE_COUNT_1}, {PARAM_RUNE_2, PARAM_RUNE_COUNT_2}, {PARAM_RUNE_3, PARAM_RUNE_COUNT_3}};
+	/** A spell's three {rune, rune count} item params. */
+	private static final int[][] RUNE_PARAMS = {{365, 366}, {367, 368}, {369, 370}};
 	private static final int PARAM_NAME = 601;
 	private static final int PARAM_MEMBERS = 603;
 	private static final int PARAM_LEVEL = 604;
@@ -102,9 +96,9 @@ public final class RuneModel
 	/** The staves that stand in for runes, all wielded in the one weapon slot; the tomes go in the shield slot. */
 	public Set<Integer> staves()
 	{
-		Set<Integer> tomes = Arrays.stream(TOMES).map(tome -> tome[0]).collect(Collectors.toSet());
+		Set<Integer> tomes = Arrays.stream(TOMES).map(tome -> tome[0]).collect(toSet());
 		return unlimitingWornItemsByRune.values().stream().flatMap(Set::stream).filter(id -> !tomes.contains(id))
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 	}
 
 	/** -1 for an unknown pouch type. */
@@ -220,11 +214,6 @@ public final class RuneModel
 
 	private static List<Integer> keysOf(CacheView cache, int enumId)
 	{
-		List<Integer> keys = new ArrayList<>();
-		for (int key : cache.enumKeys(enumId))
-		{
-			keys.add(key);
-		}
-		return keys;
+		return Arrays.stream(cache.enumKeys(enumId)).boxed().collect(toList());
 	}
 }

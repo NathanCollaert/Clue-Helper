@@ -3,7 +3,6 @@ package com.cluehelper.ui;
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.StepGuide;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -12,6 +11,7 @@ import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.plugins.banktags.*;
 import net.runelite.client.plugins.banktags.tabs.*;
+import static java.util.stream.Collectors.*;
 
 /**
  * Opens a Bank Tags tab holding only the items the current sub-step withdraws. A withdrawn item stays in the tab's
@@ -103,7 +103,7 @@ public class WithdrawTab
 			close();
 			return;
 		}
-		List<Integer> kept = shownItems.stream().filter(id -> wanted.contains(id) || isCarried(id)).collect(Collectors.toList());
+		List<Integer> kept = shownItems.stream().filter(id -> wanted.contains(id) || isCarried(id)).collect(toList());
 		boolean joins = !kept.containsAll(wanted);
 		wanted.stream().filter(id -> !kept.contains(id)).sorted().forEach(kept::add);
 		if (kept.equals(shownItems))

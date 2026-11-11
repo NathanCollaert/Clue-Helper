@@ -226,18 +226,7 @@ public final class LeftClicks
 
 	private static String firstAction(String[] actions)
 	{
-		if (actions == null)
-		{
-			return null;
-		}
-		for (String action : actions)
-		{
-			if (action != null)
-			{
-				return action;
-			}
-		}
-		return null;
+		return actions == null ? null : Arrays.stream(actions).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 
 	private String key(MenuEntry entry)

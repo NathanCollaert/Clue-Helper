@@ -119,7 +119,7 @@ final class LabelSearch
 
 	void run()
 	{
-		offer(null, startNode(), startBankState(), NONE, startBook(), 0, 0, 0, 0, null, null, null, new int[0]);
+		offer(null, startNode(), startBankState(), NONE, startBook(), 0, 0, 0, 0, null, null, null, new int[0], NOTHING);
 		while (!queue.isEmpty())
 		{
 			Label label = queue.poll();
@@ -160,7 +160,7 @@ final class LabelSearch
 			return true;
 		}
 		Label[] banked = goals[PlanContext.BANKED];
-		Label bankOnly = banked[NONE] != null ? banked[NONE] : banked[CHANGED];
+		Label bankOnly = plainOf(banked);
 		return plainBankState == PlanContext.NOT_BANKED && bankOnly != null
 			&& f > usefulUpTo(bankOnly, banked[NONE] != null) + MARGIN_HALF_TICKS;
 	}
@@ -180,8 +180,13 @@ final class LabelSearch
 
 	private Label bestPlainGoal()
 	{
-		Label[] plain = goals[plainBankState];
-		return plain[NONE] != null ? plain[NONE] : plain[CHANGED];
+		return plainOf(goals[plainBankState]);
+	}
+
+	/** Of one bank state's goals, the best that needs no margin: without a change, else with a carried one. */
+	private static Label plainOf(Label[] goalsByCategory)
+	{
+		return goalsByCategory[NONE] != null ? goalsByCategory[NONE] : goalsByCategory[CHANGED];
 	}
 
 	private int startNode()
@@ -210,7 +215,7 @@ final class LabelSearch
 			expandCape(from, abstractClass, k);
 			return;
 		}
-		if (isTarget(from.leg, from.node))
+		if (targets[from.leg][from.node])
 		{
 			arrive(from, k);
 		}
@@ -218,7 +223,7 @@ final class LabelSearch
 		OriginClass origin = ctx.originClass(from.node);
 		if (origin.allowsTeleports())
 		{
-			offer(from, ctx.abstractNode(origin), from.b, from.c, k, from.t, from.leg, 0, 0, null, null, null, from.spent);
+			move(from, ctx.abstractNode(origin), from.b, k, 0, null, from.withdrawn);
 		}
 		expandExits(from, k);
 		if (ctx.houseUsable(from.node, from.t))
@@ -257,7 +262,7 @@ final class LabelSearch
 		int[] staged = sortedUnion(from.withdrawn, ctx.stageWithdraw(from.node, from.b));
 		if (!lastLeg)
 		{
-			int half = PlanContext.WITHDRAW_HALF_TICKS * (staged.length - from.withdrawn.length);
+			int half = withdrawHalfTicks(from, staged);
 			offer(from, from.node, from.b, from.c, k, from.t, from.leg + 1, half, half, null, null, null, from.spent, staged);
 			return;
 		}
@@ -266,7 +271,7 @@ final class LabelSearch
 			return;
 		}
 		int[] withdrawn = from.b == PlanContext.BANKED ? sortedUnion(staged, ctx.requiredWithdraw) : staged;
-		int area = areaHalfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+		int area = areaHalfTicks + withdrawHalfTicks(from, withdrawn);
 		Book end = endBook(k);
 		int strand = ctx.strandHalfTicks(end, from.b, capeUses(from.spent));
 		if (probes)
@@ -316,7 +321,7 @@ final class LabelSearch
 			return;
 		}
 		WalkTable table = ctx.table;
-		WalkGates gates = ctx.gates(from.b);
+		WalkGates gates = ctx.gates[from.b];
 		for (int e = table.entriesFrom(from.node); e < table.entriesEnd(from.node); e++)
 		{
 			int cost = gates.cost(e);
@@ -328,8 +333,7 @@ final class LabelSearch
 			int[] withdrawn = sortedUnion(from.withdrawn, gates.withdraw(e));
 			if (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(to))
 			{
-				int total = Running.halfTicks(cost) + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
-				offer(from, to, from.b, from.c, k, from.t, from.leg, total, total, Leg.Kind.WALK, null, null, from.spent, withdrawn);
+				move(from, to, from.b, k, Running.halfTicks(cost) + withdrawHalfTicks(from, withdrawn), Leg.Kind.WALK, withdrawn);
 			}
 		}
 	}
@@ -348,8 +352,7 @@ final class LabelSearch
 			int cost = walk.cost(table.placed(node));
 			if (cost != WalkCosts.UNREACHED && !ctx.forbidden(node))
 			{
-				int half = Running.halfTicks(cost);
-				offer(from, node, from.b, from.c, k, from.t, from.leg, half, half, Leg.Kind.WALK, null, null, from.spent);
+				move(from, node, from.b, k, Running.halfTicks(cost), Leg.Kind.WALK, from.withdrawn);
 			}
 		}
 		for (int[] targets : legTargets)
@@ -359,8 +362,7 @@ final class LabelSearch
 				int cost = ctx.isTableNode(node) ? WalkCosts.UNREACHED : walk.cost(ctx.tile(node));
 				if (cost != WalkCosts.UNREACHED)
 				{
-					int half = Running.halfTicks(cost);
-					offer(from, node, from.b, from.c, k, from.t, from.leg, half, half, Leg.Kind.WALK, null, null, from.spent);
+					move(from, node, from.b, k, Running.halfTicks(cost), Leg.Kind.WALK, from.withdrawn);
 				}
 			}
 		}
@@ -381,10 +383,9 @@ final class LabelSearch
 
 	private void exit(Label from, int k, WorldPoint tile, OriginClass origin, OriginClass to)
 	{
-		if (to.ordinal() < origin.ordinal() && tile.getY() > to.exitY())
+		if (to.ordinal() < origin.ordinal() && tile.getY() > to.getExitY())
 		{
-			int half = Running.halfTicks(tile.getY() - to.exitY());
-			offer(from, ctx.abstractNode(to), from.b, from.c, k, from.t, from.leg, half, half, Leg.Kind.WILDERNESS_EXIT, null, null, from.spent);
+			move(from, ctx.abstractNode(to), from.b, k, Running.halfTicks(tile.getY() - to.getExitY()), Leg.Kind.WILDERNESS_EXIT, from.withdrawn);
 		}
 	}
 
@@ -492,9 +493,8 @@ final class LabelSearch
 	{
 		if (from.b == PlanContext.NOT_BANKED && ctx.options[PlanContext.BANKED] != null && ctx.isUsableBank(from.node))
 		{
-			int half = ctx.bankStopHalfTicks;
-			offer(from, from.node, PlanContext.BANKED, from.c, k, from.t, from.leg, half, half, Leg.Kind.BANK, null, null, from.spent);
-			takeGateItems(from, k, half);
+			move(from, from.node, PlanContext.BANKED, k, ctx.bankStopHalfTicks, Leg.Kind.BANK, from.withdrawn);
+			takeGateItems(from, k, ctx.bankStopHalfTicks);
 		}
 	}
 
@@ -506,7 +506,7 @@ final class LabelSearch
 	private void takeGateItems(Label from, int k, int bankHalfTicks)
 	{
 		takeAtStop(from, k, bankHalfTicks, new int[0]);
-		for (int[] tools : ctx.gates(PlanContext.BANKED).storedGateTools())
+		for (int[] tools : ctx.gates[PlanContext.BANKED].storedGateTools())
 		{
 			takeAtStop(from, k, bankHalfTicks, tools);
 		}
@@ -517,8 +517,7 @@ final class LabelSearch
 		int[] withdrawn = sortedUnion(sortedUnion(from.withdrawn, tools), ctx.stageWithdraw());
 		if (withdrawn.length > from.withdrawn.length)
 		{
-			int half = bankHalfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
-			offer(from, from.node, PlanContext.BANKED, from.c, k, from.t, from.leg, half, half, Leg.Kind.BANK, null, null, from.spent, withdrawn);
+			move(from, from.node, PlanContext.BANKED, k, bankHalfTicks + withdrawHalfTicks(from, withdrawn), Leg.Kind.BANK, withdrawn);
 		}
 	}
 
@@ -545,14 +544,9 @@ final class LabelSearch
 		}
 		if (spent != null && (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(node)))
 		{
-			int total = half + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+			int total = half + withdrawHalfTicks(from, withdrawn);
 			offer(from, node, from.b, c, k, t, from.leg, total, total + PlanContext.TELEPORT_TIE_HALF_TICKS, kind, tele, second, spent, withdrawn);
 		}
-	}
-
-	private static boolean isTeleport(Leg.Kind kind)
-	{
-		return kind == Leg.Kind.TELEPORT || kind == Leg.Kind.SWAP_TELEPORT || kind == Leg.Kind.FAIRY_RING;
 	}
 
 	private void change(Label from, int node, int c, int k, TransportOptions.Change change)
@@ -561,7 +555,7 @@ final class LabelSearch
 		int[] withdrawn = sortedUnion(from.withdrawn, change.withdraw);
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
-			int total = change.halfTicks + PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+			int total = change.halfTicks + withdrawHalfTicks(from, withdrawn);
 			int penalty = change.capeUse ? PlanContext.CAPE_USE_PENALTY_HALF_TICKS : 0;
 			offer(from, node, from.b, c, k, from.t, from.leg, total, total + penalty, Leg.Kind.SPELLBOOK_CHANGE,
 				change, null, spent, withdrawn);
@@ -642,16 +636,21 @@ final class LabelSearch
 		return count;
 	}
 
+	/** An edge on the label's own leg that keeps its change category and transport, spends nothing and ranks as it takes. */
+	private void move(Label from, int node, int b, int k, int half, Leg.Kind kind, int[] withdrawn)
+	{
+		offer(from, node, b, from.c, k, from.t, from.leg, half, half, kind, null, null, from.spent, withdrawn);
+	}
+
+	private static int withdrawHalfTicks(Label from, int[] withdrawn)
+	{
+		return PlanContext.WITHDRAW_HALF_TICKS * (withdrawn.length - from.withdrawn.length);
+	}
+
 	/**
 	 * Returns null when dominated. A lower change category also dominates a higher one at the same place, book and bank
 	 * state: it can do whatever the higher one goes on to do, and never needs the margin.
 	 */
-	private Label offer(Label from, int node, int b, int c, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
-		TransportOptions.Edge ref, TransportOptions.Edge ref2, int[] spent)
-	{
-		return offer(from, node, b, c, k, t, leg, addHalf, addRank, kind, ref, ref2, spent, from == null ? NOTHING : from.withdrawn);
-	}
-
 	private Label offer(Label from, int node, int b, int c, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
 		TransportOptions.Edge ref, TransportOptions.Edge ref2, int[] spent, int[] withdrawn)
 	{
@@ -662,18 +661,18 @@ final class LabelSearch
 		{
 			return null;
 		}
-		for (int lower = 0; lower < c; lower++)
+		for (int category = 0; category <= c; category++)
 		{
-			if (dominatedAt(stateIndex(leg, node, b, lower, k, t) * MAX_LABELS, b, rank, half, spent, withdrawn))
+			if (dominatedAt(firstSlot(leg, node, b, category, k, t), b, rank, half, spent, withdrawn))
 			{
 				return null;
 			}
 		}
-		for (int higher = c + 1; higher < CATEGORIES; higher++)
+		for (int category = c; category < CATEGORIES; category++)
 		{
-			killDominated(stateIndex(leg, node, b, higher, k, t) * MAX_LABELS, b, rank, half, spent, withdrawn);
+			killDominated(firstSlot(leg, node, b, category, k, t), b, rank, half, spent, withdrawn);
 		}
-		int base = stateIndex(leg, node, b, c, k, t) * MAX_LABELS;
+		int base = firstSlot(leg, node, b, c, k, t);
 		int free = -1;
 		int worst = -1;
 		for (int i = base; i < base + MAX_LABELS; i++)
@@ -681,17 +680,6 @@ final class LabelSearch
 			Label old = slots[i];
 			if (old == null || old.dead)
 			{
-				free = free < 0 ? i : free;
-				continue;
-			}
-			if (dominates(b, old.rank, old.half, old.spent, old.withdrawn, rank, half, spent, withdrawn))
-			{
-				return null;
-			}
-			if (dominates(b, rank, half, spent, withdrawn, old.rank, old.half, old.spent, old.withdrawn))
-			{
-				old.dead = true;
-				slots[i] = null;
 				free = free < 0 ? i : free;
 			}
 			else if (worst < 0 || old.rank > slots[worst].rank)
@@ -725,7 +713,7 @@ final class LabelSearch
 		label.ref = ref;
 		label.ref2 = ref2;
 		label.edgeHalf = addHalf;
-		label.teleports = (from == null ? 0 : from.teleports) + (isTeleport(kind) ? 1 : 0);
+		label.teleports = (from == null ? 0 : from.teleports) + (kind != null && kind.isTransport() ? 1 : 0);
 		slots[free] = label;
 		queue.add(label);
 		labels++;
@@ -758,9 +746,10 @@ final class LabelSearch
 		}
 	}
 
-	private int stateIndex(int leg, int node, int b, int c, int k, int t)
+	/** The first of the state's {@link #MAX_LABELS} slots. */
+	private int firstSlot(int leg, int node, int b, int c, int k, int t)
 	{
-		return ((((leg * nodes + node) * 2 + b) * CATEGORIES + c) * BOOKS + k) * 2 + t;
+		return (((((leg * nodes + node) * 2 + b) * CATEGORIES + c) * BOOKS + k) * 2 + t) * MAX_LABELS;
 	}
 
 	/**
@@ -871,11 +860,6 @@ final class LabelSearch
 	static Book bookOf(int k)
 	{
 		return k >= FIRST_PENDING ? pendingBook(k) : Book.values()[k];
-	}
-
-	private boolean isTarget(int leg, int node)
-	{
-		return targets[leg][node];
 	}
 
 	static final class Label

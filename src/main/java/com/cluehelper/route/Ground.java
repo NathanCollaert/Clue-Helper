@@ -1,8 +1,9 @@
 package com.cluehelper.route;
 
 import java.util.Arrays;
-import java.util.function.IntPredicate;
+import java.util.function.*;
 import lombok.*;
+import net.runelite.api.coords.WorldPoint;
 
 /**
  * Where a walk can step: the loaded scene as the client has it, its closed doors opened at a cost, and Shortest Path's
@@ -79,6 +80,43 @@ public final class Ground
 			return scene.isWallBetween(x - scene.getBaseX(), y - scene.getBaseY(), plane, dx, dy);
 		}
 		return map == null || map.isWallBetween(x, y, plane, dx, dy);
+	}
+
+	/** A straight neighbour of {@code to} with no wall between: a tile beside it through a wall is no way to it. */
+	boolean opensOnto(int x, int y, int plane, WorldPoint to)
+	{
+		int dx = to.getX() - x;
+		int dy = to.getY() - y;
+		return plane == to.getPlane() && Math.abs(dx) + Math.abs(dy) == 1 && !isWallBetween(x, y, plane, dx, dy);
+	}
+
+	/**
+	 * The packed tile within {@code radius} of {@code goal} that {@code cost} reaches: one opening onto the goal first,
+	 * then the nearest, then the cheapest; {@link WalkSearch#NONE} when none is reached.
+	 */
+	int nearestBeside(WorldPoint goal, int radius, IntUnaryOperator cost)
+	{
+		int best = WalkSearch.NONE;
+		int bestCost = WalkSearch.UNREACHED;
+		int bestDistance = Integer.MAX_VALUE;
+		for (int dx = -radius; dx <= radius; dx++)
+		{
+			for (int dy = -radius; dy <= radius; dy++)
+			{
+				int x = goal.getX() + dx;
+				int y = goal.getY() + dy;
+				int tile = WalkTable.pack(x, y, goal.getPlane());
+				int c = cost.applyAsInt(tile);
+				int distance = opensOnto(x, y, goal.getPlane(), goal) ? 0 : Math.max(Math.abs(dx), Math.abs(dy));
+				if (c != WalkSearch.UNREACHED && (distance < bestDistance || distance == bestDistance && c < bestCost))
+				{
+					best = tile;
+					bestCost = c;
+					bestDistance = distance;
+				}
+			}
+		}
+		return best;
 	}
 
 	/** The open rows that start on the packed tile. */

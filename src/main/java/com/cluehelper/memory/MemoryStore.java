@@ -39,11 +39,6 @@ public class MemoryStore
 		return slot;
 	}
 
-	public boolean hasProfile()
-	{
-		return profile.profileKey() != null;
-	}
-
 	/** Call on {@code RuneScapeProfileChanged}. */
 	public void reload()
 	{
@@ -53,14 +48,10 @@ public class MemoryStore
 		}
 	}
 
+	@RequiredArgsConstructor
 	private static final class RuneLiteProfileConfig implements ProfileConfig
 	{
 		private final ConfigManager configManager;
-
-		RuneLiteProfileConfig(ConfigManager configManager)
-		{
-			this.configManager = configManager;
-		}
 
 		@Override
 		public String profileKey()

@@ -53,6 +53,8 @@ public class DevHarness
 	private final RouteDump routeDump;
 	private final StepGuide guide;
 	private final PohService poh;
+	/** PohService's memory key. */
+	private static final String HOUSE_KEY = "poh";
 	private final StashMemory stash;
 	private String lastGuideLine;
 	private final List<Runnable> unregister = new ArrayList<>();
@@ -257,7 +259,9 @@ public class DevHarness
 	{
 		if (args.length > 0 && args[0].equalsIgnoreCase("forget"))
 		{
-			poh.forget();
+			memory.slot(HOUSE_KEY, Object.class, Object::new).clear();
+			memory.reload();
+			poh.onProfileChanged();
 		}
 		HouseState house = poh.getHouse();
 		reply("house: " + house.getSource() + (house.getScannedAt() == 0 ? ", never scanned" : ", scanned " + age(System.currentTimeMillis() - house.getScannedAt()))

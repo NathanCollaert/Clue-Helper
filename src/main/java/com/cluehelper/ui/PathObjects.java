@@ -284,11 +284,7 @@ final class PathObjects
 	/** Shortest Path names a multiloc by the form it shows (the Kharazi broken cart: 28931, placed as 2216). */
 	private boolean isObject(TileObject object, int id)
 	{
-		if (object.getId() == id)
-		{
-			return true;
-		}
-		return LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getId() == id;
+		return object.getId() == id || LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getId() == id;
 	}
 
 	private void addClosedDoor(Map<TileObject, String> objects, WorldView view, WorldPoint from, WorldPoint to)

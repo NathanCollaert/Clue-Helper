@@ -1,16 +1,17 @@
 package com.cluehelper.player;
 
+import com.cluehelper.Tables;
 import com.cluehelper.memory.BankMemory;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 import javax.inject.*;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 
@@ -22,13 +23,9 @@ import net.runelite.api.gameval.VarbitID;
 @Singleton
 public class PlayerModel
 {
-	private static final Set<Integer> RUNE_POUCHES = Set.of(
-		ItemID.BH_RUNE_POUCH, ItemID.BH_RUNE_POUCH_TROUVER, ItemID.DIVINE_RUNE_POUCH, ItemID.DIVINE_RUNE_POUCH_TROUVER);
-	private static final int[] POUCH_TYPES = {VarbitID.RUNE_POUCH_TYPE_1, VarbitID.RUNE_POUCH_TYPE_2,
-		VarbitID.RUNE_POUCH_TYPE_3, VarbitID.RUNE_POUCH_TYPE_4, VarbitID.RUNE_POUCH_TYPE_5, VarbitID.RUNE_POUCH_TYPE_6};
-	private static final int[] POUCH_QUANTITIES = {VarbitID.RUNE_POUCH_QUANTITY_1, VarbitID.RUNE_POUCH_QUANTITY_2,
-		VarbitID.RUNE_POUCH_QUANTITY_3, VarbitID.RUNE_POUCH_QUANTITY_4, VarbitID.RUNE_POUCH_QUANTITY_5,
-		VarbitID.RUNE_POUCH_QUANTITY_6};
+	private static final Set<Integer> RUNE_POUCHES = Tables.idSet("rune pouches");
+	private static final int[] POUCH_TYPES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(0)).toArray();
+	private static final int[] POUCH_QUANTITIES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(1)).toArray();
 	private static final List<Integer> OWN_VARPS = List.of(VarPlayerID.QP, VarPlayerID.AIDE_TELE_TIMER,
 		VarPlayerID.SLUG2_REGIONUID);
 	/** Last Man Standing worlds aren't here: outside the arena they play as ordinary worlds. */
@@ -48,7 +45,8 @@ public class PlayerModel
 	@Inject
 	private CheckLines checkLines;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
-	private final Queue<int[]> pendingWatches = new ConcurrentLinkedQueue<>();
+	private final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
+	private final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
 
 	private final Set<Integer> watchedVarbits = new HashSet<>();
 	private final Set<Integer> watchedVarps = new HashSet<>();
@@ -69,16 +67,28 @@ public class PlayerModel
 	private long version;
 	private Map<Integer, Integer> fakeCarried = Map.of();
 
+	/** Null until the first tick after login. */
+	@Getter
 	private volatile RuneModel runeModel;
+	/** Null while logged out. */
+	@Getter
 	private volatile PlayerSnapshot snapshot;
+	/**
+	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
+	 * new snapshot version.
+	 */
+	@Getter
 	private volatile Position position = Position.NONE;
+	/**
+	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
+	 * when first seen.
+	 */
+	@Getter
 	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	public void start()
 	{
-		List<Integer> varbits = new ArrayList<>(List.of(VarbitID.SPELLBOOK, VarbitID.LUNAR_SPELLBOOK_CHANGE,
-			VarbitID.SB_SWAP_CHECK, VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, VarbitID.IRONMAN,
-			VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE));
+		List<Integer> varbits = new ArrayList<>(Tables.idSet("player varbits"));
 		for (int i = 0; i < POUCH_TYPES.length; i++)
 		{
 			varbits.add(POUCH_TYPES[i]);
@@ -96,36 +106,6 @@ public class PlayerModel
 		position = Position.NONE;
 	}
 
-	/** Null while logged out. */
-	public PlayerSnapshot getSnapshot()
-	{
-		return snapshot;
-	}
-
-	/**
-	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
-	 * new snapshot version.
-	 */
-	public Position getPosition()
-	{
-		return position;
-	}
-
-	/**
-	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
-	 * when first seen.
-	 */
-	public int getPendingRevertSinceTick()
-	{
-		return pendingRevertSinceTick;
-	}
-
-	/** Null until the first tick after login. */
-	public RuneModel getRuneModel()
-	{
-		return runeModel;
-	}
-
 	public Runnable addListener(Consumer<PlayerSnapshot> listener)
 	{
 		listeners.add(listener);
@@ -135,14 +115,8 @@ public class PlayerModel
 	/** Any thread; the vars are watched from the next tick on. */
 	public void watch(Collection<Integer> varbits, Collection<Integer> varps)
 	{
-		for (int id : varbits)
-		{
-			pendingWatches.add(new int[]{0, id});
-		}
-		for (int id : varps)
-		{
-			pendingWatches.add(new int[]{1, id});
-		}
+		pendingVarbits.addAll(varbits);
+		pendingVarps.addAll(varps);
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
@@ -229,13 +203,6 @@ public class PlayerModel
 		markDirty("grown patches");
 	}
 
-	private static Set<String> union(Set<String> a, Set<String> b)
-	{
-		Set<String> all = new HashSet<>(a);
-		all.addAll(b);
-		return Set.copyOf(all);
-	}
-
 	/** Client thread. */
 	public void setLastFairyRing(String code)
 	{
@@ -279,7 +246,7 @@ public class PlayerModel
 		}
 		if (runeModel == null)
 		{
-			runeModel = timed("rune model", () -> RuneModel.load(new ClientCacheView(client)));
+			runeModel = RuneModel.load(new ClientCacheView(client));
 			markDirty("rune model");
 		}
 		resolveWatches();
@@ -294,17 +261,16 @@ public class PlayerModel
 		if (questsDirty)
 		{
 			questsDirty = false;
-			quests = timed("quests", this::readQuests);
+			quests = readQuests();
 			questsRead = true;
 			markDirty("quests");
 		}
 		if (dirty)
 		{
 			dirty = false;
-			long started = System.nanoTime();
 			PlayerSnapshot built = build(now);
 			trackPendingRevert(last, built);
-			log.debug("snapshot rebuilt ({}) in {} ms", dirtyBecause, (System.nanoTime() - started) / 1_000_000.0);
+			log.debug("snapshot rebuilt ({})", dirtyBecause);
 			snapshot = built;
 			listeners.forEach(listener -> listener.accept(built));
 		}
@@ -342,12 +308,11 @@ public class PlayerModel
 
 	private void resolveWatches()
 	{
-		int[] watch;
+		Integer id;
 		boolean added = false;
-		while ((watch = pendingWatches.poll()) != null)
+		while ((id = pendingVarbits.poll()) != null)
 		{
-			int id = watch[1];
-			if (watch[0] == 0 && watchedVarbits.add(id))
+			if (watchedVarbits.add(id))
 			{
 				VarbitComposition varbit = client.getVarbit(id);
 				if (varbit != null)
@@ -356,7 +321,10 @@ public class PlayerModel
 				}
 				added = true;
 			}
-			else if (watch[0] == 1 && watchedVarps.add(id))
+		}
+		while ((id = pendingVarps.poll()) != null)
+		{
+			if (watchedVarps.add(id))
 			{
 				watchedVarpIndices.add(id);
 				added = true;
@@ -421,6 +389,8 @@ public class PlayerModel
 		Set<Integer> held = new HashSet<>(inventory.keySet());
 		held.addAll(worn.keySet());
 		Set<WorldType> worldTypes = client.getWorldType();
+		Set<String> grown = new HashSet<>(plantedTrees);
+		grown.addAll(grownPatches);
 		return PlayerSnapshot.builder()
 			.version(++version)
 			.tick(client.getTickCount())
@@ -448,7 +418,7 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
-			.plantedTrees(grownPatches.isEmpty() ? plantedTrees : union(plantedTrees, grownPatches))
+			.plantedTrees(grown)
 			.unlocks(unlocks)
 			.lastFairyRing(lastFairyRing)
 			.build();
@@ -500,23 +470,10 @@ public class PlayerModel
 
 	private static String dormantReason(Set<WorldType> worldTypes)
 	{
-		for (WorldType type : worldTypes)
-		{
-			if (DORMANT_WORLDS.contains(type))
-			{
-				return type.name().toLowerCase().replace('_', ' ') + " world";
-			}
-		}
-		return null;
+		return worldTypes.stream().filter(DORMANT_WORLDS::contains).findFirst()
+			.map(type -> type.name().toLowerCase().replace('_', ' ') + " world").orElse(null);
 	}
 
-	private <T> T timed(String what, Supplier<T> read)
-	{
-		long started = System.nanoTime();
-		T value = read.get();
-		log.debug("read {} in {} ms", what, (System.nanoTime() - started) / 1_000_000.0);
-		return value;
-	}
 	/** Client thread. Whether an inventory item's name starts with {@code nameStart}, lower case. */
 	public boolean carriesItemNamed(String nameStart)
 	{
@@ -564,6 +521,7 @@ public class PlayerModel
 	}
 
 	/** Client thread only. */
+	@RequiredArgsConstructor
 	static final class ClientCacheView implements CacheView
 	{
 		private static final int MULTIRUNES_TABLE = 91;
@@ -571,11 +529,6 @@ public class PlayerModel
 		private static final int ALSO_COUNTS_COLUMN = 1;
 
 		private final Client client;
-
-		ClientCacheView(Client client)
-		{
-			this.client = client;
-		}
 
 		@Override
 		public int[] enumKeys(int enumId)
@@ -595,14 +548,19 @@ public class PlayerModel
 		public int itemIntParam(int itemId, int param, int absent)
 		{
 			ItemComposition item = client.getItemDefinition(itemId);
-			return item.getParams() != null && item.getParams().get(param) != null ? item.getIntValue(param) : absent;
+			return hasParam(item, param) ? item.getIntValue(param) : absent;
 		}
 
 		@Override
 		public String itemStringParam(int itemId, int param)
 		{
 			ItemComposition item = client.getItemDefinition(itemId);
-			return item.getParams() != null && item.getParams().get(param) != null ? item.getStringValue(param) : null;
+			return hasParam(item, param) ? item.getStringValue(param) : null;
+		}
+
+		private static boolean hasParam(ItemComposition item, int param)
+		{
+			return item.getParams() != null && item.getParams().get(param) != null;
 		}
 
 		@Override

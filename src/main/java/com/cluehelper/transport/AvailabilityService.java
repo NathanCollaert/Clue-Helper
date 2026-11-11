@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 import javax.inject.*;
+import lombok.Getter;
 import net.runelite.api.Client;
 
 /** Client thread, except the getters. Also judges again when a cooldown clears, since no var changes then. */
@@ -29,9 +30,15 @@ public class AvailabilityService
 	private final Map<Integer, String> itemNames = new ConcurrentHashMap<>();
 	private final List<Consumer<AvailabilitySet>> listeners = new CopyOnWriteArrayList<>();
 
+	@Getter
 	private volatile List<CatalogRow> catalog = List.of();
+	@Getter
 	private volatile AvailabilitySet carried = AvailabilitySet.EMPTY;
+	/** Empty when no bank counts. */
+	@Getter
 	private volatile AvailabilitySet banked = AvailabilitySet.EMPTY;
+	/** Null when no bank counts. */
+	@Getter
 	private volatile PlayerSnapshot bankedSnapshot;
 	private long judgedBankVersion = -1;
 	private volatile boolean stale = true;
@@ -76,11 +83,6 @@ public class AvailabilityService
 	{
 		gates.forEach(gate -> gate.getItems().forEach(clause -> clause.getBranches().forEach(branch -> gateItems.addAll(branch.getIds()))));
 		stale = true;
-	}
-
-	public List<CatalogRow> getCatalog()
-	{
-		return catalog;
 	}
 
 	/** Call after {@link PlayerModel#onGameTick()} on the same tick. */
@@ -142,23 +144,6 @@ public class AvailabilityService
 	{
 		listeners.add(listener);
 		return () -> listeners.remove(listener);
-	}
-
-	public AvailabilitySet getCarried()
-	{
-		return carried;
-	}
-
-	/** Empty when no bank counts. */
-	public AvailabilitySet getBanked()
-	{
-		return banked;
-	}
-
-	/** Null when no bank counts. */
-	public PlayerSnapshot getBankedSnapshot()
-	{
-		return bankedSnapshot;
 	}
 
 	public static long nowMinutes()

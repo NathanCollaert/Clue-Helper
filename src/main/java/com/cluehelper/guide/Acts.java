@@ -1,10 +1,11 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import com.cluehelper.step.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.NpcID;
+import static java.util.stream.Collectors.*;
+import com.cluehelper.guide.SubStep.Kind;
 
 /**
  * What to do once at the step, per type: the sub-steps after the travel. Texts name what core doesn't show in the same
@@ -17,8 +18,7 @@ final class Acts
 	private static final String ATTACK_OPTION = "Attack";
 	static final String USE_OPTION = "Use";
 	/** By ids: core doesn't mark Uri, and a target by name is left to core while the clue's tile is in view. */
-	private static final Set<Integer> URI_IDS = Set.of(NpcID.TRAIL_BEGINNER_URI, NpcID.TRAIL_EASY_URI, NpcID.TRAIL_MEDIUM_URI,
-		NpcID.TRAIL_HARD_URI, NpcID.TRAIL_ELITE_URI, NpcID.TRAIL_MASTER_URI, NpcID.URI_EMOTE);
+	private static final Set<Integer> URI_IDS = Tables.idSet("uri");
 	private static final Set<String> TYPES_WITH_OWN_ACT = Set.of(ClueTypes.EMOTE, ClueTypes.MUSIC, ClueTypes.HOT_COLD, ClueTypes.SKILL);
 
 	private Acts()
@@ -48,17 +48,17 @@ final class Acts
 	{
 		if (step.getWaypointAct() != null)
 		{
-			return SubStep.of(SubStep.Kind.ACT, step.getWaypointAct())
+			return SubStep.of(Kind.ACT, step.getWaypointAct())
 				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
 				.actItems(step.getActItems()).build();
 		}
 		if (step.isKeyFromNpc())
 		{
 			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
-			return SubStep.of(SubStep.Kind.ACT, "Search " + what + " with the key")
+			return SubStep.of(Kind.ACT, "Search " + what + " with the key")
 				.detail("The key comes from " + step.getNpcs().get(0)).build();
 		}
-		SubStep.SubStepBuilder act = SubStep.of(SubStep.Kind.ACT, actText(step));
+		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, actText(step));
 		String npc = talkedTo(step);
 		String option = npc == null ? null : step.getData().getNpcOption();
 		if (option != null)
@@ -89,7 +89,7 @@ final class Acts
 	/** By id too: a ghost goes by another name in the game than in the clue (Viggora is a Mysterious ghost). */
 	private static Set<Integer> targetNpcs(Step step)
 	{
-		return step.getData().getTargets().stream().flatMap(target -> target.getNpcs().stream()).collect(Collectors.toUnmodifiableSet());
+		return step.getData().getTargets().stream().flatMap(target -> target.getNpcs().stream()).collect(toUnmodifiableSet());
 	}
 
 	/** The NPC the step's own act talks to; null for a step whose act is something else. */
@@ -154,7 +154,7 @@ final class Acts
 			case ClueTypes.MUSIC:
 				return List.of(music(step));
 			case ClueTypes.FALO:
-				return List.of(SubStep.of(SubStep.Kind.ACT, "Use the item on Falo the Bard").detail("The item the Clue Scroll plugin lists")
+				return List.of(SubStep.of(Kind.ACT, "Use the item on Falo the Bard").detail("The item the Clue Scroll plugin lists")
 					.option(USE_OPTION).npcIds(targetNpcs(step)).build());
 			case ClueTypes.SKILL:
 				return List.of(handIn(step));
@@ -167,7 +167,7 @@ final class Acts
 		if (kill != null)
 		{
 			String text = kill.getText() != null ? kill.getText() : "Kill the monster";
-			return List.of(SubStep.of(SubStep.Kind.ACT, text).detail(area(data)).option(ATTACK_OPTION)
+			return List.of(SubStep.of(Kind.ACT, text).detail(area(data)).option(ATTACK_OPTION)
 				.npcIds(Set.copyOf(kill.getNpcs())).build());
 		}
 		if (isDig(step))
@@ -194,9 +194,9 @@ final class Acts
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES));
 		}
 		String emotes = step.getEmotes().isEmpty() ? "the emote" : String.join(", then ", step.getEmotes());
-		acts.add(SubStep.of(SubStep.Kind.ACT, "Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
+		acts.add(SubStep.of(Kind.ACT, "Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
 			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
-		acts.add(SubStep.of(SubStep.Kind.ACT, "Talk to Uri").detail(items ? "Stay equipped" : null)
+		acts.add(SubStep.of(Kind.ACT, "Talk to Uri").detail(items ? "Stay equipped" : null)
 			.option(TALK_OPTION).npcIds(URI_IDS).build());
 		return List.copyOf(acts);
 	}
@@ -204,7 +204,7 @@ final class Acts
 	/** Take the items out of the STASH unit and put them on. */
 	static List<SubStep> fromStash(Step step)
 	{
-		SubStep take = SubStep.of(SubStep.Kind.ACT, "Search the STASH unit: take the items")
+		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
 			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
 		return items ? List.of(take, equip()) : List.of(take);
@@ -212,7 +212,7 @@ final class Acts
 
 	private static SubStep equip()
 	{
-		return SubStep.of(SubStep.Kind.ACT, "Equip the items").detail("The Clue Scroll plugin lists them")
+		return SubStep.of(Kind.ACT, "Equip the items").detail("The Clue Scroll plugin lists them")
 			.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
@@ -234,12 +234,12 @@ final class Acts
 	private static List<SubStep> talkThenChallenge(Step step, StepIndex.Challenge challenge)
 	{
 		String npc = step.getNpcs().get(0);
-		SubStep talk = talkTo(SubStep.of(SubStep.Kind.ACT, "Talk to " + npc).detail(withFloor(step, null))
+		SubStep talk = talkTo(SubStep.of(Kind.ACT, "Talk to " + npc).detail(withFloor(step, null))
 			.done(SubStep.Done.CHALLENGE_ITEM), npc).build();
 		if (challenge.getBox() != null)
 		{
 			String box = challenge.getBox().toLowerCase().contains("light") ? "light box" : "puzzle box";
-			return List.of(talk, openBoxThenTalk(SubStep.builder().kind(SubStep.Kind.ACT), box, npc));
+			return List.of(talk, openBoxThenTalk(SubStep.builder().kind(Kind.ACT), box, npc));
 		}
 		return List.of(talk, talkTo(act("Talk to " + npc + " again: answer the challenge", null).toBuilder(), npc).build());
 	}
@@ -257,7 +257,7 @@ final class Acts
 
 	private static SubStep act(String text, String detail)
 	{
-		return SubStep.of(SubStep.Kind.ACT, text).detail(detail).build();
+		return SubStep.of(Kind.ACT, text).detail(detail).build();
 	}
 
 	private static boolean isDig(Step step)

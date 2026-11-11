@@ -6,31 +6,36 @@ import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
+import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 /** Client thread only: reads varbits. */
 @Singleton
+@RequiredArgsConstructor
 public class StepNeeds
 {
 	/** Copy of core's {@code ClueScrollOverlay.HAS_SPADE} (1.13.2). */
 	private static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
 		ItemRequirements.item(ItemID.EASTER23_SPADE));
 	/** Core's {@code ClueScrollOverlay.HAS_LIGHT} item ids (1.13.2). */
-	private static final int[] LIGHT_SOURCES = {594, 33, 32, 4531, 4534, 4524, 4539, 4550, 4702, 9065, 5013, 9804, 9805, 13137,
+	private static final List<Integer> LIGHT_SOURCES = List.of(594, 33, 32, 4531, 4534, 4524, 4539, 4550, 4702, 9065, 5013, 9804, 9805, 13137,
 		13138, 13139, 13140, 20720, 29777, 13280, 13342, 26824, 26826, 26828, 26830, 26832, 26834, 26836, 26838, 26840, 26842,
-		26844, 26846, 26848, 30363};
-	private static final ItemRequirement LIGHT = light();
+		26844, 26846, 26848, 30363);
+	private static final ItemRequirement LIGHT = anyOf("Light source", LIGHT_SOURCES);
 	private static final int LIT = 1;
 
+	/** Names, real levels and varbits. */
 	private final Client client;
 	private final IntFunction<StashMemory.State> stashStates;
 	private final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
+	/** What gear is picked from: carried, and stored while banking counts. */
 	private final Supplier<Set<Integer>> ownedItemIds;
+	/** The quests that waive a step's way-in items. */
 	private final Predicate<Quest> finishedQuests;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
@@ -41,22 +46,6 @@ public class StepNeeds
 	{
 		this(client, stash::state, gearPieces::of, () -> ownedItemIds(player.getSnapshot(), availability.getBankedSnapshot()),
 			player::finished);
-	}
-
-	/**
-	 * @param client names, real levels and varbits
-	 * @param ownedItemIds what gear is picked from: carried, and stored while banking counts
-	 * @param finishedQuests the quests that waive a step's way-in items
-	 */
-	public StepNeeds(Client client, IntFunction<StashMemory.State> stashStates,
-		BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces, Supplier<Set<Integer>> ownedItemIds,
-		Predicate<Quest> finishedQuests)
-	{
-		this.client = client;
-		this.stashStates = stashStates;
-		this.gearPieces = gearPieces;
-		this.ownedItemIds = ownedItemIds;
-		this.finishedQuests = finishedQuests;
 	}
 
 	public RequiredItems of(Step step)
@@ -98,7 +87,7 @@ public class StepNeeds
 			if (!fetchedOnTheWay)
 			{
 				// Worn gear keeps the player alive or gets them in (a mirror shield, a sled): no route without it
-				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, StepNeeds::anyOf), false, way.isWear()));
+				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, w -> anyOf(w.getName(), w.getIds())), false, way.isWear()));
 			}
 		}
 		ItemRequirement key = ownedKey(step);
@@ -138,15 +127,14 @@ public class StepNeeds
 			return item;
 		}
 		return widened.computeIfAbsent(other, alternative -> new AlternativeRequirement(item, alternative.getAll().stream()
-			.map(this::part).collect(Collectors.toList())));
+			.map(this::part).collect(toList())));
 	}
 
 	/** Any of these ids, named by them: "Grimy cadantine or Cadantine". */
 	private AlternativeRequirement.Part part(List<Integer> ids)
 	{
-		String name = ids.stream().map(id -> client.getItemDefinition(id).getName()).distinct().collect(Collectors.joining(" or "));
-		return new AlternativeRequirement.Part(name, ItemRequirements.any(name, ids.stream().map(ItemRequirements::item)
-			.toArray(ItemRequirement[]::new)));
+		String name = ids.stream().map(id -> client.getItemDefinition(id).getName()).distinct().collect(joining(" or "));
+		return new AlternativeRequirement.Part(name, anyOf(name, ids));
 	}
 
 	/** A skill challenge whose task core marked done: the way to the task's place (a talisman for its ruins) isn't needed. */
@@ -193,19 +181,9 @@ public class StepNeeds
 			.findFirst().map(target -> Stages.keyItem(target.getKey())).orElse(null);
 	}
 
-	private static ItemRequirement anyOf(StepIndex.Requires way)
+	/** Any one of the items, under one name. */
+	static ItemRequirement anyOf(String name, Collection<Integer> ids)
 	{
-		ItemRequirement[] items = way.getIds().stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new);
-		return ItemRequirements.any(way.getName(), items);
-	}
-
-	private static ItemRequirement light()
-	{
-		ItemRequirement[] items = new ItemRequirement[LIGHT_SOURCES.length];
-		for (int i = 0; i < items.length; i++)
-		{
-			items[i] = ItemRequirements.item(LIGHT_SOURCES[i]);
-		}
-		return ItemRequirements.any("Light source", items);
+		return ItemRequirements.any(name, ids.stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new));
 	}
 }

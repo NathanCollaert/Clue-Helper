@@ -45,12 +45,6 @@ public class Step
 	@Builder.Default
 	List<String> emotes = List.of();
 
-	/** False when the step data lacks this key; the step still has core's targets. */
-	public boolean isKnown()
-	{
-		return data != StepIndex.Entry.NONE;
-	}
-
 	public List<CacheRow> getCacheRows()
 	{
 		return List.copyOf(data.getRows());

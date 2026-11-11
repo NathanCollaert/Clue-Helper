@@ -1,12 +1,13 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import java.util.*;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.Quest;
 import net.runelite.api.gameval.ItemID;
+import static java.util.stream.Collectors.*;
 
 /**
  * Pure, so it runs on any thread. Spell rows are never filtered by their book: the planner decides which book a
@@ -25,9 +26,7 @@ public final class AvailabilityEngine
 	/** Worn, these turn the player into a penguin, whose side panel has no spellbook tab. */
 	private static final Set<Integer> HIDE_SPELLBOOK = Set.of(ItemID.PENG_SUIT_UNWOUND, ItemID.PENG_SUIT_WOUND);
 	/** What makes the plugin see an unlock it learns from play (UnlockMemory), told to a player who has it. */
-	private static final Map<String, String> UNLOCK_HINTS = Map.of(
-		"DRAGONTOOTH", "if unlocked, speak with the ghost captain",
-		"XERICS_HONOUR", "if unlocked, use the Honour teleport once");
+	private static final Map<String, String> UNLOCK_HINTS = Tables.byKey("unlock hints", Tables.Row::text);
 
 	@Getter
 	private final RuneModel runes;
@@ -38,7 +37,7 @@ public final class AvailabilityEngine
 	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */
 	public AvailabilitySet carried(List<CatalogRow> rows, PlayerSnapshot player, long nowMinutes)
 	{
-		List<RowAvailability> judged = rows.stream().map(row -> judge(row, player, nowMinutes)).collect(Collectors.toList());
+		List<RowAvailability> judged = rows.stream().map(row -> judge(row, player, nowMinutes)).collect(toList());
 		long validUntil = judged.stream().mapToLong(RowAvailability::getPassesFrom).min().orElse(Long.MAX_VALUE);
 		return new AvailabilitySet(player.getVersion(), List.copyOf(judged), validUntil);
 	}
@@ -117,7 +116,7 @@ public final class AvailabilityEngine
 
 	private static void checkVar(VarCheck check, PlayerSnapshot player, long nowMinutes, Verdict v)
 	{
-		Integer value = check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
+		Integer value = value(check, player);
 		if (value == null)
 		{
 			if (player.getUnknownVars() == PlayerSnapshot.UnknownVars.FAIL)
@@ -225,8 +224,7 @@ public final class AvailabilityEngine
 		}
 		if (branch.isVar())
 		{
-			Integer value = branch.getVar().getKind() == VarCheck.Kind.VARBIT ? player.varbit(branch.getVar().getId())
-				: player.varp(branch.getVar().getId());
+			Integer value = value(branch.getVar(), player);
 			return value == null ? Paid.unread(branch.getVar().describe() + ": not read")
 				: branch.getVar().test(value, 0) ? Paid.with(List.of(), false) : Paid.missing(branch.getVar().describe());
 		}
@@ -279,7 +277,7 @@ public final class AvailabilityEngine
 
 	private static boolean passes(VarCheck check, PlayerSnapshot player, long nowMinutes)
 	{
-		Integer value = check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
+		Integer value = value(check, player);
 		if (value == null)
 		{
 			return player.getUnknownVars() == PlayerSnapshot.UnknownVars.PASS;
@@ -287,33 +285,33 @@ public final class AvailabilityEngine
 		return check.test(value, nowMinutes);
 	}
 
+	/** Null when the snapshot didn't read the var. */
+	private static Integer value(VarCheck check, PlayerSnapshot player)
+	{
+		return check.getKind() == VarCheck.Kind.VARBIT ? player.varbit(check.getId()) : player.varp(check.getId());
+	}
+
+	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	private static final class Paid
 	{
-		List<ItemUse> witness;
-		boolean chargesUnknown;
-		String shortfall;
-		String unread;
+		final List<ItemUse> witness;
+		final boolean chargesUnknown;
+		final String shortfall;
+		final String unread;
 
 		static Paid with(List<ItemUse> witness, boolean chargesUnknown)
 		{
-			Paid p = new Paid();
-			p.witness = witness;
-			p.chargesUnknown = chargesUnknown;
-			return p;
+			return new Paid(witness, chargesUnknown, null, null);
 		}
 
 		static Paid missing(String shortfall)
 		{
-			Paid p = new Paid();
-			p.shortfall = shortfall;
-			return p;
+			return new Paid(null, false, shortfall, null);
 		}
 
 		static Paid unread(String what)
 		{
-			Paid p = new Paid();
-			p.unread = what;
-			return p;
+			return new Paid(null, false, null, what);
 		}
 	}
 

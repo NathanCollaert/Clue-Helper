@@ -1,14 +1,15 @@
 package com.cluehelper.poh;
 
+import com.cluehelper.Tables;
+import com.cluehelper.guide.SceneObjects;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.stream.*;
 import javax.inject.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
@@ -24,25 +25,13 @@ public class PohService
 	private static final String PROFILE_KEY = "poh";
 	/** Every piece has loaded two ticks after entering; later scans never found more. */
 	private static final int SCAN_DELAY_TICKS = 2;
-	static final int[] NEXUS_SLOTS = {VarbitID.POH_NEXUS_TELE_1, VarbitID.POH_NEXUS_TELE_2, VarbitID.POH_NEXUS_TELE_3,
-		VarbitID.POH_NEXUS_TELE_4, VarbitID.POH_NEXUS_TELE_5, VarbitID.POH_NEXUS_TELE_6, VarbitID.POH_NEXUS_TELE_7,
-		VarbitID.POH_NEXUS_TELE_8, VarbitID.POH_NEXUS_TELE_9, VarbitID.POH_NEXUS_TELE_10, VarbitID.POH_NEXUS_TELE_11,
-		VarbitID.POH_NEXUS_TELE_12, VarbitID.POH_NEXUS_TELE_13, VarbitID.POH_NEXUS_TELE_14, VarbitID.POH_NEXUS_TELE_15,
-		VarbitID.POH_NEXUS_TELE_16, VarbitID.POH_NEXUS_TELE_17, VarbitID.POH_NEXUS_TELE_18, VarbitID.POH_NEXUS_TELE_19,
-		VarbitID.POH_NEXUS_TELE_20, VarbitID.POH_NEXUS_TELE_21, VarbitID.POH_NEXUS_TELE_22, VarbitID.POH_NEXUS_TELE_23,
-		VarbitID.POH_NEXUS_TELE_24, VarbitID.POH_NEXUS_TELE_25, VarbitID.POH_NEXUS_TELE_26, VarbitID.POH_NEXUS_TELE_27,
-		VarbitID.POH_NEXUS_TELE_28, VarbitID.POH_NEXUS_TELE_29, VarbitID.POH_NEXUS_TELE_30, VarbitID.POH_NEXUS_TELE_31,
-		VarbitID.POH_NEXUS_TELE_32, VarbitID.POH_NEXUS_TELE_33, VarbitID.POH_NEXUS_TELE_34, VarbitID.POH_NEXUS_TELE_35,
-		VarbitID.POH_NEXUS_TELE_36, VarbitID.POH_NEXUS_TELE_37, VarbitID.POH_NEXUS_TELE_38, VarbitID.POH_NEXUS_TELE_39,
-		VarbitID.POH_NEXUS_TELE_40, VarbitID.POH_NEXUS_TELE_41, VarbitID.POH_NEXUS_TELE_42, VarbitID.POH_NEXUS_TELE_43,
-		VarbitID.POH_NEXUS_TELE_44, VarbitID.POH_NEXUS_TELE_45};
+	static final int[] NEXUS_SLOTS = Tables.ids("nexus slots");
 	private static final int NEXUS_LINE_SCRIPT = 2675;
 	/** The script's int arguments: [index, 10, y, struct id, line number, 1, parity, component]. */
 	private static final int NEXUS_LINE_ARGS = 8;
 	private static final int NEXUS_ARG_STRUCT = 3;
 	private static final int NEXUS_ARG_LINE_NUMBER = 4;
-	private static final int[] SETTINGS = {VarbitID.POH_NEXUS_XERIC, VarbitID.POH_NEXUS_DIGSITE, VarbitID.POH_JEWELLERYBOX_MULTI,
-		VarbitID.POH_HOUSE_LOCATION, VarbitID.POH_TELE_TOGGLE};
+	private static final int[] SETTINGS = Tables.ids("house settings");
 	private static final int[] HOUSE_VARBITS = IntStream.concat(Arrays.stream(NEXUS_SLOTS), Arrays.stream(SETTINGS)).toArray();
 	/** The varbits a house is read from. */
 	private static final Set<Integer> WATCHED = IntStream.concat(Arrays.stream(HOUSE_VARBITS), IntStream.of(VarbitID.POH_BUILDING_MODE))
@@ -62,9 +51,10 @@ public class PohService
 	private CatalogData catalogData;
 	private MemorySlot<Profile> stored;
 	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
-	private final List<Consumer<String>> listeners = new CopyOnWriteArrayList<>();
 
 	private volatile Set<Integer> pieces = Set.of();
+	/** Any thread. */
+	@Getter
 	private volatile HouseState house = HouseState.NONE;
 	private boolean seenATick;
 	private boolean wasInside;
@@ -84,19 +74,12 @@ public class PohService
 		catalogData.get().thenAccept(this::learnPieces);
 		seenATick = false;
 		wasInside = false;
-		varsDirty = true;
-		houseDirty = true;
+		readHouseAgain();
 	}
 
 	public void stop()
 	{
 		scanAtTick = -1;
-	}
-
-	/** Any thread. */
-	public HouseState getHouse()
-	{
-		return house;
 	}
 
 	public HouseOwnership.Ownership getOwnership()
@@ -107,13 +90,6 @@ public class PohService
 	public boolean isInHouse()
 	{
 		return ownership.isInHouse();
-	}
-
-	/** Listeners get the log lines on the client thread. */
-	public Runnable addListener(Consumer<String> listener)
-	{
-		listeners.add(listener);
-		return () -> listeners.remove(listener);
 	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
@@ -165,16 +141,7 @@ public class PohService
 	/** Call on {@code RuneScapeProfileChanged}, after the store reloads. */
 	public void onProfileChanged()
 	{
-		varsDirty = true;
-		houseDirty = true;
-	}
-
-	public void forget()
-	{
-		stored.clear();
-		varsDirty = true;
-		houseDirty = true;
-		tell("forgot the learned house");
+		readHouseAgain();
 	}
 
 	/** Call from a GameTick handler that runs before the player model's. */
@@ -240,6 +207,12 @@ public class PohService
 		{
 			tell("no scan: " + ownership.getOwnership() + " house");
 		}
+	}
+
+	private void readHouseAgain()
+	{
+		varsDirty = true;
+		houseDirty = true;
 	}
 
 	private void readVarsWhenDirty()
@@ -311,7 +284,6 @@ public class PohService
 
 	private void scan()
 	{
-		long started = System.nanoTime();
 		WorldView view = client.getTopLevelWorldView();
 		Player local = client.getLocalPlayer();
 		if (view == null || local == null)
@@ -340,10 +312,11 @@ public class PohService
 		Set<Integer> added = new HashSet<>(found.keySet());
 		added.removeAll(before);
 		before.removeAll(found.keySet());
-		tell(String.format("scan: %d pieces %s, walk ticks %s, added %s, gone %s, %.1f ms", found.size(), found.keySet(), ticks,
-			added, before, (System.nanoTime() - started) / 1e6));
+		tell(String.format("scan: %d pieces %s, walk ticks %s, added %s, gone %s", found.size(), found.keySet(), ticks, added,
+			before));
 	}
 
+	/** By piece, its scene tiles: a large piece is on each tile it covers. */
 	private Map<Integer, List<WorldPoint>> findPieces(Scene scene)
 	{
 		Map<Integer, List<WorldPoint>> found = new HashMap<>();
@@ -355,29 +328,9 @@ public class PohService
 				for (int y = 0; y < tiles[z][x].length; y++)
 				{
 					Tile tile = tiles[z][x][y];
-					if (tile == null)
+					for (TileObject object : tile == null ? List.<TileObject>of() : SceneObjects.objectsOn(tile))
 					{
-						continue;
-					}
-					for (GameObject object : tile.getGameObjects())
-					{
-						if (object != null && pieces.contains(object.getId()))
-						{
-							for (int ox = object.getSceneMinLocation().getX(); ox <= object.getSceneMaxLocation().getX(); ox++)
-							{
-								for (int oy = object.getSceneMinLocation().getY(); oy <= object.getSceneMaxLocation().getY(); oy++)
-								{
-									found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(new WorldPoint(ox, oy, z));
-								}
-							}
-						}
-					}
-					WallObject wall = tile.getWallObject();
-					DecorativeObject decoration = tile.getDecorativeObject();
-					GroundObject ground = tile.getGroundObject();
-					for (TileObject object : new TileObject[]{wall, decoration, ground})
-					{
-						if (object != null && pieces.contains(object.getId()))
+						if (pieces.contains(object.getId()))
 						{
 							found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(new WorldPoint(x, y, z));
 						}
@@ -471,22 +424,13 @@ public class PohService
 
 	private static Set<Integer> nexusKeys(Profile profile)
 	{
-		Set<Integer> keys = new HashSet<>();
-		for (int id : NEXUS_SLOTS)
-		{
-			int key = profile.vars.getOrDefault(id, 0);
-			if (key > 0)
-			{
-				keys.add(key);
-			}
-		}
-		return Set.copyOf(keys);
+		return Arrays.stream(NEXUS_SLOTS).mapToObj(id -> profile.vars.getOrDefault(id, 0)).filter(key -> key > 0)
+			.collect(Collectors.toUnmodifiableSet());
 	}
 
 	private void tell(String line)
 	{
 		log.debug("poh: {}", line);
-		listeners.forEach(listener -> listener.accept(line));
 	}
 
 	static final class Profile

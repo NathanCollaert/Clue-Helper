@@ -28,7 +28,7 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogLoader;
+import com.cluehelper.transport.CatalogData;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +43,7 @@ import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
+import net.runelite.http.api.RuneLiteAPI;
 
 /**
  * Plans a recording again offline the way the plugin planned it live: the core clue resolved with today's step data,
@@ -71,7 +72,7 @@ public final class CampaignReplay
 	/** The bundled walk table and world map, catalog and step data, and the rune model slice the tests plan with. */
 	public static CampaignReplay load() throws IOException
 	{
-		return new CampaignReplay(WalkTable.load(), WorldMap.load(), CatalogLoader.load(), NoTeleportAreas.load(), Loadouts.runeModel(),
+		return new CampaignReplay(WalkTable.load(RuneLiteAPI.GSON), WorldMap.load(), CatalogData.read(RuneLiteAPI.GSON), NoTeleportAreas.load(), Loadouts.runeModel(),
 			StepIndex.read(new Gson()));
 	}
 

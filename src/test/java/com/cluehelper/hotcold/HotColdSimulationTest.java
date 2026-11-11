@@ -25,6 +25,7 @@ import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdSolver;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdTemperature;
 import net.runelite.client.plugins.cluescrolls.clues.hotcold.HotColdTemperatureChange;
 import org.junit.Test;
+import net.runelite.http.api.RuneLiteAPI;
 
 /**
  * A simulation on the live planner's own rules: every spot solved from the tier's NPC, the truth on core's centre
@@ -225,7 +226,7 @@ public class HotColdSimulationTest
 
 	private static List<WorldPoint> landings() throws IOException
 	{
-		WalkTable table = WalkTable.load();
+		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 		List<WorldPoint> tiles = new ArrayList<>();
 		for (int node = 0; node < table.nodeCount(); node++)
 		{

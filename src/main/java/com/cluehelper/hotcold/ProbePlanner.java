@@ -272,30 +272,17 @@ public final class ProbePlanner
 		List<Branch> branches = new ArrayList<>();
 		for (int o = 0; o < OUTCOMES; o++)
 		{
+			double[] row = Arrays.copyOfRange(table, o * spots, (o + 1) * spots);
 			double total = 0;
-			for (int s = 0; s < spots; s++)
+			for (double mass : row)
 			{
-				total += table[o * spots + s];
+				total += mass;
 			}
 			if (total <= 0)
 			{
 				continue;
 			}
-			List<Integer> order = new ArrayList<>();
-			for (int s = 0; s < spots; s++)
-			{
-				if (table[o * spots + s] > 0)
-				{
-					order.add(s);
-				}
-			}
-			int row = o;
-			order.sort((a, b) -> Double.compare(table[row * spots + b], table[row * spots + a]));
-			Map<String, Double> shares = new LinkedHashMap<>();
-			for (int s : order)
-			{
-				shares.put(samples.names.get(s), table[o * spots + s] / total);
-			}
+			Map<String, Double> shares = Hypotheses.sharesLargestFirst(row, total, samples.names::get);
 			int c = o % COMPARISONS;
 			branches.add(new Branch(Band.values()[o / COMPARISONS], c == 0 ? null : Comparison.values()[c - 1], total, shares));
 		}

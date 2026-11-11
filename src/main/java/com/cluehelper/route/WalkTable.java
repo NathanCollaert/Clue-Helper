@@ -1,11 +1,12 @@
 package com.cluehelper.route;
 
 import com.cluehelper.transport.*;
+import com.google.gson.Gson;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /** Immutable once loaded; any thread. Costs are tiles, which are half-ticks when running. */
 public final class WalkTable
@@ -14,55 +15,68 @@ public final class WalkTable
 	public static final int NO_PATH = -1;
 	static final String DIRECTORY = "walk/";
 	private static final String KIND_BANK = "bank";
+	static final String REQUIREMENTS = "requirements.json";
 
-	private WorldPoint[] tiles = new WorldPoint[0];
-	private WorldPoint[] placed = new WorldPoint[0];
-	private boolean[] bank = new boolean[0];
+	private WorldPoint[] tiles;
+	private WorldPoint[] placed;
+	private boolean[] bank;
 	private final Map<WorldPoint, Integer> byTile = new HashMap<>();
 
-	private int[] entryStart = {0};
-	private int[] entryTo = new int[0];
-	private int[] entryFull = new int[0];
-	private int[] entryGateSet = new int[0];
-	private int[] entryOpen = new int[0];
-	private int[] entryAlternative = new int[0];
-	private int[] entryAlternativeGateSet = new int[0];
-	private int[] reverseStart = {0};
-	private int[] reverseEntry = new int[0];
-	private int[] entryFrom = new int[0];
-	private int[][] gateSets = new int[0][];
-	private List<Requirements> gates = List.of();
-	private Map<Integer, List<Bank>> banks = Map.of();
+	private int[] entryStart;
+	private int[] entryTo;
+	private int[] entryFull;
+	private int[] entryGateSet;
+	private int[] entryOpen;
+	private int[] entryAlternative;
+	private int[] entryAlternativeGateSet;
+	private int[] reverseStart;
+	private int[] reverseEntry;
+	private int[] entryFrom;
+	private int[][] gateSets;
+	private List<Requirements> gates;
+	private Map<Integer, List<Bank>> banks;
 
-	private int[] rowOrigin = new int[0];
-	private int[] rowDest = new int[0];
-	private int[] rowCost = new int[0];
-	private int[] rowGate = new int[0];
+	private int[] rowOrigin;
+	private int[] rowDest;
+	private int[] rowCost;
+	private int[] rowGate;
 	private static final int[] NO_ROWS = new int[0];
-	private Map<Integer, int[]> rowsByOrigin = Map.of();
-	private boolean[] rowIsExit = new boolean[0];
-	private Map<Long, Exit> exits = Map.of();
-	private Map<Long, List<Exit>> rowObjects = Map.of();
+	private Map<Integer, int[]> rowsByOrigin;
+	private boolean[] rowIsExit;
+	private Map<Long, Exit> exits;
+	private Map<Long, List<Exit>> rowObjects;
 	/** Each row object's id by the packed tiles its rows start from. */
-	private Map<Integer, Set<Integer>> rowObjectsAt = Map.of();
+	private Map<Integer, Set<Integer>> rowObjectsAt;
+
+	/** The gates' and banks' requirements in their tables' row order, baked from the walk generator's columns. */
+	static final class BakedRequirements
+	{
+		List<Requirements> gates = List.of();
+		List<Requirements> banks = List.of();
+	}
 
 	private WalkTable()
 	{
 	}
 
-	public static WalkTable load() throws IOException
+	public static WalkTable load(Gson gson) throws IOException
 	{
 		WalkTable table = new WalkTable();
+		BakedRequirements requirements;
+		try (Reader in = new InputStreamReader(open(DIRECTORY + REQUIREMENTS), StandardCharsets.UTF_8))
+		{
+			requirements = gson.fromJson(in, BakedRequirements.class);
+		}
 		table.readNodes(lines(DIRECTORY + "nodes.tsv"));
-		table.readGates(lines(DIRECTORY + "gates.tsv"));
+		table.gates = List.copyOf(requirements.gates);
 		table.readTable(new Varints(bytes(DIRECTORY + "table.bin")));
 		table.readRows(new Varints(bytes(DIRECTORY + "rows.bin")));
-		table.readBanks(lines(DIRECTORY + "banks.tsv"));
+		table.readBanks(lines(DIRECTORY + "banks.tsv"), requirements.banks);
 		table.exits = rowActions(lines(DIRECTORY + "exits.tsv"));
 		table.markExitRows();
 		table.rowObjects = rowsByTiles(lines(DIRECTORY + "row-objects.tsv"));
-		table.rowObjectsAt = table.rowObjects.values().stream().flatMap(List::stream).collect(Collectors.groupingBy(
-			exit -> pack(exit.getOrigin()), Collectors.mapping(Exit::getObjectId, Collectors.toUnmodifiableSet())));
+		table.rowObjectsAt = table.rowObjects.values().stream().flatMap(List::stream).collect(groupingBy(
+			exit -> pack(exit.getOrigin()), mapping(Exit::getObjectId, toUnmodifiableSet())));
 		table.indexReverse();
 		return table;
 	}
@@ -239,11 +253,6 @@ public final class WalkTable
 		return false;
 	}
 
-	public int entryCount()
-	{
-		return entryTo.length;
-	}
-
 	/** Entries that walk into {@code node}: {@code reverseEntry(i)} for i in [reverseFrom, reverseEnd). */
 	public int reverseFrom(int node)
 	{
@@ -295,7 +304,7 @@ public final class WalkTable
 		rowIsExit = new boolean[rowOrigin.length];
 		for (int row = 0; row < rowOrigin.length; row++)
 		{
-			rowIsExit[row] = exits.containsKey((long) rowOrigin[row] << 32 | rowDest[row] & 0xFFFFFFFFL);
+			rowIsExit[row] = exits.containsKey(exitKey(rowOrigin[row], rowDest[row]));
 		}
 	}
 
@@ -342,7 +351,12 @@ public final class WalkTable
 
 	private static long exitKey(WorldPoint origin, WorldPoint destination)
 	{
-		return (long) pack(origin) << 32 | pack(destination) & 0xFFFFFFFFL;
+		return exitKey(pack(origin), pack(destination));
+	}
+
+	private static long exitKey(int origin, int destination)
+	{
+		return (long) origin << 32 | destination & 0xFFFFFFFFL;
 	}
 
 	static int pack(WorldPoint tile)
@@ -382,42 +396,22 @@ public final class WalkTable
 		}
 	}
 
-	private void readGates(List<String[]> rows)
+	private void readBanks(List<String[]> rows, List<Requirements> requirements)
 	{
-		RequirementParser parser = new RequirementParser();
-		List<Requirements> parsed = new ArrayList<>();
-		for (String[] c : rows)
+		if (rows.size() != requirements.size())
 		{
-			Map<String, String> cells = new HashMap<>();
-			cells.put(RequirementParser.SKILLS, cell(c, 1));
-			cells.put(RequirementParser.QUESTS, cell(c, 2));
-			cells.put(RequirementParser.VARBITS, cell(c, 3));
-			cells.put(RequirementParser.VARPS, cell(c, 4));
-			cells.put(RequirementParser.ITEMS, cell(c, 5));
-			parsed.add(parser.parse(cells));
+			throw new IllegalStateException("banks.tsv has " + rows.size() + " rows, " + REQUIREMENTS + " " + requirements.size());
 		}
-		gates = List.copyOf(parsed);
-	}
-
-	private void readBanks(List<String[]> rows)
-	{
-		RequirementParser parser = new RequirementParser();
 		Map<Integer, List<Bank>> byNode = new HashMap<>();
-		for (String[] c : rows)
+		for (int i = 0; i < rows.size(); i++)
 		{
-			String[] xyz = c[0].split(" ");
-			int node = node(new WorldPoint(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2])));
+			String[] c = rows.get(i);
+			int node = node(parseTile(c[0]));
 			if (node == NO_NODE)
 			{
 				throw new IllegalStateException("banks.tsv: no node at " + c[0]);
 			}
-			Map<String, String> cells = new HashMap<>();
-			cells.put(RequirementParser.MEMBERS, cell(c, 3));
-			cells.put(RequirementParser.SKILLS, cell(c, 4));
-			cells.put(RequirementParser.QUESTS, cell(c, 5));
-			cells.put(RequirementParser.VARBITS, cell(c, 6));
-			cells.put(RequirementParser.VARPS, cell(c, 7));
-			Bank bank = new Bank(c[1], c[2], parser.parse(cells));
+			Bank bank = new Bank(c[1], c[2], requirements.get(i));
 			byNode.computeIfAbsent(node, n -> new ArrayList<>()).add(bank);
 		}
 		banks = byNode;
@@ -489,16 +483,12 @@ public final class WalkTable
 		{
 			byOrigin.computeIfAbsent(rowOrigin[i], tile -> new ArrayList<>()).add(i);
 		}
-		rowsByOrigin = byOrigin.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+		rowsByOrigin = byOrigin.entrySet().stream().collect(toUnmodifiableMap(Map.Entry::getKey,
 			entry -> entry.getValue().stream().mapToInt(Integer::intValue).toArray()));
 	}
 
-	private static String cell(String[] cells, int index)
-	{
-		return index < cells.length ? cells[index] : "";
-	}
-
-	private static InputStream open(String resource) throws IOException
+	/** A resource of this package; missing is an error. */
+	static InputStream open(String resource) throws IOException
 	{
 		InputStream in = WalkTable.class.getResourceAsStream(resource);
 		if (in == null)
@@ -537,14 +527,7 @@ public final class WalkTable
 	{
 		try (InputStream in = open(resource))
 		{
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			byte[] buffer = new byte[8192];
-			int read;
-			while ((read = in.read(buffer)) > 0)
-			{
-				out.write(buffer, 0, read);
-			}
-			return out.toByteArray();
+			return in.readAllBytes();
 		}
 	}
 

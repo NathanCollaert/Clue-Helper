@@ -1,7 +1,8 @@
 package com.cluehelper.step;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -137,8 +138,8 @@ public class CoreDriftTest
 		assertEquals(EXPECTED_WITHOUT_ROW, withoutRow);
 
 		StepIndex.Entry nieveOrSteve = index.entry("anagram:12059");
-		assertEquals("I EVEN / VESTE owns one row per branch of varbit 5037", List.of(true, false),
-			nieveOrSteve.getRows().stream().map(row -> row.getWhen().holdsFor(0)).collect(Collectors.toList()));
+		assertEquals("I EVEN / VESTE owns one row per branch of varbit 5037", List.of("varbit 5037 = 0", "varbit 5037 != 0"),
+			nieveOrSteve.getRows().stream().map(row -> row.getWhen().toString()).collect(Collectors.toList()));
 	}
 
 	/** The step files' contract with the guide: a broken row would only show as a step with no route or no stage. */
@@ -210,7 +211,7 @@ public class CoreDriftTest
 
 		Step whole = resolver.resolve(clue, CoreClues.plugin());
 		assertEquals("master", whole.getTier());
-		assertTrue(whole.isKnown());
+		assertNotSame(StepIndex.Entry.NONE, whole.getData());
 		assertEquals(TargetKind.SEQUENCE, whole.getKind());
 		assertEquals(3, whole.getCacheRows().size());
 		assertEquals(3, whole.getTargets().size());
@@ -231,7 +232,7 @@ public class CoreDriftTest
 		for (Map.Entry<String, ClueScroll> source : steps.entrySet())
 		{
 			Step unknown = withoutData.resolve(source.getValue(), plugin);
-			assertFalse(unknown.isKnown());
+			assertSame(StepIndex.Entry.NONE, unknown.getData());
 			if (!unknown.getTargets().equals(CoreClueReader.locations(source.getValue(), plugin)))
 			{
 				lost.add(source.getKey() + " " + unknown.getKey() + " " + unknown.getTargets());

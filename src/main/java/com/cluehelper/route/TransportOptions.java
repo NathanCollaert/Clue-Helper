@@ -70,7 +70,7 @@ final class TransportOptions
 			{
 				continue;
 			}
-			RowAvailability judged = ctx.in.getEngine().judge(row, judgedAt, ctx.in.getNowMinutes());
+			RowAvailability judged = ctx.judge(row, judgedAt);
 			if (!judged.isAvailable())
 			{
 				continue;
@@ -138,8 +138,7 @@ final class TransportOptions
 			{
 				continue;
 			}
-			CatalogRow asRow = CatalogRow.builder().name(change.getName()).requirements(change.getRequirements()).build();
-			RowAvailability judged = ctx.in.getEngine().judge(asRow, judgedAt, ctx.in.getNowMinutes());
+			RowAvailability judged = ctx.judge(change.getName(), change.getRequirements(), judgedAt);
 			if (!judged.isAvailable())
 			{
 				continue;

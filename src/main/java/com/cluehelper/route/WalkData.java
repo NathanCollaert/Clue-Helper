@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.concurrent.*;
 import javax.inject.*;
@@ -21,9 +22,9 @@ public class WalkData
 	private final CompletableFuture<Loaded> loaded;
 
 	@Inject
-	WalkData(ScheduledExecutorService executor)
+	WalkData(ScheduledExecutorService executor, Gson gson)
 	{
-		loaded = CompletableFuture.supplyAsync(WalkData::loadOrNull, executor);
+		loaded = CompletableFuture.supplyAsync(() -> loadOrNull(gson), executor);
 	}
 
 	public CompletableFuture<Loaded> get()
@@ -31,15 +32,11 @@ public class WalkData
 		return loaded;
 	}
 
-	private static Loaded loadOrNull()
+	private static Loaded loadOrNull(Gson gson)
 	{
 		try
 		{
-			long started = System.nanoTime();
-			Loaded data = new Loaded(WalkTable.load(), NoTeleportAreas.load(), WorldMap.load());
-			log.debug("walk data: {} nodes, {} entries, {} rows in {} ms", data.getTable().nodeCount(), data.getTable().entryCount(),
-				data.getTable().rowCount(), (System.nanoTime() - started) / 1_000_000);
-			return data;
+			return new Loaded(WalkTable.load(gson), NoTeleportAreas.load(), WorldMap.load());
 		}
 		catch (IOException | RuntimeException e)
 		{

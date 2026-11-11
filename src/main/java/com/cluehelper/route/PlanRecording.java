@@ -3,9 +3,9 @@ package com.cluehelper.route;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.step.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /**
  * One plan with everything it was planned from, as JSON: what a route report carries, and what the developer tools plan
@@ -53,8 +53,8 @@ public final class PlanRecording
 		r.stepType = step.getType();
 		r.tier = step.getTier();
 		r.kind = step.getKind().name();
-		r.targets = step.getTargets().stream().map(PlanRecording::xyz).collect(Collectors.toList());
-		r.stages = step.getStages().stream().map(RecordedStage::of).collect(Collectors.toList());
+		r.targets = step.getTargets().stream().map(PlanRecording::xyz).collect(toList());
+		r.stages = step.getStages().stream().map(RecordedStage::of).collect(toList());
 		r.player = input.getPlayer();
 		r.banked = input.getBanked();
 		r.pinPending = input.isPinPending();
@@ -90,12 +90,7 @@ public final class PlanRecording
 	private static List<RecordedNeed> needs(PlanInput input)
 	{
 		Set<Integer> owned = StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked());
-		List<RecordedNeed> needs = new ArrayList<>();
-		for (RequiredItems.Need need : input.getRequired().getNeeds())
-		{
-			needs.add(RecordedNeed.of(need, owned));
-		}
-		return needs;
+		return input.getRequired().getNeeds().stream().map(need -> RecordedNeed.of(need, owned)).collect(toList());
 	}
 
 	private static int[] xyz(WorldPoint tile)
@@ -120,7 +115,7 @@ public final class PlanRecording
 			RecordedStage recorded = new RecordedStage();
 			recorded.kind = stage.getKind().name();
 			recorded.act = stage.getAct();
-			recorded.tiles = stage.getTiles().stream().map(PlanRecording::xyz).collect(Collectors.toList());
+			recorded.tiles = stage.getTiles().stream().map(PlanRecording::xyz).collect(toList());
 			recorded.worn = stage.getWorn();
 			return recorded;
 		}
@@ -147,7 +142,7 @@ public final class PlanRecording
 			recorded.name = need.getName();
 			recorded.stepItem = need.isStepItem();
 			recorded.blocksRoute = need.isBlocksRoute();
-			recorded.ids = owned.stream().filter(need.getRequirement()::fulfilledBy).sorted().collect(Collectors.toList());
+			recorded.ids = owned.stream().filter(need.getRequirement()::fulfilledBy).sorted().collect(toList());
 			if (need.getRequirement() instanceof GearRequirement)
 			{
 				GearRequirement gear = (GearRequirement) need.getRequirement();

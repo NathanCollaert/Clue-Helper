@@ -25,7 +25,7 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogLoader;
+import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.RouteReport;
 import com.google.gson.Gson;
 import java.io.ByteArrayInputStream;
@@ -46,6 +46,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.http.api.RuneLiteAPI;
 
 /**
  * Plans each {@link PlanTrace} recording, and each route report a player pasted into a {@code .txt} file, again, warm
@@ -73,9 +74,9 @@ public final class PlanReplay
 			return;
 		}
 		Arrays.sort(files);
-		WalkTable table = WalkTable.load();
+		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 		WorldMap map = WorldMap.load();
-		Catalog catalog = CatalogLoader.load();
+		Catalog catalog = CatalogData.read(RuneLiteAPI.GSON);
 		NoTeleportAreas noTeleport = NoTeleportAreas.load();
 		Map<String, Step> steps = DriftSteps.read();
 		AvailabilityEngine engine = new AvailabilityEngine(Loadouts.runeModel(), id -> "item " + id);

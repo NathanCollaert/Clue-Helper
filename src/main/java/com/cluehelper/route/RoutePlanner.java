@@ -72,6 +72,8 @@ public class RoutePlanner
 	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
 	private final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
 
+	/** Loaded walk data; null until it is. */
+	@Getter
 	private volatile WalkData.Loaded walk;
 	private volatile Catalog catalog;
 	private long gatesVersion = -1;
@@ -188,9 +190,8 @@ public class RoutePlanner
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		WalkData.Loaded data = walk;
-		Catalog loadedCatalog = catalog;
 		boolean dormant = snapshot != null && snapshot.getDormantReason() != null;
-		if (step == null || snapshot == null || runes == null || data == null || loadedCatalog == null || dormant)
+		if (step == null || snapshot == null || runes == null || data == null || catalog == null || dormant)
 		{
 			if ((step == null || dormant) && plan != Plan.NONE)
 			{
@@ -220,7 +221,7 @@ public class RoutePlanner
 			return;
 		}
 		lastTrigger = trigger;
-		PlanInput input = input(step, snapshot, runes, data, loadedCatalog, required);
+		PlanInput input = input(step, snapshot, runes, required);
 		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
 		runner.submit(() -> Planner.withoutAlternatives(followingInput), planned -> onPlanned(planned, followingInput));
 	}
@@ -233,19 +234,11 @@ public class RoutePlanner
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
-		WalkData.Loaded data = walk;
-		Catalog loadedCatalog = catalog;
-		if (step == null || snapshot == null || runes == null || data == null || loadedCatalog == null || start == null)
+		if (step == null || snapshot == null || runes == null || walk == null || catalog == null || start == null)
 		{
 			return null;
 		}
-		return input(step, withRefusals(snapshot), runes, data, loadedCatalog, required);
-	}
-
-	/** Loaded walk data; null until it is. */
-	public WalkData.Loaded getWalk()
-	{
-		return walk;
+		return input(step, withRefusals(snapshot), runes, required);
 	}
 
 	/** Client thread. The walk rows the player can take now, fixed for a search on another thread. */
@@ -255,8 +248,8 @@ public class RoutePlanner
 		return row -> open != null && open[row];
 	}
 
-	private PlanInput input(Step step, PlayerSnapshot snapshot, RuneModel runes, WalkData.Loaded data, Catalog loadedCatalog,
-		RequiredItems required)
+	/** Only once the walk data and the catalog are loaded, which are never unloaded. */
+	private PlanInput input(Step step, PlayerSnapshot snapshot, RuneModel runes, RequiredItems required)
 	{
 		PlayerSnapshot banked = availability.getBankedSnapshot();
 		return PlanInput.builder()
@@ -268,9 +261,9 @@ public class RoutePlanner
 			.required(required)
 			.engine(new AvailabilityEngine(runes, availability::itemName))
 			.nowMinutes(AvailabilityService.nowMinutes())
-			.catalog(loadedCatalog)
-			.table(data.getTable())
-			.noTeleport(data.getNoTeleport().now(client::getVarbitValue))
+			.catalog(catalog)
+			.table(walk.getTable())
+			.noTeleport(walk.getNoTeleport().now(client::getVarbitValue))
 			.start(start)
 			.settings(PlannerSettings.from(config, snapshot.getAccountType()))
 			.revertTicksLeft(revertTicksLeft())
@@ -517,7 +510,7 @@ public class RoutePlanner
 		}
 		Leg leg = walk.getLegs().get(0);
 		WorldPoint end = walk.getLegs().get(walk.getLegs().size() - 1).getTo();
-		return at.getPlane() == end.getPlane() && at.distanceTo2D(end) <= leg.getFrom().distanceTo2D(end) + LANDED_TILES;
+		return at.distanceTo(end) <= leg.getFrom().distanceTo2D(end) + LANDED_TILES;
 	}
 
 	/**
@@ -529,19 +522,12 @@ public class RoutePlanner
 		Leg first = route.getFirstTransport();
 		PlanStart from = start;
 		return first != null && from != null && from.getTile() != null && first.getTo() != null
-			&& first.getTo().getPlane() == from.getTile().getPlane() && first.getTo().distanceTo2D(from.getTile()) <= LANDED_TILES;
+			&& first.getTo().distanceTo(from.getTile()) <= LANDED_TILES;
 	}
 
 	private static Route offered(Plan planned, String identity)
 	{
-		for (Route route : routesOf(planned))
-		{
-			if (route != null && route.getIdentity().equals(identity))
-			{
-				return route;
-			}
-		}
-		return null;
+		return routesOf(planned).stream().filter(route -> route != null && route.getIdentity().equals(identity)).findFirst().orElse(null);
 	}
 
 	private static List<Route> routesOf(Plan planned)

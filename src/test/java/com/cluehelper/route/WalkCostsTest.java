@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
+import net.runelite.http.api.RuneLiteAPI;
 
 /**
  * The walk search and the bundled walk table walk Shortest Path's map by the same rules, so a search from a node costs
@@ -22,7 +23,7 @@ public class WalkCostsTest
 	@Test
 	public void startWalksMatchTheTable() throws IOException
 	{
-		WalkTable table = WalkTable.load();
+		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 		Ground ground = Ground.world(WorldMap.load(), null, table, row -> true);
 		List<String> mismatches = new ArrayList<>();
 		int compared = 0;

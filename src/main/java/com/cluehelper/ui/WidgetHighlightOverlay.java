@@ -1,5 +1,6 @@
 package com.cluehelper.ui;
 
+import com.cluehelper.Tables;
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.*;
 import com.cluehelper.link.ClueLink;
@@ -8,7 +9,6 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
@@ -16,26 +16,16 @@ import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 import net.runelite.client.ui.overlay.*;
+import static java.util.stream.Collectors.*;
+import com.cluehelper.guide.StepGuide.Tab;
 
 public class WidgetHighlightOverlay extends Overlay
 {
-	private static final Map<StepGuide.Tab, Integer> TAB_CONTENT = Map.of(
-		StepGuide.Tab.INVENTORY, InterfaceID.Inventory.ITEMS,
-		StepGuide.Tab.EQUIPMENT, InterfaceID.Wornitems.UNIVERSE,
-		StepGuide.Tab.MAGIC, InterfaceID.MagicSpellbook.UNIVERSE,
-		StepGuide.Tab.EMOTES, InterfaceID.Emote.UNIVERSE,
-		StepGuide.Tab.MUSIC, InterfaceID.Music.UNIVERSE,
-		StepGuide.Tab.QUESTS, InterfaceID.Questlist.UNIVERSE);
+	private static final Map<Tab, Integer> TAB_CONTENT = Tables.byKey("tab content", Tab::valueOf, row -> row.id(0));
 	private static final int[] PRAYER_STONES = {InterfaceID.Toplevel.STONE5, InterfaceID.ToplevelOsrsStretch.STONE5,
 		InterfaceID.ToplevelPreEoc.STONE5};
 	/** Per tab: its stone in the fixed, resizable classic and resizable modern layouts. */
-	private static final Map<StepGuide.Tab, int[]> TAB_STONES = Map.of(
-		StepGuide.Tab.INVENTORY, new int[]{InterfaceID.Toplevel.STONE3, InterfaceID.ToplevelOsrsStretch.STONE3, InterfaceID.ToplevelPreEoc.STONE3},
-		StepGuide.Tab.EQUIPMENT, new int[]{InterfaceID.Toplevel.STONE4, InterfaceID.ToplevelOsrsStretch.STONE4, InterfaceID.ToplevelPreEoc.STONE4},
-		StepGuide.Tab.MAGIC, new int[]{InterfaceID.Toplevel.STONE6, InterfaceID.ToplevelOsrsStretch.STONE6, InterfaceID.ToplevelPreEoc.STONE6},
-		StepGuide.Tab.EMOTES, new int[]{InterfaceID.Toplevel.STONE12, InterfaceID.ToplevelOsrsStretch.STONE12, InterfaceID.ToplevelPreEoc.STONE12},
-		StepGuide.Tab.MUSIC, new int[]{InterfaceID.Toplevel.STONE13, InterfaceID.ToplevelOsrsStretch.STONE13, InterfaceID.ToplevelPreEoc.STONE13},
-		StepGuide.Tab.QUESTS, new int[]{InterfaceID.Toplevel.STONE2, InterfaceID.ToplevelOsrsStretch.STONE2, InterfaceID.ToplevelPreEoc.STONE2});
+	private static final Map<Tab, int[]> TAB_STONES = Tables.byKey("tab stones", Tab::valueOf, Tables.Row::ids);
 
 	/** The quest list's settings that hide a quest's journal (completed quests, miniquests), by their line in the settings. */
 	private static final Map<Integer, String> QUEST_HIDING_SETTINGS = Map.of(VarbitID.QUESTLIST_HIDE_COMPLETED, "hide completed quests",
@@ -83,14 +73,14 @@ public class WidgetHighlightOverlay extends Overlay
 		{
 			outlinePrayer(graphics);
 		}
-		StepGuide.Tab tab = guide.getHighlights().getTab();
-		boolean wanted = tab == StepGuide.Tab.MAGIC ? config.highlightSpells() : config.highlightItems();
-		if (tab == StepGuide.Tab.QUESTS && wanted)
+		Tab tab = guide.getHighlights().getTab();
+		boolean wanted = tab == Tab.MAGIC ? config.highlightSpells() : config.highlightItems();
+		if (tab == Tab.QUESTS && wanted)
 		{
 			outlineJournal(graphics);
 			return null;
 		}
-		if (tab != StepGuide.Tab.NONE && wanted && !Widgets.shown(client, TAB_CONTENT.get(tab)))
+		if (tab != Tab.NONE && wanted && !Widgets.shown(client, TAB_CONTENT.get(tab)))
 		{
 			outline(graphics, tabStone(TAB_STONES.get(tab)));
 		}
@@ -163,9 +153,8 @@ public class WidgetHighlightOverlay extends Overlay
 	private void outlineToggles(Graphics2D graphics, List<PrayerFilters.Filter> filters)
 	{
 		List<Widget> toggles = Widgets.descendants(client.getWidget(InterfaceID.Prayerbook.FILTERMENU)).stream()
-			.filter(widget -> widget.getText() != null && filters.stream()
-				.anyMatch(filter -> Text.removeTags(widget.getText()).toLowerCase().contains(filter.getPhrase())))
-			.collect(Collectors.toList());
+			.filter(widget -> filters.stream().anyMatch(filter -> plainText(widget).contains(filter.getPhrase())))
+			.collect(toList());
 		if (toggles.isEmpty())
 		{
 			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
@@ -187,7 +176,7 @@ public class WidgetHighlightOverlay extends Overlay
 			return;
 		}
 		List<String> hiding = QUEST_HIDING_SETTINGS.entrySet().stream().filter(setting -> client.getVarbitValue(setting.getKey()) == 1)
-			.map(Map.Entry::getValue).collect(Collectors.toList());
+			.map(Map.Entry::getValue).collect(toList());
 		if (Widgets.shown(client, InterfaceID.Settings.UNIVERSE))
 		{
 			outlineLines(graphics, InterfaceID.Settings.CONTENT, hiding);
@@ -195,7 +184,7 @@ public class WidgetHighlightOverlay extends Overlay
 		}
 		if (!Widgets.shown(client, InterfaceID.SideJournal.UNIVERSE))
 		{
-			outline(graphics, tabStone(TAB_STONES.get(StepGuide.Tab.QUESTS)));
+			outline(graphics, tabStone(TAB_STONES.get(Tab.QUESTS)));
 			return;
 		}
 		if (!Widgets.shown(client, InterfaceID.Questlist.LIST))
@@ -223,9 +212,14 @@ public class WidgetHighlightOverlay extends Overlay
 	private void outlineLines(Graphics2D graphics, int parentId, List<String> phrases)
 	{
 		Widgets.descendants(client.getWidget(parentId)).stream()
-			.filter(widget -> Widgets.visible(widget) && widget.getText() != null && phrases.stream()
-				.anyMatch(phrase -> Text.removeTags(widget.getText()).toLowerCase().contains(phrase)))
+			.filter(widget -> Widgets.visible(widget) && phrases.stream().anyMatch(phrase -> plainText(widget).contains(phrase)))
 			.forEach(widget -> highlighter.box(graphics, widget.getBounds()));
+	}
+
+	/** Lower case without tags; "" for a widget without text. */
+	private static String plainText(Widget widget)
+	{
+		return widget.getText() == null ? "" : Text.removeTags(widget.getText()).toLowerCase();
 	}
 
 	/** The prayer's own button, found by its name: the book's component order isn't the prayers' order. */

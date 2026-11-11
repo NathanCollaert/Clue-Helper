@@ -72,7 +72,7 @@ public class MinimapPathOverlay extends Overlay
 			{
 				points.add(null);
 			}
-			LocalPoint local = tile.getPlane() == view.getPlane() ? LocalPoint.fromWorld(view, tile) : null;
+			LocalPoint local = WaypointOverlay.onFloor(view, tile);
 			points.add(local == null ? null : Perspective.localToMinimap(client, local));
 			previous = tile;
 		}

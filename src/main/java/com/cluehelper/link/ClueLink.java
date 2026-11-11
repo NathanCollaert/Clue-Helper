@@ -7,6 +7,7 @@ import com.cluehelper.transport.AvailabilityService;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.inject.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -47,8 +48,12 @@ public class ClueLink
 	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
 
+	/** Null if the client has no Clue Scroll plugin. */
+	@Getter
 	private volatile ClueScrollPlugin core;
-	private volatile Step current;
+	/** Null when core has no clue. */
+	@Getter
+	private volatile Step currentStep;
 	private volatile boolean inventoryChanged;
 	private boolean inventoryHoldsClue;
 
@@ -56,7 +61,7 @@ public class ClueLink
 	public void start()
 	{
 		core = findCore();
-		current = null;
+		currentStep = null;
 		inventoryChanged = true;
 		state.start(isCoreActive());
 	}
@@ -64,7 +69,7 @@ public class ClueLink
 	public void stop()
 	{
 		core = null;
-		current = null;
+		currentStep = null;
 		state.start(false);
 	}
 
@@ -81,18 +86,6 @@ public class ClueLink
 	public boolean hasStep()
 	{
 		return state.hasStep();
-	}
-
-	/** Null when core has no clue. */
-	public Step getCurrentStep()
-	{
-		return current;
-	}
-
-	/** Null if the client has no Clue Scroll plugin. */
-	public ClueScrollPlugin getCore()
-	{
-		return core;
 	}
 
 	public ClueScroll coreClue()
@@ -170,11 +163,8 @@ public class ClueLink
 			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && carriesClue());
 		if (change != StepChange.UNCHANGED)
 		{
-			current = step;
-			for (StepListener listener : listeners)
-			{
-				listener.onStepChange(change, step);
-			}
+			currentStep = step;
+			listeners.forEach(listener -> listener.onStepChange(change, step));
 		}
 		return wasActive != state.isActive() || neededRead != state.needsRead() || hadStep != state.hasStep();
 	}
@@ -247,14 +237,8 @@ public class ClueLink
 
 	private ClueScrollPlugin findCore()
 	{
-		for (Plugin plugin : pluginManager.getPlugins())
-		{
-			if (plugin instanceof ClueScrollPlugin)
-			{
-				return (ClueScrollPlugin) plugin;
-			}
-		}
-		return null;
+		return pluginManager.getPlugins().stream().filter(ClueScrollPlugin.class::isInstance).map(ClueScrollPlugin.class::cast)
+			.findFirst().orElse(null);
 	}
 
 	private boolean isCoreActive()
@@ -276,6 +260,7 @@ public class ClueLink
 	 */
 	static final class LinkState
 	{
+		@Getter
 		private volatile boolean active;
 		private volatile boolean needsRead;
 		private volatile boolean hasStep;
@@ -307,11 +292,6 @@ public class ClueLink
 			lastTargets = seen == null ? null : targets;
 			hasStep = seen != null;
 			return change;
-		}
-
-		boolean isActive()
-		{
-			return active;
 		}
 
 		boolean needsRead()

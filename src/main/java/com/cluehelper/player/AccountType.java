@@ -16,12 +16,6 @@ public enum AccountType
 		return varbitValue >= 0 && varbitValue < values().length ? values()[varbitValue] : NORMAL;
 	}
 
-	/** Ironmen of every kind gather and make things themselves; only a normal account buys on the Grand Exchange. */
-	public boolean canTrade()
-	{
-		return this == NORMAL;
-	}
-
 	/** An ultimate ironman has no bank to plan with. */
 	public boolean hasBank()
 	{

@@ -11,6 +11,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /**
  * Gson fills this from the generated step files (Clue-Helper-Tools/tools/steps/generate.py), one per clue type: field
@@ -60,10 +61,12 @@ public final class StepIndex
 
 	static StepIndex read(Gson gson, Reader reader)
 	{
-		Gson withSkills = gson.newBuilder()
+		Gson withTypes = gson.newBuilder()
 			.registerTypeAdapter(Skill.class, (JsonDeserializer<Skill>) (json, type, context) -> skill(json.getAsString()))
+			.registerTypeAdapter(WorldPoint.class, (JsonDeserializer<WorldPoint>) (json, type, context) -> point(context.deserialize(json,
+				int[].class)))
 			.create();
-		StepIndex index = withSkills.fromJson(reader, StepIndex.class);
+		StepIndex index = withTypes.fromJson(reader, StepIndex.class);
 		return index == null ? empty() : index;
 	}
 
@@ -104,8 +107,7 @@ public final class StepIndex
 		/** Where the game put the step's NPC for this player, to be learned (Viggora); null for an NPC always at its targets. */
 		private LearnPlace learnPlace;
 		private List<CacheRow> rows = List.of();
-		/** Each tile as x, y, plane. */
-		private List<int[]> tiles = List.of();
+		private List<WorldPoint> tiles = List.of();
 		private List<Target> targets = List.of();
 		private List<Combat> combat = List.of();
 		private Challenge challenge;
@@ -113,7 +115,8 @@ public final class StepIndex
 		private Stash stash;
 		/** Hand data: where a step with no tile (a kill task) is done. */
 		private Area area;
-		private int[] stand;
+		/** Hand data: a walkable tile beside a blocked target tile; null when the target is walkable. */
+		private WorldPoint stand;
 		private List<Requires> requires = List.of();
 		/** Hand data: worn gear the talk needs, picked from what the player owns. */
 		private List<Gear> gear = List.of();
@@ -169,15 +172,9 @@ public final class StepIndex
 		static Entry ofParts(String tier, List<CacheRow> rows, List<Entry> unsolved)
 		{
 			Entry entry = of(tier, rows);
-			entry.requires = unsolved.stream().flatMap(part -> part.getRequires().stream()).collect(Collectors.toUnmodifiableList());
-			entry.gear = unsolved.stream().flatMap(part -> part.getGear().stream()).collect(Collectors.toUnmodifiableList());
+			entry.requires = unsolved.stream().flatMap(part -> part.getRequires().stream()).collect(toUnmodifiableList());
+			entry.gear = unsolved.stream().flatMap(part -> part.getGear().stream()).collect(toUnmodifiableList());
 			return entry;
-		}
-
-		/** Hand data: a walkable tile beside a blocked target tile; null when the target is walkable. */
-		public WorldPoint getStand()
-		{
-			return point(stand);
 		}
 
 		/** The needs the act wants worn, by name; gear for a way in is put on before going in instead. */
@@ -195,20 +192,20 @@ public final class StepIndex
 		/** The requirements that are gear to wear. */
 		public List<Requires> wornRequires()
 		{
-			return getRequires().stream().filter(Requires::isWear).collect(Collectors.toList());
+			return getRequires().stream().filter(Requires::isWear).collect(toList());
 		}
 
 		/** The requirements the player still has to meet: none a finished quest waives. */
 		public List<Requires> requiresFor(Predicate<Quest> finished)
 		{
-			return getRequires().stream().filter(need -> !need.isWaivedBy(finished)).collect(Collectors.toList());
+			return getRequires().stream().filter(need -> !need.isWaivedBy(finished)).collect(toList());
 		}
 
 		/** The requirements to wear going in, but those the player meets by what they carry (a talisman). */
 		public List<Requires> wornRequiresFor(Predicate<Quest> finished, Set<Integer> carriedIds)
 		{
 			return requiresFor(finished).stream().filter(need -> need.isWear() && !need.isCarriedInstead(carriedIds))
-				.collect(Collectors.toList());
+				.collect(toList());
 		}
 
 		/** The skill levels the task itself needs; boosts count. */
@@ -255,10 +252,11 @@ public final class StepIndex
 		}
 
 		private Kind kind;
-		private int[] tile;
+		private WorldPoint tile;
 		private List<Integer> npcs = List.of();
 		private Integer key;
-		private int[] keyTile;
+		/** Where the key's NPCs are killed. */
+		private WorldPoint keyTile;
 		private String text;
 		/** An object's name when talking is all it does (the spirit tree); null otherwise. */
 		private String talkTo;
@@ -267,26 +265,15 @@ public final class StepIndex
 		@Getter(AccessLevel.NONE)
 		private Integer fallbackLoc;
 
-		public WorldPoint getTile()
-		{
-			return point(tile);
-		}
-
 		/** A loc target's object ids: its own and the cache's fallback form. */
 		public Set<Integer> locs()
 		{
-			return Stream.of(loc, fallbackLoc).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
+			return Stream.of(loc, fallbackLoc).filter(Objects::nonNull).collect(toUnmodifiableSet());
 		}
 
 		public int getKey()
 		{
 			return key == null ? -1 : key;
-		}
-
-		/** Where the key's NPCs are killed. */
-		public WorldPoint getKeyTile()
-		{
-			return point(keyTile);
 		}
 	}
 
@@ -316,35 +303,25 @@ public final class StepIndex
 	public static final class Stash
 	{
 		private int object;
-		private int[] tile;
-
-		public WorldPoint getTile()
-		{
-			return point(tile);
-		}
+		private WorldPoint tile;
 	}
 
 	@Getter
 	public static final class Area
 	{
-		private int[] tile;
+		private WorldPoint tile;
 		private int radius;
 		private String text;
-		/** Other spawns the route may go to instead, each as x, y, plane. */
+		/** Other spawns the route may go to instead. */
 		@Getter(AccessLevel.NONE)
-		private List<int[]> also = List.of();
-
-		public WorldPoint getTile()
-		{
-			return point(tile);
-		}
+		private List<WorldPoint> also = List.of();
 
 		/** The main spawn first, then the others. */
 		public List<WorldPoint> getTiles()
 		{
 			List<WorldPoint> tiles = new ArrayList<>();
-			tiles.add(getTile());
-			also.forEach(other -> tiles.add(point(other)));
+			tiles.add(tile);
+			tiles.addAll(also);
 			return List.copyOf(tiles);
 		}
 	}
@@ -357,7 +334,8 @@ public final class StepIndex
 	{
 		private int[] area;
 		private int[] exclude;
-		private List<int[]> tiles;
+		@Getter
+		private List<WorldPoint> tiles = List.of();
 		/** Where to look, shown under the walk. */
 		@Getter
 		private String text;
@@ -396,11 +374,6 @@ public final class StepIndex
 		public int getPlane()
 		{
 			return area[4];
-		}
-
-		public List<WorldPoint> getTiles()
-		{
-			return tiles == null ? List.of() : tiles.stream().map(StepIndex::point).collect(Collectors.toUnmodifiableList());
 		}
 	}
 
@@ -560,8 +533,9 @@ public final class StepIndex
 		private int closed = -1;
 		/** Items used on the object to go in, each time (a rope on the Genie's crevice); empty when it is clicked. */
 		private List<Integer> use = List.of();
-		private int[] tile;
-		private int[] to;
+		private WorldPoint tile;
+		/** Where the way in lands. */
+		private WorldPoint to;
 		@Getter(AccessLevel.NONE)
 		private int[] inside;
 		/** The way's own floors on the way in (the pyramid's lower levels): areas as {@code inside}. */
@@ -574,17 +548,6 @@ public final class StepIndex
 		private List<String> dialogue = List.of();
 		/** Ground items to pick up part way in before going on (the Mogre Camp's rocks); null when none. */
 		private PickUp pickUp;
-
-		/** Where the way in lands. */
-		public WorldPoint getTo()
-		{
-			return point(to);
-		}
-
-		public WorldPoint getTile()
-		{
-			return point(tile);
-		}
 
 		public boolean isInside(WorldPoint at)
 		{
@@ -625,11 +588,12 @@ public final class StepIndex
 		/** Where the game counts them when they don't go to the inventory (under water); -1 for none. */
 		private int varbit = -1;
 		/** Where they lie: the game shows ground items only near the player, so these lead the way until they show. */
-		private List<int[]> spawns = List.of();
+		@Getter(AccessLevel.NONE)
+		private List<WorldPoint> spawns = List.of();
 
 		public List<WorldPoint> spawnTiles()
 		{
-			return spawns.stream().map(StepIndex::point).collect(Collectors.toList());
+			return spawns;
 		}
 	}
 
@@ -641,7 +605,7 @@ public final class StepIndex
 	@Getter
 	public static final class Place
 	{
-		private int[] tile;
+		private WorldPoint tile;
 		private String text;
 		/** What the task is done on there (an anvil), outlined; empty for a place with nothing to click. */
 		private List<Integer> objects = List.of();
@@ -674,11 +638,6 @@ public final class StepIndex
 			return span.clone();
 		}
 
-		public WorldPoint getTile()
-		{
-			return point(tile);
-		}
-
 		/** The menu option that does the task on the place's objects or NPCs ("Chop down"), or null. */
 		public String getOption()
 		{
@@ -704,15 +663,11 @@ public final class StepIndex
 		private List<Integer> objects = List.of();
 		/** The object's option; an NPC is attacked. */
 		private String option;
-		private int[] tile;
+		private WorldPoint tile;
 		private String text;
-
-		public WorldPoint getTile()
-		{
-			return point(tile);
-		}
 	}
 
+	/** Every tile in the files is x, y, plane. */
 	private static WorldPoint point(int[] tile)
 	{
 		return tile == null || tile.length < 3 ? null : new WorldPoint(tile[0], tile[1], tile[2]);

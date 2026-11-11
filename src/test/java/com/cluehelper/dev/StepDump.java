@@ -4,6 +4,7 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.step.CoreClueReader;
 import com.cluehelper.step.Step;
+import com.cluehelper.step.StepIndex;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -62,7 +63,7 @@ final class StepDump
 		List<String> lines = new ArrayList<>();
 		lines.add("Step " + step.getKey());
 		lines.add(step.getType() + ", " + step.getTier() + ", " + step.getKind()
-			+ (step.isKnown() ? ", rows " + step.getCacheRows() : ", no step data"));
+			+ (step.getData() != StepIndex.Entry.NONE ? ", rows " + step.getCacheRows() : ", no step data"));
 		lines.add("Targets (" + step.getTargets().size() + "): " + tiles(step.getTargets()));
 		if (!step.getNpcs().isEmpty())
 		{

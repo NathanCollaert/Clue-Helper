@@ -1,9 +1,9 @@
 package com.cluehelper.step;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /**
  * Core's empty-slot requirements ("No Gloves", "Nothing at all"; "No Weapon" also takes a cormorant's glove), read through
@@ -28,7 +28,7 @@ public final class EmptySlots
 
 	public static List<ItemRequirement> of(List<ItemRequirement> requirements)
 	{
-		return requirements.stream().filter(EmptySlots::metByEmptySlots).collect(Collectors.toUnmodifiableList());
+		return requirements.stream().filter(EmptySlots::metByEmptySlots).collect(toUnmodifiableList());
 	}
 
 	/** Still met with only this item worn, in this slot. */
@@ -43,7 +43,7 @@ public final class EmptySlots
 		List<String> names = Arrays.stream(SLOTS)
 			.filter(slot -> emptied.stream().anyMatch(requirement -> !allows(requirement, slot, SOME_ITEM)))
 			.map(slot -> slot.name().toLowerCase(Locale.ROOT))
-			.collect(Collectors.toList());
+			.collect(toList());
 		if (names.size() == SLOTS.length)
 		{
 			return "everything";

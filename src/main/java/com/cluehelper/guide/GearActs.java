@@ -4,11 +4,11 @@ import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 /** Acts that put gear on or take it off: what to change now, from what is carried and worn, and when it is done. */
 @Singleton
@@ -58,9 +58,9 @@ final class GearActs
 			case GEAR_WORN:
 				return step != null && wearsGear(act, step);
 			case WAY_IN_SLOTS_EMPTY:
-				return wearsWayInGear(step) || act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
+				return wearsWayInGear(step) || slotsEmptied(act);
 			case SLOTS_EMPTY:
-				return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
+				return slotsEmptied(act);
 			case ITEM_WORN:
 				return act.getActItems().stream().anyMatch(player.wornIds()::contains);
 			default:
@@ -80,7 +80,7 @@ final class GearActs
 			.filter(id -> worn.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
 		List<Integer> chosen = coversAll != null ? List.of(coversAll) : worn.stream()
 			.map(need -> need.getIds().stream().filter(carried::contains).findFirst().orElse(need.getIds().get(0)))
-			.distinct().collect(Collectors.toList());
+			.distinct().collect(toList());
 		return equipping(act, chosen);
 	}
 
@@ -93,13 +93,13 @@ final class GearActs
 		Set<Integer> worn = player.wornIds();
 		Set<Integer> inventory = player.inventoryIds();
 		List<Integer> off = wornNeeds(act, step).stream().flatMap(need -> toRemove(need.getRequirement(), worn, inventory).stream())
-			.distinct().collect(Collectors.toList());
+			.distinct().collect(toList());
 		if (!off.isEmpty())
 		{
 			return act.toBuilder().text(TAKE_OFF_TEXT).items(names(off)).actItems(Set.copyOf(off)).tab(StepGuide.Tab.EQUIPMENT).build();
 		}
 		List<Integer> chosen = wornNeeds(act, step).stream().flatMap(need -> toEquip(need.getRequirement(), worn, inventory).stream())
-			.distinct().collect(Collectors.toList());
+			.distinct().collect(toList());
 		return chosen.isEmpty() ? act : equipping(act, chosen);
 	}
 
@@ -112,8 +112,13 @@ final class GearActs
 			.filter(slot -> act.getEmptied().stream().anyMatch(requirement -> !EmptySlots.allows(requirement, slot,
 				worn[slot.getSlotIdx()].getId())))
 			.map(slot -> worn[slot.getSlotIdx()].getId())
-			.collect(Collectors.toUnmodifiableSet());
+			.collect(toUnmodifiableSet());
 		return act.toBuilder().actItems(off).build();
+	}
+
+	private boolean slotsEmptied(SubStep act)
+	{
+		return act.getEmptied().stream().allMatch(requirement -> requirement.fulfilledBy(wornBySlot()));
 	}
 
 	private SubStep equipping(SubStep act, List<Integer> itemIds)
@@ -123,7 +128,7 @@ final class GearActs
 
 	private List<String> names(List<Integer> itemIds)
 	{
-		return itemIds.stream().map(id -> client.getItemDefinition(id).getName()).collect(Collectors.toList());
+		return itemIds.stream().map(id -> client.getItemDefinition(id).getName()).collect(toList());
 	}
 
 	/** Core lists items that can't be worn among an emote's (the axe hut's lockpick): carrying those is enough. */
@@ -168,7 +173,7 @@ final class GearActs
 	private List<RequiredItems.Need> wornNeeds(SubStep act, Step step)
 	{
 		return stepNeeds.of(step).getNeeds().stream().filter(need -> act.getWornNeeds().contains(need.getName()))
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	private static List<Integer> toRemove(ItemRequirement requirement, Set<Integer> worn, Set<Integer> inventory)
@@ -188,7 +193,7 @@ final class GearActs
 		{
 			return List.of();
 		}
-		List<Integer> fitting = inventory.stream().filter(requirement::fulfilledBy).sorted().collect(Collectors.toList());
+		List<Integer> fitting = inventory.stream().filter(requirement::fulfilledBy).sorted().collect(toList());
 		boolean outfit = requirement instanceof AllRequirementsCollection;
 		return outfit || fitting.isEmpty() ? fitting : List.of(fitting.get(0));
 	}

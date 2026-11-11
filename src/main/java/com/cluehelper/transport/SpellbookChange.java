@@ -20,8 +20,6 @@ public class SpellbookChange
 	boolean inHouse;
 	@Builder.Default
 	int objectId = NO_ID;
-	@Builder.Default
-	int npcId = NO_ID;
 	/** Null when it works from any book. */
 	Book from;
 	/** Null when it goes to any book the player can use; else it toggles this book (to Standard when already on it). */

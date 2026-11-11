@@ -30,35 +30,9 @@ public class HotColdPlan
 	/** Kept spot names to their share, largest first. */
 	Map<String, Double> kept;
 	boolean exact;
-	int readings;
-	int probes;
-	int landings;
-	long nanos;
-	long landingNanos;
 	/** Every probe the choice weighed, for replays. */
 	@Builder.Default
 	List<Probe> considered = List.of();
-
-	/** The next feel, at the probe the choice picked. */
-	static HotColdPlan feel(HotColdPlanBuilder base, ProbePlanner.Choice choice)
-	{
-		return base.action(Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
-	}
-
-	static HotColdPlan digHere(HotColdPlanBuilder base, WorldPoint tile)
-	{
-		return base.action(Action.DIG_HERE).tile(tile).build();
-	}
-
-	static HotColdPlan digSpot(HotColdPlanBuilder base, WorldPoint tile)
-	{
-		return base.action(Action.DIG_SPOT).tile(tile).build();
-	}
-
-	static HotColdPlan none(HotColdPlanBuilder base)
-	{
-		return base.action(Action.NONE).build();
-	}
 
 	public boolean isDig()
 	{

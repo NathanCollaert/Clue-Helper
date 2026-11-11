@@ -38,7 +38,7 @@ public class Highlighter
 	private static final int OUTLINE_WIDTH = 2;
 	private static final int FEATHER = 0;
 	private static final int ARC = 6;
-	private static final float STROKE = 2f;
+	private static final BasicStroke STROKE = new BasicStroke(2f);
 	/**
 	 * A flat click spot (two triangles) laid over scenery drawn by other objects: the Broken bridge's gap. Its outline is a
 	 * sliver no one sees.
@@ -47,13 +47,12 @@ public class Highlighter
 	/** A model this low lies flat on the ground (an empty, raked farming patch): its outline draws nothing to see. */
 	private static final int FLAT_MODEL_HEIGHT = 8;
 	/**
-	 * The outline takes only a world ring's butterflies, not its mushrooms: a circle on the ground marks them. A house's
-	 * ring and spirit tree outline their mushrooms themselves.
+	 * A world ring's object is only its butterflies: its mushrooms are the ground decorations on its tile and the eight
+	 * around it, one piece per tile, in a copy for each part of the map. A house's ring and spirit tree carry their
+	 * mushrooms themselves.
 	 */
 	private static final Set<Integer> FAIRY_RINGS = Set.of(ObjectID.FAIRYRING_MINORHUB, ObjectID.FAIRYRING_HOMEHUB);
-	/** In local units: a tile is 128. */
-	private static final int RING_RADIUS = 150;
-	private static final int RING_POINTS = 32;
+	private static final int MUSHROOM_TILES = 1;
 
 	@Inject
 	private Client client;
@@ -84,15 +83,15 @@ public class Highlighter
 				box(graphics, hiddenShape);
 				return;
 			}
-			if (leftClick)
+			List<TileObject> parts = FAIRY_RINGS.contains(object.getId()) ? withMushrooms(object) : List.of(object);
+			for (TileObject part : parts)
 			{
-				graphics.setColor(ONE_CLICK_FILL);
-				graphics.fill(silhouette.of(object));
-			}
-			outlines.drawOutline(object, OUTLINE_WIDTH, COLOUR, FEATHER);
-			if (FAIRY_RINGS.contains(object.getId()))
-			{
-				groundRing(graphics, object);
+				if (leftClick)
+				{
+					graphics.setColor(ONE_CLICK_FILL);
+					graphics.fill(silhouette.of(part));
+				}
+				outlines.drawOutline(part, OUTLINE_WIDTH, COLOUR, FEATHER);
 			}
 		}
 		catch (NullPointerException e)
@@ -104,26 +103,24 @@ public class Highlighter
 		}
 	}
 
-	/** The mushrooms' circle on the ground round the object, outlined: the ring itself, not a box about it. */
-	private void groundRing(Graphics2D graphics, TileObject object)
+	/** The ring with the ground decorations on the tiles it stands among: its mushrooms. */
+	private static List<TileObject> withMushrooms(TileObject ring)
 	{
-		LocalPoint centre = object.getLocalLocation();
-		Polygon ring = new Polygon();
-		for (int i = 0; i < RING_POINTS; i++)
+		List<TileObject> parts = new ArrayList<>(List.of(ring));
+		Tile[][] tiles = ring.getWorldView().getScene().getTiles()[ring.getPlane()];
+		LocalPoint centre = ring.getLocalLocation();
+		for (int x = centre.getSceneX() - MUSHROOM_TILES; x <= centre.getSceneX() + MUSHROOM_TILES; x++)
 		{
-			double angle = 2 * Math.PI * i / RING_POINTS;
-			LocalPoint at = new LocalPoint(centre.getX() + (int) (RING_RADIUS * Math.cos(angle)),
-				centre.getY() + (int) (RING_RADIUS * Math.sin(angle)), centre.getWorldView());
-			Point point = Perspective.localToCanvas(client, at, object.getPlane());
-			if (point == null)
+			for (int y = centre.getSceneY() - MUSHROOM_TILES; y <= centre.getSceneY() + MUSHROOM_TILES; y++)
 			{
-				return;
+				Tile tile = x < 0 || y < 0 || x >= tiles.length || y >= tiles[x].length ? null : tiles[x][y];
+				if (tile != null && tile.getGroundObject() != null)
+				{
+					parts.add(tile.getGroundObject());
+				}
 			}
-			ring.addPoint(point.getX(), point.getY());
 		}
-		graphics.setColor(COLOUR);
-		graphics.setStroke(new BasicStroke(STROKE));
-		graphics.draw(ring);
+		return parts;
 	}
 
 	/** Where an object the outline renderer can't draw is clicked: its clickbox, else its tile. */
@@ -196,7 +193,7 @@ public class Highlighter
 
 	public void box(Graphics2D graphics, Rectangle bounds)
 	{
-		box(graphics, new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC));
+		box(graphics, rounded(bounds));
 	}
 
 	/** A spell, a tab stone, a fairy ring dial: things without text or a model. */
@@ -204,22 +201,30 @@ public class Highlighter
 	{
 		graphics.setColor(FILL);
 		graphics.fill(shape);
-		graphics.setColor(COLOUR);
-		graphics.setStroke(new BasicStroke(STROKE));
-		graphics.draw(shape);
+		outline(graphics, shape);
 	}
 
 	/** A spell: filled when its left click casts the step's teleport, outlined when its right-click menu does. */
 	public void spell(Graphics2D graphics, Rectangle bounds, boolean leftClick)
 	{
-		Shape shape = new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC);
+		Shape shape = rounded(bounds);
 		if (leftClick)
 		{
 			graphics.setColor(ONE_CLICK_FILL);
 			graphics.fill(shape);
 		}
+		outline(graphics, shape);
+	}
+
+	private static Shape rounded(Rectangle bounds)
+	{
+		return new RoundRectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height, ARC, ARC);
+	}
+
+	private static void outline(Graphics2D graphics, Shape shape)
+	{
 		graphics.setColor(COLOUR);
-		graphics.setStroke(new BasicStroke(STROKE));
+		graphics.setStroke(STROKE);
 		graphics.draw(shape);
 	}
 

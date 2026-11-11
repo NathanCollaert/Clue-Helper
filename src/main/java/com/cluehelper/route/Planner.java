@@ -9,6 +9,7 @@ import java.util.stream.*;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 /** Pure, so it runs on the executor with snapshot data only. */
 public final class Planner
@@ -53,25 +54,26 @@ public final class Planner
 	{
 		long started = System.nanoTime();
 		Step step = in.getStep();
+		Plan.PlanBuilder plan = Plan.builder().stepKey(step == null ? null : step.getKey());
 		if (step != null && step.getData().isHidden())
 		{
-			return Plan.builder().stepKey(step.getKey()).note("not guided: a step outside the normal game (Leagues, or removed)").build();
+			return plan.note("not guided: a step outside the normal game (Leagues, or removed)").build();
 		}
 		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
 		{
-			return Plan.builder().stepKey(step == null ? null : step.getKey()).note(step == null ? "no step"
+			return plan.note(step == null ? "no step"
 				: ClueTypes.HOT_COLD.equals(step.getType()) ? "choosing where to feel" : "no target tile for this step yet").build();
 		}
 		List<String> shortLevels = shortLevels(step, in.getPlayer());
 		if (!shortLevels.isEmpty())
 		{
-			return Plan.builder().stepKey(step.getKey()).requirementNotes(shortLevels).build();
+			return plan.requirementNotes(shortLevels).build();
 		}
 		PlanContext ctx = new PlanContext(in);
 		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty())
 			|| ctx.required.getMissing().stream().anyMatch(RequiredItems.Need::isBlocksRoute))
 		{
-			return Plan.builder().stepKey(step.getKey()).requirementNotes(requirementNotes(ctx)).build();
+			return plan.requirementNotes(requirementNotes(ctx)).build();
 		}
 		List<List<int[]>> orders = legOrders(ctx, step);
 		ctx.freezeNodes();
@@ -80,7 +82,6 @@ public final class Planner
 		Searches searches = new Searches(ctx, area, probes);
 
 		LabelSearch first = searches.bestOrder(orders, Set.of(), probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
-		Plan.PlanBuilder plan = Plan.builder().stepKey(step.getKey());
 		Picks picks = new Picks(ctx, first);
 		if (picks.best == null && ctx.avoidsWilderness && !probes)
 		{
@@ -121,18 +122,12 @@ public final class Planner
 		{
 			return stageOrders(ctx, step);
 		}
-		List<int[]> nodes = step.getTargets().stream().map(tile -> new int[]{ctx.nodeAt(tile)}).collect(Collectors.toList());
 		if (step.getKind() != TargetKind.SEQUENCE)
 		{
-			return List.of(List.of(nodes.stream().mapToInt(n -> n[0]).toArray()));
+			return List.of(List.of(step.getTargets().stream().mapToInt(ctx::nodeAt).toArray()));
 		}
-		if (!ClueTypes.THREE_STEP.equals(step.getType()))
-		{
-			return List.of(nodes);
-		}
-		List<List<int[]>> orders = new ArrayList<>();
-		permute(nodes, 0, orders);
-		return orders;
+		List<int[]> nodes = step.getTargets().stream().map(tile -> new int[]{ctx.nodeAt(tile)}).collect(toList());
+		return ClueTypes.THREE_STEP.equals(step.getType()) ? permutations(nodes) : List.of(nodes);
 	}
 
 	/**
@@ -152,13 +147,7 @@ public final class Planner
 				legs.add(places);
 			}
 		}
-		if (!anyOrder)
-		{
-			return List.of(legs);
-		}
-		List<List<int[]>> orders = new ArrayList<>();
-		permute(legs, 0, orders);
-		return orders;
+		return anyOrder ? permutations(legs) : List.of(legs);
 	}
 
 	/**
@@ -171,6 +160,13 @@ public final class Planner
 		boolean inHouse = PositionRules.POH_NODE.equals(tile);
 		return (patch == null || ctx.in.getPlayer().getPlantedTrees().contains(patch))
 			&& (!inHouse || ctx.in.getPlayer().getHouse().hasAny(stage.getHouseObjects())) && !ctx.lacksItems(tile);
+	}
+
+	private static List<List<int[]>> permutations(List<int[]> items)
+	{
+		List<List<int[]>> orders = new ArrayList<>();
+		permute(items, 0, orders);
+		return orders;
 	}
 
 	private static void permute(List<int[]> items, int from, List<List<int[]>> out)
@@ -288,7 +284,7 @@ public final class Planner
 				places.add(from);
 			}
 			List<WorldPoint> before = places.subList(0, places.size() - 1);
-			if (before.stream().anyMatch(seen -> seen.getPlane() == to.getPlane() && seen.distanceTo2D(to) <= SAME_LANDING_TILES))
+			if (before.stream().anyMatch(seen -> seen.distanceTo(to) <= SAME_LANDING_TILES))
 			{
 				return true;
 			}
@@ -313,7 +309,7 @@ public final class Planner
 		return landing != null && shown.stream().anyMatch(other ->
 		{
 			WorldPoint at = firstLanding(other);
-			return at != null && at.getPlane() == landing.getPlane() && at.distanceTo2D(landing) <= SAME_LANDING_TILES
+			return at != null && at.distanceTo(landing) <= SAME_LANDING_TILES
 				&& route.getSpent().keySet().containsAll(other.getSpent().keySet());
 		});
 	}
@@ -349,7 +345,7 @@ public final class Planner
 		{
 			for (RequiredItems.Need need : verdict.getMissing())
 			{
-				List<String> ways = new ArrayList<>(waysNamed(need.getName()));
+				List<String> ways = waysNamed(need.getName());
 				List<String> otherWay = verdict.getMissingParts().getOrDefault(need, List.of());
 				if (!otherWay.isEmpty())
 				{
@@ -376,9 +372,9 @@ public final class Planner
 		}
 		else
 		{
-			Arrays.stream(name.split(",? or ")).forEach(ways::add);
+			ways.addAll(Arrays.asList(name.split(",? or ")));
 		}
-		return ways.stream().map(Planner::wayLine).collect(Collectors.toList());
+		return ways;
 	}
 
 	/** A level the task needs and the player lacks: the step can't be done, so nothing routes to it. */
@@ -405,12 +401,10 @@ public final class Planner
 
 	static List<String> requirementNotes(PlanContext ctx)
 	{
-		RequiredItems required = ctx.in.getRequired();
-		List<String> notes = new ArrayList<>();
 		List<RequiredItems.Verdict> verdicts = new ArrayList<>(List.of(ctx.required));
 		verdicts.addAll(ctx.stageVerdicts());
-		notes.addAll(missingList(verdicts));
-		if (required.isSpadeAtLeprechaun() && ctx.required.getMissing().stream().anyMatch(need -> need.getName().equalsIgnoreCase("spade")))
+		List<String> notes = new ArrayList<>(missingList(verdicts));
+		if (ctx.in.getRequired().isSpadeAtLeprechaun() && ctx.required.getMissing().stream().anyMatch(need -> need.getName().equalsIgnoreCase("spade")))
 		{
 			notes.add("Your spade is with a tool leprechaun");
 		}
@@ -429,7 +423,7 @@ public final class Planner
 			return List.of(step.getData().getReach());
 		}
 		WalkTable table = ctx.table;
-		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(Collectors.toSet());
+		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(toSet());
 		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || !ctx.isTableNode(n) || table.reverseEnd(n) == table.reverseFrom(n));
 		if (noWalkData)
 		{
@@ -450,33 +444,38 @@ public final class Planner
 	 */
 	private static List<List<String>> lockingItems(PlanContext ctx, Set<Integer> targets)
 	{
-		PlayerSnapshot judged = ctx.in.getBanked() != null ? ctx.in.getBanked() : ctx.in.getPlayer();
-		WalkTable table = ctx.table;
-		WalkGates gates = ctx.gates(PlanContext.BANKED);
+		PlayerSnapshot judged = withBank(ctx);
 		Set<List<String>> missing = new LinkedHashSet<>();
-		for (int target : targets)
-		{
-			for (int i = table.reverseFrom(target); i < table.reverseEnd(target); i++)
-			{
-				gates.shutWays(table.reverseEntry(i)).stream().flatMap(List::stream)
-					.map(gate -> ctx.in.getEngine().judge(CatalogRow.builder().name("gate").requirements(gate).build(), judged,
-						ctx.in.getNowMinutes()))
-					.filter(verdict -> !verdict.isAvailable() && verdict.getMissingItems().size() == verdict.getWhyNot().size())
-					.forEach(verdict -> missing.addAll(verdict.getMissingItems()));
-			}
-		}
+		shutWaysInto(ctx, ctx.gates[PlanContext.BANKED], targets).flatMap(List::stream)
+			.map(gate -> ctx.judge("gate", gate, judged))
+			.filter(verdict -> !verdict.isAvailable() && verdict.getMissingItems().size() == verdict.getWhyNot().size())
+			.forEach(verdict -> missing.addAll(verdict.getMissingItems()));
 		return List.copyOf(missing);
+	}
+
+	/** Each way into the targets that {@code gates} shut, as the gates that shut it. */
+	private static Stream<List<Requirements>> shutWaysInto(PlanContext ctx, WalkGates gates, Set<Integer> targets)
+	{
+		WalkTable table = ctx.table;
+		return targets.stream().flatMap(target -> IntStream.range(table.reverseFrom(target), table.reverseEnd(target)).boxed()
+			.flatMap(i -> gates.shutWays(table.reverseEntry(i)).stream()));
+	}
+
+	/** The player as a missing note judges them: with the bank, where it counts. */
+	private static PlayerSnapshot withBank(PlanContext ctx)
+	{
+		return ctx.in.getBanked() != null ? ctx.in.getBanked() : ctx.in.getPlayer();
 	}
 
 	/** The way in the player lacks, from the nearest transport landing by a target (the Dragontooth boat's fare). */
 	private static List<String> blockedRideNotes(PlanContext ctx)
 	{
-		PlayerSnapshot judged = ctx.in.getBanked() != null ? ctx.in.getBanked() : ctx.in.getPlayer();
+		PlayerSnapshot judged = withBank(ctx);
 		List<WorldPoint> targets = ctx.in.getStep().getTargets();
 		return ctx.in.getCatalog().getTeleports().stream()
 			.filter(row -> row.getDestination() != null && distanceToNearest(row.getDestination(), targets) <= BLOCKED_RIDE_TILES)
 			.sorted(Comparator.comparingInt(row -> distanceToNearest(row.getDestination(), targets)))
-			.map(row -> ctx.in.getEngine().judge(row, judged, ctx.in.getNowMinutes()))
+			.map(row -> ctx.judge(row, judged))
 			.filter(verdict -> !verdict.isAvailable() && !verdict.getWhyNot().isEmpty())
 			.findFirst()
 			.map(Planner::blockedRideLines)
@@ -504,14 +503,14 @@ public final class Planner
 			return List.of();
 		}
 		List<String> lines = new ArrayList<>(List.of(heading));
-		needs.forEach(ways -> lines.addAll(alternativeLines(ways.stream().map(Planner::wayLine).collect(Collectors.toList()))));
+		needs.forEach(ways -> lines.addAll(alternativeLines(ways)));
 		return lines;
 	}
 
 	/** Needs with one way each, all of them wanted. */
 	private static List<List<String>> each(List<String> needs)
 	{
-		return needs.stream().map(List::of).collect(Collectors.toList());
+		return needs.stream().map(List::of).collect(toList());
 	}
 
 	private static String wayLine(String way)
@@ -529,15 +528,14 @@ public final class Planner
 			{
 				lines.add("or");
 			}
-			lines.add("- " + way);
+			lines.add("- " + wayLine(way));
 		}
 		return lines;
 	}
 
 	private static int distanceToNearest(WorldPoint tile, List<WorldPoint> targets)
 	{
-		return targets.stream().filter(target -> target.getPlane() == tile.getPlane()).mapToInt(target -> target.distanceTo2D(tile))
-			.min().orElse(Integer.MAX_VALUE);
+		return targets.stream().mapToInt(tile::distanceTo).min().orElse(Integer.MAX_VALUE);
 	}
 
 	/**
@@ -552,24 +550,14 @@ public final class Planner
 		{
 			return Set.of();
 		}
-		WalkTable table = ctx.table;
-		WalkGates gates = ctx.gates(PlanContext.NOT_BANKED);
-		Set<String> ways = new TreeSet<>();
-		for (int target : targets)
-		{
-			for (int i = table.reverseFrom(target); i < table.reverseEnd(target); i++)
-			{
-				gates.shutWays(table.reverseEntry(i)).stream().map(way -> unfinishedQuests(way, player)).filter(quests -> !quests.isEmpty())
-					.forEach(ways::add);
-			}
-		}
-		return ways;
+		return shutWaysInto(ctx, ctx.gates[PlanContext.NOT_BANKED], targets).map(way -> unfinishedQuests(way, player))
+			.filter(quests -> !quests.isEmpty()).collect(toCollection(TreeSet::new));
 	}
 
 	private static String unfinishedQuests(List<Requirements> gates, PlayerSnapshot player)
 	{
 		return gates.stream().flatMap(gate -> gate.getQuests().stream()).filter(quest -> !player.finished(quest))
-			.map(Quest::getName).distinct().sorted().collect(Collectors.joining(" and "));
+			.map(Quest::getName).distinct().sorted().collect(joining(" and "));
 	}
 
 	@RequiredArgsConstructor
@@ -614,9 +602,7 @@ public final class Planner
 			int bestRank = Integer.MAX_VALUE;
 			for (List<int[]> order : orders)
 			{
-				LabelSearch search = new LabelSearch(ctx, order, area, first, rankLimit);
-				search.run();
-				labels += search.labels;
+				LabelSearch search = run(new LabelSearch(ctx, order, area, first, rankLimit));
 				Route pick = new Picks(ctx, search).best;
 				if (pick != null && pick.getRankHalfTicks() < bestRank)
 				{
@@ -629,7 +615,11 @@ public final class Planner
 
 		private LabelSearch run(List<int[]> order, Set<String> excluded, int rankLimit)
 		{
-			LabelSearch search = new LabelSearch(ctx, order, probes, area, excluded, rankLimit);
+			return run(new LabelSearch(ctx, order, probes, area, excluded, rankLimit));
+		}
+
+		private LabelSearch run(LabelSearch search)
+		{
 			search.run();
 			labels += search.labels;
 			return search;
@@ -660,13 +650,11 @@ public final class Planner
 			Route pickWalked = qualifies(walkedOnly, plain) ? walkedOnly : plain;
 			Route reference = faster(pickBank, pickWalked);
 			Route pickBoth = qualifies(both, reference) ? both : reference;
-			best = Stream.of(plain, pickBank, pickWalked, pickBoth).filter(Objects::nonNull)
-				.min(Comparator.comparingInt(Route::getRankHalfTicks)).orElse(null);
+			best = fastest(Stream.of(plain, pickBank, pickWalked, pickBoth));
 			direct = pickWalked;
 			Route sameBookBanked = r[1][LabelSearch.NONE];
 			sameBook = qualifies(sameBookBanked, r[0][LabelSearch.NONE]) ? sameBookBanked : r[0][LabelSearch.NONE];
-			Route fastest = Stream.of(r[0], r[1]).flatMap(Stream::of).filter(Objects::nonNull)
-				.min(Comparator.comparingInt(Route::getRankHalfTicks)).orElse(null);
+			Route fastest = fastest(Stream.of(r[0], r[1]).flatMap(Stream::of));
 			fasterUnqualified = fastest != null && best != null && fastest.getRankHalfTicks() < best.getRankHalfTicks() ? fastest : null;
 		}
 
@@ -713,15 +701,154 @@ public final class Planner
 
 		private static boolean qualifies(Route route, Route reference)
 		{
-			if (route == null)
+			return route != null
+				&& (reference == null || route.getRankHalfTicks() < reference.getRankHalfTicks() - LabelSearch.MARGIN_HALF_TICKS);
+		}
+
+		private static Route fastest(Stream<Route> routes)
+		{
+			return routes.filter(Objects::nonNull).min(Comparator.comparingInt(Route::getRankHalfTicks)).orElse(null);
+		}
+	}
+
+	/** A searched goal label as the route the guide follows: its legs, withdraw list and what it spends. */
+	private static final class RouteBuilder
+	{
+		static Route build(PlanContext ctx, LabelSearch.Label goal, int rank)
+		{
+			List<Leg> legs = new ArrayList<>();
+			WorldPoint at = ctx.in.getStart().getTile();
+			boolean wilderness = false;
+			boolean stageReached = false;
+			for (LabelSearch.Label label : goal.chain())
 			{
-				return false;
+				if (label.kind == null)
+				{
+					stageReached |= label.parent != null && label.leg != label.parent.leg;
+					continue;
+				}
+				Leg leg = leg(ctx, label, at);
+				Leg last = legs.isEmpty() ? null : legs.get(legs.size() - 1);
+				boolean merge = leg.getKind() == Leg.Kind.WALK && last != null && last.getKind() == Leg.Kind.WALK
+					&& !leavesByExit(ctx, last) && !stageReached;
+				stageReached = false;
+				if (merge)
+				{
+					legs.set(legs.size() - 1, Leg.walk(last.getFrom(), leg.getTo(), last.getHalfTicks() + leg.getHalfTicks(), leg.getBookAfter()));
+				}
+				else
+				{
+					legs.add(leg);
+				}
+				at = leg.getTo();
+				wilderness |= at != null && ctx.isWilderness(at);
 			}
-			if (reference == null)
+			Map<String, Integer> spent = new LinkedHashMap<>();
+			for (LabelSearch.Label label : goal.chain())
 			{
-				return true;
+				tally(ctx, label.ref, spent);
+				tally(ctx, label.ref2, spent);
 			}
-			return route.getRankHalfTicks() < reference.getRankHalfTicks() - LabelSearch.MARGIN_HALF_TICKS;
+			List<ItemUse> withdraw = withdraw(ctx, goal);
+			boolean banked = goal.b == PlanContext.BANKED;
+			boolean depositFirst = banked && slotsNeeded(ctx, withdraw) > ctx.in.getPlayer().getFreeInventorySlots();
+			int extra = depositFirst ? PlanContext.DEPOSIT_FIRST_HALF_TICKS : 0;
+			boolean bankLeg = legs.stream().anyMatch(leg -> leg.getKind() == Leg.Kind.BANK);
+			return Route.builder()
+				.legs(List.copyOf(legs))
+				.halfTicks(goal.half + extra)
+				.rankHalfTicks(rank + extra)
+				.tieBreakHalfTicks(goal.teleports * PlanContext.TELEPORT_TIE_HALF_TICKS)
+				.banked(banked)
+				.withdraw(withdraw)
+				.depositFirst(depositFirst)
+				.openBankStart(banked && !bankLeg)
+				.changed(goal.c != LabelSearch.NONE)
+				.startBook(ctx.homeBook)
+				.endBook(goal.endBook != null ? goal.endBook : LabelSearch.endBook(goal.k))
+				.spent(spent)
+				.confidence(goal.confidence())
+				.wilderness(wilderness)
+				.build();
+		}
+
+		/** A start leg through an {@link Exit} stays a leg of its own, so the guide can name the exit. */
+		private static boolean leavesByExit(PlanContext ctx, Leg leg)
+		{
+			PlanStart start = ctx.in.getStart();
+			return start.getKind() == PlanStart.Kind.SCENE && leg.getFrom() != null && leg.getFrom().equals(start.getTile())
+				&& start.getWalk().exitTo(leg.getTo()) != null;
+		}
+
+		private static List<ItemUse> withdraw(PlanContext ctx, LabelSearch.Label goal)
+		{
+			if (goal.b != PlanContext.BANKED)
+			{
+				return List.of();
+			}
+			Map<Integer, ItemUse> byItem = new LinkedHashMap<>(routeWithdraw(goal));
+			ctx.required.getWithdraw().forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+			for (int gateItem : goal.withdrawn)
+			{
+				byItem.putIfAbsent(gateItem, new ItemUse(Container.BANK, gateItem, 1));
+			}
+			return List.copyOf(byItem.values());
+		}
+
+		private static Map<Integer, ItemUse> routeWithdraw(LabelSearch.Label goal)
+		{
+			Map<Integer, ItemUse> byItem = new LinkedHashMap<>();
+			for (LabelSearch.Label label : goal.chain())
+			{
+				for (TransportOptions.Edge ref : new TransportOptions.Edge[]{label.ref, label.ref2})
+				{
+					if (label.b == PlanContext.BANKED && ref != null)
+					{
+						ref.withdrawUses.forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+					}
+				}
+			}
+			return byItem;
+		}
+
+		/** A stack of something already in the inventory takes no new slot. */
+		private static int slotsNeeded(PlanContext ctx, List<ItemUse> withdraw)
+		{
+			return (int) withdraw.stream().filter(use -> ctx.in.getPlayer().count(Container.INVENTORY, use.getItemId()) == 0).count();
+		}
+
+		/** Every unit a leg uses, tracked by the search or not. */
+		private static void tally(PlanContext ctx, TransportOptions.Edge ref, Map<String, Integer> spent)
+		{
+			for (int i = 0; ref != null && i < ref.res.length; i++)
+			{
+				spent.merge(ctx.resources.name(ref.res[i]), ref.amounts[i], Integer::sum);
+			}
+		}
+
+		private static Leg leg(PlanContext ctx, LabelSearch.Label label, WorldPoint at)
+		{
+			Book book = LabelSearch.bookOf(label.k);
+			switch (label.kind)
+			{
+				case TELEPORT:
+					return Leg.teleport(at, ((TransportOptions.Teleport) label.ref).row, label.edgeHalf, book);
+				case SWAP_TELEPORT:
+					return Leg.swapTeleport(at, ((TransportOptions.Teleport) label.ref).row, ((TransportOptions.Change) label.ref2).change, label.edgeHalf, book);
+				case FAIRY_RING:
+					return Leg.fairyRing(at, ((TransportOptions.Teleport) label.ref).row, ((TransportOptions.Teleport) label.ref2).row, label.edgeHalf, book);
+				case SPELLBOOK_CHANGE:
+					return Leg.spellbookChange(at, ((TransportOptions.Change) label.ref).change, label.edgeHalf, book);
+				case BANK:
+					return Leg.bank(at, label.edgeHalf, book);
+				case WILDERNESS_EXIT:
+					// The exit's node has no tile, so its origin class is WILD0's: its own class says how far south it goes.
+					return Leg.wildernessExit(at, ctx.abstractClass(label.node).getExitY(), label.edgeHalf, book);
+				case WALK:
+					return Leg.walk(at, ctx.tile(label.node), label.edgeHalf, book);
+				default:
+					throw new IllegalArgumentException("unhandled leg kind " + label.kind);
+			}
 		}
 	}
 }

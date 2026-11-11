@@ -1,11 +1,13 @@
 package com.cluehelper.step;
 
 import java.util.*;
+import java.util.stream.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /**
  * Public getters only, never the methods that change core's state ({@code forText}, {@code update},
@@ -115,15 +117,8 @@ public final class CoreClueReader
 			return List.of();
 		}
 		String[] npcs = ((NpcClueScroll) clue).getNpcs(plugin);
-		List<String> named = new ArrayList<>();
-		for (String npc : npcs == null ? new String[0] : npcs)
-		{
-			if (npc != null && !npc.isEmpty() && !named.contains(npc))
-			{
-				named.add(npc);
-			}
-		}
-		return named;
+		return npcs == null ? List.of() : Arrays.stream(npcs).filter(npc -> npc != null && !npc.isEmpty()).distinct()
+			.collect(toList());
 	}
 
 	static List<Integer> regions(ClueScroll clue)
@@ -150,19 +145,9 @@ public final class CoreClueReader
 
 	static List<Integer> objectIds(ClueScroll clue)
 	{
-		Set<Integer> ids = new LinkedHashSet<>();
-		if (clue instanceof ObjectClueScroll)
-		{
-			int[] objectIds = ((ObjectClueScroll) clue).getObjectIds();
-			for (int id : objectIds == null ? new int[0] : objectIds)
-			{
-				if (id > 0)
-				{
-					ids.add(id);
-				}
-			}
-		}
-		return List.copyOf(ids);
+		int[] objectIds = clue instanceof ObjectClueScroll ? ((ObjectClueScroll) clue).getObjectIds() : null;
+		return objectIds == null ? List.of()
+			: Arrays.stream(objectIds).filter(id -> id > 0).distinct().boxed().collect(toUnmodifiableList());
 	}
 
 	static List<String> objectNames(ClueScroll clue)
@@ -196,15 +181,8 @@ public final class CoreClueReader
 	/** The three-step's parts core hasn't marked solved, in core's order. */
 	static List<CrypticClue> unsolvedParts(ThreeStepCrypticClue clue)
 	{
-		List<CrypticClue> parts = new ArrayList<>();
-		for (Map.Entry<CrypticClue, Boolean> part : List.copyOf(clue.getClueSteps()))
-		{
-			if (!part.getValue())
-			{
-				parts.add(part.getKey());
-			}
-		}
-		return parts;
+		return List.copyOf(clue.getClueSteps()).stream().filter(part -> !part.getValue()).map(Map.Entry::getKey)
+			.collect(toList());
 	}
 
 	static List<String> emotes(ClueScroll clue)
@@ -214,15 +192,8 @@ public final class CoreClueReader
 			return List.of();
 		}
 		EmoteClue emote = (EmoteClue) clue;
-		List<String> names = new ArrayList<>();
-		for (Emote each : new Emote[]{emote.getFirstEmote(), emote.getSecondEmote()})
-		{
-			if (each != null)
-			{
-				names.add(each.getName());
-			}
-		}
-		return List.copyOf(names);
+		return Stream.of(emote.getFirstEmote(), emote.getSecondEmote()).filter(Objects::nonNull).map(Emote::getName)
+			.collect(toUnmodifiableList());
 	}
 
 	static boolean challengeCompleted(ClueScroll clue)
@@ -265,14 +236,6 @@ public final class CoreClueReader
 
 	private static <T> List<T> distinct(List<T> values)
 	{
-		List<T> kept = new ArrayList<>();
-		for (T value : values)
-		{
-			if (value != null && !kept.contains(value))
-			{
-				kept.add(value);
-			}
-		}
-		return kept;
+		return values.stream().filter(Objects::nonNull).distinct().collect(toList());
 	}
 }

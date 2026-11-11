@@ -1,12 +1,12 @@
 package com.cluehelper.memory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 import net.runelite.client.util.Text;
+import static java.util.stream.Collectors.*;
 
 /**
  * Client thread. Filled state has no var: the Clue Scroll plugin's tick (script 1479) is built state too and stays 1
@@ -32,7 +32,7 @@ public class StashMemory
 	private static final int BUILT = 1;
 	private static final int NOT_SEEN = -1;
 	private static final Set<Integer> UNIT_OBJECTS = Arrays.stream(STASHUnit.values()).map(STASHUnit::getObjectId)
-		.collect(Collectors.toUnmodifiableSet());
+		.collect(toUnmodifiableSet());
 
 	@Inject
 	private Client client;

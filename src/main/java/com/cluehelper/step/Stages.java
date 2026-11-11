@@ -4,12 +4,12 @@ import com.cluehelper.player.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.*;
-import java.util.stream.Collectors;
 import net.runelite.api.Prayer;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.CrypticClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 /** Builds the stages of steps done in several places. Act texts never repeat core's solutions. */
 public final class Stages
@@ -27,9 +27,7 @@ public final class Stages
 	/** Every stage's tiles in order: the step's targets. */
 	public static List<WorldPoint> tiles(List<Stage> stages)
 	{
-		List<WorldPoint> tiles = new ArrayList<>();
-		stages.forEach(stage -> tiles.addAll(stage.getTiles()));
-		return List.copyOf(tiles);
+		return stages.stream().flatMap(stage -> stage.getTiles().stream()).collect(toUnmodifiableList());
 	}
 
 	static List<Stage> parts(List<CrypticClue> parts, ClueScrollPlugin plugin, Function<CrypticClue, List<String>> wornFor)
@@ -100,7 +98,7 @@ public final class Stages
 	{
 		List<Stage> left = step.getStages().stream()
 			.filter(stage -> stage.getSkippedWhenOwned().stream().noneMatch(owns))
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 		return left.size() == step.getStages().size() ? step : withStagesLeft(step, left);
 	}
 
@@ -116,9 +114,9 @@ public final class Stages
 	{
 		List<WorldPoint> spots = step.getData().getTargets().stream()
 			.filter(target -> target.getTile() != null && target.getNpcs().contains(npcId))
-			.map(StepIndex.Target::getTile).collect(Collectors.toUnmodifiableList());
+			.map(StepIndex.Target::getTile).collect(toUnmodifiableList());
 		List<WorldPoint> kept = step.getTargets().stream().filter(tile -> spots.stream().anyMatch(spot -> spot.distanceTo(tile) <= 1))
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 		return kept.isEmpty() ? step : step.toBuilder().targets(kept).build();
 	}
 
@@ -139,12 +137,12 @@ public final class Stages
 			return step;
 		}
 		Set<WorldPoint> places = step.getStages().stream().filter(stage -> stage.getKind() == Stage.Kind.TASK)
-			.flatMap(stage -> stage.getTiles().stream()).collect(Collectors.toSet());
+			.flatMap(stage -> stage.getTiles().stream()).collect(toSet());
 		List<Stage> stages = step.getStages().stream().map(stage -> stage.getKind() != Stage.Kind.TASK ? stage
 			: stage.toBuilder().tiles(List.of()).objectIds(Set.of()).npcIds(Set.of()).option(null).detail(ANYWHERE).build())
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 		return step.toBuilder().stages(stages)
-			.targets(step.getTargets().stream().filter(tile -> !places.contains(tile)).collect(Collectors.toUnmodifiableList())).build();
+			.targets(step.getTargets().stream().filter(tile -> !places.contains(tile)).collect(toUnmodifiableList())).build();
 	}
 
 	/** Inside a task's area (on a rooftop course) the task is under way: done where the player is, not from its start. */
@@ -157,9 +155,9 @@ public final class Stages
 			return step;
 		}
 		List<Stage> stages = step.getStages().stream().map(stage -> stage != task ? stage : stage.toBuilder().tiles(List.of()).build())
-			.collect(Collectors.toUnmodifiableList());
+			.collect(toUnmodifiableList());
 		return step.toBuilder().stages(stages)
-			.targets(step.getTargets().stream().filter(tile -> !task.getTiles().contains(tile)).collect(Collectors.toUnmodifiableList()))
+			.targets(step.getTargets().stream().filter(tile -> !task.getTiles().contains(tile)).collect(toUnmodifiableList()))
 			.build();
 	}
 
@@ -181,38 +179,31 @@ public final class Stages
 	 * Sherlock: the task (at its places, or anywhere when the data has none) until core marks it completed, then
 	 * Sherlock. Empty when only the hand-in is left, and for Charlie, whose item is a need of the step like Sherlock's
 	 * items: the player brings it.
+	 *
+	 * @param entry {@link StepIndex.Entry#NONE} when the data lacks the step
 	 */
-	static List<Stage> challenge(StepIndex.Entry entry, String task, boolean completed, ItemRequirement returnItem,
+	static List<Stage> challenge(StepIndex.Entry entry, String taskText, boolean completed, ItemRequirement returnItem,
 		List<WorldPoint> targets, List<ItemRequirement> emptied)
 	{
-		List<Stage> stages = new ArrayList<>();
-		if (returnItem == null && !completed)
-		{
-			List<WorldPoint> places = entry == null ? List.of() : placeTiles(entry.getPlaces());
-			String where = entry == null || !entry.hasPlaces() ? null
-				: entry.getPlaces().isEmpty() ? ANYWHERE : entry.getPlaces().get(0).getText();
-			stages.add(Stage.builder().kind(Stage.Kind.TASK).act(entry == null || entry.getAct() == null ? sentence(task) : entry.getAct()).detail(where).tiles(places)
-				.ourMarker(true).objectIds(entry == null ? Set.of() : objectsOf(entry.getPlaces()))
-				.npcIds(entry == null ? Set.of() : npcsOf(entry.getPlaces())).takesStepItems(true)
-				.worn(entry == null ? List.of() : entry.getWear()).emptied(emptied).before(entry == null ? List.of() : entry.getBefore())
-				.spans(entry == null ? List.of() : spans(entry.getPlaces()))
-				.option(entry == null ? null : entry.getPlaces().stream().map(StepIndex.Place::getOption).filter(option -> option != null)
-					.findFirst().orElse(null))
-				.dialogue(entry == null ? List.of() : entry.getPlaces().stream().map(StepIndex.Place::getDialogue)
-					.filter(dialogue -> !dialogue.isEmpty()).findFirst().orElse(List.of()))
-				.grownOnly(entry == null ? Map.of() : grownOnly(entry.getPlaces()))
-				.placeTexts(entry == null || !entry.hasPlaces() ? Map.of() : placeTexts(entry.getPlaces()))
-				.houseObjects(entry == null ? Set.of() : entry.getPlaces().stream().filter(place -> PositionRules.POH_NODE.equals(place.getTile()))
-					.flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet()))
-				.uses(entry == null ? Map.of() : usesByTile(entry.getPlaces()))
-				.book(entry == null || entry.getBook() == null ? null : Book.valueOf(entry.getBook())).build());
-		}
-		if (stages.isEmpty())
+		if (returnItem != null || completed)
 		{
 			return List.of();
 		}
-		stages.add(Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
-		return List.copyOf(stages);
+		List<StepIndex.Place> places = entry.getPlaces();
+		String where = !entry.hasPlaces() ? null : places.isEmpty() ? ANYWHERE : places.get(0).getText();
+		Stage task = Stage.builder().kind(Stage.Kind.TASK).act(entry.getAct() == null ? sentence(taskText) : entry.getAct()).detail(where)
+			.tiles(placeTiles(places)).ourMarker(true).objectIds(objectsOf(places)).npcIds(npcsOf(places)).takesStepItems(true)
+			.worn(entry.getWear()).emptied(emptied).before(entry.getBefore()).spans(spans(places))
+			.option(places.stream().map(StepIndex.Place::getOption).filter(option -> option != null).findFirst().orElse(null))
+			.dialogue(places.stream().map(StepIndex.Place::getDialogue).filter(dialogue -> !dialogue.isEmpty()).findFirst()
+				.orElse(List.of()))
+			.grownOnly(grownOnly(places))
+			.placeTexts(placeTexts(places))
+			.houseObjects(places.stream().filter(place -> PositionRules.POH_NODE.equals(place.getTile()))
+				.flatMap(place -> place.getObjects().stream()).collect(toUnmodifiableSet()))
+			.uses(usesByTile(places))
+			.book(entry.getBook() == null ? null : Book.valueOf(entry.getBook())).build();
+		return List.of(task, Stage.builder().kind(Stage.Kind.FINAL).tiles(targets).build());
 	}
 
 	/** The prayer a Sherlock task turns on ("activate the chivalry prayer."), or null. */
@@ -247,33 +238,33 @@ public final class Stages
 	private static Map<WorldPoint, String> placeTexts(List<StepIndex.Place> places)
 	{
 		return places.stream().filter(place -> place.getText() != null)
-			.collect(Collectors.toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getText, (first, same) -> first));
+			.collect(toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getText, (first, same) -> first));
 	}
 
 	private static Map<WorldPoint, String> grownOnly(List<StepIndex.Place> places)
 	{
 		return places.stream().filter(place -> place.getGrown() != null)
-			.collect(Collectors.toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getGrown));
+			.collect(toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getGrown));
 	}
 
 	private static Set<Integer> objectsOf(List<StepIndex.Place> places)
 	{
-		return places.stream().flatMap(place -> place.getObjects().stream()).collect(Collectors.toUnmodifiableSet());
+		return places.stream().flatMap(place -> place.getObjects().stream()).collect(toUnmodifiableSet());
 	}
 
 	private static Map<WorldPoint, List<StepIndex.Alternative>> usesByTile(List<StepIndex.Place> places)
 	{
 		return places.stream().filter(place -> !place.getUses().isEmpty())
-			.collect(Collectors.toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getUses));
+			.collect(toUnmodifiableMap(StepIndex.Place::getTile, StepIndex.Place::getUses));
 	}
 
 	private static Set<Integer> npcsOf(List<StepIndex.Place> places)
 	{
-		return places.stream().flatMap(place -> place.getNpcs().stream()).collect(Collectors.toUnmodifiableSet());
+		return places.stream().flatMap(place -> place.getNpcs().stream()).collect(toUnmodifiableSet());
 	}
 
 	private static List<WorldPoint> placeTiles(List<StepIndex.Place> places)
 	{
-		return places.stream().map(StepIndex.Place::getTile).distinct().collect(Collectors.toUnmodifiableList());
+		return places.stream().map(StepIndex.Place::getTile).distinct().collect(toUnmodifiableList());
 	}
 }

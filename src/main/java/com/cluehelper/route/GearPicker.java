@@ -1,9 +1,9 @@
 package com.cluehelper.route;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Value;
 import net.runelite.api.EquipmentInventorySlot;
+import static java.util.stream.Collectors.*;
 
 /**
  * Worn gear adding up to a bonus total, from what the player wears, carries and has stored: as few items out of the
@@ -76,14 +76,14 @@ public final class GearPicker
 		{
 			List<Upgrade> taken = fromStorage.subList(0, withdrawn);
 			Set<Integer> takenSlots = new HashSet<>();
+			List<Integer> equip = new ArrayList<>();
 			int left = need;
 			for (Upgrade upgrade : taken)
 			{
 				takenSlots.add(upgrade.piece.slot);
+				equip.add(upgrade.piece.itemId);
 				left -= upgrade.piece.value - value(current.get(upgrade.piece.slot));
 			}
-			List<Integer> equip = new ArrayList<>();
-			taken.forEach(upgrade -> equip.add(upgrade.piece.itemId));
 			Set<Integer> equipSlots = new HashSet<>(takenSlots);
 			for (Upgrade upgrade : fromCarried)
 			{
@@ -100,9 +100,9 @@ public final class GearPicker
 			}
 			if (left <= 0)
 			{
-				List<Integer> withdraw = taken.stream().map(upgrade -> upgrade.piece.itemId).collect(Collectors.toUnmodifiableList());
+				List<Integer> withdraw = taken.stream().map(upgrade -> upgrade.piece.itemId).collect(toUnmodifiableList());
 				List<Integer> remove = wornBest.values().stream().filter(piece -> !current.containsKey(piece.slot))
-					.filter(piece -> !equipSlots.contains(piece.slot)).map(Piece::getItemId).sorted().collect(Collectors.toUnmodifiableList());
+					.filter(piece -> !equipSlots.contains(piece.slot)).map(Piece::getItemId).sorted().collect(toUnmodifiableList());
 				return new Choice(List.copyOf(equip), withdraw, remove);
 			}
 		}

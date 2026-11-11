@@ -1,17 +1,18 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.Tables;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.*;
+import static java.util.stream.Collectors.*;
 
 /**
  * Teleport interfaces are read from their scripts' arguments, before better-teleport-menu rewrites them. Lines and menu
@@ -35,13 +36,7 @@ public class MenuLines
 	private static final int BOX_GROUP = 590;
 	private static final int LOG_FIRST_CODE = 12;
 	/** The Pendant of Ates' map has one button per place, by the place its catalog line names. */
-	private static final Map<String, Integer> ATES_BUTTONS = Map.of(
-		"The Darkfrost", InterfaceID.PendantOfAtes.TELEPORT_DARKFROST,
-		"Twilight Temple", InterfaceID.PendantOfAtes.TELEPORT_TWILIGHT,
-		"Ralos' Rise", InterfaceID.PendantOfAtes.TELEPORT_RALOS,
-		"North Aldarin", InterfaceID.PendantOfAtes.TELEPORT_ALDARIN,
-		"Kastori", InterfaceID.PendantOfAtes.TELEPORT_TLATI,
-		"Nemus Retreat", InterfaceID.PendantOfAtes.TELEPORT_AUBURN);
+	private static final Map<String, Integer> ATES_BUTTONS = Tables.byKey("ates buttons", row -> row.id(0));
 	/** Each code in the travel log is followed by its favourite star. */
 	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String MAP_TELEPORT = "Teleport";
@@ -104,8 +99,9 @@ public class MenuLines
 				String label = objectTail();
 				if (ints != null && label != null)
 				{
-					listLines.put(MenuLabels.normalise(label), new int[]{ints[0], ints[3], ints[3]});
-					rawListLines.add(new int[]{ints[0], ints[3]});
+					int[] line = {ints[0], ints[3]};
+					listLines.put(MenuLabels.normalise(label), line);
+					rawListLines.add(line);
 					listFresh = true;
 				}
 				break;
@@ -144,15 +140,8 @@ public class MenuLines
 			return;
 		}
 		listFresh = false;
-		List<String> texts = new ArrayList<>();
-		for (int[] at : rawListLines)
-		{
-			Widget line = child(at);
-			if (line != null && line.getText() != null)
-			{
-				texts.add(line.getText());
-			}
-		}
+		List<String> texts = rawListLines.stream().map(this::child).filter(line -> line != null && line.getText() != null)
+			.map(Widget::getText).collect(toList());
 		reader.accept(listTitle, texts);
 	}
 
@@ -247,9 +236,9 @@ public class MenuLines
 		{
 			return;
 		}
-		Menu menu = client.getMenu();
-		MenuEntry[] entries = menu.getMenuEntries();
-		for (int row : pickRows(entries, target))
+		MenuEntry[] entries = client.getMenu().getMenuEntries();
+		int row = pickRow(entries, target);
+		if (row >= 0)
 		{
 			colour(entries[row]);
 		}
@@ -334,26 +323,24 @@ public class MenuLines
 	/** Each mushroom on the mushtree's map is a Travel button named after its place, written with non-breaking spaces. */
 	private boolean mushtree(String destination, Found out)
 	{
-		boolean found = false;
-		for (Widget button : dynamicChildren(InterfaceID.FossilMushtrees.UNIVERSE))
-		{
-			String place = button == null || button.getName() == null ? null : button.getName().replace(' ', ' ');
-			if (Widgets.visible(button) && MenuLabels.matches(place, destination))
-			{
-				out.addMapButton(button);
-				found = true;
-			}
-		}
-		return found;
+		return addMapButtons(Arrays.asList(dynamicChildren(InterfaceID.FossilMushtrees.UNIVERSE)),
+			button -> button.getName() != null && MenuLabels.matches(button.getName().replace(' ', ' '), destination), out);
 	}
 
 	/** Each place on the glider map is a button with the place's name as its action. */
 	private boolean glider(String destination, Found out)
 	{
+		return addMapButtons(Widgets.descendants(client.getWidget(InterfaceID.Glidermap.UNIVERSE)),
+			button -> namesPlace(button, destination), out);
+	}
+
+	/** @return whether any of the buttons is visible and names the place */
+	private static boolean addMapButtons(List<Widget> buttons, Predicate<Widget> namesPlace, Found out)
+	{
 		boolean found = false;
-		for (Widget button : Widgets.descendants(client.getWidget(InterfaceID.Glidermap.UNIVERSE)))
+		for (Widget button : buttons)
 		{
-			if (Widgets.visible(button) && namesPlace(button, destination))
+			if (Widgets.visible(button) && namesPlace.test(button))
 			{
 				out.addMapButton(button);
 				found = true;
@@ -385,14 +372,8 @@ public class MenuLines
 
 	private static boolean namesPlace(Widget widget, String label)
 	{
-		for (String action : widget.getActions() == null ? new String[0] : widget.getActions())
-		{
-			if (action != null && MenuLabels.matches(action, label))
-			{
-				return true;
-			}
-		}
-		return false;
+		return widget.getActions() != null
+			&& Arrays.stream(widget.getActions()).anyMatch(action -> action != null && MenuLabels.matches(action, label));
 	}
 
 	private void find(MenuTarget target, Found out)
@@ -431,27 +412,14 @@ public class MenuLines
 		}
 	}
 
-	private int[] pickRows(MenuEntry[] entries, MenuTarget target)
+	/** The row of the first kind found, in order of preference; -1 for none. */
+	private int pickRow(MenuEntry[] entries, MenuTarget target)
 	{
 		String destination = target.destination();
-		int pick = find(entries, target, entry -> isExactly(entry, destination));
-		if (pick < 0)
-		{
-			pick = find(entries, target, entry -> isDestination(entry, target, destination));
-		}
-		if (pick < 0)
-		{
-			pick = find(entries, target, entry -> leadsToDestination(entry, target, destination));
-		}
-		if (pick < 0)
-		{
-			pick = find(entries, target, entry -> MenuLabels.isOpener(entry.getOption()));
-		}
-		if (pick < 0)
-		{
-			pick = find(entries, target, entry -> goesThroughOpened(entry, destination));
-		}
-		return pick < 0 ? new int[0] : new int[]{pick};
+		List<Predicate<MenuEntry>> preferred = List.of(entry -> isExactly(entry, destination),
+			entry -> isDestination(entry, target, destination), entry -> leadsToDestination(entry, target, destination),
+			entry -> MenuLabels.isOpener(entry.getOption()), entry -> goesThroughOpened(entry, destination));
+		return preferred.stream().mapToInt(wanted -> find(entries, target, wanted)).filter(row -> row >= 0).findFirst().orElse(-1);
 	}
 
 	private void nexus(MenuTarget target, Found out)
@@ -463,14 +431,8 @@ public class MenuLines
 			out.add(labelOf(line));
 			return;
 		}
-		Widget map = client.getWidget(InterfaceID.TelenexusTeleport.FRAME);
-		Widget[] icons = map == null || map.isHidden() ? null : map.getDynamicChildren();
-		if (icons == null)
-		{
-			return;
-		}
 		Widget region = null;
-		for (Widget icon : icons)
+		for (Widget icon : dynamicChildren(InterfaceID.TelenexusTeleport.FRAME))
 		{
 			if (!Widgets.visible(icon) || icon.getActions() == null)
 			{
@@ -527,18 +489,9 @@ public class MenuLines
 		}
 		Widget contents = client.getWidget(InterfaceID.Grouping.DROPDOWN_CONTENTS);
 		Widget[] lines = Widgets.visible(contents) ? contents.getDynamicChildren() : null;
-		if (lines != null)
-		{
-			for (Widget line : lines)
-			{
-				if (Widgets.visible(line) && MenuLabels.matches(line.getText(), name))
-				{
-					out.add(line);
-					return;
-				}
-			}
-		}
-		out.add(client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP));
+		Widget line = lines == null ? null : Arrays.stream(lines)
+			.filter(shown -> Widgets.visible(shown) && MenuLabels.matches(shown.getText(), name)).findFirst().orElse(null);
+		out.add(line != null ? line : client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP));
 	}
 
 	/**
@@ -584,15 +537,8 @@ public class MenuLines
 
 	private static boolean hasTextMatching(Widget widget, String label)
 	{
-		for (Widget part : Widgets.descendants(widget))
-		{
-			String text = part.getText();
-			if (text != null && MenuLabels.matches(text.split(LINE_BREAK, 2)[0], label))
-			{
-				return true;
-			}
-		}
-		return false;
+		return Widgets.descendants(widget).stream()
+			.anyMatch(part -> part.getText() != null && MenuLabels.matches(part.getText().split(LINE_BREAK, 2)[0], label));
 	}
 
 	private void quetzal(int quetzalTableId, Found out)
@@ -644,11 +590,11 @@ public class MenuLines
 	{
 		double rowMiddle = location.getBounds().getCenterY();
 		List<Widget> buttons = widgets.stream().filter(Widgets::visible).filter(MenuLines::isBoatTeleportButton)
-			.collect(Collectors.toList());
+			.collect(toList());
 		double nearest = buttons.stream().mapToDouble(button -> Math.abs(button.getBounds().getCenterY() - rowMiddle)).min()
 			.orElse(Double.MAX_VALUE);
 		return buttons.stream().filter(button -> Math.abs(button.getBounds().getCenterY() - rowMiddle) <= nearest + SAME_ROW_PIXELS)
-			.map(button -> buttonFrame(widgets, button)).collect(Collectors.toList());
+			.map(button -> buttonFrame(widgets, button)).collect(toList());
 	}
 
 	/** The button's frame around its text, a separate widget with neither action nor text; the text when there is none. */
@@ -686,19 +632,14 @@ public class MenuLines
 		int index = MenuLabels.hotkeyIndex(destination);
 		for (int[] line : listLines.values())
 		{
-			if (index >= 0 && line[2] == index)
+			if (index >= 0 && line[1] == index)
 			{
 				out.add(child(line));
 				return;
 			}
 		}
-		Widget options = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
-		Widget[] lines = options == null || options.isHidden() ? null : options.getDynamicChildren();
-		if (lines == null)
-		{
-			return;
-		}
-		List<String> labels = new ArrayList<>(target.getPath());
+		Widget[] lines = dynamicChildren(InterfaceID.Chatmenu.OPTIONS);
+		List<String> labels = target.getPath();
 		for (int i = labels.size() - 1; i >= 0; i--)
 		{
 			for (Widget option : lines)
@@ -718,14 +659,9 @@ public class MenuLines
 	 */
 	private Widget drawnOverList(int[] listLine, String destination)
 	{
-		for (Widget widget : Widgets.descendants(client.getWidget(listLine[0] >>> 16, 0)))
-		{
-			if (Widgets.visible(widget) && widget.getActions() != null && MenuLabels.matches(widget.getName(), destination))
-			{
-				return widget;
-			}
-		}
-		return null;
+		return Widgets.descendants(client.getWidget(listLine[0] >>> 16, 0)).stream()
+			.filter(widget -> Widgets.visible(widget) && widget.getActions() != null && MenuLabels.matches(widget.getName(), destination))
+			.findFirst().orElse(null);
 	}
 
 	/** An option named exactly so wins over one that only starts the same: a ladder's "Climb-up" over its "Climb". */
@@ -755,18 +691,8 @@ public class MenuLines
 			}
 		}
 		Menu sub = entry.getSubMenu();
-		if (sub == null || destination == null)
-		{
-			return false;
-		}
-		for (MenuEntry option : sub.getMenuEntries())
-		{
-			if (MenuLabels.matches(option.getOption(), destination))
-			{
-				return true;
-			}
-		}
-		return false;
+		return sub != null && destination != null
+			&& Arrays.stream(sub.getMenuEntries()).anyMatch(option -> MenuLabels.matches(option.getOption(), destination));
 	}
 
 	private int find(MenuEntry[] entries, MenuTarget target, Predicate<MenuEntry> wanted)

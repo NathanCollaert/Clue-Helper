@@ -3,10 +3,10 @@ package com.cluehelper.route;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.Item;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import static java.util.stream.Collectors.*;
 
 /**
  * Each need is core's own {@link ItemRequirement}, tested through {@code fulfilledBy}; only our own
@@ -80,7 +80,7 @@ public class RequiredItems
 
 	Verdict judge(PlayerSnapshot player, PlayerSnapshot banked)
 	{
-		List<Need> open = needs.stream().filter(need -> !(need.stepItem && stash == StashMemory.State.FILLED)).collect(Collectors.toList());
+		List<Need> open = needs.stream().filter(need -> !(need.stepItem && stash == StashMemory.State.FILLED)).collect(toList());
 		if (open.isEmpty())
 		{
 			return Verdict.MET;
@@ -90,13 +90,13 @@ public class RequiredItems
 		{
 			return Verdict.MET;
 		}
-		if (banked == null || !allMet(open, everything(carried, banked)))
+		Map<Integer, Integer> all = banked == null ? carried : everything(carried, banked);
+		if (banked == null || !allMet(open, all))
 		{
-			Map<Integer, Integer> all = banked == null ? carried : everything(carried, banked);
 			Item[] owned = PlayerSnapshot.items(all);
-			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(owned)).collect(Collectors.toList());
+			List<Need> missing = open.stream().filter(need -> !need.requirement.fulfilledBy(owned)).collect(toList());
 			Map<Need, List<String>> parts = missing.stream().filter(need -> need.requirement instanceof AlternativeRequirement)
-				.collect(Collectors.toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
+				.collect(toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
 			return Verdict.missing(missing, parts);
 		}
 		return Verdict.fromBank(withOneStaff(open, player, carried, banked));
@@ -108,18 +108,17 @@ public class RequiredItems
 	 */
 	private List<ItemUse> withOneStaff(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried, PlayerSnapshot banked)
 	{
-		Set<Integer> held = carried.keySet().stream().filter(staves::contains).collect(Collectors.toSet());
+		Set<Integer> held = carried.keySet().stream().filter(staves::contains).collect(toSet());
 		if (!held.isEmpty())
 		{
-			Set<Integer> others = staves.stream().filter(staff -> !held.contains(staff)).collect(Collectors.toSet());
-			List<ItemUse> withHeld = minimalWithdraw(open, player, carried, banked, others);
+			List<ItemUse> withHeld = minimalWithdraw(open, player, carried, banked, stavesBut(held));
 			if (allMet(open, with(carried, withHeld)))
 			{
 				return withHeld;
 			}
 		}
 		List<ItemUse> fewest = minimalWithdraw(open, player, carried, banked, Set.of());
-		List<Integer> picked = fewest.stream().map(ItemUse::getItemId).filter(staves::contains).collect(Collectors.toList());
+		List<Integer> picked = fewest.stream().map(ItemUse::getItemId).filter(staves::contains).collect(toList());
 		if (picked.size() <= 1)
 		{
 			return fewest;
@@ -127,14 +126,18 @@ public class RequiredItems
 		List<ItemUse> best = null;
 		for (int kept : picked)
 		{
-			Set<Integer> others = staves.stream().filter(staff -> staff != kept).collect(Collectors.toSet());
-			List<ItemUse> withdraw = minimalWithdraw(open, player, carried, banked, others);
+			List<ItemUse> withdraw = minimalWithdraw(open, player, carried, banked, stavesBut(Set.of(kept)));
 			if (allMet(open, with(carried, withdraw)) && (best == null || withdraw.size() < best.size()))
 			{
 				best = withdraw;
 			}
 		}
 		return best != null ? best : fewest;
+	}
+
+	private Set<Integer> stavesBut(Set<Integer> kept)
+	{
+		return staves.stream().filter(staff -> !kept.contains(staff)).collect(toSet());
 	}
 
 	/**

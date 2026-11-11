@@ -4,11 +4,11 @@ import com.cluehelper.SpellbookChanges;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
-import com.cluehelper.transport.CatalogRow;
+import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import static java.util.stream.Collectors.*;
 
 final class PlanContext
 {
@@ -45,13 +45,13 @@ final class PlanContext
 
 	final PlanResources resources = new PlanResources();
 	final TransportOptions[] options = new TransportOptions[2];
-	private final WalkGates[] gates = new WalkGates[2];
+	/** By bank state: after a bank stop a gate may also take a stored item, such as a knife for a web. */
+	final WalkGates[] gates = new WalkGates[2];
 	/** Books a route may change to; always holds the start book. */
 	final Set<Book> expanded = EnumSet.noneOf(Book.class);
 	final Book startBook;
 	final Book homeBook;
 	final boolean startPending;
-	private final boolean targetInWilderness;
 	/** Every target of the step, or of one of its stages, is in the Wilderness: avoiding it would leave no way there. */
 	final boolean onlyInWilderness;
 	final boolean avoidsWilderness;
@@ -82,17 +82,15 @@ final class PlanContext
 		goal = abstractBase + ABSTRACT_CLASSES.length;
 		pohNode = table.node(PositionRules.POH_NODE);
 		SpellbookState book = in.getPlayer().getSpellbook();
-		boolean pending = book != null && book.isPendingRevert() && in.getRevertTicksLeft() > 0 && book.getBook() != Book.LUNAR;
-		startPending = pending;
-		startBook = book == null || book.getBook() == null ? Book.STANDARD : book.isPendingRevert() && !pending ? Book.LUNAR : book.getBook();
+		startPending = book != null && book.isPendingRevert() && in.getRevertTicksLeft() > 0 && book.getBook() != Book.LUNAR;
+		startBook = book == null || book.getBook() == null ? Book.STANDARD : book.isPendingRevert() && !startPending ? Book.LUNAR : book.getBook();
 		homeBook = book != null && book.isPendingRevert() ? Book.LUNAR : startBook;
-		targetInWilderness = in.getStep().getTargets().stream().anyMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
+		boolean targetInWilderness = in.getStep().getTargets().stream().anyMatch(this::isWilderness);
 		onlyInWilderness = allInWilderness(in.getStep().getTargets())
 			|| in.getStep().getStages().stream().anyMatch(stage -> allInWilderness(stage.getTiles()));
 		avoidsWilderness = in.getSettings().isAvoidWilderness() && !onlyInWilderness && !startsInWilderness(in.getStart());
-		PlayerSnapshot carrier = in.getPlayer();
 		depositsBookFirst = in.getSettings().isScrollBookOutOfWilderness() && targetInWilderness
-			&& (carrier.carried(BookScrolls.BOOK) > 0);
+			&& in.getPlayer().carried(BookScrolls.BOOK) > 0;
 		options[NOT_BANKED] = new TransportOptions(this, in.getPlayer(), NOT_BANKED);
 		if (in.getSettings().isBankEdge() && in.getBanked() != null)
 		{
@@ -104,7 +102,7 @@ final class PlanContext
 		PlayerSnapshot bankedPlayer = options[BANKED] == null ? null : in.getBanked();
 		Set<RequiredItems.Need> atStages = judgeStageNeeds(bankedPlayer);
 		required = in.getRequired().toBuilder()
-			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(Collectors.toList()))
+			.needs(in.getRequired().getNeeds().stream().filter(need -> !atStages.contains(need)).collect(toList()))
 			.staves(in.getEngine().getRunes().staves())
 			.build().judge(in.getPlayer(), bankedPlayer);
 		requiredWithdraw = TransportOptions.ids(required.getWithdraw());
@@ -113,10 +111,14 @@ final class PlanContext
 		expandBooks();
 	}
 
-	/** After a bank stop a gate may also take a stored item, such as a knife for a web. */
-	WalkGates gates(int bankState)
+	RowAvailability judge(CatalogRow row, PlayerSnapshot player)
 	{
-		return gates[bankState];
+		return in.getEngine().judge(row, player, in.getNowMinutes());
+	}
+
+	RowAvailability judge(String name, Requirements requirements, PlayerSnapshot player)
+	{
+		return judge(CatalogRow.builder().name(name).requirements(requirements).build(), player);
 	}
 
 	/**
@@ -135,7 +137,7 @@ final class PlanContext
 			}
 			List<RequiredItems.Need> wanted = in.getRequired().getNeeds().stream()
 				.filter(need -> stage.getWorn().contains(need.getName()) || stage.isTakesStepItems() && need.isStepItem())
-				.collect(Collectors.toList());
+				.collect(toList());
 			if (wanted.isEmpty() || stage.getTiles().isEmpty())
 			{
 				continue;
@@ -172,7 +174,7 @@ final class PlanContext
 				continue;
 			}
 			ItemRequirement[] groups = use.getAll().stream()
-				.map(ids -> ItemRequirements.any(use.getName(), ids.stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new)))
+				.map(ids -> StepNeeds.anyOf(use.getName(), ids))
 				.toArray(ItemRequirement[]::new);
 			here.add(new RequiredItems.Need(use.getName(), ItemRequirements.all(use.getName(), groups), need.isStepItem(),
 				need.isBlocksRoute()));
@@ -234,7 +236,7 @@ final class PlanContext
 	{
 		WorldPoint at = tile(node);
 		boolean depositsBook = depositsBookFirst && options[BANKED] != null
-			&& (at == null || OriginClass.of(at, in.getNoTeleport()).isWilderness());
+			&& (at == null || isWilderness(at));
 		return !depositsBook && !required.isFromBank();
 	}
 
@@ -270,9 +272,8 @@ final class PlanContext
 		if (bankUsable[node] == 0)
 		{
 			PlayerSnapshot judgedAt = in.getPlayer().toBuilder().wildernessLevel(0).build();
-			boolean usable = table.banks(node).stream().anyMatch(bank -> !bank.isDepositOnly() && in.getEngine()
-				.judge(CatalogRow.builder().name(bank.getName()).requirements(bank.getRequirements()).build(), judgedAt, in.getNowMinutes())
-				.isAvailable());
+			boolean usable = table.banks(node).stream()
+				.anyMatch(bank -> !bank.isDepositOnly() && judge(bank.getName(), bank.getRequirements(), judgedAt).isAvailable());
 			bankUsable[node] = (byte) (usable ? 1 : 2);
 		}
 		return bankUsable[node] == 1;
@@ -369,12 +370,17 @@ final class PlanContext
 	/** Already inside, the way out may take the Wilderness' own obelisks and levers. */
 	private boolean startsInWilderness(PlanStart start)
 	{
-		return start != null && start.getTile() != null && OriginClass.of(start.getTile(), in.getNoTeleport()).isWilderness();
+		return start != null && start.getTile() != null && isWilderness(start.getTile());
 	}
 
 	private boolean allInWilderness(List<WorldPoint> tiles)
 	{
-		return !tiles.isEmpty() && tiles.stream().allMatch(tile -> OriginClass.of(tile, in.getNoTeleport()).isWilderness());
+		return !tiles.isEmpty() && tiles.stream().allMatch(this::isWilderness);
+	}
+
+	boolean isWilderness(WorldPoint tile)
+	{
+		return OriginClass.of(tile, in.getNoTeleport()).isWilderness();
 	}
 
 	/** Changes are a setting, and a teleport must be able to follow. */

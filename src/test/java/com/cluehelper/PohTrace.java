@@ -1,5 +1,9 @@
 package com.cluehelper;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.MenuTarget;
 import com.cluehelper.guide.StepGuide;
@@ -12,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import net.runelite.api.Client;
 import net.runelite.api.Menu;
 import net.runelite.api.MenuEntry;
@@ -29,6 +34,7 @@ final class PohTrace
 {
 	static final String POH_TAG = "[CH-POH]";
 	static final String MENU_TAG = "[CH-MENU]";
+	private static final String HOUSE_LINE = "poh: ";
 	static final File FRAMES = new File("build/poh-menus");
 	private static final Set<Integer> TELEPORT_INTERFACES = Set.of(17, 187, 219, 590, InterfaceID.Fairyrings.ROOT_RECT0 >>> 16,
 		InterfaceID.FairyringsLog.UNIVERSE >>> 16, InterfaceID.QuetzalMenu.ICONS >>> 16, InterfaceID.QuetzalwhistleMenu.ICONS >>> 16);
@@ -47,21 +53,50 @@ final class PohTrace
 	private int frames;
 	private String lastTarget;
 
-	PohTrace(Client client, PohService poh, StepGuide guide, MenuLines lines, Consumer<File> saveFrame)
+	PohTrace(Client client, StepGuide guide, MenuLines lines, Consumer<File> saveFrame)
 	{
 		this.client = client;
 		this.guide = guide;
 		this.lines = lines;
 		this.saveFrame = saveFrame;
 		FRAMES.mkdirs();
-		unregister = poh.addListener(line ->
+		unregister = followHouseLog();
+	}
+
+	/** The house service writes what it learns to its debug log; the trace reads it there, on the client thread. */
+	private Runnable followHouseLog()
+	{
+		Logger houseLog = (Logger) LoggerFactory.getLogger(PohService.class);
+		Level before = houseLog.getLevel();
+		AppenderBase<ILoggingEvent> appender = new AppenderBase<>()
 		{
-			log.info("{} t{} {}", POH_TAG, client.getTickCount(), line);
-			if (line.startsWith("scan") || line.startsWith("entered"))
+			@Override
+			protected void append(ILoggingEvent event)
 			{
-				frame("house");
+				String message = event.getFormattedMessage();
+				if (message.startsWith(HOUSE_LINE))
+				{
+					onHouseLine(message.substring(HOUSE_LINE.length()));
+				}
 			}
-		});
+		};
+		appender.start();
+		houseLog.setLevel(Level.DEBUG);
+		houseLog.addAppender(appender);
+		return () ->
+		{
+			houseLog.detachAppender(appender);
+			houseLog.setLevel(before);
+		};
+	}
+
+	private void onHouseLine(String line)
+	{
+		log.info("{} t{} {}", POH_TAG, client.getTickCount(), line);
+		if (line.startsWith("scan") || line.startsWith("entered"))
+		{
+			frame("house");
+		}
 	}
 
 	void stop()
