@@ -224,6 +224,11 @@ public class EdgeCaseRoutesTest
 		rideCases(lines, maxed, plain);
 		lines.add(line("start on a node: standing at the Varrock Teleport landing, to Varrock bank crates",
 			checked(input(mid, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3213, 3424, 0))), plain).build())));
+		PlayerSnapshot staffInInventory = alsoCarrying(withVarbits(maxed, Map.of(VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE, 0)),
+			ItemID.DRAMEN_STAFF);
+		lines.add(line("Dramen staff in the inventory, not worn, at the Tower of Life ring: dials AIQ there",
+			checked(input(staffInInventory, step("fairyring:a i q 0 4 4 0"),
+				PlanStart.atNode(table, table.node(new WorldPoint(2658, 3230, 0))), plain).build())));
 
 		lines.add(line("AREA: " + firstOf(TargetKind.AREA).getKey(), checked(input(maxed, firstOf(TargetKind.AREA), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		lines.add(line("SEQUENCE skill: " + firstOf(TargetKind.SEQUENCE).getKey(), checked(input(maxed, firstOf(TargetKind.SEQUENCE), PlanStart.teleportOnly(ANYWHERE), plain).build())));

@@ -276,6 +276,8 @@ start on a node: standing at the Varrock Teleport landing, to Varrock bank crate
   best      28t: walk 28
   alt       32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
   alt       42t: Skills necklace: Cooking Guild → walk 37 {charge:11968=1}
+Dramen staff in the inventory, not worn, at the Tower of Life ring: dials AIQ there
+  best      16t: Fairy ring AIQ: Asgarnia: Mudskipper Point → walk 3
 AREA: cryptic:a demon's best friend holds the next step of this clue.
   best      28t: Master scroll book: Key master teleport → walk 23 {charge:21389=1}
 SEQUENCE skill: cryptic:a graceful man of many colours, his crates must be full of many delights.

@@ -86,7 +86,8 @@ public final class SubSteps
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash)
 			.build(this::exitOf, this::plantedTreeTeleport);
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(withAreaNpcsOnWalk(legs, step.getData()), step.getData(), this::finished, carriedIds()), step.getData());
-		List<SubStep> steps = withRideGearWorn(route, withEntranaDeposits(withWanderNote(withGearOnArrival(wayIn), step.getData())));
+		List<SubStep> steps = withFairyRingStaffWorn(route,
+			withRideGearWorn(route, withEntranaDeposits(withWanderNote(withGearOnArrival(wayIn), step.getData()))));
 		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
 			: steps;
 	}
@@ -150,8 +151,47 @@ public final class SubSteps
 	/** A ride that takes worn gear (a ghostspeak amulet for the ghost captain) has it put on first. */
 	private List<SubStep> withRideGearWorn(Route route, List<SubStep> steps)
 	{
-		Set<Integer> withdrawn = route == null ? Set.of() : route.getWithdraw().stream().map(ItemUse::getItemId).collect(toSet());
+		Set<Integer> withdrawn = withdrawnIds(route);
 		return withBefore(steps, sub -> equipForRide(sub, withdrawn));
+	}
+
+	/**
+	 * The staff goes on before the route's first fairy ring and stays on for the rest, so a chained code's later hops
+	 * follow each other with nothing between them.
+	 */
+	private List<SubStep> withFairyRingStaffWorn(Route route, List<SubStep> steps)
+	{
+		int ring = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getKind() == Kind.FAIRY_RING).findFirst().orElse(-1);
+		Set<Integer> staves = ring < 0 ? Set.of() : stavesToWield(steps.get(ring).getRow());
+		if (staves.isEmpty())
+		{
+			return steps;
+		}
+		List<SubStep> out = new ArrayList<>(steps);
+		out.add(ring, equip(staves, withdrawnIds(route)));
+		return List.copyOf(out);
+	}
+
+	/** None when one is worn already or the Lumbridge elite diary lets the player use fairy rings without one. */
+	private Set<Integer> stavesToWield(CatalogRow landing)
+	{
+		PlayerSnapshot player = snapshot.get();
+		if (player == null)
+		{
+			return Set.of();
+		}
+		Set<Integer> staves = landing.getRequirements().getItems().stream()
+			.filter(ItemClause::isMustBeWorn)
+			.filter(clause -> !AvailabilityEngine.isWaived(clause, player, AvailabilityService.nowMinutes()))
+			.flatMap(clause -> clause.getBranches().stream())
+			.flatMap(branch -> branch.getIds().stream())
+			.collect(toUnmodifiableSet());
+		return staves.stream().anyMatch(player.getWorn()::containsKey) ? Set.of() : staves;
+	}
+
+	private static Set<Integer> withdrawnIds(Route route)
+	{
+		return route == null ? Set.of() : route.getWithdraw().stream().map(ItemUse::getItemId).collect(toSet());
 	}
 
 	/** Each sub-step, with the ones {@code before} gives for it ahead of it. */
@@ -176,22 +216,21 @@ public final class SubSteps
 			.collect(toUnmodifiableSet());
 	}
 
-	/**
-	 * Named by the piece the player has on them or the route withdraws, else by the first the ride takes; none for any
-	 * other sub-step.
-	 */
+	/** None for any sub-step but a ride that takes worn gear. */
 	private List<SubStep> equipForRide(SubStep ride, Set<Integer> withdrawn)
 	{
 		Set<Integer> gear = ride.getKind() == Kind.TELEPORT ? rideGear(ride.getRow()) : Set.of();
-		if (gear.isEmpty())
-		{
-			return List.of();
-		}
+		return gear.isEmpty() ? List.of() : List.of(equip(gear, withdrawn));
+	}
+
+	/** Named by the piece the player has on them or the route withdraws, else by the lowest id of {@code gear}. */
+	private SubStep equip(Set<Integer> gear, Set<Integer> withdrawn)
+	{
 		PlayerSnapshot carrier = snapshot.get();
 		int piece = gear.stream().filter(id -> carrier != null && carrier.carriedIds().contains(id) || withdrawn.contains(id))
 			.findFirst().orElse(gear.stream().sorted().findFirst().orElseThrow());
-		return List.of(SubStep.of(Kind.ACT, "Equip the " + client.getItemDefinition(piece).getName()).actItems(gear)
-			.done(SubStep.Done.ITEM_WORN).tab(Tab.INVENTORY).build());
+		return SubStep.of(Kind.ACT, "Equip the " + client.getItemDefinition(piece).getName()).actItems(gear)
+			.done(SubStep.Done.ITEM_WORN).tab(Tab.INVENTORY).build();
 	}
 
 	private static boolean isEntranaShip(SubStep step)

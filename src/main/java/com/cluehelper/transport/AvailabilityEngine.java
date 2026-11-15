@@ -19,8 +19,9 @@ public final class AvailabilityEngine
 	/** Carried first, so a banked snapshot withdraws only what the player lacks (its bank maps are empty otherwise). */
 	private static final List<Container> CARRIED = List.of(Container.INVENTORY, Container.WORN, Container.BANK,
 		Container.GROUP_STORAGE);
-	/** At a bank a withdrawn item can be worn before the teleport. */
-	private static final List<Container> WORN_ONLY = List.of(Container.WORN, Container.BANK, Container.GROUP_STORAGE);
+	/** A carried item can be put on before the teleport, and so can one withdrawn at a bank. */
+	private static final List<Container> WEARABLE = List.of(Container.WORN, Container.INVENTORY, Container.BANK,
+		Container.GROUP_STORAGE);
 	/** Shortest Path lists every charge of an item as its own alternative: glory(1) to glory(t6) is 12. */
 	private static final int MAX_ALTERNATIVES_NAMED = 2;
 	/** Worn, these turn the player into a penguin, whose side panel has no spellbook tab. */
@@ -138,7 +139,7 @@ public final class AvailabilityEngine
 
 	private void checkClause(ItemClause clause, boolean spendsCharges, PlayerSnapshot player, long nowMinutes, Verdict v)
 	{
-		if (clause.getWaivedBy() != null && passes(clause.getWaivedBy(), player, nowMinutes))
+		if (isWaived(clause, player, nowMinutes))
 		{
 			return;
 		}
@@ -245,7 +246,7 @@ public final class AvailabilityEngine
 		boolean chargesUnknown = false;
 		boolean emptied = false;
 		int have = 0;
-		for (Container container : mustBeWorn ? WORN_ONLY : CARRIED)
+		for (Container container : mustBeWorn ? WEARABLE : CARRIED)
 		{
 			for (int id : ids)
 			{
@@ -273,6 +274,12 @@ public final class AvailabilityEngine
 		String what = itemNames.apply(ids.get(0)) + (ids.size() > 1 ? " (any of " + ids.size() + ")" : "");
 		return Paid.missing((mustBeWorn ? "needs to wield " : "needs ")
 			+ (branch.getQuantity() > 1 ? branch.getQuantity() + " x " : "") + what + (emptied ? ", no charges left" : ""));
+	}
+
+	/** Whether the player does without the clause's items: the Lumbridge elite diary for a fairy ring's staff. */
+	public static boolean isWaived(ItemClause clause, PlayerSnapshot player, long nowMinutes)
+	{
+		return clause.getWaivedBy() != null && passes(clause.getWaivedBy(), player, nowMinutes);
 	}
 
 	private static boolean passes(VarCheck check, PlayerSnapshot player, long nowMinutes)
