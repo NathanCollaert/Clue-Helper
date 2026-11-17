@@ -65,7 +65,7 @@ Something else wrong? [Open a bug report](https://github.com/NathanCollaert/Clue
 | Highlight items / spells / menu lines | What gets highlighted for the current action | On |
 | Withdraw tab | Open a bank tab with only the items to withdraw (uses Bank Tags) | On |
 | Path | Draw the path line to where to go next, in the scene and on the minimap | On |
-| Overlay | None, Separate (its own overlay under Clue Scroll's) Combined (one overlay with Clue Scroll's text on top) or Helper only (Clue Scroll's overlay hidden) | Combined |
+| Overlay | None, Separate (its own overlay under Clue Scroll's), Combined (one overlay with Clue Scroll's text on top) or Helper only (Clue Scroll's overlay hidden) | Combined |
 | Show the next step | Show the action after the current one in the box | On |
 | Probe planner | Suggest where to feel next on hot/cold steps | On |
 
