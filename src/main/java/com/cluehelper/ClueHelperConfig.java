@@ -144,15 +144,15 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "showBox",
-		name = "Show the box",
-		description = "Show the Clue Helper box under the Clue Scroll plugin's box. Highlights and the path work without it",
+		keyName = "guideBox",
+		name = "Overlay",
+		description = "None: no Clue Helper overlay; highlights and the path still work. Separate: its own overlay under the Clue Scroll plugin's. Combined: one overlay, the Clue Scroll plugin's text on top. Helper only: the Clue Helper overlay alone, the Clue Scroll plugin's hidden",
 		section = guidanceSection,
 		position = 5
 	)
-	default boolean showBox()
+	default GuideBoxStyle guideBox()
 	{
-		return true;
+		return GuideBoxStyle.COMBINED;
 	}
 
 	@ConfigItem(

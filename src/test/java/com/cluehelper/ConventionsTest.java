@@ -49,7 +49,7 @@ public class ConventionsTest
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
 		"avoidWilderness", "scrollBookOutOfWilderness",
 		"highlightItems", "withdrawTab", "highlightSpells", "highlightMenus",
-		"pathLine", "showBox", "showNextStep",
+		"pathLine", "guideBox", "showNextStep",
 		"spellbookChanges", "useBank",
 		"hotColdPlanner"));
 
@@ -138,7 +138,7 @@ public class ConventionsTest
 			assertTrue(type + " is declared 'public enum'", Files.readString(source).contains("public enum " + type));
 			enums++;
 		}
-		assertEquals("avoidWilderness and spellbookChanges", 2, enums);
+		assertEquals("avoidWilderness, spellbookChanges and guideBox", 3, enums);
 	}
 
 	@Test

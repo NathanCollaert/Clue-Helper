@@ -35,6 +35,9 @@ import net.runelite.client.ui.overlay.*;
 public class ClueHelperPlugin extends Plugin
 {
 	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
+	/** The on/off setting the Overlay dropdown replaced. */
+	private static final String OLD_SHOW_BOX_KEY = "showBox";
+	private static final String GUIDE_BOX_KEY = "guideBox";
 
 	@Inject
 	private ClueLink clueLink;
@@ -106,6 +109,9 @@ public class ClueHelperPlugin extends Plugin
 	private ClueHelperConfig config;
 
 	@Inject
+	private ConfigManager configManager;
+
+	@Inject
 	private OverlayManager overlayManager;
 
 	@Inject
@@ -136,6 +142,8 @@ public class ClueHelperPlugin extends Plugin
 	private GuideOverlay guideOverlay;
 	@Inject
 	private GuideBoxPresenter box;
+	@Inject
+	private CoreBoxMerge coreBoxMerge;
 
 	@Inject
 	private SceneDoors sceneDoors;
@@ -162,6 +170,7 @@ public class ClueHelperPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
+		carryOverHiddenBox();
 		guideOverlay.show(GuideBox.EMPTY);
 		clueLink.start();
 		playerModel.start();
@@ -182,6 +191,7 @@ public class ClueHelperPlugin extends Plugin
 			overlayManager.add(overlay);
 		}
 		clientThread.invokeLater(box::refresh);
+		clientThread.invokeLater(this::mergeCoreBox);
 	}
 
 	@Override
@@ -191,6 +201,7 @@ public class ClueHelperPlugin extends Plugin
 		{
 			overlayManager.remove(overlay);
 		}
+		coreBoxMerge.giveBack(clueLink.isActive());
 		unregister.forEach(Runnable::run);
 		unregister.clear();
 		routeReport.stop();
@@ -211,6 +222,7 @@ public class ClueHelperPlugin extends Plugin
 		if (clueLink.onPluginChanged(event))
 		{
 			clientThread.invokeLater(box::refresh);
+			clientThread.invokeLater(this::mergeCoreBox);
 		}
 	}
 
@@ -223,6 +235,7 @@ public class ClueHelperPlugin extends Plugin
 		if (clueLink.onGameTick())
 		{
 			box.refresh();
+			mergeCoreBox();
 		}
 		bankMemory.onGameTick();
 		poh.onGameTick();
@@ -379,6 +392,7 @@ public class ClueHelperPlugin extends Plugin
 			return;
 		}
 		clientThread.invokeLater(box::refresh);
+		clientThread.invokeLater(this::mergeCoreBox);
 		if (HOT_COLD_KEYS.contains(event.getKey()))
 		{
 			clientThread.invokeLater(() ->
@@ -397,6 +411,27 @@ public class ClueHelperPlugin extends Plugin
 		poh.onProfileChanged();
 		hotCold.onProfileChanged();
 		publishMemories();
+	}
+
+	/** A player who turned the old "Show the box" off keeps no box. */
+	private void carryOverHiddenBox()
+	{
+		String oldShowBox = configManager.getConfiguration(ClueHelperConfig.GROUP, OLD_SHOW_BOX_KEY);
+		if (oldShowBox == null)
+		{
+			return;
+		}
+		if (Boolean.FALSE.toString().equals(oldShowBox))
+		{
+			configManager.setConfiguration(ClueHelperConfig.GROUP, GUIDE_BOX_KEY, GuideBoxStyle.NONE);
+		}
+		configManager.unsetConfiguration(ClueHelperConfig.GROUP, OLD_SHOW_BOX_KEY);
+	}
+
+	/** Reads core's state when it runs, so a call queued before shutDown finds core inactive and changes nothing. */
+	private void mergeCoreBox()
+	{
+		coreBoxMerge.apply(clueLink.isActive() ? clueLink.getCore() : null);
 	}
 
 	private void publishMemories()

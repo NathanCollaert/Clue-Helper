@@ -178,6 +178,12 @@ public final class CoreClueReader
 		return requirements == null ? List.of() : distinct(Arrays.asList(requirements));
 	}
 
+	/** The text core's box shows under "Solution:", or null for a clue that shows none. */
+	public static String solution(ClueScroll clue, ClueScrollPlugin plugin)
+	{
+		return clue instanceof CrypticClue ? ((CrypticClue) clue).getSolution(plugin) : null;
+	}
+
 	/** The three-step's parts core hasn't marked solved, in core's order. */
 	static List<CrypticClue> unsolvedParts(ThreeStepCrypticClue clue)
 	{
