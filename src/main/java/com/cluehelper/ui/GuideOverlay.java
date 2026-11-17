@@ -7,14 +7,19 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.MenuAction;
+import net.runelite.client.plugins.cluescrolls.*;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.*;
 import net.runelite.client.ui.overlay.components.*;
 import net.runelite.client.util.*;
 
-/** The guidance text, under the Clue Scroll plugin's own box and as wide. Renders only the value it was handed. */
+/**
+ * The guidance text, under the Clue Scroll plugin's own box and as wide, or, once that box was handed over, alone or
+ * under that box's text. Renders only the values it was handed.
+ */
 @Singleton
 public class GuideOverlay extends OverlayPanel
 {
@@ -32,6 +37,9 @@ public class GuideOverlay extends OverlayPanel
 
 	private final ClueHelperConfig config;
 	private volatile GuideBox box = GuideBox.EMPTY;
+	/** Null while the Clue Scroll plugin draws its own box. */
+	private volatile ClueScrollOverlay coreBox;
+	private volatile ClueScrollPlugin corePlugin;
 	private FontMetrics metrics;
 
 	@Inject
@@ -51,16 +59,91 @@ public class GuideOverlay extends OverlayPanel
 		this.box = box;
 	}
 
+	/**
+	 * Client thread, with core's box out of the overlay manager, or null to give it back before it goes back in. Core's
+	 * own actions (Reset) move onto this box while its text does. Core keeps its lines after drawing them, so they can
+	 * be taken from its panel.
+	 */
+	public void mergeCoreBox(ClueScrollOverlay core, ClueScrollPlugin plugin)
+	{
+		ClueScrollOverlay previous = coreBox;
+		if (previous != null)
+		{
+			getMenuEntries().removeAll(overlayActions(previous));
+			previous.setClearChildren(true);
+		}
+		corePlugin = plugin;
+		coreBox = core;
+		if (core != null)
+		{
+			core.setClearChildren(false);
+			getMenuEntries().addAll(overlayActions(core));
+		}
+	}
+
+	private static List<OverlayMenuEntry> overlayActions(Overlay overlay)
+	{
+		return overlay.getMenuEntries().stream().filter(entry -> entry.getMenuAction() == MenuAction.RUNELITE_OVERLAY)
+			.collect(Collectors.toList());
+	}
+
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		ClueScrollOverlay core = coreBox;
+		if (core != null && config.guideBox() == GuideBoxStyle.COMBINED)
+		{
+			coreLines(graphics, core);
+		}
 		GuideBox shown = box;
-		if (!shown.isShown() || !config.showBox())
+		if (shown.isShown() && config.guideBox() != GuideBoxStyle.NONE)
+		{
+			guide(graphics, shown);
+		}
+		if (panelComponent.getChildren().isEmpty())
 		{
 			return null;
 		}
 		panelComponent.setPreferredSize(new Dimension(ComponentConstants.STANDARD_WIDTH, 0));
+		return super.render(graphics);
+	}
+
+	/** Core draws its box into an empty clip, so nothing shows, and its lines move into this box. */
+	private void coreLines(Graphics2D graphics, ClueScrollOverlay core)
+	{
+		List<LayoutableRenderableEntity> lines = drawnCoreLines(graphics, core);
+		ClueScrollPlugin plugin = corePlugin;
+		RedundantCoreLines.remove(lines, plugin.getClue(), plugin);
+		panelComponent.getChildren().addAll(lines);
+	}
+
+	private static List<LayoutableRenderableEntity> drawnCoreLines(Graphics2D graphics, ClueScrollOverlay core)
+	{
+		List<LayoutableRenderableEntity> lines = core.getPanelComponent().getChildren();
+		lines.clear();
+		Graphics2D unseen = (Graphics2D) graphics.create();
+		unseen.setClip(0, 0, 0, 0);
+		try
+		{
+			core.render(unseen);
+		}
+		finally
+		{
+			unseen.dispose();
+		}
+		List<LayoutableRenderableEntity> drawn = new ArrayList<>(lines);
+		lines.clear();
+		return drawn;
+	}
+
+	private void guide(Graphics2D graphics, GuideBox shown)
+	{
 		metrics = graphics.getFontMetrics();
+		if (!panelComponent.getChildren().isEmpty())
+		{
+			gap();
+		}
+		int title = panelComponent.getChildren().size();
 		panelComponent.getChildren().add(TitleComponent.builder().text(TITLE).color(TEXT).build());
 		line(shown.title(), TEXT);
 		line(shown.detail(), MUTED);
@@ -72,7 +155,7 @@ public class GuideOverlay extends OverlayPanel
 			gap();
 			hotCold(shown.getHotCold());
 		}
-		if (!shown.getNotes().isEmpty() && hasTextUnderTitle())
+		if (!shown.getNotes().isEmpty() && hasTextUnder(title))
 		{
 			gap();
 		}
@@ -82,7 +165,6 @@ public class GuideOverlay extends OverlayPanel
 			gap();
 			upcoming(graphics, shown.getNext());
 		}
-		return super.render(graphics);
 	}
 
 	/** In the small font, measured in it too: a hotkey's tags would wrap it a word per line. */
@@ -102,9 +184,9 @@ public class GuideOverlay extends OverlayPanel
 		view.getWarnings().forEach(warning -> line(warning, WARNING));
 	}
 
-	private boolean hasTextUnderTitle()
+	private boolean hasTextUnder(int title)
 	{
-		return panelComponent.getChildren().size() > 1;
+		return panelComponent.getChildren().size() > title + 1;
 	}
 
 	private void gap()

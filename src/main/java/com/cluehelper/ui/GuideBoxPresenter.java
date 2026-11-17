@@ -11,6 +11,7 @@ import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
 import javax.inject.*;
+import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 
 /** Client thread only. Reads the guide, the routes and the hot/cold planner into one box and hands it to the overlay. */
 @Singleton
@@ -45,11 +46,22 @@ public class GuideBoxPresenter
 			config.showNextStep() ? guide.getShownNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
 		GuideBox.GuideBoxBuilder shown = atStep.toBuilder();
+		if (repeatsCoreSolution(atStep.getNowDetail()))
+		{
+			shown.nowDetail(null);
+		}
 		if (atStep.getState().showsRoutes())
 		{
 			shown.hotCold(hotColdView());
 		}
 		overlay.show(shown.build());
+	}
+
+	/** The step's detail can be core's solution word for word, which the Clue Helper box leaves to core. */
+	private boolean repeatsCoreSolution(String detail)
+	{
+		ClueScrollPlugin core = clueLink.getCore();
+		return detail != null && core != null && detail.equals(CoreClueReader.solution(clueLink.coreClue(), core));
 	}
 
 	private BoxState boxState()
