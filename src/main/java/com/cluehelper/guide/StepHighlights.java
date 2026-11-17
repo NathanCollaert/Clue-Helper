@@ -487,7 +487,10 @@ final class StepHighlights
 			.collect(toUnmodifiableSet());
 	}
 
-	/** The carried items the emote step wants on, refreshed every tick as they are put on. */
+	/**
+	 * The carried items the emote step wants on, refreshed every tick as they are put on: all outlined, filled where a
+	 * left click puts them on (an axe whose left click is Use is still one to wield).
+	 */
 	private Highlights withEquipItems(Highlights shown, SubStep current, Step step)
 	{
 		if (current == null || current.getKind() != SubStep.Kind.ACT || current.getDone() != SubStep.Done.EQUIPPED
@@ -495,10 +498,19 @@ final class StepHighlights
 		{
 			return shown;
 		}
-		Set<Integer> wanted = player.inventoryIds().stream().filter(leftClicks::wears)
+		Set<Integer> wanted = player.inventoryIds().stream().filter(id -> leftClicks.wearOption(id) != null)
 			.filter(id -> isStepItem(step, id))
 			.collect(toUnmodifiableSet());
-		return shown.toBuilder().items(wanted).fillItems(wanted).build();
+		Set<Integer> wornOnLeftClick = wanted.stream().filter(leftClicks::wears).collect(toUnmodifiableSet());
+		return shown.toBuilder().items(wanted).fillItems(wornOnLeftClick).menuTarget(wearTargets(wanted)).build();
+	}
+
+	/** Each item's own option coloured in its menu: Wield on the axe, Wear on the boots. */
+	private MenuTarget wearTargets(Set<Integer> items)
+	{
+		List<MenuTarget> each = items.stream().sorted().map(id -> rowTargets.items(Set.of(id), leftClicks.wearOption(id)))
+			.collect(toList());
+		return each.isEmpty() ? MenuTarget.NONE : each.get(0).toBuilder().alternatives(List.copyOf(each.subList(1, each.size()))).build();
 	}
 
 	/** The carried item the act names, refreshed every tick as it arrives (the puzzle box, after the talk). */

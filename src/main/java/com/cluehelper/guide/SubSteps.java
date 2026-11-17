@@ -83,7 +83,7 @@ public final class SubSteps
 	public List<SubStep> of(Route route, Step step)
 	{
 		boolean takeFromStash = takeFromStash(step);
-		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash)
+		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
 			.build(this::exitOf, this::plantedTreeTeleport);
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(withAreaNpcsOnWalk(legs, step.getData()), step.getData(), this::finished, carriedIds()), step.getData());
 		List<SubStep> steps = withFairyRingStaffWorn(route,
@@ -249,7 +249,19 @@ public final class SubSteps
 	/** What to do at the step once there, its STASH items taken out first when they wait there. */
 	public List<SubStep> acts(Step step)
 	{
-		return Acts.of(step, takeFromStash(step));
+		return Acts.of(step, takeFromStash(step), handInItems(step));
+	}
+
+	/** What the step's NPC is handed, by name: Charlie's item, or the one Falo the Bard asks for. */
+	private List<String> handInItems(Step step)
+	{
+		StepRequirements requirements = step.getRequirements();
+		if (requirements == null)
+		{
+			return List.of();
+		}
+		List<ItemRequirement> handedIn = ClueTypes.FALO.equals(step.getType()) ? requirements.getItems() : requirements.getOwnItems();
+		return handedIn.stream().map(item -> item.getCollectiveName(client)).collect(toList());
 	}
 
 	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
@@ -376,6 +388,7 @@ public final class SubSteps
 		private final Function<ItemUse, String> itemLines;
 		private final HouseState house;
 		private final boolean takeFromStash;
+		private final List<String> handInItems;
 
 		/** The STASH unit stands outside the step's way in: its items come before going in. */
 		private boolean stashFirst()
@@ -506,7 +519,7 @@ public final class SubSteps
 			}
 			else
 			{
-				steps.addAll(Acts.of(step, takeFromStash && !stashFirst()));
+				steps.addAll(Acts.of(step, takeFromStash && !stashFirst(), handInItems));
 			}
 		}
 	}
