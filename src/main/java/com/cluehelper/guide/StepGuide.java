@@ -1087,6 +1087,12 @@ public class StepGuide
 	}
 
 	/** The box shows the acts alone: nothing to travel. */
+	/** An ended emote's STASH items are still carried, so the guide walks back to its unit to put them away. */
+	public boolean owesStashPutBack()
+	{
+		return deposit.getAt() != null;
+	}
+
 	public boolean isAtStep()
 	{
 		return !steps.isEmpty() && steps.stream().allMatch(sub -> sub.getKind() == Kind.ACT);

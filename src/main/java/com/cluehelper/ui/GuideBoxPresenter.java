@@ -66,7 +66,8 @@ public class GuideBoxPresenter
 
 	private BoxState boxState()
 	{
-		return BoxState.of(isDormant(), clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), planner.isWorking());
+		return BoxState.of(isDormant(), clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), guide.owesStashPutBack(),
+			planner.isWorking());
 	}
 
 	private boolean isDormant()
