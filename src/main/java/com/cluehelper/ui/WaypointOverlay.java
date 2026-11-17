@@ -690,17 +690,23 @@ public class WaypointOverlay extends Overlay
 	 * (every stepping stone, both ends of a pipe) and the objects of the jump's other rows (a climb's rocks at the top
 	 * of its rope). The line leads over them, not straight from one end to the other. Across a short jump only those
 	 * that each bring it nearer the far end count: the Kharazi Jungle's bushes stand in a wall, all one name and id,
-	 * and would pull the line back and forth across it.
+	 * and would pull the line back and forth across it. A climb to another floor or a longer jump goes through one
+	 * object at its start, the outlined one, else the nearest: a second ladder beside it is never led over.
 	 */
 	private List<TileObject> objectsCrossed(WorldView view, WorldPoint from, WorldPoint jumpEnd)
 	{
 		boolean crossing = from.getPlane() == jumpEnd.getPlane() && from.distanceTo2D(jumpEnd) <= CROSSING_JUMP_TILES;
 		WorldPoint to = crossing ? jumpEnd : from;
 		Rectangle around = around(from, to, 1);
-		Stream<TileObject> outlined = pathObjects.keySet().stream()
+		List<TileObject> outlinedHere = pathObjects.keySet().stream()
 			.filter(object -> object.getPlane() == from.getPlane()
 				&& around.contains(object.getWorldLocation().getX(), object.getWorldLocation().getY()))
-			.flatMap(object -> paths.sameNamed(view, object, around).stream());
+			.collect(Collectors.toList());
+		if (!crossing && !outlinedHere.isEmpty())
+		{
+			return List.of(nearest(outlinedHere, from));
+		}
+		Stream<TileObject> outlined = outlinedHere.stream().flatMap(object -> paths.sameNamed(view, object, around).stream());
 		WalkData.Loaded data = routes.getWalk();
 		WalkTable table = data == null || view.isInstance() ? null : data.getTable();
 		List<TileObject> rowEnds = paths.rowObjectsAround(view, table, from, jumpEnd, around(from, to, ROW_ENDS_MARGIN_TILES));
@@ -708,7 +714,16 @@ public class WaypointOverlay extends Overlay
 			.distinct()
 			.sorted(Comparator.comparingInt(object -> PathObjects.squaredDistance(object.getWorldLocation(), from)))
 			.collect(Collectors.toList());
-		return crossing ? nearingEnd(nearestFirst, from, jumpEnd) : nearestFirst;
+		if (!crossing)
+		{
+			return nearestFirst.isEmpty() ? List.of() : List.of(nearestFirst.get(0));
+		}
+		return nearingEnd(nearestFirst, from, jumpEnd);
+	}
+
+	private static TileObject nearest(List<TileObject> objects, WorldPoint from)
+	{
+		return Collections.min(objects, Comparator.comparingInt(object -> PathObjects.squaredDistance(object.getWorldLocation(), from)));
 	}
 
 	private static List<TileObject> nearingEnd(List<TileObject> nearestFirst, WorldPoint from, WorldPoint end)
