@@ -402,7 +402,8 @@ final class StepHighlights
 		else
 		{
 			Set<Integer> held = withHeld(shown, rowTargets.heldUses(row));
-			shown.menuWidget(ScrollBook.entry(row.getName())).menuTarget(rowTargets.heldTeleport(current, held));
+			shown.menuWidget(ScrollBook.entry(row.getName())).menuWidgetLeftClick(rowTargets.optionPath(row).size() == 1)
+				.menuTarget(rowTargets.heldTeleport(current, held));
 		}
 	}
 
