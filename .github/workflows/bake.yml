@@ -29,23 +29,23 @@ jobs:
     outputs:
       game-cache: ${{ steps.game-cache.outputs.id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: dev
       - id: tools
         continue-on-error: true
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.repository_owner }}/Clue-Helper-Tools
           ref: dev
           ssh-key: ${{ secrets.TOOLS_DEPLOY_KEY }}
           path: Clue-Helper-Tools
           persist-credentials: false
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -55,7 +55,7 @@ jobs:
         run: python $TOOLS/drift/newest_cache.py >> "$GITHUB_OUTPUT"
       - id: saved-dump
         if: steps.game-cache.outcome == 'success'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: ${{ env.DUMPS }}
           key: cache-dump-${{ steps.game-cache.outputs.id }}
@@ -67,7 +67,7 @@ jobs:
           bash $TOOLS/drift/regenerate.sh
       # Saved here and not at the end of the job, which ends red whenever something needs a hand; the wiki job reads it.
       - if: steps.saved-dump.outputs.cache-hit != 'true' && hashFiles('Clue-Helper-Tools/tools/cache/dump/*/npcs.json') != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ${{ env.DUMPS }}
           key: cache-dump-${{ steps.game-cache.outputs.id }}
@@ -106,7 +106,7 @@ jobs:
           git commit -m "Regenerate the bundled data against the latest RuneLite and Shortest Path releases"
           git push origin HEAD:dev
       - if: steps.test.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: |
@@ -146,21 +146,21 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: dev
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: ${{ github.repository_owner }}/Clue-Helper-Tools
           ref: dev
           ssh-key: ${{ secrets.TOOLS_DEPLOY_KEY }}
           path: Clue-Helper-Tools
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       # The item names come from a cache dump: the one bake just used, or the last one saved when bake had none.
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@v6
         with:
           path: ${{ env.DUMPS }}
           key: cache-dump-${{ needs.bake.outputs.game-cache }}
