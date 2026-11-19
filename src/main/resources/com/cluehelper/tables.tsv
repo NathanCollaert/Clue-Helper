@@ -189,9 +189,19 @@ teleport list openers	commune
 max cape game names	feldip hills	carnivorous chinchompas
 max cape game names	tele to poh	home
 max cape game names	bandit camp quarry	enakhras temple entrance
-unlock hints	DRAGONTOOTH	"if unlocked
-unlock hints	speak with the ghost captain"	XERICS_HONOUR
-unlock hints	"if unlocked	use the Honour teleport once"
+unlock hints	DRAGONTOOTH	if unlocked, speak with the ghost captain
+unlock hints	XERICS_HONOUR	if unlocked, use the Honour teleport once
+unlock hints	STORED_LOGS	if the balloons' log storage holds logs, fly once without carrying any
+unlock hints	STORED_OAK_LOGS	if the balloons' log storage holds oak logs, fly once without carrying any
+unlock hints	STORED_WILLOW_LOGS	if the balloons' log storage holds willow logs, fly once without carrying any
+unlock hints	STORED_YEW_LOGS	if the balloons' log storage holds yew logs, fly once without carrying any
+unlock hints	STORED_MAGIC_LOGS	if the balloons' log storage holds magic logs, fly once without carrying any
+balloon fares	2808 3354 0	ItemID.LOGS=1511	STORED_LOGS
+balloon fares	2941 3420 0	ItemID.LOGS=1511	STORED_LOGS
+balloon fares	2923 3302 0	ItemID.OAK_LOGS=1521	STORED_OAK_LOGS
+balloon fares	3299 3482 0	ItemID.WILLOW_LOGS=1519	STORED_WILLOW_LOGS
+balloon fares	2459 3110 0	ItemID.YEW_LOGS=1515	STORED_YEW_LOGS
+balloon fares	2478 3456 0	ItemID.MAGIC_LOGS=1513	STORED_MAGIC_LOGS
 not teleports	wield
 not teleports	wear
 not teleports	equip

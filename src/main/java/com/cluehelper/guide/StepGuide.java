@@ -78,6 +78,8 @@ public class StepGuide
 	@Inject
 	private BankMemory bankMemory;
 	@Inject
+	private UnlockMemory unlocks;
+	@Inject
 	private MenuLines menuLines;
 	@Inject
 	private RowTargets rowTargets;
@@ -840,6 +842,10 @@ public class StepGuide
 		{
 			log.debug("teleport refused: {}", refused);
 			routes.onRowRefused(refused);
+			if (current != null && current.getRow() != null)
+			{
+				unlocks.onTeleportRefused(current.getRow());
+			}
 		}
 	}
 
