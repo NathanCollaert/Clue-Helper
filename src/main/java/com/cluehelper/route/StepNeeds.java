@@ -22,10 +22,10 @@ import static java.util.stream.Collectors.*;
 public class StepNeeds
 {
 	/** Copy of core's {@code ClueScrollOverlay.HAS_SPADE} (1.13.2). */
-	public static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
+	private static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
 		ItemRequirements.item(ItemID.EASTER23_SPADE));
 	/** Core's {@code ClueScrollOverlay.HAS_LIGHT}. */
-	public static final ItemRequirement LIGHT = anyOf("Light source", IntStream.of(Tables.ids("light sources")).boxed().collect(toList()));
+	private static final ItemRequirement LIGHT = anyOf("Light source", IntStream.of(Tables.ids("light sources")).boxed().collect(toList()));
 	private static final int NO_FIRE_PIT = -1;
 	private static final int LIT = 1;
 
@@ -160,7 +160,7 @@ public class StepNeeds
 	}
 
 	/** A lit fire pit lights the step, as core counts it. */
-	public static boolean isFirePitLit(int firePitVarbitId, Client client)
+	private static boolean isFirePitLit(int firePitVarbitId, Client client)
 	{
 		return firePitVarbitId != NO_FIRE_PIT && client.getVarbitValue(firePitVarbitId) == LIT;
 	}

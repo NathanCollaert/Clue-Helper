@@ -117,39 +117,24 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		guide.getPickUpTiles().stream().filter(tile -> tile.getPlane() == view.getPlane()).forEach(tile -> drawTile(graphics, view, tile));
-		WalkCosts here = targets.planWalk();
-		Goal goal = goal(view, here, guide.getCurrent());
+		Goal goal = goal(view, guide.getCurrent());
 		if (goal == null)
 		{
 			return null;
 		}
-		switch (goal.getKind())
+		if (goal.getHere() != null)
 		{
-			case TO_OBJECT:
-				drawPathToObject(graphics, view);
-				break;
-			case APPROACH:
-				drawApproach(graphics, view, here, goal.getNpc());
-				break;
-			case PATH:
-				if (here != null)
-				{
-					drawPath(graphics, view, here, goal.getWalk(),
-						goal.getObject() == null ? endOn(view, goal.getWalk()) : endIn(view, goal.getObject()));
-				}
-				if (goal.isMarkTile())
-				{
-					drawTile(graphics, view, goal.getWalk().getSouthWest());
-				}
-				break;
-			default:
-				throw new IllegalArgumentException("unhandled goal " + goal.getKind());
+			drawPath(graphics, view, goal.getHere(), goal.getWalk(), goal.getEnd());
+		}
+		if (goal.isMarkTile())
+		{
+			drawTile(graphics, view, goal.getWalk().getSouthWest());
 		}
 		return null;
 	}
 
 	/** Where the line leads for the current sub-step; null when nothing is drawn. */
-	private Goal goal(WorldView view, WalkCosts here, SubStep current)
+	private Goal goal(WorldView view, SubStep current)
 	{
 		WorldPoint waypoint = current == null ? null : current.getWaypoint();
 		if (waypoint == null && current != null)
@@ -165,17 +150,17 @@ public class WaypointOverlay extends Overlay
 			if (isActWithoutPlace(current))
 			{
 				WorldPoint act = actTarget(view, current, current.getTab() == StepGuide.Tab.EMOTES ? SubSteps.ARRIVE_TILES : 1);
-				return act == null ? null : Goal.path(WalkGoal.tile(act), false);
+				return act == null ? null : path(view, WalkGoal.tile(act), false);
 			}
 		}
 		if (!walkableWaypoint(waypoint, view) && !guide.getHighlightObjects().isEmpty())
 		{
-			return Goal.toObject();
+			return toObject(view);
 		}
 		NPC target = waypoint == null && current != null && current.getKind() == SubStep.Kind.ACT ? targets.npc() : null;
 		if (target != null && walkableWaypoint(target.getWorldLocation(), view))
 		{
-			return Goal.approach(target);
+			return approach(target);
 		}
 		if (waypoint == null)
 		{
@@ -183,28 +168,37 @@ public class WaypointOverlay extends Overlay
 		}
 		if (isObeliskTeleport(current))
 		{
-			return Goal.path(WalkGoal.area(waypoint, OBELISK_PLATFORM_TILES, OBELISK_PLATFORM_TILES), false);
+			return path(view, WalkGoal.area(waypoint, OBELISK_PLATFORM_TILES, OBELISK_PLATFORM_TILES), false);
 		}
 		TileObject object = outlined() ? targets.object(view) : null;
 		NPC approached = object == null && approachOutlined() ? targets.npc() : null;
 		if (approached != null)
 		{
-			return Goal.approach(approached);
+			return approach(approached);
 		}
 		if (object == null && besideOutlinedNpc(waypoint) || object != null && besidePlayer(view, object))
 		{
 			return null;
 		}
 		boolean markTile = !outlined() && !awaitsNpc() && waypoint.getPlane() == view.getPlane();
-		return object == null ? Goal.path(WalkGoal.tile(waypoint), markTile)
-			: Goal.pathTo(object, LineTargets.objectGoal(view, object), markTile);
+		return object == null ? path(view, WalkGoal.tile(waypoint), markTile) : pathTo(view, targets.planWalk(), object, markTile);
+	}
+
+	private Goal path(WorldView view, WalkGoal walk, boolean markTile)
+	{
+		return new Goal(targets.planWalk(), walk, endOn(view, walk), markTile);
+	}
+
+	private Goal pathTo(WorldView view, WalkCosts here, TileObject object, boolean markTile)
+	{
+		return new Goal(here, LineTargets.objectGoal(view, object), endIn(view, object), markTile);
 	}
 
 	/** Core marks the clue itself; only the way there is ours. */
 	private Goal pathToClue(WorldView view, SubStep current)
 	{
 		WorldPoint goal = wandererOr(view, current.getGoal());
-		return goal == null ? null : Goal.path(WalkGoal.tile(goal), false);
+		return goal == null ? null : path(view, WalkGoal.tile(goal), false);
 	}
 
 	/**
@@ -305,16 +299,8 @@ public class WaypointOverlay extends Overlay
 
 	private static WorldPoint nearestNpc(WorldView view, Predicate<NPC> wanted, WorldPoint at)
 	{
-		WorldPoint best = null;
-		for (NPC npc : view.npcs())
-		{
-			WorldPoint tile = npc.getWorldLocation();
-			if (wanted.test(npc) && (best == null || tile.distanceTo2D(at) < best.distanceTo2D(at)))
-			{
-				best = tile;
-			}
-		}
-		return best;
+		return view.npcs().stream().filter(wanted).map(NPC::getWorldLocation).min(Comparator.comparingInt(tile -> tile.distanceTo2D(at)))
+			.orElse(null);
 	}
 
 	private void noteConversationStep()
@@ -392,18 +378,11 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/** Renu, NPCs that teleport and NPCs that are the way in or out (the Guardian mummy): the path leads to the NPC. */
-	private void drawApproach(Graphics2D graphics, WorldView view, WalkCosts here, NPC npc)
+	private Goal approach(NPC npc)
 	{
 		WorldPoint from = playerTile();
 		WorldPoint at = npc.getWorldLocation();
-		if (from == null || from.distanceTo2D(at) <= 1)
-		{
-			return;
-		}
-		if (here != null)
-		{
-			drawPath(graphics, view, here, WalkGoal.tile(at), endIn(npc));
-		}
+		return from == null || from.distanceTo2D(at) <= 1 ? null : new Goal(targets.planWalk(), WalkGoal.tile(at), endIn(npc), false);
 	}
 
 	/** The walk table's tiles for a house are not the instance's own, so in a house the object leads the way. */
@@ -413,18 +392,11 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/** A nexus, altar or other object the step uses, where the step has no tile in the loaded scene to walk to. */
-	private void drawPathToObject(Graphics2D graphics, WorldView view)
+	private Goal toObject(WorldView view)
 	{
 		WalkCosts here = targets.walk(view);
-		if (here == null)
-		{
-			return;
-		}
-		TileObject object = targets.object(view);
-		if (object != null && !besidePlayer(view, object))
-		{
-			drawPath(graphics, view, here, LineTargets.objectGoal(view, object), endIn(view, object));
-		}
+		TileObject object = here == null ? null : targets.object(view);
+		return object == null || besidePlayer(view, object) ? null : pathTo(view, here, object, false);
 	}
 
 	private boolean besidePlayer(WorldView view, TileObject object)
@@ -752,38 +724,13 @@ public class WaypointOverlay extends Overlay
 	@Value
 	private static class Goal
 	{
-		enum Kind
-		{
-			PATH, APPROACH, TO_OBJECT
-		}
-
-		Kind kind;
+		/** The walk the line is laid over; null draws no line. */
+		WalkCosts here;
 		WalkGoal walk;
-		NPC npc;
-		/** The object a path leads to; null for a plain tile. */
-		TileObject object;
+		/** What the line ends in; null when it ends on a plain tile. */
+		LineEnd end;
 		/** The goal's tile is marked, as nothing on it is outlined. */
 		boolean markTile;
-
-		static Goal path(WalkGoal walk, boolean markTile)
-		{
-			return new Goal(Kind.PATH, walk, null, null, markTile);
-		}
-
-		static Goal pathTo(TileObject object, WalkGoal walk, boolean markTile)
-		{
-			return new Goal(Kind.PATH, walk, null, object, markTile);
-		}
-
-		static Goal approach(NPC npc)
-		{
-			return new Goal(Kind.APPROACH, null, npc, null, false);
-		}
-
-		private static Goal toObject()
-		{
-			return new Goal(Kind.TO_OBJECT, null, null, null, false);
-		}
 	}
 
 	/** The object or NPC the line ends in: it runs on from the tile beside it to its middle, hidden under its model. */

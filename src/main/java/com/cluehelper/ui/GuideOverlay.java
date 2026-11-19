@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.MenuAction;
 import net.runelite.client.plugins.cluescrolls.*;
+import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.*;
 import net.runelite.client.ui.overlay.components.*;
@@ -61,8 +62,7 @@ public class GuideOverlay extends OverlayPanel
 
 	/**
 	 * Client thread, with core's box out of the overlay manager, or null to give it back before it goes back in. Core's
-	 * own actions (Reset) move onto this box while its text does. Core keeps its lines after drawing them, so they can
-	 * be taken from its panel.
+	 * own actions (Reset) move onto this box while its text does.
 	 */
 	public void mergeCoreBox(ClueScrollOverlay core, ClueScrollPlugin plugin)
 	{
@@ -70,13 +70,11 @@ public class GuideOverlay extends OverlayPanel
 		if (previous != null)
 		{
 			getMenuEntries().removeAll(overlayActions(previous));
-			previous.setClearChildren(true);
 		}
 		corePlugin = plugin;
 		coreBox = core;
 		if (core != null)
 		{
-			core.setClearChildren(false);
 			getMenuEntries().addAll(overlayActions(core));
 		}
 	}
@@ -90,10 +88,10 @@ public class GuideOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		ClueScrollOverlay core = coreBox;
-		if (core != null && config.guideBox() == GuideBoxStyle.COMBINED)
+		ClueScrollPlugin plugin = corePlugin;
+		if (coreBox != null && plugin != null && plugin.getClue() != null && config.guideBox() == GuideBoxStyle.COMBINED)
 		{
-			coreLines(graphics, core);
+			coreLines(plugin, plugin.getClue());
 		}
 		GuideBox shown = box;
 		if (shown.isShown() && config.guideBox() != GuideBoxStyle.NONE)
@@ -108,32 +106,22 @@ public class GuideOverlay extends OverlayPanel
 		return super.render(graphics);
 	}
 
-	/** Core draws its box into an empty clip, so nothing shows, and its lines move into this box. */
-	private void coreLines(Graphics2D graphics, ClueScrollOverlay core)
+	/**
+	 * The clue's own hint, as core's box shows it but without its item warnings (the route brings the items), then the
+	 * enemy to fight as core's box adds it.
+	 */
+	private void coreLines(ClueScrollPlugin plugin, ClueScroll clue)
 	{
-		List<LayoutableRenderableEntity> lines = drawnCoreLines(graphics, core);
-		ClueScrollPlugin plugin = corePlugin;
-		RedundantCoreLines.remove(lines, plugin.getClue(), plugin);
+		PanelComponent hint = new PanelComponent();
+		clue.makeOverlayHint(hint, plugin);
+		List<LayoutableRenderableEntity> lines = hint.getChildren();
+		RedundantCoreLines.remove(lines, clue, plugin);
+		if (clue.getEnemy() != null)
+		{
+			lines.add(LineComponent.builder().left("").build());
+			lines.add(LineComponent.builder().left(clue.getEnemy().getText()).leftColor(Color.YELLOW).build());
+		}
 		panelComponent.getChildren().addAll(lines);
-	}
-
-	private static List<LayoutableRenderableEntity> drawnCoreLines(Graphics2D graphics, ClueScrollOverlay core)
-	{
-		List<LayoutableRenderableEntity> lines = core.getPanelComponent().getChildren();
-		lines.clear();
-		Graphics2D unseen = (Graphics2D) graphics.create();
-		unseen.setClip(0, 0, 0, 0);
-		try
-		{
-			core.render(unseen);
-		}
-		finally
-		{
-			unseen.dispose();
-		}
-		List<LayoutableRenderableEntity> drawn = new ArrayList<>(lines);
-		lines.clear();
-		return drawn;
 	}
 
 	private void guide(Graphics2D graphics, GuideBox shown)

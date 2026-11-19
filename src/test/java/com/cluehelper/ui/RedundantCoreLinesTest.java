@@ -14,7 +14,10 @@ import net.runelite.client.ui.overlay.components.*;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/** Pins where core puts the lines RedundantCoreLines finds by place, because a line hides its text. */
+/**
+ * Pins where core puts the lines RedundantCoreLines finds by place, because a line hides its text, and what core's box
+ * adds under the hint, which the combined box rebuilds without the item warnings.
+ */
 public class RedundantCoreLinesTest
 {
 	private static final List<String> REDUNDANT = List.of(
@@ -56,7 +59,7 @@ public class RedundantCoreLinesTest
 	}
 
 	@Test
-	public void removesCoreBoxItemWarningsAndKeepsTheEnemy() throws Exception
+	public void coreBoxAddsOnlyItemWarningsAndTheEnemyUnderTheHint() throws Exception
 	{
 		ClueScrollPlugin plugin = pluginCarrying(new Item[0]);
 		ClueScroll clue = new DarkDigWithEnemy();
@@ -67,11 +70,8 @@ public class RedundantCoreLinesTest
 		overlay.setClearChildren(false);
 		overlay.render(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics());
 
-		List<LayoutableRenderableEntity> lines = new ArrayList<>(overlay.getPanelComponent().getChildren());
 		assertEquals(List.of(DarkDigWithEnemy.TITLE, "", "Requires Spade!", "", "Requires Light Source!", "", DarkDigWithEnemy.ENEMY.getText()),
-			texts(lines));
-		RedundantCoreLines.remove(lines, clue, plugin);
-		assertEquals(List.of(DarkDigWithEnemy.TITLE, "", DarkDigWithEnemy.ENEMY.getText()), texts(lines));
+			texts(overlay.getPanelComponent().getChildren()));
 	}
 
 	/** Needs both a spade and a light, and has no note, which the offline plugin could not read. */
