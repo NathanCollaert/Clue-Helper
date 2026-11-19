@@ -40,7 +40,7 @@ final class PlayerDump
 			.append(" A_carried ").append(available.size()).append('/').append(carried.getRows().size());
 		if (s != null)
 		{
-			line.append(" pouch ").append(s.isPouchHeld() ? names(s.getPouch()) : "not held")
+			line.append(" pouch ").append(names(s.getPouch()))
 				.append(" charges ").append(charges(s));
 		}
 		if (!gained.isEmpty())

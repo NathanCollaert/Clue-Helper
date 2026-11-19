@@ -21,6 +21,7 @@ import net.runelite.api.gameval.VarbitID;
 @Singleton
 public class PlayerModel
 {
+	private static final PlayerSnapshot EMPTY = PlayerSnapshot.builder().build();
 	private static final Set<Integer> RUNE_POUCHES = Tables.idSet("rune pouches");
 	private static final int[] POUCH_TYPES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(0)).toArray();
 	private static final int[] POUCH_QUANTITIES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(1)).toArray();
@@ -400,16 +401,13 @@ public class PlayerModel
 		grown.addAll(grownPatches);
 		return PlayerSnapshot.builder()
 			.version(++version)
-			.tick(client.getTickCount())
 			.position(now)
 			.wildernessLevel(wildernessLevel(now))
 			.membersWorld(worldTypes.contains(WorldType.MEMBERS))
-			.pvpWorld(WorldType.isPvpWorld(worldTypes))
 			.dormantReason(dormantReason(worldTypes))
 			.accountType(AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)))
 			.inventory(bankMemory.withKit(inventory))
 			.worn(worn)
-			.pouchHeld(pouchHeld)
 			.pouch(pouchHeld ? pouch() : Map.of())
 			.boostedLevels(boosted)
 			.realLevels(real)
@@ -486,47 +484,48 @@ public class PlayerModel
 	/** Client thread. Whether an inventory item's name starts with {@code nameStart}, lower case. */
 	public boolean carriesItemNamed(String nameStart)
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
+		return now().carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Client thread. Held or worn: an item put away (in a deposit box) is gone from both. */
 	public boolean holdsOrWearsItemNamed(String nameStart)
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.holdsOrWearsItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
+		return now().holdsOrWearsItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Inventory and worn; empty while logged out. */
 	public Set<Integer> carriedIds()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null ? Set.of() : snapshot.carriedIds();
+		return now().carriedIds();
 	}
 
 	public Set<Integer> inventoryIds()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null ? Set.of() : snapshot.getInventory().keySet();
+		return Collections.unmodifiableSet(now().getInventory().keySet());
 	}
 
 	public boolean finished(Quest quest)
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.finished(quest);
+		return now().finished(quest);
 	}
 
 	public Set<Integer> wornIds()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null ? Set.of() : snapshot.getWorn().keySet();
+		return Collections.unmodifiableSet(now().getWorn().keySet());
 	}
 
 	/** The standard book until the spellbook is read. */
 	public Book currentBook()
 	{
+		SpellbookState spellbook = now().getSpellbook();
+		return spellbook == null ? Book.STANDARD : spellbook.getBook();
+	}
+
+	/** The snapshot, or an empty one while logged out. */
+	private PlayerSnapshot now()
+	{
 		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null || snapshot.getSpellbook() == null ? Book.STANDARD : snapshot.getSpellbook().getBook();
+		return snapshot == null ? EMPTY : snapshot;
 	}
 
 	/** Client thread only. */

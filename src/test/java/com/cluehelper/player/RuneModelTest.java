@@ -122,7 +122,6 @@ public class RuneModelTest
 		return PlayerSnapshot.builder()
 			.membersWorld(true)
 			.inventory(Map.of(ItemID.DIVINE_RUNE_POUCH, 1))
-			.pouchHeld(true)
 			.pouch(pouch)
 			.boostedLevels(levels)
 			.realLevels(levels)

@@ -6,11 +6,12 @@ import lombok.*;
 import net.runelite.api.*;
 
 /**
- * Immutable, so any thread can read it. Walking alone doesn't make a new version: see
- * {@link PlayerModel#getPosition()}.
+ * Immutable, so any thread can read it: its maps and sets are handed over fresh and never changed. Walking alone doesn't
+ * make a new version: see {@link PlayerModel#getPosition()}.
  */
-@Getter
-public final class PlayerSnapshot
+@Value
+@Builder(toBuilder = true)
+public class PlayerSnapshot
 {
 	/** How a var the snapshot didn't read is judged; only test loadouts declare PASS or FAIL. */
 	public enum UnknownVars
@@ -18,95 +19,62 @@ public final class PlayerSnapshot
 		UNREAD, PASS, FAIL
 	}
 
-	private final long version;
-	private final int tick;
-	private final Position position;
-	private final int wildernessLevel;
-	private final boolean membersWorld;
-	private final boolean pvpWorld;
+	long version;
+	@Builder.Default
+	Position position = Position.NONE;
+	int wildernessLevel;
+	boolean membersWorld;
 	/** Null on a normal world. */
-	private final String dormantReason;
-	private final AccountType accountType;
-	private final Map<Integer, Integer> inventory;
-	private final Map<Integer, Integer> worn;
-	/** The pouch varbits keep their values while it is banked, so they only count while it is held. */
-	private final boolean pouchHeld;
-	private final Map<Integer, Integer> pouch;
-	private final Map<Skill, Integer> boostedLevels;
-	private final Map<Skill, Integer> realLevels;
-	private final int totalLevel;
-	private final int combatLevel;
-	private final int questPoints;
+	String dormantReason;
+	AccountType accountType;
+	@Builder.Default
+	Map<Integer, Integer> inventory = Map.of();
+	@Builder.Default
+	Map<Integer, Integer> worn = Map.of();
+	/** Empty unless a rune pouch is held: its varbits keep their values while it is banked. */
+	@Builder.Default
+	Map<Integer, Integer> pouch = Map.of();
+	@Builder.Default
+	Map<Skill, Integer> boostedLevels = Map.of();
+	@Builder.Default
+	Map<Skill, Integer> realLevels = Map.of();
+	int totalLevel;
+	int combatLevel;
+	int questPoints;
 	/** Tracks the Music cape still needs; 0 in a snapshot that never counted them. */
-	private final int lockedMusicTracks;
+	int lockedMusicTracks;
 	/** Quest points the player lacks of all the game offers; 0 in a snapshot that never counted them. */
-	private final int missingQuestPoints;
-	private final boolean questsRead;
-	private final Map<Quest, QuestState> quests;
-	private final Map<Integer, Integer> varbits;
-	private final Map<Integer, Integer> varps;
-	private final UnknownVars unknownVars;
-	private final SpellbookState spellbook;
+	int missingQuestPoints;
+	boolean questsRead;
+	@Builder.Default
+	Map<Quest, QuestState> quests = Map.of();
+	@Builder.Default
+	Map<Integer, Integer> varbits = Map.of();
+	@Builder.Default
+	Map<Integer, Integer> varps = Map.of();
+	@Builder.Default
+	UnknownVars unknownVars = UnknownVars.UNREAD;
+	SpellbookState spellbook;
 	/** Held items only, except in a banked snapshot. */
-	private final Map<Integer, Charge> charges;
-	private final int freeInventorySlots;
+	@Builder.Default
+	Map<Integer, Charge> charges = Map.of();
+	int freeInventorySlots;
 	/** Placeholders left out; empty except in a banked snapshot. */
-	private final Map<Integer, Integer> bank;
+	@Builder.Default
+	Map<Integer, Integer> bank = Map.of();
 	/** Empty except in a banked snapshot. */
-	private final Map<Integer, Integer> groupStorage;
-	private final HouseState house;
+	@Builder.Default
+	Map<Integer, Integer> groupStorage = Map.of();
+	@Builder.Default
+	HouseState house = HouseState.NONE;
 	/** Patch names known to be grown: spirit trees, and the grown patches read from Time Tracking. */
-	private final Set<String> plantedTrees;
+	@Builder.Default
+	Set<String> plantedTrees = Set.of();
 	/** Account unlocks seen in play, named as the catalog's {@code UNLOCK_} tokens name them (without the prefix). */
-	private final Set<String> unlocks;
+	@Builder.Default
+	Set<String> unlocks = Set.of();
 	/** The three-letter code where a ring's Last-destination goes; null when unknown. */
-	private final String lastFairyRing;
-
-	@Builder(toBuilder = true)
-	private PlayerSnapshot(long version, int tick, Position position, int wildernessLevel, boolean membersWorld,
-		boolean pvpWorld, String dormantReason, AccountType accountType, Map<Integer, Integer> inventory,
-		Map<Integer, Integer> worn, boolean pouchHeld, Map<Integer, Integer> pouch,
-		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
-		int questPoints, int lockedMusicTracks, int missingQuestPoints, boolean questsRead, Map<Quest, QuestState> quests,
-		Map<Integer, Integer> varbits,
-		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
-		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house,
-		Set<String> plantedTrees, Set<String> unlocks, String lastFairyRing)
-	{
-		this.version = version;
-		this.tick = tick;
-		this.position = position == null ? Position.NONE : position;
-		this.wildernessLevel = wildernessLevel;
-		this.membersWorld = membersWorld;
-		this.pvpWorld = pvpWorld;
-		this.dormantReason = dormantReason;
-		this.accountType = accountType;
-		this.inventory = copy(inventory);
-		this.worn = copy(worn);
-		this.pouchHeld = pouchHeld;
-		this.pouch = pouchHeld ? copy(pouch) : Map.of();
-		this.boostedLevels = copy(boostedLevels);
-		this.realLevels = copy(realLevels);
-		this.totalLevel = totalLevel;
-		this.combatLevel = combatLevel;
-		this.questPoints = questPoints;
-		this.lockedMusicTracks = lockedMusicTracks;
-		this.missingQuestPoints = missingQuestPoints;
-		this.questsRead = questsRead;
-		this.quests = copy(quests);
-		this.varbits = copy(varbits);
-		this.varps = copy(varps);
-		this.unknownVars = unknownVars == null ? UnknownVars.UNREAD : unknownVars;
-		this.spellbook = spellbook;
-		this.charges = copy(charges);
-		this.freeInventorySlots = freeInventorySlots;
-		this.bank = copy(bank);
-		this.groupStorage = copy(groupStorage);
-		this.house = house == null ? HouseState.NONE : house;
-		this.plantedTrees = plantedTrees == null ? Set.of() : Set.copyOf(plantedTrees);
-		this.unlocks = unlocks == null ? Set.of() : Set.copyOf(unlocks);
-		this.lastFairyRing = lastFairyRing;
-	}
+	String lastFairyRing;
 
 	public int boosted(Skill skill)
 	{
@@ -222,10 +190,5 @@ public final class PlayerSnapshot
 	public Integer varp(int id)
 	{
 		return varps.get(id);
-	}
-
-	private static <K, V> Map<K, V> copy(Map<K, V> map)
-	{
-		return map == null ? Map.of() : Map.copyOf(map);
 	}
 }

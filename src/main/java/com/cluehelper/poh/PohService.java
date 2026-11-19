@@ -278,8 +278,9 @@ public class PohService
 		{
 			return;
 		}
-		Map<Integer, List<WorldPoint>> found = findPieces(view.getScene());
-		WalkCosts walk = walkFrom(view, local.getLocalLocation());
+		Map<Integer, List<WorldPoint>> found = findPieces(view);
+		LoadedScene scene = LoadedScene.captureLoaded(view);
+		WalkCosts walk = scene == null ? null : WalkCosts.from(Ground.sceneOnly(scene), local.getWorldLocation());
 		Map<Integer, Integer> ticks = new HashMap<>();
 		found.forEach((id, cells) ->
 		{
@@ -298,11 +299,11 @@ public class PohService
 		houseDirty = true;
 	}
 
-	/** By piece, its scene tiles: a large piece is on each tile it covers. */
-	private Map<Integer, List<WorldPoint>> findPieces(Scene scene)
+	/** By piece, its tiles: a large piece is on each tile it covers. */
+	private Map<Integer, List<WorldPoint>> findPieces(WorldView view)
 	{
 		Map<Integer, List<WorldPoint>> found = new HashMap<>();
-		Tile[][][] tiles = scene.getTiles();
+		Tile[][][] tiles = view.getScene().getTiles();
 		for (int z = 0; z < tiles.length; z++)
 		{
 			for (int x = 0; x < tiles[z].length; x++)
@@ -314,30 +315,13 @@ public class PohService
 					{
 						if (pieces.contains(object.getId()))
 						{
-							found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(new WorldPoint(x, y, z));
+							found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(WorldPoint.fromScene(view, x, y, z));
 						}
 					}
 				}
 			}
 		}
 		return found;
-	}
-
-	/** Uses the instance's own collision flags; its points are scene coordinates, not world ones. */
-	private static WalkCosts walkFrom(WorldView view, LocalPoint at)
-	{
-		CollisionData[] maps = view.getCollisionMaps();
-		if (maps == null || at == null)
-		{
-			return null;
-		}
-		int[][][] flags = new int[maps.length][][];
-		for (int plane = 0; plane < maps.length; plane++)
-		{
-			flags[plane] = maps[plane] == null ? null : maps[plane].getFlags();
-		}
-		LoadedScene scene = new LoadedScene(0, 0, view.getSizeX(), view.getSizeY(), flags);
-		return WalkCosts.from(Ground.sceneOnly(scene), new WorldPoint(at.getSceneX(), at.getSceneY(), view.getPlane()));
 	}
 
 	private void publish()

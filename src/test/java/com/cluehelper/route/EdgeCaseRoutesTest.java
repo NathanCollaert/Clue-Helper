@@ -433,7 +433,7 @@ public class EdgeCaseRoutesTest
 		varps.put(MINIGAME_TELEPORT_TIMER_VARP, (int) NOW_MINUTES);
 		return player.toBuilder().inventory(Map.of(ItemID.COINS, 1_000_000, ItemID.DRAGON_AXE, 1, ItemID.LOGS, 1, ItemID.OAK_LOGS, 1,
 				ItemID.WILLOW_LOGS, 1, ItemID.YEW_LOGS, 1, ItemID.MAGIC_LOGS, 1, ItemID.ECTOTOKEN, 100))
-			.worn(Map.of()).pouchHeld(false).charges(Map.of()).house(HouseState.NONE).varps(varps).build();
+			.worn(Map.of()).charges(Map.of()).house(HouseState.NONE).varps(varps).build();
 	}
 
 	private static PlayerSnapshot withVarbits(PlayerSnapshot player, Map<Integer, Integer> values)
