@@ -202,7 +202,7 @@ public class CoreDriftTest
 		for (String start : List.of("the doorman of the warriors' guild", "she's small but can build", "my life was spared"))
 		{
 			CrypticClue part = (CrypticClue) CoreClues.entries("CrypticClue").stream()
-				.filter(c -> ClueFacts.normalise(((CrypticClue) c).getText()).startsWith(start))
+				.filter(c -> StepKey.normalise(((CrypticClue) c).getText()).startsWith(start))
 				.findFirst().orElseThrow(() -> new AssertionError("no cryptic starting " + start));
 			parts.add(new AbstractMap.SimpleEntry<>(part, false));
 		}

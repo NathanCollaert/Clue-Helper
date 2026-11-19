@@ -24,70 +24,82 @@ public final class CoreClueReader
 	{
 		if (clue instanceof ThreeStepCrypticClue)
 		{
-			return ClueFacts.of(ClueTypes.THREE_STEP).text(((ThreeStepCrypticClue) clue).getText());
+			return byText(ClueTypes.THREE_STEP, ((ThreeStepCrypticClue) clue).getText());
 		}
 		if (clue instanceof CrypticClue)
 		{
-			return ClueFacts.of(ClueTypes.CRYPTIC).text(((CrypticClue) clue).getText());
+			return byText(ClueTypes.CRYPTIC, ((CrypticClue) clue).getText());
 		}
 		if (clue instanceof AnagramClue)
 		{
 			AnagramClue anagram = (AnagramClue) clue;
-			return ClueFacts.of(ClueTypes.ANAGRAM).itemId(anagram.getItemId()).text(anagram.getTextProvider().apply(plugin));
+			String text = anagram.getTextProvider().apply(plugin);
+			return byItemOr(ClueTypes.ANAGRAM, anagram.getItemId(), StepKey.normalise(text), text);
 		}
 		if (clue instanceof CipherClue)
 		{
 			CipherClue cipher = (CipherClue) clue;
-			return ClueFacts.of(ClueTypes.CIPHER).itemId(cipher.getItemId()).text(cipher.getText());
+			return byItemOr(ClueTypes.CIPHER, cipher.getItemId(), StepKey.normalise(cipher.getText()), cipher.getText());
 		}
 		if (clue instanceof CoordinateClue)
 		{
 			CoordinateClue coordinate = (CoordinateClue) clue;
-			WorldPoint location = coordinate.getLocation(plugin);
-			return ClueFacts.of(ClueTypes.COORDINATE).itemId(coordinate.getItemId())
-				.tile(location.getX(), location.getY(), location.getPlane());
+			String tile = StepKey.tile(coordinate.getLocation(plugin));
+			return byItemOr(ClueTypes.COORDINATE, coordinate.getItemId(), tile, "Dig at " + tile);
 		}
 		if (clue instanceof EmoteClue)
 		{
 			EmoteClue emote = (EmoteClue) clue;
-			return ClueFacts.of(ClueTypes.EMOTE).itemId(emote.getItemId()).text(emote.getText());
+			return byItemOr(ClueTypes.EMOTE, emote.getItemId(), StepKey.normalise(emote.getText()), emote.getText());
 		}
 		if (clue instanceof BeginnerMapClue)
 		{
-			return ClueFacts.of(ClueTypes.BEGINNER_MAP).widgetGroupId(((BeginnerMapClue) clue).getWidgetGroupID());
+			BeginnerMapClue map = (BeginnerMapClue) clue;
+			return new ClueFacts(ClueTypes.BEGINNER_MAP, "map:w" + map.getWidgetGroupID(), map.getDescription(), null);
 		}
 		if (clue instanceof MapClue)
 		{
 			MapClue map = (MapClue) clue;
-			WorldPoint location = map.getLocation(plugin);
-			return ClueFacts.of(ClueTypes.MAP).itemId(map.getItemId())
-				.tile(location.getX(), location.getY(), location.getPlane());
+			return byItemOr(ClueTypes.MAP, map.getItemId(), StepKey.tile(map.getLocation(plugin)), map.getDescription());
 		}
 		if (clue instanceof FairyRingClue)
 		{
-			return ClueFacts.of(ClueTypes.FAIRY_RING).text(((FairyRingClue) clue).getText());
+			return byText(ClueTypes.FAIRY_RING, ((FairyRingClue) clue).getText());
 		}
 		if (clue instanceof MusicClue)
 		{
 			MusicClue music = (MusicClue) clue;
-			return ClueFacts.of(ClueTypes.MUSIC).itemId(music.getItemId()).text(music.getSong());
+			return byItemOr(ClueTypes.MUSIC, music.getItemId(), StepKey.normalise(music.getSong()), "Play " + music.getSong());
 		}
 		if (clue instanceof FaloTheBardClue)
 		{
-			return ClueFacts.of(ClueTypes.FALO).text(((FaloTheBardClue) clue).getText());
+			return byText(ClueTypes.FALO, ((FaloTheBardClue) clue).getText());
 		}
 		if (clue instanceof SkillChallengeClue)
 		{
 			SkillChallengeClue skill = (SkillChallengeClue) clue;
-			return ClueFacts.of(ClueTypes.SKILL).challenge(String.valueOf(skill.getType()), skill.getRawChallenge());
+			String key = "skill:" + skill.getType() + ":" + StepKey.normalise(skill.getRawChallenge());
+			return new ClueFacts(ClueTypes.SKILL, key, skill.getRawChallenge(), null);
 		}
 		if (clue instanceof HotColdClue)
 		{
 			HotColdClue hotCold = (HotColdClue) clue;
-			return ClueFacts.of(ClueTypes.HOT_COLD).tier((hotCold.isBeginner() ? HotColdTier.BEGINNER : HotColdTier.MASTER).getTierName())
-				.npc(hotCold.getNpc()).text(hotCold.getText());
+			HotColdTier tier = hotCold.isBeginner() ? HotColdTier.BEGINNER : HotColdTier.MASTER;
+			return new ClueFacts(ClueTypes.HOT_COLD, StepKey.hotCold(tier, hotCold.getNpc()), hotCold.getText(), tier.getTierName());
 		}
-		return ClueFacts.of(clue.getClass().getSimpleName());
+		String type = clue.getClass().getSimpleName();
+		return new ClueFacts(type, "unknown:" + type, null, null);
+	}
+
+	static ClueFacts byText(String type, String text)
+	{
+		return new ClueFacts(type, type + ":" + StepKey.normalise(text), text, null);
+	}
+
+	/** Keyed by the clue's item when it has one of its own, else by {@code otherwise}. */
+	private static ClueFacts byItemOr(String type, int itemId, String otherwise, String text)
+	{
+		return new ClueFacts(type, type + ":" + (StepKey.hasOwnItem(itemId) ? String.valueOf(itemId) : otherwise), text, null);
 	}
 
 	static List<WorldPoint> locations(ClueScroll clue, ClueScrollPlugin plugin)
@@ -216,28 +228,6 @@ public final class CoreClueReader
 	static int lightSourceVarbitId(ClueScroll clue)
 	{
 		return clue instanceof CoordinateClue ? ((CoordinateClue) clue).getLightSourceVarbitId() : -1;
-	}
-
-	static String displayText(ClueScroll clue, ClueFacts facts, ClueScrollPlugin plugin)
-	{
-		if (clue instanceof MapClue)
-		{
-			return ((MapClue) clue).getDescription();
-		}
-		if (clue instanceof SkillChallengeClue)
-		{
-			return ((SkillChallengeClue) clue).getRawChallenge();
-		}
-		if (clue instanceof CoordinateClue)
-		{
-			int[] tile = facts.getTile();
-			return "Dig at " + tile[0] + "," + tile[1] + "," + tile[2];
-		}
-		if (clue instanceof MusicClue)
-		{
-			return "Play " + facts.getText();
-		}
-		return facts.getText();
 	}
 
 	private static <T> List<T> distinct(List<T> values)

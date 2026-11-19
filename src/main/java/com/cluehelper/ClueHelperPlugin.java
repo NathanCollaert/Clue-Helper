@@ -82,7 +82,7 @@ public class ClueHelperPlugin extends Plugin
 	private AvailabilityService availability;
 
 	@Inject
-	private CatalogData catalog;
+	private BundledData bundledData;
 
 	@Inject
 	private PlannerRunner planner;
@@ -180,7 +180,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.start();
 		clientThread.invokeLater(this::publishMemories);
 		availability.start();
-		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
+		bundledData.getCatalog().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
 		routes.start();
 		guide.start();
 		hotCold.start();

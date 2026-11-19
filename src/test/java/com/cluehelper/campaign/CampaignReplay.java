@@ -28,7 +28,6 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogData;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +71,7 @@ public final class CampaignReplay
 	/** The bundled walk table and world map, catalog and step data, and the rune model slice the tests plan with. */
 	public static CampaignReplay load() throws IOException
 	{
-		return new CampaignReplay(WalkTable.load(RuneLiteAPI.GSON), WorldMap.load(), CatalogData.read(RuneLiteAPI.GSON), NoTeleportAreas.load(), Loadouts.runeModel(),
+		return new CampaignReplay(WalkTable.load(RuneLiteAPI.GSON), WorldMap.load(), Catalog.read(RuneLiteAPI.GSON), NoTeleportAreas.load(), Loadouts.runeModel(),
 			StepIndex.read(new Gson()));
 	}
 

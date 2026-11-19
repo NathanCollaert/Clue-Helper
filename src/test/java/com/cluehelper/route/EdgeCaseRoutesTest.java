@@ -18,7 +18,6 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogData;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -83,7 +82,7 @@ public class EdgeCaseRoutesTest
 	{
 		table = WalkTable.load(RuneLiteAPI.GSON);
 		map = WorldMap.load();
-		catalog = CatalogData.read(RuneLiteAPI.GSON);
+		catalog = Catalog.read(RuneLiteAPI.GSON);
 		runes = Loadouts.runeModel();
 		steps = DriftSteps.read();
 	}

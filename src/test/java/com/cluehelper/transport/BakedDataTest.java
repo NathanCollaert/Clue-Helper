@@ -18,7 +18,7 @@ public class BakedDataTest
 	@Test
 	public void catalogIsBakedFromTheCurrentTables() throws IOException
 	{
-		assertEquals(DataBake.CATALOG + STALE, CatalogLoader.load(), CatalogData.read(gson));
+		assertEquals(DataBake.CATALOG + STALE, CatalogLoader.load(), Catalog.read(gson));
 	}
 
 	@Test

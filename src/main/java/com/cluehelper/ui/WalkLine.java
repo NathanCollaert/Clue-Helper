@@ -116,7 +116,7 @@ final class WalkLine
 		this.here = here;
 		stale = false;
 		Player local = client.getLocalPlayer();
-		WalkData.Loaded data = routes.getWalk();
+		WalkData data = routes.getWalk();
 		if (local == null || data == null)
 		{
 			return;

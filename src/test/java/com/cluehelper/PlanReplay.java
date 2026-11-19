@@ -25,7 +25,6 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.RouteReport;
 import com.google.gson.Gson;
 import java.io.ByteArrayInputStream;
@@ -76,7 +75,7 @@ public final class PlanReplay
 		Arrays.sort(files);
 		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 		WorldMap map = WorldMap.load();
-		Catalog catalog = CatalogData.read(RuneLiteAPI.GSON);
+		Catalog catalog = Catalog.read(RuneLiteAPI.GSON);
 		NoTeleportAreas noTeleport = NoTeleportAreas.load();
 		Map<String, Step> steps = DriftSteps.read();
 		AvailabilityEngine engine = new AvailabilityEngine(Loadouts.runeModel(), id -> "item " + id);

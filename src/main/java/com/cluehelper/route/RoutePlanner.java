@@ -1,6 +1,6 @@
 package com.cluehelper.route;
 
-import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.*;
 import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
@@ -48,9 +48,7 @@ public class RoutePlanner
 	@Inject
 	private AvailabilityService availability;
 	@Inject
-	private CatalogData catalogData;
-	@Inject
-	private WalkData walkData;
+	private BundledData bundledData;
 	@Inject
 	private PlannerRunner runner;
 	/** The walk from the player's tile, searched apart so it never supersedes a plan. */
@@ -74,7 +72,7 @@ public class RoutePlanner
 
 	/** Loaded walk data; null until it is. */
 	@Getter
-	private volatile WalkData.Loaded walk;
+	private volatile WalkData walk;
 	private volatile Catalog catalog;
 	private long gatesVersion = -1;
 	private boolean[] rowOpen;
@@ -112,8 +110,8 @@ public class RoutePlanner
 
 	public void start()
 	{
-		catalogData.get().thenAccept(loaded -> catalog = loaded);
-		walkData.get().thenAccept(loaded ->
+		bundledData.getCatalog().thenAccept(loaded -> catalog = loaded);
+		bundledData.getWalk().thenAccept(loaded ->
 		{
 			if (loaded != null)
 			{
@@ -189,7 +187,7 @@ public class RoutePlanner
 		Step step = travelStep();
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
-		WalkData.Loaded data = walk;
+		WalkData data = walk;
 		boolean dormant = snapshot != null && snapshot.getDormantReason() != null;
 		if (step == null || snapshot == null || runes == null || data == null || catalog == null || dormant)
 		{
@@ -325,7 +323,7 @@ public class RoutePlanner
 		return snapshot.toBuilder().varbits(varbits).spellbook(noCapeUses).build();
 	}
 
-	private void updateStart(WalkData.Loaded data, PlayerSnapshot snapshot, RuneModel runes, Step step)
+	private void updateStart(WalkData data, PlayerSnapshot snapshot, RuneModel runes, Step step)
 	{
 		Position position = player.getPosition();
 		WalkTable table = data.getTable();

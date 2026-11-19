@@ -1,5 +1,6 @@
 package com.cluehelper.memory;
 
+import com.cluehelper.BundledData;
 import com.cluehelper.guide.Widgets;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.step.*;
@@ -29,7 +30,7 @@ public class NpcPlaceMemory
 	@Inject
 	private Client client;
 	@Inject
-	private StepData data;
+	private BundledData data;
 	@Inject
 	private PlayerModel player;
 	private MemorySlot<Places> remembered;
@@ -128,7 +129,7 @@ public class NpcPlaceMemory
 	{
 		if (learnable == null)
 		{
-			learnable = data.index().getSteps().values().stream().filter(entry -> entry.getLearnPlace() != null)
+			learnable = data.stepIndex().getSteps().values().stream().filter(entry -> entry.getLearnPlace() != null)
 				.collect(toUnmodifiableList());
 		}
 		return learnable;

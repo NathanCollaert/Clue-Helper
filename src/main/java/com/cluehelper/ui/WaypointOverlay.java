@@ -538,7 +538,7 @@ public class WaypointOverlay extends Overlay
 	private void followAhead(WorldView view)
 	{
 		walkLine.advance();
-		WalkData.Loaded data = routes.getWalk();
+		WalkData data = routes.getWalk();
 		pathObjects = paths.along(view, data == null || view.isInstance() ? null : data.getTable(), walkLine.getAhead());
 	}
 
@@ -679,7 +679,7 @@ public class WaypointOverlay extends Overlay
 			return List.of(nearest(outlinedHere, from));
 		}
 		Stream<TileObject> outlined = outlinedHere.stream().flatMap(object -> paths.sameNamed(view, object, around).stream());
-		WalkData.Loaded data = routes.getWalk();
+		WalkData data = routes.getWalk();
 		WalkTable table = data == null || view.isInstance() ? null : data.getTable();
 		List<TileObject> rowEnds = paths.rowObjectsAround(view, table, from, jumpEnd, around(from, to, ROW_ENDS_MARGIN_TILES));
 		List<TileObject> nearestFirst = Stream.concat(outlined, rowEnds.stream())

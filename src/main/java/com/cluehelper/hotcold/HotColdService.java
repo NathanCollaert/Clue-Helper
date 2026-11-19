@@ -1,6 +1,6 @@
 package com.cluehelper.hotcold;
 
-import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.*;
 import com.cluehelper.link.*;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
@@ -55,7 +55,7 @@ public class HotColdService
 	@Inject
 	private ProbeTarget probeTarget;
 	@Inject
-	private StepData stepData;
+	private BundledData bundledData;
 	@Inject
 	private StepNeeds stepNeeds;
 	@Inject
@@ -275,7 +275,7 @@ public class HotColdService
 
 	private void submit(Step step)
 	{
-		WalkData.Loaded walk = routes.getWalk();
+		WalkData walk = routes.getWalk();
 		Step landings = walk == null ? null : landingStep(step, walk.getTable());
 		PlanInput landingSearch = landings == null ? null : routes.inputFor(landings, stepNeeds.of(landings));
 		if (landingSearch == null)
@@ -345,7 +345,7 @@ public class HotColdService
 			.requirements(step.getRequirements().plus(HotColdTier.of(step.getTier()).getDevice())).build();
 	}
 
-	private List<Probe> localProbes(WalkData.Loaded walk)
+	private List<Probe> localProbes(WalkData walk)
 	{
 		PlanStart start = routes.getStart();
 		WorldPoint here = player.getPosition().getTile();
@@ -381,8 +381,8 @@ public class HotColdService
 	{
 		if (beginnerSpots == null)
 		{
-			beginnerSpots = Spots.of(stepData.index(), HotColdTier.BEGINNER);
-			masterSpots = Spots.of(stepData.index(), HotColdTier.MASTER);
+			beginnerSpots = Spots.of(bundledData.stepIndex(), HotColdTier.BEGINNER);
+			masterSpots = Spots.of(bundledData.stepIndex(), HotColdTier.MASTER);
 		}
 		return tier == HotColdTier.BEGINNER ? beginnerSpots : masterSpots;
 	}

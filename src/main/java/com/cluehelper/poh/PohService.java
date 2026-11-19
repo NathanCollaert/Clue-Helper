@@ -1,6 +1,6 @@
 package com.cluehelper.poh;
 
-import com.cluehelper.Tables;
+import com.cluehelper.*;
 import com.cluehelper.guide.SceneObjects;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
@@ -46,7 +46,7 @@ public class PohService
 	@Inject
 	private PlayerModel player;
 	@Inject
-	private CatalogData catalogData;
+	private BundledData bundledData;
 	private MemorySlot<Profile> stored;
 	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
 
@@ -69,7 +69,7 @@ public class PohService
 
 	public void start()
 	{
-		catalogData.get().thenAccept(this::learnPieces);
+		bundledData.getCatalog().thenAccept(this::learnPieces);
 		seenATick = false;
 		wasInside = false;
 		readHouseAgain();

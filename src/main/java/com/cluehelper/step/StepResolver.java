@@ -1,5 +1,6 @@
 package com.cluehelper.step;
 
+import com.cluehelper.BundledData;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
@@ -28,9 +29,9 @@ public class StepResolver
 	private final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
 
 	@Inject
-	StepResolver(StepData data, Client client)
+	StepResolver(BundledData data, Client client)
 	{
-		this(data::index, id -> isShown(client, id));
+		this(data::stepIndex, id -> isShown(client, id));
 	}
 
 	public StepResolver(Supplier<StepIndex> index)
@@ -56,7 +57,7 @@ public class StepResolver
 	public Step resolve(ClueScroll clue, ClueScrollPlugin plugin)
 	{
 		ClueFacts facts = CoreClueReader.facts(clue, plugin);
-		String key = StepKey.of(facts);
+		String key = facts.getKey();
 		StepIndex.Entry found = clue instanceof ThreeStepCrypticClue
 			? threeStepEntry((ThreeStepCrypticClue) clue)
 			: index.get().entry(key);
@@ -73,7 +74,7 @@ public class StepResolver
 			.key(key)
 			.type(facts.getType())
 			.tier(tier)
-			.text(CoreClueReader.displayText(clue, facts, plugin))
+			.text(facts.getText())
 			.kind(stages.isEmpty() ? kind(clue, entry) : TargetKind.SEQUENCE)
 			.targets(stages.isEmpty() ? targets : Stages.tiles(stages))
 			.npcs(npcs)
@@ -162,7 +163,7 @@ public class StepResolver
 
 	private StepIndex.Entry partEntry(CrypticClue part)
 	{
-		return index.get().entry(StepKey.of(ClueFacts.of(ClueTypes.CRYPTIC).text(part.getText())));
+		return index.get().entry(CoreClueReader.byText(ClueTypes.CRYPTIC, part.getText()).getKey());
 	}
 
 	private List<String> wornFor(CrypticClue part)

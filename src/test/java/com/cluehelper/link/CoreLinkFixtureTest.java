@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.cluehelper.step.ClueFacts;
-import com.cluehelper.step.StepKey;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
@@ -28,22 +26,6 @@ public class CoreLinkFixtureTest
 	private static final String RUN1 = "/core-link/run1-clue-reads-and-toggles.jsonl";
 	private static final String RUN2 = "/core-link/run2-start-with-core-off.jsonl";
 	private static final Gson GSON = new Gson();
-
-	@Test
-	public void keyRuleRebuildsEveryRecordedKey() throws IOException
-	{
-		int checked = 0;
-		for (JsonObject e : events(RUN1, "clue"))
-		{
-			if (e.has("fields"))
-			{
-				ClueFacts facts = GSON.fromJson(e.get("fields"), ClueFacts.class);
-				assertEquals("tick " + e.get("t"), e.get("key").getAsString(), StepKey.of(facts));
-				checked++;
-			}
-		}
-		assertEquals(15, checked);
-	}
 
 	@Test
 	public void replayGivesOneChangePerRecordedTransition() throws IOException

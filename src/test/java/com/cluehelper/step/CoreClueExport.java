@@ -92,7 +92,7 @@ public class CoreClueExport
 	/** The step index generator joins on this key, taken under var state 0. */
 	private static JsonObject withStepKey(JsonObject described, ClueScroll clue)
 	{
-		described.addProperty("stepKey", StepKey.of(CoreClueReader.facts(clue, fakePlugin)));
+		described.addProperty("stepKey", CoreClueReader.facts(clue, fakePlugin).getKey());
 		return described;
 	}
 
