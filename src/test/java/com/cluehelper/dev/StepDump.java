@@ -3,6 +3,7 @@ package com.cluehelper.dev;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.step.CoreClueReader;
+import com.cluehelper.step.RequirementsText;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.google.gson.Gson;
@@ -73,7 +74,7 @@ final class StepDump
 		{
 			lines.add("Objects: " + step.getObjectIds() + " " + step.getObjectNames());
 		}
-		lines.add("Needs: " + step.getRequirements());
+		lines.add("Needs: " + (step.getRequirements() == null ? "unknown" : RequirementsText.describe(step.getRequirements())));
 		String text = step.getText() == null ? "" : step.getText();
 		lines.add("Text: " + (text.length() > SHOWN_TEXT ? text.substring(0, SHOWN_TEXT) + "…" : text));
 		return lines;

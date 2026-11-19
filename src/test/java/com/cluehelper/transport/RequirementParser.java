@@ -196,6 +196,12 @@ public final class RequirementParser
 		}
 	}
 
+	private static VarCheck.Op varOp(char code)
+	{
+		return Arrays.stream(VarCheck.Op.values()).filter(op -> op.code.charAt(0) == code).findFirst()
+			.orElseThrow(() -> new IllegalArgumentException("no var operator " + code));
+	}
+
 	private static LevelNeed levelNeed(String level, String name)
 	{
 		boolean max = MAX.equals(level);
@@ -214,19 +220,19 @@ public final class RequirementParser
 		String lower = name.toLowerCase(Locale.ROOT);
 		if (lower.equals("music"))
 		{
-			return max ? LevelNeed.everyMusicTrack() : null;
+			return max ? new LevelNeed(null, LevelNeed.Aggregate.MUSIC_TRACKS, 0) : null;
 		}
 		if (lower.startsWith("total"))
 		{
-			return LevelNeed.ofAggregate(LevelNeed.Aggregate.TOTAL, max ? MAX_SKILL_LEVEL * Skill.values().length : required);
+			return new LevelNeed(null, LevelNeed.Aggregate.TOTAL, max ? MAX_SKILL_LEVEL * Skill.values().length : required);
 		}
 		if (lower.startsWith("combat"))
 		{
-			return LevelNeed.ofAggregate(LevelNeed.Aggregate.COMBAT, max ? MAX_COMBAT_LEVEL : required);
+			return new LevelNeed(null, LevelNeed.Aggregate.COMBAT, max ? MAX_COMBAT_LEVEL : required);
 		}
 		if (lower.startsWith("quest"))
 		{
-			return max ? LevelNeed.everyQuestPoint() : LevelNeed.ofAggregate(LevelNeed.Aggregate.QUEST_POINTS, required);
+			return new LevelNeed(null, max ? LevelNeed.Aggregate.ALL_QUEST_POINTS : LevelNeed.Aggregate.QUEST_POINTS, max ? 0 : required);
 		}
 		return null;
 	}
@@ -259,7 +265,7 @@ public final class RequirementParser
 				out.errors.add((kind == VarCheck.Kind.VARBIT ? VARBITS : VARPS) + ": can't read '" + clause + "'");
 				continue;
 			}
-			VarCheck check = new VarCheck(kind, Integer.parseInt(m.group(1)), VarCheck.Op.of(m.group(2).charAt(0)),
+			VarCheck check = new VarCheck(kind, Integer.parseInt(m.group(1)), varOp(m.group(2).charAt(0)),
 				Integer.parseInt(m.group(3)));
 			if (isBookClause(check))
 			{

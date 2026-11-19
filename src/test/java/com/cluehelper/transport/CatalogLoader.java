@@ -87,13 +87,18 @@ public final class CatalogLoader
 		}
 	}
 
+	static Category category(String cell)
+	{
+		return Category.valueOf(cell.trim().toUpperCase(Locale.ROOT).replace(' ', '_'));
+	}
+
 	private static CatalogRow teleport(TsvTable.Line line, RequirementParser parser)
 	{
 		String code = line.get(CODE);
 		String menu = line.get(MENU);
 		return CatalogRow.builder()
 			.name(line.get(NAME))
-			.category(Category.of(line.get(CATEGORY)))
+			.category(category(line.get(CATEGORY)))
 			.origin(tile(line.get(ORIGIN)))
 			.destination(tile(line.get(DESTINATION)))
 			.code(code.isEmpty() ? null : code)
@@ -161,7 +166,7 @@ public final class CatalogLoader
 		{
 			boolean staffClause = clause.getBranches().stream()
 				.anyMatch(branch -> branch.getIds().stream().anyMatch(FAIRY_RING_STAVES::contains));
-			clauses.add(staffClause ? clause.wornOnly(LUMBRIDGE_ELITE_DONE) : clause);
+			clauses.add(staffClause ? new ItemClause(clause.getBranches(), true, LUMBRIDGE_ELITE_DONE) : clause);
 		}
 		return requirements.toBuilder().items(List.copyOf(clauses)).build();
 	}

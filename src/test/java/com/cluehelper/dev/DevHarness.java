@@ -21,6 +21,7 @@ import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.step.ClueTypes;
 import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
+import com.cluehelper.transport.AvailabilitySet;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +53,7 @@ public class DevHarness
 	private final StepDump stepDump;
 	private final PlayerDump playerDump;
 	private final AvailabilityService availability;
+	private AvailabilitySet lastJudged;
 	private final RoutePlanner routes;
 	private final RouteDump routeDump;
 	private final StepGuide guide;
@@ -104,7 +106,6 @@ public class DevHarness
 			args -> clientThread.invokeLater(() -> watchVarbit(args)));
 		stepLogger.setEnabled(true);
 		unregister.add(clueLink.addListener(this::onStepChange));
-		unregister.add(availability.addListener(playerDump::onJudged));
 		unregister.add(routes.addListener(this::onPlanned));
 		unregister.add(guide.addListener(this::onGuideChanged));
 		commands = c;
@@ -182,6 +183,12 @@ public class DevHarness
 	public void onGameTick()
 	{
 		onGuideChanged();
+		AvailabilitySet carried = availability.getCarried();
+		if (carried != lastJudged)
+		{
+			lastJudged = carried;
+			playerDump.onJudged(carried);
+		}
 	}
 
 	private void onGuideChanged()

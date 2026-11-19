@@ -7,7 +7,7 @@ import lombok.*;
 import net.runelite.api.Skill;
 
 @Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class LevelNeed
 {
 	@RequiredArgsConstructor
@@ -35,23 +35,6 @@ public class LevelNeed
 	public static LevelNeed ofSkill(Skill skill, int level)
 	{
 		return new LevelNeed(skill, null, level);
-	}
-
-	public static LevelNeed ofAggregate(Aggregate aggregate, int level)
-	{
-		return new LevelNeed(null, aggregate, level);
-	}
-
-	/** The Music cape's need, which grows with every track a game update adds. */
-	public static LevelNeed everyMusicTrack()
-	{
-		return new LevelNeed(null, Aggregate.MUSIC_TRACKS, 0);
-	}
-
-	/** The Quest point cape's need, which grows with every quest a game update adds. */
-	public static LevelNeed everyQuestPoint()
-	{
-		return new LevelNeed(null, Aggregate.ALL_QUEST_POINTS, 0);
 	}
 
 	/**

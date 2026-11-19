@@ -252,7 +252,7 @@ public class CoreDriftTest
 			step.getRegions().stream().map(String::valueOf).collect(Collectors.joining("|")),
 			step.getObjectIds().stream().map(String::valueOf).collect(Collectors.joining("|")),
 			String.join("|", step.getObjectNames()),
-			step.getRequirements().toString(),
+			RequirementsText.describe(step.getRequirements()),
 			step.getCacheRows().stream().map(row -> String.valueOf(row.getId())).collect(Collectors.joining("|")),
 			oneLine(step.getText()));
 	}
@@ -286,7 +286,7 @@ public class CoreDriftTest
 			row.put("targetCount", step.getTargets().size());
 			row.put("npcs", String.join(", ", step.getNpcs()));
 			row.put("objects", step.getObjectIds() + " " + step.getObjectNames());
-			row.put("needs", step.getRequirements().toString());
+			row.put("needs", RequirementsText.describe(step.getRequirements()));
 			row.put("rows", step.getCacheRows().stream().map(CacheRow::getName).collect(Collectors.joining(", ")));
 			row.put("branches", SNAPSHOT.get(key).size());
 			row.put("text", oneLine(step.getText()));

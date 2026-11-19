@@ -5,7 +5,6 @@ import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import javax.inject.*;
 import lombok.Getter;
 import net.runelite.api.Client;
@@ -28,7 +27,6 @@ public class AvailabilityService
 	/** Items that walk gates ask for (a long rope), named with the catalog's for no-route notes. */
 	private final Set<Integer> gateItems = ConcurrentHashMap.newKeySet();
 	private final Map<Integer, String> itemNames = new ConcurrentHashMap<>();
-	private final List<Consumer<AvailabilitySet>> listeners = new CopyOnWriteArrayList<>();
 
 	@Getter
 	private volatile List<CatalogRow> catalog = List.of();
@@ -105,8 +103,6 @@ public class AvailabilityService
 			carried = engine.carried(catalog, snapshot, now);
 			bankedSnapshot = withBank(snapshot);
 			banked = bankedSnapshot == null ? AvailabilitySet.EMPTY : engine.carried(catalog, bankedSnapshot, now);
-			AvailabilitySet judged = carried;
-			listeners.forEach(listener -> listener.accept(judged));
 		}
 	}
 
@@ -137,13 +133,6 @@ public class AvailabilityService
 			.groupStorage(group == null ? Map.of() : player.counted(group.items))
 			.charges(charges)
 			.build();
-	}
-
-	/** Listeners run on the client thread, each time the catalog is judged again. */
-	public Runnable addListener(Consumer<AvailabilitySet> listener)
-	{
-		listeners.add(listener);
-		return () -> listeners.remove(listener);
 	}
 
 	public static long nowMinutes()

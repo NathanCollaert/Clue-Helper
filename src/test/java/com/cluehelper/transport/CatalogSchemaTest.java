@@ -58,7 +58,7 @@ public class CatalogSchemaTest
 	private static void teleportRules(CatalogLoader.TsvTable.Line line, Failures fail, String at)
 	{
 		sharedRules(line, fail, at);
-		Category category = Category.of(line.get(CatalogLoader.CATEGORY));
+		Category category = CatalogLoader.category(line.get(CatalogLoader.CATEGORY));
 		if (SPELLBOOK_CLAUSE.matcher(line.get(RequirementParser.VARBITS)).find())
 		{
 			fail.add(at + "4070 left in Varbits");

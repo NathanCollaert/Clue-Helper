@@ -39,9 +39,4 @@ public class ItemClause
 			return var != null;
 		}
 	}
-
-	public ItemClause wornOnly(VarCheck waiver)
-	{
-		return new ItemClause(branches, true, waiver);
-	}
 }

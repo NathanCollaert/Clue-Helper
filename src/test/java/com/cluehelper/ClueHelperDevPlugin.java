@@ -195,7 +195,6 @@ public class ClueHelperDevPlugin extends Plugin
 		unregister.add(service(ClueLink.class).addListener(this::saveStepFrame));
 		unregister.add(service(ClueLink.class).addListener((change, step) -> forgetFakeKey(change)));
 		unregister.add(() -> clientThread.invokeLater(() -> service(PlayerModel.class).fakeCarried(Map.of())));
-		unregister.add(service(AvailabilityService.class).addListener(this::savePlayerFrame));
 		unregister.add(service(RoutePlanner.class).addListener(this::onPlanned));
 		unregister.add(service(StepGuide.class).addListener(this::saveGuideFrames));
 		BankTrace bankTrace = new BankTrace(client, service(BankMemory.class), service(StepGuide.class),
@@ -617,6 +616,7 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		checkLanding();
 		harness.onGameTick();
+		savePlayerFrame(service(AvailabilityService.class).getCarried());
 		traceLine();
 		saveLiveFrame();
 		resumeCampaignOnceLoggedIn();

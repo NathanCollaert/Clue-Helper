@@ -74,31 +74,4 @@ public final class StepRequirements
 		}
 		return true;
 	}
-
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-		if (spade != SpadeNeed.NONE)
-		{
-			text.append("spade");
-		}
-		if (light)
-		{
-			text.append(text.length() > 0 ? ", " : "").append("light");
-			if (firePitVarbitId != -1)
-			{
-				text.append(" (fire pit ").append(firePitVarbitId).append(')');
-			}
-		}
-		if (lightSourceVarbitId != -1)
-		{
-			text.append(text.length() > 0 ? ", " : "").append("light varbit ").append(lightSourceVarbitId);
-		}
-		if (!items.isEmpty())
-		{
-			text.append(text.length() > 0 ? ", " : "").append(items.size()).append(" item requirement").append(items.size() == 1 ? "" : "s");
-		}
-		return text.length() == 0 ? "none" : text.toString();
-	}
 }
