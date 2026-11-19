@@ -56,6 +56,6 @@ public class FurnitureOverlay extends Overlay
 	private boolean isMarkedByCore(NPC npc)
 	{
 		Step step = clueLink.getCurrentStep();
-		return step != null && step.getNpcs() != null && WaypointOverlay.isNamed(npc, step.getNpcs());
+		return step != null && WaypointOverlay.isNamed(npc, step.getNpcs());
 	}
 }

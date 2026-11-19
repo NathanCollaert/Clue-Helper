@@ -40,7 +40,7 @@ public final class Planner
 		{
 			return plan.note("not guided: a step outside the normal game (Leagues, or removed)").build();
 		}
-		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
+		if (step == null || step.getTargets().isEmpty())
 		{
 			return plan.note(step == null ? "no step"
 				: ClueTypes.HOT_COLD.equals(step.getType()) ? "choosing where to feel" : "no target tile for this step yet").build();

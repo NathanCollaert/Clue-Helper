@@ -133,12 +133,6 @@ public class StepResolver
 			.tier(UNKNOWN_TIER)
 			.text("")
 			.kind(TargetKind.ANY_OF)
-			.targets(List.of())
-			.npcs(List.of())
-			.regions(List.of())
-			.objectIds(List.of())
-			.objectNames(List.of())
-			.requirements(StepRequirements.none())
 			.build();
 	}
 

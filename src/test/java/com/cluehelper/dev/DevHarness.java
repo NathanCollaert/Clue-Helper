@@ -210,7 +210,7 @@ public class DevHarness
 		}
 		return String.format("%d/%d %s %s (%s) | waypoint %s | items %s | widgets %s | objects %d | at step %s | route %s",
 			guide.getSteps().indexOf(current) + 1, guide.getSteps().size(), current.getKind(), current.getText(), current.getDetail(),
-			current.getWaypoint(), guide.getHighlights().getItems(), guide.getHighlights().getSpellWidget() + "/" + guide.getHighlights().getMenuWidget(),
+			current.getWaypoint(), guide.getHighlights().getItems(), guide.getHighlights().getSpellWidget() + "/" + guide.getHighlights().getScroll(),
 			guide.getHighlightObjects().size() + guide.getHighlightNpcs().size(), guide.isAtStep(),
 			guide.getRoute() == null ? "-" : guide.getRoute().describe());
 	}

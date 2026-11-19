@@ -190,9 +190,9 @@ public class MenuLines
 	/**
 	 * Call every client tick: it also puts back the colour of lines no longer wanted.
 	 *
-	 * @param entryWidget a scroll book entry whose name and charges are coloured too, or -1
+	 * @param scroll a scroll whose book entry's name and charges are coloured too, or null
 	 */
-	public void colourLines(MenuTarget target, int entryWidget, boolean enabled)
+	public void colourLines(MenuTarget target, ScrollBook.Scroll scroll, boolean enabled)
 	{
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
 		if (enabled)
@@ -200,9 +200,9 @@ public class MenuLines
 			Found found = lineWidgets(target);
 			found.widgets.stream().filter(line -> !found.mapButtons.contains(line)).flatMap(line -> Widgets.descendants(line).stream())
 				.filter(Widgets::hasText).forEach(wanted::add);
-			if (entryWidget != ScrollBook.NO_WIDGET)
+			if (scroll != null)
 			{
-				for (int text : ScrollBook.texts(entryWidget))
+				for (int text : new int[]{scroll.getCharges(), scroll.getTitle()})
 				{
 					Widget line = client.getWidget(text);
 					if (Widgets.visible(line) && Widgets.hasText(line))

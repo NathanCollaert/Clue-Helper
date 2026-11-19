@@ -67,7 +67,7 @@ public class WidgetHighlightOverlay extends Overlay
 		guide.getHighlightChoice().forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 		if (config.highlightMenus())
 		{
-			outlineEntry(graphics, guide.getHighlights().getMenuWidget(), guide.getHighlights().isMenuWidgetLeftClick());
+			outlineEntry(graphics, guide.getHighlights().getScroll(), guide.getHighlights().isScrollLeftClick());
 		}
 		if (config.highlightItems())
 		{
@@ -192,9 +192,7 @@ public class WidgetHighlightOverlay extends Overlay
 			outline(graphics, InterfaceID.SideJournal.QUEST_LIST);
 			return;
 		}
-		Widget quest = Widgets.descendants(client.getWidget(InterfaceID.Questlist.LIST)).stream()
-			.filter(line -> Widgets.visible(line) && line.getText() != null && Text.removeTags(line.getText()).equalsIgnoreCase(learn.getJournal()))
-			.findFirst().orElse(null);
+		Widget quest = JournalScroll.questLine(client, learn.getJournal());
 		if (quest == null || !hiding.isEmpty())
 		{
 			outline(graphics, InterfaceID.Questlist.SETTINGS_BUTTON);
@@ -239,12 +237,16 @@ public class WidgetHighlightOverlay extends Overlay
 	 * A scroll book entry gets its scroll's outline, from the item's icon scaled to the book's larger model of it, and
 	 * MenuLines colours its name and charges.
 	 */
-	private void outlineEntry(Graphics2D graphics, int widgetId, boolean leftClick)
+	private void outlineEntry(Graphics2D graphics, ScrollBook.Scroll scroll, boolean leftClick)
 	{
-		Widget picture = widgetId < 0 ? null : client.getWidget(ScrollBook.picture(widgetId));
+		if (scroll == null)
+		{
+			return;
+		}
+		Widget picture = client.getWidget(scroll.getPicture());
 		if (picture == null || picture.isHidden() || picture.getItemId() <= 0)
 		{
-			outline(graphics, widgetId);
+			outline(graphics, scroll.getEntry());
 			return;
 		}
 		highlighter.itemScaled(graphics, picture.getItemId(), picture.getBounds(), leftClick);

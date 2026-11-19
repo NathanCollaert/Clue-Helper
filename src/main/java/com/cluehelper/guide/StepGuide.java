@@ -13,7 +13,7 @@ import javax.inject.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.coords.*;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.AnimationID;
 import net.runelite.api.gameval.InterfaceID;
@@ -947,7 +947,7 @@ public class StepGuide
 		List<String> back = itemsToPutBack(ended);
 		if ((stash == StashMemory.State.FILLED || stash == StashMemory.State.EMPTY) && !back.isEmpty())
 		{
-			int stashId = ended.getRequirements() == null ? StepRequirements.NO_STASH : ended.getRequirements().getStashObjectId();
+			int stashId = ended.getRequirements().getStashObjectId();
 			deposit.start(ended.getData().getStash().getTile(), stashId, back, client.getTickCount());
 		}
 	}
@@ -955,10 +955,6 @@ public class StepGuide
 	/** The ended emote's items still on the player, by the names of the ones carried; none once all are put back. */
 	private List<String> itemsToPutBack(Step ended)
 	{
-		if (ended.getRequirements() == null)
-		{
-			return List.of();
-		}
 		Set<Integer> carried = player.carriedIds();
 		return ended.getRequirements().getItems().stream()
 			.flatMap(need -> carried.stream().filter(need::fulfilledBy).findFirst().stream())
@@ -1249,24 +1245,14 @@ public class StepGuide
 
 	private static int tilesFromFootprint(WorldView view, TileObject object, WorldPoint tile)
 	{
-		WorldPoint southWest = object.getWorldLocation();
-		int width = 1;
-		int height = 1;
-		if (object instanceof GameObject)
+		if (!(object instanceof GameObject))
 		{
-			GameObject game = (GameObject) object;
-			Point min = game.getSceneMinLocation();
-			southWest = WorldPoint.fromScene(view, min.getX(), min.getY(), game.getPlane());
-			width = game.sizeX();
-			height = game.sizeY();
+			return object.getWorldLocation().distanceTo(tile);
 		}
-		if (southWest.getPlane() != tile.getPlane())
-		{
-			return Integer.MAX_VALUE;
-		}
-		int dx = Math.max(0, Math.max(southWest.getX() - tile.getX(), tile.getX() - (southWest.getX() + width - 1)));
-		int dy = Math.max(0, Math.max(southWest.getY() - tile.getY(), tile.getY() - (southWest.getY() + height - 1)));
-		return Math.max(dx, dy);
+		GameObject game = (GameObject) object;
+		Point min = game.getSceneMinLocation();
+		WorldPoint southWest = WorldPoint.fromScene(view, min.getX(), min.getY(), game.getPlane());
+		return new WorldArea(southWest, game.sizeX(), game.sizeY()).distanceTo(tile);
 	}
 
 	private boolean isComplete(SubStep step, WorldPoint tile)
@@ -1372,7 +1358,7 @@ public class StepGuide
 	{
 		SubStep act = listedAt(index);
 		boolean talk = act != null && act.getKind() == Kind.ACT && act.getActItemNamed() == null && routeStep != null
-			&& routeStep.getNpcs() != null && act.getText().startsWith(TALK_TO)
+			&& act.getText().startsWith(TALK_TO)
 			&& routeStep.getNpcs().contains(act.getText().substring(TALK_TO.length()));
 		String box = talk ? carriedBox() : null;
 		String npc = box == null ? null : act.getText().substring(TALK_TO.length());

@@ -174,7 +174,7 @@ final class Acts
 		{
 			return List.of(main.toBuilder().text("Dig").detail(withFloor(step, note(step))).fights(fightsFor(step)).again("Dig again").build());
 		}
-		if (data != null && data.getChallenge() != null && step.getNpcs() != null && !step.getNpcs().isEmpty())
+		if (data != null && data.getChallenge() != null && !step.getNpcs().isEmpty())
 		{
 			return talkThenChallenge(step, data.getChallenge());
 		}
@@ -185,7 +185,7 @@ final class Acts
 	{
 		List<SubStep> acts = new ArrayList<>();
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
-		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
+		boolean items = !step.getRequirements().getItems().isEmpty();
 		acts.addAll(items ? SubSteps.remove(EmptySlots.of(step.getRequirements().getItems())) : List.of());
 		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip()) : List.of());
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
@@ -206,7 +206,7 @@ final class Acts
 	{
 		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
 			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
-		boolean items = step.getRequirements() != null && !step.getRequirements().getItems().isEmpty();
+		boolean items = !step.getRequirements().getItems().isEmpty();
 		return items ? List.of(take, equip()) : List.of(take);
 	}
 
@@ -273,7 +273,7 @@ final class Acts
 
 	private static boolean isDig(Step step)
 	{
-		return step.getRequirements() != null && step.getRequirements().getSpade() != SpadeNeed.NONE;
+		return step.getRequirements().getSpade() != SpadeNeed.NONE;
 	}
 
 	private static boolean fightsFor(Step step)

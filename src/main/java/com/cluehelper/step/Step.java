@@ -15,13 +15,19 @@ public class Step
 	String text;
 	TargetKind kind;
 	/** The cache tile for coordinate clues, never core's mirror twin. */
-	List<WorldPoint> targets;
-	List<String> npcs;
+	@Builder.Default
+	List<WorldPoint> targets = List.of();
+	@Builder.Default
+	List<String> npcs = List.of();
 	/** Where an AREA step's NPC roams, or where a skill challenge's objects are. */
-	List<Integer> regions;
-	List<Integer> objectIds;
-	List<String> objectNames;
-	StepRequirements requirements;
+	@Builder.Default
+	List<Integer> regions = List.of();
+	@Builder.Default
+	List<Integer> objectIds = List.of();
+	@Builder.Default
+	List<String> objectNames = List.of();
+	@Builder.Default
+	StepRequirements requirements = StepRequirements.none();
 	/**
 	 * Set on a hot/cold step rewritten to one probe tile of our own: what to do there. The target is then our waypoint,
 	 * not core's.
@@ -57,17 +63,12 @@ public class Step
 	public boolean isKeyFromNpc()
 	{
 		boolean talk = text != null && text.toLowerCase().contains("speak");
-		return ClueTypes.CRYPTIC.equals(type) && !talk && hasAny(npcs) && (hasAny(objectNames) || hasAny(objectIds));
+		return ClueTypes.CRYPTIC.equals(type) && !talk && !npcs.isEmpty() && (!objectNames.isEmpty() || !objectIds.isEmpty());
 	}
 
 	/** The NPCs the step is done with: none when its NPC only drops the key for its object. */
 	public List<String> getNpcsAtStep()
 	{
-		return npcs == null || isKeyFromNpc() ? List.of() : npcs;
-	}
-
-	private static boolean hasAny(List<?> list)
-	{
-		return list != null && !list.isEmpty();
+		return isKeyFromNpc() ? List.of() : npcs;
 	}
 }

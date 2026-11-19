@@ -124,7 +124,7 @@ final class StepHighlights
 		{
 			return deposit.getStashId();
 		}
-		boolean taking = act.getDone() == SubStep.Done.STASH_WITHDRAWN && step != null && step.getRequirements() != null;
+		boolean taking = act.getDone() == SubStep.Done.STASH_WITHDRAWN && step != null;
 		return taking ? step.getRequirements().getStashObjectId() : StepRequirements.NO_STASH;
 	}
 
@@ -276,28 +276,16 @@ final class StepHighlights
 	/** The carried item to use until one is picked, then the way's object it is used on. */
 	private Highlights useOnWayIn(Highlights.HighlightsBuilder shown, StepIndex.WayIn way)
 	{
-		List<String> use = List.of(USE_OPTION);
-		if (client.isWidgetSelected())
-		{
-			return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(way.getObject())).path(use).build()).build();
-		}
-		PlayerSnapshot carried = player.getSnapshot();
-		Set<Integer> items = carried == null ? Set.of() : way.getUse().stream().filter(carried.getInventory()::containsKey)
-			.collect(toUnmodifiableSet());
-		return shown.items(items).menuTarget(MenuTarget.builder().itemIds(items).path(use).build()).tab(Tab.INVENTORY).build();
+		Set<Integer> items = player.inventoryIds().stream().filter(way.getUse()::contains).collect(toUnmodifiableSet());
+		return useOn(shown, MenuTarget.builder().objectIds(Set.of(way.getObject())), items, Set.of());
 	}
 
 	/** The carried item the step names until one is picked, then the NPC it is used on (Falo the Bard). */
 	private Highlights useOnNpc(Highlights.HighlightsBuilder shown, SubStep current, Step step)
 	{
-		List<String> use = List.of(USE_OPTION);
-		if (client.isWidgetSelected())
-		{
-			return shown.menuTarget(MenuTarget.builder().npcIds(current.getNpcIds()).path(use).build()).build();
-		}
 		Set<Integer> items = player.inventoryIds().stream().filter(id -> isStepItem(step, id)).collect(toUnmodifiableSet());
 		Set<Integer> worn = player.wornIds().stream().filter(id -> isStepItem(step, id)).collect(toUnmodifiableSet());
-		if (items.isEmpty() && !worn.isEmpty())
+		if (!client.isWidgetSelected() && items.isEmpty() && !worn.isEmpty())
 		{
 			// A worn item can't be used on him: off first (Falo's gloves)
 			return shown.items(worn).fillItems(worn.stream().filter(leftClicks::removes).collect(toUnmodifiableSet()))
@@ -305,8 +293,18 @@ final class StepHighlights
 		}
 		Set<Integer> useOnLeftClick = items.stream().filter(id -> USE_OPTION.equals(leftClicks.item(id)))
 			.collect(toUnmodifiableSet());
-		return shown.items(items).fillItems(useOnLeftClick).menuTarget(MenuTarget.builder().itemIds(items).path(use).build())
-			.tab(Tab.INVENTORY).build();
+		return useOn(shown, MenuTarget.builder().npcIds(current.getNpcIds()), items, useOnLeftClick);
+	}
+
+	/** {@code items} to use until one is picked, then {@code usedOn}. */
+	private Highlights useOn(Highlights.HighlightsBuilder shown, MenuTarget.MenuTargetBuilder usedOn, Set<Integer> items, Set<Integer> fill)
+	{
+		List<String> use = List.of(USE_OPTION);
+		if (client.isWidgetSelected())
+		{
+			return shown.menuTarget(usedOn.path(use).build()).build();
+		}
+		return shown.items(items).fillItems(fill).menuTarget(MenuTarget.builder().itemIds(items).path(use).build()).tab(Tab.INVENTORY).build();
 	}
 
 	private static boolean usesItemOnNpc(SubStep current, Step step)
@@ -402,7 +400,7 @@ final class StepHighlights
 		else
 		{
 			Set<Integer> held = withHeld(shown, rowTargets.heldUses(row));
-			shown.menuWidget(ScrollBook.entry(row.getName())).menuWidgetLeftClick(rowTargets.optionPath(row).size() == 1)
+			shown.scroll(ScrollBook.scroll(row.getName())).scrollLeftClick(rowTargets.optionPath(row).size() == 1)
 				.menuTarget(rowTargets.heldTeleport(current, held));
 		}
 	}
@@ -495,7 +493,7 @@ final class StepHighlights
 	private Highlights withEquipItems(Highlights shown, SubStep current, Step step)
 	{
 		if (current == null || current.getKind() != SubStep.Kind.ACT || current.getDone() != SubStep.Done.EQUIPPED
-			|| step == null || step.getRequirements() == null)
+			|| step == null)
 		{
 			return shown;
 		}
@@ -536,10 +534,11 @@ final class StepHighlights
 	private Highlights takeOutFromBook(Highlights.HighlightsBuilder shown, Set<Integer> items, SubStep current, String option)
 	{
 		boolean fromBook = current.getDone() == SubStep.Done.ITEM_CARRIED && current.getRow() != null;
-		boolean bookOpen = fromBook && Widgets.shown(client, InterfaceID.Bookofscrolls.CONTENTS);
-		return shown.menuWidget(fromBook ? ScrollBook.entry(current.getRow().getName()) : ScrollBook.NO_WIDGET)
+		ScrollBook.Scroll scroll = fromBook ? ScrollBook.scroll(current.getRow().getName()) : null;
+		boolean bookOpen = scroll != null && Widgets.shown(client, InterfaceID.Bookofscrolls.CONTENTS);
+		return shown.scroll(scroll)
 			.menuTarget(bookOpen
-				? MenuTarget.builder().widgetIds(ScrollBook.widgets(current.getRow().getName())).path(List.of(ScrollBook.REMOVE_OPTION)).build()
+				? MenuTarget.builder().widgetIds(scroll.widgets()).path(List.of(ScrollBook.REMOVE_OPTION)).build()
 				: rowTargets.items(items, option))
 			.build();
 	}

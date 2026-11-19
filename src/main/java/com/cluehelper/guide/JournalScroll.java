@@ -30,9 +30,7 @@ public class JournalScroll
 			scrolled = false;
 			return;
 		}
-		Widget quest = scrolled ? null : Widgets.descendants(client.getWidget(InterfaceID.Questlist.LIST)).stream()
-			.filter(line -> Widgets.visible(line) && line.getText() != null && Text.removeTags(line.getText()).equalsIgnoreCase(learn.getJournal()))
-			.findFirst().orElse(null);
+		Widget quest = scrolled ? null : questLine(client, learn.getJournal());
 		Widget list = quest == null ? null : scrollingAncestor(quest);
 		if (list == null)
 		{
@@ -42,6 +40,14 @@ public class JournalScroll
 		int scroll = Math.max(0, Math.min(list.getScrollHeight(), middle - list.getHeight() / 2));
 		client.runScript(ScriptID.UPDATE_SCROLLBAR, InterfaceID.Questlist.SCROLLBAR, list.getId(), scroll);
 		scrolled = true;
+	}
+
+	/** The quest list's line for the journal, or null while the list doesn't show it. */
+	public static Widget questLine(Client client, String journal)
+	{
+		return Widgets.descendants(client.getWidget(InterfaceID.Questlist.LIST)).stream()
+			.filter(line -> Widgets.visible(line) && line.getText() != null && Text.removeTags(line.getText()).equalsIgnoreCase(journal))
+			.findFirst().orElse(null);
 	}
 
 	/** The layer that scrolls the line: the first one up that holds more than it shows. */

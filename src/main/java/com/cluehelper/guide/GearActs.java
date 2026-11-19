@@ -32,7 +32,7 @@ final class GearActs
 		switch (act.getDone())
 		{
 			case EQUIPPED:
-				return step == null || step.getRequirements() == null ? act : equipStepItems(act, step);
+				return step == null ? act : equipStepItems(act, step);
 			case WAY_IN_WORN:
 				return step == null || !act.getNpcIds().isEmpty() ? act : equipWhatIsCarried(act, step);
 			case GEAR_WORN:
@@ -155,7 +155,7 @@ final class GearActs
 
 	private boolean wearsStepItems(Step step)
 	{
-		return step != null && step.getRequirements() != null && player.getSnapshot() != null && unmetStepItems(step).isEmpty();
+		return step != null && player.getSnapshot() != null && unmetStepItems(step).isEmpty();
 	}
 
 	/**

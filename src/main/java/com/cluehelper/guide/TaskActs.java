@@ -52,7 +52,7 @@ final class TaskActs
 	/** The items the task needs that the player carries, outlined (used on each other, not clicked once). */
 	Highlights withItems(Highlights shown, SubStep current, Step step)
 	{
-		if (current == null || !current.isTask() || step == null || step.getRequirements() == null)
+		if (current == null || !current.isTask() || step == null)
 		{
 			return shown;
 		}
@@ -293,7 +293,7 @@ final class TaskActs
 	{
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
-		if (step == null || step.getRequirements() == null || snapshot == null || runes == null)
+		if (step == null || snapshot == null || runes == null)
 		{
 			return null;
 		}

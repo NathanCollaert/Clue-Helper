@@ -287,7 +287,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
-		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getMenuWidget(), config.highlightMenus());
+		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getScroll(), config.highlightMenus());
 	}
 
 	/** Runs after Menu Entry Swapper's swaps, so the menu's top entry is the real left click. */

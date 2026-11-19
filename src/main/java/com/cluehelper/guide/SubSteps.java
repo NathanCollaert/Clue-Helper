@@ -21,6 +21,7 @@ import com.cluehelper.guide.SubStep.Kind;
 import com.cluehelper.guide.StepGuide.Tab;
 
 @Singleton
+@RequiredArgsConstructor
 public final class SubSteps
 {
 	public static final int ARRIVE_TILES = 3;
@@ -43,13 +44,16 @@ public final class SubSteps
 	private static final String ENTRANA_RULE = "Entrana allows no weapons or armour: the deposit box by the monks";
 	private static final String DEPOSIT = "Deposit";
 
+	/** For item names. */
 	private final Client client;
 	private final Supplier<PlayerSnapshot> snapshot;
 	private final IntPredicate onlyInBankedKit;
 	private final StepNeeds stepNeeds;
 	private final Supplier<PlanStart> start;
 	private final BooleanSupplier scrollBookOutOfWilderness;
+	/** What the Entrana monks turn away. */
 	private final IntPredicate weaponOrArmour;
+	/** The teleports, for the spirit tree a planted-tree task travels to. */
 	private final Supplier<List<CatalogRow>> catalog;
 
 	@Inject
@@ -60,24 +64,7 @@ public final class SubSteps
 			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog);
 	}
 
-	/**
-	 * @param client item names
-	 * @param weaponOrArmour what the Entrana monks turn away
-	 * @param catalog the teleports, for the spirit tree a planted-tree task travels to
-	 */
-	public SubSteps(Client client, Supplier<PlayerSnapshot> snapshot, IntPredicate onlyInBankedKit, StepNeeds stepNeeds,
-		Supplier<PlanStart> start, BooleanSupplier scrollBookOutOfWilderness, IntPredicate weaponOrArmour,
-		Supplier<List<CatalogRow>> catalog)
-	{
-		this.client = client;
-		this.snapshot = snapshot;
-		this.onlyInBankedKit = onlyInBankedKit;
-		this.stepNeeds = stepNeeds;
-		this.start = start;
-		this.scrollBookOutOfWilderness = scrollBookOutOfWilderness;
-		this.weaponOrArmour = weaponOrArmour;
-		this.catalog = catalog;
-	}
+
 
 	/** Client thread only. The route's legs as sub-steps, then the step's own acts. */
 	public List<SubStep> of(Route route, Step step)
@@ -267,7 +254,7 @@ public final class SubSteps
 	/** The step's items wait in its filled STASH unit, and the player has none of them on. */
 	public boolean takeFromStash(Step step)
 	{
-		if (step == null || step.getData().getStash() == null || step.getRequirements() == null)
+		if (step == null || step.getData().getStash() == null)
 		{
 			return false;
 		}
