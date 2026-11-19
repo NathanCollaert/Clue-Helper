@@ -73,6 +73,8 @@ public class MenuLines
 	private FairyDials fairyDials;
 	@Inject
 	private SceneObjects sceneObjects;
+	@Inject
+	private EasyTeleportsNames easyTeleportsNames;
 	private final Map<String, int[]> listLines = new HashMap<>();
 	private String listTitle;
 	private final List<int[]> rawListLines = new ArrayList<>();
@@ -254,7 +256,7 @@ public class MenuLines
 			boolean named = false;
 			for (MenuEntry option : options)
 			{
-				if (MenuLabels.matches(option.getOption(), destination))
+				if (shows(option.getOption(), destination))
 				{
 					colour(option);
 					named = true;
@@ -644,7 +646,7 @@ public class MenuLines
 		{
 			for (Widget option : lines)
 			{
-				if (Widgets.visible(option) && MenuLabels.matches(option.getText(), labels.get(i)))
+				if (Widgets.visible(option) && shows(option.getText(), labels.get(i)))
 				{
 					out.add(option);
 					return;
@@ -665,10 +667,16 @@ public class MenuLines
 	}
 
 	/** An option named exactly so wins over one that only starts the same: a ladder's "Climb-up" over its "Climb". */
-	private static boolean isExactly(MenuEntry entry, String destination)
+	private boolean isExactly(MenuEntry entry, String destination)
 	{
-		return destination != null && entry.getOption() != null
-			&& MenuLabels.normalise(entry.getOption()).equals(MenuLabels.normalise(destination));
+		return destination != null && entry.getOption() != null && easyTeleportsNames.readings(entry.getOption()).stream()
+			.anyMatch(option -> MenuLabels.normalise(option).equals(MenuLabels.normalise(destination)));
+	}
+
+	/** Whether the shown option or line names the label, also under a name Easy Teleports gave it. */
+	private boolean shows(String shown, String label)
+	{
+		return easyTeleportsNames.readings(shown).stream().anyMatch(reading -> MenuLabels.matches(reading, label));
 	}
 
 	private boolean isDestination(MenuEntry entry, MenuTarget target, String destination)
@@ -677,22 +685,22 @@ public class MenuLines
 		{
 			return MenuLabels.isRingDestination(entry.getOption(), target.getLineKey());
 		}
-		return destination != null && MenuLabels.matches(entry.getOption(), destination);
+		return destination != null && shows(entry.getOption(), destination);
 	}
 
-	private static boolean leadsToDestination(MenuEntry entry, MenuTarget target, String destination)
+	private boolean leadsToDestination(MenuEntry entry, MenuTarget target, String destination)
 	{
 		List<String> path = target.getPath();
 		for (int i = 0; i < path.size() - 1; i++)
 		{
-			if (MenuLabels.matches(entry.getOption(), path.get(i)))
+			if (shows(entry.getOption(), path.get(i)))
 			{
 				return true;
 			}
 		}
 		Menu sub = entry.getSubMenu();
 		return sub != null && destination != null
-			&& Arrays.stream(sub.getMenuEntries()).anyMatch(option -> MenuLabels.matches(option.getOption(), destination));
+			&& Arrays.stream(sub.getMenuEntries()).anyMatch(option -> shows(option.getOption(), destination));
 	}
 
 	private int find(MenuEntry[] entries, MenuTarget target, Predicate<MenuEntry> wanted)

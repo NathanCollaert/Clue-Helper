@@ -24,7 +24,7 @@ public class FairyRingMemory
 	private static final String[] LEFT_DIAL = {"A", "D", "C", "B"};
 	private static final String[] MIDDLE_DIAL = {"I", "L", "K", "J"};
 	private static final String[] RIGHT_DIAL = {"P", "S", "R", "Q"};
-	private static final Pattern LAST_DESTINATION = Pattern.compile("last-destination \\(([A-Z]{3})\\)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern LAST_DESTINATION = Pattern.compile("last-destination \\((?:[^()]*\\()?([A-Z]{3})\\)", Pattern.CASE_INSENSITIVE);
 	/** A ring teleport lands about 7 ticks after the confirm, arrival lock included. */
 	private static final int LANDING_WITHIN_TICKS = 12;
 
@@ -84,7 +84,10 @@ public class FairyRingMemory
 		}
 	}
 
-	/** The code a "Last-destination (XYZ)" option names; null for any other option. */
+	/**
+	 * The code a "Last-destination (XYZ)" option names, also as Easy Teleports writes it: "Last-destination (Zanaris
+	 * (BKS))". Null for any other option.
+	 */
 	private static String lastDestination(String option)
 	{
 		Matcher last = LAST_DESTINATION.matcher(Text.removeTags(option == null ? "" : option));

@@ -133,6 +133,9 @@ public class ClueHelperPlugin extends Plugin
 	private MenuLines menuLines;
 
 	@Inject
+	private EasyTeleportsNames easyTeleportsNames;
+
+	@Inject
 	private WaypointOverlay waypointOverlay;
 
 	@Inject
@@ -387,6 +390,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
+		easyTeleportsNames.onConfigChanged(event);
 		if (grownPatches.isOurs(event))
 		{
 			clientThread.invokeLater(grownPatches::publish);
