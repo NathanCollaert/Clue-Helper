@@ -13,14 +13,17 @@ public class LevelNeed
 	@RequiredArgsConstructor
 	public enum Aggregate
 	{
-		TOTAL("%d total level", PlayerSnapshot::getTotalLevel),
-		COMBAT("combat level %d", PlayerSnapshot::getCombatLevel),
-		QUEST_POINTS("%d quest points", PlayerSnapshot::getQuestPoints),
-		/** Held against 0: the locked tracks count down to it. */
-		MUSIC_TRACKS("every music track", player -> -player.getLockedMusicTracks());
+		TOTAL("%d total level", PlayerSnapshot::getTotalLevel, null),
+		COMBAT("combat level %d", PlayerSnapshot::getCombatLevel, null),
+		QUEST_POINTS("%d quest points", PlayerSnapshot::getQuestPoints, null),
+		/** Held against 0: what is still missing counts down to it. */
+		MUSIC_TRACKS("every music track", player -> -player.getLockedMusicTracks(), "still locked"),
+		ALL_QUEST_POINTS("every quest point", player -> -player.getMissingQuestPoints(), "short");
 
 		private final String format;
 		private final ToIntFunction<PlayerSnapshot> have;
+		/** How what is missing is worded, for a need held against 0; null for a level. */
+		private final String missingAs;
 	}
 
 	/** Null for an aggregate. */
@@ -45,6 +48,12 @@ public class LevelNeed
 		return new LevelNeed(null, Aggregate.MUSIC_TRACKS, 0);
 	}
 
+	/** The Quest point cape's need, which grows with every quest a game update adds. */
+	public static LevelNeed everyQuestPoint()
+	{
+		return new LevelNeed(null, Aggregate.ALL_QUEST_POINTS, 0);
+	}
+
 	/**
 	 * The player's own level the need is held against: boosts count, but Hitpoints' boosted level is the health left,
 	 * and a Hitpoints need (the God Wars ice bridge's 70) is on the level itself.
@@ -65,7 +74,8 @@ public class LevelNeed
 
 	public String shortfall(PlayerSnapshot player)
 	{
-		String has = aggregate == Aggregate.MUSIC_TRACKS ? player.getLockedMusicTracks() + " still locked" : "has " + have(player);
+		boolean countsDown = aggregate != null && aggregate.missingAs != null;
+		String has = countsDown ? -have(player) + " " + aggregate.missingAs : "has " + have(player);
 		return describe() + " (" + has + ")";
 	}
 }

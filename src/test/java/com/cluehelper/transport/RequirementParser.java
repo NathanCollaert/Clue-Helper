@@ -224,9 +224,9 @@ public final class RequirementParser
 		{
 			return LevelNeed.ofAggregate(LevelNeed.Aggregate.COMBAT, max ? MAX_COMBAT_LEVEL : required);
 		}
-		if (lower.startsWith("quest") && !max)
+		if (lower.startsWith("quest"))
 		{
-			return LevelNeed.ofAggregate(LevelNeed.Aggregate.QUEST_POINTS, required);
+			return max ? LevelNeed.everyQuestPoint() : LevelNeed.ofAggregate(LevelNeed.Aggregate.QUEST_POINTS, required);
 		}
 		return null;
 	}

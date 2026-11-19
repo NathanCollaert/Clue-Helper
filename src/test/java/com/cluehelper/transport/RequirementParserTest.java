@@ -21,6 +21,7 @@ public class RequirementParserTest
 		{"Skills", "25 Magic;50 Agility", "levels 25 Magic; 50 Agility"},
 		{"Skills", "Max Total", "levels 2376 total level"},
 		{"Skills", "Max Music", "levels every music track"},
+		{"Skills", "Max Quest", "levels every quest point"},
 		{"Skills", "Max Construction;100 Combat;32 Quest", "levels 99 Construction; combat level 100; 32 quest points"},
 		{"Skills", "70 Agilty", "error Skills: can't read '70 Agilty'"},
 		{"Skills", "high Magic", "error Skills: can't read 'high Magic'"},

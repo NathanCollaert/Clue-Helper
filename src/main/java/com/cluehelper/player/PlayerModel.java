@@ -46,6 +46,8 @@ public class PlayerModel
 	private CheckLines checkLines;
 	@Inject
 	private MusicTracks musicTracks;
+	@Inject
+	private QuestPointTotal questPointTotal;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
 	private final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
 	private final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
@@ -57,6 +59,7 @@ public class PlayerModel
 	private boolean questsRead;
 	private volatile boolean questsDirty;
 	private int lockedMusicTracks;
+	private int missingQuestPoints;
 	private volatile boolean musicDirty;
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
@@ -273,6 +276,7 @@ public class PlayerModel
 		{
 			questsDirty = false;
 			quests = readQuests();
+			missingQuestPoints = Math.max(0, questPointTotal.offered() - client.getVarpValue(VarPlayerID.QP));
 			questsRead = true;
 			markDirty("quests");
 		}
@@ -427,6 +431,7 @@ public class PlayerModel
 			.combatLevel(client.getLocalPlayer().getCombatLevel())
 			.questPoints(client.getVarpValue(VarPlayerID.QP))
 			.lockedMusicTracks(lockedMusicTracks)
+			.missingQuestPoints(missingQuestPoints)
 			.questsRead(questsRead)
 			.quests(quests)
 			.varbits(varbits)
