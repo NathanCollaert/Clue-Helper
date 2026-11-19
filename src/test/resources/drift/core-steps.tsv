@@ -107,7 +107,7 @@ cipher:19762	*	cipher	medium	ANY_OF	1625,3802,0	npc 7048				none	2268	The cipher
 cipher:19764	*	cipher	medium	ANY_OF	3112,3162,1	npc 5081				none	2267	The cipher reveals who to speak to next: XJABSE USBJCPSO
 cipher:19766	*	cipher	medium	ANY_OF	1845,3754,0	npc 6971				none	2266	The cipher reveals who to speak to next: ECRVCKP MJCNGF
 cipher:19768	*	cipher	medium	ANY_OF	3354,2974,0	npc 11875				none	2263	The cipher reveals who to speak to next: BMJ UIF LFCBC TFMMFS
-cipher:19770	*	cipher	medium	ANY_OF	3227,3227,0	npc 311				none	2265	The cipher reveals who to speak to next: HQNM LZM STSNQ
+cipher:19770	*	cipher	medium	ANY_OF	3218,3238,0	npc 16821				none	2265	The cipher reveals who to speak to next: BZOSZHM GZQKZM
 cipher:19772	*	cipher	medium	ANY_OF	3440,9895,0	npc 9636				none	2264	The cipher reveals who to speak to next: GUHCHO
 cipher:19898	0,1,3,4,5,10,100	cipher	hard	ANY_OF	2289,3144,0	npc 5304				none	2270	The cipher reveals who to speak to next: OVEXON
 cipher:19898	2	cipher	hard	ANY_OF	3229,6062,0	npc 5304				none	2270	The cipher reveals who to speak to next: OVEXON
@@ -371,7 +371,7 @@ cryptic:i lie lonely and forgotten in mid wilderness, where the dead rise from t
 cryptic:i live in a deserted crack collecting soles.	*	cryptic	elite	AREA	3371,9320,0	Genie	13457			light	1439	I live in a deserted crack collecting soles.
 cryptic:i sit on the beach and cry for those that have passed on.	*	cryptic	hard	ANY_OF	2324,2772,0					spade	7045	I sit on the beach and cry for those that have passed on.
 cryptic:i watch the sea. i watch you fish. i watch your tree.	*	cryptic	hard	ANY_OF	2860,3431,0	Ellena				none	1380	I watch the sea. I watch you fish. I watch your tree.
-cryptic:i wonder how many bronze swords he has handed out.	*	cryptic	easy	ANY_OF	3146,9913,0	Vannaka				none	1252	I wonder how many bronze swords he has handed out.
+cryptic:i wonder how many bronze shortswords he has handed out.	*	cryptic	easy	ANY_OF	3146,9913,0	Vannaka				none	1252	I wonder how many bronze shortswords he has handed out.
 cryptic:i would make a chemistry joke, but i'm afraid i wouldn't get a reaction.	*	cryptic	easy	ANY_OF	2932,3212,0	Chemist				none	1272	I would make a chemistry joke, but I'm afraid I wouldn't get a reaction.
 cryptic:i wouldn't wear this jean on my legs.	*	cryptic	easy	ANY_OF	1734,3576,0	Father Jean				none	1243	I wouldn't wear this jean on my legs.
 cryptic:identify the back of this over-acting brother. (he's a long way from home.)	*	cryptic	hard	ANY_OF	3376,3284,0	Hamid				none	1376	Identify the back of this over-acting brother. (He's a long way from home.)
@@ -425,7 +425,7 @@ cryptic:search for a crate in varrock castle.	*	cryptic	easy	ANY_OF	3224,3492,0	
 cryptic:search for a crate on the ground floor of a house in seers' village.	*	cryptic	easy	ANY_OF	2699,3470,0			25775		none	1283	Search for a crate on the ground floor of a house in Seers' Village.
 cryptic:search the basket of apples in an orchard, south of the unknown grave surrounded by white roses.	*	cryptic	medium	ANY_OF	1718,3626,0			27522		none	1368	Search the basket of apples in an orchard, south of the unknown grave surrounded by white roses.
 cryptic:search the bookcase in the monastery.	*	cryptic	easy	ANY_OF	3054,3484,0			380		none	1307	Search the bookcase in the monastery.
-cryptic:search the boxes in a shop in taverley.	*	cryptic	easy	ANY_OF	2886,3449,0			360		none	1327	Search the boxes in a shop in Taverley.
+cryptic:search the boxes in a shop in taverley.	*	cryptic	easy	ANY_OF	2886,3449,0			360		none	17195	Search the boxes in a shop in Taverley.
 cryptic:search the boxes in one of the tents in al kharid.	*	cryptic	easy	ANY_OF	3308,3206,0			361		none	1313	Search the boxes in one of the tents in Al Kharid.
 cryptic:search the boxes in the goblin house near lumbridge.	*	cryptic	easy	ANY_OF	3245,3245,0			359		none	1304	Search the boxes in the goblin house near Lumbridge.
 cryptic:search the boxes in the house near the south entrance to varrock.	*	cryptic	easy	ANY_OF	3203,3384,0			5111		none	1291	Search the boxes in the house near the south entrance to Varrock.
@@ -658,7 +658,7 @@ emote:12550	*	emote	hard	ANY_OF	3043,4697,3					2 item requirements	2148	Cheer a
 emote:12552	*	emote	hard	ANY_OF	1646,3631,0					3 item requirements	2157	Salute in the centre of the mess hall. Beware of double agents! Equip a rune halberd rune platebody and an amulet of strength.
 emote:19776	*	emote	medium	ANY_OF	1543,3623,0					3 item requirements	2123	Beckon in the Shayzien Combat Ring. Show your anger before you talk to me. Equip an adamant platebody, adamant full helm and adamant platelegs.
 emote:19778	*	emote	medium	ANY_OF	1632,3807,0					3 item requirements	2143	Yawn in the centre of the Arceuus Library. Nod your head before you talk to me. Equip blue dragonhide vambraces, adamant boots and an adamant dagger.
-emote:19780	*	emote	medium	ANY_OF	3128,3245,0					3 item requirements	2130	Cry in the Draynor Village jail. Jump for joy before you talk to me. Equip an adamant sword, a sapphire amulet and an adamant plateskirt.
+emote:19780	*	emote	medium	ANY_OF	3128,3245,0					3 item requirements	2130	Cry in the Draynor Village jail. Jump for joy before you talk to me. Equip an adamant shortsword, a sapphire amulet and an adamant plateskirt.
 emote:19787	*	emote	elite	ANY_OF	2776,3781,0					4 item requirements	2171	Panic at the area flowers meet snow. Equip Blue D'hide vambraces, a dragon spear and a rune plateskirt.
 emote:19788	*	emote	elite	ANY_OF	1487,3635,0					3 item requirements	2174	Shrug in the Shayzien war tent. Equip a blue mystic robe bottom, a rune kiteshield and any bob shirt.
 emote:19789	*	emote	elite	ANY_OF	2728,3377,0					3 item requirements	2161	Bow on the ground floor of the Legends' Guild. Equip a Cape of Legends, a dragon battleaxe and an amulet of glory.

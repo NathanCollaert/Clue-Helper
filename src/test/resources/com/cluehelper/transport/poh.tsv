@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 6f8eab1 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 497a5f5 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 nexus	Portal nexus: Varrock	1858 7051 0	3213 3424 0								20	1	4	F	none	any	Y	nexus:1	nexus 450 Misthalin		
 nexus	Portal nexus: Grand Exchange	1858 7051 0	3165 3479 0						4480=1		20	1	4	F	none	any	Y	nexus:1	nexus 451 Misthalin		varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE
@@ -7,7 +7,7 @@ nexus	Portal nexus: Falador	1858 7051 0	2964 3378 0								20	1	4	F	none	any	Y	n
 nexus	Portal nexus: Camelot	1858 7051 0	2757 3479 0								20	1	4	F	none	any	Y	nexus:4	nexus 454 Kandarin		
 nexus	Portal nexus: Seers' Village	1858 7051 0	2726 3487 0						4477=1		20	1	4	F	none	any	Y	nexus:4	nexus 455 Kandarin		varbit:4477=KANDARIN_DIARY_HARD_COMPLETE
 nexus	Portal nexus: Ardougne	1858 7051 0	2662 3305 0								20	1	4	F	none	any	Y	nexus:5	nexus 456 Kandarin		
-nexus	Portal nexus: Watchtower	1858 7051 0	2546 3114 0								20	1	4	F	none	any	Y	nexus:6	nexus 457 Kandarin		
+nexus	Portal nexus: Watchtower	1858 7051 0	2546 3112 0								20	1	4	F	none	any	Y	nexus:6	nexus 457 Kandarin		
 nexus	Portal nexus: Yanille	1858 7051 0	2584 3097 0						4460=1		20	1	4	F	none	any	Y	nexus:6	nexus 458 Kandarin		varbit:4460=ARDOUGNE_DIARY_HARD_COMPLETE
 nexus	Portal nexus: Senntisten	1858 7051 0	3320 3337 0								20	1	4	F	none	any	Y	nexus:7	nexus 459 Misthalin		
 nexus	Portal nexus: Marim	1858 7051 0	2797 2798 1								20	1	4	F	none	any	Y	nexus:8	nexus 460 Kandarin		
@@ -32,7 +32,7 @@ nexus	Portal nexus: Salve Graveyard	1858 7051 0	3433 3461 0								20	1	4	F	none
 nexus	Portal nexus: Fenken' Castle	1858 7051 0	3548 3529 0								20	1	4	F	none	any	Y	nexus:25	nexus 1250 Morytania		
 nexus	Portal nexus: West Ardougne	1858 7051 0	2500 3290 0								20	1	4	F	none	any	Y	nexus:26	nexus 1251 Kandarin		
 nexus	Portal nexus: Harmony Island	1858 7051 0	3797 2866 0								20	1	4	F	none	any	Y	nexus:27	nexus 1252 Morytania		
-nexus	Portal nexus: Cemetery	1858 7051 0	2981 3764 0								20	1	4	F	none	any	Y	nexus:28	nexus 1253 Wilderness		
+nexus	Portal nexus: Cemetery	1858 7051 0	2980 3763 0								20	1	4	F	none	any	Y	nexus:28	nexus 1253 Wilderness		
 nexus	Portal nexus: Barrows	1858 7051 0	3564 3315 0								20	1	4	F	none	any	Y	nexus:29	nexus 1254 Morytania		
 nexus	Portal nexus: Ape Atoll Dungeon	1858 7051 0	2771 9102 0								20	1	4	F	none	any	Y	nexus:30	nexus 1255 Kandarin		
 nexus	Portal nexus: Trollheim	1858 7051 0	2890 3679 0								20	1	4	F	none	any	Y	nexus:32	nexus 6414 Asgarnia		
@@ -137,7 +137,7 @@ portal	Portal chamber: Seers' Village	1858 7051 0	2726 3487 0						4477=1		20	1	
 portal	Portal chamber: Carrallanger	1858 7051 0	3158 3666 0								20	1	0	F	none	any	Y	object:33434|33437|33440			object:33434=POH_PORTAL_TEAK_CARRALLANGAR object:33437=POH_PORTAL_MAG_CARRALLANGAR object:33440=POH_PORTAL_MARBLE_CARRALLANGAR
 portal	Portal chamber: Catherby	1858 7051 0	2801 3449 0								20	1	0	F	none	any	Y	object:33432|33435|33438			object:33432=POH_PORTAL_TEAK_CATHERBY object:33435=POH_PORTAL_MAG_CATHERBY object:33438=POH_PORTAL_MARBLE_CATHERBY
 portal	Portal chamber: Civitas illa Fortis	1858 7051 0	1681 3133 0								20	1	0	F	none	any	Y	object:50713|50714|50715			object:50713=POH_PORTAL_TEAK_FORTIS object:50714=POH_PORTAL_MAG_FORTIS object:50715=POH_PORTAL_MARBLE_FORTIS
-portal	Portal chamber: Cemetery	1858 7051 0	2981 3764 0								20	1	0	F	none	any	Y	object:37590|37602|37614			object:37590=POH_PORTAL_TEAK_CEMETERY object:37602=POH_PORTAL_MAG_CEMETERY object:37614=POH_PORTAL_MARBLE_CEMETERY
+portal	Portal chamber: Cemetery	1858 7051 0	2980 3763 0								20	1	0	F	none	any	Y	object:37590|37602|37614			object:37590=POH_PORTAL_TEAK_CEMETERY object:37602=POH_PORTAL_MAG_CEMETERY object:37614=POH_PORTAL_MARBLE_CEMETERY
 portal	Portal chamber: Dareeyak	1858 7051 0	2968 3696 0								20	1	0	F	none	any	Y	object:60793|60803|60813			object:60793=POH_PORTAL_TEAK_DAREEYAK object:60803=POH_PORTAL_MAG_DAREEYAK object:60813=POH_PORTAL_MARBLE_DAREEYAK
 portal	Portal chamber: Draynor Manor	1858 7051 0	3109 3351 0								20	1	0	F	none	any	Y	object:37583|37595|37607			object:37583=POH_PORTAL_TEAK_DRAYNOR_MANOR object:37595=POH_PORTAL_MAG_DRAYNOR_MANOR object:37607=POH_PORTAL_MARBLE_DRAYNOR_MANOR
 portal	Portal chamber: Falador	1858 7051 0	2964 3378 0								20	1	0	F	none	any	Y	object:13617|13624|13631			object:13617=POH_PORTAL_TEAK_FALADOR object:13624=POH_PORTAL_MAG_FALADOR object:13631=POH_PORTAL_MARBLE_FALADOR
@@ -174,7 +174,7 @@ portal	Portal chamber: Varrock	1858 7051 0	3213 3424 0								20	1	0	F	none	any	
 portal	Portal chamber: Waterbirth Island	1858 7051 0	2546 3755 0								20	1	0	F	none	any	Y	object:29342|29350|29358			object:29342=POH_PORTAL_TEAK_WATERBIRTH object:29350=POH_PORTAL_MAG_WATERBIRTH object:29358=POH_PORTAL_MARBLE_WATERBIRTH
 portal	Portal chamber: Weiss	1858 7051 0	2846 3938 0								20	1	0	F	none	any	Y	object:37581|37593|37605			object:37581=POH_PORTAL_TEAK_WEISS object:37593=POH_PORTAL_MAG_WEISS object:37605=POH_PORTAL_MARBLE_WEISS
 portal	Portal chamber: West Ardougne	1858 7051 0	2500 3290 0								20	1	0	F	none	any	Y	object:37588|37600|37612			object:37588=POH_PORTAL_TEAK_WEST_ARDOUGNE object:37600=POH_PORTAL_MAG_WEST_ARDOUGNE object:37612=POH_PORTAL_MARBLE_WEST_ARDOUGNE
-portal	Portal chamber: Watchtower	1858 7051 0	2546 3114 0								20	1	0	F	none	any	Y	object:33096|33102|33108			object:33096=POH_PORTAL_TEAK_YANILLE_WATCHTOWER1ST object:33102=POH_PORTAL_MAHOGANY_YANILLE_WATCHTOWER1ST object:33108=POH_PORTAL_MARBLE_YANILLE_WATCHTOWER1ST
+portal	Portal chamber: Watchtower	1858 7051 0	2546 3112 0								20	1	0	F	none	any	Y	object:33096|33102|33108			object:33096=POH_PORTAL_TEAK_YANILLE_WATCHTOWER1ST object:33102=POH_PORTAL_MAHOGANY_YANILLE_WATCHTOWER1ST object:33108=POH_PORTAL_MARBLE_YANILLE_WATCHTOWER1ST
 portal	Portal chamber: Yanille	1858 7051 0	2584 3097 0						4460=1		20	1	0	F	none	any	Y	object:33097|33103|33109			varbit:4460=ARDOUGNE_DIARY_HARD_COMPLETE object:33097=POH_PORTAL_TEAK_YANILLE_YANILLE1ST object:33103=POH_PORTAL_MAHOGANY_YANILLE_YANILLE1ST object:33109=POH_PORTAL_MARBLE_YANILLE_YANILLE1ST
 fairy ring	Fairy ring (enter) Your house	1858 7051 0				772=1|9084=1			2326>39			7	1	F	none	any	Y	object:29228|29229|27097|40779			item:772=DRAMEN_STAFF item:9084=LUNAR_MOONCLAN_LIMINAL_STAFF varbit:2326=FAIRY2_QUEENCURE_QUEST object:29228=POH_FAIRY_RING object:29229=POH_SPIRIT_RING object:27097=LEAGUE_5_POH_SPIRIT_RING object:40779=XMAS20_POH_SPIRIT_RING
 spirit tree	Spirit tree: Tree Gnome Village	1858 7051 0	2542 3170 0					Tree Gnome Village			20	3	4	F	none	any	Y	object:29227|44936|40778|29229|27097|40779	list 1: Tree Gnome Village		object:29227=POH_SPIRIT_TREE object:44936=LEAGUE_5_POH_SPIRIT_TREE object:40778=XMAS20_POH_SPIRIT_TREE object:29229=POH_SPIRIT_RING object:27097=LEAGUE_5_POH_SPIRIT_RING object:40779=XMAS20_POH_SPIRIT_RING
