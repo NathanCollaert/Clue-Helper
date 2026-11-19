@@ -479,7 +479,7 @@ final class StepHighlights
 	private Set<Integer> oneClickItems(Highlights shown, SubStep current, String label)
 	{
 		boolean signals = shown.getMenuTarget().getLine() == MenuTarget.Line.QUETZAL;
-		boolean oneDestination = label == null && rowTargets.hasOneDestination(current);
+		boolean oneDestination = label == null ? rowTargets.hasOneDestination(current) : rowTargets.namesItsOnlyLanding(current);
 		return shown.getHeldUses().stream()
 			.filter(use -> signals ? RowTargets.SIGNAL_OPTION.equalsIgnoreCase(leftClicks.item(use))
 				: oneDestination ? isOwnTeleport(leftClicks.item(use)) : teleportsTo(leftClicks.swappedOrLearned(use), label))

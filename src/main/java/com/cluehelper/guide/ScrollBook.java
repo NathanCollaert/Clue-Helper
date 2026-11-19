@@ -13,7 +13,6 @@ import com.cluehelper.guide.SubStep.Kind;
 /** The master scroll book: its interface's widget per scroll, and the bank stops that keep it out of the Wilderness. */
 public final class ScrollBook
 {
-	private static final String ROW_PREFIX = "Master scroll book: ";
 	public static final int NO_WIDGET = -1;
 	static final String BOOK_NAME = "master scroll book";
 	static final String REMOVE_OPTION = "Remove";
@@ -62,7 +61,7 @@ public final class ScrollBook
 
 	static int entry(String rowName)
 	{
-		Scroll scroll = rowName.startsWith(ROW_PREFIX) ? BY_NAME.get(rowName.substring(ROW_PREFIX.length())) : null;
+		Scroll scroll = rowName.startsWith(BookScrolls.BOOK_ROW_PREFIX) ? BY_NAME.get(BookScrolls.scrollName(rowName)) : null;
 		return scroll == null ? NO_WIDGET : scroll.getEntry();
 	}
 

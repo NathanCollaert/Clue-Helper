@@ -4,6 +4,7 @@ import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -144,6 +145,31 @@ final class RowTargets
 	{
 		return current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
 			&& optionPath(current.getRow()).isEmpty();
+	}
+
+	/**
+	 * The row's name ends in where its items land, and they land nowhere else, so it holds no option to pick (Shortest
+	 * Path's "Royal seed pod: Grand Tree"): any left click of the item's own is the teleport.
+	 */
+	boolean namesItsOnlyLanding(SubStep current)
+	{
+		if (current == null || current.getKind() != SubStep.Kind.TELEPORT || current.getRow() == null)
+		{
+			return false;
+		}
+		CatalogRow row = current.getRow();
+		Set<Integer> items = itemIds(row);
+		return !items.isEmpty() && !optionPath(row).isEmpty() && availability.getCatalog().stream()
+			.noneMatch(other -> !Objects.equals(other.getDestination(), row.getDestination())
+				&& !Collections.disjoint(itemIds(other), items));
+	}
+
+	private static Set<Integer> itemIds(CatalogRow row)
+	{
+		return row.getRequirements().getItems().stream()
+			.flatMap(clause -> clause.getBranches().stream())
+			.flatMap(branch -> branch.getIds().stream())
+			.collect(Collectors.toSet());
 	}
 
 	/** The row's carried items; runes are left out, as the spell widget covers those. */
