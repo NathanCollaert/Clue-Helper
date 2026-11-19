@@ -1,6 +1,6 @@
 package com.cluehelper.route;
 
-import java.io.IOException;
+import com.cluehelper.Tables;
 import java.util.*;
 import java.util.function.IntUnaryOperator;
 import lombok.*;
@@ -11,24 +11,15 @@ import static java.util.stream.Collectors.*;
 public final class NoTeleportAreas
 {
 	public static final NoTeleportAreas NONE = new NoTeleportAreas(List.of());
-	private static final String RESOURCE = "no-teleport.tsv";
 	private static final int ANY_PLANE = -1;
-	private static final int ALWAYS = -1;
 	private static final int VARBIT = 5;
 	private static final int LIFTED_AT = 6;
 
 	private final List<int[]> boxes;
 
-	public static NoTeleportAreas load() throws IOException
+	public static NoTeleportAreas load()
 	{
-		List<int[]> boxes = new ArrayList<>();
-		for (String[] c : WalkTable.lines(RESOURCE))
-		{
-			boolean lifts = c.length > 7 && !c[6].isEmpty();
-			boxes.add(new int[]{Integer.parseInt(c[1]), Integer.parseInt(c[2]), Integer.parseInt(c[3]), Integer.parseInt(c[4]),
-				Integer.parseInt(c[5]), lifts ? Integer.parseInt(c[6]) : ALWAYS, lifts ? Integer.parseInt(c[7]) : 0});
-		}
-		return new NoTeleportAreas(List.copyOf(boxes));
+		return new NoTeleportAreas(Tables.rows("no teleport").stream().map(Tables.Row::ids).collect(toUnmodifiableList()));
 	}
 
 	/**
@@ -38,7 +29,7 @@ public final class NoTeleportAreas
 	public NoTeleportAreas now(IntUnaryOperator varbitValue)
 	{
 		return new NoTeleportAreas(boxes.stream()
-			.filter(box -> box[VARBIT] == ALWAYS || varbitValue.applyAsInt(box[VARBIT]) < box[LIFTED_AT])
+			.filter(box -> varbitValue.applyAsInt(box[VARBIT]) < box[LIFTED_AT])
 			.collect(toUnmodifiableList()));
 	}
 

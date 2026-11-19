@@ -130,6 +130,12 @@ public final class WalkGates
 		return List.copyOf(tools.values());
 	}
 
+	/** The webs' gate passes: on a snapshot without a bank, only a carried or worn blade passes it. */
+	public boolean canSlash()
+	{
+		return gatePass[table.getSlashGate()];
+	}
+
 	public boolean[] rowOpen()
 	{
 		boolean[] open = new boolean[table.rowCount()];

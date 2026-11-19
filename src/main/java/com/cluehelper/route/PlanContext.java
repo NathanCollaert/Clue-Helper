@@ -261,7 +261,7 @@ final class PlanContext
 
 	boolean isUsableBank(int node)
 	{
-		if (!isTableNode(node) || !table.isBank(node))
+		if (!isTableNode(node))
 		{
 			return false;
 		}
@@ -273,7 +273,7 @@ final class PlanContext
 		{
 			PlayerSnapshot judgedAt = in.getPlayer().toBuilder().wildernessLevel(0).build();
 			boolean usable = table.banks(node).stream()
-				.anyMatch(bank -> !bank.isDepositOnly() && judge(bank.getName(), bank.getRequirements(), judgedAt).isAvailable());
+				.anyMatch(bank -> judge(bank.getName(), bank.getRequirements(), judgedAt).isAvailable());
 			bankUsable[node] = (byte) (usable ? 1 : 2);
 		}
 		return bankUsable[node] == 1;

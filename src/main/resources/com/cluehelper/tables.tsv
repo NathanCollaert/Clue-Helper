@@ -411,3 +411,7 @@ easy teleports names	Prifddinas	replacementMaxCapePrifddinas	enableMaxCape
 easy teleports names	The Pandemonium	replacementMaxCapePandemonium	enableMaxCape	
 # Core's ClueScrollOverlay.HAS_LIGHT item ids (1.13.2).
 light sources		594	33	32	4531	4534	4524	4539	4550	4702	9065	5013	9804	9805	13137	13138	13139	13140	20720	29777	13280	13342	26824	26826	26828	26830	26832	26834	26836	26838	26840	26842	26844	26846	26848	30363
+# no teleport: minX, minY, maxX, maxY, plane (-1 any), then the varbit that lifts the area once it reaches the value after it.
+# Swimming by Mogre Camp: inventory, gear and spellbook are locked until five rocks weigh the player down; the anchor (2963 9478)
+# climbs out; the cavern and the crab pen, both entered at y 9515 (walked live 2026-10-30), are outside.
+no teleport	swimming by Mogre Camp	2930	9450	3010	9514	1	VarbitID.HUNDRED_PIRATE_ROCKS=1869	5

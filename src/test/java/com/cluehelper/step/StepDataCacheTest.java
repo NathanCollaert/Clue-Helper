@@ -32,7 +32,7 @@ public class StepDataCacheTest
 	private static final Path DUMPS = Path.of("Clue-Helper-Tools/tools/cache/dump");
 	private static final String DATED = "\\d{4}-\\d{2}-\\d{2}";
 	private static final Path SKILL_STEPS = Path.of("src/main/resources/com/cluehelper/step/steps/skill.json");
-	private static final Path ROW_OBJECTS = Path.of("src/main/resources/com/cluehelper/route/walk/row-objects.tsv");
+	private static final Path ROW_OBJECTS = Path.of("src/test/resources/com/cluehelper/route/walk/row-objects.tsv");
 	private static final String SHERLOCK = "skill:SHERLOCK:";
 	/** An item used on the object ("Use Rope -> Rock") is no option of the object's own. */
 	private static final String USE_ITEM_ON = "Use";

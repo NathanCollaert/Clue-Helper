@@ -1,11 +1,8 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.PlayerSnapshot;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.inject.*;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -38,23 +35,16 @@ public final class SceneDoors
 		| CollisionDataFlag.BLOCK_MOVEMENT_EAST | CollisionDataFlag.BLOCK_MOVEMENT_SOUTH;
 
 	private static final String NONE = "";
-	/** Shortest Path's SLASH items (knives, axes, blades), as the catalog generator writes them. */
-	private static final Set<Integer> SLASH_ITEMS = slashItems();
-
 	/** The option that opens each object: Open, Slash, Squeeze-through, Walk-through, or NONE. */
 	private final Map<Integer, String> openOptions = new HashMap<>();
 	/** By place: doors share ids across the game, and one locked door doesn't lock every other one like it. */
 	private final Set<Door> locked = new HashSet<>();
 	private Door lastOpened;
+	/** From each new snapshot's walk gates: a web opens only to a player carrying or wielding something that slashes. */
+	@Setter
 	private volatile boolean canSlash;
 	@Inject
 	private Client client;
-
-	/** From each new snapshot: a web opens only to a player carrying or wielding something that slashes. */
-	public void playerChanged(PlayerSnapshot player)
-	{
-		canSlash = player.carriedIds().stream().anyMatch(SLASH_ITEMS::contains);
-	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
@@ -175,26 +165,6 @@ public final class SceneDoors
 			}
 			return option;
 		});
-	}
-
-	private static Set<Integer> slashItems()
-	{
-		try (InputStream in = WalkTable.open("slash.txt"))
-		{
-			Set<Integer> ids = new HashSet<>();
-			for (String line : new String(in.readAllBytes(), StandardCharsets.UTF_8).split("\\R"))
-			{
-				if (!line.isBlank() && !line.startsWith("#"))
-				{
-					ids.add(Integer.parseInt(line.trim()));
-				}
-			}
-			return Set.copyOf(ids);
-		}
-		catch (IOException e)
-		{
-			throw new IllegalStateException("can't read slash.txt", e);
-		}
 	}
 
 	private static void clearWall(int[][] flags, int[][] doorSides, int x, int y, int orientation)

@@ -115,7 +115,7 @@ public class RoutePlanner
 		{
 			if (loaded != null)
 			{
-				watchGateVars(loaded.getTable());
+				player.watch(loaded.getTable().getWatchedVarbits(), loaded.getTable().getWatchedVarps());
 				availability.nameItemsOf(loaded.getTable().getGates());
 				walk = loaded;
 			}
@@ -398,7 +398,7 @@ public class RoutePlanner
 		}
 		WalkGates gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
 		rowOpen = gates.rowOpen();
-		doors.playerChanged(snapshot);
+		doors.setCanSlash(gates.canSlash());
 		gatesVersion = snapshot.getVersion();
 	}
 
@@ -537,23 +537,6 @@ public class RoutePlanner
 		routes.add(planned.getFollowed());
 		planned.getCandidates().forEach(candidate -> routes.add(candidate.getRoute()));
 		return routes;
-	}
-
-	private void watchGateVars(WalkTable table)
-	{
-		Set<Integer> varbits = new HashSet<>();
-		Set<Integer> varps = new HashSet<>();
-		for (Requirements gate : table.getGates())
-		{
-			List<VarCheck> checks = new ArrayList<>(gate.getVars());
-			gate.getItems().forEach(clause -> clause.getBranches().stream().filter(ItemClause.Branch::isVar)
-				.forEach(branch -> checks.add(branch.getVar())));
-			for (VarCheck check : checks)
-			{
-				(check.getKind() == VarCheck.Kind.VARBIT ? varbits : varps).add(check.getId());
-			}
-		}
-		player.watch(varbits, varps);
 	}
 
 	/** Walking changes it only through the nearest node or the walk to a target in the scene. */
