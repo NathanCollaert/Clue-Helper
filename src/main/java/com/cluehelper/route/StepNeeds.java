@@ -1,11 +1,13 @@
 package com.cluehelper.route;
 
+import com.cluehelper.Tables;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.IntStream;
 import javax.inject.*;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
@@ -22,12 +24,8 @@ public class StepNeeds
 	/** Copy of core's {@code ClueScrollOverlay.HAS_SPADE} (1.13.2). */
 	public static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
 		ItemRequirements.item(ItemID.EASTER23_SPADE));
-	/** Core's {@code ClueScrollOverlay.HAS_LIGHT} item ids (1.13.2). */
-	private static final List<Integer> LIGHT_SOURCES = List.of(594, 33, 32, 4531, 4534, 4524, 4539, 4550, 4702, 9065, 5013, 9804, 9805, 13137,
-		13138, 13139, 13140, 20720, 29777, 13280, 13342, 26824, 26826, 26828, 26830, 26832, 26834, 26836, 26838, 26840, 26842,
-		26844, 26846, 26848, 30363);
 	/** Core's {@code ClueScrollOverlay.HAS_LIGHT}. */
-	public static final ItemRequirement LIGHT = anyOf("Light source", LIGHT_SOURCES);
+	public static final ItemRequirement LIGHT = anyOf("Light source", IntStream.of(Tables.ids("light sources")).boxed().collect(toList()));
 	private static final int NO_FIRE_PIT = -1;
 	private static final int LIT = 1;
 

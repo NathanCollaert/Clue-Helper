@@ -20,6 +20,7 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.CatalogRow;
+import com.cluehelper.transport.ItemClause;
 import com.cluehelper.transport.Requirements;
 import com.google.gson.Gson;
 import java.time.LocalDate;
@@ -141,8 +142,7 @@ public final class CampaignRecorder
 		Stream<Requirements> gates = input.getTable() == null ? Stream.empty() : input.getTable().getGates().stream();
 		Stream.concat(rows, gates)
 			.flatMap(requirements -> requirements.getItems().stream())
-			.flatMap(clause -> clause.getBranches().stream())
-			.flatMap(branch -> branch.getIds().stream())
+			.flatMap(ItemClause::ids)
 			.distinct()
 			.filter(id -> notes.stream().anyMatch(note -> note.contains(client.getItemDefinition(id).getName())))
 			.forEach(id -> tape.client().getItemDefinition(id).getName());

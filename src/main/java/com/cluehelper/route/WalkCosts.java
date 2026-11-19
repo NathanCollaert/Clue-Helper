@@ -84,30 +84,19 @@ public final class WalkCosts
 		return near == WalkSearch.NONE ? UNREACHED : costOf(near);
 	}
 
-	/**
-	 * The cheapest tile on a straight side of the object: the game walks to a side to use it, never a corner. A side
-	 * with no wall between it and the object wins: stairs against a bank's outer wall face inwards. Null when none.
-	 */
-	public WorldPoint cheapestBeside(WorldPoint southWest, int sizeX, int sizeY)
+	/** The walk to the cheapest tile that reaches the goal: one of its tiles, or one its object is used from. */
+	public int cost(WalkGoal goal)
 	{
-		WorldPoint best = null;
-		int bestCost = UNREACHED;
-		boolean bestOpen = false;
-		for (int x = -1; x <= sizeX; x++)
+		WorldPoint southWest = goal.getSouthWest();
+		int best = UNREACHED;
+		for (int x = -1; x <= goal.getSizeX(); x++)
 		{
-			for (int y = -1; y <= sizeY; y++)
+			for (int y = -1; y <= goal.getSizeY(); y++)
 			{
-				boolean outsideX = x == -1 || x == sizeX;
-				boolean outsideY = y == -1 || y == sizeY;
 				WorldPoint tile = southWest.dx(x).dy(y);
-				int c = outsideX != outsideY ? cost(tile) : UNREACHED;
-				boolean open = c != UNREACHED && ground.opensOnto(tile.getX(), tile.getY(), tile.getPlane(),
-					southWest.dx(Math.max(0, Math.min(sizeX - 1, x))).dy(Math.max(0, Math.min(sizeY - 1, y))));
-				if (c != UNREACHED && (open && !bestOpen || open == bestOpen && c < bestCost))
+				if (goal.reachedAt(ground, tile.getX(), tile.getY(), tile.getPlane()))
 				{
-					best = tile;
-					bestCost = c;
-					bestOpen = open;
+					best = Math.min(best, cost(tile));
 				}
 			}
 		}

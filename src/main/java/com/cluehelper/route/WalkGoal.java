@@ -30,6 +30,11 @@ public class WalkGoal
 		return new WalkGoal(southWest, sizeX, sizeY, true);
 	}
 
+	boolean reachedAt(Ground ground, int x, int y, int plane)
+	{
+		return object ? isUsedFrom(ground, x, y, plane) : contains(x, y, plane);
+	}
+
 	boolean contains(int x, int y, int plane)
 	{
 		return plane == southWest.getPlane() && x >= southWest.getX() && x < southWest.getX() + sizeX

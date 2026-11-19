@@ -167,8 +167,7 @@ final class RowTargets
 	private static Set<Integer> itemIds(CatalogRow row)
 	{
 		return row.getRequirements().getItems().stream()
-			.flatMap(clause -> clause.getBranches().stream())
-			.flatMap(branch -> branch.getIds().stream())
+			.flatMap(ItemClause::ids)
 			.collect(Collectors.toSet());
 	}
 

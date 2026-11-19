@@ -1,6 +1,7 @@
 package com.cluehelper.transport;
 
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.Value;
 import net.runelite.api.Quest;
 
@@ -11,6 +12,12 @@ public class ItemClause
 	List<Branch> branches;
 	boolean mustBeWorn;
 	VarCheck waivedBy;
+
+	/** Every branch's item ids. */
+	public Stream<Integer> ids()
+	{
+		return branches.stream().flatMap(branch -> branch.getIds().stream());
+	}
 
 	@Value
 	public static class Branch

@@ -409,3 +409,5 @@ easy teleports names	Brimhaven	replacementMaxCapeBrimhaven	enableMaxCape
 easy teleports names	Yanille	replacementMaxCapeYanille	enableMaxCape	
 easy teleports names	Prifddinas	replacementMaxCapePrifddinas	enableMaxCape	
 easy teleports names	The Pandemonium	replacementMaxCapePandemonium	enableMaxCape	
+# Core's ClueScrollOverlay.HAS_LIGHT item ids (1.13.2).
+light sources		594	33	32	4531	4534	4524	4539	4550	4702	9065	5013	9804	9805	13137	13138	13139	13140	20720	29777	13280	13342	26824	26826	26828	26830	26832	26834	26836	26838	26840	26842	26844	26846	26848	30363

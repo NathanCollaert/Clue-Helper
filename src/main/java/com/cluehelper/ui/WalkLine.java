@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.coords.*;
 import net.runelite.client.callback.ClientThread;
 
 /**
@@ -69,17 +69,12 @@ final class WalkLine
 		}
 		WorldPoint at = local.getWorldLocation();
 		int nearestDistance = Integer.MAX_VALUE;
-		LoadedScene live = null;
 		for (int i = passed; i < walk.size(); i++)
 		{
 			WorldPoint tile = walk.get(i);
 			int distance = tile.getPlane() == at.getPlane() ? tile.distanceTo2D(at) : Integer.MAX_VALUE;
 			boolean neighbourTie = distance == nearestDistance && distance == 1;
-			if (neighbourTie && live == null)
-			{
-				live = LoadedScene.capture(client.getTopLevelWorldView());
-			}
-			if (distance < nearestDistance || distance == nearestDistance && !(neighbourTie && isClosedOff(live, at, tile)))
+			if (distance < nearestDistance || distance == nearestDistance && !(neighbourTie && isClosedOff(client.getTopLevelWorldView(), at, tile)))
 			{
 				passed = i;
 				nearestDistance = distance;
@@ -92,9 +87,10 @@ final class WalkLine
 	 * miss the tile in front of the door: standing there, the tile behind a door not yet opened is as near as the one
 	 * before it, but not passed.
 	 */
-	private static boolean isClosedOff(LoadedScene live, WorldPoint at, WorldPoint tile)
+	private static boolean isClosedOff(WorldView view, WorldPoint at, WorldPoint tile)
 	{
-		return live != null && live.contains(at) && live.contains(tile) && !live.canStep(at, tile);
+		return !view.isInstance() && view.contains(at) && view.contains(tile)
+			&& !new WorldArea(at, 1, 1).canTravelInDirection(view, tile.getX() - at.getX(), tile.getY() - at.getY());
 	}
 
 	/** The walk from the player on: from the tile {@link #advance} reached. */

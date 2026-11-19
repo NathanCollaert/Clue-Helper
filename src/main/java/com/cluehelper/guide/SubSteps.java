@@ -170,8 +170,7 @@ public final class SubSteps
 		Set<Integer> staves = landing.getRequirements().getItems().stream()
 			.filter(ItemClause::isMustBeWorn)
 			.filter(clause -> !AvailabilityEngine.isWaived(clause, player, AvailabilityService.nowMinutes()))
-			.flatMap(clause -> clause.getBranches().stream())
-			.flatMap(branch -> branch.getIds().stream())
+			.flatMap(ItemClause::ids)
 			.collect(toUnmodifiableSet());
 		return staves.stream().anyMatch(player.getWorn()::containsKey) ? Set.of() : staves;
 	}
@@ -197,8 +196,7 @@ public final class SubSteps
 	{
 		return row == null ? Set.of() : row.getRequirements().getItems().stream()
 			.filter(CatalogRules::isGhostspeakNeed)
-			.flatMap(clause -> clause.getBranches().stream())
-			.flatMap(branch -> branch.getIds().stream())
+			.flatMap(ItemClause::ids)
 			.filter(CatalogRules.GHOSTSPEAK::contains)
 			.collect(toUnmodifiableSet());
 	}
