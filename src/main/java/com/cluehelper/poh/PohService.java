@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.stream.*;
 import javax.inject.*;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.*;
@@ -18,7 +17,6 @@ import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
 /** Client thread only, except {@link #getHouse()}. */
-@Slf4j
 @Singleton
 public class PohService
 {
@@ -174,18 +172,15 @@ public class PohService
 				ownership.startedInside(buildMode);
 			}
 			scanAtTick = client.getTickCount() + SCAN_DELAY_TICKS;
-			tell("entered a house: " + ownership.getOwnership() + (ownership.getEntryClick() == null ? "" : " (" + ownership.getEntryClick() + ")"));
 		}
 		else if (!inside && wasInside)
 		{
 			ownership.left();
 			scanAtTick = -1;
-			tell("left the house");
 		}
 		else if (inside && buildMode && ownership.getOwnership() != HouseOwnership.Ownership.OWNED)
 		{
 			ownership.buildModeSeen();
-			tell("build mode: the house is the player's");
 		}
 		wasInside = inside;
 		seenATick = true;
@@ -202,10 +197,6 @@ public class PohService
 		if (ownership.getOwnership() == HouseOwnership.Ownership.OWNED)
 		{
 			scan();
-		}
-		else
-		{
-			tell("no scan: " + ownership.getOwnership() + " house");
 		}
 	}
 
@@ -231,7 +222,6 @@ public class PohService
 			nexusLinesDirty = false;
 			stored.set(stored.get());
 			houseDirty = true;
-			tell("nexus hotkeys learned: " + stored.get().nexusLines.size() + " lines");
 		}
 	}
 
@@ -277,8 +267,6 @@ public class PohService
 		{
 			profile.vars = values;
 			stored.set(profile);
-			tell("house varbits: " + nexusKeys(profile).size() + " nexus destinations, Xeric " + values.get(VarbitID.POH_NEXUS_XERIC)
-				+ ", digsite " + values.get(VarbitID.POH_NEXUS_DIGSITE) + ", box " + values.get(VarbitID.POH_JEWELLERYBOX_MULTI));
 		}
 	}
 
@@ -303,17 +291,11 @@ public class PohService
 			}
 		});
 		Profile profile = stored.get();
-		Set<Integer> before = new HashSet<>(profile.furniture);
 		profile.furniture = new ArrayList<>(found.keySet());
 		profile.walkTicks = ticks;
 		profile.scannedAt = System.currentTimeMillis();
 		stored.set(profile);
 		houseDirty = true;
-		Set<Integer> added = new HashSet<>(found.keySet());
-		added.removeAll(before);
-		before.removeAll(found.keySet());
-		tell(String.format("scan: %d pieces %s, walk ticks %s, added %s, gone %s", found.size(), found.keySet(), ticks, added,
-			before));
 	}
 
 	/** By piece, its scene tiles: a large piece is on each tile it covers. */
@@ -370,8 +352,6 @@ public class PohService
 		{
 			house = next;
 			player.setHouse(next);
-			tell("house: " + next.getSource() + ", " + next.getFurniture().size() + " pieces, " + next.getNexusKeys().size()
-				+ " nexus destinations");
 		}
 	}
 
@@ -426,11 +406,6 @@ public class PohService
 	{
 		return Arrays.stream(NEXUS_SLOTS).mapToObj(id -> profile.vars.getOrDefault(id, 0)).filter(key -> key > 0)
 			.collect(Collectors.toUnmodifiableSet());
-	}
-
-	private void tell(String line)
-	{
-		log.debug("poh: {}", line);
 	}
 
 	static final class Profile

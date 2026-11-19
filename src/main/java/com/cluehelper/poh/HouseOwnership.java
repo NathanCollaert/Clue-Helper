@@ -31,11 +31,8 @@ public final class HouseOwnership
 	private boolean inHouse;
 	@Getter
 	private Ownership ownership = Ownership.UNCERTAIN;
-	@Getter
-	private String entryClick;
 
 	private Entry pending = Entry.UNKNOWN;
-	private String pendingClick;
 	private long pendingAt;
 
 	/** Only clicks outside a house count: inside, a stranger's portal offers the owner's options. */
@@ -49,7 +46,6 @@ public final class HouseOwnership
 		if (entry != Entry.UNKNOWN)
 		{
 			pending = entry;
-			pendingClick = (strip(option) + " " + strip(target)).trim();
 			pendingAt = clock.getAsLong();
 		}
 	}
@@ -82,11 +78,9 @@ public final class HouseOwnership
 	{
 		inHouse = true;
 		boolean fresh = pending != Entry.UNKNOWN && clock.getAsLong() - pendingAt <= ENTRY_TTL_MILLIS;
-		entryClick = fresh ? pendingClick : null;
 		if (buildMode)
 		{
 			ownership = Ownership.OWNED;
-			entryClick = "build mode";
 		}
 		else if (!fresh)
 		{
@@ -97,7 +91,6 @@ public final class HouseOwnership
 			ownership = pending == Entry.OWN ? Ownership.OWNED : Ownership.FOREIGN;
 		}
 		pending = Entry.UNKNOWN;
-		pendingClick = null;
 	}
 
 	/** One-way: build mode can prove "mine", never "not mine". */
@@ -106,7 +99,6 @@ public final class HouseOwnership
 		if (inHouse)
 		{
 			ownership = Ownership.OWNED;
-			entryClick = "build mode";
 		}
 	}
 
@@ -115,14 +107,12 @@ public final class HouseOwnership
 		inHouse = true;
 		pending = Entry.UNKNOWN;
 		ownership = buildMode ? Ownership.OWNED : Ownership.UNCERTAIN;
-		entryClick = buildMode ? "build mode" : null;
 	}
 
 	public void left()
 	{
 		inHouse = false;
 		ownership = Ownership.UNCERTAIN;
-		entryClick = null;
 	}
 
 	private static String strip(String text)
