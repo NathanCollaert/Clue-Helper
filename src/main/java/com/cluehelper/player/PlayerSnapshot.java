@@ -37,6 +37,8 @@ public final class PlayerSnapshot
 	private final int totalLevel;
 	private final int combatLevel;
 	private final int questPoints;
+	/** Tracks the Music cape still needs; 0 in a snapshot that never counted them. */
+	private final int lockedMusicTracks;
 	private final boolean questsRead;
 	private final Map<Quest, QuestState> quests;
 	private final Map<Integer, Integer> varbits;
@@ -63,7 +65,8 @@ public final class PlayerSnapshot
 		boolean pvpWorld, String dormantReason, AccountType accountType, Map<Integer, Integer> inventory,
 		Map<Integer, Integer> worn, boolean pouchHeld, Map<Integer, Integer> pouch,
 		Map<Skill, Integer> boostedLevels, Map<Skill, Integer> realLevels, int totalLevel, int combatLevel,
-		int questPoints, boolean questsRead, Map<Quest, QuestState> quests, Map<Integer, Integer> varbits,
+		int questPoints, int lockedMusicTracks, boolean questsRead, Map<Quest, QuestState> quests,
+		Map<Integer, Integer> varbits,
 		Map<Integer, Integer> varps, UnknownVars unknownVars, SpellbookState spellbook, Map<Integer, Charge> charges,
 		int freeInventorySlots, Map<Integer, Integer> bank, Map<Integer, Integer> groupStorage, HouseState house,
 		Set<String> plantedTrees, Set<String> unlocks, String lastFairyRing)
@@ -85,6 +88,7 @@ public final class PlayerSnapshot
 		this.totalLevel = totalLevel;
 		this.combatLevel = combatLevel;
 		this.questPoints = questPoints;
+		this.lockedMusicTracks = lockedMusicTracks;
 		this.questsRead = questsRead;
 		this.quests = copy(quests);
 		this.varbits = copy(varbits);

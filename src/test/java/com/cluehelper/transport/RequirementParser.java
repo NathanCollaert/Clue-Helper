@@ -212,6 +212,10 @@ public final class RequirementParser
 			}
 		}
 		String lower = name.toLowerCase(Locale.ROOT);
+		if (lower.equals("music"))
+		{
+			return max ? LevelNeed.everyMusicTrack() : null;
+		}
 		if (lower.startsWith("total"))
 		{
 			return LevelNeed.ofAggregate(LevelNeed.Aggregate.TOTAL, max ? MAX_SKILL_LEVEL * Skill.values().length : required);

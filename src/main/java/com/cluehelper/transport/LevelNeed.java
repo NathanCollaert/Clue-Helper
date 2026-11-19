@@ -15,7 +15,9 @@ public class LevelNeed
 	{
 		TOTAL("%d total level", PlayerSnapshot::getTotalLevel),
 		COMBAT("combat level %d", PlayerSnapshot::getCombatLevel),
-		QUEST_POINTS("%d quest points", PlayerSnapshot::getQuestPoints);
+		QUEST_POINTS("%d quest points", PlayerSnapshot::getQuestPoints),
+		/** Held against 0: the locked tracks count down to it. */
+		MUSIC_TRACKS("every music track", player -> -player.getLockedMusicTracks());
 
 		private final String format;
 		private final ToIntFunction<PlayerSnapshot> have;
@@ -37,6 +39,12 @@ public class LevelNeed
 		return new LevelNeed(null, aggregate, level);
 	}
 
+	/** The Music cape's need, which grows with every track a game update adds. */
+	public static LevelNeed everyMusicTrack()
+	{
+		return new LevelNeed(null, Aggregate.MUSIC_TRACKS, 0);
+	}
+
 	/**
 	 * The player's own level the need is held against: boosts count, but Hitpoints' boosted level is the health left,
 	 * and a Hitpoints need (the God Wars ice bridge's 70) is on the level itself.
@@ -53,5 +61,11 @@ public class LevelNeed
 	public String describe()
 	{
 		return skill != null ? level + " " + skill.getName() : String.format(Locale.ROOT, aggregate.format, level);
+	}
+
+	public String shortfall(PlayerSnapshot player)
+	{
+		String has = aggregate == Aggregate.MUSIC_TRACKS ? player.getLockedMusicTracks() + " still locked" : "has " + have(player);
+		return describe() + " (" + has + ")";
 	}
 }

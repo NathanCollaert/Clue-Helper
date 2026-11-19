@@ -72,10 +72,9 @@ public final class AvailabilityEngine
 
 	private static void checkLevel(LevelNeed need, PlayerSnapshot player, Verdict v)
 	{
-		int have = need.have(player);
-		if (have < need.getLevel())
+		if (need.have(player) < need.getLevel())
 		{
-			v.level(need.describe() + " (has " + have + ")");
+			v.level(need.shortfall(player));
 		}
 	}
 
