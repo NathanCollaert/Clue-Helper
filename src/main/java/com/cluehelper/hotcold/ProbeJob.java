@@ -52,7 +52,7 @@ public class ProbeJob
 			grid = Hypotheses.filter(spots, tier, List.of(last.asAnchor()));
 		}
 		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares())
-			.exact(grid.isExact()).considered(List.copyOf(nearby));
+			.considered(List.copyOf(nearby));
 		if (shook && core.isFelt())
 		{
 			return plan.action(HotColdPlan.Action.DIG_HERE).tile(new WorldPoint(last.getX(), last.getY(), last.getPlane())).build();

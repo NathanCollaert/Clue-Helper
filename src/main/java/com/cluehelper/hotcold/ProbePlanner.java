@@ -46,24 +46,11 @@ public final class ProbePlanner
 	}
 
 	@Value
-	public static class Branch
-	{
-		Band band;
-		/** Null when the reading would have no comparison. */
-		Comparison comparison;
-		double probability;
-		/** Spot name to its share within this branch, largest first. */
-		Map<String, Double> spots;
-	}
-
-	@Value
 	public static class Choice
 	{
 		Probe probe;
 		double bits;
 		int costTicks;
-		/** Most likely first. */
-		List<Branch> branches;
 	}
 
 	/**
@@ -103,7 +90,7 @@ public final class ProbePlanner
 		{
 			return null;
 		}
-		return new Choice(best, bestBits, bestCost, branches(samples, tier, before, best.getTile()));
+		return new Choice(best, bestBits, bestCost);
 	}
 
 	/**
@@ -259,35 +246,6 @@ public final class ProbePlanner
 			return band.ordinal() * COMPARISONS;
 		}
 		return band.ordinal() * COMPARISONS + 1 + Comparison.of(distance, Hypotheses.distance(before, hx, hy)).ordinal();
-	}
-
-	private static List<Branch> branches(Hypotheses.Samples samples, HotColdTier tier, WorldPoint before, WorldPoint at)
-	{
-		int spots = samples.spotCount();
-		double[] table = new double[OUTCOMES * spots];
-		for (int i = 0; i < samples.x.length; i++)
-		{
-			table[outcome(samples.x[i], samples.y[i], tier, before, at) * spots + samples.spot[i]] += samples.weight[i];
-		}
-		List<Branch> branches = new ArrayList<>();
-		for (int o = 0; o < OUTCOMES; o++)
-		{
-			double[] row = Arrays.copyOfRange(table, o * spots, (o + 1) * spots);
-			double total = 0;
-			for (double mass : row)
-			{
-				total += mass;
-			}
-			if (total <= 0)
-			{
-				continue;
-			}
-			Map<String, Double> shares = Hypotheses.sharesLargestFirst(row, total, samples.names::get);
-			int c = o % COMPARISONS;
-			branches.add(new Branch(Band.values()[o / COMPARISONS], c == 0 ? null : Comparison.values()[c - 1], total, shares));
-		}
-		branches.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
-		return branches;
 	}
 
 	private static double[] spotMasses(Hypotheses.Samples samples)

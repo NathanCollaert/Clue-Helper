@@ -29,7 +29,6 @@ public class HotColdPlan
 	ProbePlanner.Choice choice;
 	/** Kept spot names to their share, largest first. */
 	Map<String, Double> kept;
-	boolean exact;
 	/** Every probe the choice weighed, for replays. */
 	@Builder.Default
 	List<Probe> considered = List.of();
