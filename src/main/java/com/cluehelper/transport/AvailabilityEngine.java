@@ -82,7 +82,7 @@ public final class AvailabilityEngine
 	{
 		if (!player.isQuestsRead())
 		{
-			v.unread("quests not read yet");
+			v.no("quests not read yet");
 		}
 		else if (!player.finished(quest))
 		{
@@ -125,7 +125,7 @@ public final class AvailabilityEngine
 			}
 			else if (player.getUnknownVars() == PlayerSnapshot.UnknownVars.UNREAD)
 			{
-				v.unread(check.describe() + ": not read");
+				v.no(check.describe() + ": not read");
 			}
 			return;
 		}
@@ -165,13 +165,11 @@ public final class AvailabilityEngine
 		if (best != null)
 		{
 			v.witness.addAll(best.witness);
-			v.chargesUnknown |= best.chargesUnknown;
 		}
 		else if (unread != null)
 		{
 			List<String> ways = new ArrayList<>(shortfalls);
 			ways.add(unread);
-			v.unread = true;
 			v.item(ways);
 		}
 		else
@@ -220,17 +218,17 @@ public final class AvailabilityEngine
 		if (branch.isQuest())
 		{
 			return !player.isQuestsRead() ? Paid.unread("quests not read yet")
-				: player.finished(branch.getQuest()) ? Paid.with(List.of(), false) : Paid.missing(branch.getQuest().getName() + " (quest)");
+				: player.finished(branch.getQuest()) ? Paid.with(List.of()) : Paid.missing(branch.getQuest().getName() + " (quest)");
 		}
 		if (branch.isVar())
 		{
 			Integer value = value(branch.getVar(), player);
 			return value == null ? Paid.unread(branch.getVar().describe() + ": not read")
-				: branch.getVar().test(value, 0) ? Paid.with(List.of(), false) : Paid.missing(branch.getVar().describe());
+				: branch.getVar().test(value, 0) ? Paid.with(List.of()) : Paid.missing(branch.getVar().describe());
 		}
 		if (branch.isUnlock())
 		{
-			return player.getUnlocks().contains(branch.getUnlock()) ? Paid.with(List.of(), false)
+			return player.getUnlocks().contains(branch.getUnlock()) ? Paid.with(List.of())
 				: Paid.unread("the " + branch.getUnlock().toLowerCase(Locale.ROOT).replace('_', ' ') + " unlock ("
 				+ UNLOCK_HINTS.getOrDefault(branch.getUnlock(), "not seen yet") + ")");
 		}
@@ -238,11 +236,10 @@ public final class AvailabilityEngine
 		if (ids.size() == 1 && runes.isRune(ids.get(0)) && !mustBeWorn)
 		{
 			RuneModel.Supply supply = runes.supply(ids.get(0), branch.getQuantity(), player);
-			return supply.isEnough() ? Paid.with(supply.getWitness(), false)
+			return supply.isEnough() ? Paid.with(supply.getWitness())
 				: Paid.missing(runes.shortfall(ids.get(0), branch.getQuantity(), supply.getHave()));
 		}
 		List<ItemUse> used = new ArrayList<>();
-		boolean chargesUnknown = false;
 		boolean emptied = false;
 		int have = 0;
 		for (Container container : mustBeWorn ? WEARABLE : CARRIED)
@@ -260,7 +257,6 @@ public final class AvailabilityEngine
 					emptied = true;
 					continue;
 				}
-				chargesUnknown |= spendsCharges && charge == null;
 				int take = Math.min(count, branch.getQuantity() - have);
 				used.add(new ItemUse(container, id, take));
 				have += take;
@@ -268,7 +264,7 @@ public final class AvailabilityEngine
 		}
 		if (have >= branch.getQuantity())
 		{
-			return Paid.with(used, chargesUnknown);
+			return Paid.with(used);
 		}
 		String what = itemNames.apply(ids.get(0)) + (ids.size() > 1 ? " (any of " + ids.size() + ")" : "");
 		return Paid.missing((mustBeWorn ? "needs to wield " : "needs ")
@@ -301,23 +297,22 @@ public final class AvailabilityEngine
 	private static final class Paid
 	{
 		final List<ItemUse> witness;
-		final boolean chargesUnknown;
 		final String shortfall;
 		final String unread;
 
-		static Paid with(List<ItemUse> witness, boolean chargesUnknown)
+		static Paid with(List<ItemUse> witness)
 		{
-			return new Paid(witness, chargesUnknown, null, null);
+			return new Paid(witness, null, null);
 		}
 
 		static Paid missing(String shortfall)
 		{
-			return new Paid(null, false, shortfall, null);
+			return new Paid(null, shortfall, null);
 		}
 
 		static Paid unread(String what)
 		{
-			return new Paid(null, false, null, what);
+			return new Paid(null, null, what);
 		}
 	}
 
@@ -329,20 +324,12 @@ public final class AvailabilityEngine
 		final List<String> missingQuests = new ArrayList<>();
 		final List<String> otherReasons = new ArrayList<>();
 		final List<ItemUse> witness = new ArrayList<>();
-		boolean unread;
-		boolean chargesUnknown;
 		long passesFrom = Long.MAX_VALUE;
 
 		void no(String reason)
 		{
 			whyNot.add(reason);
 			otherReasons.add(reason);
-		}
-
-		void unread(String reason)
-		{
-			unread = true;
-			no(reason);
 		}
 
 		void item(List<String> ways)
@@ -366,9 +353,7 @@ public final class AvailabilityEngine
 		RowAvailability result(CatalogRow row)
 		{
 			boolean available = whyNot.isEmpty();
-			RowAvailability.Confidence confidence = unread ? RowAvailability.Confidence.UNREAD
-				: available && chargesUnknown ? RowAvailability.Confidence.CHARGES_UNKNOWN : RowAvailability.Confidence.SURE;
-			return new RowAvailability(row, available, confidence, available ? List.copyOf(witness) : List.of(),
+			return new RowAvailability(row, available, available ? List.copyOf(witness) : List.of(),
 				List.copyOf(whyNot), List.copyOf(missingItems), List.copyOf(missingLevels), List.copyOf(missingQuests),
 				List.copyOf(otherReasons), passesFrom);
 		}

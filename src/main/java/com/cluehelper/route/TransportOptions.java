@@ -23,7 +23,6 @@ final class TransportOptions
 		int[] amounts;
 		int[] withdraw;
 		List<ItemUse> withdrawUses;
-		RowAvailability.Confidence confidence;
 	}
 
 	static final class Teleport extends Edge
@@ -253,7 +252,6 @@ final class TransportOptions
 		units.forEach(ctx.resources::used);
 		edge.res = units.keySet().stream().mapToInt(Integer::intValue).toArray();
 		edge.amounts = units.values().stream().mapToInt(Integer::intValue).toArray();
-		edge.confidence = judged.getConfidence();
 		edge.withdrawUses = withdrawUses(witness);
 		edge.withdraw = ids(edge.withdrawUses);
 	}

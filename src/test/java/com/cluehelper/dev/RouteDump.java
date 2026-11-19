@@ -37,7 +37,6 @@ final class RouteDump
 		line(lines, "Direct", plan.getDirect());
 		line(lines, "Same book", plan.getSameBook());
 		line(lines, "Faster, under the margin", plan.getFasterUnqualified());
-		plan.getAlternatives().forEach(route -> line(lines, "Alt", route));
 		return lines;
 	}
 
@@ -55,7 +54,7 @@ final class RouteDump
 	{
 		if (route != null)
 		{
-			lines.add(label + " " + route.getTicks() + "t (rank " + (route.getRankHalfTicks() + 1) / 2 + ", " + route.getConfidence()
+			lines.add(label + " " + route.getTicks() + "t (rank " + (route.getRankHalfTicks() + 1) / 2
 				+ "): " + (route.isOpenBankStart() ? "(open bank) " : "") + route.describe() + " " + route.getSpent()
 				+ (route.getEndBook() != route.getStartBook() ? " leaves you on " + route.getEndBook() : "") + withdraw(route));
 		}

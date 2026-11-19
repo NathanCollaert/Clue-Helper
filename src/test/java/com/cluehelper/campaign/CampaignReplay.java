@@ -123,7 +123,7 @@ public final class CampaignReplay
 			.refusedChanges(recording.refusedChanges)
 			.foreignHouseStart(recording.foreignHouseStart)
 			.build();
-		Plan plan = Planner.withoutAlternatives(input);
+		Plan plan = Planner.plan(input);
 		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start,
 			recording.settings::isScrollBookOutOfWilderness, id -> false, catalog::getTeleports);
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);

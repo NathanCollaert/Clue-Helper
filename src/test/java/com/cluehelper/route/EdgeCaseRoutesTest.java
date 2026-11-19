@@ -495,7 +495,6 @@ public class EdgeCaseRoutesTest
 		routes.add(plan.getBest());
 		routes.add(plan.getDirect());
 		routes.add(plan.getSameBook());
-		routes.addAll(plan.getAlternatives());
 		plan.getCandidates().forEach(c -> routes.add(c.getRoute()));
 		for (Route route : routes)
 		{
@@ -549,10 +548,6 @@ public class EdgeCaseRoutesTest
 		if (plan.getFasterUnqualified() != null)
 		{
 			out.append("\n  faster, under the margin ").append(RouteText.describe(plan.getFasterUnqualified()));
-		}
-		for (Route alternative : plan.getAlternatives())
-		{
-			out.append("\n  alt       ").append(RouteText.describe(alternative));
 		}
 		if (plan.getNote() != null)
 		{

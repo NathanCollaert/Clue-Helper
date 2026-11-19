@@ -19,9 +19,6 @@ public class Plan
 	Route sameBook;
 	/** Faster than Best, but it didn't beat its reference by the margin. */
 	Route fasterUnqualified;
-	/** Each with a first transport no earlier route has. */
-	@Builder.Default
-	List<Route> alternatives = List.of();
 	/** The followed route's way, planned again when the best starts another way; null when that way isn't within the margin. */
 	Route followed;
 	@Builder.Default

@@ -26,31 +26,12 @@ public final class Planner
 	/** A hand-written need named with its other ways: "Chef's hat (or cooking cape, Max cape, Varrock armour 3)". */
 	private static final Pattern OTHER_WAYS = Pattern.compile("(.+) \\(or (?:an? )?(.+)\\)");
 	private static final int REGION_SIZE = 64;
-	private static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
-	/** Catalog landings of one place spread 0–2 tiles. */
-	private static final int SAME_LANDING_TILES = 2;
-	/** Rejected repeats and round trips count against this too. */
-	private static final int MOST_ALTERNATIVE_SEARCHES = 12;
 
 	private Planner()
 	{
 	}
 
 	public static Plan plan(PlanInput in)
-	{
-		return plan(in, true);
-	}
-
-	/**
-	 * Without the alternatives, whose searches take most of a plan's time; the followed route's way is planned again
-	 * instead, bounded by the best route plus the commit margin.
-	 */
-	public static Plan withoutAlternatives(PlanInput in)
-	{
-		return plan(in, false);
-	}
-
-	private static Plan plan(PlanInput in, boolean withAlternatives)
 	{
 		long started = System.nanoTime();
 		Step step = in.getStep();
@@ -81,11 +62,11 @@ public final class Planner
 		boolean probes = step.getKind() == TargetKind.PROBES;
 		Searches searches = new Searches(ctx, area, probes);
 
-		LabelSearch first = searches.bestOrder(orders, Set.of(), probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
+		LabelSearch first = searches.bestOrder(orders, probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
 		Picks picks = new Picks(ctx, first);
 		if (picks.best == null && ctx.avoidsWilderness && !probes)
 		{
-			Plan throughWilderness = plan(wildernessAllowed(in), withAlternatives);
+			Plan throughWilderness = plan(wildernessAllowed(in));
 			if (throughWilderness.getBest() != null)
 			{
 				return throughWilderness.toBuilder().note("only reachable through the Wilderness")
@@ -98,7 +79,6 @@ public final class Planner
 			.candidates(picks.candidates());
 		Map<WorldPoint, Integer> probeRanks = new LinkedHashMap<>();
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
-		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
 		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
 		List<String> requirementNotes = requirementNotes(ctx);
 		boolean missingNamed = requirementNotes.contains(NOT_FOUND);
@@ -216,102 +196,6 @@ public final class Planner
 		int limit = picks.best.getRankHalfTicks() + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
 		LabelSearch search = searches.firstBy(orders, first, limit);
 		return search == null ? null : new Picks(searches.ctx, search).best;
-	}
-
-	private static List<Route> alternatives(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
-	{
-		List<Route> alternatives = new ArrayList<>();
-		Set<String> excluded = new HashSet<>();
-		Set<String> identities = new HashSet<>();
-		List<Route> shown = new ArrayList<>();
-		Stream.of(picks.best, picks.direct, picks.sameBook, picks.fasterUnqualified).filter(Objects::nonNull).forEach(route ->
-		{
-			excluded.add(route.getFirstTransportKey());
-			excludeAfterBank(route, excluded);
-			identities.add(route.getIdentity());
-			shown.add(route);
-		});
-		if (excluded.isEmpty())
-		{
-			return alternatives;
-		}
-		int limit = picks.best == null ? Integer.MAX_VALUE
-			: picks.best.getRankHalfTicks() + Math.max(picks.best.getRankHalfTicks(), ALTERNATIVE_SLACK_HALF_TICKS);
-		for (int tries = 0; alternatives.size() < in.getSettings().getRouteCount() - 1 && tries < MOST_ALTERNATIVE_SEARCHES; tries++)
-		{
-			LabelSearch search = searches.bestOrder(orders, Set.copyOf(excluded), limit);
-			Route next = new Picks(searches.ctx, search).best;
-			if (next == null || !excluded.add(next.getFirstTransportKey()))
-			{
-				break;
-			}
-			excludeAfterBank(next, excluded);
-			if (!repeats(next, shown) && !loops(next) && identities.add(next.getIdentity()))
-			{
-				alternatives.add(next);
-				shown.add(next);
-			}
-		}
-		return alternatives;
-	}
-
-	private static void excludeAfterBank(Route route, Set<String> excluded)
-	{
-		String afterBank = route.getAfterBankTransportKey();
-		if (afterBank != null)
-		{
-			excluded.add(afterBank);
-		}
-	}
-
-	/**
-	 * Leaving the shown routes' transports out can leave a round trip as the cheapest route with a transport ("walk to
-	 * ring BIP, ring to DIP, ring back to BIP, walk 35").
-	 */
-	private static boolean loops(Route route)
-	{
-		List<WorldPoint> places = new ArrayList<>();
-		for (Leg leg : route.getLegs())
-		{
-			WorldPoint from = leg.getFrom();
-			WorldPoint to = leg.getTo();
-			if (from == null || to == null || to.equals(from))
-			{
-				continue;
-			}
-			if (places.isEmpty())
-			{
-				places.add(from);
-			}
-			List<WorldPoint> before = places.subList(0, places.size() - 1);
-			if (before.stream().anyMatch(seen -> seen.distanceTo(to) <= SAME_LANDING_TILES))
-			{
-				return true;
-			}
-			places.add(to);
-		}
-		return false;
-	}
-
-	private static WorldPoint firstLanding(Route route)
-	{
-		Leg first = route.getFirstTransport();
-		return first == null ? null : first.getTo();
-	}
-
-	/**
-	 * Two capes to the same place are one alternative, while a free home teleport beside a paid spell
-	 * stays.
-	 */
-	private static boolean repeats(Route route, List<Route> shown)
-	{
-		WorldPoint landing = firstLanding(route);
-		return landing != null && shown.stream().anyMatch(other ->
-		{
-			WorldPoint at = firstLanding(other);
-			return at != null && at.distanceTo(landing) <= SAME_LANDING_TILES
-				&& route.getSpent().keySet().containsAll(other.getSpent().keySet());
-		});
 	}
 
 	private static int probeRankLimitHalfTicks(PlanInput in)
@@ -572,7 +456,7 @@ public final class Planner
 		 * Each order after the first stops at the best rank so far, which leaves out its slower direct and same-book
 		 * routes; so a bounded winner runs once more in full.
 		 */
-		LabelSearch bestOrder(List<List<int[]>> orders, Set<String> excluded, int rankLimit)
+		LabelSearch bestOrder(List<List<int[]>> orders, int rankLimit)
 		{
 			LabelSearch best = null;
 			List<int[]> bestOrder = null;
@@ -581,7 +465,7 @@ public final class Planner
 			for (List<int[]> order : orders)
 			{
 				int limit = Math.min(rankLimit, bestRank);
-				LabelSearch search = run(order, excluded, limit);
+				LabelSearch search = run(order, limit);
 				Route pick = new Picks(ctx, search).best;
 				int rank = pick == null ? Integer.MAX_VALUE : pick.getRankHalfTicks();
 				if (best == null || rank < bestRank)
@@ -592,7 +476,7 @@ public final class Planner
 					bestBounded = limit != rankLimit;
 				}
 			}
-			return bestBounded ? run(bestOrder, excluded, rankLimit) : best;
+			return bestBounded ? run(bestOrder, rankLimit) : best;
 		}
 
 		/** The best order's search of the routes that start with transport {@code first}; null when none is in the limit. */
@@ -613,9 +497,9 @@ public final class Planner
 			return best;
 		}
 
-		private LabelSearch run(List<int[]> order, Set<String> excluded, int rankLimit)
+		private LabelSearch run(List<int[]> order, int rankLimit)
 		{
-			return run(new LabelSearch(ctx, order, probes, area, excluded, rankLimit));
+			return run(new LabelSearch(ctx, order, probes, area, rankLimit));
 		}
 
 		private LabelSearch run(LabelSearch search)
@@ -718,7 +602,6 @@ public final class Planner
 		{
 			List<Leg> legs = new ArrayList<>();
 			WorldPoint at = ctx.in.getStart().getTile();
-			boolean wilderness = false;
 			boolean stageReached = false;
 			for (LabelSearch.Label label : goal.chain())
 			{
@@ -741,7 +624,6 @@ public final class Planner
 					legs.add(leg);
 				}
 				at = leg.getTo();
-				wilderness |= at != null && ctx.isWilderness(at);
 			}
 			Map<String, Integer> spent = new LinkedHashMap<>();
 			for (LabelSearch.Label label : goal.chain())
@@ -758,7 +640,6 @@ public final class Planner
 				.legs(List.copyOf(legs))
 				.halfTicks(goal.half + extra)
 				.rankHalfTicks(rank + extra)
-				.tieBreakHalfTicks(goal.teleports * PlanContext.TELEPORT_TIE_HALF_TICKS)
 				.banked(banked)
 				.withdraw(withdraw)
 				.depositFirst(depositFirst)
@@ -767,8 +648,6 @@ public final class Planner
 				.startBook(ctx.homeBook)
 				.endBook(goal.endBook != null ? goal.endBook : LabelSearch.endBook(goal.k))
 				.spent(spent)
-				.confidence(goal.confidence())
-				.wilderness(wilderness)
 				.build();
 		}
 

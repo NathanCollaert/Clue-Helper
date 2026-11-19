@@ -132,13 +132,13 @@ public final class PlanReplay
 		Plan plan = null;
 		for (int i = 0; i < WARM_UP; i++)
 		{
-			plan = Planner.withoutAlternatives(input);
+			plan = Planner.plan(input);
 		}
 		long best = Long.MAX_VALUE;
 		for (int i = 0; i < TIMED; i++)
 		{
 			long started = System.nanoTime();
-			plan = Planner.withoutAlternatives(input);
+			plan = Planner.plan(input);
 			best = Math.min(best, System.nanoTime() - started);
 		}
 		System.out.printf("%s: live %d ms %d labels | replay %d ms %d labels | %s%n", name, recording.getLiveMillis(),

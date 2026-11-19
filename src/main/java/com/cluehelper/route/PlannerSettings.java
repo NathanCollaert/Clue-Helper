@@ -10,8 +10,6 @@ import lombok.*;
 public class PlannerSettings
 {
 	@Builder.Default
-	int routeCount = 3;
-	@Builder.Default
 	SpellbookChanges spellbookChanges = SpellbookChanges.ALL;
 	boolean avoidWilderness;
 	@Builder.Default

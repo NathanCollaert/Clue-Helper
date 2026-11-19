@@ -156,7 +156,6 @@ public class RouteReport
 		route(out, "best without the bank", plan.getDirect());
 		route(out, "best without a spellbook change", plan.getSameBook());
 		route(out, "faster but within the margin", plan.getFasterUnqualified());
-		plan.getAlternatives().forEach(alternative -> route(out, "alternative", alternative));
 		plan.getCandidates().forEach(candidate -> route(out, "candidate " + candidate.getCategory(), candidate.getRoute()));
 		plan.getRequirementNotes().forEach(note -> line(out, "requirement", note));
 	}

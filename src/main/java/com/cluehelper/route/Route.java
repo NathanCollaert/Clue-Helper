@@ -17,8 +17,6 @@ public class Route
 	int halfTicks;
 	/** Half-ticks plus the ranking-only cape-use, stranding and teleport tie-break penalties. */
 	int rankHalfTicks;
-	/** The part of {@link #rankHalfTicks} that only breaks near-ties by teleport count. */
-	int tieBreakHalfTicks;
 	boolean banked;
 	/** Spellbook Swap included. */
 	boolean changed;
@@ -27,8 +25,6 @@ public class Route
 	Book endBook;
 	/** Keyed like {@code item:1712}, {@code cooldown:892}, {@code cape}. */
 	Map<String, Integer> spent;
-	RowAvailability.Confidence confidence;
-	boolean wilderness;
 	@Builder.Default
 	List<ItemUse> withdraw = List.of();
 	/** The withdraw list needs more slots than are free; the extra click is counted in the ticks. */
@@ -71,10 +67,7 @@ public class Route
 		return first == null ? WALK : transportKey(first);
 	}
 
-	/**
-	 * A way into the house followed by the house's own transport counts as that transport, or one house route would
-	 * hide all others from the alternatives.
-	 */
+	/** A way into the house followed by the house's own transport counts as that transport. */
 	public Leg getFirstTransport()
 	{
 		List<Leg> transports = legs.stream().filter(Leg::isTransport).collect(toList());
@@ -85,27 +78,6 @@ public class Route
 		Leg first = transports.get(0);
 		boolean intoHouse = PositionRules.POH_NODE.equals(first.getTo()) && transports.size() > 1;
 		return intoHouse ? transports.get(1) : first;
-	}
-
-	/**
-	 * Alternatives leave this out too, or every way to reach a bank would come back as an alternative with the same
-	 * teleport after it.
-	 */
-	public String getAfterBankTransportKey()
-	{
-		boolean afterBank = false;
-		for (Leg leg : legs)
-		{
-			if (leg.getKind() == Leg.Kind.BANK)
-			{
-				afterBank = true;
-			}
-			else if (afterBank && leg.isTransport())
-			{
-				return transportKey(leg);
-			}
-		}
-		return null;
 	}
 
 	private static String transportKey(Leg leg)

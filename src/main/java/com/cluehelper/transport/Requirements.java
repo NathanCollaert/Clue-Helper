@@ -25,7 +25,7 @@ public class Requirements
 	boolean members;
 	/** Null for rows that work on every book. Availability never filters by it. */
 	Book book;
-	/** Unknown charges lower the confidence of a row that spends them. */
+	/** An item with no charges left doesn't pay for a row that spends them. */
 	boolean spendsCharges;
 	/** Null for rows outside the house. */
 	HouseNeed house;

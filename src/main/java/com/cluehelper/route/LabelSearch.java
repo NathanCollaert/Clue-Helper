@@ -2,7 +2,6 @@ package com.cluehelper.route;
 
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
-import com.cluehelper.transport.RowAvailability;
 import java.util.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -37,7 +36,6 @@ final class LabelSearch
 	private final int areaHalfTicks;
 	private final int nodes;
 	private final int revertHalfTicks;
-	private final Set<String> excluded;
 	/** Only routes whose first transport has this key, a way into the house aside; null for any. */
 	private final String onlyFirst;
 	private final boolean requireTransport;
@@ -54,30 +52,28 @@ final class LabelSearch
 	final Map<Integer, Label[][]> probeBest = new HashMap<>();
 	int labels;
 
-	/** @param excluded first-transport keys to leave out; {@link Route#WALK} leaves out routes with no transport */
-	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded, int rankLimit)
+	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, int rankLimit)
 	{
-		this(ctx, legTargets, probes, areaHalfTicks, excluded, null, rankLimit);
+		this(ctx, legTargets, probes, areaHalfTicks, null, rankLimit);
 	}
 
 	/** The routes that start with transport {@code onlyFirst} ({@link Route#WALK} for none), up to {@code rankLimit}. */
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, int areaHalfTicks, String onlyFirst, int rankLimit)
 	{
-		this(ctx, legTargets, false, areaHalfTicks, Set.of(), onlyFirst, rankLimit);
+		this(ctx, legTargets, false, areaHalfTicks, onlyFirst, rankLimit);
 	}
 
-	private LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, Set<String> excluded,
-		String onlyFirst, int rankLimit)
+	private LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, String onlyFirst,
+		int rankLimit)
 	{
 		this.rankLimit = rankLimit;
 		this.ctx = ctx;
 		this.legTargets = legTargets;
 		this.probes = probes;
 		this.areaHalfTicks = areaHalfTicks;
-		this.excluded = excluded;
 		this.onlyFirst = onlyFirst;
-		this.requireTransport = excluded.contains(Route.WALK) || onlyFirst != null && !Route.WALK.equals(onlyFirst);
-		this.wantSameBook = excluded.isEmpty() && onlyFirst == null;
+		this.requireTransport = onlyFirst != null && !Route.WALK.equals(onlyFirst);
+		this.wantSameBook = onlyFirst == null;
 		this.nodes = ctx.nodeCount();
 		this.revertHalfTicks = ctx.startPending ? 2 * ctx.in.getRevertTicksLeft() : -1;
 		this.slots = new Label[legTargets.size() * nodes * STATES_PER_NODE * MAX_LABELS];
@@ -244,7 +240,7 @@ final class LabelSearch
 		}
 		for (TransportOptions.Teleport tele : here)
 		{
-			if (tele.node != from.node && !ctx.forbidden(tele.node) && !excluded.contains(Route.teleportKey(tele.row)))
+			if (tele.node != from.node && !ctx.forbidden(tele.node))
 			{
 				transport(from, tele.node, from.c, k, tele.halfTicks, Leg.Kind.TELEPORT, tele, null);
 			}
@@ -395,8 +391,7 @@ final class LabelSearch
 		TransportOptions.Change swap = ctx.in.getSettings().getSpellbookChanges() != SpellbookChanges.OFF ? options.swap : null;
 		for (TransportOptions.Teleport tele : options.teleports)
 		{
-			if (!origin.allows(tele.maxWilderness) || origin == OriginClass.POH && tele.minigame || ctx.forbidden(tele.node)
-				|| excluded.contains(Route.teleportKey(tele.row)))
+			if (!origin.allows(tele.maxWilderness) || origin == OriginClass.POH && tele.minigame || ctx.forbidden(tele.node))
 			{
 				continue;
 			}
@@ -477,7 +472,7 @@ final class LabelSearch
 		}
 		for (TransportOptions.Teleport landing : options.fairyLandings)
 		{
-			if (landing.node != from.node && !ctx.forbidden(landing.node) && !excluded.contains(Route.fairyKey(landing.row)))
+			if (landing.node != from.node && !ctx.forbidden(landing.node))
 			{
 				int half = Math.max(entry.halfTicks, landing.halfTicks) - (ctx.isLastFairyRing(landing.row) ? 2 * landing.row.getMenuTicks() : 0);
 				transport(from, landing.node, from.c, k, half, Leg.Kind.FAIRY_RING, entry, landing);
@@ -713,7 +708,6 @@ final class LabelSearch
 		label.ref = ref;
 		label.ref2 = ref2;
 		label.edgeHalf = addHalf;
-		label.teleports = (from == null ? 0 : from.teleports) + (kind != null && kind.isTransport() ? 1 : 0);
 		slots[free] = label;
 		queue.add(label);
 		labels++;
@@ -881,24 +875,8 @@ final class LabelSearch
 		TransportOptions.Edge ref;
 		TransportOptions.Edge ref2;
 		int edgeHalf;
-		/** Teleports and fairy rings so far, each ranked {@link PlanContext#TELEPORT_TIE_HALF_TICKS} more. */
-		int teleports;
 		Book endBook;
 		boolean dead;
-
-		RowAvailability.Confidence confidence()
-		{
-			RowAvailability.Confidence worst = RowAvailability.Confidence.SURE;
-			for (Label l = this; l != null; l = l.parent)
-			{
-				RowAvailability.Confidence c = l.ref == null ? null : l.ref.confidence;
-				if (c != null && c.ordinal() > worst.ordinal())
-				{
-					worst = c;
-				}
-			}
-			return worst;
-		}
 
 		List<Label> chain()
 		{

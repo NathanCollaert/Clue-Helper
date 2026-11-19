@@ -223,7 +223,7 @@ public class RoutePlanner
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, required);
 		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
-		runner.submit(() -> Planner.withoutAlternatives(followingInput), planned -> onPlanned(planned, followingInput));
+		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
 	}
 
 	/**
@@ -536,7 +536,6 @@ public class RoutePlanner
 		routes.add(planned.getBest());
 		routes.add(planned.getDirect());
 		routes.add(planned.getSameBook());
-		routes.addAll(planned.getAlternatives());
 		routes.add(planned.getFollowed());
 		planned.getCandidates().forEach(candidate -> routes.add(candidate.getRoute()));
 		return routes;
