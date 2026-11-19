@@ -55,6 +55,12 @@ public class Outcome
 		return guide.equals(now.guide) && withoutTicks(route).equals(withoutTicks(now.route)) ? Change.TICKS : Change.ROUTE;
 	}
 
+	/** The same route, tick counts aside, whatever the guide's lines say now. */
+	boolean isSameRouteAs(Outcome now)
+	{
+		return withoutTicks(route).equals(withoutTicks(now.route));
+	}
+
 	private static List<String> withoutTicks(List<String> lines)
 	{
 		return lines.stream().map(line -> TICKS.matcher(line).replaceAll("#")).collect(Collectors.toList());
