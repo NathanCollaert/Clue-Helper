@@ -6,9 +6,7 @@ import lombok.*;
 @RequiredArgsConstructor
 public enum BoxState
 {
-	DORMANT(null, null),
-	CORE_OFF(null, null),
-	READ_CLUE(null, null),
+	/** No clue to guide: none open, the Clue Scroll plugin off, the clue not read yet, or the plugin dormant. */
 	NO_CLUE(null, null),
 	/** The clue is done, but its emote's items still go back into the STASH unit. */
 	PUT_BACK(null, null),
@@ -32,17 +30,9 @@ public enum BoxState
 	public static BoxState of(boolean dormant, boolean coreActive, boolean clueNeedsRead, boolean hasStep, boolean owesPutBack,
 		boolean planning)
 	{
-		if (dormant)
+		if (dormant || !coreActive || clueNeedsRead)
 		{
-			return DORMANT;
-		}
-		if (!coreActive)
-		{
-			return CORE_OFF;
-		}
-		if (clueNeedsRead)
-		{
-			return READ_CLUE;
+			return NO_CLUE;
 		}
 		if (!hasStep)
 		{
