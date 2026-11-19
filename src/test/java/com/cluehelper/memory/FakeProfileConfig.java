@@ -50,13 +50,4 @@ public final class FakeProfileConfig implements ProfileConfig
 		}
 		values(profileKey).put(key, value);
 	}
-
-	@Override
-	public void unset(String key)
-	{
-		if (profileKey != null)
-		{
-			values(profileKey).remove(key);
-		}
-	}
 }

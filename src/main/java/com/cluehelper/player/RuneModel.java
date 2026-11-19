@@ -13,13 +13,7 @@ import static java.util.stream.Collectors.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RuneModel
 {
-	/** A spell's three {rune, rune count} item params. */
-	private static final int[][] RUNE_PARAMS = {{365, 366}, {367, 368}, {369, 370}};
 	private static final int PARAM_NAME = 601;
-	private static final int PARAM_MEMBERS = 603;
-	private static final int PARAM_LEVEL = 604;
-	private static final int PARAM_QUEST = 1189;
-	private static final int ABSENT = -1;
 
 	/** {element rune, enum of its staves (OBJ → BOOLEAN), enum of the pouch types that hold it}. */
 	private static final int[][] ELEMENTS = {
@@ -160,11 +154,6 @@ public final class RuneModel
 
 	private static List<Spell> spells(CacheView cache)
 	{
-		Map<Integer, Quest> questsById = new HashMap<>();
-		for (Quest quest : Quest.values())
-		{
-			questsById.put(quest.getId(), quest);
-		}
 		List<Spell> spells = new ArrayList<>();
 		int[] books = cache.enumKeys(EnumID.SPELLBOOKS);
 		int[] bookEnums = cache.enumIntValues(EnumID.SPELLBOOKS);
@@ -177,27 +166,16 @@ public final class RuneModel
 			}
 			for (int obj : cache.enumIntValues(bookEnums[b]))
 			{
-				spells.add(spell(cache, book, obj, questsById));
+				spells.add(spell(cache, book, obj));
 			}
 		}
 		return spells;
 	}
 
-	private static Spell spell(CacheView cache, Book book, int obj, Map<Integer, Quest> questsById)
+	private static Spell spell(CacheView cache, Book book, int obj)
 	{
-		List<Spell.RuneCost> runes = new ArrayList<>();
-		for (int[] param : RUNE_PARAMS)
-		{
-			int rune = cache.itemIntParam(obj, param[0], ABSENT);
-			if (rune > 0)
-			{
-				runes.add(new Spell.RuneCost(rune, cache.itemIntParam(obj, param[1], 0)));
-			}
-		}
 		String name = cache.itemStringParam(obj, PARAM_NAME);
-		return new Spell(book, name == null ? "spell " + obj : name, obj,
-			Math.max(0, cache.itemIntParam(obj, PARAM_LEVEL, 0)), cache.itemIntParam(obj, PARAM_MEMBERS, 0) == 1,
-			questsById.get(cache.itemIntParam(obj, PARAM_QUEST, ABSENT)), List.copyOf(runes));
+		return new Spell(book, name == null ? "spell " + obj : name, obj);
 	}
 
 	private static Map<Integer, Integer> enumMap(CacheView cache, int enumId)

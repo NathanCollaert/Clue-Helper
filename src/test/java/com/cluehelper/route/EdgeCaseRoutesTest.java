@@ -162,7 +162,7 @@ public class EdgeCaseRoutesTest
 		Step edgeville = step("cryptic:talk to the mother of a basement dwelling son.");
 
 		PlayerSnapshot glory1 = mid.toBuilder().inventory(Map.of(itemId("AMULET_OF_GLORY_1"), 1)).charges(Map.of(
-			itemId("AMULET_OF_GLORY_1"), new Charge(1, Charge.Source.ITEM_ID))).build();
+			itemId("AMULET_OF_GLORY_1"), new Charge(1))).build();
 		lines.add(line("consumption: glory(1) carried, bank on with glory(1), to Draynor",
 			checked(input(glory1, draynor, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(glory1).build())));
 		PlayerSnapshot minigames = mid.toBuilder().inventory(Map.of()).build();
@@ -259,7 +259,7 @@ public class EdgeCaseRoutesTest
 		Step draynorDig = step("map:w348");
 		RequiredItems spade = required(StashMemory.State.NONE, need("spade", ItemRequirements.item(ItemID.SPADE), false));
 		PlayerSnapshot glory1 = mid.toBuilder().inventory(Map.of(itemId("AMULET_OF_GLORY_1"), 1)).charges(Map.of(
-			itemId("AMULET_OF_GLORY_1"), new Charge(1, Charge.Source.ITEM_ID))).build();
+			itemId("AMULET_OF_GLORY_1"), new Charge(1))).build();
 		lines.add(line("required spade: glory(1) carried, a spade in the bank, to Draynor (dig)",
 			checked(input(glory1, draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
 				.banked(withBank(glory1, Map.of(ItemID.SPADE, 1))).build())));
@@ -363,8 +363,8 @@ public class EdgeCaseRoutesTest
 			checked(input(maxed, aldarin, civitas, plain).build())));
 		PlayerSnapshot noPassage = withoutAll(mid, Set.of(ItemID.NECKLACE_OF_PASSAGE_5, ItemID.NECKLACE_OF_PASSAGE_2));
 		Map<Integer, Charge> passageCharges = new HashMap<>(noPassage.getCharges());
-		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_5, new Charge(5, Charge.Source.ITEM_ID));
-		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_2, new Charge(2, Charge.Source.ITEM_ID));
+		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_5, new Charge(5));
+		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_2, new Charge(2));
 		PlayerSnapshot twoPassages = noPassage.toBuilder().charges(passageCharges).build();
 		lines.add(line("partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
 			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().bankEdge(true).build())

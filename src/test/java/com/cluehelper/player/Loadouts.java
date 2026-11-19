@@ -108,7 +108,7 @@ public final class Loadouts
 			Integer known = CHARGES.get(item.getAsString());
 			if (known != null)
 			{
-				charges.put(id, new Charge(known, Charge.Source.ITEM_ID));
+				charges.put(id, new Charge(known));
 			}
 		}
 		if (f.get("runes").getAsBoolean())
@@ -175,7 +175,7 @@ public final class Loadouts
 			Integer known = CHARGES.get(family);
 			if (known != null)
 			{
-				charges.put(id, new Charge(known, Charge.Source.ITEM_ID));
+				charges.put(id, new Charge(known));
 			}
 		}
 		boolean group = carried.getAccountType().isGroup();

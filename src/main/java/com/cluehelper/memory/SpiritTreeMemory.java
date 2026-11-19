@@ -126,7 +126,6 @@ public class SpiritTreeMemory
 		next.patches.putAll(remembered.get().patches);
 		Seen seen = new Seen();
 		seen.value = value;
-		seen.seenAt = System.currentTimeMillis();
 		next.patches.put(patch, seen);
 		remembered.set(next);
 		log.debug("spirit tree {} = {} ({})", patch, value, source);
@@ -159,6 +158,5 @@ public class SpiritTreeMemory
 	{
 		/** The patch varbit's value; from the menu, {@link SpiritTreeMemory#GROWN} or 0. */
 		int value;
-		long seenAt;
 	}
 }

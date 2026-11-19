@@ -52,6 +52,6 @@ public class StepLogger
 
 	public synchronized void clear()
 	{
-		slot.clear();
+		slot.set(new StepLog());
 	}
 }

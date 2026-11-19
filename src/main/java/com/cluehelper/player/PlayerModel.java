@@ -7,7 +7,6 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import javax.inject.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -19,7 +18,6 @@ import net.runelite.api.gameval.VarbitID;
  * Event handlers run on the client thread and only mark the model dirty; {@link #onGameTick()} rebuilds the snapshot
  * at most once per tick. Off the client thread, read snapshots only.
  */
-@Slf4j
 @Singleton
 public class PlayerModel
 {
@@ -70,7 +68,6 @@ public class PlayerModel
 	/** Grown patches other than spirit trees, named as the step data names them. */
 	private Set<String> grownPatches = Set.of();
 	private String lastFairyRing;
-	private String dirtyBecause;
 	private long version;
 	private Map<Integer, Integer> fakeCarried = Map.of();
 
@@ -103,7 +100,7 @@ public class PlayerModel
 		}
 		varbits.addAll(ChargeReader.chargeVarbits());
 		watch(varbits, OWN_VARPS);
-		markDirty("start");
+		dirty = true;
 		questsDirty = true;
 	}
 
@@ -132,7 +129,7 @@ public class PlayerModel
 		{
 			questsDirty = true;
 			musicDirty = true;
-			markDirty("login");
+			dirty = true;
 		}
 		else if (event.getGameState() == GameState.LOGIN_SCREEN)
 		{
@@ -148,7 +145,7 @@ public class PlayerModel
 		if (event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN
 			|| event.getContainerId() == InventoryID.HUNTSMANS_KIT)
 		{
-			markDirty("items");
+			dirty = true;
 		}
 	}
 
@@ -160,7 +157,7 @@ public class PlayerModel
 		}
 		if (watchedVarpIndices.contains(event.getVarpId()))
 		{
-			markDirty("vars");
+			dirty = true;
 		}
 	}
 
@@ -172,28 +169,28 @@ public class PlayerModel
 
 	public void onStatChanged()
 	{
-		markDirty("stats");
+		dirty = true;
 	}
 
 	/** Client thread. */
 	public void setPlantedTrees(Set<String> next)
 	{
 		plantedTrees = Set.copyOf(next);
-		markDirty("spirit trees");
+		dirty = true;
 	}
 
 	/** Client thread. */
 	public void setUnlocks(Set<String> next)
 	{
 		unlocks = Set.copyOf(next);
-		markDirty("unlocks");
+		dirty = true;
 	}
 
 	/** Client thread. */
 	public void setUncounted(Set<Integer> next)
 	{
 		uncounted = Set.copyOf(next);
-		markDirty("uncounted items");
+		dirty = true;
 	}
 
 	/** Whether owning {@code itemId} counts for what it would bring: false for an uncounted one. */
@@ -214,39 +211,38 @@ public class PlayerModel
 	public void setGrownPatches(Set<String> next)
 	{
 		grownPatches = Set.copyOf(next);
-		markDirty("grown patches");
+		dirty = true;
 	}
 
 	/** Client thread. */
 	public void setLastFairyRing(String code)
 	{
 		lastFairyRing = code;
-		markDirty("fairy ring");
+		dirty = true;
 	}
 
 	/** Client thread. */
 	public void setHouse(HouseState next)
 	{
 		house = next;
-		markDirty("house");
+		dirty = true;
 	}
 
 	public void onChargesLearned()
 	{
-		markDirty("charges");
+		dirty = true;
 	}
 
 	/** Client thread. Also answers for items that aren't held, such as the remembered bank's. */
 	public Map<Integer, Charge> charges(Collection<Integer> itemIds)
 	{
-		chargeReader.rememberVarbitCharges(itemIds);
 		Map<Integer, Charge> charges = new HashMap<>(chargeReader.read(itemIds));
 		for (int id : itemIds)
 		{
 			CheckLines.Checked checked = checkLines.charges().get(id);
 			if (checked != null)
 			{
-				charges.putIfAbsent(id, new Charge(checked.charges, Charge.Source.CHECK_LINE));
+				charges.putIfAbsent(id, new Charge(checked.charges));
 			}
 		}
 		return charges;
@@ -261,7 +257,7 @@ public class PlayerModel
 		if (runeModel == null)
 		{
 			runeModel = RuneModel.load(new ClientCacheView(client));
-			markDirty("rune model");
+			dirty = true;
 		}
 		resolveWatches();
 		Position now = readPosition();
@@ -269,7 +265,7 @@ public class PlayerModel
 		if (last == null || now.getKind() != last.getPosition().getKind()
 			|| wildernessLevel(now) != last.getWildernessLevel())
 		{
-			markDirty("place");
+			dirty = true;
 		}
 		position = now;
 		if (questsDirty)
@@ -278,20 +274,19 @@ public class PlayerModel
 			quests = readQuests();
 			missingQuestPoints = Math.max(0, questPointTotal.offered() - client.getVarpValue(VarPlayerID.QP));
 			questsRead = true;
-			markDirty("quests");
+			dirty = true;
 		}
 		if (musicDirty)
 		{
 			musicDirty = false;
 			lockedMusicTracks = musicTracks.locked();
-			markDirty("music");
+			dirty = true;
 		}
 		if (dirty)
 		{
 			dirty = false;
 			PlayerSnapshot built = build(now);
 			trackPendingRevert(last, built);
-			log.debug("snapshot rebuilt ({})", dirtyBecause);
 			snapshot = built;
 			listeners.forEach(listener -> listener.accept(built));
 		}
@@ -315,15 +310,6 @@ public class PlayerModel
 	public void fakeCarried(Map<Integer, Integer> items)
 	{
 		fakeCarried = Map.copyOf(items);
-		markDirty("fake carried items");
-	}
-
-	private void markDirty(String because)
-	{
-		if (!dirty)
-		{
-			dirtyBecause = because;
-		}
 		dirty = true;
 	}
 
@@ -353,7 +339,7 @@ public class PlayerModel
 		}
 		if (added)
 		{
-			markDirty("watch");
+			dirty = true;
 		}
 	}
 

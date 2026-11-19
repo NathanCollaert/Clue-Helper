@@ -70,11 +70,5 @@ public class MemoryStore
 		{
 			configManager.setRSProfileConfiguration(ClueHelperConfig.GROUP, key, value);
 		}
-
-		@Override
-		public void unset(String key)
-		{
-			configManager.unsetRSProfileConfiguration(ClueHelperConfig.GROUP, key);
-		}
 	}
 }

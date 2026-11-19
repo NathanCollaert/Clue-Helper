@@ -87,7 +87,6 @@ public class StashMemory
 		units.units.putAll(remembered.get().units);
 		Seen seen = new Seen();
 		seen.filled = filled;
-		seen.seenAt = System.currentTimeMillis();
 		units.units.put(objectId, seen);
 		remembered.set(units);
 	}
@@ -111,6 +110,5 @@ public class StashMemory
 	static final class Seen
 	{
 		boolean filled;
-		long seenAt;
 	}
 }

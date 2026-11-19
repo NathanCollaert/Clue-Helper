@@ -1,5 +1,6 @@
 package com.cluehelper.dev;
 
+import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.HotColdTrace;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.hotcold.FeelLogs;
@@ -33,6 +34,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 
 @Slf4j
@@ -64,12 +66,14 @@ public class DevHarness
 	private int watchedVarbit = NO_VARBIT;
 	private final HotColdService hotCold;
 	private final MemoryStore memory;
+	private final ConfigManager configManager;
 
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, StepLogger stepLogger, ClueLink clueLink, Gson gson, PlayerModel player,
 		AvailabilityService availability, RoutePlanner routes, StepGuide guide, PohService poh, StashMemory stash, HotColdService hotCold,
-		MemoryStore memory)
+		MemoryStore memory, ConfigManager configManager)
 	{
+		this.configManager = configManager;
 		this.hotCold = hotCold;
 		this.memory = memory;
 		this.poh = poh;
@@ -279,7 +283,7 @@ public class DevHarness
 		}
 		clientThread.invoke(() ->
 		{
-			memory.slot(args[0], Object.class, Object::new).clear();
+			configManager.unsetRSProfileConfiguration(ClueHelperConfig.GROUP, args[0]);
 			memory.reload();
 			reply("forgot " + args[0]);
 		});
@@ -289,7 +293,7 @@ public class DevHarness
 	{
 		if (args.length > 0 && args[0].equalsIgnoreCase("forget"))
 		{
-			memory.slot(HOUSE_KEY, Object.class, Object::new).clear();
+			configManager.unsetRSProfileConfiguration(ClueHelperConfig.GROUP, HOUSE_KEY);
 			memory.reload();
 			poh.onProfileChanged();
 		}

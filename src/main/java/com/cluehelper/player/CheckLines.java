@@ -68,7 +68,6 @@ public class CheckLines
 		updated.items.putAll(remembered.get().items);
 		Checked checked = new Checked();
 		checked.charges = count;
-		checked.checkedAt = System.currentTimeMillis();
 		updated.items.put(checkedItem, checked);
 		remembered.set(updated);
 		checkedItem = NONE;
@@ -89,7 +88,6 @@ public class CheckLines
 	public static final class Checked
 	{
 		public int charges;
-		private long checkedAt;
 	}
 
 	static final class Remembered

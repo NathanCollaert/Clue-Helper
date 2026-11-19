@@ -73,16 +73,4 @@ public class MemoryStoreTest
 		profile.values("main").put("bank", "{not json");
 		assertTrue(bank.get().items.isEmpty());
 	}
-
-	@Test
-	public void clearRemovesTheStoredValue()
-	{
-		profile.logIn("main");
-		MemorySlot<String> note = store.slot("note", String.class, () -> null);
-		note.set("x");
-		note.clear();
-		store.reload();
-		assertNull(note.get());
-		assertFalse(profile.values("main").containsKey("note"));
-	}
 }

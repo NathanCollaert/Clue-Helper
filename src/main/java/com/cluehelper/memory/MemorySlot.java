@@ -48,15 +48,6 @@ public final class MemorySlot<T>
 		profile.set(key, gson.toJson(newValue));
 	}
 
-	public synchronized void clear()
-	{
-		forget();
-		if (profile.profileKey() != null)
-		{
-			profile.unset(key);
-		}
-	}
-
 	synchronized void forget()
 	{
 		loaded = false;

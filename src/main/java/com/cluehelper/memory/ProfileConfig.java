@@ -8,6 +8,4 @@ interface ProfileConfig
 	String get(String key);
 
 	void set(String key, String value);
-
-	void unset(String key);
 }

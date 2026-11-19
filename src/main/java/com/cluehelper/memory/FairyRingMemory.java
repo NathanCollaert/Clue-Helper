@@ -133,7 +133,6 @@ public class FairyRingMemory
 		{
 			Last next = new Last();
 			next.code = code;
-			next.seenAt = System.currentTimeMillis();
 			remembered.set(next);
 			log.debug("fairy ring {} ({})", code, source);
 		}
@@ -150,6 +149,5 @@ public class FairyRingMemory
 	static final class Last
 	{
 		String code;
-		long seenAt;
 	}
 }

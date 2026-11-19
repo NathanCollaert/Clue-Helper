@@ -1,6 +1,5 @@
 package com.cluehelper.dev;
 
-import com.cluehelper.player.Charge;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.PlayerSnapshot;
 import com.cluehelper.transport.AvailabilitySet;
@@ -58,13 +57,8 @@ final class PlayerDump
 	private String charges(PlayerSnapshot s)
 	{
 		return s.getCharges().entrySet().stream()
-			.map(e -> name(e.getKey()) + "=" + e.getValue().getCharges() + " " + source(e.getValue()))
+			.map(e -> name(e.getKey()) + "=" + e.getValue().getCharges())
 			.collect(Collectors.joining(", ", "[", "]"));
-	}
-
-	private static String source(Charge charge)
-	{
-		return charge.getSource().name().toLowerCase().replace('_', ' ');
 	}
 
 	private String names(Map<Integer, Integer> items)
