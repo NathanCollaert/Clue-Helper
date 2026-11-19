@@ -29,11 +29,12 @@ final class Acts
 	 * Gear the act wants worn (Robin's +180 ranged attack) goes on first; a step of several places wears it per stage.
 	 *
 	 * @param takeFromStash the step's items are in its STASH unit and not on the player
+	 * @param handInItems the items Charlie or Falo the Bard asks for, by name
 	 */
-	static List<SubStep> of(Step step, boolean takeFromStash)
+	static List<SubStep> of(Step step, boolean takeFromStash, List<String> handInItems)
 	{
 		List<String> worn = !step.getStages().isEmpty() ? List.of() : step.getData().getWornNeeds();
-		List<SubStep> acts = actsOf(step, takeFromStash);
+		List<SubStep> acts = actsOf(step, takeFromStash, handInItems);
 		if (worn.isEmpty())
 		{
 			return acts;
@@ -139,7 +140,7 @@ final class Acts
 		return "Do the clue step";
 	}
 
-	private static List<SubStep> actsOf(Step step, boolean takeFromStash)
+	private static List<SubStep> actsOf(Step step, boolean takeFromStash, List<String> handInItems)
 	{
 		SubStep main = act(step);
 		if (step.getWaypointAct() != null)
@@ -154,10 +155,9 @@ final class Acts
 			case ClueTypes.MUSIC:
 				return List.of(music(step));
 			case ClueTypes.FALO:
-				return List.of(SubStep.of(Kind.ACT, "Use the item on Falo the Bard").detail("The item the Clue Scroll plugin lists")
-					.option(USE_OPTION).npcIds(targetNpcs(step)).build());
+				return List.of(useOnFalo(handInItems).option(USE_OPTION).npcIds(targetNpcs(step)).build());
 			case ClueTypes.SKILL:
-				return List.of(handIn(step));
+				return List.of(handIn(step, handInItems));
 			default:
 				break;
 		}
@@ -212,7 +212,7 @@ final class Acts
 
 	private static SubStep equip()
 	{
-		return SubStep.of(Kind.ACT, "Equip the items").detail("The Clue Scroll plugin lists them")
+		return SubStep.of(Kind.ACT, "Equip the items")
 			.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
@@ -225,10 +225,21 @@ final class Acts
 			.tab(StepGuide.Tab.MUSIC).build();
 	}
 
-	private static SubStep handIn(Step step)
+	private static SubStep.SubStepBuilder useOnFalo(List<String> handInItems)
 	{
-		boolean charlie = "beginner".equals(step.getTier());
-		return act(charlie ? "Give Charlie the item" : "Talk to Sherlock", charlie ? "He wants what the clue names" : "Task done: hand it in");
+		return handInItems.isEmpty() ? SubStep.of(Kind.ACT, "Use the item on Falo the Bard").detail("The item the Clue Scroll plugin lists")
+			: SubStep.of(Kind.ACT, "Use on Falo the Bard:").items(handInItems);
+	}
+
+	/** Charlie's item is listed by name, as the withdraw and equip steps list theirs. */
+	private static SubStep handIn(Step step, List<String> handInItems)
+	{
+		if (!"beginner".equals(step.getTier()))
+		{
+			return act("Talk to Sherlock", "Task done: hand it in");
+		}
+		return handInItems.isEmpty() ? act("Give Charlie the item", "He wants what the clue names")
+			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 
 	private static List<SubStep> talkThenChallenge(Step step, StepIndex.Challenge challenge)

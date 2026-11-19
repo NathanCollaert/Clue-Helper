@@ -1,5 +1,5 @@
 {
-"dump": "2026-10-18",
+"dump": "2026-11-18",
 "steps": {
 "music:23138": {"items":[23138],"music":{"track":"Karamja Jam","unlock":"Brimhaven Dungeon"},"regions":[23],"rows":[{"id":1887,"name":"CLUEHELPER_MUSIC_MEDIUM_5"}],"targets":[{"kind":"npc","npcs":[3267],"text":"On the bridge in Falador Park.","tile":[2990,3384,0]}],"tier":"medium","tiles":[[2990,3384,0]]},
 "music:23139": {"items":[23139],"music":{"track":"Faerie","unlock":"Zanaris"},"regions":[23],"rows":[{"id":1885,"name":"CLUEHELPER_MUSIC_MEDIUM_3"}],"targets":[{"kind":"npc","npcs":[3267],"text":"On the bridge in Falador Park.","tile":[2990,3384,0]}],"tier":"medium","tiles":[[2990,3384,0]]},

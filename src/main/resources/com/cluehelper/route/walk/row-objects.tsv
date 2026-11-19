@@ -1,4 +1,14 @@
 Origin	Destination	Option	Object	ObjectId	Chat
+1117 3428 0	1119 3428 0	Climb-over	Rocks	48740	
+1119 3428 0	1117 3428 0	Leave	Rocks	48742	
+1146 3434 0	1149 3445 0	Enter	Entry	48746	
+1149 3445 0	1146 3434 0	Enter	Entry	48745	
+1174 3427 0	1183 9812 0	Enter	Entry	48723	
+1183 9812 0	1174 3427 0	Climb-up	Stairs	48730	
+1187 9763 0	1191 3410 0	Climb-up	Ladder	48732	
+1191 3410 0	1187 9763 0	Enter	Entry	48722	
+1193 3400 0	1193 3402 0	Climb-over	Barricade	48735	
+1193 3402 0	1193 3400 0	Climb-over	Barricade	48735	
 1232 3755 1	1234 3755 0	Climb-down	Rope ladder	34478	
 1234 3755 0	1232 3755 1	Climb-up	Rope ladder	34477	
 1240 1226 0	1291 1253 0	Exit	Portcullis	21772	
@@ -24,16 +34,30 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1296 3375 0	1296 9767 0	Enter	Cave	56439	
 1296 9767 0	1296 3375 0	Exit	Cave	56440	
 1297 9780 0	1274 9770 0	Enter	Cave	57274	
+1301 9398 0	1306 9398 0	Walk-across	Log balance	56718	
+1302 9409 1	1305 9410 0	Climb	Rope	56716	
 1304 1290 0	1309 1269 0	Exit	Portcullis	21772	
+1305 3036 0	1311 9346 2	Enter	Passageway	56636	
+1305 9410 0	1302 9409 1	Climb	Rope	56715	
 1306 3036 0	1312 9346 2	Enter	Passageway	56636	
+1306 9398 0	1301 9398 0	Walk-across	Log balance	56718	
+1307 9420 1	1309 9420 2	Climb	Rope	56713	
 1308 9782 0	1309 9786 0	Cross	Stepping stone	57277	
 1309 1237 0	2873 9848 0	Crawl	Cave	26564	
 1309 1269 0	1304 1290 0	Turn	Iron Winch	23104	
 1309 9420 2	1307 9420 1	Climb	Rope	56714	
+1309 9420 2	1307 9420 1	Climb	Rope	56714	
 1309 9786 0	1308 9782 0	Cross	Stepping stone	57277	
 1310 1237 0	2873 9848 0	Crawl	Cave	26566	
 1311 1237 0	2873 9848 0	Crawl	Cave	26565	
+1311 3102 0	1311 9430 2	Use	Lift Platform	56650	
+1311 9346 2	1305 3036 0	Exit	Passageway	56637	
+1311 9430 2	1311 3102 0	Use	Lift Platform	56647	
 1312 3103 0	1311 9430 2	Use	Lift Platform	56650	
+1313 9378 0	1317 9378 0	Cross	Stepping stone	56717	
+1314 9420 2	1316 9420 0	Climb	Rope	56712	
+1316 9420 0	1314 9420 2	Climb	Rope	56711	
+1317 9378 0	1313 9378 0	Cross	Stepping stone	56717	
 1324 3363 0	1324 9768 0	Squeeze-through	Cave	57279	
 1324 3777 0	1324 3785 0	Climb	Rocks	34397	
 1324 3785 0	1324 3777 0	Climb	Rocks	34397	
@@ -42,8 +66,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1324 9768 0	1324 3363 0	Squeeze-through	Cave	57278	
 1328 1253 0	1368 1226 0	Turn	Iron Winch	23104	
 1329 1253 0	1368 1226 0	Turn	Iron Winch	23104	
+1332 9366 0	1334 9367 1	Climb-up	Staircase	56664	
 1334 9358 2	1335 9363 1	Climb-down	Staircase	56663	
+1334 9359 2	1337 9360 1	Climb-down	Staircase	56663	
 1334 9367 1	1330 9367 0	Climb-down	Staircase	56663	
+1334 9367 1	1332 9366 0	Climb-down	Staircase	56663	
+1337 9360 1	1334 9359 2	Climb-up	Staircase	56664	
 1338 2917 0	1343 2917 0	Climb	Rocks	54776	
 1343 2917 0	1338 2917 0	Climb	Rocks	54776	
 1361 3309 0	1486 3232 0	Follow	Mountain Guide	14529	
@@ -78,7 +106,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1436 3128 0	1439 9509 1	Pass-through	Entrance	51375	
 1438 10093 1	1438 10093 2	Enter	Lift	30259	
 1438 10093 2	1438 10093 1	Enter	Lift	30258	
-1438 10098 2	1438 10098 1	Hang-over	Platform edge	56371	
+1438 10097 2	1438 10098 1	Hang-over	Platform edge	56371	
 1439 9509 1	1435 3128 0	Pass-through	Entrance	51375	
 1440 9509 1	1435 3128 0	Pass-through	Entrance	51375	
 1448 10097 1	1453 10097 1	Jump	Gap	56372	
@@ -100,7 +128,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1465 3128 0	1455 3128 0	Climb	Rocks	51931	
 1469 3653 0	1650 9987 0	Enter	Hole	28915	
 1470 3652 0	1650 9987 0	Enter	Hole	28915	
-1470 3654 0	1650 9987 0	Enter	Hole	28915	
 1470 3687 0	1475 3687 0	Climb	Handholds	42009	
 1471 3653 0	1650 9987 0	Enter	Hole	28915	
 1475 3687 0	1470 3687 0	Climb	Handholds	27362	
@@ -109,6 +136,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1486 3232 0	1361 3309 0	Follow	Mountain Guide	14529	
 1496 3571 0	1496 3571 1	Climb-up	Ladder	42207	
 1496 3571 1	1496 3571 0	Climb-down	Ladder	42208	
+1503 4642 0	3046 2979 0	Climb-up	Ladder	58027	
 1504 3396 1	1504 3399 0	Cross	Gangplank	29724	
 1504 3399 0	1504 3396 1	Cross	Gangplank	29723	
 1507 3592 2	1511 3592 1	Climb	Stairs	27200	
@@ -128,11 +156,11 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1524 3563 0	1520 3563 1	Climb	Stairs	27201	
 1527 3563 0	1523 3563 1	Climb	Stairs	27201	
 1528 3543 1	1524 3543 0	Climb	Stairs	27200	
-1533 3050 0	1533 9446 0	Enter	Cave	51761	
-1533 3051 0	1533 9446 0	Enter	Cave	51761	
-1533 9445 0	1533 3051 0	Exit	Cave	51760	
-1533 9446 0	1533 3051 0	Exit	Cave	51760	
-1533 9447 0	1533 3051 0	Exit	Cave	51760	
+1533 3050 0	1538 9446 0	Enter	Cave	51761	
+1533 3051 0	1538 9446 0	Enter	Cave	51761	
+1538 9445 0	1533 3051 0	Exit	Cave	51760	
+1538 9446 0	1533 3051 0	Exit	Cave	51760	
+1538 9447 0	1533 3051 0	Exit	Cave	51760	
 1539 3547 0	1539 3547 1	Climb-up	Ladder	42207	
 1539 3547 1	1539 3547 0	Climb-down	Ladder	42208	
 1539 3556 0	1539 3556 1	Climb-up	Ladder	42207	
@@ -321,6 +349,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1631 4023 0	1629 4023 0	Jump	Gap	29326	
 1631 4023 0	1633 4023 0	Jump	Gap	29326	
 1631 4957 0	1761 4964 0	Walk-up	Stairs	24427	
+1631 9632 0	1642 3222 0	Use	Lift Platform	54521	
 1632 3963 0	1630 3958 0	Enter	Doors of Dinh	29322	
 1632 3963 0	1630 3979 0	Enter	Doors of Dinh	29322	
 1632 4957 0	1761 4964 0	Walk-up	Stairs	24427	
@@ -346,6 +375,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1639 10046 0	1461 9879 0	Climb-up	Vine	42350	
 1639 10048 0	1461 9879 0	Climb-up	Vine	42350	
 1640 10047 0	1461 9879 0	Climb-up	Vine	42350	
+1642 3222 0	1631 9632 0	Use	Lift Platform	54524	
 1642 3222 0	1631 9632 0	Use	Lift Platform	54524	
 1643 3449 0	1646 9848 0	Enter	Cave	31690	
 1643 3450 0	1646 9848 0	Enter	Cave	31690	
@@ -427,12 +457,18 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1726 9992 0	1803 9968 0	Climb-up	Vine	28897	
 1726 9994 0	1803 9968 0	Climb-up	Vine	28897	
 1727 9993 0	1803 9968 0	Climb-up	Vine	28897	
+1741 5352 0	2531 3446 0	Ride	Aged log	25216	
+1741 5353 0	2531 3446 0	Ride	Aged log	25216	
+1741 5354 0	2531 3446 0	Ride	Aged log	25216	
 1742 3854 0	1752 3854 0	Climb	Rocks	27984	
-1742 5352 0	2531 3446 0	Ride	Aged log	25216	
 1743 3136 0	1747 3136 1	Cross	Gangplank	50734	
+1745 6456 0	1745 6459 0	Enter	Passage	49412	
+1745 6459 0	1745 6456 0	Enter	Passage	49412	
 1747 3136 1	1743 3136 0	Cross	Gangplank	50735	
 1752 5137 0	2985 3316 0	Climb	Rope	12230	
+1755 6421 0	1758 6421 0	Enter	Passage	49410	
 1758 4958 0	3258 3452 0	Walk-up	Stairs	24427	
+1758 6421 0	1755 6421 0	Enter	Passage	49410	
 1759 4958 0	3258 3452 0	Walk-up	Stairs	24427	
 1760 4958 0	3258 3452 0	Walk-up	Stairs	24427	
 1761 3872 0	1761 3874 0	Climb	Rocks	34741	
@@ -440,11 +476,19 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1761 4963 0	1631 4957 0	Walk-down	Stairs	24428	
 1761 4964 0	1631 4957 0	Walk-down	Stairs	24428	
 1761 4965 0	1631 4957 0	Walk-down	Stairs	24428	
-1761 5362 0	2531 3446 0	Ride	Aged log	25216	
+1761 5361 0	2531 3446 0	Ride	Aged log	25216	
+1762 5361 0	2531 3446 0	Ride	Aged log	25216	
+1763 5361 0	2531 3446 0	Ride	Aged log	25216	
 1768 5366 1	1772 5366 0	Climb-down	Stairs	25338	
 1769 3849 0	1774 3849 0	Climb	Rocks	27988	
+1770 6459 0	1773 6459 0	Enter	Passage	49418	
+1773 6459 0	1770 6459 0	Enter	Passage	49418	
 1774 3849 0	1769 3849 0	Climb	Rocks	27988	
 1776 3884 0	1776 3880 0	Jump	Boulder	27990	
+1778 5346 0	1778 5343 1	Climb-up	Stairs	25339	
+1782 6419 0	1782 6422 0	Enter	Passage	49411	
+1782 6422 0	1782 6419 0	Enter	Passage	49411	
+1789 6405 0	2047 6436 0	Exit	Passage	49408	
 1795 3106 0	1799 9506 0	Enter	Colosseum entrance	50749	
 1795 3107 0	1799 9506 0	Enter	Colosseum entrance	50749	
 1797 4383 2	1797 4382 1	Climb-down	Ladder	10205	
@@ -489,22 +533,35 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1858 5244 0	3081 3421 0	Climb-up	Ladder	20784	
 1859 5243 0	3081 3421 0	Climb-up	Ladder	20784	
 1860 5244 0	3081 3421 0	Climb-up	Ladder	20784	
+1862 6420 0	1862 6423 0	Enter	Passage	49411	
+1862 6423 0	1862 6420 0	Enter	Passage	49411	
 1863 4369 1	1863 4374 2	Climb-up	Ladder	10211	
 1864 4386 2	1864 4390 1	Climb-down	Ladder	10213	
 1866 5323 0	3213 3221 0	Open	Large door	12350	
+1871 6440 0	1871 6443 0	Enter	Passage	49411	
+1871 6443 0	1871 6440 0	Enter	Passage	49411	
+1880 6437 0	2046 6438 0	Exit	Fleshy Strand	49409	
 1882 4620 1	1884 4620 1	Climb-over	Low wall	10035	
 1882 4658 1	1884 4658 1	Climb-over	Low wall	10035	
 1884 4620 1	1882 4620 1	Climb-over	Low wall	10035	
 1884 4658 1	1882 4658 1	Climb-over	Low wall	10035	
 1887 4409 1	1890 4409 0	Climb-down	Ladder	10215	
+1896 6437 0	1899 6437 0	Enter	Passage	49410	
+1898 6456 0	1901 6456 0	Enter	Passage	49418	
+1899 6437 0	1896 6437 0	Enter	Passage	49410	
 1901 4612 1	1911 4612 1	Climb	Wall support	10033	
+1901 6456 0	1898 6456 0	Enter	Passage	49418	
 1902 5221 0	2042 5245 0	Climb-down	Ladder	20785	
 1902 5223 0	2042 5245 0	Climb-down	Ladder	20785	
 1903 5222 0	2042 5245 0	Climb-down	Ladder	20785	
+1903 6410 0	1903 6413 0	Enter	Passage	49412	
+1903 6413 0	1903 6410 0	Enter	Passage	49412	
 1911 4612 1	1901 4612 1	Climb	Wall support	10033	
 1912 5226 0	3081 3421 0	Climb-up	Ladder	20784	
 1913 5225 0	3081 3421 0	Climb-up	Ladder	20784	
 1913 5227 0	3081 3421 0	Climb-up	Ladder	20784	
+1913 6426 0	1913 6429 0	Enter	Passage	49410	
+1913 6429 0	1913 6426 0	Enter	Passage	49410	
 1914 5226 0	3081 3421 0	Climb-up	Ladder	20784	
 1927 4424 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
 1927 4453 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
@@ -512,14 +569,18 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1927 6223 0	1963 6221 3	Squeeze-through	Crevice	40889	
 1930 4438 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
 1932 4468 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
+1933 9519 0	1966 3097 0	Exit	Opening	60174	
+1934 4420 3	3288 2801 0	Leave Tomb	Tomb Door	20932	
 1934 4420 3	3288 2801 0	Leave Tomb	Tomb Door	20932	
 1934 4428 3	1944 4427 0	Start-minigame	Guardian mummy	1779	
+1934 4450 2	3288 2801 0	Leave Tomb	Tomb Door	20932	
 1936 9009 1	2457 2849 0	Climb-up	Ladder	32205	
 1937 4969 0	1937 4970 0	Open	Gate	9141	
 1937 4970 0	1937 4969 0	Open	Gate	9141	
 1939 4958 0	2931 10196 0	Climb-up	Stairs	9138	
 1940 4958 0	2931 10196 0	Climb-up	Stairs	9138	
 1941 4453 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
+1942 2805 0	1957 9190 0	Enter	Cave	60166	
 1942 4703 0	1942 4706 1	Climb-up	Stairs	6085	
 1942 4706 1	1942 4703 0	Climb-down	Stairs	6086	
 1943 4421 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
@@ -528,9 +589,13 @@ Origin	Destination	Option	Object	ObjectId	Chat
 1954 4477 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
 1955 4464 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
 1956 4454 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
+1957 9190 0	1942 2805 0	Exit	Cave	60167	
 1965 4444 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
+1966 3097 0	1933 9519 0	Enter	Cave entrance	60173	
 1967 8986 1	1969 8986 1	Pass	Magical Barrier	31617	
 1967 8987 1	1969 8987 1	Pass	Magical Barrier	31617	
+1968 4420 2	3288 2801 0	Leave Tomb	Tomb Door	20932	
+1968 4450 3	3288 2801 0	Leave Tomb	Tomb Door	20932	
 1969 8986 1	1967 8986 1	Pass	Magical Barrier	31617	
 1969 8987 1	1967 8987 1	Pass	Magical Barrier	31617	
 1970 4458 0	3288 2801 0	Leave Tomb	Tomb Door	20931	
@@ -549,7 +614,20 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2026 5217 0	2123 5252 0	Climb-down	Ladder	19004	
 2026 5219 0	2123 5252 0	Climb-down	Ladder	19004	
 2027 5218 0	2123 5252 0	Climb-down	Ladder	19004	
+2029 6430 0	2035 6430 0	Cross	Stepping Stone	49209	
+2035 6430 0	2029 6430 0	Cross	Stepping Stone	49209	
 2042 5245 0	1859 5243 0	Climb-up	Ladder	19003	
+2044 6440 0	1789 6405 0	Enter	Passage	49526	
+2046 6428 0	2179 6459 0	Enter	Passage	49527	
+2052 6435 0	1880 6437 0	Enter	Passage	49528	
+2069 6368 0	2071 6368 0	Climb	Handholds	47593	
+2071 6368 0	2069 6368 0	Climb	Handholds	47593	
+2076 9203 0	2082 9203 0	Squeeze-through	Crevice	60146	
+2082 9203 0	2076 9203 0	Squeeze-through	Crevice	60146	
+2090 6380 0	2092 6380 0	Climb	Handholds	47594	
+2092 6380 0	2090 6380 0	Climb	Handholds	47594	
+2094 6382 0	2098 6382 0	Cross	Stepping Stone	49529	
+2098 6382 0	2094 6382 0	Cross	Stepping Stone	49529	
 2118 3893 1	2118 3895 0	Climb	Ladder	16962	
 2118 3895 0	2118 3893 1	Climb	Ladder	16960	
 2120 4686 1	2124 4686 1	Cross	Bridge	3255	
@@ -621,6 +699,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2166 4409 2	2800 5160 0	Climb-up	Ladder	20281	
 2167 4686 1	2163 4686 1	Cross	Bridge	3255	
 2173 4725 1	2370 9718 0	Open	Door	3220	
+2178 6459 0	2046 6436 0	Exit	Passage	49408	
 2181 3208 0	2181 3212 0	Pass	Sticks	3922	
 2181 3212 0	2181 3208 0	Pass	Sticks	3922	
 2181 3326 0	3208 6078 0	Enter	City Gate	36518	
@@ -633,7 +712,11 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2188 3168 0	2188 3165 0	Enter	Dense forest	3939	
 2188 3168 0	2188 3171 0	Enter	Dense forest	3998	
 2188 3171 0	2188 3168 0	Enter	Dense forest	3998	
+2189 6412 0	2192 6412 0	Enter	Passage	49411	
+2192 6412 0	2189 6412 0	Enter	Passage	49411	
 2196 3237 0	2202 3237 0	Cross	Log balance	3931	
+2197 6453 0	2197 6456 0	Enter	Passage	49410	
+2197 6456 0	2197 6453 0	Enter	Passage	49410	
 2199 3169 0	2202 3169 0	Pass	Sticks	3922	
 2202 3169 0	2199 3169 0	Pass	Sticks	3922	
 2202 3237 0	2196 3237 0	Cross	Log balance	3931	
@@ -641,11 +724,13 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2206 4934 1	2900 3565 0	Climb-up	Stairs	4627	
 2207 4934 1	2207 4938 0	Climb-down	Stairs	4620	
 2207 4938 0	2207 4934 1	Climb-up	Stairs	4622	
+2207 6413 0	2210 6413 0	Enter	Passage	49411	
 2208 4830 0	1862 4639 0	Use	Portal	34758	
 2208 4934 1	2207 4938 0	Climb-down	Stairs	4620	
 2208 4938 0	2207 4934 1	Climb-up	Stairs	4622	
 2209 3201 0	2209 3205 0	Jump	Leaves	3925	
 2209 3205 0	2209 3201 0	Jump	Leaves	3925	
+2210 6413 0	2207 6413 0	Enter	Passage	49411	
 2211 3809 0	2213 3809 1	Climb	Ladder	16960	
 2212 4940 0	2212 4944 1	Climb-up	Stairs	4622	
 2212 4944 1	2212 4940 0	Climb-down	Stairs	4620	
@@ -664,6 +749,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2217 3166 0	2217 3163 0	Enter	Dense forest	3938	
 2217 3166 0	2217 3169 0	Enter	Dense forest	3939	
 2217 3169 0	2217 3166 0	Enter	Dense forest	3939	
+2219 6403 0	2222 6403 0	Enter	Passage	49418	
 2220 3152 0	2220 3155 0	Step-over	Tripwire	3921	
 2220 3155 0	2220 3152 0	Step-over	Tripwire	3921	
 2220 3792 2	2223 3792 1	Climb	Stairs	16947	
@@ -671,11 +757,14 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2221 3795 2	2221 3792 3	Climb	Stairs	16945	
 2221 3805 2	2221 3808 3	Climb	Stairs	16945	
 2221 3808 3	2221 3805 2	Climb	Stairs	16947	
+2222 6403 0	2219 6403 0	Enter	Passage	49418	
 2223 3792 1	2220 3792 2	Climb	Stairs	16945	
 2225 3792 1	2228 3792 2	Climb	Stairs	16945	
 2225 3806 1	2225 3809 0	Climb	Stairs	16948	
 2225 3809 0	2225 3806 1	Climb	Stairs	16946	
 2226 3219 0	2229 3219 0	Enter	Dense forest	3938	
+2226 6420 0	2226 6423 0	Enter	Passage	49412	
+2226 6423 0	2226 6420 0	Enter	Passage	49412	
 2227 3792 3	2227 3795 2	Climb	Stairs	16947	
 2227 3795 2	2227 3792 3	Climb	Stairs	16945	
 2227 3805 2	2227 3808 3	Climb	Stairs	16945	
@@ -790,12 +879,60 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2318 3894 0	2420 10279 1	Open	Cave	21585	
 2322 3502 0	2324 3497 0	Climb	Rocks	19849	
 2324 3497 0	2322 3502 0	Climb	Rocks	19849	
+2327 3168 0	2327 3168 1	Climb-up	ladder	8744	
+2327 3168 1	2327 3168 0	Climb-down	ladder	8745	
+2327 3168 1	2327 3168 2	Climb-up	ladder	8745	
+2327 3168 2	2327 3168 1	Climb-down	ladder	8746	
+2327 3175 0	2327 3175 1	Climb-up	ladder	8744	
+2327 3175 1	2327 3175 0	Climb-down	ladder	8745	
+2327 3175 1	2327 3175 2	Climb-up	ladder	8745	
+2327 3175 2	2327 3175 1	Climb-down	ladder	8746	
+2328 3167 0	2328 3167 1	Climb-up	ladder	8744	
+2328 3167 1	2328 3167 0	Climb-down	ladder	8745	
+2328 3167 1	2328 3167 2	Climb-up	ladder	8745	
+2328 3167 2	2328 3167 1	Climb-down	ladder	8746	
+2328 3169 0	2328 3169 1	Climb-up	ladder	8744	
+2328 3169 1	2328 3169 0	Climb-down	ladder	8745	
+2328 3169 1	2328 3169 2	Climb-up	ladder	8745	
+2328 3169 2	2328 3169 1	Climb-down	ladder	8746	
+2328 3174 0	2328 3174 1	Climb-up	ladder	8744	
+2328 3174 1	2328 3174 0	Climb-down	ladder	8745	
+2328 3174 1	2328 3174 2	Climb-up	ladder	8745	
+2328 3174 2	2328 3174 1	Climb-down	ladder	8746	
+2328 3176 0	2328 3176 1	Climb-up	ladder	8744	
+2328 3176 1	2328 3176 0	Climb-down	ladder	8745	
+2328 3176 1	2328 3176 2	Climb-up	ladder	8745	
+2328 3176 2	2328 3176 1	Climb-down	ladder	8746	
+2329 3168 0	2329 3168 1	Climb-up	ladder	8744	
+2329 3168 1	2329 3168 0	Climb-down	ladder	8745	
+2329 3168 1	2329 3168 2	Climb-up	ladder	8745	
+2329 3168 2	2329 3168 1	Climb-down	ladder	8746	
+2329 3175 0	2329 3175 1	Climb-up	ladder	8744	
+2329 3175 1	2329 3175 0	Climb-down	ladder	8745	
+2329 3175 1	2329 3175 2	Climb-up	ladder	8745	
+2329 3175 2	2329 3175 1	Climb-down	ladder	8746	
 2329 3802 1	2331 3802 0	Climb-down	Ladder	21515	
 2329 3810 1	2331 3810 0	Climb-down	Ladder	21515	
 2331 3802 0	2329 3802 1	Climb-up	Ladder	21514	
 2331 3810 0	2329 3810 1	Climb-up	Ladder	21514	
 2332 3252 0	2338 3253 0	Climb	Rocks	16514	
+2334 3160 0	2334 3160 1	Climb-up	ladder	8744	
+2334 3160 1	2334 3160 0	Climb-down	ladder	8746	
+2334 3183 0	2334 3183 1	Climb-up	ladder	8744	
+2334 3183 1	2334 3183 0	Climb-down	ladder	8746	
+2335 3159 0	2335 3159 1	Climb-up	ladder	8744	
+2335 3159 1	2335 3159 0	Climb-down	ladder	8746	
+2335 3161 0	2335 3161 1	Climb-up	ladder	8744	
+2335 3161 1	2335 3161 0	Climb-down	ladder	8746	
+2335 3182 0	2335 3182 1	Climb-up	ladder	8744	
+2335 3182 1	2335 3182 0	Climb-down	ladder	8746	
+2335 3184 0	2335 3184 1	Climb-up	ladder	8744	
+2335 3184 1	2335 3184 0	Climb-down	ladder	8746	
 2335 9350 0	2439 3164 0	Climb up	Stairs	25429	
+2336 3160 0	2336 3160 1	Climb-up	ladder	8744	
+2336 3160 1	2336 3160 0	Climb-down	ladder	8746	
+2336 3183 0	2336 3183 1	Climb-up	ladder	8744	
+2336 3183 1	2336 3183 0	Climb-down	ladder	8746	
 2336 9794 0	2150 4546 1	Ascend	Cave	3223	
 2338 3253 0	2332 3252 0	Climb	Rocks	16515	
 2338 3281 0	2338 3286 0	Climb	Rocks	16514	
@@ -810,7 +947,15 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2349 5215 0	3081 3421 0	Climb-up	Bone Chain	23732	
 2350 5214 0	3081 3421 0	Climb-up	Bone Chain	23732	
 2350 5216 0	3081 3421 0	Climb-up	Bone Chain	23732	
+2351 3180 0	2351 3180 1	Climb-up	ladder	8744	
+2351 3180 1	2351 3180 0	Climb-down	ladder	8746	
 2351 5215 0	3081 3421 0	Climb-up	Bone Chain	23732	
+2352 3179 0	2352 3179 1	Climb-up	ladder	8744	
+2352 3179 1	2352 3179 0	Climb-down	ladder	8746	
+2352 3181 0	2352 3181 1	Climb-up	ladder	8744	
+2352 3181 1	2352 3181 0	Climb-down	ladder	8746	
+2353 3180 0	2353 3180 1	Climb-up	ladder	8744	
+2353 3180 1	2353 3180 0	Climb-down	ladder	8746	
 2355 3839 0	2355 3848 0	Walk-across	Rope bridge	21312	
 2355 3848 0	2355 3839 0	Walk-across	Rope bridge	21313	
 2355 9394 0	2458 3185 0	Climb up	Stairs	25429	
@@ -839,6 +984,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2375 9610 0	2370 9666 0	Pass-through	Tunnel	3219	
 2375 9644 0	2373 9644 0	Cross	Ledge	3238	
 2376 3491 0	2378 3489 1	Climb-up	Staircase	16675	
+2376 9452 0	2379 9452 0	Use	Crevice	536	
 2376 9610 0	2371 9666 0	Pass-through	Tunnel	3218	
 2377 3488 0	2378 3489 1	Climb-up	Staircase	16675	
 2377 3491 0	2378 3489 1	Climb-up	Staircase	16675	
@@ -849,6 +995,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2378 3848 0	2378 3839 0	Walk-across	Rope bridge	21315	
 2378 4713 0	2390 4717 0	Climb-over	Rocky Ledge	2959	
 2379 4714 0	2382 4714 0	Climb	Rocks	40960	
+2379 9452 0	2376 9452 0	Use	Crevice	535	
 2379 9619 0	2381 9619 0	Picklock	Gate	3268	
 2379 9634 0	2381 9634 0	Cross	Stone bridge	3276	
 2381 9619 0	2379 9619 0	Picklock	Gate	3268	
@@ -963,6 +1110,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2403 3450 0	2400 3450 1	Climb-up	Staircase	16675	
 2403 3889 0	2394 10300 1	Open	Cave	21584	
 2403 9620 0	2405 9620 0	Picklock	Gate	3268	
+2404 9415 0	2412 3060 0	Use	Crevice	534	
 2405 3418 0	2409 9812 0	Enter	Cave entrance	17209	
 2405 3419 0	2409 9812 0	Enter	Cave entrance	17209	
 2405 3420 0	2409 9812 0	Enter	Cave entrance	17209	
@@ -994,6 +1142,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2409 9812 0	2402 3419 0	Exit	Tunnel	17223	
 2410 3824 0	2410 3824 2	Climb-up	Ladder	21395	
 2410 3824 2	2410 3824 0	Climb-down	Ladder	21396	
+2412 3060 0	2404 9415 0	Enter	Smoky cave	30176	
 2412 3488 0	2412 3489 1	Climb-up	Staircase	16675	
 2412 3489 0	2412 3489 1	Climb-up	Staircase	16675	
 2412 3489 1	2413 3490 0	Climb-down	Staircase	16677	
@@ -1133,7 +1282,9 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2449 3463 1	2449 3463 0	Climb-down	Ladder	16679	
 2451 9688 0	2451 9694 0	Squeeze-through	Pipe	3235	
 2452 2847 2	2449 2847 1	Climb-down	Stairs	31610	
+2452 3232 0	3015 5629 0	Climb	Ladder	29635	
 2452 4473 0	3201 3169 0	Use	Fairy ring	12094	
+2453 3231 0	3015 5629 0	Climb	Ladder	29635	
 2455 2839 1	2457 2839 0	Climb-down	Stairs	32206	
 2455 3048 0	2457 3048 0	Climb-over	Crushed barricade	6882	
 2455 3049 0	2457 3049 0	Climb-over	Crushed barricade	6881	
@@ -1208,6 +1359,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2465 3495 3	2465 3495 0	Bottom-Floor	Ladder	56229	
 2465 3495 3	2465 3495 2	Climb-down	Ladder	56229	
 2465 4010 0	2461 10417 0	Enter	Cave	37433	
+2465 4433 0	2465 4434 0	Open	Magic door	12047	
 2466 3491 0	2466 3493 0	Open	Tree Door	1968	
 2466 3493 0	2466 3491 0	Open	Tree Door	1968	
 2466 3494 0	2466 3494 1	Climb-up	Ladder	4458	
@@ -1230,6 +1382,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2466 3496 2	2466 3496 3	Climb-up	Ladder	56232	
 2466 3496 3	2466 3496 0	Bottom-Floor	Ladder	56229	
 2466 3496 3	2466 3496 2	Climb-down	Ladder	56229	
+2466 4433 0	2466 4434 0	Open	Magic door	12045	
 2466 9674 0	2464 9674 0	Pull	Lever	3337	
 2466 9723 0	2468 9723 0	Climb-over	Rockslide	3309	
 2467 3491 0	2466 3493 0	Open	Tree Door	1968	
@@ -1250,6 +1403,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2468 9903 0	2468 9905 0	Push	Roots	2451	
 2468 9905 0	2468 9903 0	Push	Roots	2451	
 2468 10403 0	2471 10403 0	Climb	Steps	37417	
+2470 4437 0	2469 4437 0	Open	Magic door	12047	
+2470 4438 0	2469 4438 0	Open	Magic door	12045	
 2470 9706 0	2472 9706 0	Climb-over	Rockslide	3309	
 2471 3426 0	2471 3423 1	Climb-over	Obstacle net	23134	
 2471 10403 0	2468 10403 0	Climb	Steps	37417	
@@ -1318,6 +1473,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2485 3419 2	2487 3420 0	Climb-down	Tree branch	23560	
 2485 3425 0	2485 3428 0	Climb-over	Obstacle net	23134	
 2485 3465 2	2484 3463 1	Climb-down	Tree	28800	
+2485 4471 0	3260 3171 0	Use	Fairy ring	12003	
 2485 9720 0	2485 9722 0	Climb-over	Rockslide	3309	
 2485 9722 0	2485 9720 0	Climb-over	Rockslide	3309	
 2486 3045 0	2477 9437 2	Climb-down	Stairs	6841	
@@ -1326,12 +1482,14 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2486 3420 2	2487 3420 0	Climb-down	Tree branch	23560	
 2486 3425 0	2486 3428 0	Climb-over	Obstacle net	23134	
 2486 3515 0	2489 3521 0	Climb	Rocks	16534	
-2486 4471 0	3260 3171 0	Use	Fairy ring	12003	
+2486 4470 0	3260 3171 0	Use	Fairy ring	12003	
+2486 4472 0	3260 3171 0	Use	Fairy ring	12003	
 2487 3402 0	2485 3401 1	Climb-up	Staircase	16675	
 2487 3403 0	2485 3401 1	Climb-up	Staircase	16675	
 2487 3407 0	2489 3409 1	Climb-up	Staircase	16675	
 2487 3425 0	2487 3428 0	Climb-over	Obstacle net	23134	
 2487 3430 0	2487 3437 0	Squeeze-through	Obstacle pipe	23139	
+2487 4471 0	3260 3171 0	Use	Fairy ring	12003	
 2488 3406 0	2489 3409 1	Climb-up	Staircase	16675	
 2488 3409 0	2489 3409 1	Climb-up	Staircase	16675	
 2488 3425 0	2488 3428 0	Climb-over	Obstacle net	23134	
@@ -1754,12 +1912,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2591 3092 1	2590 3088 0	Climb-down	Staircase	15648	
 2592 3338 0	2592 3339 0	Open	Door	2054	
 2592 3339 0	2592 3338 0	Open	Door	2054	
-2594 3085 0	2594 9485 0	Climb-down	Ladder	17384	
+2594 3086 0	2594 9486 0	Climb-down	Ladder	17384	
 2594 3208 0	2597 3208 1	Climb-up	Staircase	16671	
 2594 3209 0	2597 3208 1	Climb-up	Staircase	16671	
 2594 3334 1	2590 3334 0	Climb-down	Staircase	15648	
 2594 3335 1	2590 3334 0	Climb-down	Staircase	15648	
-2594 9486 0	2594 3085 0	Climb-up	Ladder	17383	
+2594 9486 0	2594 3086 0	Climb-up	Ladder	17385	
 2595 3207 0	2597 3208 1	Climb-up	Staircase	16671	
 2595 3210 0	2597 3208 1	Climb-up	Staircase	16671	
 2596 3087 0	2597 3087 0	Open	Magic guild door	1732	
@@ -1913,6 +2071,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2633 4682 0	2634 4682 1	Climb-up	Staircase	16671	
 2634 4682 1	2635 4681 0	Climb-down	Staircase	16673	
 2635 4681 0	2634 4682 1	Climb-up	Staircase	16671	
+2637 2414 0	2683 8877 0	Climb-down	Dark hole	60073	
 2637 3350 0	2640 3350 0	Climb-over	Stile	993	
 2637 4011 1	2658 10371 0	Use	Avalanche	21158	
 2638 3349 0	2640 3350 0	Climb-over	Stile	993	
@@ -2027,6 +2186,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2682 9548 0	2690 9547 0	Cross	Stepping stone	19040	
 2683 3268 1	2683 3271 0	Cross	Gangplank	2086	
 2683 3271 0	2683 3268 1	Cross	Gangplank	2085	
+2683 8877 0	2637 2414 0	Climb-up	Rope	60076	
 2684 9436 0	2697 9436 0	Enter	Crevice	30198	
 2687 9506 0	2682 9506 0	Walk-across	Log balance	20884	
 2688 3697 0	2691 3697 0	Jump	Broken Fence	544	
@@ -2042,6 +2202,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2696 5277 1	2488 5536 0	Enter	Doorway	23052	
 2696 5291 1	2696 5294 2	Climb-up	Stairs	22931	
 2696 5294 2	2696 5291 1	Climb-down	Stairs	22932	
+2696 9683 0	2697 3283 0	Climb-up	Exit	18354	
 2697 3496 0	2698 3495 1	Climb-up	Staircase	25935	
 2697 3497 0	2698 3495 1	Climb-up	Staircase	25935	
 2697 4497 0	2761 4497 0	Climb-down	Ladder	4967	
@@ -2049,6 +2210,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2697 5294 2	2696 5291 1	Climb-down	Stairs	22932	
 2697 9436 0	2684 9436 0	Enter	Crevice	30198	
 2697 9525 0	2695 9533 0	Cross	Stepping stone	19040	
+2698 3283 0	2696 9684 0	Climb-down	Old ruin entrance	18270	
 2698 3495 0	2698 3495 1	Climb-up	Staircase	25935	
 2698 3495 1	2697 3496 0	Climb-down	Staircase	25801	
 2698 3498 0	2698 3495 1	Climb-up	Staircase	25935	
@@ -2278,6 +2440,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2734 9478 0	2760 3061 0	Use	Crevice	30201	
 2735 4503 0	2799 4567 0	Climb-up	Ladder	4970	
 2735 10008 0	2730 10008 0	Squeeze-through	Crevice	16539	
+2736 3580 0	2736 3580 1	Climb-up	Staircase	25682	
+2736 3580 1	2736 3580 0	Climb-down	Staircase	25683	
 2736 3580 1	2737 3580 0	Climb-down	Staircase	25683	
 2736 5351 0	2733 5351 1	Climb-up	Stairs	22931	
 2736 5352 0	2733 5351 1	Climb-up	Stairs	22931	
@@ -2354,15 +2518,15 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2762 2940 0	2762 2942 0	Chop-down	Jungle Bush	2892	
 2762 2943 0	2762 2941 0	Chop-down	Jungle Bush	2892	
 2762 2989 0	2760 9389 0	Search	Well stacked rocks	2234	
-2763 2703 0	2763 9103 0	Climb-down	Bamboo Ladder	4780	
 2763 3238 1	2760 3238 0	Cross	Gangplank	17401	
-2763 9103 0	2763 2703 0	Climb-up	Bamboo Ladder	4781	
 2763 9312 0	2763 9322 0	Search	Ancient Gate	2930	
 2763 9312 0	2763 9322 0	Search	Ancient Gate	2930	
 2763 9312 0	2763 9322 0	Search	Ancient Gate	2930	
 2763 9312 0	2763 9322 0	Search	Ancient Gate	2930	
 2763 9333 0	2377 4712 0	Climb-down	Winch	2935	
 2763 9333 0	2377 4712 0	Search	Winch	2934	
+2764 2703 0	2764 9103 0	Climb-down	Bamboo Ladder	4780	
+2764 9103 0	2764 2703 0	Climb-up	Bamboo Ladder	4781	
 2764 9339 0	2770 9340 0	Squeeze-Through	Crevice	53242	
 2764 9376 0	2765 2976 0	Climb	Climbing rocks	2236	
 2766 3491 1	2766 3491 2	Climb-up	Ladder	26107	
@@ -2440,6 +2604,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2783 4569 0	3423 9625 0	Climb-up	Ladder	4966	
 2783 4941 1	3233 9293 0	Climb-down	Ladder	6500	
 2783 4973 1	2845 4973 2	Climb-up	Ladder	6502	
+2783 6427 0	3411 9813 0	Climb-up	Rubble	48924	
 2784 4940 1	3233 9293 0	Climb-down	Ladder	6500	
 2784 4942 1	3233 9293 0	Climb-down	Ladder	6500	
 2785 4941 1	3233 9293 0	Climb-down	Ladder	6500	
@@ -2449,14 +2614,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2789 9296 0	2790 9295 0	Jump-over	Jagged wall	2926	
 2790 4486 0	2726 4486 0	Climb-up	Ladder	4968	
 2790 9295 0	2789 9296 0	Jump-over	Jagged wall	2926	
-2791 2935 0	2791 2937 0	Chop-down	Jungle tree	2890	
-2791 2937 0	2791 2935 0	Chop-down	Jungle tree	2890	
-2791 2937 0	2791 2939 0	Chop-down	Jungle Bush	2893	
-2791 2939 0	2791 2937 0	Chop-down	Jungle Bush	2893	
-2791 2939 0	2791 2941 0	Chop-down	Jungle Bush	2893	
-2791 2941 0	2791 2939 0	Chop-down	Jungle Bush	2893	
-2791 2941 0	2791 2943 0	Chop-down	Jungle tree	2890	
-2791 2943 0	2791 2941 0	Chop-down	Jungle tree	2890	
 2791 2978 0	2795 2978 0	Climb	Rocks	2231	
 2791 2979 0	2795 2979 0	Climb	Rocks	2231	
 2791 2980 0	2795 2980 0	Climb	Rocks	2231	
@@ -2465,12 +2622,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2792 3417 1	2792 3414 0	Cross	Gangplank	17395	
 2792 4592 0	3454 3242 0	Walk-up	Stairs	4923	
 2792 4827 0	2980 3511 0	Use	Portal	34749	
-2793 2937 0	2793 2939 0	Chop-down	Jungle Bush	2893	
-2793 2939 0	2793 2937 0	Chop-down	Jungle Bush	2893	
-2793 2939 0	2793 2941 0	Chop-down	Jungle Bush	2893	
-2793 2941 0	2793 2939 0	Chop-down	Jungle Bush	2893	
-2793 2941 0	2793 2943 0	Chop-down	Jungle tree	2890	
-2793 2943 0	2793 2941 0	Chop-down	Jungle tree	2890	
 2794 9338 0	2805 9339 0	Search	Bookcase	2911	
 2795 2793 0	2795 2797 1	Climb-up	Stairs	4756	
 2795 2797 1	2795 2793 0	Climb-down	Stairs	4755	
@@ -2500,8 +2651,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2797 4600 0	2733 4536 0	Climb-down	Ladder	4969	
 2798 2938 0	2798 2940 0	Chop-down	Jungle Bush	2893	
 2798 2940 0	2798 2942 0	Chop-down	Jungle Bush	2892	
-2798 2941 0	2798 2939 0	Chop-down	Jungle Bush	2892	
-2798 2943 0	2798 2941 0	Chop-down	Jungle tree	2890	
 2798 4453 0	2799 4453 0	Open	Door	4962	
 2798 4566 0	2734 4502 0	Climb-down	Ladder	4969	
 2798 4568 0	2734 4504 0	Climb-down	Ladder	4969	
@@ -2520,15 +2669,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2799 10134 0	2797 3719 0	Enter	Tunnel	5013	
 2800 2793 0	2800 2797 1	Climb-up	Stairs	4756	
 2800 2797 1	2800 2793 0	Climb-down	Stairs	4755	
-2800 2936 0	2800 2938 0	Chop-down	Jungle tree	2889	
-2800 2938 0	2800 2940 0	Chop-down	Jungle tree	2890	
-2800 2939 0	2800 2937 0	Chop-down	Jungle tree	2889	
-2800 2940 0	2800 2942 0	Chop-down	Jungle Bush	2893	
-2800 2941 0	2800 2939 0	Chop-down	Jungle Bush	2893	
-2800 2943 0	2800 2941 0	Chop-down	Jungle tree	2890	
 2800 4429 0	3435 9635 0	Crawl-through	Cart tunnel	29333	
 2800 5160 0	2166 4409 2	Climb-down	Ladder	20278	
 2800 10134 0	2797 3719 0	Enter	Tunnel	5013	
+2801 2934 0	2801 2936 0	Chop-down	Jungle Bush	2892	
+2802 2756 0	2802 2759 0	Talk-to	Elder Guard	5277	
+2802 2759 0	2802 2756 0	Talk-to	Elder Guard	5277	
 2802 10187 0	2822 3745 0	Enter	Tunnel	5011	
 2803 2727 2	2806 2724 0	Jump off	End of bridge	4745	
 2803 2733 2	2803 2735 0	Climb-down	Bamboo Ladder	4744	
@@ -2567,16 +2713,19 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2819 2938 0	2819 2936 0	Chop-down	Jungle Bush	2893	
 2819 2938 0	2819 2940 0	Chop-down	Jungle Bush	2893	
 2819 2940 0	2819 2938 0	Chop-down	Jungle Bush	2893	
-2820 2935 0	2820 2937 0	Chop-down	Jungle tree	2890	
-2820 2937 0	2820 2939 0	Chop-down	Jungle Bush	2893	
-2820 2938 0	2820 2936 0	Chop-down	Jungle Bush	2892	
-2820 2940 0	2820 2938 0	Chop-down	Jungle tree	2890	
 2820 3486 0	2820 9882 0	Climb-down	Stairs	55	
 2820 3557 0	2820 3558 0	Open	Door	3746	
 2820 3558 0	2820 3557 0	Open	Door	3746	
 2820 9882 0	2820 3486 0	Climb-up	Stairs	54	
+2821 2936 0	2821 2938 0	Chop-down	Jungle Bush	2893	
+2821 2938 0	2821 2936 0	Chop-down	Jungle Bush	2893	
+2821 2938 0	2821 2940 0	Chop-down	Jungle Bush	2892	
+2821 2940 0	2821 2938 0	Chop-down	Jungle Bush	2892	
+2821 3374 0	2822 9774 0	Climb-down	Ladder	2408	
 2821 3486 0	2820 9882 0	Climb-down	Stairs	55	
 2821 9882 0	2820 3486 0	Climb-up	Stairs	54	
+2822 2934 0	2822 2936 0	Chop-down	Jungle Bush	2893	
+2822 2936 0	2822 2934 0	Chop-down	Jungle Bush	2893	
 2822 3513 0	2822 9913 0	Climb-down	Ladder	16680	
 2822 3555 0	2823 3555 0	Open	Door	3745	
 2822 3635 0	2820 3635 0	Climb	Rocks	3748	
@@ -2875,11 +3024,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2863 2976 0	2863 2971 0	Cross	Stepping stone	16466	
 2863 9570 0	2480 5175 0	Enter	Cave entrance	11835	
 2863 9574 0	2480 5175 0	Enter	Cave entrance	11835	
-2864 2934 0	2864 2936 0	Chop-down	Jungle Bush	2892	
 2864 2936 0	2864 2934 0	Chop-down	Jungle Bush	2892	
-2864 2936 0	2864 2938 0	Chop-down	Jungle tree	2889	
 2864 2939 0	2864 2937 0	Chop-down	Jungle tree	2889	
-2864 2939 0	2864 2941 0	Chop-down	Jungle Bush	2893	
 2864 2941 0	2864 2939 0	Chop-down	Jungle Bush	2893	
 2864 9570 0	2480 5175 0	Enter	Cave entrance	11835	
 2865 3938 0	2866 3938 0	Squeeze-through	Broken fence	46817	
@@ -2894,23 +3040,11 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2865 10210 0	2862 10209 1	Climb-up	Stairs	6087	
 2865 10221 0	2865 10224 1	Climb-up	Stairs	6085	
 2865 10224 1	2865 10221 0	Climb-down	Stairs	6086	
-2866 2934 0	2866 2936 0	Chop-down	Jungle Bush	2892	
-2866 2936 0	2866 2934 0	Chop-down	Jungle Bush	2892	
-2866 2936 0	2866 2938 0	Chop-down	Jungle Bush	2892	
-2866 2938 0	2866 2940 0	Chop-down	Jungle Bush	2893	
-2866 2939 0	2866 2937 0	Chop-down	Jungle tree	2890	
-2866 2941 0	2866 2939 0	Chop-down	Jungle tree	2890	
 2866 3428 0	2869 3428 0	Climb	Rocks	62423	
 2866 3938 0	2865 3938 0	Squeeze-through	Broken fence	46817	
 2867 3718 0	2874 3720 0	Enter	Cave entrance	6440	
 2867 3719 0	2874 3720 0	Enter	Cave entrance	6440	
 2867 3720 0	2874 3720 0	Enter	Cave entrance	6440	
-2868 2934 0	2868 2936 0	Chop-down	Jungle tree	2889	
-2868 2936 0	2868 2934 0	Chop-down	Jungle tree	2889	
-2868 2936 0	2868 2938 0	Chop-down	Jungle tree	2889	
-2868 2938 0	2868 2940 0	Chop-down	Jungle Bush	2892	
-2868 2939 0	2868 2937 0	Chop-down	Jungle Bush	2892	
-2868 2941 0	2868 2939 0	Chop-down	Jungle Bush	2893	
 2868 3016 0	2400 4835 0	Enter	Mysterious ruins	34821	
 2868 3721 0	2874 3720 0	Enter	Cave entrance	6440	
 2868 10198 1	2865 10198 2	Climb-up	Stairs	6089	
@@ -2923,6 +3057,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2869 10085 0	2869 10084 0	Open	Storeroom Door	3810	
 2870 2971 0	2870 2971 1	Climb-up	Ladder	16683	
 2870 2971 1	2870 2971 0	Climb-down	Ladder	16679	
+2871 2934 0	2871 2936 0	Chop-down	Jungle Bush	2893	
 2871 2970 0	2871 2970 1	Climb-up	Ladder	16683	
 2871 2970 1	2871 2970 0	Climb-down	Ladder	16679	
 2871 2972 0	2871 2972 1	Climb-up	Ladder	16683	
@@ -3003,11 +3138,19 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2888 9823 1	2886 9823 0	Jump-down	Rocks	14106	
 2888 9830 0	2889 9830 0	Open	Prison door	2144	
 2888 9831 0	2889 9831 0	Open	Prison door	2143	
+2889 3508 1	2889 3508 2	Climb-up	Ladder	16683	
+2889 3508 2	2889 3508 1	Climb-down	Ladder	16679	
 2889 9830 0	2888 9830 0	Open	Prison door	2144	
 2889 9831 0	2888 9831 0	Open	Prison door	2143	
+2890 3507 1	2890 3507 2	Climb-up	Ladder	16683	
+2890 3507 2	2890 3507 1	Climb-down	Ladder	16679	
+2890 3509 1	2890 3509 2	Climb-up	Ladder	16683	
+2890 3509 2	2890 3509 1	Climb-down	Ladder	16679	
 2890 10198 1	2893 10198 2	Climb-up	Stairs	6089	
 2890 10199 1	2893 10198 2	Climb-up	Stairs	6089	
 2890 10200 1	2893 10198 2	Climb-up	Stairs	6089	
+2891 3508 1	2891 3508 2	Climb-up	Ladder	16683	
+2891 3508 2	2891 3508 1	Climb-down	Ladder	16679	
 2891 3557 0	2891 3557 1	Climb-up	Ladder	16683	
 2891 3557 1	2891 3557 0	Climb-down	Ladder	16679	
 2891 3570 0	2891 3570 1	Climb-up	Ladder	16683	
@@ -3029,12 +3172,29 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2893 10200 2	2890 10198 1	Climb-down	Stairs	6090	
 2893 10209 0	2896 10209 1	Climb-up	Stairs	6087	
 2893 10210 0	2896 10209 1	Climb-up	Stairs	6087	
+2894 3505 1	2894 3505 2	Climb-up	Ladder	16683	
+2894 3505 2	2894 3505 1	Climb-down	Ladder	16679	
+2894 3516 1	2894 3516 2	Climb-up	Ladder	16683	
+2894 3516 2	2894 3516 1	Climb-down	Ladder	16679	
 2894 3566 0	2894 3567 0	Open	Large door	3743	
 2894 3567 0	2894 3566 0	Open	Large door	3743	
 2894 3671 0	2893 10074 2	Enter	Cave Entrance	3759	
 2894 10074 2	2893 3671 0	Exit	Cave Exit	3760	
+2895 3504 1	2895 3504 2	Climb-up	Ladder	16683	
+2895 3504 2	2895 3504 1	Climb-down	Ladder	16679	
+2895 3506 1	2895 3506 2	Climb-up	Ladder	16683	
+2895 3506 2	2895 3506 1	Climb-down	Ladder	16679	
+2895 3515 1	2895 3515 2	Climb-up	Ladder	16683	
+2895 3515 2	2895 3515 1	Climb-down	Ladder	16679	
+2895 3517 1	2895 3517 2	Climb-up	Ladder	16683	
+2895 3517 2	2895 3517 1	Climb-down	Ladder	16679	
 2895 3672 0	2893 10074 2	Enter	Cave Entrance	3759	
 2896 2727 0	2393 3465 0	Travel	Waydar	1446	
+2896 3505 1	2896 3505 2	Climb-up	Ladder	16683	
+2896 3505 2	2896 3505 1	Climb-down	Ladder	16679	
+2896 3512 0	2897 3513 1	Climb-up	Staircase	16671	
+2896 3516 1	2896 3516 2	Climb-up	Ladder	16683	
+2896 3516 2	2896 3516 1	Climb-down	Ladder	16679	
 2896 3618 0	2897 3618 0	Open	Arena Entrance	3782	
 2896 3619 0	2897 3619 0	Open	Arena Entrance	3783	
 2896 10188 1	2893 10188 0	Climb-down	Stairs	6088	
@@ -3043,6 +3203,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2896 10210 1	2893 10209 0	Climb-down	Stairs	6088	
 2897 3428 0	2898 3427 1	Climb-up	Staircase	16671	
 2897 3429 0	2898 3427 1	Climb-up	Staircase	16671	
+2897 3513 1	2896 3512 0	Climb-down	Staircase	16673	
 2897 3565 0	2897 3569 1	Climb-up	Stairs	4626	
 2897 3569 1	2897 3565 0	Climb-down	Stairs	4625	
 2897 3618 0	2896 3618 0	Open	Arena Entrance	3782	
@@ -3137,6 +3298,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2911 3687 0	2909 3687 0	Climb	Rocks	3748	
 2912 4953 3	3233 2898 0	Climb-up	Ladder	6504	
 2912 5300 2	2914 5300 1	Climb-down	Rock	26561	
+2912 5473 0	3321 3141 0	Drink-from	Fountain	12941	
 2913 3221 0	2913 3221 1	Climb-up	Ship's ladder	9744	
 2913 3221 1	2913 3221 0	Climb-down	Ship's ladder	9745	
 2913 4952 3	3233 2898 0	Climb-up	Ladder	6504	
@@ -3228,11 +3390,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2931 10196 0	1940 4958 0	Climb-down	Stairs	9084	
 2931 10197 0	1940 4958 0	Climb-down	Stairs	9084	
 2932 2936 0	2932 2938 0	Chop-down	Jungle tree	2890	
-2932 2938 0	2932 2936 0	Chop-down	Jungle tree	2890	
 2932 2938 0	2932 2940 0	Chop-down	Jungle Bush	2892	
 2932 2940 0	2932 2942 0	Chop-down	Jungle Bush	2892	
-2932 2941 0	2932 2939 0	Chop-down	Jungle tree	2889	
-2932 2943 0	2932 2941 0	Chop-down	Jungle Bush	2893	
 2932 4711 2	2549 3112 1	Climb-down	Ladder	2797	
 2933 2937 0	2933 2939 0	Chop-down	Jungle Bush	2893	
 2933 2939 0	2933 2937 0	Chop-down	Jungle Bush	2893	
@@ -3246,11 +3405,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2934 3355 0	2936 3355 0	Climb-over	Crumbling wall	24222	
 2935 9810 0	2936 9810 0	Squeeze-through	Loose Railing	28849	
 2936 2936 0	2936 2938 0	Chop-down	Jungle tree	2889	
-2936 2938 0	2936 2936 0	Chop-down	Jungle tree	2889	
 2936 2938 0	2936 2940 0	Chop-down	Jungle Bush	2893	
-2936 2940 0	2936 2938 0	Chop-down	Jungle Bush	2893	
-2936 2940 0	2936 2942 0	Chop-down	Jungle tree	2889	
-2936 2943 0	2936 2941 0	Chop-down	Jungle tree	2889	
+2936 2940 0	2936 2942 0	Chop-down	Jungle Bush	2892	
 2936 3355 0	2934 3355 0	Climb-over	Crumbling wall	24222	
 2936 9810 0	2935 9810 0	Squeeze-through	Loose Railing	28849	
 2938 3252 0	2937 3252 0	Open	Exit door	2602	
@@ -3264,7 +3420,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 2946 3439 0	2943 3439 0	Climb-up	Climbing rocks	53255	
 2946 3520 0	2946 3523 0	Cross	Wilderness Ditch	23271	
 2946 3523 0	2946 3520 0	Cross	Wilderness Ditch	23271	
-2946 3678 0	2949 3681 0	Climb	Rocks	16545	
+2946 3678 0	2950 3681 0	Climb	Rocks	16545	
 2947 3520 0	2947 3523 0	Cross	Wilderness Ditch	23271	
 2947 3523 0	2947 3520 0	Cross	Wilderness Ditch	23271	
 2948 3309 0	2948 3313 0	Climb-into	Underwall tunnel	16527	
@@ -3501,8 +3657,10 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3014 9951 0	3038 3382 0	Leave	Old passageway	31892	
 3014 9952 0	3038 3382 0	Leave	Old passageway	31892	
 3015 3246 0	3016 3246 0	Open	Door	59	
+3015 5629 0	2453 3231 0	Climb	Ladder	29636	
 3016 3246 0	3015 3246 0	Open	Door	59	
-3016 3352 3	3016 3349 3	Jump	Gap	14919	
+3016 3353 3	3016 3349 3	Jump	Gap	14919	
+3016 5630 0	2453 3231 0	Climb	Ladder	29636	
 3016 10249 0	3070 3856 0	Climb-up	Ladder	18990	
 3017 3332 3	3019 3332 3	Jump	Ledge	14924	
 3017 3333 3	3019 3333 3	Jump	Ledge	14924	
@@ -3512,19 +3670,19 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3017 3344 0	3021 3344 1	Climb-up	Staircase	24077	
 3017 3345 3	3014 3345 3	Jump	Ledge	14920	
 3017 3346 3	3014 3346 3	Jump	Ledge	14920	
-3017 3352 3	3017 3349 3	Jump	Gap	14919	
+3017 3353 3	3017 3349 3	Jump	Gap	14919	
 3017 3850 0	3069 10255 0	Climb-down	Ladder	18987	
 3017 3958 1	3017 3960 2	Climb-up	Ship's ladder	245	
 3017 3960 2	3017 3958 1	Climb-down	Ship's ladder	246	
+3017 4822 0	3039 4844 0	Go-through	Passage	26250	
+3017 4834 0	3039 4844 0	Go-through	Passage	26250	
 3017 10248 0	3070 3856 0	Climb-up	Ladder	18990	
 3017 10250 0	3070 3856 0	Climb-up	Ladder	18990	
 3018 3231 0	2962 9650 0	Climb-down	Manhole	10321	
-3018 3352 3	3018 3349 3	Jump	Gap	14919	
+3018 3353 3	3018 3349 3	Jump	Gap	14919	
 3018 3450 0	3018 9850 0	Climb-down	Trapdoor	11867	
 3018 3958 0	3018 3958 1	Climb-up	Ship's ladder	272	
 3018 3958 1	3018 3958 0	Climb-down	Ship's ladder	273	
-3018 4822 0	3039 4844 0	Go-through	Passage	26250	
-3018 4834 0	3039 4844 0	Go-through	Passage	26250	
 3018 9850 0	3018 3450 0	Climb-up	Ladder	17387	
 3018 10249 0	3070 3856 0	Climb-up	Ladder	18990	
 3019 3337 0	3019 9737 0	Climb-down	Ladder	30367	
@@ -3533,10 +3691,10 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3020 3332 0	3024 3332 1	Climb-up	Staircase	24077	
 3020 3333 0	3024 3333 1	Climb-up	Staircase	24077	
 3020 3450 0	3020 9850 0	Climb-down	Trapdoor	11867	
+3020 4843 0	3039 4844 0	Go-through	Passage	26250	
 3021 3339 0	3021 9739 0	Climb-down	Ladder	30367	
 3021 3343 1	3017 3343 0	Climb-down	Staircase	24078	
 3021 3344 1	3017 3344 0	Climb-down	Staircase	24078	
-3021 4843 0	3039 4844 0	Go-through	Passage	26250	
 3022 3332 3	3029 3332 0	Jump	Edge	14925	
 3022 3333 3	3029 3333 0	Jump	Edge	14925	
 3022 3334 3	3029 3334 0	Jump	Edge	14925	
@@ -3561,6 +3719,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3027 3352 1	3027 3354 0	Climb-down	Ladder	24084	
 3027 3353 3	3020 3353 3	Cross	Tightrope	14911	
 3027 3354 0	3027 3352 1	Climb-up	Ladder	24082	
+3027 4812 0	3039 4844 0	Go-through	Passage	26250	
 3027 4834 0	3229 4834 0	Exit-through	Blood rift	43825	
 3027 9571 0	3035 9557 0	Enter	Tunnel	42506	
 3028 4837 0	2142 4836 0	Exit-through	Cosmic rift	24974	
@@ -3568,8 +3727,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3029 3217 0	3032 3217 1	Cross	Gangplank	2083	
 3029 3852 0	3031 3852 0	Slash	Web	733	
 3029 4830 0	2587 4836 0	Exit-through	Fire rift	24971	
-3029 4850 0	3033 4843 0	Go-through	Passage	26250	
-3030 4812 0	3039 4844 0	Go-through	Passage	26250	
+3029 4851 0	3033 4843 0	Go-through	Passage	26250	
 3031 3852 0	3029 3852 0	Slash	Web	733	
 3031 4825 0	2660 4843 0	Exit-through	Earth rift	24972	
 3032 3217 1	3029 3217 0	Cross	Gangplank	2084	
@@ -3580,6 +3738,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3032 6125 1	3228 6116 0	Channel	Teleport Platform	36082	
 3033 3389 1	3033 3390 0	Jump	Wall	17051	
 3033 3390 0	3033 3389 1	Climb	Rough wall	62418	
+3033 6068 0	3283 6058 0	Channel	Teleport Platform	36197	
 3034 4793 0	3221 3219 0	Operate	Appendage	27027	
 3034 9558 0	3026 9571 0	Enter	Tunnel	42506	
 3035 3214 0	3035 3214 1	Climb-up	Ship's ladder	272	
@@ -3614,17 +3773,25 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3039 3383 1	3037 3382 0	Climb-down	Staircase	24252	
 3039 4805 0	3039 4800 0	Enter	Passage	27054	
 3039 4821 0	2520 4848 0	Exit-through	Body rift	24973	
-3039 4854 0	3039 4844 0	Go-through	Passage	26250	
+3039 4855 0	3039 4844 0	Go-through	Passage	26250	
+3040 4696 2	3040 4699 2	Jump	Gap	10859	
 3041 3199 1	3041 3202 0	Cross	Gangplank	14305	
 3041 3202 0	3041 3199 1	Cross	Gangplank	14304	
+3041 4696 2	3041 4699 2	Jump	Gap	10859	
+3041 4701 2	3043 4701 2	Climb-over	Low wall	10865	
+3041 4702 2	3043 4702 2	Climb-over	Low wall	10865	
 3042 3305 0	3045 3305 0	Climb-over	Stile	7527	
 3042 3520 0	3042 3523 0	Cross	Wilderness Ditch	23271	
 3042 3523 0	3042 3520 0	Cross	Wilderness Ditch	23271	
-3042 4811 0	3039 4844 0	Go-through	Passage	26250	
+3042 4810 0	3039 4844 0	Go-through	Passage	26250	
+3042 9399 0	3046 2996 0	Exit	Opening	58093	
 3043 3304 0	3045 3305 0	Climb-over	Stile	7527	
 3043 3306 0	3045 3305 0	Climb-over	Stile	7527	
 3043 3520 0	3043 3523 0	Cross	Wilderness Ditch	23271	
 3043 3523 0	3043 3520 0	Cross	Wilderness Ditch	23271	
+3043 4694 2	3042 4697 3	Climb-up	Stairs	10857	
+3043 4701 2	3041 4701 2	Climb-over	Low wall	10865	
+3043 4702 2	3041 4702 2	Climb-over	Low wall	10865	
 3044 3306 0	3042 3305 0	Climb-over	Stile	7527	
 3044 3520 0	3044 3523 0	Cross	Wilderness Ditch	23271	
 3044 3523 0	3044 3520 0	Cross	Wilderness Ditch	23271	
@@ -3646,7 +3813,10 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3045 3520 0	3045 3523 0	Cross	Wilderness Ditch	23271	
 3045 3523 0	3045 3520 0	Cross	Wilderness Ditch	23271	
 3045 3927 0	3044 10322 0	Climb-down	Staircase	16664	
+3045 4696 3	3364 2830 0	Enter	Doorway	10855	
 3045 10323 0	3044 3927 0	Climb-up	Staircase	16665	
+3046 2979 0	1503 4642 0	Climb-down	Ladder	58029	
+3046 2996 0	3042 9399 0	Enter	Cave entrance	58092	
 3046 3362 0	3046 3366 1	Climb-up	Staircase	24079	
 3046 3366 1	3046 3362 0	Climb-down	Staircase	24080	
 3046 3482 0	3046 3482 1	Climb-up	Ladder	2641	
@@ -3655,6 +3825,9 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3046 3484 1	3046 3484 0	Climb-down	Ladder	16679	
 3046 3520 0	3046 3523 0	Cross	Wilderness Ditch	23271	
 3046 3523 0	3046 3520 0	Cross	Wilderness Ditch	23271	
+3046 4693 2	3048 4693 2	Climb-over	Low wall	10865	
+3046 4694 2	3048 4694 2	Climb-over	Low wall	10865	
+3046 4699 3	3046 4696 3	Jump	Gap	10859	
 3046 9756 0	3046 9757 0	Open	Door	30364	
 3046 9757 0	3046 9756 0	Open	Door	30364	
 3047 3227 1	3045 3227 2	Climb-up	Ship's ladder	245	
@@ -3663,15 +3836,20 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3047 3483 1	3047 3483 0	Climb-down	Ladder	16679	
 3047 3520 0	3047 3523 0	Cross	Wilderness Ditch	23271	
 3047 3523 0	3047 3520 0	Cross	Wilderness Ditch	23271	
+3047 4699 3	3047 4696 3	Jump	Gap	10859	
 3047 4825 0	2846 4836 0	Exit-through	Air rift	25378	
 3048 3231 1	3048 3234 0	Cross	Gangplank	2413	
 3048 3234 0	3048 3231 1	Cross	Gangplank	2412	
 3048 3358 3	3048 3361 3	Jump	Gap	14903	
 3048 3520 0	3048 3523 0	Cross	Wilderness Ditch	23271	
 3048 3523 0	3048 3520 0	Cross	Wilderness Ditch	23271	
+3048 4693 2	3046 4693 2	Climb-over	Low wall	10865	
+3048 4694 2	3046 4694 2	Climb-over	Low wall	10865	
+3048 4697 2	3048 4694 2	Jump	Gap	10859	
 3049 3354 1	3050 3353 0	Climb-down	Staircase	24076	
 3049 3520 0	3049 3523 0	Cross	Wilderness Ditch	23271	
 3049 3523 0	3049 3520 0	Cross	Wilderness Ditch	23271	
+3049 4697 2	3049 4694 2	Jump	Gap	10859	
 3049 4839 0	2464 4826 0	Exit-through	Law rift	25034	
 3050 3349 3	3050 3357 3	Cross	Hand holds	14901	
 3050 3352 0	3049 3354 1	Climb-up	Staircase	24075	
@@ -3680,10 +3858,10 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3050 3356 1	3050 3354 2	Climb-up	Ladder	24082	
 3050 3520 0	3050 3523 0	Cross	Wilderness Ditch	23271	
 3050 3523 0	3050 3520 0	Cross	Wilderness Ditch	23271	
-3050 4813 0	3039 4844 0	Go-through	Passage	26250	
+3050 4812 0	3039 4844 0	Go-through	Passage	26250	
 3050 4829 0	1816 3856 0	Exit-through	Soul rift	25377	
 3050 4837 0	2205 4838 0	Exit-through	Death rift	25035	
-3050 4850 0	3039 4844 0	Go-through	Passage	26250	
+3050 4851 0	3039 4844 0	Go-through	Passage	26250	
 3051 3520 0	3051 3523 0	Cross	Wilderness Ditch	23271	
 3051 3523 0	3051 3520 0	Cross	Wilderness Ditch	23271	
 3051 4833 0	2714 4838 0	Exit-through	Water rift	25376	
@@ -3725,15 +3903,15 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3058 3483 1	3058 3483 0	Climb-down	Ladder	16679	
 3058 3520 0	3058 3523 0	Cross	Wilderness Ditch	23271	
 3058 3523 0	3058 3520 0	Cross	Wilderness Ditch	23271	
-3058 4822 0	3039 4844 0	Go-through	Passage	26250	
 3058 9776 0	3061 3376 0	Climb-up	Staircase	23969	
 3058 9777 0	3061 3377 0	Climb-up	Staircase	23969	
 3059 3520 0	3059 3523 0	Cross	Wilderness Ditch	23271	
 3059 3523 0	3059 3520 0	Cross	Wilderness Ditch	23271	
-3059 4840 0	3039 4844 0	Go-through	Passage	26250	
+3059 4822 0	3039 4844 0	Go-through	Passage	26250	
 3060 3000 1	3063 3000 0	Cross	Gangplank	60523	
 3060 3520 0	3060 3523 0	Cross	Wilderness Ditch	23271	
 3060 3523 0	3060 3520 0	Cross	Wilderness Ditch	23271	
+3060 4840 0	3039 4844 0	Go-through	Passage	26250	
 3060 9555 0	3060 9557 0	Climb	Steps	8729	
 3060 9557 0	3060 9555 0	Climb	Steps	8729	
 3060 9766 0	3728 5692 0	Enter	Cave	26654	
@@ -3742,12 +3920,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3061 3377 0	3058 9777 0	Climb-down	Staircase	16664	
 3061 3520 0	3061 3523 0	Cross	Wilderness Ditch	23271	
 3061 3523 0	3061 3520 0	Cross	Wilderness Ditch	23271	
-3061 4831 0	3052 4831 0	Go-through	Passage	26250	
 3061 4985 1	2906 3537 0	Enter	Passageway	7258	
 3062 3282 0	3063 3284 0	Climb-over	Stile	7527	
 3062 3283 0	3063 3281 0	Climb-over	Stile	7527	
 3062 3520 0	3062 3523 0	Cross	Wilderness Ditch	23271	
 3062 3523 0	3062 3520 0	Cross	Wilderness Ditch	23271	
+3062 4831 0	3052 4831 0	Go-through	Passage	26250	
 3063 3000 0	3060 3000 1	Cross	Gangplank	60522	
 3063 3281 0	3063 3284 0	Climb-over	Stile	7527	
 3063 3284 0	3063 3281 0	Climb-over	Stile	7527	
@@ -4127,6 +4305,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3121 9285 1	3122 9286 0	Climb-down	Ladder	11042	
 3121 9287 1	3122 9286 0	Climb-down	Ladder	11042	
 3121 9288 1	3189 2889 0	Climb	Sand pile	10950	
+3122 2490 0	3125 8880 0	Enter	Cave entrance	57908	
 3122 3102 0	3122 3103 0	Open	Door	9723	
 3122 3103 0	3122 3102 0	Open	Door	9723	
 3122 3128 0	3122 3128 1	Climb-up	Ladder	16683	
@@ -4156,6 +4335,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3124 3128 1	3124 3128 0	Climb-down	Ladder	16679	
 3124 9328 1	3194 2926 0	Climb	Sand pile	10950	
 3125 3124 0	3124 3124 0	Open	Door	9721	
+3125 8880 0	3122 2490 0	Exit	Cave exit	57909	
 3125 9328 1	3194 2926 0	Climb	Sand pile	10950	
 3126 3633 0	3126 3633 1	Climb-up	Ladder	14745	
 3126 3633 1	3126 3633 0	Climb-down	Ladder	14746	
@@ -4484,8 +4664,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3179 3523 0	3179 3520 0	Cross	Wilderness Ditch	23271	
 3179 4561 0	3174 4561 1	Enter	Passageway	20515	
 3179 4598 1	3175 4598 1	Enter	Passageway	20536	
-3180 2432 0	3180 2434 0	Climb	Rocks	57928	
-3180 2434 0	3180 2432 0	Climb	Rocks	57927	
+3180 2431 0	3180 2435 0	Climb	Rocks	57928	
+3180 2435 0	3180 2431 0	Climb	Rocks	57927	
 3180 3520 0	3180 3523 0	Cross	Wilderness Ditch	23271	
 3180 3523 0	3180 3520 0	Cross	Wilderness Ditch	23271	
 3180 4596 1	3182 4596 1	Jump-to	Pillar	20549	
@@ -4570,7 +4750,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3192 3520 0	3192 3523 0	Cross	Wilderness Ditch	23271	
 3192 3523 0	3192 3520 0	Cross	Wilderness Ditch	23271	
 3193 2925 0	3124 9328 1	Climb-down	Secret entrance	11046	
-3193 3346 0	3191 3339 0	Jump-to	Stepping stone	62412	
+3193 3346 0	3193 3338 0	Jump-to	Stepping stone	62412	
 3193 3402 3	3193 3398 3	Leap	Gap	14833	
 3193 3520 0	3193 3523 0	Cross	Wilderness Ditch	23271	
 3193 3523 0	3193 3520 0	Cross	Wilderness Ditch	23271	
@@ -4653,6 +4833,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3205 9378 0	3310 2961 0	Climb-up	Rope	6439	
 3205 9380 0	3310 2961 0	Climb-up	Rope	6439	
 3206 2395 0	3212 2395 0	Cross	Stepping stone	57936	
+3206 2395 0	3212 2395 0	Cross	Stepping stone	57936	
 3206 3208 0	3205 3209 1	Climb-up	Staircase	56230	
 3206 3208 1	3205 3209 2	Climb-up	Staircase	16672	
 3206 3208 1	3206 3208 0	Climb-down	Staircase	16672	
@@ -4695,6 +4876,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3211 3520 0	3211 3523 0	Cross	Wilderness Ditch	23271	
 3211 3523 0	3211 3520 0	Cross	Wilderness Ditch	23271	
 3212 2395 0	3206 2395 0	Cross	Stepping stone	57936	
+3212 2395 0	3206 2395 0	Cross	Stepping stone	57936	
 3212 3138 0	3214 3130 0	Jump-to	Stepping stone	16513	
 3212 3138 0	3214 3131 0	Jump-to	Stepping stone	16513	
 3212 3221 0	3213 3221 0	Open	Large door	12349	
@@ -4721,6 +4903,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3215 3523 0	3215 3520 0	Cross	Wilderness Ditch	23271	
 3216 3520 0	3216 3523 0	Cross	Wilderness Ditch	23271	
 3216 3523 0	3216 3520 0	Cross	Wilderness Ditch	23271	
+3216 12441 0	3222 12441 0	Pass	Tight Gap	36693	
 3217 3520 0	3217 3523 0	Cross	Wilderness Ditch	23271	
 3217 3523 0	3217 3520 0	Cross	Wilderness Ditch	23271	
 3217 10058 0	3102 3655 0	Climb-up	Stairs	31558	
@@ -4731,11 +4914,27 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3219 3495 0	3220 3496 1	Climb-up	Staircase	11789	
 3219 3520 0	3219 3523 0	Cross	Wilderness Ditch	23271	
 3219 3523 0	3219 3520 0	Cross	Wilderness Ditch	23271	
+3219 6065 0	3219 6065 2	Channel	Teleport Platform	36490	
+3219 6065 2	3219 6065 0	Channel	Teleport Platform	36490	
+3219 6066 0	3219 6066 2	Channel	Teleport Platform	36490	
+3219 6066 2	3219 6066 0	Channel	Teleport Platform	36490	
+3219 6099 0	3219 6099 2	Channel	Teleport Platform	36490	
+3219 6099 2	3219 6099 0	Channel	Teleport Platform	36490	
+3219 6100 0	3219 6100 2	Channel	Teleport Platform	36490	
+3219 6100 2	3219 6100 0	Channel	Teleport Platform	36490	
 3219 9532 2	3226 9542 0	Enter	Tunnel	6658	
 3219 9618 0	3221 9618 0	Squeeze-through	Hole	6905	
 3220 3496 1	3219 3495 0	Climb-down	Staircase	11793	
 3220 3520 0	3220 3523 0	Cross	Wilderness Ditch	23271	
 3220 3523 0	3220 3520 0	Cross	Wilderness Ditch	23271	
+3220 6064 0	3220 6064 2	Channel	Teleport Platform	36490	
+3220 6064 2	3220 6064 0	Channel	Teleport Platform	36490	
+3220 6067 0	3220 6067 2	Channel	Teleport Platform	36490	
+3220 6067 2	3220 6067 0	Channel	Teleport Platform	36490	
+3220 6098 0	3220 6098 2	Channel	Teleport Platform	36490	
+3220 6098 2	3220 6098 0	Channel	Teleport Platform	36490	
+3220 6101 0	3220 6101 2	Channel	Teleport Platform	36490	
+3220 6101 2	3220 6101 0	Channel	Teleport Platform	36490	
 3220 9532 2	3226 9542 0	Enter	Tunnel	6658	
 3220 10084 0	3220 10088 0	Jump-to	Pillar	31561	
 3220 10088 0	3220 10084 0	Jump-to	Pillar	31561	
@@ -4743,6 +4942,14 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3221 3471 2	3223 3472 3	Climb-up	Staircase	11790	
 3221 3520 0	3221 3523 0	Cross	Wilderness Ditch	23271	
 3221 3523 0	3221 3520 0	Cross	Wilderness Ditch	23271	
+3221 6064 0	3221 6064 2	Channel	Teleport Platform	36490	
+3221 6064 2	3221 6064 0	Channel	Teleport Platform	36490	
+3221 6067 0	3221 6067 2	Channel	Teleport Platform	36490	
+3221 6067 2	3221 6067 0	Channel	Teleport Platform	36490	
+3221 6098 0	3221 6098 2	Channel	Teleport Platform	36490	
+3221 6098 2	3221 6098 0	Channel	Teleport Platform	36490	
+3221 6101 0	3221 6101 2	Channel	Teleport Platform	36490	
+3221 6101 2	3221 6101 0	Channel	Teleport Platform	36490	
 3221 9552 0	3221 9556 0	Jump-across	Stepping stone	5949	
 3221 9556 0	3221 9552 0	Jump-across	Stepping stone	5949	
 3221 9618 0	3219 9618 0	Squeeze-through	Hole	6905	
@@ -4755,6 +4962,15 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3222 3491 0	3222 3490 0	Open	Door	32464	
 3222 3520 0	3222 3523 0	Cross	Wilderness Ditch	23271	
 3222 3523 0	3222 3520 0	Cross	Wilderness Ditch	23271	
+3222 6065 0	3222 6065 2	Channel	Teleport Platform	36490	
+3222 6065 2	3222 6065 0	Channel	Teleport Platform	36490	
+3222 6066 0	3222 6066 2	Channel	Teleport Platform	36490	
+3222 6066 2	3222 6066 0	Channel	Teleport Platform	36490	
+3222 6099 0	3222 6099 2	Channel	Teleport Platform	36490	
+3222 6099 2	3222 6099 0	Channel	Teleport Platform	36490	
+3222 6100 0	3222 6100 2	Channel	Teleport Platform	36490	
+3222 6100 2	3222 6100 0	Channel	Teleport Platform	36490	
+3222 12441 0	3216 12441 0	Pass	Tight Gap	36692	
 3223 3472 1	3223 3472 2	Climb-up	Ladder	11801	
 3223 3472 2	3223 3472 1	Climb-down	Ladder	11802	
 3223 3472 3	3222 3471 2	Climb-down	Staircase	11793	
@@ -4762,12 +4978,16 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3223 3523 0	3223 3520 0	Cross	Wilderness Ditch	23271	
 3224 3520 0	3224 3523 0	Cross	Wilderness Ditch	23271	
 3224 3523 0	3224 3520 0	Cross	Wilderness Ditch	23271	
-3224 4832 0	3559 9779 0	Use	Portal	43478	
+3224 4831 0	3559 9779 0	Use	Portal	43478	
+3224 4833 0	3559 9779 0	Use	Portal	43478	
 3224 9600 0	3224 9604 0	Squeeze-through	Hole	6912	
 3224 9604 0	3224 9600 0	Squeeze-through	Hole	6912	
 3225 3520 0	3225 3523 0	Cross	Wilderness Ditch	23271	
 3225 3523 0	3225 3520 0	Cross	Wilderness Ditch	23271	
+3225 4832 0	3559 9779 0	Use	Portal	43478	
+3225 6046 0	3225 12445 0	Enter	Cave	36690	
 3225 9542 0	3219 9532 2	Enter	Tunnel	6659	
+3225 12445 0	3225 6046 0	Exit	Steps	36691	
 3226 3108 0	3483 9510 2	Climb-down	Tunnel entrance	3827	
 3226 3109 0	3483 9510 2	Climb-down	Tunnel entrance	3827	
 3226 3393 0	3230 3393 1	Climb-up	Staircase	11796	
@@ -4845,6 +5065,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3231 9293 0	2783 4941 1	Climb-up	Ladder	6501	
 3231 9800 0	3231 3400 0	Climb-up	Ladder	11804	
 3231 9802 0	3231 3402 0	Climb-up	Ladder	11804	
+3231 12537 0	3256 6082 2	Travel	Teleport Platform	36615	
 3232 2897 0	2913 4954 3	Climb-down	Ladder	6497	
 3232 2898 0	3232 2900 0	Open	Pyramid entrance	6547	
 3232 2900 0	3232 2898 0	Open	Pyramid entrance	6547	
@@ -4857,6 +5078,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3232 9294 0	2783 4941 1	Climb-up	Ladder	6501	
 3232 9801 0	3232 3401 0	Climb-up	Ladder	11804	
 3232 10351 0	3233 3950 0	Use	Crevice	26763	
+3232 12420 0	3242 12420 0	Pass	Tight Gap	36695	
+3232 12537 0	3256 6082 2	Travel	Teleport Platform	36615	
 3233 2887 0	3233 9313 0	Enter	Tunnel	6481	
 3233 2896 0	2913 4954 3	Climb-down	Ladder	6497	
 3233 2898 0	2913 4954 3	Climb-down	Ladder	6497	
@@ -4870,6 +5093,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3233 9323 0	3233 9325 0	Open	Doorway	6555	
 3233 9325 0	3233 9323 0	Open	Doorway	6555	
 3233 10332 0	3233 3938 0	Use	Crevice	26763	
+3233 12537 0	3256 6082 2	Travel	Teleport Platform	36615	
+3234 2418 0	3237 8882 0	Enter	Cave entrance	57915	
 3234 2897 0	2913 4954 3	Climb-down	Ladder	6497	
 3234 3424 0	3234 3424 1	Climb-up	Ladder	11794	
 3234 3424 1	3234 3424 0	Climb-down	Ladder	11795	
@@ -4878,6 +5103,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3234 9323 0	3234 9325 0	Open	Doorway	6553	
 3234 9325 0	3234 9323 0	Open	Doorway	6553	
 3235 2386 0	3235 2390 0	Climb	Rocks	57932	
+3235 2386 0	3235 2390 0	Climb	Rocks	57932	
+3235 2390 0	3235 2386 0	Climb	Rocks	57931	
 3235 2390 0	3235 2386 0	Climb	Rocks	57931	
 3235 3520 0	3235 3523 0	Cross	Wilderness Ditch	23271	
 3235 3523 0	3235 3520 0	Cross	Wilderness Ditch	23271	
@@ -4891,6 +5118,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3237 3446 0	3239 3447 1	Climb-up	Staircase	11789	
 3237 3520 0	3237 3523 0	Cross	Wilderness Ditch	23271	
 3237 3523 0	3237 3520 0	Cross	Wilderness Ditch	23271	
+3237 8882 0	3234 2418 0	Exit	Cave exit	57916	
 3237 9858 0	3236 3458 0	Climb-up	Ladder	11806	
 3238 3408 3	3238 3410 3	Hurdle	Ledge	14836	
 3238 3415 3	3238 3417 0	Jump-off	Edge	14841	
@@ -4907,6 +5135,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3239 3447 1	3238 3446 0	Climb-down	Staircase	11793	
 3239 3520 0	3239 3523 0	Cross	Wilderness Ditch	23271	
 3239 3523 0	3239 3520 0	Cross	Wilderness Ditch	23271	
+3239 4832 0	3559 9779 0	Use	Portal	43478	
 3239 9524 2	3241 9524 2	Climb	Rocks	6673	
 3239 9525 2	3241 9525 2	Climb	Rocks	6673	
 3240 3334 0	3240 3335 0	Jump-over	Fence	16518	
@@ -4915,7 +5144,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3240 3415 3	3240 3417 0	Jump-off	Edge	14841	
 3240 3520 0	3240 3523 0	Cross	Wilderness Ditch	23271	
 3240 3523 0	3240 3520 0	Cross	Wilderness Ditch	23271	
-3240 4832 0	3559 9779 0	Use	Portal	43478	
+3240 4831 0	3559 9779 0	Use	Portal	43478	
+3240 4833 0	3559 9779 0	Use	Portal	43478	
 3241 3520 0	3241 3523 0	Cross	Wilderness Ditch	23271	
 3241 3523 0	3241 3520 0	Cross	Wilderness Ditch	23271	
 3241 9524 2	3239 9524 2	Climb	Rocks	6673	
@@ -4925,6 +5155,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3242 3520 0	3242 3523 0	Cross	Wilderness Ditch	23271	
 3242 3523 0	3242 3520 0	Cross	Wilderness Ditch	23271	
 3242 3948 0	3243 10351 0	Enter	Cavern	26762	
+3242 12420 0	3232 12420 0	Pass	Tight Gap	36694	
 3243 3383 0	3243 9783 0	Climb-down	Ladder	11803	
 3243 3520 0	3243 3523 0	Cross	Wilderness Ditch	23271	
 3243 3523 0	3243 3520 0	Cross	Wilderness Ditch	23271	
@@ -4938,19 +5169,51 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3244 9784 0	3244 3382 0	Climb-up	Ladder	2405	
 3245 3520 0	3245 3523 0	Cross	Wilderness Ditch	23271	
 3245 3523 0	3245 3520 0	Cross	Wilderness Ditch	23271	
+3245 6039 0	3245 6039 2	Channel	Teleport Platform	36490	
+3245 6039 2	3245 6039 0	Channel	Teleport Platform	36490	
+3245 6040 0	3245 6040 2	Channel	Teleport Platform	36490	
+3245 6040 2	3245 6040 0	Channel	Teleport Platform	36490	
+3245 6125 0	3245 6125 2	Channel	Teleport Platform	36490	
+3245 6125 2	3245 6125 0	Channel	Teleport Platform	36490	
+3245 6126 0	3245 6126 2	Channel	Teleport Platform	36490	
+3245 6126 2	3245 6126 0	Channel	Teleport Platform	36490	
 3245 9783 0	3244 3382 0	Climb-up	Ladder	2405	
 3246 3179 0	3259 3179 0	Jump-to	Broken Raft	17069	
 3246 3409 0	3246 3409 1	Climb-up	Ladder	11794	
 3246 3409 1	3246 3409 0	Climb-down	Ladder	11795	
 3246 3520 0	3246 3523 0	Cross	Wilderness Ditch	23271	
 3246 3523 0	3246 3520 0	Cross	Wilderness Ditch	23271	
+3246 6038 0	3246 6038 2	Channel	Teleport Platform	36490	
+3246 6038 2	3246 6038 0	Channel	Teleport Platform	36490	
+3246 6041 0	3246 6041 2	Channel	Teleport Platform	36490	
+3246 6041 2	3246 6041 0	Channel	Teleport Platform	36490	
+3246 6124 0	3246 6124 2	Channel	Teleport Platform	36490	
+3246 6124 2	3246 6124 0	Channel	Teleport Platform	36490	
+3246 6127 0	3246 6127 2	Channel	Teleport Platform	36490	
+3246 6127 2	3246 6127 0	Channel	Teleport Platform	36490	
 3246 9646 0	3232 9610 0	Cellar	Dartog	997	
 3246 9646 0	3313 9613 0	Mines	Kazgar	7301	
 3246 10215 0	3124 3805 0	Climb-up	Stairs	43868	
 3247 3520 0	3247 3523 0	Cross	Wilderness Ditch	23271	
 3247 3523 0	3247 3520 0	Cross	Wilderness Ditch	23271	
+3247 6038 0	3247 6038 2	Channel	Teleport Platform	36490	
+3247 6038 2	3247 6038 0	Channel	Teleport Platform	36490	
+3247 6041 0	3247 6041 2	Channel	Teleport Platform	36490	
+3247 6041 2	3247 6041 0	Channel	Teleport Platform	36490	
+3247 6124 0	3247 6124 2	Channel	Teleport Platform	36490	
+3247 6124 2	3247 6124 0	Channel	Teleport Platform	36490	
+3247 6127 0	3247 6127 2	Channel	Teleport Platform	36490	
+3247 6127 2	3247 6127 0	Channel	Teleport Platform	36490	
 3248 3520 0	3248 3523 0	Cross	Wilderness Ditch	23271	
 3248 3523 0	3248 3520 0	Cross	Wilderness Ditch	23271	
+3248 6039 0	3248 6039 2	Channel	Teleport Platform	36490	
+3248 6039 2	3248 6039 0	Channel	Teleport Platform	36490	
+3248 6040 0	3248 6040 2	Channel	Teleport Platform	36490	
+3248 6040 2	3248 6040 0	Channel	Teleport Platform	36490	
+3248 6125 0	3248 6125 2	Channel	Teleport Platform	36490	
+3248 6125 2	3248 6125 0	Channel	Teleport Platform	36490	
+3248 6126 0	3248 6126 2	Channel	Teleport Platform	36490	
+3248 6126 2	3248 6126 0	Channel	Teleport Platform	36490	
 3249 3520 0	3249 3523 0	Cross	Wilderness Ditch	23271	
 3249 3523 0	3249 3520 0	Cross	Wilderness Ditch	23271	
 3250 3520 0	3250 3523 0	Cross	Wilderness Ditch	23271	
@@ -4964,16 +5227,23 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3253 3520 0	3253 3523 0	Cross	Wilderness Ditch	23271	
 3253 3523 0	3253 3520 0	Cross	Wilderness Ditch	23271	
 3254 2398 0	3260 2398 0	Climb	Rocks	57933	
+3254 2398 0	3260 2398 0	Climb	Rocks	57933	
 3254 3442 1	3254 3446 2	Climb-up	Staircase	11797	
 3254 3446 2	3254 3442 1	Climb-down	Staircase	11799	
 3254 3520 0	3254 3523 0	Cross	Wilderness Ditch	23271	
 3254 3523 0	3254 3520 0	Cross	Wilderness Ditch	23271	
+3254 6081 2	3232 12537 0	Travel	Teleport Platform	36614	
+3254 6084 2	3232 12537 0	Travel	Teleport Platform	36614	
 3255 3420 0	3257 3421 1	Climb-up	Staircase	11789	
 3255 3520 0	3255 3523 0	Cross	Wilderness Ditch	23271	
 3255 3523 0	3255 3520 0	Cross	Wilderness Ditch	23271	
+3255 6081 2	3232 12537 0	Travel	Teleport Platform	36614	
+3255 6084 2	3232 12537 0	Travel	Teleport Platform	36614	
 3256 3420 0	3257 3421 1	Climb-up	Staircase	11789	
 3256 3520 0	3256 3523 0	Cross	Wilderness Ditch	23271	
 3256 3523 0	3256 3520 0	Cross	Wilderness Ditch	23271	
+3256 6082 2	3232 12537 0	Travel	Teleport Platform	36614	
+3256 6083 2	3232 12537 0	Travel	Teleport Platform	36614	
 3257 3421 1	3256 3420 0	Climb-down	Staircase	11793	
 3257 3422 1	3256 3420 0	Climb-down	Staircase	11793	
 3257 3450 0	1759 4958 0	Walk-down	Stairs	24428	
@@ -4998,6 +5268,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3259 3523 0	3259 3520 0	Cross	Wilderness Ditch	23271	
 3259 3663 0	3385 10052 0	Walk-down	Stairs	40388	
 3260 2398 0	3254 2398 0	Climb	Rocks	57934	
+3260 2398 0	3254 2398 0	Climb	Rocks	57934	
 3260 3520 0	3260 3523 0	Cross	Wilderness Ditch	23271	
 3260 3523 0	3260 3520 0	Cross	Wilderness Ditch	23271	
 3260 3663 0	3385 10052 0	Walk-down	Stairs	40388	
@@ -5015,12 +5286,14 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3263 3520 0	3263 3523 0	Cross	Wilderness Ditch	23271	
 3263 3523 0	3263 3520 0	Cross	Wilderness Ditch	23271	
 3263 6024 0	2239 3269 0	Exit	City Gate	36522	
+3263 6078 0	3268 6082 2	Climb up	Crystal Staircase	36387	
 3263 6135 0	2239 3386 0	Exit	City Gate	36522	
 3264 3405 0	3263 3405 0	Open	Gate	2050	
 3264 3406 0	3263 3406 0	Open	Gate	2051	
 3264 3520 0	3264 3523 0	Cross	Wilderness Ditch	23271	
 3264 3523 0	3264 3520 0	Cross	Wilderness Ditch	23271	
 3264 6024 0	2240 3269 0	Exit	City Gate	36523	
+3264 6078 0	3268 6082 2	Climb up	Crystal Staircase	36387	
 3264 6135 0	2240 3386 0	Exit	City Gate	36523	
 3265 3520 0	3265 3523 0	Cross	Wilderness Ditch	23271	
 3265 3523 0	3265 3520 0	Cross	Wilderness Ditch	23271	
@@ -5047,6 +5320,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3268 3523 0	3268 3520 0	Cross	Wilderness Ditch	23271	
 3268 3625 0	3268 3629 0	Cross	Stepping stone	53237	
 3268 3629 0	3268 3625 0	Cross	Stepping stone	53237	
+3268 6082 2	3263 6078 0	Climb down	Crystal Staircase	36390	
 3268 9228 2	3257 9226 0	Climb-down	Ladder	20287	
 3269 3520 0	3269 3523 0	Cross	Wilderness Ditch	23271	
 3269 3523 0	3269 3520 0	Cross	Wilderness Ditch	23271	
@@ -5057,7 +5331,10 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3271 2817 0	3263 2817 0	Jump-to	Stepping stone	62401	
 3271 3520 0	3271 3523 0	Cross	Wilderness Ditch	23271	
 3271 3523 0	3271 3520 0	Cross	Wilderness Ditch	23271	
+3271 6051 0	3302 12454 0	Enter	Cave entrance	36556	
 3272 2327 0	3272 2333 0	Climb	Rocks	57930	
+3272 2327 0	3272 2333 0	Climb	Rocks	57930	
+3272 2333 0	3272 2327 0	Climb	Rocks	57929	
 3272 2333 0	3272 2327 0	Climb	Rocks	57929	
 3272 3182 3	3272 3172 3	Cross	Tightrope	14398	
 3272 3520 0	3272 3523 0	Cross	Wilderness Ditch	23271	
@@ -5084,9 +5361,25 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3279 2772 1	3279 2770 3	Climb-up	Ladder	20356	
 3279 3520 0	3279 3523 0	Cross	Wilderness Ditch	23271	
 3279 3523 0	3279 3520 0	Cross	Wilderness Ditch	23271	
+3279 6039 0	3279 6039 2	Channel	Teleport Platform	36490	
+3279 6039 2	3279 6039 0	Channel	Teleport Platform	36490	
+3279 6040 0	3279 6040 2	Channel	Teleport Platform	36490	
+3279 6040 2	3279 6040 0	Channel	Teleport Platform	36490	
+3279 6125 0	3279 6125 2	Channel	Teleport Platform	36490	
+3279 6125 2	3279 6125 0	Channel	Teleport Platform	36490	
+3279 6126 0	3279 6126 2	Channel	Teleport Platform	36490	
+3279 6126 2	3279 6126 0	Channel	Teleport Platform	36490	
 3280 3412 0	1700 3141 0	Travel	Primio	12888	
 3280 3520 0	3280 3523 0	Cross	Wilderness Ditch	23271	
 3280 3523 0	3280 3520 0	Cross	Wilderness Ditch	23271	
+3280 6038 0	3280 6038 2	Channel	Teleport Platform	36490	
+3280 6038 2	3280 6038 0	Channel	Teleport Platform	36490	
+3280 6041 0	3280 6041 2	Channel	Teleport Platform	36490	
+3280 6041 2	3280 6041 0	Channel	Teleport Platform	36490	
+3280 6124 0	3280 6124 2	Channel	Teleport Platform	36490	
+3280 6124 2	3280 6124 0	Channel	Teleport Platform	36490	
+3280 6127 0	3280 6127 2	Channel	Teleport Platform	36490	
+3280 6127 2	3280 6127 0	Channel	Teleport Platform	36490	
 3280 9254 0	3280 9256 2	Climb-up	Ladder	20284	
 3280 9256 2	3280 9254 0	Climb-down	Ladder	20285	
 3281 2754 2	3281 2756 1	Climb-down	Ladder	20354	
@@ -5094,6 +5387,14 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3281 3520 0	3281 3523 0	Cross	Wilderness Ditch	23271	
 3281 3523 0	3281 3520 0	Cross	Wilderness Ditch	23271	
 3281 3935 0	3282 3936 1	Climb-up	Staircase	14736	
+3281 6038 0	3281 6038 2	Channel	Teleport Platform	36490	
+3281 6038 2	3281 6038 0	Channel	Teleport Platform	36490	
+3281 6041 0	3281 6041 2	Channel	Teleport Platform	36490	
+3281 6041 2	3281 6041 0	Channel	Teleport Platform	36490	
+3281 6124 0	3281 6124 2	Channel	Teleport Platform	36490	
+3281 6124 2	3281 6124 0	Channel	Teleport Platform	36490	
+3281 6127 0	3281 6127 2	Channel	Teleport Platform	36490	
+3281 6127 2	3281 6127 0	Channel	Teleport Platform	36490	
 3282 3520 0	3282 3523 0	Cross	Wilderness Ditch	23271	
 3282 3523 0	3282 3520 0	Cross	Wilderness Ditch	23271	
 3282 3936 1	3281 3935 0	Climb-down	Staircase	14736	
@@ -5101,6 +5402,15 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3282 3936 2	3281 3935 1	Climb-down	Staircase	14736	
 3282 3936 2	3282 3936 3	Climb-up	Staircase	14736	
 3282 3936 3	3282 3936 2	Climb-down	Staircase	14737	
+3282 6039 0	3282 6039 2	Channel	Teleport Platform	36490	
+3282 6039 2	3282 6039 0	Channel	Teleport Platform	36490	
+3282 6040 0	3282 6040 2	Channel	Teleport Platform	36490	
+3282 6040 2	3282 6040 0	Channel	Teleport Platform	36490	
+3282 6057 0	3033 6068 0	Channel	Teleport Platform	36198	
+3282 6125 0	3282 6125 2	Channel	Teleport Platform	36490	
+3282 6125 2	3282 6125 0	Channel	Teleport Platform	36490	
+3282 6126 0	3282 6126 2	Channel	Teleport Platform	36490	
+3282 6126 2	3282 6126 0	Channel	Teleport Platform	36490	
 3283 2754 1	3283 2756 0	Climb-down	Ladder	20354	
 3283 2756 0	3283 2754 1	Climb-up	Ladder	20353	
 3283 2768 1	3285 2768 0	Climb-down	Ladder	20354	
@@ -5138,6 +5448,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3287 3523 0	3287 3520 0	Cross	Wilderness Ditch	23271	
 3288 3520 0	3288 3523 0	Cross	Wilderness Ditch	23271	
 3288 3523 0	3288 3520 0	Cross	Wilderness Ditch	23271	
+3288 8868 1	3271 2463 0	Climb	Steps	57903	
+3288 8869 1	3271 2463 0	Climb	Steps	57903	
 3289 2700 0	3295 2700 0	Cross	Stepping stone	43989	
 3289 3520 0	3289 3523 0	Cross	Wilderness Ditch	23271	
 3289 3523 0	3289 3520 0	Cross	Wilderness Ditch	23271	
@@ -5183,6 +5495,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3302 3315 0	3306 3315 0	Climb	Rocks	16550	
 3302 3520 0	3302 3523 0	Cross	Wilderness Ditch	23271	
 3302 3523 0	3302 3520 0	Cross	Wilderness Ditch	23271	
+3302 12454 0	3271 6051 0	Exit	Steps	36215	
 3303 3115 0	3304 3117 0	Go-through	Shantay pass	4031	
 3303 3520 0	3303 3523 0	Cross	Wilderness Ditch	23271	
 3303 3523 0	3303 3520 0	Cross	Wilderness Ditch	23271	
@@ -5195,19 +5508,51 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3304 9376 0	3305 9376 0	Open	Gate	6452	
 3305 3520 0	3305 3523 0	Cross	Wilderness Ditch	23271	
 3305 3523 0	3305 3520 0	Cross	Wilderness Ditch	23271	
+3305 6065 0	3305 6065 2	Channel	Teleport Platform	36490	
+3305 6065 2	3305 6065 0	Channel	Teleport Platform	36490	
+3305 6066 0	3305 6066 2	Channel	Teleport Platform	36490	
+3305 6066 2	3305 6066 0	Channel	Teleport Platform	36490	
+3305 6099 0	3305 6099 2	Channel	Teleport Platform	36490	
+3305 6099 2	3305 6099 0	Channel	Teleport Platform	36490	
+3305 6100 0	3305 6100 2	Channel	Teleport Platform	36490	
+3305 6100 2	3305 6100 0	Channel	Teleport Platform	36490	
 3305 9375 0	3304 9375 0	Open	Gate	6451	
 3305 9376 0	3304 9376 0	Open	Gate	6452	
 3305 9497 0	3321 3122 0	Use	Crevice	26712	
 3306 3315 0	3302 3315 0	Climb	Rocks	16549	
 3306 3520 0	3306 3523 0	Cross	Wilderness Ditch	23271	
 3306 3523 0	3306 3520 0	Cross	Wilderness Ditch	23271	
+3306 6064 0	3306 6064 2	Channel	Teleport Platform	36490	
+3306 6064 2	3306 6064 0	Channel	Teleport Platform	36490	
+3306 6067 0	3306 6067 2	Channel	Teleport Platform	36490	
+3306 6067 2	3306 6067 0	Channel	Teleport Platform	36490	
+3306 6098 0	3306 6098 2	Channel	Teleport Platform	36490	
+3306 6098 2	3306 6098 0	Channel	Teleport Platform	36490	
+3306 6101 0	3306 6101 2	Channel	Teleport Platform	36490	
+3306 6101 2	3306 6101 0	Channel	Teleport Platform	36490	
 3307 2803 2	3309 2803 0	Climb-down	Ladder	20357	
 3307 3520 0	3307 3523 0	Cross	Wilderness Ditch	23271	
 3307 3523 0	3307 3520 0	Cross	Wilderness Ditch	23271	
+3307 6064 0	3307 6064 2	Channel	Teleport Platform	36490	
+3307 6064 2	3307 6064 0	Channel	Teleport Platform	36490	
+3307 6067 0	3307 6067 2	Channel	Teleport Platform	36490	
+3307 6067 2	3307 6067 0	Channel	Teleport Platform	36490	
+3307 6098 0	3307 6098 2	Channel	Teleport Platform	36490	
+3307 6098 2	3307 6098 0	Channel	Teleport Platform	36490	
+3307 6101 0	3307 6101 2	Channel	Teleport Platform	36490	
+3307 6101 2	3307 6101 0	Channel	Teleport Platform	36490	
 3308 3491 0	3308 3493 0	Climb-over	Broken fence	2618	
 3308 3493 0	3308 3491 0	Climb-over	Broken fence	2618	
 3308 3520 0	3308 3523 0	Cross	Wilderness Ditch	23271	
 3308 3523 0	3308 3520 0	Cross	Wilderness Ditch	23271	
+3308 6065 0	3308 6065 2	Channel	Teleport Platform	36490	
+3308 6065 2	3308 6065 0	Channel	Teleport Platform	36490	
+3308 6066 0	3308 6066 2	Channel	Teleport Platform	36490	
+3308 6066 2	3308 6066 0	Channel	Teleport Platform	36490	
+3308 6099 0	3308 6099 2	Channel	Teleport Platform	36490	
+3308 6099 2	3308 6099 0	Channel	Teleport Platform	36490	
+3308 6100 0	3308 6100 2	Channel	Teleport Platform	36490	
+3308 6100 2	3308 6100 0	Channel	Teleport Platform	36490	
 3309 2803 0	3307 2803 2	Climb-up	Ladder	20356	
 3309 2962 0	3206 9379 0	Climb-down	Smokey well	6279	
 3309 3452 0	3105 5280 0	Enter	Rift	13968	
@@ -5268,6 +5613,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3319 6080 0	2298 3328 0	Exit	City Gate	36523	
 3319 6081 0	2298 3329 0	Exit	City Gate	36523	
 3320 2796 0	3321 2858 0	Climb-through	Hole	6620	
+3320 3139 0	2912 5474 0	Teleport	Apprentice	1808	
 3320 3520 0	3320 3523 0	Cross	Wilderness Ditch	23271	
 3320 3523 0	3320 3520 0	Cross	Wilderness Ditch	23271	
 3321 3122 0	3305 9497 0	Enter	Cave	30180	
@@ -5338,21 +5684,44 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3352 2827 0	3348 2827 0	Climb	Climbing rocks	11949	
 3352 2828 0	3348 2828 0	Climb	Climbing rocks	11949	
 3352 2829 0	3348 2829 0	Climb	Climbing rocks	11949	
+3353 2921 0	3353 2925 0	Cross	Stepping stone	43988	
+3353 2925 0	3353 2921 0	Cross	Stepping stone	43988	
 3353 2961 0	3354 2958 1	Climb-up	Staircase	6242	
+3354 2848 1	3354 2850 1	Climb-over	Low wall	10865	
+3354 2850 1	3354 2848 1	Climb-over	Low wall	10865	
 3354 2958 1	3353 2961 0	Climb-down	Staircase	6243	
 3354 2959 1	3353 2961 0	Climb-down	Staircase	6243	
+3355 2830 0	3355 2833 1	Climb-up	Stairs	10857	
+3355 2848 1	3355 2850 1	Climb-over	Low wall	10865	
+3355 2850 1	3355 2848 1	Climb-over	Low wall	10865	
+3356 2846 2	3356 2849 2	Jump	Gap	10859	
 3356 2982 1	3356 2982 2	Climb-up	Ladder	6261	
 3356 2982 2	3356 2982 1	Climb-down	Ladder	6260	
+3357 2713 0	3359 9128 0	Enter	Entry	44596	
+3357 2832 1	3356 2835 2	Climb-up	Stairs	10857	
+3357 2836 2	3357 2841 2	Cross	Gap	10884	
+3357 2846 2	3357 2849 2	Jump	Gap	10859	
 3357 3307 1	3360 3306 0	Climb-down	Stairs	10776	
+3358 2838 3	3358 2840 3	Climb-over	Low wall	10865	
+3358 2840 3	3358 2838 3	Climb-over	Low wall	10865	
 3358 3307 1	3360 3306 0	Climb-down	Stairs	10776	
+3359 2834 2	3358 2837 3	Climb-up	Stairs	10857	
+3359 2838 3	3359 2840 3	Climb-over	Low wall	10865	
+3359 2840 3	3359 2838 3	Climb-over	Low wall	10865	
+3359 2842 3	3359 2847 3	Cross	Ledge	10888	
+3359 2849 2	3364 2849 2	Cross	Gap	10861	
 3359 3307 1	3360 3306 0	Climb-down	Stairs	10776	
+3359 9128 0	3357 2713 0	Leave	Exit	46087	
 3360 3306 0	3357 3307 1	Climb-up	Stairs	10775	
 3360 3307 0	3357 3307 1	Climb-up	Stairs	10775	
 3360 9904 0	3440 9899 0	Climb-up	Ladder	12764	
+3361 2836 3	3040 4695 2	Climb-up	Stairs	10857	
 3363 3298 0	3363 3300 0	Enter	Doorway	10721	
 3363 3300 0	3363 3298 0	Enter	Doorway	10721	
 3364 3002 0	3364 3002 1	Climb-up	Ladder	6261	
 3364 3002 1	3364 3002 0	Climb-down	Ladder	6260	
+3366 2833 2	3363 2833 2	Jump	Gap	10859	
+3366 2834 2	3363 2834 2	Jump	Gap	10859	
 3366 3306 0	3369 3307 1	Climb-up	Stairs	10771	
 3366 3307 0	3369 3307 1	Climb-up	Stairs	10771	
 3367 3307 1	3366 3306 0	Climb-down	Stairs	10773	
@@ -5361,11 +5730,18 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3368 2991 0	3368 2991 1	Climb-up	Ladder	6261	
 3368 2991 1	3368 2991 0	Climb-down	Ladder	6260	
 3368 3307 1	3366 3306 0	Climb-down	Stairs	10773	
+3369 2833 2	3371 2833 2	Climb-over	Low wall	10865	
+3369 2834 2	3371 2834 2	Climb-over	Low wall	10865	
 3369 3307 1	3366 3306 0	Climb-down	Stairs	10773	
 3369 4826 0	3369 4826 1	Climb-up	Ladder	16683	
 3369 4826 1	3369 4826 0	Climb-down	Ladder	16679	
+3370 2835 3	3365 2835 3	Cross	Plank	10868	
+3370 2843 3	3370 2840 3	Jump	Gap	10859	
 3370 2970 0	3371 2970 0	Open	Door	6240	
 3370 2971 0	3371 2971 0	Open	Door	6238	
+3371 2833 2	3369 2833 2	Climb-over	Low wall	10865	
+3371 2834 2	3369 2834 2	Climb-over	Low wall	10865	
+3371 2843 3	3371 2840 3	Jump	Gap	10859	
 3371 2970 0	3370 2970 0	Open	Door	6240	
 3371 2971 0	3370 2971 0	Open	Door	6238	
 3371 3129 0	3349 9536 0	Use	Root	6382	
@@ -5375,6 +5751,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3371 4810 1	3371 4810 0	Climb-down	Ladder	16679	
 3371 9312 0	3371 9313 0	Open	Door	10431	
 3371 9313 0	3371 9312 0	Open	Door	10431	
+3372 2841 2	3372 2836 2	Cross	Ledge	10860	
 3372 2902 0	3374 9305 0	Climb-down	Crevice	10416	
 3372 2903 0	3374 9305 0	Climb-down	Crevice	10416	
 3372 2904 0	3374 9305 0	Climb-down	Crevice	10416	
@@ -5397,19 +5774,25 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3375 2905 0	3374 9305 0	Climb-down	Crevice	10416	
 3375 2906 0	3374 9305 0	Climb-down	Crevice	10416	
 3375 2906 0	3374 9305 0	Climb-down	Crevice	10416	
+3383 3418 0	3405 9803 0	Operate	Winch	48918	
 3384 10052 0	3259 3663 0	Exit	Opening	40389	
 3385 10052 0	3259 3663 0	Exit	Opening	40389	
 3386 10052 0	3259 3663 0	Exit	Opening	40389	
+3389 9248 0	3390 9248 0	Open	Door	43962	
+3390 9248 0	3389 9248 0	Open	Door	43962	
 3391 3155 0	3396 3155 0	Climb	Rocks	62403	
 3396 3155 0	3391 3155 0	Climb	Rocks	62404	
 3403 2926 0	3403 2926 1	Climb-up	Ladder	10493	
 3403 2926 1	3403 2926 0	Climb-down	Ladder	10494	
 3405 3506 0	3405 9906 0	Climb-down	Trapdoor	1581	
+3405 9248 0	3406 9248 0	Open	Door	43961	
 3405 9631 0	3429 3233 0	Crawl-through	Cart tunnel	4921	
+3405 9803 0	3383 3418 0	Climb-up	Rope	48919	
 3405 9894 0	3405 9895 0	Open	Gate	3444	
 3405 9895 0	3405 9894 0	Open	Gate	3444	
 3405 9906 0	3405 3506 0	Climb-up	Ladder	17385	
 3405 10145 0	3294 3749 0	Exit	Opening	40391	
+3406 9248 0	3405 9248 0	Open	Door	43961	
 3406 10145 0	3294 3749 0	Exit	Opening	40391	
 3407 10145 0	3294 3749 0	Exit	Opening	40391	
 3408 3488 0	3409 3488 0	Open	Large door	3490	
@@ -5427,14 +5810,18 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3410 3486 2	3410 3486 1	Climb-down	Ladder	16679	
 3411 3485 1	3411 3485 2	Climb-up	Ladder	16683	
 3411 3485 2	3411 3485 1	Climb-down	Ladder	16679	
+3411 9813 0	2783 6427 0	Enter	Crevice	49510	
+3412 2848 0	3445 9248 2	Enter	Entry	6643	
 3412 3540 1	3417 3540 2	Climb-up	Staircase	2119	
 3412 3541 1	3417 3540 2	Climb-up	Staircase	2119	
 3412 9633 0	2772 4577 0	Climb-down	Ladder	4965	
+3412 9813 0	2784 6427 0	Enter	Crevice	49510	
 3412 9932 3	3417 3536 0	Climb-up	Ladder	30192	
 3413 9632 0	2773 4576 0	Climb-down	Ladder	4965	
 3413 9634 0	2773 4578 0	Climb-down	Ladder	4965	
 3414 9633 0	2774 4577 0	Climb-down	Ladder	4965	
 3415 3489 2	3416 3489 2	Open	Cell gate	3463	
+3416 2806 0	3419 2802 0	Climb	Steps	44111	
 3416 3484 0	3416 3485 1	Climb-up	Staircase	16671	
 3416 3485 0	3416 3485 1	Climb-up	Staircase	16671	
 3416 3485 1	3417 3486 0	Climb-down	Staircase	16673	
@@ -5455,6 +5842,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3418 3486 0	3416 3485 1	Climb-up	Staircase	16671	
 3418 3491 0	3416 3493 1	Climb-up	Staircase	16671	
 3418 3532 0	3420 3534 2	Climb-up	Ivy	57677	
+3419 2802 0	3416 2806 0	Climb	Steps	44113	
 3420 3185 0	3420 3185 1	Climb-up	Ladder	10493	
 3420 3185 1	3420 3185 0	Climb-down	Ladder	10494	
 3420 3534 2	3418 3532 0	Climb-through	Broken window	57679	
@@ -5481,7 +5869,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3425 3484 0	3425 3483 0	Squeeze-through	Ornate railing	17000	
 3426 2901 0	3426 2901 1	Climb-up	Ladder	10493	
 3426 2901 1	3426 2901 0	Climb-down	Ladder	10494	
-3426 3478 0	3424 3476 0	Climb	Rocks	16999	
 3426 3555 1	3426 3556 1	Open	Door	2102	
 3426 3556 1	3426 3555 1	Open	Door	2102	
 3427 3477 0	3424 3476 0	Climb	Rocks	16999	
@@ -5501,8 +5888,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3435 10112 0	3435 10115 0	Squeeze-Through	Crevice	53259	
 3435 10115 0	3435 10112 0	Squeeze-Through	Crevice	53259	
 3436 9637 0	3441 3232 0	Crawl-through	Cart tunnel	4920	
+3437 9245 2	3438 9242 0	Climb-down	Stairs	43959	
+3437 9251 2	3438 9254 0	Climb-down	Stairs	43958	
 3438 3537 0	3433 3537 1	Climb-up	Staircase	2114	
 3438 3538 0	3433 3537 1	Climb-up	Staircase	2114	
+3438 9242 0	3437 9245 2	Climb-up	Stairs	43957	
+3438 9254 0	3437 9251 2	Climb-up	Stairs	43956	
 3439 2892 0	3439 2892 1	Climb-up	Ladder	10493	
 3439 2892 1	3439 2892 0	Climb-down	Ladder	10494	
 3439 3337 0	3442 9734 1	Enter	Grotto	3516	
@@ -5531,6 +5922,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3444 3533 0	3442 3531 0	Climb-through	Broken window	57679	
 3445 2911 0	3449 2911 1	Climb-up	Staircase	10525	
 3445 2912 0	3449 2911 1	Climb-up	Staircase	10525	
+3445 9248 2	3412 2848 0	Climb-up	Stairs	43955	
 3446 3236 0	3444 3236 0	Climb-over	Mine cart	4918	
 3446 3576 1	3446 3576 2	Climb-up	Spikey chain	16537	
 3446 3576 2	3446 3576 1	Climb-down	Spikey chain	16538	
@@ -5580,10 +5972,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3492 9862 0	3513 9811 0	Enter	Cave entrance	12771	
 3495 3464 0	3477 9845 0	Open	Trapdoor	5055	
 3495 3465 0	3477 9845 0	Open	Trapdoor	5055	
+3497 3355 0	3501 3355 0	Cross	Stepping stone	42588	
 3498 3504 2	3492 3504 2	Jump	Gap	14845	
 3498 3505 2	3492 3504 2	Jump	Gap	14845	
 3500 9510 2	3506 9505 2	Squeeze-through	Crevice	16465	
 3500 9811 0	3509 3449 0	Open	Wooden doors	5056	
+3501 3355 0	3497 3355 0	Cross	Stepping stone	42588	
 3501 3426 0	3502 3432 0	Cross-bridge	Tree	5003	
 3501 9811 0	3509 3449 0	Open	Wooden doors	5057	
 3502 3425 0	3502 3432 0	Cross-bridge	Tree	5003	
@@ -5609,6 +6003,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3509 3449 0	3500 9811 0	Open	Wooden doors	5061	
 3509 9496 2	3508 9493 0	Climb-down	Tunnel entrance	23609	
 3509 9499 2	3508 9493 0	Climb-down	Tunnel entrance	23609	
+3510 2971 0	3929 9631 1	Enter	Vault Door	46743	
 3510 3449 0	3500 9811 0	Open	Wooden doors	5060	
 3510 3482 2	3510 3485 0	Jump	Gap	14897	
 3510 9496 2	3508 9493 0	Climb-down	Tunnel entrance	23609	
@@ -5624,8 +6019,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3537 3554 1	3537 3549 0	Climb-down	Staircase	5207	
 3538 3260 0	3538 3262 0	Climb-over	Broken fence	18411	
 3538 3262 0	3538 3260 0	Climb-over	Broken fence	18411	
-3538 3543 0	3538 3543 1	Climb-up	Ladder	16683	
-3538 3543 1	3538 3543 0	Climb-down	Ladder	16679	
 3538 3550 0	3537 3554 1	Climb-up	Staircase	5206	
 3538 3554 1	3537 3549 0	Climb-down	Staircase	5207	
 3539 3542 0	3539 3542 1	Climb-up	Ladder	16683	
@@ -5636,6 +6029,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3540 3543 1	3540 3543 0	Climb-down	Ladder	16679	
 3543 3463 0	3549 9865 0	Climb-down	Trapdoor	11637	
 3544 3282 0	3548 3283 0	Jump-Across	Dry stone wall	53256	
+3545 3282 0	3547 3282 0	Jump-Across	Dry stone wall	53256	
+3547 3282 0	3545 3282 0	Jump-Across	Dry stone wall	53256	
 3547 3539 1	3547 3539 2	Climb-up	Ladder	16683	
 3547 3539 2	3547 3539 1	Climb-down	Ladder	16679	
 3547 3554 1	3547 3554 2	Climb-up	Ladder	16683	
@@ -5693,7 +6088,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3582 3262 0	3582 3264 0	Climb-over	Broken fence	18411	
 3582 3264 0	3582 3262 0	Climb-over	Broken fence	18411	
 3588 3173 0	3590 3173 1	Climb-up	Floor	18124	
-3588 3173 1	3588 3173 0	Climb-down	Floor	18122	
 3588 3180 0	3592 3180 0	Climb-over	Wall rubble	18037	
 3588 3209 1	3588 3211 0	Climb-down	Ladder	17999	
 3588 3211 0	3588 3209 1	Climb-up	Ladder	18000	
@@ -5701,8 +6095,6 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3588 3252 2	3588 3250 1	Climb-down	Ladder	18001	
 3588 3258 2	3588 3260 1	Climb-down	Ladder	18001	
 3588 3260 1	3588 3258 2	Climb-up	Ladder	18002	
-3589 3173 0	3590 3173 1	Climb-up	Floor	18124	
-3589 3173 1	3588 3173 0	Climb-down	Floor	18122	
 3589 3174 0	3590 3173 1	Climb-up	Floor	18124	
 3589 3174 1	3588 3173 0	Climb-down	Floor	18122	
 3589 3179 0	3592 3180 0	Climb-over	Wall rubble	18037	
@@ -5888,6 +6280,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3642 3307 0	3641 3307 0	Open	Door	18047	
 3643 3306 0	3637 9695 0	Climb-down	Staircase	18049	
 3647 3209 0	2391 4620 2	Talk-to	Vyrewatch	8251	Could you escort me to the mines?
+3647 9815 0	3658 9815 0	Squeeze-through	Web tunnel	54159	
 3649 3218 0	3631 3219 0	Enter	Door	32660	
 3649 3219 0	3631 3219 0	Enter	Door	32660	
 3649 3220 0	3631 3219 0	Enter	Door	32660	
@@ -5902,6 +6295,9 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3653 3520 0	3669 9888 3	Climb-down	Trapdoor	16114	
 3654 3384 0	2400 5969 0	Enter	Mausoleum Door	38574	
 3654 3519 0	3669 9888 3	Climb-down	Trapdoor	16114	
+3657 3407 0	3679 9797 0	Enter	Cave	42594	
+3658 9815 0	3647 9815 0	Squeeze-through	Web tunnel	54152	
+3658 9815 0	3647 9815 0	Squeeze-through	Web tunnel	54152	
 3659 3507 0	3659 3509 0	Pay-toll(2-Ecto)	Energy Barrier	16105	
 3659 3509 0	3659 3507 0	Pay-toll(2-Ecto)	Energy Barrier	16105	
 3660 3507 0	3660 3509 0	Pay-toll(2-Ecto)	Energy Barrier	16105	
@@ -5951,6 +6347,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3675 9889 1	3671 9886 2	Climb-up	Stairs	16108	
 3677 2948 0	3677 2948 1	Climb-up	Ship's ladder	11308	
 3677 2948 1	3677 2948 0	Climb-down	Ship's ladder	11309	
+3677 9820 0	3684 9820 0	Squeeze-through	Web tunnel	54152	
+3677 9820 0	3684 9820 0	Squeeze-through	Web tunnel	54152	
+3678 9842 0	3678 9849 0	Squeeze-through	Web tunnel	54152	
+3678 9842 0	3678 9849 0	Squeeze-through	Web tunnel	54152	
+3678 9849 0	3678 9842 0	Squeeze-through	Web tunnel	54157	
+3679 9797 0	3658 3407 0	Exit	Cave	42595	
 3680 2963 0	3786 2824 0	Transport	Brother Tranquility	550	
 3680 3853 0	3595 10291 0	Climb Down	Trap Door	30842	
 3680 3854 0	3595 10291 0	Climb Down	Trap Door	30842	
@@ -5960,6 +6362,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3683 9889 0	3687 9887 1	Climb-up	Stairs	16108	
 3684 2950 1	3684 2953 0	Cross	Gangplank	11212	
 3684 2953 0	3684 2950 1	Cross	Gangplank	11211	
+3684 9820 0	3677 9820 0	Squeeze-through	Web tunnel	54155	
 3685 2946 1	3687 2946 2	Climb-up	Ship's ladder	11289	
 3685 2950 1	3687 2950 2	Climb-up	Ship's ladder	11289	
 3686 9886 1	3683 9888 0	Climb-down	Stairs	16109	
@@ -5972,6 +6375,8 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3688 9887 2	3692 9887 3	Climb-up	Stairs	16108	
 3688 9888 2	3692 9887 3	Climb-up	Stairs	16108	
 3688 9889 2	3692 9887 3	Climb-up	Stairs	16108	
+3689 9837 0	3696 9837 0	Squeeze-through	Web tunnel	54152	
+3689 9837 0	3696 9837 0	Squeeze-through	Web tunnel	54152	
 3689 9890 2	3692 9887 3	Climb-up	Stairs	16108	
 3690 9886 3	3688 9888 2	Climb-down	Stairs	16109	
 3690 9890 3	3688 9888 2	Climb-down	Stairs	16109	
@@ -5983,6 +6388,7 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3696 2996 0	3696 2996 1	Climb-up	Bamboo Ladder	4772	
 3696 2996 1	3696 2996 0	Climb-down	Bamboo Ladder	4778	
 3696 9764 2	3633 3339 0	Climb-up	Staircase	39093	
+3696 9837 0	3689 9837 0	Squeeze-through	Web tunnel	54155	
 3697 9764 2	3633 3339 0	Climb-up	Staircase	39093	
 3700 3335 1	3703 3334 0	Climb-down	Stairs	32648	
 3702 3503 0	3705 3503 1	Cross	Gangplank	17392	
@@ -6145,3 +6551,12 @@ Origin	Destination	Option	Object	ObjectId	Chat
 3884 4598 0	3886 4598 0	Open	Imposing doors	50211	
 3886 4598 0	3884 4598 0	Open	Imposing doors	50211	
 3892 4714 0	3861 4595 0	Climb	Stairs	55786	
+3929 9631 1	3510 2971 0	Climb-up	Steps	48795	
+4053 4568 0	4127 5508 0	Crawl-through	Opening	62542	
+4061 4466 0	4063 4550 2	Crawl-through	Hole	53637	
+4063 4550 2	4061 4466 0	Climb-through	Opening	53622	
+4065 4554 1	4065 4555 0	Jump-down	Wall	53676	
+4065 4555 0	4065 4554 1	Climb-up	Wall	53623	
+4066 4552 2	4066 4553 1	Jump-down	Wall	53676	
+4066 4553 1	4066 4552 2	Climb-up	Wall	53624	
+4127 5508 0	4053 4568 0	Enter	Opening	63009	

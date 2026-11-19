@@ -78,6 +78,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
@@ -810,6 +811,12 @@ public class ClueHelperDevPlugin extends Plugin
 			log.info("{} menu entry '{}' on '{}' type {} id {} npc {}", TAG, entry.getOption(), entry.getTarget(), entry.getType(),
 				entry.getIdentifier(), npc == null ? "none" : npc.getId() + " '" + npc.getName() + "'");
 		}
+	}
+
+	@Subscribe
+	public void onVarbitChanged(VarbitChanged event)
+	{
+		harness.onVarbitChanged(event);
 	}
 
 	@Subscribe

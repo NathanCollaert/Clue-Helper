@@ -31,6 +31,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 
@@ -59,6 +60,8 @@ public class DevHarness
 	private String lastGuideLine;
 	private final List<Runnable> unregister = new ArrayList<>();
 	private volatile DevCommands commands;
+	private static final int NO_VARBIT = -1;
+	private int watchedVarbit = NO_VARBIT;
 	private final HotColdService hotCold;
 	private final MemoryStore memory;
 
@@ -93,6 +96,8 @@ public class DevHarness
 			args -> clientThread.invokeLater(this::stashes));
 		c.register("hotcold", "[reset] show the hot/cold step's feel log, or restart it keeping its last reading as the anchor",
 			args -> clientThread.invokeLater(() -> hotColdLog(args)));
+		c.register("varbit", "<id> log the varbit's value now and every time it changes",
+			args -> clientThread.invokeLater(() -> watchVarbit(args)));
 		stepLogger.setEnabled(true);
 		unregister.add(clueLink.addListener(this::onStepChange));
 		unregister.add(availability.addListener(playerDump::onJudged));
@@ -108,6 +113,31 @@ public class DevHarness
 		stepLogger.setEnabled(false);
 		unregister.forEach(Runnable::run);
 		unregister.clear();
+	}
+
+	private void watchVarbit(String[] args)
+	{
+		if (args.length != 1 || !args[0].matches("\\d+"))
+		{
+			reply("usage: ::ch-varbit <id>, e.g. 20096");
+			return;
+		}
+		watchedVarbit = Integer.parseInt(args[0]);
+		tellVarbit(client.getVarbitValue(watchedVarbit));
+	}
+
+	public void onVarbitChanged(VarbitChanged event)
+	{
+		if (watchedVarbit != NO_VARBIT && event.getVarbitId() == watchedVarbit)
+		{
+			tellVarbit(event.getValue());
+		}
+	}
+
+	private void tellVarbit(int value)
+	{
+		log.info("varbit {} = {}", watchedVarbit, value);
+		reply("varbit " + watchedVarbit + " = " + value);
 	}
 
 	public void onCommandExecuted(CommandExecuted event)

@@ -36,6 +36,8 @@ public class StepGuide
 	}
 
 	static final String KEEP_GOING = "Keep going: ";
+	/** An object's own location and the tile a click on it names can differ by its size. */
+	private static final int TASK_OBJECT_TILES = 2;
 
 	private static final String CAPE_LIMIT_TEXT = "five times per day";
 	private static final int NO_ANIMATION = -1;
@@ -77,6 +79,8 @@ public class StepGuide
 	private PlayerModel player;
 	@Inject
 	private BankMemory bankMemory;
+	@Inject
+	private UnlockMemory unlocks;
 	@Inject
 	private MenuLines menuLines;
 	@Inject
@@ -134,8 +138,10 @@ public class StepGuide
 	private WorldPoint lastTile;
 	/** Where the player stood before the last teleport. */
 	private WorldPoint jumpedFrom;
-	/** The step whose task the player has started on its object (a pyre built), or null. */
+	/** The step whose task the player has started on its object (a pyre built, a net trap set), or null. */
 	private String taskStartedKey;
+	/** The clicked object's tile, for {@link #taskStartedKey}. */
+	private WorldPoint taskStartedAt;
 	/** A route that came while a teleport was under way, followed once it lands. */
 	private Waiting waiting;
 	/** While an enemy attacks during a dig or an emote. */
@@ -353,7 +359,7 @@ public class StepGuide
 		{
 			return;
 		}
-		if (isTravelling())
+		if (isTravelling() || isTravelJustClicked())
 		{
 			waiting = new Waiting(committed, player.getPosition().getTile());
 			return;
@@ -365,6 +371,26 @@ public class StepGuide
 	 * A task begun on its object goes on there, not back to a bank: its items are in the object now (the pyre logs, built
 	 * into the pyre), so the step's needs no longer read as carried.
 	 */
+	private boolean isTaskObject(int objectId)
+	{
+		return routeStep != null && routeStep.getStages().stream()
+			.anyMatch(stage -> stage.getKind() == Stage.Kind.TASK && stage.getObjectIds().contains(objectId));
+	}
+
+	/**
+	 * Once the task is under way, only the object it was begun on: a net trap's tree is no young tree any more, and the
+	 * next young tree is not where the catch comes.
+	 */
+	private List<TileObject> whereTaskBegan(List<TileObject> objects)
+	{
+		if (!isTaskUnderway() || taskStartedAt == null)
+		{
+			return objects;
+		}
+		return objects.stream().filter(object -> object.getWorldLocation().distanceTo(taskStartedAt) <= TASK_OBJECT_TILES)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
 	private boolean isTaskUnderway()
 	{
 		SubStep current = getCurrent();
@@ -412,8 +438,7 @@ public class StepGuide
 			// A new scene (out of a cave) is searched at once, not on the slow refresh
 			scene = SceneHighlights.NONE;
 		}
-		boolean clickedJustNow = travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= travelStartTicks();
-		travelStarted = isTravelStep() && isAnimating() && (travelStarted || clickedJustNow);
+		travelStarted = isTravelStep() && isAnimating() && (travelStarted || isTravelJustClicked());
 		if (travelStarted && getCurrent().isTravel())
 		{
 			teleportAnimatedTick = client.getTickCount();
@@ -422,7 +447,7 @@ public class StepGuide
 		// Before the early returns below: a follow on every tick near the step would starve them (a deposit never seen)
 		actWatcher.onGameTick(routeStep);
 		deposit.onGameTick(tile);
-		if (waiting != null && !isTravelling())
+		if (waiting != null && !isTravelling() && !isTravelJustClicked())
 		{
 			Waiting next = waiting;
 			boolean stale = PositionRules.teleported(next.getFrom(), tile);
@@ -559,7 +584,7 @@ public class StepGuide
 	{
 		List<TileObject> objects = bank ? sceneObjects.banksNear(current.getWaypoint(), BANK_TILES)
 			: target.getObjectIds().stream().anyMatch(AbyssObstacles::isObstacle) ? abyssObstacle()
-			: onlyPatchToUse(current, atExit(current, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption())));
+			: whereTaskBegan(onlyPatchToUse(current, atExit(current, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption()))));
 		List<NPC> npcs = bank ? sceneObjects.bankersNear(current.getWaypoint(), BANK_TILES) : npcsFor(target);
 		if (!bank)
 		{
@@ -789,9 +814,12 @@ public class StepGuide
 			travelClickTick = client.getTickCount();
 		}
 		SubStep current = getCurrent();
-		if (current != null && current.isTask() && routeStep != null && current.getObjectIds().contains(event.getId()))
+		// The object is often clicked from afar, during the walk to it: the click counts whatever the sub-step.
+		if (isTaskObject(event.getId()))
 		{
 			taskStartedKey = routeStep.getKey();
+			WorldView view = client.getTopLevelWorldView();
+			taskStartedAt = view == null ? null : WorldPoint.fromScene(view, event.getParam0(), event.getParam1(), view.getPlane());
 		}
 		if (current == null || current.getKind() != Kind.TELEPORT || current.getRow() == null)
 		{
@@ -840,6 +868,10 @@ public class StepGuide
 		{
 			log.debug("teleport refused: {}", refused);
 			routes.onRowRefused(refused);
+			if (current != null && current.getRow() != null)
+			{
+				unlocks.onTeleportRefused(current.getRow());
+			}
 		}
 	}
 
@@ -1087,6 +1119,12 @@ public class StepGuide
 	}
 
 	/** The box shows the acts alone: nothing to travel. */
+	/** An ended emote's STASH items are still carried, so the guide walks back to its unit to put them away. */
+	public boolean owesStashPutBack()
+	{
+		return deposit.getAt() != null;
+	}
+
 	public boolean isAtStep()
 	{
 		return !steps.isEmpty() && steps.stream().allMatch(sub -> sub.getKind() == Kind.ACT);
@@ -1130,6 +1168,16 @@ public class StepGuide
 		boolean landing = !jumpedThisSubStep && teleportAnimatedTick != ActWatcher.NEVER
 			&& client.getTickCount() - teleportAnimatedTick <= LANDING_TICKS;
 		return isTravelAnimating() || landing;
+	}
+
+	/**
+	 * A click during the travel sub-step, in the ticks before its animation would show. The click already spends the
+	 * teleport (a scroll leaves the book), so a plan searched right after it is one without that teleport: held back
+	 * like a plan that comes during the animation, or the guide would point at another way out until the landing.
+	 */
+	private boolean isTravelJustClicked()
+	{
+		return travelClickTick != ActWatcher.NEVER && client.getTickCount() - travelClickTick <= travelStartTicks();
 	}
 
 	private boolean isTravelAnimating()

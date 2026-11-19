@@ -41,7 +41,7 @@ Tile	Name	Kind	Members	Skills	Quests	Varbits	VarPlayers	GroupStorage
 1804 9501 0	Fortis Colosseum	bank	Y				4130>1999	Y
 1809 3566 0	Hosidius Vinery	bank	Y					Y
 1882 3315 1	Port Roberts	bank	Y					Y
-1935 2754 0	Deepfin Point	bank	Y					Y
+1936 2755 0	Deepfin Point	bank	Y					Y
 1948 4957 0	Blast Furnace	bank	Y		The Giant Dwarf			Y
 2011 9186 0	Deepfin Mine	bank	Y			18361=1		Y
 2020 5931 0	Soul Wars	bank	Y					Y
@@ -97,8 +97,7 @@ Tile	Name	Kind	Members	Skills	Quests	Varbits	VarPlayers	GroupStorage
 3092 3243 0	Draynor Village	bank	N					Y
 3094 3491 0	Edgeville	bank	N					Y
 3130 3631 0	Ferox Enclave	bank	Y					Y
-3147 3450 0	Cooks' Guild	bank	Y	99 Cooking				Y
-3147 3450 0	Cooks' Guild	bank	Y			4481=1		Y
+3147 3450 0	Cooks' Guild	bank	Y					Y
 3156 2835 0	Ruins of Unkah	bank	Y					Y
 3162 3489 0	Grand Exchange	bank	N					Y
 3182 2418 0	Great Conch	bank	Y		Troubled Tortugans			Y
@@ -131,3 +130,4 @@ Tile	Name	Kind	Members	Skills	Quests	Varbits	VarPlayers	GroupStorage
 3768 3899 0	Fossil Island Shipwreck	bank	Y		Bone Voyage			Y
 3810 3021 0	Trouble Brewing	bank	Y		Cabin Fever			Y
 3819 3809 0	Fossil Island Volcano	bank	Y		Bone Voyage			Y
+4133 5553 0	The Fractured Archive	bank	Y		While Guthix Sleeps			Y

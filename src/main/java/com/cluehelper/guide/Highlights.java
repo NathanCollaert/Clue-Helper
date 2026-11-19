@@ -27,6 +27,8 @@ public class Highlights
 	/** A scroll book entry, or {@link ScrollBook#NO_WIDGET}. */
 	@Builder.Default
 	int menuWidget = ScrollBook.NO_WIDGET;
+	/** The entry's left click is the step's click: a scroll that teleports with no choice after it, so it is filled. */
+	boolean menuWidgetLeftClick;
 	@Builder.Default
 	StepGuide.Tab tab = StepGuide.Tab.NONE;
 	@Builder.Default

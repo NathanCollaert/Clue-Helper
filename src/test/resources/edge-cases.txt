@@ -50,7 +50,7 @@ member on an F2P world on Ancient: Edgeville Home Teleport
 avoidWilderness with a Wilderness target
   best      71t: Games necklace: Corporeal Beast → walk 66 {charge:3853=1}
   alt       97t: Ring of dueling: Ferox Enclave → walk 92 {charge:2552=1}
-  alt       118t: Clan Wars Minigame Teleport → walk 92 {cooldown:888=1}
+  alt       111t: Bounty Hunter Minigame Teleport → walk 85 {cooldown:888=1}
   note      Wilderness target
 avoidWilderness, targets in and out of it: to the one outside
   best      4t: Varrock Teleport {item:556=3, item:554=1, item:563=1}
@@ -119,12 +119,12 @@ emote item in the bank, STASH filled
 Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley shop boxes
   best      22t: (at the open bank) Max cape: POH Portals: Taverley → walk 14 withdraw [13280] deposit first
 scroll book kept out of the Wilderness: carried, to the Lava Maze
-  best      89t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw []
-  alt       116t: Crafting cape: Teleport → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 87 {item:556=1, item:557=1, item:563=1} withdraw []
-  alt       117t: Ring of dueling: Castle Wars → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 87 {charge:2552=1} withdraw []
+  best      90t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport: Northern entrance → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw []
+  alt       116t: Ring of dueling: Castle Wars → walk 4 → bank → Teleport to House → House obelisk: Level 35 Wilderness → walk 87 {charge:2552=1, item:556=1, item:557=1, item:563=1} withdraw []
+  alt       117t: Crafting cape: Teleport → walk 4 → bank → Construction cape: Tele to POH → House obelisk: Level 35 Wilderness → walk 87 withdraw []
   note      Wilderness target
 scroll book kept out of the Wilderness: banked, to the Lava Maze
-  best      92t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw [21389] deposit first
+  best      93t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport: Northern entrance → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw [21389] deposit first
   alt       102t: Teleport to House → House obelisk: Level 35 Wilderness → walk 87 {item:556=1, item:557=1, item:563=1}
   alt       103t: Teleport to House → House obelisk: Level 44 Wilderness → walk 88 {item:556=1, item:557=1, item:563=1}
   note      Wilderness target
@@ -149,7 +149,7 @@ house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no
   best      79t (rank 109): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
   same book 144t: Games necklace: Corporeal Beast → walk 139 {charge:3853=1}
   alt       148t: Max cape: Other Teleports: Black chinchompa → walk 143 {daily:4819=1}
-  alt       157t: Master scroll book: Revenant cave teleport → walk 152 {charge:21389=1}
+  alt       158t: Master scroll book: Revenant cave teleport: Northern entrance → walk 152 {charge:21389=1}
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
   best      77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62
@@ -207,8 +207,8 @@ spirit tree to the house: at the Grand Exchange tree, mid-ironman with a fully b
   note      Wilderness target
 quetzal: at Renu in Civitas illa Fortis, maxed, dig outside the bank on Aldarin
   best      27t: Quetzal: Aldarin → walk 19
+  alt       31t: Mastering Mixology Minigame Teleport → walk 5 {cooldown:888=1}
   alt       36t: Construction cape: Aldarin → walk 31
-  alt       39t: Teleport to House → Fairy ring CKQ: Varlamore: Aldarin → walk 21 {item:556=1, item:557=1, item:563=1}
 partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost
   best      52t: Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 32 {charge:2552=1, charge:21153=1} withdraw [21153]
 pharaoh's sceptre: carried, maxed, yawn in the 7th room of Pyramid Plunder
@@ -217,8 +217,8 @@ pharaoh's sceptre: carried, maxed, yawn in the 7th room of Pyramid Plunder
   alt       185t: Master scroll book: Nardah teleport → walk 180 {charge:21389=1}
 quetzal whistle: carried, maxed, emote outside the gates of Cam Torum
   best      19t: Quetzal whistle: Cam Torum → walk 6 {charge:29275=1}
+  alt       27t: Civitas illa Fortis Teleport → walk 9 → Quetzal: Cam Torum → walk 6 {item:557=1, item:554=1, item:563=2}
   alt       27t: Quetzal whistle: Aldarin → Quetzal: Cam Torum → walk 6 {charge:29275=1}
-  alt       27t: Quetzal whistle: Auburnvale → Quetzal: Cam Torum → walk 6 {charge:29275=1}
 ride: boat, boarding at 2720,3301,0 with coins, an axe and logs only, cryptic:try not to step on any aquatic nasties while searching this crate.
   best      21t: Boat: Fishing Platform → walk 11
 ride: charter, boarding at 2792,3414,0 with coins, an axe and logs only, cryptic:talk to charles at port piscarilius.

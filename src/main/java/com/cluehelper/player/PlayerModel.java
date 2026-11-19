@@ -44,6 +44,10 @@ public class PlayerModel
 	private ChargeReader chargeReader;
 	@Inject
 	private CheckLines checkLines;
+	@Inject
+	private MusicTracks musicTracks;
+	@Inject
+	private QuestPointTotal questPointTotal;
 	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
 	private final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
 	private final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
@@ -54,6 +58,9 @@ public class PlayerModel
 	private Map<Quest, QuestState> quests = Map.of();
 	private boolean questsRead;
 	private volatile boolean questsDirty;
+	private int lockedMusicTracks;
+	private int missingQuestPoints;
+	private volatile boolean musicDirty;
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
 	private Set<String> plantedTrees = Set.of();
@@ -124,6 +131,7 @@ public class PlayerModel
 		if (event.getGameState() == GameState.LOGGED_IN)
 		{
 			questsDirty = true;
+			musicDirty = true;
 			markDirty("login");
 		}
 		else if (event.getGameState() == GameState.LOGIN_SCREEN)
@@ -154,6 +162,12 @@ public class PlayerModel
 		{
 			markDirty("vars");
 		}
+	}
+
+	/** Called from any thread. The table is too long to read on every varp change, so it is read at login and here. */
+	public void onMusicTrackUnlocked()
+	{
+		musicDirty = true;
 	}
 
 	public void onStatChanged()
@@ -262,8 +276,15 @@ public class PlayerModel
 		{
 			questsDirty = false;
 			quests = readQuests();
+			missingQuestPoints = Math.max(0, questPointTotal.offered() - client.getVarpValue(VarPlayerID.QP));
 			questsRead = true;
 			markDirty("quests");
+		}
+		if (musicDirty)
+		{
+			musicDirty = false;
+			lockedMusicTracks = musicTracks.locked();
+			markDirty("music");
 		}
 		if (dirty)
 		{
@@ -409,6 +430,8 @@ public class PlayerModel
 			.totalLevel(client.getTotalLevel())
 			.combatLevel(client.getLocalPlayer().getCombatLevel())
 			.questPoints(client.getVarpValue(VarPlayerID.QP))
+			.lockedMusicTracks(lockedMusicTracks)
+			.missingQuestPoints(missingQuestPoints)
 			.questsRead(questsRead)
 			.quests(quests)
 			.varbits(varbits)

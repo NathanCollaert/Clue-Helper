@@ -1,7 +1,8 @@
 name: Daily bake
 
-# Re-bakes catalog.json, requirements.json and the gameval values in tables.tsv against the latest RuneLite
-# release, and commits the result straight to dev when it changed and the tests still pass.
+# bake commits a change that fails the tests all the same, and ends red: the campaign's goldens have to be replayed in
+# a dev client, which no runner can do, before dev can be released.
+# wiki only opens and closes issues: the wiki's page gives no landing tiles, so nothing can be added to the data from it.
 on:
   schedule:
     - cron: '17 4 * * *'
@@ -13,40 +14,158 @@ permissions:
 concurrency: bake
 
 env:
-  BAKED_FILES: >-
-    src/main/resources/com/cluehelper/transport/catalog.json
-    src/main/resources/com/cluehelper/route/walk/requirements.json
-    src/main/resources/com/cluehelper/tables.tsv
+  TOOLS: Clue-Helper-Tools/tools
+  DUMPS: Clue-Helper-Tools/tools/cache/dump
 
 jobs:
   bake:
     runs-on: ubuntu-latest
+    env:
+      GENERATED: >-
+        src/main/resources/com/cluehelper
+        src/test/resources/com/cluehelper/transport
+        src/test/resources/com/cluehelper/route/walk
+      STEP_DATA: src/main/resources/com/cluehelper/step
+    outputs:
+      game-cache: ${{ steps.game-cache.outputs.id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: dev
-      - uses: actions/setup-java@v4
+      - id: tools
+        continue-on-error: true
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ github.repository_owner }}/Clue-Helper-Tools
+          ref: dev
+          ssh-key: ${{ secrets.TOOLS_DEPLOY_KEY }}
+          path: Clue-Helper-Tools
+          persist-credentials: false
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - id: game-cache
+        if: steps.tools.outcome == 'success'
+        continue-on-error: true
+        run: python $TOOLS/drift/newest_cache.py >> "$GITHUB_OUTPUT"
+      - id: saved-dump
+        if: steps.game-cache.outcome == 'success'
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.DUMPS }}
+          key: cache-dump-${{ steps.game-cache.outputs.id }}
+      - id: regenerate
+        if: steps.game-cache.outcome == 'success'
+        continue-on-error: true
+        run: |
+          bash $TOOLS/drift/fetch_inputs.sh
+          bash $TOOLS/drift/regenerate.sh
+      # Saved here and not at the end of the job, which ends red whenever something needs a hand; the wiki job reads it.
+      - if: steps.saved-dump.outputs.cache-hit != 'true' && hashFiles('Clue-Helper-Tools/tools/cache/dump/*/npcs.json') != ''
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.DUMPS }}
+          key: cache-dump-${{ steps.game-cache.outputs.id }}
+      - name: Throw away a regeneration that did not finish
+        if: steps.regenerate.outcome != 'success'
+        run: |
+          git checkout -- $GENERATED
+          git clean -fdq -- $GENERATED
+      # On its own: a clue the cache gained needs a hand in the matcher, and must not hold back a new teleport.
+      - id: steps
+        if: steps.regenerate.outcome == 'success'
+        continue-on-error: true
+        run: bash $TOOLS/drift/regenerate_steps.sh
+      - name: Throw away step data that did not finish
+        if: steps.steps.outcome == 'failure'
+        run: |
+          git checkout -- $STEP_DATA
+          git clean -fdq -- $STEP_DATA
+
       - run: ./gradlew bakeData
       - id: diff
         run: |
-          if [ -n "$(git status --porcelain -- $BAKED_FILES)" ]; then
+          if [ -n "$(git status --porcelain -- $GENERATED)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            git status --short -- $BAKED_FILES
+            git status --short -- $GENERATED
           fi
-      - if: steps.diff.outputs.changed == 'true'
+      - id: test
+        if: steps.diff.outputs.changed == 'true'
+        continue-on-error: true
         run: ./gradlew test
       - if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Re-bake data against the latest RuneLite release" -- $BAKED_FILES
+          git add -A -- $GENERATED
+          git commit -m "Regenerate the bundled data against the latest RuneLite and Shortest Path releases"
           git push origin HEAD:dev
-      - if: failure()
-        uses: actions/upload-artifact@v4
+      - if: steps.test.outcome == 'failure'
+        uses: actions/upload-artifact@v7
         with:
-          name: campaign-changes
-          path: build/campaign/changed.html
+          name: test-results
+          path: |
+            build/campaign/changed.html
+            build/reports/tests/test
           if-no-files-found: ignore
+
+      - name: Report what needs a hand
+        if: >-
+          steps.tools.outcome != 'success' || steps.regenerate.outcome != 'success'
+          || steps.steps.outcome == 'failure' || steps.test.outcome == 'failure'
+        env:
+          TOOLS_CHECKOUT: ${{ steps.tools.outcome }}
+          REGENERATION: ${{ steps.regenerate.outcome }}
+          STEPS: ${{ steps.steps.outcome }}
+          TESTS: ${{ steps.test.outcome }}
+        run: |
+          if [ "$STEPS" = failure ]; then
+            echo "::error::The step data could not be regenerated and was left as it was; the catalog and walk data went ahead. Fix it in Clue-Helper-Tools (see that step's log)"
+          fi
+          if [ "$TOOLS_CHECKOUT" != success ]; then
+            echo "::error::Clue-Helper-Tools could not be checked out (the TOOLS_DEPLOY_KEY secret): only the re-bake ran"
+          elif [ "$REGENERATION" != success ]; then
+            echo "::error::The regeneration failed and was thrown away; only the re-bake ran. Fix it in Clue-Helper-Tools (see the Regenerate step's log)"
+          fi
+          if [ "$TESTS" = failure ]; then
+            echo "::error::The regenerated data is on dev but fails the tests: read the test-results artifact and replay the changed campaign steps"
+          fi
+          exit 1
+
+  # Runs after bake, whatever its result, so it compares the page with the catalog bake just pushed.
+  wiki:
+    needs: bake
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: dev
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ github.repository_owner }}/Clue-Helper-Tools
+          ref: dev
+          ssh-key: ${{ secrets.TOOLS_DEPLOY_KEY }}
+          path: Clue-Helper-Tools
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      # The item names come from a cache dump: the one bake just used, or the last one saved when bake had none.
+      - uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.DUMPS }}
+          key: cache-dump-${{ needs.bake.outputs.game-cache }}
+          restore-keys: cache-dump-
+          fail-on-cache-miss: true
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: python $TOOLS/catalog/wiki_teleports.py --issues

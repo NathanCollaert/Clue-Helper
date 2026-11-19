@@ -27,7 +27,7 @@ dependencies {
 }
 
 group = 'com.cluehelper'
-version = '1.5.0'
+version = '1.6.0'
 sourceCompatibility = '11'
 
 tasks.withType(JavaCompile) {
@@ -84,9 +84,10 @@ tasks.register('bakeData', JavaExec) {
 
 tasks.register('acceptTickChanges', JavaExec) {
 	group = 'tools'
-	description = "Take the new tick counts of the campaign steps the last test run marked ticks-only, after reading build/campaign/changed.html"
+	description = "Take the new tick counts of the campaign steps the last test run marked ticks-only, after reading build/campaign/changed.html; -Pwording also takes steps whose guide lines were only reworded"
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'com.cluehelper.campaign.AcceptTickChanges'
+	args project.hasProperty('wording') ? ['wording'] : []
 }
 
 tasks.register('campaignReplay', JavaExec) {

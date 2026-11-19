@@ -182,13 +182,21 @@ public class Highlighter
 	}
 
 	/** An item's outline scaled into {@code bounds}, for a picture larger than the inventory icon (a scroll book entry). */
-	public void itemScaled(Graphics2D graphics, int itemId, Rectangle bounds)
+	public void itemScaled(Graphics2D graphics, int itemId, Rectangle bounds, boolean leftClick)
 	{
-		BufferedImage outline = itemManager.getItemOutline(itemId, 1, COLOUR);
-		double scale = Math.min(bounds.getWidth() / outline.getWidth(), bounds.getHeight() / outline.getHeight());
-		int width = (int) Math.round(outline.getWidth() * scale);
-		int height = (int) Math.round(outline.getHeight() * scale);
-		graphics.drawImage(outline, bounds.x + (bounds.width - width) / 2, bounds.y + (bounds.height - height) / 2, width, height, null);
+		if (leftClick)
+		{
+			drawScaled(graphics, ImageUtil.fillImage(itemManager.getImage(itemId, 1, false), ONE_CLICK_FILL), bounds);
+		}
+		drawScaled(graphics, itemManager.getItemOutline(itemId, 1, COLOUR), bounds);
+	}
+
+	private static void drawScaled(Graphics2D graphics, BufferedImage image, Rectangle bounds)
+	{
+		double scale = Math.min(bounds.getWidth() / image.getWidth(), bounds.getHeight() / image.getHeight());
+		int width = (int) Math.round(image.getWidth() * scale);
+		int height = (int) Math.round(image.getHeight() * scale);
+		graphics.drawImage(image, bounds.x + (bounds.width - width) / 2, bounds.y + (bounds.height - height) / 2, width, height, null);
 	}
 
 	public void box(Graphics2D graphics, Rectangle bounds)

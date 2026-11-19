@@ -13,9 +13,9 @@ import com.cluehelper.guide.SubStep.Kind;
 /** The master scroll book: its interface's widget per scroll, and the bank stops that keep it out of the Wilderness. */
 public final class ScrollBook
 {
-	private static final String ROW_PREFIX = "Master scroll book: ";
 	public static final int NO_WIDGET = -1;
 	static final String BOOK_NAME = "master scroll book";
+	private static final String BOOK_SHOWN = "Master scroll book";
 	static final String REMOVE_OPTION = "Remove";
 	private static final String OPEN_OPTION = "Open";
 	private static final String READ_OPTION = "Read";
@@ -62,7 +62,7 @@ public final class ScrollBook
 
 	static int entry(String rowName)
 	{
-		Scroll scroll = rowName.startsWith(ROW_PREFIX) ? BY_NAME.get(rowName.substring(ROW_PREFIX.length())) : null;
+		Scroll scroll = rowName.startsWith(BookScrolls.BOOK_ROW_PREFIX) ? BY_NAME.get(BookScrolls.scrollName(rowName)) : null;
 		return scroll == null ? NO_WIDGET : scroll.getEntry();
 	}
 
@@ -107,7 +107,7 @@ public final class ScrollBook
 		WorldPoint bankTile = bank >= 0 ? out.get(bank).getWaypoint() : null;
 		if (bookRow && (bookFromBank || bank < 0))
 		{
-			out.addAll(withdraw >= 0 ? withdraw + 1 : 0, List.of(takeOut(row), bankAgain(bankTile), deposit(), closeBank()));
+			out.addAll(withdraw >= 0 ? withdraw + 1 : 0, List.of(takeOutAtOpenBank(row), bankAgain(bankTile), deposit(), closeBank()));
 			return List.copyOf(out);
 		}
 		if (bank < 0)
@@ -118,7 +118,7 @@ public final class ScrollBook
 		out.add(bank + 1, deposit());
 		if (bookRow)
 		{
-			out.add(bank, takeOut(row));
+			out.add(walkToBank(out, bank), takeOut(row));
 		}
 		return List.copyOf(out);
 	}
@@ -135,13 +135,25 @@ public final class ScrollBook
 		return -1;
 	}
 
+	/** A carried book's scroll comes out where the player stands, before the walk to the bank the book is left at. */
+	private static int walkToBank(List<SubStep> steps, int bank)
+	{
+		return bank > 0 && steps.get(bank - 1).getKind() == Kind.WALK ? bank - 1 : bank;
+	}
+
 	/** Opens the book, then Remove on the scroll's entry; {@code row} is the book's teleport. */
 	private static SubStep takeOut(CatalogRow row)
 	{
 		String scroll = BookScrolls.scrollName(row);
-		return SubStep.of(Kind.ACT, "Open the master scroll book: take out a " + scroll)
-			.detail("With the bank closed").row(row).actItemNamed(BOOK_NAME).actOption(OPEN_OPTION)
+		return SubStep.of(Kind.ACT, "Take out of the master scroll book:").items(List.of(scroll))
+			.row(row).actItemNamed(BOOK_NAME).actOption(OPEN_OPTION)
 			.carriedWhenDone(scroll.toLowerCase()).done(SubStep.Done.ITEM_CARRIED).build();
+	}
+
+	/** A book just withdrawn is opened beside the open bank, where a click on an inventory item deposits it. */
+	private static SubStep takeOutAtOpenBank(CatalogRow row)
+	{
+		return takeOut(row).toBuilder().detail("With the bank closed").build();
 	}
 
 	private static SubStep bankAgain(WorldPoint bank)
@@ -152,7 +164,7 @@ public final class ScrollBook
 
 	private static SubStep deposit()
 	{
-		return SubStep.of(Kind.ACT, "Deposit the master scroll book").detail("It stays out of the Wilderness")
+		return SubStep.of(Kind.ACT, "Deposit in the bank:").items(List.of(BOOK_SHOWN)).detail("It stays out of the Wilderness")
 			.actItemNamed(BOOK_NAME).done(SubStep.Done.ITEM_GONE).build();
 	}
 

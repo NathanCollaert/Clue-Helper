@@ -378,6 +378,10 @@ public class ClueHelperPlugin extends Plugin
 		{
 			playerModel.onChargesLearned();
 		}
+		if (MusicTracks.tellsOfAnUnlock(event))
+		{
+			playerModel.onMusicTrackUnlocked();
+		}
 	}
 
 	@Subscribe

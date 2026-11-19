@@ -67,7 +67,7 @@ public class WidgetHighlightOverlay extends Overlay
 		guide.getHighlightChoice().forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 		if (config.highlightMenus())
 		{
-			outlineEntry(graphics, guide.getHighlights().getMenuWidget());
+			outlineEntry(graphics, guide.getHighlights().getMenuWidget(), guide.getHighlights().isMenuWidgetLeftClick());
 		}
 		if (config.highlightItems())
 		{
@@ -239,7 +239,7 @@ public class WidgetHighlightOverlay extends Overlay
 	 * A scroll book entry gets its scroll's outline, from the item's icon scaled to the book's larger model of it, and
 	 * MenuLines colours its name and charges.
 	 */
-	private void outlineEntry(Graphics2D graphics, int widgetId)
+	private void outlineEntry(Graphics2D graphics, int widgetId, boolean leftClick)
 	{
 		Widget picture = widgetId < 0 ? null : client.getWidget(ScrollBook.picture(widgetId));
 		if (picture == null || picture.isHidden() || picture.getItemId() <= 0)
@@ -247,7 +247,7 @@ public class WidgetHighlightOverlay extends Overlay
 			outline(graphics, widgetId);
 			return;
 		}
-		highlighter.itemScaled(graphics, picture.getItemId(), picture.getBounds());
+		highlighter.itemScaled(graphics, picture.getItemId(), picture.getBounds(), leftClick);
 	}
 
 	private void outlineSpell(Graphics2D graphics, Highlights shown)

@@ -31,9 +31,17 @@ public final class BookScrolls
 		return PositionRules.wildernessLevel(row.getDestination()) > 0;
 	}
 
-	/** "Revenant cave teleport", as the loose scroll is named. */
 	public static String scrollName(CatalogRow row)
 	{
-		return row.getName().substring(BOOK_ROW_PREFIX.length());
+		return scrollName(row.getName());
+	}
+
+	/**
+	 * "Revenant cave teleport", as the loose scroll is named: a book row's name without the book, and without the line
+	 * of the scroll's own choice ("Master scroll book: Revenant cave teleport: Level 17").
+	 */
+	public static String scrollName(String bookRowName)
+	{
+		return bookRowName.substring(BOOK_ROW_PREFIX.length()).split(": ", 2)[0];
 	}
 }

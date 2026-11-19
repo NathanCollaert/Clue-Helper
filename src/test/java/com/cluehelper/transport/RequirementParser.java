@@ -212,6 +212,10 @@ public final class RequirementParser
 			}
 		}
 		String lower = name.toLowerCase(Locale.ROOT);
+		if (lower.equals("music"))
+		{
+			return max ? LevelNeed.everyMusicTrack() : null;
+		}
 		if (lower.startsWith("total"))
 		{
 			return LevelNeed.ofAggregate(LevelNeed.Aggregate.TOTAL, max ? MAX_SKILL_LEVEL * Skill.values().length : required);
@@ -220,9 +224,9 @@ public final class RequirementParser
 		{
 			return LevelNeed.ofAggregate(LevelNeed.Aggregate.COMBAT, max ? MAX_COMBAT_LEVEL : required);
 		}
-		if (lower.startsWith("quest") && !max)
+		if (lower.startsWith("quest"))
 		{
-			return LevelNeed.ofAggregate(LevelNeed.Aggregate.QUEST_POINTS, required);
+			return max ? LevelNeed.everyQuestPoint() : LevelNeed.ofAggregate(LevelNeed.Aggregate.QUEST_POINTS, required);
 		}
 		return null;
 	}

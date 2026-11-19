@@ -16,18 +16,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * Hand-written click targets and walk row objects against the cache's names and options. A copied id can be
- * silently wrong (an ivy that is a corpse, a ladder top that is its bottom). Needs the local cache dump, which
- * isn't committed: without it the test is skipped.
+ * silently wrong (an ivy that is a corpse, a ladder top that is its bottom). Needs a local cache dump, which
+ * isn't committed: without one the test is skipped. It reads the newest, as the generators do.
  */
 public class StepDataCacheTest
 {
-	private static final Path DUMP = Path.of("Clue-Helper-Tools/tools/cache/dump/2026-10-18");
+	private static final Path DUMPS = Path.of("Clue-Helper-Tools/tools/cache/dump");
+	private static final String DATED = "\\d{4}-\\d{2}-\\d{2}";
 	private static final Path SKILL_STEPS = Path.of("src/main/resources/com/cluehelper/step/steps/skill.json");
 	private static final Path ROW_OBJECTS = Path.of("src/main/resources/com/cluehelper/route/walk/row-objects.tsv");
 	private static final String SHERLOCK = "skill:SHERLOCK:";
@@ -40,9 +43,22 @@ public class StepDataCacheTest
 	@BeforeClass
 	public static void loadDump() throws IOException
 	{
-		assumeTrue("no cache dump at " + DUMP.toAbsolutePath(), Files.isDirectory(DUMP));
-		objects = byId(DUMP.resolve("objects.json"));
-		npcs = byId(DUMP.resolve("npcs.json"));
+		Optional<Path> dump = newestDump();
+		assumeTrue("no cache dump under " + DUMPS.toAbsolutePath(), dump.isPresent());
+		objects = byId(dump.get().resolve("objects.json"));
+		npcs = byId(dump.get().resolve("npcs.json"));
+	}
+
+	private static Optional<Path> newestDump() throws IOException
+	{
+		if (!Files.isDirectory(DUMPS))
+		{
+			return Optional.empty();
+		}
+		try (Stream<Path> dumps = Files.list(DUMPS))
+		{
+			return dumps.filter(dump -> dump.getFileName().toString().matches(DATED)).max(Path::compareTo);
+		}
 	}
 
 	@Test

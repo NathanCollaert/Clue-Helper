@@ -120,7 +120,8 @@ public class GuideBox
 			notes.add("Visit your house once so its furniture counts");
 		}
 		boolean noRoute = committed == null && plan.getBest() == null;
-		if (noRoute && notes.isEmpty() && !(plan == Plan.NONE && state == BoxState.WORKING))
+		boolean planned = state != BoxState.PUT_BACK && !(plan == Plan.NONE && state == BoxState.WORKING);
+		if (noRoute && notes.isEmpty() && planned)
 		{
 			notes.add(plan == Plan.NONE ? NO_PLAN_YET : NO_ROUTE);
 		}
