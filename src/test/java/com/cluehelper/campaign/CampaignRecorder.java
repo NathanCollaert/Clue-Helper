@@ -85,7 +85,8 @@ public final class CampaignRecorder
 		recording.onlyInBankedKit = new TreeMap<>();
 		StepNeeds needs = new StepNeeds(tape.client(), id -> recordStash(recording, id),
 			(bonus, owned) -> recordGear(recording, bonus.name(), gearPieces.of(bonus, owned)),
-			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()), input.getPlayer()::finished);
+			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()), input.getPlayer()::finished,
+			() -> input.getStart() == null ? null : input.getStart().getTile());
 		RequiredItems required = needs.of(travel);
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
 			input.getSettings()::isScrollBookOutOfWilderness, id -> false,

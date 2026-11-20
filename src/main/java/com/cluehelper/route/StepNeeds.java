@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 import javax.inject.*;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
@@ -37,6 +38,8 @@ public class StepNeeds
 	private final Supplier<Set<Integer>> ownedItemIds;
 	/** The quests that waive a step's way-in items. */
 	private final Predicate<Quest> finishedQuests;
+	/** Where the player stands; null while unknown. */
+	private final Supplier<WorldPoint> playerTile;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
@@ -45,7 +48,7 @@ public class StepNeeds
 	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)
 	{
 		this(client, stash::state, gearPieces::of, () -> ownedItemIds(player.getSnapshot(), availability.getBankedSnapshot()),
-			player::finished);
+			player::finished, () -> player.getPosition().getTile());
 	}
 
 	public RequiredItems of(Step step)
@@ -84,7 +87,7 @@ public class StepNeeds
 				continue;
 			}
 			boolean fetchedOnTheWay = gettingLeft && way.getFrom() != null;
-			if (!fetchedOnTheWay)
+			if (!fetchedOnTheWay && !usedUpGoingIn(way, step))
 			{
 				// Worn gear keeps the player alive or gets them in (a mirror shield, a sled): no route without it
 				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, w -> anyOf(w.getName(), w.getIds())), false, way.isWear()));
@@ -141,6 +144,14 @@ public class StepNeeds
 	private static boolean taskDone(Step step)
 	{
 		return ClueTypes.SKILL.equals(step.getType()) && step.getStages().stream().noneMatch(stage -> stage.getKind() == Stage.Kind.TASK);
+	}
+
+	/** An item used on the way in (the rope tied to the Genie's crevice) is no longer needed once inside. */
+	private boolean usedUpGoingIn(StepIndex.Requires way, Step step)
+	{
+		StepIndex.WayIn wayIn = step.getData().getEntry();
+		WorldPoint tile = playerTile.get();
+		return wayIn != null && tile != null && wayIn.isInside(tile) && way.getIds().stream().anyMatch(wayIn.getUse()::contains);
 	}
 
 	/** Gear is picked from all of these, the bank only while banking counts. */
