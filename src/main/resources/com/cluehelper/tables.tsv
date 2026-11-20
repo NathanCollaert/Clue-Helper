@@ -165,9 +165,9 @@ ride places	LEVER	the lever
 ride places	BALLOON	the balloon basket
 ride places	MUSHTREE	the mushtree
 ride places	WILDERNESS_OBELISK	the obelisk
-spellbook change warnings	Ancient Pyramid altar	"Drains your Prayer
-spellbook change warnings	and the way in crosses desert heat"	Astral altar
-spellbook change warnings	Aggressive suqahs nearby	Tyss
+spellbook change warnings	Ancient Pyramid altar	Drains your Prayer, and the way in crosses desert heat
+spellbook change warnings	Astral altar	Aggressive suqahs nearby
+spellbook change warnings	Tyss	Right-click Tyss: Spellbook
 mushtree places	House on the Hill
 mushtree places	Verdant Valley
 mushtree places	Sticky Swamp

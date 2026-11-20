@@ -74,6 +74,11 @@ public class CatalogSchemaTest
 		{
 			fail.add(at + row.getLine() + " line without its name");
 		}
+		boolean clicked = row.getLine() != MenuLine.LABEL || !row.getClicks().isEmpty();
+		if (row.isLocated() && clicked && row.getObjects().isEmpty() && row.getNpcs().isEmpty())
+		{
+			fail.add(at + "a menu to pick from, but no object or NPC to open it on");
+		}
 		boolean spell = row.getCategory() == Category.SPELL || row.getCategory() == Category.HOME;
 		if (spell == (row.getSpell() == null))
 		{
