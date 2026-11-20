@@ -1,5 +1,5 @@
 {
-"dump": "2026-11-18",
+"dump": "2026-11-19",
 "steps": {
 "cryptic:'a bag belt only?', he asked his balding brothers.": {"items":[2793],"regions":[3],"rows":[{"id":1391,"name":"CLUEHELPER_CRYPTIC_HARD_ABBOT_LANGLEY"}],"targets":[{"kind":"npc","npcs":[2577],"text":"In Edgeville Monastery.","tile":[3058,3487,0]}],"tier":"hard","tiles":[[3058,3487,0]]},
 "cryptic:'see you in your dreams' said the vegetable man.": {"items":[12157],"regions":[4],"rows":[{"id":1433,"name":"CLUEHELPER_CRYPTIC_ELITE_DOMINIC_ONION"}],"targets":[{"kind":"npc","npcs":[1120],"text":"Nightmare Zone.","tile":[2609,3116,0]}],"tier":"elite","tiles":[[2609,3116,0]]},

@@ -1,5 +1,5 @@
 {
-"dump": "2026-11-18",
+"dump": "2026-11-19",
 "steps": {
 "cipher:19762": {"challenge":{"answer":9,"question":"How many round tables can be found on this floor of the library?"},"items":[19762],"regions":[10],"rows":[{"id":2268,"name":"CLUEHELPER_CIPHER_MEDIUM_5"}],"targets":[{"kind":"npc","npcs":[7048],"text":"Ground floor of Arceuus Library.","tile":[1625,3802,0]}],"tier":"medium","tiles":[[1625,3802,0]]},
 "cipher:19764": {"challenge":{"answer":3150,"question":"How many air runes would I need to cast 630 wind waves?"},"items":[19764],"manual":["stand"],"regions":[1],"rows":[{"id":2267,"name":"CLUEHELPER_CIPHER_MEDIUM_4"}],"stand":[3112,3162,1],"targets":[{"kind":"npc","npcs":[5081],"text":"First floor of Wizards Tower.","tile":[3112,3162,0]}],"tier":"medium","tiles":[[3112,3162,0]]},

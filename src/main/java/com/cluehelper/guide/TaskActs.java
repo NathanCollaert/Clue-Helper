@@ -27,6 +27,7 @@ final class TaskActs
 	private static final int PATCH_WEEDED = 3;
 	private static final String RAKE = "Rake";
 	private static final String SPADE = "Spade";
+	private static final int[] PRODUCT_SCREENS = {InterfaceID.CraftingGold.UNIVERSE, InterfaceID.Smithing.UNIVERSE};
 
 	/** In the order a patch is picked to plant in: the least clearing first. */
 	private enum Patch
@@ -215,8 +216,8 @@ final class TaskActs
 	}
 
 	/**
-	 * The making step's product in the "How many do you wish to make?" box (its option, A to R), or in the furnace's
-	 * jewellery screen.
+	 * The making step's product in the "How many do you wish to make?" box (its option, A to R), or in a screen that
+	 * shows each product as its item: the furnace's jewellery, the anvil's smithing.
 	 */
 	private Widget makeOption(Step step)
 	{
@@ -225,10 +226,13 @@ final class TaskActs
 		{
 			return null;
 		}
-		if (Widgets.shown(client, InterfaceID.CraftingGold.UNIVERSE))
+		for (int screen : PRODUCT_SCREENS)
 		{
-			return Widgets.descendants(client.getWidget(InterfaceID.CraftingGold.UNIVERSE)).stream()
-				.filter(shown -> Widgets.visible(shown) && shown.getItemId() == making.getMake()).findFirst().orElse(null);
+			if (Widgets.shown(client, screen))
+			{
+				return Widgets.descendants(client.getWidget(screen)).stream()
+					.filter(shown -> Widgets.visible(shown) && shown.getItemId() == making.getMake()).findFirst().orElse(null);
+			}
 		}
 		if (!Widgets.shown(client, InterfaceID.Skillmulti.UNIVERSE))
 		{

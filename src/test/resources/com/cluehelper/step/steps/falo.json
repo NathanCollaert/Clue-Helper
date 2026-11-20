@@ -1,5 +1,5 @@
 {
-"dump": "2026-11-18",
+"dump": "2026-11-19",
 "steps": {
 "falo:a blood red weapon, a strong curved sword, found on the island of primate lords.": {"regions":[4],"requirements":{"groups":[{"group":39,"ids":[4587,20000,28031],"text":"Any Dragon Scimitar"}]},"rows":[{"id":1722,"name":"CLUEHELPER_FALOBARD_MASTER_0"}],"targets":[{"kind":"npc","npcs":[7306],"text":"Between Seers' Village and Rellekka. Fairy ring (CJR).","tile":[2689,3550,0]}],"tier":"master","tiles":[[2689,3550,0]]},
 "falo:a book that preaches of some great figure, lending strength, might and vigour.": {"regions":[8],"requirements":{"groups":[{"group":7,"ids":[3840,3842,3844,12608,12610,12612,26488,26490,26492,26494,26496,26498],"text":"Any God Book"}]},"rows":[{"id":1723,"name":"CLUEHELPER_FALOBARD_MASTER_1"}],"targets":[{"kind":"npc","npcs":[7306],"text":"Between Seers' Village and Rellekka. Fairy ring (CJR).","tile":[2689,3550,0]}],"tier":"master","tiles":[[2689,3550,0]]},

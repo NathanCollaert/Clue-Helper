@@ -1,5 +1,5 @@
 {
-"dump": "2026-11-18",
+"dump": "2026-11-19",
 "steps": {
 "map:12130": {"items":[12130],"regions":[4],"rows":[{"id":2254,"name":"CLUEHELPER_MAP_ELITE_0"}],"targets":[{"kind":"coord","text":"South-west of Tree Gnome Village.","tile":[2449,3130,0]}],"tier":"elite","tiles":[[2449,3130,0]]},
 "map:12179": {"items":[12179],"regions":[6],"rows":[{"id":2228,"name":"CLUEHELPER_MAP_EASY_0"}],"targets":[{"kind":"coord","text":"Al Kharid mine.","tile":[3300,3291,0]}],"tier":"easy","tiles":[[3300,3291,0]]},

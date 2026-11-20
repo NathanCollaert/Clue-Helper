@@ -1,5 +1,5 @@
 {
-"dump": "2026-11-18",
+"dump": "2026-11-19",
 "steps": {
 "anagram:12055": {"challenge":{"answer":2,"question":"How many types of dragon are there beneath the whirlpool's cavern?"},"items":[12055],"regions":[4],"rows":[{"id":1523,"name":"CLUEHELPER_ANAGRAM_MEDIUM_OTTO_GODBLESSED"}],"targets":[{"kind":"npc","npcs":[2914],"text":"South of the Barbarian Outpost, in Otto's Grotto.","tile":[2501,3487,0]}],"tier":"medium","tiles":[[2501,3487,0]]},
 "anagram:12057": {"challenge":{"answer":5,"question":"How many stalls are there in Varrock Square?"},"items":[12057],"regions":[1],"rows":[{"id":1508,"name":"CLUEHELPER_ANAGRAM_MEDIUM_BARAEK"}],"targets":[{"kind":"npc","npcs":[2881],"text":"The fur trader in Varrock square.","tile":[3217,3434,0]}],"tier":"medium","tiles":[[3217,3434,0]]},

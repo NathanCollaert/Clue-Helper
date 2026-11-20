@@ -1,5 +1,5 @@
 {
-"dump": "2026-11-18",
+"dump": "2026-11-19",
 "steps": {
 "hotcold:beginner:leagues tutor": {"hidden":true,"manual":["hidden"],"tier":"beginner"},
 "hotcold:beginner:reldo": {"regions":[1],"rows":[{"id":1238,"name":"CLUEHELPER_CRYPTIC_BEGINNER_RELDO"}],"targets":[{"fallbackNpcs":[4243],"kind":"npc","npcs":[6203],"text":"In Varrock Palace library.","tile":[3213,3495,0]}],"tier":"beginner","tiles":[[3213,3495,0]]},
