@@ -196,12 +196,17 @@ unlock hints	STORED_OAK_LOGS	if the balloons' log storage holds oak logs, fly on
 unlock hints	STORED_WILLOW_LOGS	if the balloons' log storage holds willow logs, fly once without carrying any
 unlock hints	STORED_YEW_LOGS	if the balloons' log storage holds yew logs, fly once without carrying any
 unlock hints	STORED_MAGIC_LOGS	if the balloons' log storage holds magic logs, fly once without carrying any
-balloon fares	2808 3354 0	ItemID.LOGS=1511	STORED_LOGS
-balloon fares	2941 3420 0	ItemID.LOGS=1511	STORED_LOGS
-balloon fares	2923 3302 0	ItemID.OAK_LOGS=1521	STORED_OAK_LOGS
-balloon fares	3299 3482 0	ItemID.WILLOW_LOGS=1519	STORED_WILLOW_LOGS
-balloon fares	2459 3110 0	ItemID.YEW_LOGS=1515	STORED_YEW_LOGS
-balloon fares	2478 3456 0	ItemID.MAGIC_LOGS=1513	STORED_MAGIC_LOGS
+# landing unlocks: the landing, the fare item a landing there must not have dropped (0 for none), the unlock it shows, and
+# where the trip must start: anywhere, or beside another balloon (a scroll landing near one is no flight). Only a
+# balloon stores its fare, so only a refused flight unlearns one.
+landing unlocks	1254 3560 0	0	XERICS_HONOUR	anywhere
+landing unlocks	3792 3560 0	ItemID.ECTOTOKEN=4278	DRAGONTOOTH	anywhere
+landing unlocks	2808 3354 0	ItemID.LOGS=1511	STORED_LOGS	balloon
+landing unlocks	2941 3420 0	ItemID.LOGS=1511	STORED_LOGS	balloon
+landing unlocks	2923 3302 0	ItemID.OAK_LOGS=1521	STORED_OAK_LOGS	balloon
+landing unlocks	3299 3482 0	ItemID.WILLOW_LOGS=1519	STORED_WILLOW_LOGS	balloon
+landing unlocks	2459 3110 0	ItemID.YEW_LOGS=1515	STORED_YEW_LOGS	balloon
+landing unlocks	2478 3456 0	ItemID.MAGIC_LOGS=1513	STORED_MAGIC_LOGS	balloon
 not teleports	wield
 not teleports	wear
 not teleports	equip
