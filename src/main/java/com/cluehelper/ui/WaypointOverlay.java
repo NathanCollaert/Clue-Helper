@@ -224,7 +224,7 @@ public class WaypointOverlay extends Overlay
 	/**
 	 * Where the act is done: its NPC, else its nearest tile; null within {@code here} tiles of it, and inside a
 	 * wanderer's range with it out of view, where the player looks for it. The kill for a key leads to the NPC
-	 * dropping the key, else the stage's marker. A hot/cold feel without a waypoint is done where the player stands:
+	 * dropping the key, else the stage's marker, and nowhere while fighting. A hot/cold feel without a waypoint is done where the player stands:
 	 * the step's tiles are only the places it might be felt from.
 	 */
 	private WorldPoint actTarget(WorldView view, SubStep current, int here)
@@ -236,6 +236,10 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		boolean killForKey = isKillForKey(current);
+		if (killForKey && isFighting())
+		{
+			return null;
+		}
 		WorldPoint target = killForKey ? nearestKeyHolder(view, step, current.getStage(), at) : nearestNamedNpc(view, step.getNpcsAtStep(), at);
 		StepIndex.Wander range = step.getData().getWander();
 		if (target == null && !killForKey && range != null && range.contains(at))
@@ -564,6 +568,13 @@ public class WaypointOverlay extends Overlay
 		}
 		// The walk data's own spot may be across the ring from the obstacle picked: the line still points at the outlined one
 		return AbyssObstacles.isObstacle(first.getId()) ? List.of(at, first.getWorldLocation()) : ahead;
+	}
+
+	/** Attacking an NPC: the fight is where the player is, so no line leads anywhere. */
+	private boolean isFighting()
+	{
+		Player local = client.getLocalPlayer();
+		return local != null && local.getInteracting() instanceof NPC;
 	}
 
 	private WorldPoint playerTile()
