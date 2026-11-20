@@ -175,7 +175,6 @@ public class ClueHelperPlugin extends Plugin
 		clueLink.start();
 		playerModel.start();
 		poh.start();
-		clientThread.invokeLater(this::publishMemories);
 		availability.start();
 		bundledData.getCatalog().thenAccept(availability::setCatalog);
 		routes.start();
@@ -388,7 +387,7 @@ public class ClueHelperPlugin extends Plugin
 		easyTeleportsNames.onConfigChanged(event);
 		if (grownPatches.isOurs(event))
 		{
-			clientThread.invokeLater(grownPatches::publish);
+			playerModel.onGrownPatchChanged();
 		}
 		if (!ClueHelperConfig.GROUP.equals(event.getGroup()))
 		{
@@ -413,7 +412,6 @@ public class ClueHelperPlugin extends Plugin
 		bankMemory.onProfileChanged();
 		poh.onProfileChanged();
 		hotCold.onProfileChanged();
-		publishMemories();
 	}
 
 	/** A player who turned the old "Show the box" off keeps no box. */
@@ -435,14 +433,6 @@ public class ClueHelperPlugin extends Plugin
 	private void mergeCoreBox()
 	{
 		coreBoxMerge.apply(clueLink.isActive() ? clueLink.getCore() : null);
-	}
-
-	private void publishMemories()
-	{
-		grownPatches.publish();
-		fairyRings.publish();
-		unlocks.publish();
-		keyRing.publish();
 	}
 
 	private Overlay[] overlays()

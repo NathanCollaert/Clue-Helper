@@ -1,7 +1,7 @@
 package com.cluehelper.player;
 
 import com.cluehelper.Tables;
-import com.cluehelper.memory.BankMemory;
+import com.cluehelper.memory.*;
 import com.google.gson.Gson;
 import java.util.*;
 import java.util.concurrent.*;
@@ -41,6 +41,16 @@ public class PlayerModel
 	@Inject
 	private BankMemory bankMemory;
 	@Inject
+	private MemoryStore memory;
+	@Inject
+	private UnlockMemory unlockMemory;
+	@Inject
+	private KeyRingMemory keyRing;
+	@Inject
+	private GrownPatches grownPatches;
+	@Inject
+	private FairyRingMemory fairyRings;
+	@Inject
 	private ChargeReader chargeReader;
 	@Inject
 	private CheckLines checkLines;
@@ -65,12 +75,7 @@ public class PlayerModel
 	private volatile boolean musicDirty;
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
-	private Set<String> unlocks = Set.of();
-	/** Items owned but known not to do what their id promises: a steel key ring the Metal key was taken off. */
-	private Set<Integer> uncounted = Set.of();
-	/** Grown patches, the planted spirit trees among them, named as the catalog and the step data name them. */
-	private Set<String> grownPatches = Set.of();
-	private String lastFairyRing;
+	private long memoryVersion = -1;
 	private long version;
 	private Map<Integer, Integer> fakeCarried = Map.of();
 
@@ -175,52 +180,30 @@ public class PlayerModel
 		dirty = true;
 	}
 
-	/** Client thread. */
-	public void setUnlocks(Set<String> next)
-	{
-		unlocks = Set.copyOf(next);
-		dirty = true;
-	}
-
-	/** Client thread. */
-	public void setUncounted(Set<Integer> next)
-	{
-		uncounted = Set.copyOf(next);
-		dirty = true;
-	}
-
 	/** Whether owning {@code itemId} counts for what it would bring: false for an uncounted one. */
 	public boolean counts(int itemId)
 	{
-		return !uncounted.contains(itemId);
+		return !keyRing.uncounted().contains(itemId);
 	}
 
 	/** {@code items} without the uncounted ones. */
 	public Map<Integer, Integer> counted(Map<Integer, Integer> items)
 	{
 		Map<Integer, Integer> counted = new HashMap<>(items);
-		counted.keySet().removeAll(uncounted);
+		counted.keySet().removeAll(keyRing.uncounted());
 		return counted;
-	}
-
-	/** Client thread. */
-	public void setGrownPatches(Set<String> next)
-	{
-		grownPatches = Set.copyOf(next);
-		dirty = true;
-	}
-
-	/** Client thread. */
-	public void setLastFairyRing(String code)
-	{
-		lastFairyRing = code;
-		dirty = true;
 	}
 
 	/** Client thread. */
 	public void setHouse(HouseState next)
 	{
 		house = next;
+		dirty = true;
+	}
+
+	/** Time Tracking stored one of the patches {@link GrownPatches} reads. */
+	public void onGrownPatchChanged()
+	{
 		dirty = true;
 	}
 
@@ -264,6 +247,11 @@ public class PlayerModel
 			dirty = true;
 		}
 		position = now;
+		if (memory.getVersion() != memoryVersion)
+		{
+			memoryVersion = memory.getVersion();
+			dirty = true;
+		}
 		if (questsDirty)
 		{
 			questsDirty = false;
@@ -418,9 +406,9 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
-			.plantedTrees(grownPatches)
-			.unlocks(unlocks)
-			.lastFairyRing(lastFairyRing)
+			.plantedTrees(grownPatches.grown())
+			.unlocks(unlockMemory.unlocks())
+			.lastFairyRing(fairyRings.lastCode())
 			.build();
 	}
 

@@ -1,7 +1,6 @@
 package com.cluehelper.memory;
 
 import com.cluehelper.Tables;
-import com.cluehelper.player.PlayerModel;
 import java.time.Instant;
 import java.util.*;
 import javax.inject.*;
@@ -40,8 +39,6 @@ public class GrownPatches
 
 	@Inject
 	private ConfigManager configManager;
-	@Inject
-	private PlayerModel player;
 	private MemorySlot<Patches> menuSeen;
 
 	@Inject
@@ -50,15 +47,14 @@ public class GrownPatches
 		menuSeen = memory.slot(SPIRIT_TREES_KEY, Patches.class, Patches::new);
 	}
 
-	/** Call on start, after a profile change and when Time Tracking writes one of its patches. */
-	public void publish()
+	public Set<String> grown()
 	{
 		Set<String> grown = SPIRIT_TREE_PATCHES.keySet().stream().filter(this::isGrownTree).collect(toCollection(HashSet::new));
 		if (isGrownRedwood(tracked(REDWOOD_KEY).value))
 		{
 			grown.add(FARMING_GUILD_REDWOOD);
 		}
-		player.setGrownPatches(grown);
+		return grown;
 	}
 
 	public boolean isOurs(ConfigChanged event)
@@ -88,7 +84,6 @@ public class GrownPatches
 			}
 		}
 		menuSeen.set(next);
-		publish();
 	}
 
 	/** A list line's place, without its coloured hotkey. */

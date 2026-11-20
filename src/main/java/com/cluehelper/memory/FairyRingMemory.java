@@ -30,13 +30,10 @@ public class FairyRingMemory
 
 	@Inject
 	private Client client;
-	@Inject
-	private PlayerModel player;
 	private MemorySlot<Last> remembered;
 	private String pending;
 	private int pendingTick;
 	private WorldPoint pendingFrom;
-	private String published;
 
 	@Inject
 	void init(MemoryStore memory)
@@ -44,16 +41,10 @@ public class FairyRingMemory
 		remembered = memory.slot(KEY, Last.class, Last::new);
 	}
 
-	/** Call on start and after a profile change. */
-	public void publish()
+	/** The code the rings' Last-destination goes to, or null. */
+	public String lastCode()
 	{
-		String code = remembered.get().code;
-		if (code != null && !code.equals(published))
-		{
-			published = code;
-			player.setLastFairyRing(code);
-			log.debug("fairy ring last destination {}", code);
-		}
+		return remembered.get().code;
 	}
 
 	/** At the confirm the dials show where the ring sends the player, also after picking a travel-log line. */
@@ -136,7 +127,6 @@ public class FairyRingMemory
 			remembered.set(next);
 			log.debug("fairy ring {} ({})", code, source);
 		}
-		publish();
 	}
 
 	private WorldPoint position()

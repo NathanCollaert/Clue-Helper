@@ -46,8 +46,6 @@ public class UnlockMemory
 
 	@Inject
 	private Client client;
-	@Inject
-	private PlayerModel player;
 	private MemorySlot<Learned> learned;
 	private MemorySlot<Seen> legacyXericsHonour;
 	private MemorySlot<Seen> legacyDragontooth;
@@ -62,8 +60,7 @@ public class UnlockMemory
 		legacyDragontooth = memory.slot(DRAGONTOOTH_KEY, Seen.class, Seen::new);
 	}
 
-	/** Call on start and after a profile change. */
-	public void publish()
+	public Set<String> unlocks()
 	{
 		Set<String> unlocks = new HashSet<>(learned.get().unlocks);
 		if (legacyXericsHonour.get().learnedAt > 0)
@@ -74,7 +71,7 @@ public class UnlockMemory
 		{
 			unlocks.add(DRAGONTOOTH);
 		}
-		player.setUnlocks(unlocks);
+		return unlocks;
 	}
 
 	/** Call before the player model's GameTick handler, so its snapshot has fresh unlocks. */
@@ -141,7 +138,6 @@ public class UnlockMemory
 			Learned next = new Learned();
 			next.unlocks = unlocks;
 			learned.set(next);
-			publish();
 		}
 	}
 

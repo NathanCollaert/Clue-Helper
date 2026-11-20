@@ -16,6 +16,7 @@ public final class MemorySlot<T>
 	private final Supplier<T> fresh;
 	private final ProfileConfig profile;
 	private final Gson gson;
+	private final Runnable onSet;
 
 	private boolean loaded;
 	private String loadedProfile;
@@ -40,6 +41,7 @@ public final class MemorySlot<T>
 		value = newValue;
 		loadedProfile = currentProfile;
 		loaded = true;
+		onSet.run();
 		if (currentProfile == null)
 		{
 			log.debug("{} kept in memory only: no RuneScape profile yet", key);

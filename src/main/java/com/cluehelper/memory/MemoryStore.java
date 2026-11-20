@@ -4,6 +4,7 @@ import com.cluehelper.ClueHelperConfig;
 import com.google.gson.Gson;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import javax.inject.*;
 import lombok.*;
@@ -20,6 +21,7 @@ public class MemoryStore
 	private final ProfileConfig profile;
 	private final Gson gson;
 	private final List<MemorySlot<?>> slots = new CopyOnWriteArrayList<>();
+	private final AtomicLong version = new AtomicLong();
 
 	@Inject
 	MemoryStore(ConfigManager configManager, Gson gson)
@@ -34,7 +36,7 @@ public class MemoryStore
 	 */
 	public <T> MemorySlot<T> slot(String key, Class<T> type, Supplier<T> fresh)
 	{
-		MemorySlot<T> slot = new MemorySlot<>(key, type, fresh, profile, gson);
+		MemorySlot<T> slot = new MemorySlot<>(key, type, fresh, profile, gson, version::incrementAndGet);
 		slots.add(slot);
 		return slot;
 	}
@@ -46,6 +48,13 @@ public class MemoryStore
 		{
 			slot.forget();
 		}
+		version.incrementAndGet();
+	}
+
+	/** Moves on whenever a slot is set or the profile's slots are reloaded. */
+	public long getVersion()
+	{
+		return version.get();
 	}
 
 	@RequiredArgsConstructor
