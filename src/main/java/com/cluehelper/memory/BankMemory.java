@@ -37,10 +37,6 @@ public class BankMemory
 	private final Map<Integer, Boolean> placeholders = new HashMap<>();
 	private final LateDeposits lateDeposits = new LateDeposits();
 
-	private volatile Seen liveBank;
-	private volatile Seen liveGroup;
-	private volatile Seen liveKit;
-	private boolean unsaved;
 	/** The PIN is asked once per login: a bank or PIN screen seen since then means it's done. */
 	private volatile boolean pinDoneThisSession;
 	/** Changes whenever the remembered contents or the PIN state change, so a plan can tell it is stale. */
@@ -63,19 +59,19 @@ public class BankMemory
 	/** Null when this profile has never opened it. Any thread. */
 	public Seen getBank()
 	{
-		return latest(liveBank, storedBank);
+		return seenOrNull(storedBank);
 	}
 
 	/** Null when never seen or not a group account. Any thread. */
 	public Seen getGroupStorage()
 	{
-		return latest(liveGroup, storedGroup);
+		return seenOrNull(storedGroup);
 	}
 
 	/** The huntsman's kit's traps and tools, as last sent when it was opened; null when never. Any thread. */
 	public Seen getKit()
 	{
-		return latest(liveKit, storedKit);
+		return seenOrNull(storedKit);
 	}
 
 	/**
@@ -117,19 +113,19 @@ public class BankMemory
 		else if (event.getContainerId() == InventoryID.BANK)
 		{
 			lateDeposits.onBankSeen(client.getTickCount());
-			liveBank = seen(event.getItemContainer());
+			storedBank.hold(seen(event.getItemContainer()));
 			pinDoneThisSession = true;
 			changed();
 		}
 		else if (event.getContainerId() == InventoryID.INV_GROUP_TEMP && AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)).isGroup()
 			&& client.getVarbitValue(VarbitID.GIM_SHARED_BANK_HASEDITED) != 1)
 		{
-			liveGroup = seen(event.getItemContainer());
+			storedGroup.hold(seen(event.getItemContainer()));
 			changed();
 		}
 		else if (event.getContainerId() == InventoryID.HUNTSMANS_KIT)
 		{
-			liveKit = seen(event.getItemContainer());
+			storedKit.hold(seen(event.getItemContainer()));
 			changed();
 			if (!bankOpen)
 			{
@@ -176,7 +172,7 @@ public class BankMemory
 		updated.seenAt = bank.seenAt;
 		updated.items = new HashMap<>(bank.items);
 		deposited.forEach((id, quantity) -> updated.items.merge(id, quantity, Integer::sum));
-		liveBank = updated;
+		storedBank.hold(updated);
 		changed();
 		if (!bankOpen)
 		{
@@ -210,40 +206,22 @@ public class BankMemory
 		}
 	}
 
-	/** On {@code RuneScapeProfileChanged}, after the store reloads: the live copies belonged to the old profile. */
+	/** On {@code RuneScapeProfileChanged}, after the store reloads and drops the held contents of the old profile. */
 	public void onProfileChanged()
 	{
-		liveBank = null;
-		liveGroup = null;
-		liveKit = null;
-		unsaved = false;
 		version++;
 	}
 
 	private void save()
 	{
-		if (!unsaved)
-		{
-			return;
-		}
-		unsaved = false;
-		store(storedBank, liveBank);
-		store(storedGroup, liveGroup);
-		store(storedKit, liveKit);
+		storedBank.saveHeld();
+		storedGroup.saveHeld();
+		storedKit.saveHeld();
 	}
 
-	private static void store(MemorySlot<Seen> slot, Seen live)
-	{
-		if (live != null)
-		{
-			slot.set(live);
-		}
-	}
-
-	/** The remembered contents changed: saved later, and a plan made from them is stale. */
+	/** The remembered contents changed: held until saved, and a plan made from them is stale. */
 	private void changed()
 	{
-		unsaved = true;
 		version++;
 	}
 
@@ -298,14 +276,10 @@ public class BankMemory
 		return placeholders.computeIfAbsent(id, i -> client.getItemDefinition(i).getPlaceholderTemplateId() != NO_PLACEHOLDER);
 	}
 
-	private static Seen latest(Seen live, MemorySlot<Seen> stored)
+	private static Seen seenOrNull(MemorySlot<Seen> slot)
 	{
-		if (live != null)
-		{
-			return live;
-		}
-		Seen saved = stored.get();
-		return saved == null || saved.seenAt == 0 ? null : saved;
+		Seen seen = slot.get();
+		return seen.seenAt == 0 ? null : seen;
 	}
 
 	public static final class Seen

@@ -21,6 +21,7 @@ public final class MemorySlot<T>
 	private boolean loaded;
 	private String loadedProfile;
 	private T value;
+	private boolean held;
 
 	public synchronized T get()
 	{
@@ -50,8 +51,27 @@ public final class MemorySlot<T>
 		profile.set(key, gson.toJson(newValue));
 	}
 
+	/** Kept in memory until {@link #saveHeld()}: for a value that changes too often to write every time. */
+	public synchronized void hold(T newValue)
+	{
+		value = newValue;
+		loadedProfile = profile.profileKey();
+		loaded = true;
+		held = true;
+	}
+
+	public synchronized void saveHeld()
+	{
+		if (held)
+		{
+			held = false;
+			set(value);
+		}
+	}
+
 	synchronized void forget()
 	{
+		held = false;
 		loaded = false;
 		loadedProfile = null;
 		value = null;
