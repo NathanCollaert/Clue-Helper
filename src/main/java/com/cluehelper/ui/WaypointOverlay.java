@@ -36,6 +36,8 @@ public class WaypointOverlay extends Overlay
 	private static final int CROSSING_TICKS = 10;
 	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
+	/** {@code Actor.getHealthRatio} while no health bar is shown: not hit lately. */
+	private static final int NO_HEALTH_BAR = -1;
 	private static final int OBELISK_PLATFORM_TILES = 3;
 	private static final BasicStroke PATH_STROKE = new BasicStroke(2f);
 	private static final int COVER_STEP_PIXELS = 3;
@@ -587,7 +589,10 @@ public class WaypointOverlay extends Overlay
 		return AbyssObstacles.isObstacle(first.getId()) ? List.of(at, first.getWorldLocation()) : ahead;
 	}
 
-	/** Attacking one of the {@code wanted} NPCs, or attacked by one: the fight is where the player is, so no line. */
+	/**
+	 * Attacking one of the {@code wanted} NPCs, its health bar up, or attacked by one: the fight is where the player is,
+	 * so no line. Running to an NPC clicked from afar targets it too, before any hit, and keeps the line.
+	 */
 	private boolean isFighting(WorldView view, Predicate<NPC> wanted)
 	{
 		Player local = client.getLocalPlayer();
@@ -596,8 +601,8 @@ public class WaypointOverlay extends Overlay
 			return false;
 		}
 		Actor opponent = local.getInteracting();
-		return opponent instanceof NPC && wanted.test((NPC) opponent)
-			|| view.npcs().stream().anyMatch(npc -> npc.getInteracting() == local && wanted.test(npc));
+		boolean hitting = opponent instanceof NPC && wanted.test((NPC) opponent) && opponent.getHealthRatio() != NO_HEALTH_BAR;
+		return hitting || view.npcs().stream().anyMatch(npc -> npc.getInteracting() == local && wanted.test(npc));
 	}
 
 	private WorldPoint playerTile()
