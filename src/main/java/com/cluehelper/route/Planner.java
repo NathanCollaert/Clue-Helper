@@ -324,13 +324,14 @@ public final class Planner
 
 	/**
 	 * The items owned nowhere that shut every way into the targets, each with its ways round (the sled down Trollweiss
-	 * Mountain): only gates that items alone keep shut.
+	 * Mountain): only gates that items alone keep shut. Without the bank edge there are no banked gates, so the
+	 * player's own gates are judged with the bank instead.
 	 */
 	private static List<List<String>> lockingItems(PlanContext ctx, Set<Integer> targets)
 	{
 		PlayerSnapshot judged = withBank(ctx);
 		Set<List<String>> missing = new LinkedHashSet<>();
-		shutWaysInto(ctx, ctx.gates[PlanContext.BANKED], targets).flatMap(List::stream)
+		shutWaysInto(ctx, ctx.gates[ctx.gates[PlanContext.BANKED] != null ? PlanContext.BANKED : PlanContext.NOT_BANKED], targets).flatMap(List::stream)
 			.map(gate -> ctx.judge("gate", gate, judged))
 			.filter(verdict -> !verdict.isAvailable() && verdict.getMissingItems().size() == verdict.getWhyNot().size())
 			.forEach(verdict -> missing.addAll(verdict.getMissingItems()));
