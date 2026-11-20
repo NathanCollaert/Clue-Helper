@@ -238,7 +238,13 @@ final class RowParts
 		{
 			check(travelText(withKey(text, SAMPLE_KEY), destination(row)), join(label, pick, String.valueOf(SAMPLE_KEY)), row);
 		}
-		return parts.label(label).pick(pick).key(partKey);
+		return parts.label(label).pick(row.getCategory() == Category.CAPE ? withoutSubmenu(pick) : pick).key(partKey);
+	}
+
+	/** A cape's place without the submenu it sits in ("Other Teleports: Farming Guild" shows as "Farming Guild"). */
+	private static String withoutSubmenu(String pick)
+	{
+		return pick == null ? null : pick.substring(pick.lastIndexOf(": ") + 1).trim();
 	}
 
 	private static void check(String shown, String joined, CatalogRow row)
