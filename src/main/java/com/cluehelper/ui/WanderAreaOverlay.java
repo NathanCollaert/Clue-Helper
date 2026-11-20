@@ -20,7 +20,6 @@ import net.runelite.client.ui.overlay.*;
  */
 public class WanderAreaOverlay extends Overlay
 {
-	private static final int PLANE = 4;
 	private static final Stroke EDGE = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10, new float[]{8, 8}, 0);
 
 	@Inject
@@ -50,32 +49,30 @@ public class WanderAreaOverlay extends Overlay
 		graphics.setStroke(EDGE);
 		Step step = clueLink.getCurrentStep();
 		StepIndex.Wander range = step == null ? null : step.getData().getWander();
-		if (range != null && view.getPlane() == range.getPlane())
+		if (range != null)
 		{
-			drawBox(graphics, view, range.getWest(), range.getSouth(), range.getEast(), range.getNorth());
-			int[] exclude = range.getExclude();
-			if (exclude != null)
-			{
-				drawBox(graphics, view, exclude[0], exclude[1], exclude[2], exclude[3]);
-			}
+			drawBox(graphics, view, range.getArea());
+			drawBox(graphics, view, range.getExclude());
 		}
 		SubStep current = guide.getCurrent();
 		for (StepIndex.Place place : current == null ? List.<StepIndex.Place>of() : current.getSpans())
 		{
-			int[] span = place.getSpan();
-			if (view.getPlane() == span[PLANE])
-			{
-				drawBox(graphics, view, span[0], span[1], span[2], span[3]);
-			}
+			drawBox(graphics, view, place.getSpan());
 		}
 		return null;
 	}
 
-	/** Around the tiles from west, south to east, north inclusive. */
-	private void drawBox(Graphics2D graphics, WorldView view, int west, int south, int eastTile, int northTile)
+	/** Around the box's tiles, when it is on the plane in view. */
+	private void drawBox(Graphics2D graphics, WorldView view, StepIndex.Box box)
 	{
-		int east = eastTile + 1;
-		int north = northTile + 1;
+		if (box == null || box.getPlane() != view.getPlane())
+		{
+			return;
+		}
+		int west = box.getWest();
+		int south = box.getSouth();
+		int east = box.getEast() + 1;
+		int north = box.getNorth() + 1;
 		drawEdge(graphics, view, west, south, east, south);
 		drawEdge(graphics, view, east, south, east, north);
 		drawEdge(graphics, view, east, north, west, north);

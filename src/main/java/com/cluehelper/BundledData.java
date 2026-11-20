@@ -26,7 +26,7 @@ public class BundledData
 	BundledData(ScheduledExecutorService executor, Gson gson)
 	{
 		catalog = CompletableFuture.supplyAsync(() -> catalogOrEmpty(gson), executor);
-		steps = CompletableFuture.supplyAsync(() -> StepIndex.read(gson), executor);
+		steps = CompletableFuture.supplyAsync(() -> stepsOrEmpty(gson), executor);
 		walk = CompletableFuture.supplyAsync(() -> walkOrNull(gson), executor);
 	}
 
@@ -46,6 +46,19 @@ public class BundledData
 		{
 			log.warn("the bundled catalog is unreadable: no teleports will be offered", e);
 			return Catalog.EMPTY;
+		}
+	}
+
+	private static StepIndex stepsOrEmpty(Gson gson)
+	{
+		try
+		{
+			return StepIndex.read(gson);
+		}
+		catch (IllegalStateException | JsonParseException e)
+		{
+			log.warn("the bundled step data is unreadable: every step resolves as unknown", e);
+			return StepIndex.empty();
 		}
 	}
 

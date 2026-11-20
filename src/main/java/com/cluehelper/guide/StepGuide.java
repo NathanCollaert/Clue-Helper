@@ -745,7 +745,7 @@ public class StepGuide
 	 */
 	private WorldPoint onTheWay(WorldPoint tile, WorldPoint on, StepIndex.PickUp pickUp)
 	{
-		List<WorldPoint> tiles = pickUpTiles.isEmpty() ? pickUp.spawnTiles() : pickUpTiles;
+		List<WorldPoint> tiles = pickUpTiles.isEmpty() ? pickUp.getSpawnTiles() : pickUpTiles;
 		return tile == null || on == null ? null
 			: tiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile) + at.distanceTo2D(on))).orElse(null);
 	}

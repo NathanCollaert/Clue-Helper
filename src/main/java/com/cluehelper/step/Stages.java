@@ -167,7 +167,7 @@ public final class Stages
 		List<StepIndex.Place> spans = new ArrayList<>();
 		for (StepIndex.Place place : places)
 		{
-			if (place.hasSpan() && spans.stream().noneMatch(kept -> Arrays.equals(kept.getSpan(), place.getSpan())))
+			if (place.getSpan() != null && spans.stream().noneMatch(kept -> kept.getSpan().equals(place.getSpan())))
 			{
 				spans.add(place);
 			}

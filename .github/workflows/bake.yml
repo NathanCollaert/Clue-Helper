@@ -25,7 +25,8 @@ jobs:
         src/main/resources/com/cluehelper
         src/test/resources/com/cluehelper/transport
         src/test/resources/com/cluehelper/route/walk
-      STEP_DATA: src/main/resources/com/cluehelper/step
+        src/test/resources/com/cluehelper/step
+      STEP_DATA: src/test/resources/com/cluehelper/step
     outputs:
       game-cache: ${{ steps.game-cache.outputs.id }}
     steps:

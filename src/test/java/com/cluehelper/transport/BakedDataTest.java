@@ -1,6 +1,7 @@
 package com.cluehelper.transport;
 
 import com.cluehelper.route.WalkLoader;
+import com.cluehelper.step.StepLoader;
 import com.google.gson.Gson;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,12 @@ public class BakedDataTest
 		{
 			assertArrayEquals(WalkLoader.COLUMNS + STALE, walk.getColumns(), baked.readAllBytes());
 		}
+	}
+
+	@Test
+	public void stepDataIsBakedFromTheCurrentStepFiles() throws IOException
+	{
+		assertEquals(StepLoader.JSON + STALE, DataBake.stepsJson(), Files.readString(StepLoader.JSON, StandardCharsets.UTF_8));
 	}
 
 	@Test

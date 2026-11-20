@@ -1,6 +1,6 @@
 package com.cluehelper.step;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -8,22 +8,18 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 
 /**
- * Gson fills this from the generated step files (Clue-Helper-Tools/tools/steps/generate.py), one per clue type: field
- * names are their JSON keys. Fields the plugin doesn't use (outfits, requirement groups) stay in the files only.
- * Keys iterate in sorted order, which the golden routes' sample depends on.
+ * Gson fills this from {@code steps.json}, baked by the test source set's {@code StepLoader} from the step files
+ * Clue-Helper-Tools/tools/steps/generate.py writes: field names are its JSON keys. Keys iterate in sorted order, which
+ * the golden routes' sample depends on.
  */
-@Slf4j
 public final class StepIndex
 {
-	static final String DIRECTORY = "steps/";
-	private static final List<String> FILES = List.of("anagram", "cipher", "coordinate", "cryptic", "emote", "fairyring", "falo",
-		"hotcold", "map", "music", "skill");
+	private static final String FILE = "steps.json";
 
 	@Getter
 	private Map<String, Entry> steps = Map.of();
@@ -32,54 +28,17 @@ public final class StepIndex
 
 	public static StepIndex read(Gson gson)
 	{
-		StepIndex all = new StepIndex();
-		Map<String, Entry> steps = new HashMap<>();
-		Map<String, Spot> spots = new HashMap<>();
-		for (String file : FILES)
+		try (InputStream in = StepIndex.class.getResourceAsStream(FILE))
 		{
-			String resource = DIRECTORY + file + ".json";
-			try (InputStream in = StepIndex.class.getResourceAsStream(resource))
+			if (in == null)
 			{
-				if (in == null)
-				{
-					log.warn("{} is missing: its steps resolve as unknown", resource);
-					continue;
-				}
-				StepIndex part = read(gson, new InputStreamReader(in, StandardCharsets.UTF_8));
-				steps.putAll(part.getSteps());
-				spots.putAll(part.getHotColdSpots());
+				throw new IllegalStateException(FILE + " is missing");
 			}
-			catch (IOException | JsonParseException e)
-			{
-				log.warn("{} is unreadable: its steps resolve as unknown", resource, e);
-			}
+			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), StepIndex.class);
 		}
-		all.steps = Collections.unmodifiableMap(new TreeMap<>(steps));
-		all.hotColdSpots = Collections.unmodifiableMap(new TreeMap<>(spots));
-		return all;
-	}
-
-	static StepIndex read(Gson gson, Reader reader)
-	{
-		Gson withTypes = gson.newBuilder()
-			.registerTypeAdapter(Skill.class, (JsonDeserializer<Skill>) (json, type, context) -> skill(json.getAsString()))
-			.registerTypeAdapter(WorldPoint.class, (JsonDeserializer<WorldPoint>) (json, type, context) -> point(context.deserialize(json,
-				int[].class)))
-			.create();
-		StepIndex index = withTypes.fromJson(reader, StepIndex.class);
-		return index == null ? empty() : index;
-	}
-
-	/** The cache spells skills "Fishing", the hand data "FISHING". */
-	private static Skill skill(String name)
-	{
-		try
+		catch (IOException e)
 		{
-			return Skill.valueOf(name.toUpperCase(Locale.ROOT));
-		}
-		catch (IllegalArgumentException e)
-		{
-			throw new JsonParseException("unknown skill " + name, e);
+			throw new IllegalStateException("can't read " + FILE, e);
 		}
 	}
 
@@ -123,7 +82,8 @@ public final class StepIndex
 		/** Hand data: where the step's NPC wanders far from core's tile (Wingstone across the desert); null for most. */
 		private Wander wander;
 		private WayIn entry;
-		private Reach reach;
+		/** Hand data: how to get to a target no route reaches (a Sailing island); null for the rest. */
+		private String reach;
 		private List<Place> places;
 		/** Sherlock's items worn for the task (the lumberjack outfit), by core's names for them. */
 		private List<String> wear = List.of();
@@ -157,8 +117,8 @@ public final class StepIndex
 		private String note;
 		/** Quest steps: never guided. */
 		private boolean hidden;
-		@Getter(AccessLevel.NONE)
-		private Prerequisites requirements;
+		/** The skill levels the task itself needs; boosts count. */
+		private List<Level> levels = List.of();
 
 		static Entry of(String tier, List<CacheRow> rows)
 		{
@@ -208,18 +168,6 @@ public final class StepIndex
 				.collect(toList());
 		}
 
-		/** The skill levels the task itself needs; boosts count. */
-		public List<Level> getLevels()
-		{
-			return requirements == null ? List.of() : requirements.stats;
-		}
-
-		/** Hand data: how to get to a target no route reaches (a Sailing island); null for the rest. */
-		public String getReach()
-		{
-			return reach == null ? null : reach.text;
-		}
-
 		public List<Place> getPlaces()
 		{
 			return places == null ? List.of() : places;
@@ -254,27 +202,15 @@ public final class StepIndex
 		private Kind kind;
 		private WorldPoint tile;
 		private List<Integer> npcs = List.of();
-		private Integer key;
+		/** The key's item id; -1 for a target with none. */
+		private int key = -1;
 		/** Where the key's NPCs are killed. */
 		private WorldPoint keyTile;
 		private String text;
 		/** An object's name when talking is all it does (the spirit tree); null otherwise. */
 		private String talkTo;
-		@Getter(AccessLevel.NONE)
-		private Integer loc;
-		@Getter(AccessLevel.NONE)
-		private Integer fallbackLoc;
-
 		/** A loc target's object ids: its own and the cache's fallback form. */
-		public Set<Integer> locs()
-		{
-			return Stream.of(loc, fallbackLoc).filter(Objects::nonNull).collect(toUnmodifiableSet());
-		}
-
-		public int getKey()
-		{
-			return key == null ? -1 : key;
-		}
+		private Set<Integer> locs = Set.of();
 	}
 
 	@Getter
@@ -309,71 +245,46 @@ public final class StepIndex
 	@Getter
 	public static final class Area
 	{
-		private WorldPoint tile;
 		private int radius;
 		private String text;
-		/** Other spawns the route may go to instead. */
-		@Getter(AccessLevel.NONE)
-		private List<WorldPoint> also = List.of();
-
-		/** The main spawn first, then the others. */
-		public List<WorldPoint> getTiles()
-		{
-			List<WorldPoint> tiles = new ArrayList<>();
-			tiles.add(tile);
-			tiles.addAll(also);
-			return List.copyOf(tiles);
-		}
+		/** The main spawn first, then the others the route may go to instead. */
+		private List<WorldPoint> tiles = List.of();
 	}
 
 	/**
 	 * An NPC's wander range: the box it walks in, less a box inside it never enters,
 	 * and tiles across it that routes may end on.
 	 */
+	@Getter
 	public static final class Wander
 	{
-		private int[] area;
-		private int[] exclude;
-		@Getter
+		private Box area;
+		/** The box it never enters; null when there is none. */
+		private Box exclude;
 		private List<WorldPoint> tiles = List.of();
 		/** Where to look, shown under the walk. */
-		@Getter
 		private String text;
 
 		public boolean contains(WorldPoint at)
 		{
-			return WayIn.within(area, at) && (exclude == null || !WayIn.within(exclude, at));
+			return Box.within(area, at) && !Box.within(exclude, at);
 		}
+	}
 
-		/** West, south, east, north and plane of the box it never enters; null when there is none. */
-		public int[] getExclude()
-		{
-			return exclude == null ? null : exclude.clone();
-		}
+	/** West, south, east and north edges, inclusive, on one plane. */
+	@Value
+	public static class Box
+	{
+		int west;
+		int south;
+		int east;
+		int north;
+		int plane;
 
-		public int getWest()
+		static boolean within(Box box, WorldPoint at)
 		{
-			return area[0];
-		}
-
-		public int getSouth()
-		{
-			return area[1];
-		}
-
-		public int getEast()
-		{
-			return area[2];
-		}
-
-		public int getNorth()
-		{
-			return area[3];
-		}
-
-		public int getPlane()
-		{
-			return area[4];
+			return box != null && at != null && at.getPlane() == box.plane && at.getX() >= box.west && at.getY() >= box.south
+				&& at.getX() <= box.east && at.getY() <= box.north;
 		}
 	}
 
@@ -393,12 +304,6 @@ public final class StepIndex
 	{
 		private Skill skill;
 		private int level;
-	}
-
-	/** The cache's requirements of the task; its items come from core instead. */
-	private static final class Prerequisites
-	{
-		private List<Level> stats = List.of();
 	}
 
 	/** An interface's option, found by its text since its slot varies, and the button that confirms it. */
@@ -537,10 +442,10 @@ public final class StepIndex
 		/** Where the way in lands. */
 		private WorldPoint to;
 		@Getter(AccessLevel.NONE)
-		private int[] inside;
-		/** The way's own floors on the way in (the pyramid's lower levels): areas as {@code inside}. */
+		private Box inside;
+		/** The way's own floors on the way in (the pyramid's lower levels). */
 		@Getter(AccessLevel.NONE)
-		private int[][] partWay;
+		private List<Box> partWay = List.of();
 		/** Part way in, no line: the way can't be drawn (Pyramid Plunder's doors open in no fixed order). */
 		private boolean noLine;
 		private String text;
@@ -551,26 +456,13 @@ public final class StepIndex
 
 		public boolean isInside(WorldPoint at)
 		{
-			return within(inside, at);
+			return Box.within(inside, at);
 		}
 
 		/** On the way in, not yet inside. */
 		public boolean isPartWay(WorldPoint at)
 		{
-			for (int[] area : partWay == null ? new int[0][] : partWay)
-			{
-				if (within(area, at))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private static boolean within(int[] area, WorldPoint at)
-		{
-			return area != null && at != null && at.getPlane() == area[4] && at.getX() >= area[0] && at.getY() >= area[1]
-				&& at.getX() <= area[2] && at.getY() <= area[3];
+			return partWay.stream().anyMatch(box -> Box.within(box, at));
 		}
 	}
 
@@ -588,18 +480,7 @@ public final class StepIndex
 		/** Where the game counts them when they don't go to the inventory (under water); -1 for none. */
 		private int varbit = -1;
 		/** Where they lie: the game shows ground items only near the player, so these lead the way until they show. */
-		@Getter(AccessLevel.NONE)
-		private List<WorldPoint> spawns = List.of();
-
-		public List<WorldPoint> spawnTiles()
-		{
-			return spawns;
-		}
-	}
-
-	private static final class Reach
-	{
-		private String text;
+		private List<WorldPoint> spawnTiles = List.of();
 	}
 
 	@Getter
@@ -617,25 +498,14 @@ public final class StepIndex
 		private List<Alternative> uses = List.of();
 		/** A patch that must be grown for this place to count; null for a place always there. */
 		private String grown;
-		/** The area the task works anywhere in, {west, south, east, north, plane} (the Dark Altar's reanimation ground). */
-		private int[] span;
+		/** The area the task works anywhere in (the Dark Altar's reanimation ground); null for a place that is a tile. */
+		private Box span;
 		/** The chat options to pick, in order, after the click. */
 		private List<String> dialogue = List.of();
 
-		public boolean hasSpan()
-		{
-			return span != null;
-		}
-
 		public boolean spans(WorldPoint at)
 		{
-			return WayIn.within(span, at);
-		}
-
-		/** {west, south, east, north, plane}; only for a place that {@link #hasSpan()}. */
-		public int[] getSpan()
-		{
-			return span.clone();
+			return Box.within(span, at);
 		}
 
 		/** The menu option that does the task on the place's objects or NPCs ("Chop down"), or null. */
@@ -667,9 +537,4 @@ public final class StepIndex
 		private String text;
 	}
 
-	/** Every tile in the files is x, y, plane. */
-	private static WorldPoint point(int[] tile)
-	{
-		return tile == null || tile.length < 3 ? null : new WorldPoint(tile[0], tile[1], tile[2]);
-	}
 }

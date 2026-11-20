@@ -72,7 +72,7 @@ final class Acts
 		if (object != null)
 		{
 			Set<Integer> objects = new HashSet<>(step.getObjectIds());
-			step.getData().getTargets().forEach(target -> objects.addAll(target.locs()));
+			step.getData().getTargets().forEach(target -> objects.addAll(target.getLocs()));
 			return act.text("Talk to " + (object.equals(npc) ? object : "the " + object.toLowerCase())).option(TALK_OPTION)
 				.objectIds(Set.copyOf(objects)).build();
 		}

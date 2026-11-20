@@ -196,7 +196,7 @@ public class StepResolver
 		{
 			return List.of(entry.getStand());
 		}
-		if (entry.getArea() != null && entry.getArea().getTile() != null)
+		if (entry.getArea() != null && !entry.getArea().getTiles().isEmpty())
 		{
 			return entry.getArea().getTiles();
 		}
