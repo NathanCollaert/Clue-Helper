@@ -62,6 +62,9 @@ public class CatalogRow
 	int[] icon;
 	/** The spell's name, without its option; null when it isn't a spell. */
 	String spell;
+	/** The cache object of the spell, whose params name its spellbook button; -1 when it isn't a spell the cache lists. */
+	@Builder.Default
+	int spellObj = -1;
 	/** The master scroll book's scroll it reads, as the loose scroll is named; null when it isn't a book teleport. */
 	String scroll;
 	/** Its first click opens a list or map the place is picked from (the portal nexus), so that click teleports nowhere yet. */

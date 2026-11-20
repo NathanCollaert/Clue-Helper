@@ -2,7 +2,7 @@ package com.cluehelper.transport;
 
 import com.cluehelper.Tables;
 import com.cluehelper.guide.MenuLines;
-import com.cluehelper.player.HouseState;
+import com.cluehelper.player.*;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Collectors;
@@ -57,6 +57,8 @@ final class RowParts
 	/** A key for the rows whose key only the game knows, to check the line still has a place for it. */
 	private static final char SAMPLE_KEY = 'A';
 
+	private static final List<Spell> SPELLS = RuneLoader.spells();
+
 	private RowParts()
 	{
 	}
@@ -69,6 +71,7 @@ final class RowParts
 			.approach(approach(row, menu))
 			.options(optionPath(row))
 			.spell(isSpell(row) ? spellName(row.getName()) : null)
+			.spellObj(isSpell(row) ? spellObj(spellName(row.getName()), row.getRequirements().getBook()) : -1)
 			.scroll(row.getName().startsWith(BOOK_ROW_PREFIX) ? row.getName().substring(BOOK_ROW_PREFIX.length()).split(": ", 2)[0] : null)
 			.opensMenu(menu != null && (OPENS_MENU.matcher(menu).find() || menu.contains(MENU_STEP)));
 		line(parts, row, menu);
@@ -77,6 +80,13 @@ final class RowParts
 			located(parts, row, menu);
 		}
 		return text(parts, row, menu).build();
+	}
+
+	/** The cache's object for the spell on the row's book, or on any book when the row names none; -1 when none matches. */
+	private static int spellObj(String name, Book book)
+	{
+		return SPELLS.stream().filter(spell -> spell.getName().equalsIgnoreCase(name) && (book == null || spell.getBook() == book))
+			.mapToInt(Spell::getObj).findFirst().orElse(-1);
 	}
 
 	/** Spellbook changes: the line before the book, its detail, and the place a walk heads for. */

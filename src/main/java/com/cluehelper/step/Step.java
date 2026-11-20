@@ -8,6 +8,9 @@ import net.runelite.api.coords.WorldPoint;
 @Builder(toBuilder = true)
 public class Step
 {
+	/** Stands for the step's NPC in baked act text: core names it at play, by quest state or from the client. */
+	public static final String NPC_NAME = "npcname";
+
 	String key;
 	String type;
 	/** Beginner to master, or "unknown" for a key the step data doesn't have. */
@@ -64,6 +67,12 @@ public class Step
 	{
 		boolean talk = text != null && text.toLowerCase().contains("speak");
 		return ClueTypes.CRYPTIC.equals(type) && !talk && !npcs.isEmpty() && (!objectNames.isEmpty() || !objectIds.isEmpty());
+	}
+
+	/** The text with the step's NPC named; "the NPC" for a step core names none for. */
+	public String namingNpc(String text)
+	{
+		return text == null ? null : text.replace(NPC_NAME, npcs.isEmpty() ? "the NPC" : npcs.get(0));
 	}
 
 	/** The NPCs the step is done with: none when its NPC only drops the key for its object. */

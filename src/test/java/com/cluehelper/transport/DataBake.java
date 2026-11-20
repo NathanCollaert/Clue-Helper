@@ -1,5 +1,6 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.player.RuneLoader;
 import com.cluehelper.route.WalkLoader;
 import com.cluehelper.step.StepLoader;
 import com.google.gson.*;
@@ -16,7 +17,8 @@ import net.runelite.http.api.RuneLiteAPI;
 /**
  * Turns the source tables into the data the plugin loads, so the parsing never ships: the teleport catalog
  * ({@code catalog.json}), the walk data ({@code walk/walk.json} and {@code walk/columns.bin}, see {@link WalkLoader}),
- * the step data ({@code step/steps.json}, see {@link StepLoader}) and the gameval values in {@code tables.tsv}, each
+ * the step data ({@code step/steps.json}, see {@link StepLoader}), the rune model ({@code player/runes.json}, see
+ * {@link RuneLoader}) and the gameval values in {@code tables.tsv}, each
  * written after its constant's name. Run with {@code gradlew bakeData} after Clue-Helper-Tools regenerates the catalog,
  * the walk data or the step data; {@code BakedDataTest}
  * fails while the baked files are out of date.
@@ -29,7 +31,7 @@ public final class DataBake
 	/** Sets iterate in a different order each run; sorted, a bake of unchanged tables writes the same file. */
 	private static final JsonSerializer<Set<?>> SORTED_SETS = (set, type, context) ->
 		context.serialize(set.stream().map(String::valueOf).sorted().toArray(String[]::new));
-	private static final Gson GSON = RuneLiteAPI.GSON.newBuilder().registerTypeHierarchyAdapter(Set.class, SORTED_SETS).create();
+	static final Gson GSON = RuneLiteAPI.GSON.newBuilder().registerTypeHierarchyAdapter(Set.class, SORTED_SETS).create();
 
 	private DataBake()
 	{
@@ -45,8 +47,9 @@ public final class DataBake
 			out.write(walk.getColumns());
 		}
 		Files.writeString(StepLoader.JSON, stepsJson(), StandardCharsets.UTF_8);
+		Files.writeString(RuneLoader.JSON, RuneLoader.json(GSON), StandardCharsets.UTF_8);
 		Files.write(TABLES, tablesWithValues(), StandardCharsets.UTF_8);
-		System.out.println("baked " + CATALOG + ", " + WalkLoader.JSON + ", " + WalkLoader.COLUMNS + ", " + StepLoader.JSON + " and " + TABLES);
+		System.out.println("baked " + CATALOG + ", " + WalkLoader.JSON + ", " + WalkLoader.COLUMNS + ", " + StepLoader.JSON + ", " + RuneLoader.JSON + " and " + TABLES);
 	}
 
 	static String walkJson(WalkLoader.Baked walk)
@@ -56,7 +59,7 @@ public final class DataBake
 
 	static String stepsJson() throws IOException
 	{
-		return StepLoader.json(GSON, StepLoader.load());
+		return StepLoader.json(StepLoader.load());
 	}
 
 	/** The tables file with every gameval cell's value written after its name. */

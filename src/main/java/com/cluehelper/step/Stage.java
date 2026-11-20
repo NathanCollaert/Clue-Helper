@@ -36,6 +36,11 @@ public class Stage
 	int radius;
 	/** The key: the stage is done once it is carried. Null for other stages. */
 	ItemRequirement item;
+	/** Baked for {@link #item}: the key's id, or any of a way in's item ids. */
+	@Builder.Default
+	List<Integer> itemIds = List.of();
+	/** Baked for {@link #item}: a way in's item by name; null for a key. */
+	String itemName;
 	/** Any of these owned anywhere, the bank too, skips the stage: the way in's requires bring it from there. */
 	@Builder.Default
 	Set<Integer> skippedWhenOwned = Set.of();

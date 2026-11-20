@@ -116,7 +116,6 @@ public class RoutePlanner
 			if (loaded != null)
 			{
 				player.watch(loaded.getTable().getWatchedVarbits(), loaded.getTable().getWatchedVarps());
-				availability.nameItemsOf(loaded.getTable().getGates());
 				walk = loaded;
 			}
 		});

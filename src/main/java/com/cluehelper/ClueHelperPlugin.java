@@ -180,7 +180,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.start();
 		clientThread.invokeLater(this::publishMemories);
 		availability.start();
-		bundledData.getCatalog().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
+		bundledData.getCatalog().thenAccept(availability::setCatalog);
 		routes.start();
 		guide.start();
 		hotCold.start();

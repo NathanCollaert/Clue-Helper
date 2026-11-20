@@ -89,6 +89,7 @@ public class StepResolver
 			.build();
 	}
 
+	/** The entry's baked stages, given what only the game knows: core's targets, NPC name and empty-slot needs, and the items. */
 	private List<Stage> stages(ClueScroll clue, ClueScrollPlugin plugin, StepIndex.Entry entry, List<WorldPoint> targets,
 		List<String> npcs)
 	{
@@ -96,26 +97,32 @@ public class StepResolver
 		{
 			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::wornFor);
 		}
-		StepIndex.Target key = entry.getTargets().stream()
-			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
-		if (key != null)
+		if (CoreClueReader.challengeCompleted(clue))
 		{
-			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
-				Stages::keyItem), targets);
+			return List.of();
 		}
-		StepIndex.Requires dropped = entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
-		if (dropped != null)
+		Step named = Step.builder().npcs(npcs).build();
+		List<ItemRequirement> emptied = EmptySlots.of(CoreClueReader.itemRequirements(clue));
+		return entry.getStages().stream().map(stage -> stage.toBuilder()
+			.tiles(stage.getKind() == Stage.Kind.FINAL ? targets : stage.getTiles())
+			.act(named.namingNpc(stage.getAct()))
+			.item(item(stage))
+			.emptied(stage.getKind() == Stage.Kind.TASK ? emptied : List.of())
+			.build()).collect(toUnmodifiableList());
+	}
+
+	/** A key by its id, one requirement per key so a re-read step equals the last one; a way in's item, any of its ids. */
+	private ItemRequirement item(Stage stage)
+	{
+		if (stage.getItemIds().isEmpty())
 		{
-			ItemRequirement item = ItemRequirements.any(dropped.getName(), dropped.getIds().stream().map(ItemRequirements::item)
-				.toArray(ItemRequirement[]::new));
-			return Stages.killForWayIn(dropped, item, targets);
+			return null;
 		}
-		if (clue instanceof SkillChallengeClue)
+		if (stage.getItemName() == null)
 		{
-			return Stages.challenge(entry, ((SkillChallengeClue) clue).getRawChallenge(), CoreClueReader.challengeCompleted(clue),
-				CoreClueReader.returnItem(clue), targets, EmptySlots.of(CoreClueReader.itemRequirements(clue)));
+			return keyRequirements.computeIfAbsent(stage.getItemIds().get(0), Stages::keyItem);
 		}
-		return List.of();
+		return ItemRequirements.any(stage.getItemName(), stage.getItemIds().stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new));
 	}
 
 	/** Cache tiles the step is also done at, off core's targets: Brimstail inside his cave, Martin Thwait in the den. */

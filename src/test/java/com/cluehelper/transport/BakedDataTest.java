@@ -1,5 +1,6 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.player.RuneLoader;
 import com.cluehelper.route.WalkLoader;
 import com.cluehelper.step.StepLoader;
 import com.google.gson.Gson;
@@ -37,7 +38,13 @@ public class BakedDataTest
 	@Test
 	public void stepDataIsBakedFromTheCurrentStepFiles() throws IOException
 	{
-		assertEquals(StepLoader.JSON + STALE, DataBake.stepsJson(), Files.readString(StepLoader.JSON, StandardCharsets.UTF_8));
+		assertEquals(StepLoader.JSON + STALE, DataBake.stepsJson().strip(), Files.readString(StepLoader.JSON, StandardCharsets.UTF_8).strip());
+	}
+
+	@Test
+	public void runeModelIsBakedFromTheCurrentCacheSlice() throws IOException
+	{
+		assertEquals(RuneLoader.JSON + STALE, RuneLoader.json(DataBake.GSON).strip(), Files.readString(RuneLoader.JSON, StandardCharsets.UTF_8).strip());
 	}
 
 	@Test

@@ -697,7 +697,7 @@ public class StepGuide
 		}
 		if (!step.getTargets().isEmpty())
 		{
-			rest.add(LegSteps.walkToClue(step.getTargets().get(0), SubSteps.ARRIVE_TILES));
+			rest.add(LegSteps.walkToClue(step.getTargets().get(0), SubSteps.ARRIVE_TILES, StepIndex.Entry.NONE));
 		}
 		rest.addAll(subSteps.acts(step));
 		return SubSteps.withWayInEquipped(rest, step.getData(), player::finished, player.carriedIds());

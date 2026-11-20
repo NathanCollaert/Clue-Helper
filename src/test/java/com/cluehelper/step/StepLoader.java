@@ -1,5 +1,7 @@
 package com.cluehelper.step;
 
+import com.cluehelper.guide.*;
+import com.cluehelper.hotcold.SpotParts;
 import com.google.gson.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -7,12 +9,18 @@ import java.nio.file.*;
 import java.util.*;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
+import net.runelite.client.plugins.cluescrolls.clues.item.*;
+import net.runelite.http.api.RuneLiteAPI;
+import static java.util.stream.Collectors.*;
 
 /**
  * Reads the step files Clue-Helper-Tools/tools/steps/generate.py writes ({@code src/test/resources/com/cluehelper/step/steps},
  * one per clue type, tiles as {@code [x, y, plane]}, boxes as {@code [west, south, east, north, plane]}) into the one
- * {@code steps.json} {@link StepIndex#read} takes as it is. {@code DataBake} writes it; {@code BakedDataTest} fails
- * while it is stale.
+ * {@code steps.json} {@link StepIndex#read} takes as it is, each core clue's entry with the stages ({@link StageParts}) and
+ * acts ({@link ActParts}) the plugin built from it at play before. {@code DataBake} writes it; {@code BakedDataTest}
+ * fails while it is stale.
  */
 public final class StepLoader
 {
@@ -21,11 +29,39 @@ public final class StepLoader
 	private static final List<String> FILES = List.of("anagram", "cipher", "coordinate", "cryptic", "emote", "fairyring", "falo",
 		"hotcold", "map", "music", "skill");
 	private static final int BOX_SIDES = 5;
+	/** Reads the source files' arrays, and the objects the baked parts are written as. */
 	private static final Gson SOURCE_GSON = new GsonBuilder()
-		.registerTypeAdapter(WorldPoint.class, (JsonDeserializer<WorldPoint>) (json, type, context) -> point(json.getAsJsonArray()))
-		.registerTypeAdapter(StepIndex.Box.class, (JsonDeserializer<StepIndex.Box>) (json, type, context) -> box(json.getAsJsonArray()))
+		.registerTypeAdapter(WorldPoint.class, (JsonDeserializer<WorldPoint>) (json, type, context) -> point(json))
+		.registerTypeAdapter(StepIndex.Box.class, (JsonDeserializer<StepIndex.Box>) (json, type, context) -> box(json))
 		.registerTypeAdapter(Skill.class, (JsonDeserializer<Skill>) (json, type, context) -> Skill.valueOf(json.getAsString().toUpperCase(Locale.ROOT)))
 		.create();
+	/**
+	 * Sets and maps iterate in a different order each run; sorted, a bake of unchanged files writes the same file. A map
+	 * keyed by tile is written as {@code [key, value]} pairs, which Gson reads back into a map.
+	 */
+	private static final JsonSerializer<Set<?>> SORTED_SETS = (set, type, context) -> context.serialize(set.stream().sorted().toArray());
+	private static final JsonSerializer<Map<?, ?>> SORTED_MAPS = (map, type, context) ->
+	{
+		List<Map.Entry<?, ?>> entries = map.entrySet().stream().sorted(Comparator.comparing(entry -> String.valueOf(entry.getKey())))
+			.collect(toList());
+		if (entries.stream().allMatch(entry -> entry.getKey() instanceof String))
+		{
+			JsonObject object = new JsonObject();
+			entries.forEach(entry -> object.add((String) entry.getKey(), context.serialize(entry.getValue())));
+			return object;
+		}
+		JsonArray pairs = new JsonArray();
+		for (Map.Entry<?, ?> entry : entries)
+		{
+			JsonArray pair = new JsonArray();
+			pair.add(context.serialize(entry.getKey()));
+			pair.add(context.serialize(entry.getValue()));
+			pairs.add(pair);
+		}
+		return pairs;
+	};
+	private static final Gson GSON = RuneLiteAPI.GSON.newBuilder().registerTypeHierarchyAdapter(Set.class, SORTED_SETS)
+		.registerTypeHierarchyAdapter(Map.class, SORTED_MAPS).create();
 
 	private StepLoader()
 	{
@@ -51,14 +87,154 @@ public final class StepLoader
 		}
 		JsonObject index = new JsonObject();
 		index.add("steps", sorted(steps));
-		index.add("hotColdSpots", sorted(spots));
+		index.add("hotColdSpots", GSON.toJsonTree(SpotParts.of(cacheSpots(spots))));
+		Map<String, ClueScroll> clues = coreClues();
+		StepIndex shaped = SOURCE_GSON.fromJson(index, StepIndex.class);
+		clues.forEach((key, clue) -> entryOf(index, key).add("stages", GSON.toJsonTree(StageParts.of(shaped.entry(key), clue))));
+		StepIndex staged = SOURCE_GSON.fromJson(index, StepIndex.class);
+		StepResolver resolver = new StepResolver(() -> staged);
+		clues.forEach((key, clue) -> addActs(entryOf(index, key), resolver.resolve(clue, plugin())));
+		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(amounts(clue))));
 		return SOURCE_GSON.fromJson(index, StepIndex.class);
 	}
 
-	/** The JSON {@link StepIndex#read} takes. */
-	public static String json(Gson gson, StepIndex index)
+	/** The cache's hot/cold spots by core's name, as the hot/cold step file holds them. */
+	public static Map<String, CacheSpot> cacheSpots() throws IOException
 	{
-		return gson.toJson(index) + "\n";
+		try (Reader in = Files.newBufferedReader(SOURCES.resolve("hotcold.json"), StandardCharsets.UTF_8))
+		{
+			return cacheSpots(new JsonParser().parse(in).getAsJsonObject().getAsJsonObject("hotColdSpots"));
+		}
+	}
+
+	private static Map<String, CacheSpot> cacheSpots(JsonObject spots)
+	{
+		Map<String, CacheSpot> byName = new TreeMap<>();
+		spots.entrySet().forEach(spot -> byName.put(spot.getKey(), SOURCE_GSON.fromJson(spot.getValue(), CacheSpot.class)));
+		return byName;
+	}
+
+	/** A hot/cold spot's cache row. */
+	@lombok.Getter
+	public static final class CacheSpot
+	{
+		private int row;
+		private String name;
+		/** The row's centre as x, y, plane; null in older generated data. */
+		private int[] tile;
+	}
+
+	/** The JSON {@link StepIndex#read} takes. */
+	public static String json(StepIndex index)
+	{
+		return GSON.toJson(index) + "\n";
+	}
+
+	private static JsonObject entryOf(JsonObject index, String key)
+	{
+		return index.getAsJsonObject("steps").getAsJsonObject(key);
+	}
+
+	private static void addActs(JsonObject entry, Step step)
+	{
+		List<SubStep> acts = ActParts.baked(step);
+		SubStep main = ActParts.bakedMain(step);
+		List<SubStep> all = new ArrayList<>(acts);
+		all.add(main);
+		all.forEach(act -> requireBakeable(step, act));
+		entry.add("acts", GSON.toJsonTree(acts));
+		entry.add("mainAct", GSON.toJsonTree(main));
+		entry.add("arriveNpcs", GSON.toJsonTree(ActParts.arriveNpcs(step)));
+	}
+
+	/** An act holding a part of the game Gson can't write (core's item requirements, a teleport) must stay built at play. */
+	private static void requireBakeable(Step step, SubStep act)
+	{
+		boolean bakeable = act.getEmptied().isEmpty() && act.getStage() == null && act.getRow() == null && act.getChange() == null
+			&& act.getExit() == null && act.getWayIn() == null && act.getBook() == null;
+		if (!bakeable)
+		{
+			throw new IllegalStateException(step.getKey() + "'s act holds what only the game has: " + act);
+		}
+	}
+
+	/** The item ids core asks for more than one of, and how many: a MultipleOfItemRequirement, alone or as one of a choice. */
+	private static Map<Integer, Integer> amounts(ClueScroll clue)
+	{
+		Map<Integer, Integer> amounts = new TreeMap<>();
+		for (ItemRequirement requirement : CoreClueReader.itemRequirements(clue))
+		{
+			for (ItemRequirement single : requirement instanceof AnyRequirementCollection ? children((AnyRequirementCollection) requirement)
+				: List.of(requirement))
+			{
+				if (single instanceof MultipleOfItemRequirement && quantity(single) > 1)
+				{
+					amounts.merge(field(single, "itemId"), quantity(single), Math::max);
+				}
+			}
+		}
+		return amounts;
+	}
+
+	private static int quantity(ItemRequirement multiple)
+	{
+		return field(multiple, "quantity");
+	}
+
+	@SuppressWarnings("unchecked")
+	private static List<ItemRequirement> children(AnyRequirementCollection any)
+	{
+		return Arrays.asList((ItemRequirement[]) fieldValue(any, "requirements"));
+	}
+
+	private static int field(ItemRequirement requirement, String name)
+	{
+		return (int) fieldValue(requirement, name);
+	}
+
+	/** Core's requirements keep their parts private. */
+	private static Object fieldValue(Object owner, String name)
+	{
+		try
+		{
+			java.lang.reflect.Field field = owner.getClass().getDeclaredField(name);
+			field.setAccessible(true);
+			return field.get(owner);
+		}
+		catch (ReflectiveOperationException e)
+		{
+			throw new IllegalStateException("core's " + owner.getClass().getSimpleName() + " has no " + name, e);
+		}
+	}
+
+	/** Core's clues by step key, as the resolver keys them. */
+	private static Map<String, ClueScroll> coreClues()
+	{
+		Map<String, ClueScroll> clues = new TreeMap<>();
+		try
+		{
+			for (ClueScroll clue : CoreClues.steps().values())
+			{
+				clues.put(CoreClueReader.facts(clue, plugin()).getKey(), clue);
+			}
+		}
+		catch (ReflectiveOperationException e)
+		{
+			throw new IllegalStateException("can't read core's clues", e);
+		}
+		return clues;
+	}
+
+	private static ClueScrollPlugin plugin()
+	{
+		try
+		{
+			return CoreClues.plugin();
+		}
+		catch (ReflectiveOperationException e)
+		{
+			throw new IllegalStateException("can't make core's clue plugin", e);
+		}
 	}
 
 	/** Getters that unwrapped a nested source field read a flat one. */
@@ -114,13 +290,24 @@ public final class StepLoader
 		return sorted;
 	}
 
-	private static WorldPoint point(JsonArray xyz)
+	private static WorldPoint point(JsonElement json)
 	{
+		if (json.isJsonObject())
+		{
+			JsonObject point = json.getAsJsonObject();
+			return new WorldPoint(point.get("x").getAsInt(), point.get("y").getAsInt(), point.get("plane").getAsInt());
+		}
+		JsonArray xyz = json.getAsJsonArray();
 		return new WorldPoint(xyz.get(0).getAsInt(), xyz.get(1).getAsInt(), xyz.get(2).getAsInt());
 	}
 
-	private static StepIndex.Box box(JsonArray sides)
+	private static StepIndex.Box box(JsonElement json)
 	{
+		if (json.isJsonObject())
+		{
+			return new Gson().fromJson(json, StepIndex.Box.class);
+		}
+		JsonArray sides = json.getAsJsonArray();
 		if (sides.size() != BOX_SIDES)
 		{
 			throw new JsonParseException("a box is west, south, east, north, plane: " + sides);

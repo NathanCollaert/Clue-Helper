@@ -5,14 +5,12 @@ import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
 import javax.inject.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import static java.util.stream.Collectors.*;
 
 /** What to click for a catalog row: its object or NPC and menu path, its held items, or its spell's button. Client thread only. */
-@Slf4j
 @Singleton
 final class RowTargets
 {
@@ -31,7 +29,6 @@ final class RowTargets
 	private PlayerModel player;
 	@Inject
 	private AvailabilityService availability;
-	private final Map<String, Integer> spellWidgets = new HashMap<>();
 
 	/** The row's object or NPC, with the menu its catalog line names. */
 	MenuTarget located(CatalogRow row)
@@ -122,25 +119,8 @@ final class RowTargets
 	/** -1 when none is known. */
 	int spellWidget(CatalogRow row)
 	{
-		RuneModel runes = player.getRuneModel();
-		if (runes == null)
-		{
-			return -1;
-		}
-		return spellWidgets.computeIfAbsent(row.getName(), name ->
-		{
-			Book book = row.getRequirements().getBook();
-			for (Spell spell : runes.getSpells())
-			{
-				if (spell.getName().equalsIgnoreCase(row.getSpell()) && (book == null || spell.getBook() == book))
-				{
-					int widget = client.getItemDefinition(spell.getObj()).getIntValue(PARAM_SPELL_WIDGET);
-					return widget > 0 ? widget : -1;
-				}
-			}
-			log.debug("no spell widget for {}", name);
-			return -1;
-		});
+		int widget = row.getSpellObj() < 0 ? -1 : client.getItemDefinition(row.getSpellObj()).getIntValue(PARAM_SPELL_WIDGET);
+		return widget > 0 ? widget : -1;
 	}
 
 	int minigameSpellWidget(Book book)

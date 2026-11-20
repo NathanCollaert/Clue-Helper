@@ -1,12 +1,13 @@
 package com.cluehelper.step;
 
+import com.cluehelper.guide.SubStep;
+import com.cluehelper.hotcold.Spot;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.*;
 import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -23,8 +24,9 @@ public final class StepIndex
 
 	@Getter
 	private Map<String, Entry> steps = Map.of();
+	/** Core's spots of both tiers, centred where the cache's rows put them. */
 	@Getter
-	private Map<String, Spot> hotColdSpots = Map.of();
+	private List<Spot> hotColdSpots = List.of();
 
 	public static StepIndex read(Gson gson)
 	{
@@ -119,6 +121,16 @@ public final class StepIndex
 		private boolean hidden;
 		/** The skill levels the task itself needs; boosts count. */
 		private List<Level> levels = List.of();
+		/** Baked: the places visited in turn, the last ({@link Stage.Kind#FINAL}) core's targets; empty for one place. */
+		private List<Stage> stages = List.of();
+		/** Baked: what is done once at the step, {@link Step#NPC_NAME} for core's name of its NPC (see guide's Acts). */
+		private List<SubStep> acts = List.of();
+		/** Baked: the step's one act, shown at a marker or once its stages are done. */
+		private SubStep mainAct;
+		/** Baked: who a walk to an area step's targets ends on (the monsters killed there). */
+		private Set<Integer> arriveNpcs = Set.of();
+		/** Baked: how many of an item core's requirements ask for, by item id, where it is more than one (3 mithril bars). */
+		private Map<Integer, Integer> amounts = Map.of();
 
 		static Entry of(String tier, List<CacheRow> rows)
 		{
@@ -513,15 +525,6 @@ public final class StepIndex
 		{
 			return click == null || click.size() < 2 ? null : click.get(0);
 		}
-	}
-
-	@Getter
-	public static final class Spot
-	{
-		private int row;
-		private String name;
-		/** The row's centre as x, y, plane; null in older generated data. */
-		private int[] tile;
 	}
 
 	/** An NPC killed for a way in's item: where it stands and what the stage says. */

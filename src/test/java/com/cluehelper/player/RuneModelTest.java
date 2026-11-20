@@ -34,7 +34,7 @@ public class RuneModelTest
 	private static final int ABSENT = -1;
 
 	private final SliceCacheView cache = new SliceCacheView("/runes/cache-runes.json");
-	private final RuneModel model = RuneModel.load(cache);
+	private final RuneModel model = RuneLoader.load(cache);
 
 	@Test
 	public void everySpellAgreesWithTheCacheSpellTable() throws Exception
@@ -50,7 +50,7 @@ public class RuneModelTest
 				expected.add(String.join(" | ", c[0].toUpperCase(), c[1], c[2], c[3], c[4], c[6]));
 			}
 		}
-		List<String> ours = model.getSpells().stream().map(s -> String.join(" | ", s.getBook().name(), s.getName(),
+		List<String> ours = RuneLoader.spells(cache).stream().map(s -> String.join(" | ", s.getBook().name(), s.getName(),
 			String.valueOf(Math.max(0, cache.itemIntParam(s.getObj(), PARAM_LEVEL, 0))),
 			cache.itemIntParam(s.getObj(), PARAM_MEMBERS, 0) == 1 ? "1" : "0", quest(s),
 			runes(s).stream().map(r -> r[0] + "x" + r[1]).collect(Collectors.joining(";"))))
@@ -74,7 +74,7 @@ public class RuneModelTest
 
 	private Set<String> lunarCastable(PlayerSnapshot player)
 	{
-		return model.getSpells().stream()
+		return RuneLoader.spells(cache).stream()
 			.filter(spell -> spell.getBook() == Book.LUNAR && affords(spell, player))
 			.map(Spell::getName).collect(Collectors.toCollection(TreeSet::new));
 	}

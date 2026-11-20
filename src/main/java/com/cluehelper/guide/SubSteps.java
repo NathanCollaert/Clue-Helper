@@ -39,7 +39,6 @@ public final class SubSteps
 	/** A wandering NPC: being in its area is enough. */
 	static final int AREA_ARRIVE_TILES = 15;
 
-	private static final int MAX_STACK = Integer.MAX_VALUE / 2;
 	private static final String ENTRANA_SHIP = "Ship: Entrana";
 	private static final String ENTRANA_RULE = "Entrana allows no weapons or armour: the deposit box by the monks";
 	private static final String DEPOSIT = "Deposit";
@@ -72,9 +71,9 @@ public final class SubSteps
 		boolean takeFromStash = takeFromStash(step);
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
 			.build(this::exitOf, this::plantedTreeTeleport);
-		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(withAreaNpcsOnWalk(legs, step.getData()), step.getData(), this::finished, carriedIds()), step.getData());
+		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds()), step.getData());
 		List<SubStep> steps = withFairyRingStaffWorn(route,
-			withRideGearWorn(route, withEntranaDeposits(withWanderNote(withGearOnArrival(wayIn), step.getData()))));
+			withRideGearWorn(route, withEntranaDeposits(withGearOnArrival(wayIn))));
 		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
 			: steps;
 	}
@@ -312,55 +311,14 @@ public final class SubSteps
 		return stepNeeds.of(step).getNeeds().stream().anyMatch(need -> need.getRequirement().fulfilledBy(itemId));
 	}
 
-	/** The fewest of the item that, with what is carried, meet every step need it counts towards. */
+	/** What the step data says core asks for, less what is carried, while a step need it counts towards is unmet. */
 	private int stillToTake(Step step, int itemId)
 	{
 		Map<Integer, Integer> carried = carriedItems();
-		int most = 0;
-		for (RequiredItems.Need need : stepNeeds.of(step).getNeeds())
-		{
-			ItemRequirement requirement = need.getRequirement();
-			if (requirement.fulfilledBy(itemId) && !requirement.fulfilledBy(withMore(carried, itemId, 0)))
-			{
-				most = Math.max(most, fewestMeeting(requirement, carried, itemId));
-			}
-		}
-		return most;
-	}
-
-	/** Doubles, then halves back: needs run from 1 to thousands (coins). 0 when this item alone can't meet it (an outfit). */
-	private static int fewestMeeting(ItemRequirement requirement, Map<Integer, Integer> carried, int itemId)
-	{
-		int high = 1;
-		while (high < MAX_STACK && !requirement.fulfilledBy(withMore(carried, itemId, high)))
-		{
-			high *= 2;
-		}
-		if (high >= MAX_STACK)
-		{
-			return 0;
-		}
-		int low = high / 2;
-		while (low + 1 < high)
-		{
-			int middle = (low + high) / 2;
-			if (requirement.fulfilledBy(withMore(carried, itemId, middle)))
-			{
-				high = middle;
-			}
-			else
-			{
-				low = middle;
-			}
-		}
-		return high;
-	}
-
-	private static Item[] withMore(Map<Integer, Integer> carried, int itemId, int more)
-	{
-		Map<Integer, Integer> items = new HashMap<>(carried);
-		items.merge(itemId, more, Integer::sum);
-		return PlayerSnapshot.items(items);
+		Item[] carriedNow = PlayerSnapshot.items(carried);
+		boolean unmet = stepNeeds.of(step).getNeeds().stream().map(RequiredItems.Need::getRequirement)
+			.anyMatch(requirement -> requirement.fulfilledBy(itemId) && !requirement.fulfilledBy(carriedNow));
+		return unmet ? step.getData().getAmounts().getOrDefault(itemId, 1) - carried.getOrDefault(itemId, 0) : 0;
 	}
 
 	/** The sub-steps of one route, built leg by leg: each stage's walk and act in turn, then the step's own acts. */
@@ -408,7 +366,7 @@ public final class SubSteps
 					{
 						steps.add(LegSteps.enter(step.getData()));
 					}
-					steps.add(LegSteps.walkToStage(leg, reached));
+					steps.add(LegSteps.walkToStage(leg, reached, step.getData()));
 				}
 				else
 				{
@@ -637,31 +595,6 @@ public final class SubSteps
 	{
 		return List.of(SubStep.of(Kind.ACT, "Equip:").items(wornNeeds)
 			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(Tab.INVENTORY).build());
-	}
-
-	/**
-	 * Monsters spread over an area (hellhounds) are walked to until one is close by, as a walk to an NPC is: the walk is
-	 * done and they are outlined on landing, not only near the area's centre.
-	 */
-	private static List<SubStep> withAreaNpcsOnWalk(List<SubStep> steps, StepIndex.Entry data)
-	{
-		Set<Integer> npcs = data == null || data.getArea() == null ? Set.of() : steps.stream()
-			.filter(sub -> sub.getKind() == Kind.ACT && !sub.getNpcIds().isEmpty())
-			.map(SubStep::getNpcIds).findFirst().orElse(Set.of());
-		return npcs.isEmpty() ? steps : withWalksToClue(steps, walk -> walk.npcIds(npcs));
-	}
-
-	/** A wide wanderer is looked for rather than walked to: where it wanders goes under the walk. */
-	private static List<SubStep> withWanderNote(List<SubStep> steps, StepIndex.Entry data)
-	{
-		StepIndex.Wander wander = data == null ? null : data.getWander();
-		return wander == null || wander.getText() == null ? steps : withWalksToClue(steps, walk -> walk.detail(wander.getText()));
-	}
-
-	private static List<SubStep> withWalksToClue(List<SubStep> steps, UnaryOperator<SubStep.SubStepBuilder> change)
-	{
-		return steps.stream().map(sub -> sub.getKind() == Kind.WALK_TO_CLUE ? change.apply(sub.toBuilder()).build() : sub)
-			.collect(toUnmodifiableList());
 	}
 
 	/**

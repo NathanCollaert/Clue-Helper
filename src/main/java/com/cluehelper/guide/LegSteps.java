@@ -25,12 +25,12 @@ final class LegSteps
 	{
 	}
 
-	static SubStep walkToStage(Leg leg, Stage stage)
+	static SubStep walkToStage(Leg leg, Stage stage, StepIndex.Entry data)
 	{
 		int radius = stage.getRadius() > 0 ? stage.getRadius() : SubSteps.ARRIVE_TILES;
 		if (!stage.isOurMarker())
 		{
-			return walkToClue(leg.getTo(), radius);
+			return walkToClue(leg.getTo(), radius, data);
 		}
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
@@ -44,9 +44,15 @@ final class LegSteps
 		return SubStep.of(Kind.WALK, text).waypoint(to).goal(to).radius(radius);
 	}
 
-	static SubStep walkToClue(WorldPoint goal, int radius)
+	/**
+	 * Monsters spread over an area (hellhounds) are walked to until one is close by, and outlined on landing; a wide
+	 * wanderer is looked for, where it wanders said under the walk.
+	 */
+	static SubStep walkToClue(WorldPoint goal, int radius, StepIndex.Entry data)
 	{
-		return SubStep.of(Kind.WALK_TO_CLUE, "Walk to the clue").goal(goal).radius(radius).build();
+		StepIndex.Wander wander = data.getWander();
+		return SubStep.of(Kind.WALK_TO_CLUE, "Walk to the clue").goal(goal).radius(radius).npcIds(data.getArriveNpcs())
+			.detail(wander == null ? null : wander.getText()).build();
 	}
 
 	/** Core's *clue* tag items are named too, and outlined in the bank like ours, so the spade is easy to find. */
@@ -75,7 +81,7 @@ final class LegSteps
 		}
 		if (step.getTargets().contains(leg.getTo()))
 		{
-			return walkToClue(leg.getTo(), step.getKind() == TargetKind.AREA ? SubSteps.AREA_ARRIVE_TILES : SubSteps.ARRIVE_TILES);
+			return walkToClue(leg.getTo(), step.getKind() == TargetKind.AREA ? SubSteps.AREA_ARRIVE_TILES : SubSteps.ARRIVE_TILES, step.getData());
 		}
 		return walkTo("Walk to " + walkGoal(next), leg.getTo(), SubSteps.ARRIVE_TILES).build();
 	}

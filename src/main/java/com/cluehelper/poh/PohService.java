@@ -227,23 +227,7 @@ public class PohService
 
 	private void learnPieces(Catalog catalog)
 	{
-		Set<Integer> ids = new HashSet<>(HouseState.NEXUS_OBJECTS);
-		for (CatalogRow row : catalog.getTeleports())
-		{
-			HouseNeed need = row.getRequirements().getHouse();
-			if (need != null && need.getKind() == HouseNeed.Kind.FURNITURE)
-			{
-				ids.addAll(need.getIds());
-			}
-		}
-		for (SpellbookChange change : catalog.getSpellbookChanges())
-		{
-			if (change.isInHouse() && change.getObjectId() != SpellbookChange.NO_ID)
-			{
-				ids.add(change.getObjectId());
-			}
-		}
-		pieces = Set.copyOf(ids);
+		pieces = catalog.getHousePieces();
 		houseDirty = true;
 	}
 

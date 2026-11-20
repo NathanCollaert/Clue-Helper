@@ -1,81 +1,42 @@
 package com.cluehelper.player;
 
+import com.google.gson.Gson;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import lombok.*;
-import net.runelite.api.*;
-import net.runelite.api.gameval.ItemID;
-import static java.util.stream.Collectors.*;
 
 /**
- * Everything except the tomes comes from the cache, so a game update that adds a staff or a rune carries
- * over by itself. The spellbook widget is never read: it is stale while the magic tab is hidden.
+ * Read from {@code runes.json}, which the test source set's {@code RuneLoader} bakes from the cache's rune tables and the
+ * tomes; the daily bake keeps it current with the game cache.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public final class RuneModel
 {
-	private static final int PARAM_NAME = 601;
+	private static final String FILE = "runes.json";
 
-	/** {element rune, enum of its staves (OBJ → BOOLEAN), enum of the pouch types that hold it}. */
-	private static final int[][] ELEMENTS = {
-		{ItemID.AIRRUNE, 988, 983},
-		{ItemID.WATERRUNE, 989, 987},
-		{ItemID.EARTHRUNE, 996, 993},
-		{ItemID.FIRERUNE, 997, 994},
-	};
-	/** Not in the cache as data. Only the charged ids: an empty tome supplies nothing. */
-	private static final int[][] TOMES = {
-		{ItemID.TOME_OF_FIRE, ItemID.FIRERUNE},
-		{ItemID.TOME_OF_WATER, ItemID.WATERRUNE},
-		{ItemID.TOME_OF_EARTH, ItemID.EARTHRUNE},
-	};
-
-	@Getter
-	private final List<Spell> spells;
 	private final Map<Integer, Integer> pouchRunes;
 	/** The rune itself comes first. */
 	private final Map<Integer, List<Integer>> payersByRune;
 	private final Map<Integer, Set<Integer>> unlimitingWornItemsByRune;
 	private final Map<Integer, String> runeNames;
+	/** The staves that stand in for runes, all wielded in the one weapon slot; the tomes go in the shield slot. */
+	private final Set<Integer> staves;
 
-	/** On the client thread when {@code cache} is the client. */
-	public static RuneModel load(CacheView cache)
+	public static RuneModel read(Gson gson)
 	{
-		Map<Integer, Integer> pouchRunes = enumMap(cache, EnumID.RUNEPOUCH_RUNE);
-		Map<Integer, Set<Integer>> payerSets = new HashMap<>();
-		Map<Integer, String> names = new HashMap<>();
-		for (int rune : pouchRunes.values())
+		try (InputStream in = RuneModel.class.getResourceAsStream(FILE))
 		{
-			payerSets.computeIfAbsent(rune, r -> new LinkedHashSet<>()).add(rune);
-			names.put(rune, cache.itemName(rune));
-		}
-		Map<Integer, Set<Integer>> unlimited = new HashMap<>();
-		for (int[] element : ELEMENTS)
-		{
-			int rune = element[0];
-			unlimited.computeIfAbsent(rune, r -> new TreeSet<>()).addAll(keysOf(cache, element[1]));
-			for (int type : keysOf(cache, element[2]))
+			if (in == null)
 			{
-				Integer combination = pouchRunes.get(type);
-				if (combination != null)
-				{
-					payerSets.computeIfAbsent(rune, r -> new LinkedHashSet<>()).add(combination);
-				}
+				throw new IllegalStateException(FILE + " is missing");
 			}
+			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), RuneModel.class);
 		}
-		for (int[] tome : TOMES)
+		catch (IOException e)
 		{
-			unlimited.computeIfAbsent(tome[1], r -> new TreeSet<>()).add(tome[0]);
+			throw new IllegalStateException("can't read " + FILE, e);
 		}
-		for (int[] row : cache.multirunes())
-		{
-			payerSets.computeIfAbsent(row[0], r -> new LinkedHashSet<>(Collections.singleton(row[0]))).add(row[1]);
-		}
-		Map<Integer, List<Integer>> payers = new HashMap<>();
-		payerSets.forEach((rune, set) -> payers.put(rune, List.copyOf(set)));
-		Map<Integer, Set<Integer>> unlimitedCopy = new HashMap<>();
-		unlimited.forEach((rune, set) -> unlimitedCopy.put(rune, Set.copyOf(set)));
-		return new RuneModel(List.copyOf(spells(cache)), Map.copyOf(pouchRunes), Map.copyOf(payers),
-			Map.copyOf(unlimitedCopy), Map.copyOf(names));
 	}
 
 	/** Every item that pays for a rune or stands in for one: runes, combination runes, staves and tomes. */
@@ -87,12 +48,9 @@ public final class RuneModel
 		return Set.copyOf(ids);
 	}
 
-	/** The staves that stand in for runes, all wielded in the one weapon slot; the tomes go in the shield slot. */
 	public Set<Integer> staves()
 	{
-		Set<Integer> tomes = Arrays.stream(TOMES).map(tome -> tome[0]).collect(toSet());
-		return unlimitingWornItemsByRune.values().stream().flatMap(Set::stream).filter(id -> !tomes.contains(id))
-			.collect(toUnmodifiableSet());
+		return staves;
 	}
 
 	/** -1 for an unknown pouch type. */
@@ -150,48 +108,5 @@ public final class RuneModel
 		int have;
 		/** Empty unless enough. */
 		List<ItemUse> witness;
-	}
-
-	private static List<Spell> spells(CacheView cache)
-	{
-		List<Spell> spells = new ArrayList<>();
-		int[] books = cache.enumKeys(EnumID.SPELLBOOKS);
-		int[] bookEnums = cache.enumIntValues(EnumID.SPELLBOOKS);
-		for (int b = 0; b < books.length; b++)
-		{
-			Book book = Book.of(books[b]);
-			if (book == null)
-			{
-				continue;
-			}
-			for (int obj : cache.enumIntValues(bookEnums[b]))
-			{
-				spells.add(spell(cache, book, obj));
-			}
-		}
-		return spells;
-	}
-
-	private static Spell spell(CacheView cache, Book book, int obj)
-	{
-		String name = cache.itemStringParam(obj, PARAM_NAME);
-		return new Spell(book, name == null ? "spell " + obj : name, obj);
-	}
-
-	private static Map<Integer, Integer> enumMap(CacheView cache, int enumId)
-	{
-		int[] keys = cache.enumKeys(enumId);
-		int[] values = cache.enumIntValues(enumId);
-		Map<Integer, Integer> map = new HashMap<>();
-		for (int i = 0; i < keys.length; i++)
-		{
-			map.put(keys[i], values[i]);
-		}
-		return map;
-	}
-
-	private static List<Integer> keysOf(CacheView cache, int enumId)
-	{
-		return Arrays.stream(cache.enumKeys(enumId)).boxed().collect(toList());
 	}
 }

@@ -64,6 +64,13 @@ public final class WalkLoader
 		return new WalkLoader().bake();
 	}
 
+	/** The walk gates, parsed as the bake parses them. */
+	public static List<Requirements> gates() throws IOException
+	{
+		WalkLoader loader = new WalkLoader();
+		return loader.requirements(rows("gates.tsv"), FIRST_GATE_COLUMN, GATE_COLUMNS);
+	}
+
 	private Baked bake() throws IOException
 	{
 		readNodes(rows("nodes.tsv"));
