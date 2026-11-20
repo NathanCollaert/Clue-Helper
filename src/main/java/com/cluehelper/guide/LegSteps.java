@@ -6,6 +6,7 @@ import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.SubStep.Kind;
@@ -20,6 +21,8 @@ final class LegSteps
 	private static final String TALK_TO = "Talk to";
 	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
 	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
+	/** A task's place that reads as the walk's end ("The nearest anvil"); a longer one, with how-tos, goes under the walk. */
+	private static final Pattern SHORT_PLACE = Pattern.compile("(The|An?) [^:,(]+");
 
 	private LegSteps()
 	{
@@ -35,7 +38,9 @@ final class LegSteps
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
 		String place = stage.getKind() == Stage.Kind.TASK ? stage.atPlace(leg.getTo()).getDetail() : null;
-		return walkTo(text, leg.getTo(), radius).detail(place)
+		boolean named = place != null && SHORT_PLACE.matcher(place).matches();
+		return walkTo(named ? "Walk to " + Character.toLowerCase(place.charAt(0)) + place.substring(1) : text, leg.getTo(), radius)
+			.detail(named ? null : place)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
