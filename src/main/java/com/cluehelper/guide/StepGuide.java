@@ -356,7 +356,8 @@ public class StepGuide
 			return;
 		}
 		Route committed = routes.getCommitted();
-		if (committed != null && committed.isBanked() && isTaskUnderway())
+		boolean sameStep = step != null && routeStep != null && step.getKey().equals(routeStep.getKey());
+		if (committed != null && committed.isBanked() && sameStep && isTaskUnderway())
 		{
 			return;
 		}
