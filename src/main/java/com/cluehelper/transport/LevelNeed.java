@@ -20,10 +20,10 @@ public class LevelNeed
 		MUSIC_TRACKS("every music track", player -> -player.getLockedMusicTracks(), "still locked"),
 		ALL_QUEST_POINTS("every quest point", player -> -player.getMissingQuestPoints(), "short");
 
-		private final String format;
-		private final ToIntFunction<PlayerSnapshot> have;
+		final String format;
+		final ToIntFunction<PlayerSnapshot> have;
 		/** How what is missing is worded, for a need held against 0; null for a level. */
-		private final String missingAs;
+		final String missingAs;
 	}
 
 	/** Null for an aggregate. */

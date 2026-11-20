@@ -28,9 +28,9 @@ public class MinimapPathOverlay extends Overlay
 	private static final double CORNER = 0.2;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private WaypointOverlay waypoints;
+	WaypointOverlay waypoints;
 
 	MinimapPathOverlay()
 	{

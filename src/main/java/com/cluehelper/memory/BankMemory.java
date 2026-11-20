@@ -29,22 +29,22 @@ public class BankMemory
 	private static final int NO_NOTE = -1;
 	private static final String DEPOSIT = "Deposit";
 
-	private final Client client;
-	private final MemorySlot<Seen> storedBank;
-	private final MemorySlot<Seen> storedGroup;
-	private final MemorySlot<Pin> pin;
-	private final MemorySlot<Seen> storedKit;
-	private final Map<Integer, Boolean> placeholders = new HashMap<>();
-	private final LateDeposits lateDeposits = new LateDeposits();
+	final Client client;
+	final MemorySlot<Seen> storedBank;
+	final MemorySlot<Seen> storedGroup;
+	final MemorySlot<Pin> pin;
+	final MemorySlot<Seen> storedKit;
+	final Map<Integer, Boolean> placeholders = new HashMap<>();
+	final LateDeposits lateDeposits = new LateDeposits();
 
 	/** The PIN is asked once per login: a bank or PIN screen seen since then means it's done. */
-	private volatile boolean pinDoneThisSession;
+	volatile boolean pinDoneThisSession;
 	/** Changes whenever the remembered contents or the PIN state change, so a plan can tell it is stale. */
 	@Getter
-	private volatile long version;
+	volatile long version;
 	/** Tracked from the bank's own load and close events: the bank widget can outlive a closed bank. */
 	@Getter
-	private volatile boolean bankOpen;
+	volatile boolean bankOpen;
 
 	@Inject
 	BankMemory(Client client, MemoryStore memory)
@@ -310,11 +310,11 @@ public class BankMemory
 		private static final int CONFIRM_TICKS = 1;
 		private static final int NEVER = Integer.MIN_VALUE;
 
-		private Map<Integer, Integer> carried = Map.of();
-		private final Map<Integer, Integer> pending = new HashMap<>();
-		private int clickTick = NEVER;
-		private int bankSeenTick = NEVER;
-		private int ticksWaited;
+		Map<Integer, Integer> carried = Map.of();
+		final Map<Integer, Integer> pending = new HashMap<>();
+		int clickTick = NEVER;
+		int bankSeenTick = NEVER;
+		int ticksWaited;
 
 		void onDepositClicked(int tick)
 		{

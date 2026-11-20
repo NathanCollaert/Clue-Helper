@@ -35,11 +35,11 @@ public class StashMemory
 		.collect(toUnmodifiableSet());
 
 	@Inject
-	private Client client;
-	private MemorySlot<Units> remembered;
-	private final Map<Integer, Integer> builtVarbits = new HashMap<>();
-	private int lastSearchObject = NOT_SEEN;
-	private int lastSearchTick;
+	Client client;
+	MemorySlot<Units> remembered;
+	final Map<Integer, Integer> builtVarbits = new HashMap<>();
+	int lastSearchObject = NOT_SEEN;
+	int lastSearchTick;
 
 	@Inject
 	void init(MemoryStore memory)

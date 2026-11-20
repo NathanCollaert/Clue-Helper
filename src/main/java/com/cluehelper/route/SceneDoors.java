@@ -36,15 +36,15 @@ public final class SceneDoors
 
 	private static final String NONE = "";
 	/** The option that opens each object: Open, Slash, Squeeze-through, Walk-through, or NONE. */
-	private final Map<Integer, String> openOptions = new HashMap<>();
+	final Map<Integer, String> openOptions = new HashMap<>();
 	/** By place: doors share ids across the game, and one locked door doesn't lock every other one like it. */
-	private final Set<Door> locked = new HashSet<>();
-	private Door lastOpened;
+	final Set<Door> locked = new HashSet<>();
+	Door lastOpened;
 	/** From each new snapshot's walk gates: a web opens only to a player carrying or wielding something that slashes. */
 	@Setter
-	private volatile boolean canSlash;
+	volatile boolean canSlash;
 	@Inject
-	private Client client;
+	Client client;
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{

@@ -25,15 +25,15 @@ public final class HouseOwnership
 		OWN, FRIEND, UNKNOWN
 	}
 
-	private final LongSupplier clock;
+	final LongSupplier clock;
 
 	@Getter
-	private boolean inHouse;
+	boolean inHouse;
 	@Getter
-	private Ownership ownership = Ownership.UNCERTAIN;
+	Ownership ownership = Ownership.UNCERTAIN;
 
-	private Entry pending = Entry.UNKNOWN;
-	private long pendingAt;
+	Entry pending = Entry.UNKNOWN;
+	long pendingAt;
 
 	/** Only clicks outside a house count: inside, a stranger's portal offers the owner's options. */
 	public void observeClick(String option, String target)

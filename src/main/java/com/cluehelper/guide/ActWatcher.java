@@ -23,17 +23,17 @@ public class ActWatcher
 	private static final Set<String> CHALLENGE_ITEMS = Set.of("challenge scroll", "puzzle box", "light box");
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
-	private int withdrawTick = NEVER;
-	private int depositTick = NEVER;
-	private int uriTick = NEVER;
-	private int challengeTick = NEVER;
-	private int enemyTick = NEVER;
-	private NPC enemy;
-	private boolean inventoryChanged = true;
-	private boolean challengeCarried;
+	PlayerModel player;
+	int withdrawTick = NEVER;
+	int depositTick = NEVER;
+	int uriTick = NEVER;
+	int challengeTick = NEVER;
+	int enemyTick = NEVER;
+	NPC enemy;
+	boolean inventoryChanged = true;
+	boolean challengeCarried;
 
 	public void onChatMessage(ChatMessage message)
 	{

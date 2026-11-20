@@ -23,7 +23,7 @@ public class MusicTracks
 	private static final String UNLOCKED_TEXT = "unlocked a new music track";
 
 	@Inject
-	private Client client;
+	Client client;
 
 	public static boolean tellsOfAnUnlock(ChatMessage message)
 	{

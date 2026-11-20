@@ -38,17 +38,17 @@ final class TaskActs
 	}
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private SceneObjects sceneObjects;
+	SceneObjects sceneObjects;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private StepNeeds stepNeeds;
+	StepNeeds stepNeeds;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 
 	/** The items the task needs that the player carries, outlined (used on each other, not clicked once). */
 	Highlights withItems(Highlights shown, SubStep current, Step step)

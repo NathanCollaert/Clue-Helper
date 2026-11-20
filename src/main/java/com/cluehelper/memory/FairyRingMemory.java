@@ -29,11 +29,11 @@ public class FairyRingMemory
 	private static final int LANDING_WITHIN_TICKS = 12;
 
 	@Inject
-	private Client client;
-	private MemorySlot<Last> remembered;
-	private String pending;
-	private int pendingTick;
-	private WorldPoint pendingFrom;
+	Client client;
+	MemorySlot<Last> remembered;
+	String pending;
+	int pendingTick;
+	WorldPoint pendingFrom;
 
 	@Inject
 	void init(MemoryStore memory)

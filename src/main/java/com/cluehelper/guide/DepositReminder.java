@@ -18,9 +18,9 @@ final class DepositReminder
 	private static final int DEPOSIT_TILES = 15;
 
 	@Inject
-	private ActWatcher actWatcher;
-	private Pending pending;
-	private boolean beenNear;
+	ActWatcher actWatcher;
+	Pending pending;
+	boolean beenNear;
 
 	/** The unit to put the items back into; null when nothing is owed. */
 	WorldPoint getAt()

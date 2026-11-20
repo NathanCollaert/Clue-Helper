@@ -32,19 +32,19 @@ public class WidgetHighlightOverlay extends Overlay
 		VarbitID.QUESTLIST_HIDE_MINIQUESTS, "hide miniquests");
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private MenuLines menuLines;
+	MenuLines menuLines;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PrayerFilters prayerFilters;
+	PrayerFilters prayerFilters;
 
 	WidgetHighlightOverlay()
 	{

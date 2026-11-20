@@ -16,10 +16,10 @@ import net.runelite.client.util.Text;
 public class JournalScroll
 {
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ClueLink clueLink;
-	private boolean scrolled;
+	ClueLink clueLink;
+	boolean scrolled;
 
 	public void onGameTick()
 	{

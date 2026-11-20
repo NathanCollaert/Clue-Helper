@@ -26,9 +26,9 @@ public class EasyTeleportsNames
 		Comparator.comparingInt(String::length).reversed().thenComparing(Comparator.naturalOrder());
 
 	@Inject
-	private ConfigManager configManager;
+	ConfigManager configManager;
 	/** Each shown name to the game names it stands for, read again after any change to the settings. */
-	private volatile Map<String, List<String>> gameNames;
+	volatile Map<String, List<String>> gameNames;
 
 	/** The text as shown, then the same text with the game's name for each name Easy Teleports put in it. */
 	public List<String> readings(String shown)

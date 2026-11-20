@@ -18,10 +18,10 @@ public final class WalkCosts
 	/** A node stands this close to an exit's landing. */
 	private static final int BESIDE_TILES = 2;
 
-	private final Ground ground;
+	final Ground ground;
 	@Getter
-	private final WorldPoint start;
-	private final WalkSearch search;
+	final WorldPoint start;
+	final WalkSearch search;
 
 	public static WalkCosts from(Ground ground, WorldPoint start)
 	{

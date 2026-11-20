@@ -35,13 +35,13 @@ final class PathObjects
 	}
 	private static final String OPEN = "Open";
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private AbyssObstacles abyss;
+	AbyssObstacles abyss;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 	@Inject
-	private SceneDoors doors;
+	SceneDoors doors;
 
 	/** Client thread only. Each object with the menu option that takes the path through it. */
 	Map<TileObject, String> along(WorldView view, WalkTable table, List<WorldPoint> path)

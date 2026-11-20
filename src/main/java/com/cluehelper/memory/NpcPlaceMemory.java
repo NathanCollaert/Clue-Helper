@@ -28,13 +28,13 @@ public class NpcPlaceMemory
 	private static final int SPOT_TILES = 20;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private BundledData data;
+	BundledData data;
 	@Inject
-	private PlayerModel player;
-	private MemorySlot<Places> remembered;
-	private List<StepIndex.Entry> learnable;
+	PlayerModel player;
+	MemorySlot<Places> remembered;
+	List<StepIndex.Entry> learnable;
 
 	@Inject
 	void init(MemoryStore memory)

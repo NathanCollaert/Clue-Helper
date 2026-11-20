@@ -23,43 +23,43 @@ public final class WalkTable
 	public static final String COLUMNS = "columns.bin";
 	private static final int[] NO_ROWS = new int[0];
 
-	private WorldPoint[] tiles;
-	private WorldPoint[] placed;
-	private int[][] gateSets;
+	WorldPoint[] tiles;
+	WorldPoint[] placed;
+	int[][] gateSets;
 	/** Index = gate id − 1. */
 	@Getter
-	private List<Requirements> gates;
-	private Map<Integer, List<Bank>> banks;
-	private Map<Integer, int[]> rowsByOrigin;
-	private boolean[] rowIsExit;
-	private Map<Long, Exit> exits;
-	private Map<Long, List<Exit>> rowObjects;
+	List<Requirements> gates;
+	Map<Integer, List<Bank>> banks;
+	Map<Integer, int[]> rowsByOrigin;
+	boolean[] rowIsExit;
+	Map<Long, Exit> exits;
+	Map<Long, List<Exit>> rowObjects;
 	/** Each row object's id by the packed tiles its rows start from. */
-	private Map<Integer, Set<Integer>> rowObjectsAt;
+	Map<Integer, Set<Integer>> rowObjectsAt;
 	/** The gate of the webs' rows: one passes it by carrying something that slashes. */
 	@Getter
-	private int slashGate;
+	int slashGate;
 	/** The vars the gates read, so the player model keeps them current. */
 	@Getter
-	private List<Integer> watchedVarbits;
+	List<Integer> watchedVarbits;
 	@Getter
-	private List<Integer> watchedVarps;
+	List<Integer> watchedVarps;
 
-	private final transient Map<WorldPoint, Integer> byTile = new HashMap<>();
-	private transient int[] entryStart;
-	private transient int[] entryTo;
-	private transient int[] entryFull;
-	private transient int[] entryGateSet;
-	private transient int[] entryOpen;
-	private transient int[] entryAlternative;
-	private transient int[] entryAlternativeGateSet;
-	private transient int[] reverseStart;
-	private transient int[] reverseEntry;
-	private transient int[] entryFrom;
-	private transient int[] rowOrigin;
-	private transient int[] rowDest;
-	private transient int[] rowCost;
-	private transient int[] rowGate;
+	final transient Map<WorldPoint, Integer> byTile = new HashMap<>();
+	transient int[] entryStart;
+	transient int[] entryTo;
+	transient int[] entryFull;
+	transient int[] entryGateSet;
+	transient int[] entryOpen;
+	transient int[] entryAlternative;
+	transient int[] entryAlternativeGateSet;
+	transient int[] reverseStart;
+	transient int[] reverseEntry;
+	transient int[] entryFrom;
+	transient int[] rowOrigin;
+	transient int[] rowDest;
+	transient int[] rowCost;
+	transient int[] rowGate;
 
 	private WalkTable()
 	{

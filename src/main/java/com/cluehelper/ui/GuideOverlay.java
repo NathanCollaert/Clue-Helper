@@ -36,12 +36,12 @@ public class GuideOverlay extends OverlayPanel
 	private static final String CLOSE_COLOUR = "</col>";
 	private static final char NO_BREAK = ' ';
 
-	private final ClueHelperConfig config;
-	private volatile GuideBox box = GuideBox.EMPTY;
+	final ClueHelperConfig config;
+	volatile GuideBox box = GuideBox.EMPTY;
 	/** Null while the Clue Scroll plugin draws its own box. */
-	private volatile ClueScrollOverlay coreBox;
-	private volatile ClueScrollPlugin corePlugin;
-	private FontMetrics metrics;
+	volatile ClueScrollOverlay coreBox;
+	volatile ClueScrollPlugin corePlugin;
+	FontMetrics metrics;
 
 	@Inject
 	GuideOverlay(ClueHelperPlugin plugin, ClueHelperConfig config, RouteReport report)

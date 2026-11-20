@@ -31,12 +31,12 @@ public final class WorldWalk
 	/** Where the walk ends: the goal's first tile found, the first tile found that uses its object, or the best tile beside it. */
 	private static final class End implements WalkSearch.Stop
 	{
-		private final Ground ground;
-		private final WalkGoal goal;
-		private final WorldPoint goalTile;
-		private final int target;
-		private int usedFrom = WalkSearch.NONE;
-		private int reached = WalkSearch.NONE;
+		final Ground ground;
+		final WalkGoal goal;
+		final WorldPoint goalTile;
+		final int target;
+		int usedFrom = WalkSearch.NONE;
+		int reached = WalkSearch.NONE;
 
 		End(Ground ground, WalkGoal goal)
 		{

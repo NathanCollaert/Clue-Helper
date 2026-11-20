@@ -38,60 +38,60 @@ public class RoutePlanner
 	private static final long NO_SCENE = Long.MIN_VALUE;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private BundledData bundledData;
+	BundledData bundledData;
 	@Inject
-	private PlannerRunner runner;
+	PlannerRunner runner;
 	/** The walk from the player's tile, searched apart so it never supersedes a plan. */
-	private PlannerRunner startRunner;
+	PlannerRunner startRunner;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private StepNeeds stepNeeds;
+	StepNeeds stepNeeds;
 	@Inject
-	private PohService poh;
+	PohService poh;
 	@Inject
-	private ProbeTarget probeTarget;
+	ProbeTarget probeTarget;
 	@Inject
-	private StageTarget stageTarget;
+	StageTarget stageTarget;
 	@Inject
-	private SceneDoors doors;
-	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
-	private final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
+	SceneDoors doors;
+	final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
+	final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
 
 	/** Loaded walk data; null until it is. */
 	@Getter
-	private volatile WalkData walk;
-	private volatile Catalog catalog;
-	private long gatesVersion = -1;
-	private boolean[] rowOpen;
-	private WorldPoint lastTile;
+	volatile WalkData walk;
+	volatile Catalog catalog;
+	long gatesVersion = -1;
+	boolean[] rowOpen;
+	WorldPoint lastTile;
 	/** After a teleport the scene loads a tick after the tile moves: a walk over the old scene must be redone. */
-	private long lastSceneBase = NO_SCENE;
+	long lastSceneBase = NO_SCENE;
 	@Getter
-	private volatile PlanStart start;
-	private volatile int nearestNode = WalkTable.NO_NODE;
-	private int targetWalkBucket = NO_TARGET_NEAR;
-	private Trigger lastTrigger;
+	volatile PlanStart start;
+	volatile int nearestNode = WalkTable.NO_NODE;
+	int targetWalkBucket = NO_TARGET_NEAR;
+	Trigger lastTrigger;
 	@Getter
-	private volatile Plan plan = Plan.NONE;
+	volatile Plan plan = Plan.NONE;
 	@Getter
-	private volatile Route committed;
-	private String committedStep;
+	volatile Route committed;
+	String committedStep;
 	/** The step's targets when it was committed: a hot/cold step keeps its key while its target moves. */
-	private List<WorldPoint> committedTargets = List.of();
+	List<WorldPoint> committedTargets = List.of();
 	/** The committed walk was kept once although the last plan didn't offer it. */
-	private boolean walkHeld;
-	private final Set<String> refusedChanges = new HashSet<>();
+	boolean walkHeld;
+	final Set<String> refusedChanges = new HashSet<>();
 
 	@Inject
 	void init(ScheduledExecutorService executor, ClientThread clientThread)

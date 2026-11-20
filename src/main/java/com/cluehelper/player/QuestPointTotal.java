@@ -15,7 +15,7 @@ public class QuestPointTotal
 	private static final int NOT_RELEASED = 0;
 
 	@Inject
-	private Client client;
+	Client client;
 
 	int offered()
 	{

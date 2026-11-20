@@ -3,6 +3,8 @@ package com.cluehelper.route;
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import java.util.*;
+import lombok.AccessLevel;
+import lombok.experimental.*;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -30,26 +32,29 @@ final class LabelSearch
 	private static final int[] NOTHING = new int[0];
 	private static final int CANNOT_CAST = -1;
 
-	private final PlanContext ctx;
-	private final List<int[]> legTargets;
-	private final boolean probes;
-	private final int areaHalfTicks;
-	private final int nodes;
-	private final int revertHalfTicks;
+	final PlanContext ctx;
+	final List<int[]> legTargets;
+	final boolean probes;
+	final int areaHalfTicks;
+	final int nodes;
+	final int revertHalfTicks;
 	/** Only routes whose first transport has this key, a way into the house aside; null for any. */
-	private final String onlyFirst;
-	private final boolean requireTransport;
-	private final boolean wantSameBook;
-	private final int rankLimit;
-	private final Label[] slots;
-	private final LowerBound[] bounds;
-	private final boolean[][] targets;
-	private final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : a.half - b.half);
+	final String onlyFirst;
+	final boolean requireTransport;
+	final boolean wantSameBook;
+	final int rankLimit;
+	final Label[] slots;
+	final LowerBound[] bounds;
+	final boolean[][] targets;
+	final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : a.half - b.half);
 
+	@PackagePrivate
 	final Label[][] goals = new Label[2][CATEGORIES];
 	/** The bank state of the plain routes the margin is judged against: banked when no route can skip the bank. */
-	private final int plainBankState;
+	final int plainBankState;
+	@PackagePrivate
 	final Map<Integer, Label[][]> probeBest = new HashMap<>();
+	@PackagePrivate
 	int labels;
 
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, int rankLimit)
@@ -878,6 +883,7 @@ final class LabelSearch
 		return k >= FIRST_PENDING ? pendingBook(k) : Book.values()[k];
 	}
 
+	@FieldDefaults(level = AccessLevel.PACKAGE)
 	static final class Label
 	{
 		int leg;

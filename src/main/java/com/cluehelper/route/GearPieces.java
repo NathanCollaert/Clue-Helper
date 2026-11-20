@@ -13,10 +13,10 @@ public class GearPieces
 	private static final int AMMO = EquipmentInventorySlot.AMMO.getSlotIdx();
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ItemManager itemManager;
-	private final Map<GearBonus, Map<Integer, Optional<GearPicker.Piece>>> cache = new EnumMap<>(GearBonus.class);
+	ItemManager itemManager;
+	final Map<GearBonus, Map<Integer, Optional<GearPicker.Piece>>> cache = new EnumMap<>(GearBonus.class);
 
 	public Map<Integer, GearPicker.Piece> of(GearBonus bonus, Collection<Integer> itemIds)
 	{

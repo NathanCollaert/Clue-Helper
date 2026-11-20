@@ -27,7 +27,7 @@ public class FairyDials
 	private static final int[] MUSHROOM_RADII = {21, 31, 31, 31};
 
 	@Inject
-	private Client client;
+	Client client;
 
 	public List<Shape> shapes(String code)
 	{

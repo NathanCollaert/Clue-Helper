@@ -49,42 +49,42 @@ public class WaypointOverlay extends Overlay
 	private static final String NO_STEP = "";
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PathObjects paths;
+	PathObjects paths;
 	@Inject
-	private WalkLine walkLine;
+	WalkLine walkLine;
 	@Inject
-	private LineTargets targets;
+	LineTargets targets;
 	@Inject
-	private WorldWalk walker;
+	WorldWalk walker;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 	@Inject
-	private ModelSilhouette silhouette;
+	ModelSilhouette silhouette;
 
-	private int crossingFrom = NOT_CROSSING;
-	private List<WorldPoint> drawnWalk = List.of();
+	int crossingFrom = NOT_CROSSING;
+	List<WorldPoint> drawnWalk = List.of();
 	/** Client thread. The tiles the line was last drawn through. */
 	@Getter
-	private List<WorldPoint> line = List.of();
+	List<WorldPoint> line = List.of();
 	/** Client thread, after this overlay's render in the same frame. The tiles the line shows now; empty when none does. */
 	@Getter(AccessLevel.PACKAGE)
-	private List<WorldPoint> shownLine = List.of();
-	private Map<TileObject, String> pathObjects = Map.of();
-	private int lineTick = -1;
+	List<WorldPoint> shownLine = List.of();
+	Map<TileObject, String> pathObjects = Map.of();
+	int lineTick = -1;
 	/** The step the open conversation began on; null with no conversation open. */
-	private String conversationStepKey;
+	String conversationStepKey;
 
 	WaypointOverlay()
 	{

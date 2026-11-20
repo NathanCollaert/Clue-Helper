@@ -4,6 +4,7 @@ import com.cluehelper.step.HotColdTier;
 import java.util.*;
 import java.util.function.IntFunction;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 
@@ -14,6 +15,7 @@ import static java.util.stream.Collectors.*;
  * and the tiles' weights sum to 1.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PACKAGE)
 public final class Hypotheses
 {
 	/** 133 of 140 cache centres equal core's, so a spot's prior sits mostly on its centre. */

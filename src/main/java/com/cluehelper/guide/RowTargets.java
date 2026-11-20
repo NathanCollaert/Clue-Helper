@@ -24,11 +24,11 @@ final class RowTargets
 	private static final Map<Book, Integer> MINIGAME_SPELLS = Tables.byKey("minigame spells", Book::valueOf, row -> row.id(0));
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 
 	/** The row's object or NPC, with the menu its catalog line names. */
 	MenuTarget located(CatalogRow row)

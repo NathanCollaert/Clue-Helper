@@ -18,19 +18,19 @@ final class WalkLine
 	private static final int OFF_WALK_TILES = 2;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private WorldWalk walker;
-	private PlannerRunner runner;
+	WorldWalk walker;
+	PlannerRunner runner;
 
-	private WalkGoal goal;
-	private WalkCosts here;
-	private List<WorldPoint> walk = List.of();
+	WalkGoal goal;
+	WalkCosts here;
+	List<WorldPoint> walk = List.of();
 	/** The index of the walk's tile the player last stood nearest. */
-	private int passed;
-	private boolean stale;
+	int passed;
+	boolean stale;
 
 	@Inject
 	void init(ScheduledExecutorService executor, ClientThread clientThread)

@@ -9,8 +9,8 @@ import javax.inject.*;
 @Singleton
 final class ObeliskDestination
 {
-	private boolean listSeen;
-	private String setFor;
+	boolean listSeen;
+	String setFor;
 
 	/**
 	 * Call every tick. {@code watching} while the step's menu target is the obelisk's list line; {@code showing} while

@@ -15,16 +15,16 @@ import net.runelite.api.coords.WorldPoint;
 final class LineTargets
 {
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private SceneDoors doors;
+	SceneDoors doors;
 
-	private WorldPoint instanceTile;
-	private WalkCosts instanceWalk;
+	WorldPoint instanceTile;
+	WalkCosts instanceWalk;
 
 	/** The outlined object cheapest to walk to: the game walks to the nearest side of the booth or chest clicked. */
 	TileObject object(WorldView view)

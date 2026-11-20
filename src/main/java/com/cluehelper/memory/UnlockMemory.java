@@ -45,12 +45,12 @@ public class UnlockMemory
 	private static final int BALLOON_TILES = 15;
 
 	@Inject
-	private Client client;
-	private MemorySlot<Learned> learned;
-	private MemorySlot<Seen> legacyXericsHonour;
-	private MemorySlot<Seen> legacyDragontooth;
-	private WorldPoint lastTile;
-	private Map<Integer, Integer> lastFares = Map.of();
+	Client client;
+	MemorySlot<Learned> learned;
+	MemorySlot<Seen> legacyXericsHonour;
+	MemorySlot<Seen> legacyDragontooth;
+	WorldPoint lastTile;
+	Map<Integer, Integer> lastFares = Map.of();
 
 	@Inject
 	void init(MemoryStore memory)

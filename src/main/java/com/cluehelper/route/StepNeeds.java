@@ -31,18 +31,18 @@ public class StepNeeds
 	private static final int LIT = 1;
 
 	/** Names, real levels and varbits. */
-	private final Client client;
-	private final IntFunction<StashMemory.State> stashStates;
-	private final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
+	final Client client;
+	final IntFunction<StashMemory.State> stashStates;
+	final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
 	/** What gear is picked from: carried, and stored while banking counts. */
-	private final Supplier<Set<Integer>> ownedItemIds;
+	final Supplier<Set<Integer>> ownedItemIds;
 	/** The quests that waive a step's way-in items. */
-	private final Predicate<Quest> finishedQuests;
+	final Predicate<Quest> finishedQuests;
 	/** Where the player stands; null while unknown. */
-	private final Supplier<WorldPoint> playerTile;
+	final Supplier<WorldPoint> playerTile;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
-	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
-	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
+	final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
+	final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
 
 	@Inject
 	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)

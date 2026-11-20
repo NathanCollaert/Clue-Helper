@@ -14,8 +14,8 @@ public enum BoxState
 		"Ranking routes from what you have."),
 	ROUTES(null, null);
 
-	private final String title;
-	private final String detail;
+	final String title;
+	final String detail;
 
 	/**
 	 * While the Clue Scroll plugin shows a clue, and after the last one while its STASH items are owed: the guide's

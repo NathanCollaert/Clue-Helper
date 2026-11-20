@@ -17,7 +17,7 @@ public final class SceneObjects
 	private static final String USE = "Use";
 
 	@Inject
-	private Client client;
+	Client client;
 
 	List<TileObject> banksNear(WorldPoint at, int radius)
 	{

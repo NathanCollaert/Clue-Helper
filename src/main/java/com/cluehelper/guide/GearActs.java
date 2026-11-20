@@ -18,13 +18,13 @@ final class GearActs
 	private static final String TAKE_OFF_TEXT = "Take off:";
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private StepNeeds stepNeeds;
+	StepNeeds stepNeeds;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 
 	/** A gear act as the pieces to put on or take off now; any other sub-step, or one there is no step for, as it is. */
 	SubStep refresh(SubStep act, Step step)

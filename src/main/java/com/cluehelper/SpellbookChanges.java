@@ -6,7 +6,7 @@ public enum SpellbookChanges
 	SWAP_ONLY("Spellbook Swap only"),
 	ALL("All");
 
-	private final String label;
+	final String label;
 
 	SpellbookChanges(String label)
 	{

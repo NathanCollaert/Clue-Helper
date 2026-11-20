@@ -23,8 +23,8 @@ public class KeyRingMemory
 	private static final String ON_THE_RING = METAL_KEY + " -> steel key ring";
 
 	@Inject
-	private Client client;
-	private MemorySlot<Ring> remembered;
+	Client client;
+	MemorySlot<Ring> remembered;
 
 	@Inject
 	void init(MemoryStore memory)

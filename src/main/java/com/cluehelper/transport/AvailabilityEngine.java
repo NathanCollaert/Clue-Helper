@@ -30,9 +30,9 @@ public final class AvailabilityEngine
 	private static final Map<String, String> UNLOCK_HINTS = Tables.byKey("unlock hints", Tables.Row::text);
 
 	@Getter
-	private final RuneModel runes;
+	final RuneModel runes;
 	/** Called from any thread. */
-	private final IntFunction<String> itemNames;
+	final IntFunction<String> itemNames;
 
 
 	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */

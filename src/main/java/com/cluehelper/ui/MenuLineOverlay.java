@@ -12,15 +12,15 @@ import net.runelite.client.ui.overlay.*;
 public class MenuLineOverlay extends Overlay
 {
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private MenuLines lines;
+	MenuLines lines;
 	@Inject
-	private FairyDials dials;
+	FairyDials dials;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 
 	MenuLineOverlay()
 	{

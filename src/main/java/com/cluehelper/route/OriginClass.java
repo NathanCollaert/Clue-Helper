@@ -19,10 +19,10 @@ public enum OriginClass
 
 	private static final int NO_EXIT = Integer.MIN_VALUE;
 
-	private final int highestLevel;
+	final int highestLevel;
 	/** Walking due south to this surface y reaches the class. */
 	@Getter(AccessLevel.PACKAGE)
-	private final int exitY;
+	final int exitY;
 
 	OriginClass(int highestLevel)
 	{

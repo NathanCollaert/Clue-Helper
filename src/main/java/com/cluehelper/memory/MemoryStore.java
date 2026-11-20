@@ -18,10 +18,10 @@ import net.runelite.client.config.ConfigManager;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class MemoryStore
 {
-	private final ProfileConfig profile;
-	private final Gson gson;
-	private final List<MemorySlot<?>> slots = new CopyOnWriteArrayList<>();
-	private final AtomicLong version = new AtomicLong();
+	final ProfileConfig profile;
+	final Gson gson;
+	final List<MemorySlot<?>> slots = new CopyOnWriteArrayList<>();
+	final AtomicLong version = new AtomicLong();
 
 	@Inject
 	MemoryStore(ConfigManager configManager, Gson gson)
@@ -60,7 +60,7 @@ public class MemoryStore
 	@RequiredArgsConstructor
 	private static final class RuneLiteProfileConfig implements ProfileConfig
 	{
-		private final ConfigManager configManager;
+		final ConfigManager configManager;
 
 		@Override
 		public String profileKey()

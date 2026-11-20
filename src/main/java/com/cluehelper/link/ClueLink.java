@@ -28,29 +28,29 @@ public class ClueLink
 {
 
 	@Inject
-	private PluginManager pluginManager;
+	PluginManager pluginManager;
 	@Inject
-	private ClueScrollService service;
+	ClueScrollService service;
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepResolver resolver;
+	StepResolver resolver;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private NpcPlaceMemory npcPlaces;
-	private final LinkState state = new LinkState();
-	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
-	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
+	NpcPlaceMemory npcPlaces;
+	final LinkState state = new LinkState();
+	final List<StepListener> listeners = new CopyOnWriteArrayList<>();
+	final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
 
 	/** Null if the client has no Clue Scroll plugin. */
 	@Getter
-	private volatile ClueScrollPlugin core;
+	volatile ClueScrollPlugin core;
 	/** Null when core has no clue. */
 	@Getter
-	private volatile Step currentStep;
+	volatile Step currentStep;
 
 	/** Swing thread. Core's instance exists even while it is off. */
 	public void start()
@@ -210,10 +210,10 @@ public class ClueLink
 	static final class LinkState
 	{
 		@Getter
-		private volatile boolean active;
-		private volatile boolean hasStep;
-		private String lastKey;
-		private Object lastTargets;
+		volatile boolean active;
+		volatile boolean hasStep;
+		String lastKey;
+		Object lastTargets;
 
 		void start(boolean coreActive)
 		{

@@ -17,21 +17,21 @@ final class WalkSearch
 		int after(int tile, int cost);
 	}
 
-	private final Ground ground;
-	private final int maxCost;
-	private final boolean exitsEnd;
-	private final boolean stepsOnly;
-	private final int tileLimit;
-	private final int slotMask;
-	private final int slotShift;
-	private final int[] keys;
-	private final int[] costs;
-	private final int[] parents;
-	private final int[] vias;
-	private final boolean[] used;
-	private final IntList exitLandings = new IntList();
-	private int reached;
-	private int settledBelow;
+	final Ground ground;
+	final int maxCost;
+	final boolean exitsEnd;
+	final boolean stepsOnly;
+	final int tileLimit;
+	final int slotMask;
+	final int slotShift;
+	final int[] keys;
+	final int[] costs;
+	final int[] parents;
+	final int[] vias;
+	final boolean[] used;
+	final IntList exitLandings = new IntList();
+	int reached;
+	int settledBelow;
 
 	/**
 	 * @param maxCost no tile past this cost is reached

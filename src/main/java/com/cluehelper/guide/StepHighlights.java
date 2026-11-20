@@ -38,21 +38,21 @@ final class StepHighlights
 		ObjectID.XMAS20_POH_SPIRIT_RING);
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 	@Inject
-	private RowTargets rowTargets;
+	RowTargets rowTargets;
 	@Inject
-	private TaskActs taskActs;
+	TaskActs taskActs;
 	@Inject
-	private DepositReminder deposit;
+	DepositReminder deposit;
 	@Inject
-	private ObeliskDestination obelisk;
+	ObeliskDestination obelisk;
 
 	Highlights of(SubStep current, Step step)
 	{

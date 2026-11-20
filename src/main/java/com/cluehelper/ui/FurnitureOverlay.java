@@ -13,17 +13,17 @@ import net.runelite.client.ui.overlay.*;
 public class FurnitureOverlay extends Overlay
 {
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 	@Inject
-	private LineTargets targets;
+	LineTargets targets;
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 
 	FurnitureOverlay()
 	{

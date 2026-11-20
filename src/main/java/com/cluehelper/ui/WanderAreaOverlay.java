@@ -23,13 +23,13 @@ public class WanderAreaOverlay extends Overlay
 	private static final Stroke EDGE = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10, new float[]{8, 8}, 0);
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 
 	WanderAreaOverlay()
 	{

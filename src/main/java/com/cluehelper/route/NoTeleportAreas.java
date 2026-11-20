@@ -15,7 +15,7 @@ public final class NoTeleportAreas
 	private static final int VARBIT = 5;
 	private static final int LIFTED_AT = 6;
 
-	private final List<int[]> boxes;
+	final List<int[]> boxes;
 
 	public static NoTeleportAreas load()
 	{

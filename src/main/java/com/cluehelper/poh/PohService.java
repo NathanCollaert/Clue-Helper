@@ -42,24 +42,24 @@ public class PohService
 	private static final int DIGSITE_FIRST = ObjectID.POH_AMULET_DIG_DIGSITE;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private BundledData bundledData;
-	private MemorySlot<Profile> stored;
-	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
+	BundledData bundledData;
+	MemorySlot<Profile> stored;
+	final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
 
-	private volatile Set<Integer> pieces = Set.of();
+	volatile Set<Integer> pieces = Set.of();
 	/** Any thread. */
 	@Getter
-	private volatile HouseState house = HouseState.NONE;
-	private boolean seenATick;
-	private boolean wasInside;
-	private int scanAtTick = -1;
-	private boolean varsDirty = true;
-	private boolean houseDirty = true;
-	private boolean nexusLinesDirty;
+	volatile HouseState house = HouseState.NONE;
+	boolean seenATick;
+	boolean wasInside;
+	int scanAtTick = -1;
+	boolean varsDirty = true;
+	boolean houseDirty = true;
+	boolean nexusLinesDirty;
 
 	@Inject
 	void init(MemoryStore memory)

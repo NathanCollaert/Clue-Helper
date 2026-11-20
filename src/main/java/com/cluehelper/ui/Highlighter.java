@@ -55,15 +55,15 @@ public class Highlighter
 	private static final int MUSHROOM_TILES = 1;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ModelOutlineRenderer outlines;
+	ModelOutlineRenderer outlines;
 	@Inject
-	private ItemManager itemManager;
-	private final Set<Integer> unmodelled = new HashSet<>();
+	ItemManager itemManager;
+	final Set<Integer> unmodelled = new HashSet<>();
 
 	@Inject
-	private ModelSilhouette silhouette;
+	ModelSilhouette silhouette;
 
 	/**
 	 * The client's own getModel throws a NullPointerException for some dynamic objects (seen at Trollheim and after

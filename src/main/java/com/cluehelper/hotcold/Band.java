@@ -17,9 +17,9 @@ public enum Band
 	ICE_COLD("ice cold", Integer.MAX_VALUE, Integer.MAX_VALUE);
 
 	@Getter
-	private final String text;
-	private final int beginnerMax;
-	private final int masterMax;
+	final String text;
+	final int beginnerMax;
+	final int masterMax;
 
 	public static Band of(int distance, HotColdTier tier)
 	{

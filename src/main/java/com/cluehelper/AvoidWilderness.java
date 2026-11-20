@@ -6,7 +6,7 @@ public enum AvoidWilderness
 	HARDCORE_ONLY("Hardcore only"),
 	ALWAYS("Always");
 
-	private final String label;
+	final String label;
 
 	AvoidWilderness(String label)
 	{

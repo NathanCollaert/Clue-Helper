@@ -6,10 +6,13 @@ import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
+import lombok.AccessLevel;
+import lombok.experimental.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 import static java.util.stream.Collectors.*;
 
+@FieldDefaults(level = AccessLevel.PACKAGE)
 final class PlanContext
 {
 	static final int NOT_BANKED = 0;
@@ -511,9 +514,10 @@ final class PlanContext
 		/** Assumed: no route uses one resource more often than this. */
 		private static final int MOST_USES_PER_ROUTE = 8;
 
-		private final Map<String, Integer> ids = new LinkedHashMap<>();
-		private final List<int[]> available = new ArrayList<>();
-		private final List<Integer> mostPerUse = new ArrayList<>();
+		final Map<String, Integer> ids = new LinkedHashMap<>();
+		final List<int[]> available = new ArrayList<>();
+		final List<Integer> mostPerUse = new ArrayList<>();
+		@PackagePrivate
 		int cape = -1;
 
 		int item(int itemId, PlayerSnapshot player, int bankState)

@@ -16,11 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 public class BundledData
 {
 	@Getter
-	private final CompletableFuture<Catalog> catalog;
-	private final CompletableFuture<StepIndex> steps;
+	final CompletableFuture<Catalog> catalog;
+	final CompletableFuture<StepIndex> steps;
 	/** Null inside when the walk data is unreadable: no routes are planned. */
 	@Getter
-	private final CompletableFuture<WalkData> walk;
+	final CompletableFuture<WalkData> walk;
 
 	@Inject
 	BundledData(ScheduledExecutorService executor, Gson gson)

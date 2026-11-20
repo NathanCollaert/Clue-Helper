@@ -44,16 +44,16 @@ public final class SubSteps
 	private static final String DEPOSIT = "Deposit";
 
 	/** For item names. */
-	private final Client client;
-	private final Supplier<PlayerSnapshot> snapshot;
-	private final IntPredicate onlyInBankedKit;
-	private final StepNeeds stepNeeds;
-	private final Supplier<PlanStart> start;
-	private final BooleanSupplier scrollBookOutOfWilderness;
+	final Client client;
+	final Supplier<PlayerSnapshot> snapshot;
+	final IntPredicate onlyInBankedKit;
+	final StepNeeds stepNeeds;
+	final Supplier<PlanStart> start;
+	final BooleanSupplier scrollBookOutOfWilderness;
 	/** What the Entrana monks turn away. */
-	private final IntPredicate weaponOrArmour;
+	final IntPredicate weaponOrArmour;
 	/** The teleports, for the spirit tree a planted-tree task travels to. */
-	private final Supplier<List<CatalogRow>> catalog;
+	final Supplier<List<CatalogRow>> catalog;
 
 	@Inject
 	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear,
@@ -325,13 +325,13 @@ public final class SubSteps
 	@RequiredArgsConstructor
 	private static final class RouteSteps
 	{
-		private final List<SubStep> steps = new ArrayList<>();
-		private final Route route;
-		private final Step step;
-		private final Function<ItemUse, String> itemLines;
-		private final HouseState house;
-		private final boolean takeFromStash;
-		private final List<String> handInItems;
+		final List<SubStep> steps = new ArrayList<>();
+		final Route route;
+		final Step step;
+		final Function<ItemUse, String> itemLines;
+		final HouseState house;
+		final boolean takeFromStash;
+		final List<String> handInItems;
 
 		/** The STASH unit stands outside the step's way in: its items come before going in. */
 		private boolean stashFirst()
@@ -670,7 +670,7 @@ public final class SubSteps
 	public static class CombatGear
 	{
 		@Inject
-		private ItemManager itemManager;
+		ItemManager itemManager;
 
 		public boolean isWeaponOrArmour(int itemId)
 		{

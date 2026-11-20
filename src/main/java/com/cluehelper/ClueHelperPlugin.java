@@ -40,126 +40,126 @@ public class ClueHelperPlugin extends Plugin
 	private static final String GUIDE_BOX_KEY = "guideBox";
 
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 
 	@Inject
-	private MemoryStore memory;
+	MemoryStore memory;
 
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 
 	@Inject
-	private StashMemory stashMemory;
+	StashMemory stashMemory;
 
 	@Inject
-	private CheckLines checkLines;
+	CheckLines checkLines;
 
 	@Inject
-	private GrownPatches grownPatches;
+	GrownPatches grownPatches;
 
 	@Inject
-	private UnlockMemory unlocks;
+	UnlockMemory unlocks;
 
 	@Inject
-	private KeyRingMemory keyRing;
+	KeyRingMemory keyRing;
 
 	@Inject
-	private NpcPlaceMemory npcPlaces;
+	NpcPlaceMemory npcPlaces;
 
 	@Inject
-	private FairyRingMemory fairyRings;
+	FairyRingMemory fairyRings;
 
 	@Inject
-	private PohService poh;
+	PohService poh;
 
 	@Inject
-	private PlayerModel playerModel;
+	PlayerModel playerModel;
 
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 
 	@Inject
-	private BundledData bundledData;
+	BundledData bundledData;
 
 	@Inject
-	private PlannerRunner planner;
+	PlannerRunner planner;
 
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 
 	@Inject
-	private ActWatcher actWatcher;
+	ActWatcher actWatcher;
 
 	@Inject
-	private HotColdService hotCold;
+	HotColdService hotCold;
 
 	@Inject
-	private ClientThread clientThread;
+	ClientThread clientThread;
 
 	@Inject
-	private Client client;
+	Client client;
 
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 
 	@Inject
-	private ConfigManager configManager;
+	ConfigManager configManager;
 
 	@Inject
-	private OverlayManager overlayManager;
+	OverlayManager overlayManager;
 
 	@Inject
-	private ItemHighlightOverlay itemOverlay;
+	ItemHighlightOverlay itemOverlay;
 
 	@Inject
-	private WidgetHighlightOverlay widgetOverlay;
+	WidgetHighlightOverlay widgetOverlay;
 
 	@Inject
-	private MenuLineOverlay menuLineOverlay;
+	MenuLineOverlay menuLineOverlay;
 
 	@Inject
-	private FurnitureOverlay furnitureOverlay;
+	FurnitureOverlay furnitureOverlay;
 
 	@Inject
-	private WanderAreaOverlay wanderAreaOverlay;
+	WanderAreaOverlay wanderAreaOverlay;
 
 	@Inject
-	private MenuLines menuLines;
+	MenuLines menuLines;
 
 	@Inject
-	private EasyTeleportsNames easyTeleportsNames;
+	EasyTeleportsNames easyTeleportsNames;
 
 	@Inject
-	private WaypointOverlay waypointOverlay;
+	WaypointOverlay waypointOverlay;
 
 	@Inject
-	private MinimapPathOverlay minimapPathOverlay;
+	MinimapPathOverlay minimapPathOverlay;
 
 	@Inject
-	private GuideOverlay guideOverlay;
+	GuideOverlay guideOverlay;
 	@Inject
-	private GuideBoxPresenter box;
+	GuideBoxPresenter box;
 	@Inject
-	private CoreBoxMerge coreBoxMerge;
+	CoreBoxMerge coreBoxMerge;
 
 	@Inject
-	private SceneDoors sceneDoors;
+	SceneDoors sceneDoors;
 
 	@Inject
-	private WithdrawTab withdrawTab;
+	WithdrawTab withdrawTab;
 
 	@Inject
-	private RouteReport routeReport;
+	RouteReport routeReport;
 
 	@Inject
-	private JournalScroll journalScroll;
+	JournalScroll journalScroll;
 
 
-	private final List<Runnable> unregister = new ArrayList<>();
-	private boolean shownWorking;
+	final List<Runnable> unregister = new ArrayList<>();
+	boolean shownWorking;
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)

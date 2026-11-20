@@ -15,11 +15,11 @@ import net.runelite.api.Item;
 public class StageTarget
 {
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private AvailabilityService availability;
-	private Step lastIn;
-	private Step lastOut;
+	AvailabilityService availability;
+	Step lastIn;
+	Step lastOut;
 
 	/** The same step object while the stages left don't change. */
 	public Step travelStep(Step step)

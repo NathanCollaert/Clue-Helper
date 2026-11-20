@@ -25,10 +25,10 @@ public class CheckLines
 	private static final Pattern UNLIMITED_LINE = Pattern.compile("\\bhas unlimited charges\\b", Pattern.CASE_INSENSITIVE);
 	private static final int NONE = -1;
 
-	private final Client client;
-	private final MemorySlot<Remembered> remembered;
-	private int checkedItem = NONE;
-	private int checkedTick;
+	final Client client;
+	final MemorySlot<Remembered> remembered;
+	int checkedItem = NONE;
+	int checkedTick;
 
 	@Inject
 	CheckLines(Client client, MemoryStore memory)

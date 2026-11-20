@@ -21,12 +21,12 @@ public class StepResolver
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
 
-	private final Supplier<StepIndex> index;
+	final Supplier<StepIndex> index;
 	/** Whether an NPC id shows for the player: a multiloc NPC is hidden in the form its quest state doesn't use. */
-	private final IntPredicate npcShown;
-	private final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
+	final IntPredicate npcShown;
+	final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
 	/** One requirement per key or tool entry, so a re-read step equals the last one. */
-	private final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
+	final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
 
 	@Inject
 	StepResolver(BundledData data, Client client)

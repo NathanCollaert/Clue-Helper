@@ -11,17 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemorySlot<T>
 {
-	private final String key;
-	private final Class<T> type;
-	private final Supplier<T> fresh;
-	private final ProfileConfig profile;
-	private final Gson gson;
-	private final Runnable onSet;
+	final String key;
+	final Class<T> type;
+	final Supplier<T> fresh;
+	final ProfileConfig profile;
+	final Gson gson;
+	final Runnable onSet;
 
-	private boolean loaded;
-	private String loadedProfile;
-	private T value;
-	private boolean held;
+	boolean loaded;
+	String loadedProfile;
+	T value;
+	boolean held;
 
 	public synchronized T get()
 	{

@@ -38,8 +38,8 @@ public class GrownPatches
 	private static final Map<String, String> SPIRIT_TREE_PATCHES = Tables.byKey("spirit tree patches", row -> row.ids()[0] + "." + row.ids()[1]);
 
 	@Inject
-	private ConfigManager configManager;
-	private MemorySlot<Patches> menuSeen;
+	ConfigManager configManager;
+	MemorySlot<Patches> menuSeen;
 
 	@Inject
 	void init(MemoryStore memory)

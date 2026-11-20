@@ -15,13 +15,13 @@ public final class RuneModel
 {
 	private static final String FILE = "runes.json";
 
-	private final Map<Integer, Integer> pouchRunes;
+	final Map<Integer, Integer> pouchRunes;
 	/** The rune itself comes first. */
-	private final Map<Integer, List<Integer>> payersByRune;
-	private final Map<Integer, Set<Integer>> unlimitingWornItemsByRune;
-	private final Map<Integer, String> runeNames;
+	final Map<Integer, List<Integer>> payersByRune;
+	final Map<Integer, Set<Integer>> unlimitingWornItemsByRune;
+	final Map<Integer, String> runeNames;
 	/** The staves that stand in for runes, all wielded in the one weapon slot; the tomes go in the shield slot. */
-	private final Set<Integer> staves;
+	final Set<Integer> staves;
 
 	public static RuneModel read(Gson gson)
 	{

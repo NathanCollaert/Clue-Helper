@@ -16,30 +16,30 @@ public final class PlanRecording
 {
 	private static final long NANOS_PER_MILLI = 1_000_000;
 
-	private String stepKey;
-	private String stepType;
-	private String tier;
-	private String kind;
-	private List<int[]> targets;
-	private List<RecordedStage> stages;
-	private PlayerSnapshot player;
-	private PlayerSnapshot banked;
-	private boolean pinPending;
-	private boolean atOpenBank;
-	private long nowMinutes;
-	private String startKind;
-	private int[] startTile;
+	String stepKey;
+	String stepType;
+	String tier;
+	String kind;
+	List<int[]> targets;
+	List<RecordedStage> stages;
+	PlayerSnapshot player;
+	PlayerSnapshot banked;
+	boolean pinPending;
+	boolean atOpenBank;
+	long nowMinutes;
+	String startKind;
+	int[] startTile;
 	/** Null when no scene was saved beside the recording. */
-	private String sceneFile;
-	private PlannerSettings settings;
-	private int revertTicksLeft;
-	private Set<String> refusedChanges;
-	private boolean foreignHouseStart;
-	private String followedFirstTransport;
-	private String stash;
-	private List<RecordedNeed> needs;
-	private long liveMillis;
-	private int liveLabels;
+	String sceneFile;
+	PlannerSettings settings;
+	int revertTicksLeft;
+	Set<String> refusedChanges;
+	boolean foreignHouseStart;
+	String followedFirstTransport;
+	String stash;
+	List<RecordedNeed> needs;
+	long liveMillis;
+	int liveLabels;
 
 	private PlanRecording()
 	{
@@ -101,10 +101,10 @@ public final class PlanRecording
 	@Getter
 	public static final class RecordedStage
 	{
-		private String kind;
-		private String act;
-		private List<int[]> tiles;
-		private List<String> worn;
+		String kind;
+		String act;
+		List<int[]> tiles;
+		List<String> worn;
 
 		private RecordedStage()
 		{
@@ -124,13 +124,13 @@ public final class PlanRecording
 	@Getter
 	public static final class RecordedNeed
 	{
-		private String name;
-		private boolean stepItem;
-		private boolean blocksRoute;
-		private List<Integer> ids;
+		String name;
+		boolean stepItem;
+		boolean blocksRoute;
+		List<Integer> ids;
 		/** Gear needs only: the bonus total and each owned piece. */
-		private int gearAtLeast;
-		private List<GearPicker.Piece> gearPieces;
+		int gearAtLeast;
+		List<GearPicker.Piece> gearPieces;
 
 		private RecordedNeed()
 		{

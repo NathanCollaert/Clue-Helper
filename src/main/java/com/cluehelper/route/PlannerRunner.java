@@ -18,10 +18,10 @@ import net.runelite.client.callback.ClientThread;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PlannerRunner
 {
-	private final Executor background;
-	private final Executor clientThread;
-	private final AtomicLong generation = new AtomicLong();
-	private volatile long finishedGeneration;
+	final Executor background;
+	final Executor clientThread;
+	final AtomicLong generation = new AtomicLong();
+	volatile long finishedGeneration;
 
 	@Inject
 	public PlannerRunner(ScheduledExecutorService executor, ClientThread clientThread)

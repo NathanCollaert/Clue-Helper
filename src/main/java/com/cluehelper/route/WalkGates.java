@@ -19,14 +19,14 @@ public final class WalkGates
 	private static final int SLASH_TICKS = 2;
 	private static final int RETRY_HALF_TICKS = 2 * SLASH_TICKS * (EXPECTED_SLASHES_WITHOUT_SWORD - 1);
 
-	private final WalkTable table;
-	private final boolean[] gatePass;
-	private final boolean[] setPass;
+	final WalkTable table;
+	final boolean[] gatePass;
+	final boolean[] setPass;
 	/** Stored items a passing gate takes, such as a banked knife for a web; carried ones are preferred. */
-	private final int[][] gateWithdraw;
-	private final int[][] setWithdraw;
-	private final int[] gateExtra;
-	private final int[] setExtra;
+	final int[][] gateWithdraw;
+	final int[][] setWithdraw;
+	final int[] gateExtra;
+	final int[] setExtra;
 
 	public WalkGates(WalkTable table, PlayerSnapshot player, AvailabilityEngine engine, long nowMinutes)
 	{

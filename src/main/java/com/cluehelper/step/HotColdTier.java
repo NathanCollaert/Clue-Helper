@@ -12,11 +12,11 @@ public enum HotColdTier
 	MASTER("master", ItemID.MASTER_DEVICE, "jorral");
 
 	/** The tier as a step names it. */
-	private final String tierName;
-	private final int deviceItemId;
+	final String tierName;
+	final int deviceItemId;
 	/** The NPC who hands out the device, as a step key names him. */
-	private final String deviceNpc;
-	private final ItemRequirement device;
+	final String deviceNpc;
+	final ItemRequirement device;
 
 	HotColdTier(String tierName, int deviceItemId, String deviceNpc)
 	{

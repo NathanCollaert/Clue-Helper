@@ -18,27 +18,27 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 public class GuideBoxPresenter
 {
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PlayerModel playerModel;
+	PlayerModel playerModel;
 	@Inject
-	private PlannerRunner planner;
+	PlannerRunner planner;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private HotColdService hotCold;
+	HotColdService hotCold;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private PohService poh;
+	PohService poh;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private GuideOverlay overlay;
+	GuideOverlay overlay;
 
 	public void refresh()
 	{

@@ -73,89 +73,89 @@ public class StepGuide
 		InterfaceID.TOPLEVEL_PRE_EOC);
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private UnlockMemory unlocks;
+	UnlockMemory unlocks;
 	@Inject
-	private MenuLines menuLines;
+	MenuLines menuLines;
 	@Inject
-	private RowTargets rowTargets;
+	RowTargets rowTargets;
 	@Inject
-	private GearActs gearActs;
+	GearActs gearActs;
 	@Inject
-	private TaskActs taskActs;
+	TaskActs taskActs;
 	@Inject
-	private StepHighlights stepHighlights;
+	StepHighlights stepHighlights;
 	@Inject
-	private ActWatcher actWatcher;
+	ActWatcher actWatcher;
 	@Inject
-	private StepNeeds stepNeeds;
+	StepNeeds stepNeeds;
 	@Inject
-	private SubSteps subSteps;
+	SubSteps subSteps;
 	@Inject
-	private SceneObjects sceneObjects;
+	SceneObjects sceneObjects;
 	@Inject
-	private AbyssObstacles abyssObstacles;
+	AbyssObstacles abyssObstacles;
 	@Inject
-	private ClueLink clueLink;
-	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
+	ClueLink clueLink;
+	final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private static final String TALK_TO = "Talk to ";
 	private static final List<String> BOXES = List.of("puzzle box", "light box");
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 	@Inject
-	private DepositReminder deposit;
-	private final ChangeRefusal changeRefusal = new ChangeRefusal();
-	private final TeleportRefusal teleportRefusal = new TeleportRefusal();
+	DepositReminder deposit;
+	final ChangeRefusal changeRefusal = new ChangeRefusal();
+	final TeleportRefusal teleportRefusal = new TeleportRefusal();
 	@Inject
-	private ObeliskDestination obelisk;
+	ObeliskDestination obelisk;
 
-	private Runnable unregister;
+	Runnable unregister;
 	@Getter
-	private Route route;
-	private Step routeStep;
+	Route route;
+	Step routeStep;
 	/** When the guided step began: an act's event counts from then. */
-	private int stepSince = ActWatcher.NEVER;
-	private String actReachedStepKey;
+	int stepSince = ActWatcher.NEVER;
+	String actReachedStepKey;
 	@Getter
-	private List<SubStep> steps = List.of();
-	private int index;
-	private boolean jumpedThisSubStep;
-	private int teleportAnimatedTick = ActWatcher.NEVER;
-	private int travelClickTick = ActWatcher.NEVER;
+	List<SubStep> steps = List.of();
+	int index;
+	boolean jumpedThisSubStep;
+	int teleportAnimatedTick = ActWatcher.NEVER;
+	int travelClickTick = ActWatcher.NEVER;
 	/** The travel sub-step's own animation is playing: one that started right after a click during it. */
-	private boolean travelStarted;
+	boolean travelStarted;
 	/**
 	 * The fairy ring sub-step's code took the player away: the leaving animation played during it. The last ring's
 	 * arrival animation is still playing when the next code is dialled, so any animation won't do.
 	 */
-	private boolean ringVanished;
-	private WorldPoint lastTile;
+	boolean ringVanished;
+	WorldPoint lastTile;
 	/** Where the player stood before the last teleport. */
-	private WorldPoint jumpedFrom;
+	WorldPoint jumpedFrom;
 	/** The step whose task the player has started on its object (a pyre built, a net trap set), or null. */
-	private String taskStartedKey;
+	String taskStartedKey;
 	/** The clicked object's tile, for {@link #taskStartedKey}. */
-	private WorldPoint taskStartedAt;
+	WorldPoint taskStartedAt;
 	/** A route that came while a teleport was under way, followed once it lands. */
-	private Waiting waiting;
+	Waiting waiting;
 	/** While an enemy attacks during a dig or an emote. */
-	private Fight fight;
-	private RingChain ringChain;
+	Fight fight;
+	RingChain ringChain;
 	/** After a talk that hands over a puzzle or light box: open it (core solves it), then talk again. */
-	private SubStep boxView;
+	SubStep boxView;
 	/** Ground items to pick up now, by tile. */
 	@Getter
-	private List<WorldPoint> pickUpTiles = List.of();
+	List<WorldPoint> pickUpTiles = List.of();
 	@Getter
-	private Highlights highlights = Highlights.NONE;
-	private SceneHighlights scene = SceneHighlights.NONE;
+	Highlights highlights = Highlights.NONE;
+	SceneHighlights scene = SceneHighlights.NONE;
 
 	public void start()
 	{
@@ -1437,9 +1437,9 @@ public class StepGuide
 	{
 		private static final int CHECK_TICKS = 2;
 
-		private String candidate;
-		private Book book;
-		private int checkTick;
+		String candidate;
+		Book book;
+		int checkTick;
 
 		/** A MESBOX line during the change: the change is suspect until its check tick. */
 		void suspect(String change, Book book, int tick)
@@ -1509,10 +1509,10 @@ public class StepGuide
 		/** A teleport animates on its click's tick or within two: three ticks without one means it was refused. */
 		private static final int CHECK_TICKS = 3;
 
-		private int clickTick = ActWatcher.NEVER;
-		private WorldPoint clickTile;
-		private String row;
-		private int checkTick = ActWatcher.NEVER;
+		int clickTick = ActWatcher.NEVER;
+		WorldPoint clickTile;
+		String row;
+		int checkTick = ActWatcher.NEVER;
 
 		void clicked(int tick, WorldPoint tile)
 		{

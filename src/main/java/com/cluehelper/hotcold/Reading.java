@@ -12,13 +12,13 @@ import net.runelite.api.coords.WorldPoint;
 @NoArgsConstructor
 public final class Reading
 {
-	private int x;
-	private int y;
-	private int plane;
+	int x;
+	int y;
+	int plane;
 	/** Null on an anchor: a finished step's last reading, kept only for the next step's first comparison. */
-	private Band band;
+	Band band;
 	/** Null on a step's first reading and on the shaking line. */
-	private Comparison comparison;
+	Comparison comparison;
 
 	public Reading asAnchor()
 	{

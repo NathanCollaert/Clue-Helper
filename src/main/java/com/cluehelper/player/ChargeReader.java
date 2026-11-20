@@ -22,10 +22,10 @@ public class ChargeReader
 	private static final Map<Integer, String> ITEM_CHARGES_KEYS = Map.of(ItemID.CHRONICLE, "chronicle");
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ConfigManager configManager;
-	private final Map<Integer, Integer> chargesInName = new HashMap<>();
+	ConfigManager configManager;
+	final Map<Integer, Integer> chargesInName = new HashMap<>();
 
 	static Collection<Integer> chargeVarbits()
 	{

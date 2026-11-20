@@ -37,66 +37,66 @@ public class PlayerModel
 	private static final int INVENTORY_SLOTS = 28;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private MemoryStore memory;
+	MemoryStore memory;
 	@Inject
-	private UnlockMemory unlockMemory;
+	UnlockMemory unlockMemory;
 	@Inject
-	private KeyRingMemory keyRing;
+	KeyRingMemory keyRing;
 	@Inject
-	private GrownPatches grownPatches;
+	GrownPatches grownPatches;
 	@Inject
-	private FairyRingMemory fairyRings;
+	FairyRingMemory fairyRings;
 	@Inject
-	private ChargeReader chargeReader;
+	ChargeReader chargeReader;
 	@Inject
-	private CheckLines checkLines;
+	CheckLines checkLines;
 	@Inject
-	private MusicTracks musicTracks;
+	MusicTracks musicTracks;
 	@Inject
-	private QuestPointTotal questPointTotal;
+	QuestPointTotal questPointTotal;
 	@Inject
-	private Gson gson;
-	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
-	private final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
-	private final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
+	Gson gson;
+	final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
+	final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
+	final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
 
-	private final Set<Integer> watchedVarbits = new HashSet<>();
-	private final Set<Integer> watchedVarps = new HashSet<>();
-	private final Set<Integer> watchedVarpIndices = new HashSet<>();
-	private Map<Quest, QuestState> quests = Map.of();
-	private boolean questsRead;
-	private volatile boolean questsDirty;
-	private int lockedMusicTracks;
-	private int missingQuestPoints;
-	private volatile boolean musicDirty;
-	private volatile boolean dirty;
-	private HouseState house = HouseState.NONE;
-	private long memoryVersion = -1;
-	private long version;
-	private Map<Integer, Integer> fakeCarried = Map.of();
+	final Set<Integer> watchedVarbits = new HashSet<>();
+	final Set<Integer> watchedVarps = new HashSet<>();
+	final Set<Integer> watchedVarpIndices = new HashSet<>();
+	Map<Quest, QuestState> quests = Map.of();
+	boolean questsRead;
+	volatile boolean questsDirty;
+	int lockedMusicTracks;
+	int missingQuestPoints;
+	volatile boolean musicDirty;
+	volatile boolean dirty;
+	HouseState house = HouseState.NONE;
+	long memoryVersion = -1;
+	long version;
+	Map<Integer, Integer> fakeCarried = Map.of();
 
 	/** Null until the first tick after login. */
 	@Getter
-	private volatile RuneModel runeModel;
+	volatile RuneModel runeModel;
 	/** Null while logged out. */
 	@Getter
-	private volatile PlayerSnapshot snapshot;
+	volatile PlayerSnapshot snapshot;
 	/**
 	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
 	 * new snapshot version.
 	 */
 	@Getter
-	private volatile Position position = Position.NONE;
+	volatile Position position = Position.NONE;
 	/**
 	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
 	 * when first seen.
 	 */
 	@Getter
-	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
+	volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	public void start()
 	{

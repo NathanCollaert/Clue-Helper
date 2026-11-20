@@ -10,7 +10,7 @@ final class LowerBound
 {
 	static final int UNREACHABLE = Integer.MAX_VALUE / 4;
 
-	private final int[] bound;
+	final int[] bound;
 
 	LowerBound(PlanContext ctx, int[] targets)
 	{

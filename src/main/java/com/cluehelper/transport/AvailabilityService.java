@@ -14,28 +14,28 @@ public class AvailabilityService
 	private static final long MILLIS_PER_MINUTE = 60_000L;
 
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private ClueHelperConfig config;
-	private volatile Set<Integer> catalogItems = Set.of();
+	ClueHelperConfig config;
+	volatile Set<Integer> catalogItems = Set.of();
 	/** The catalog's items and the walk gates' (a long rope), for no-route notes. */
-	private volatile Map<Integer, String> itemNames = Map.of();
+	volatile Map<Integer, String> itemNames = Map.of();
 
 	@Getter
-	private volatile List<CatalogRow> catalog = List.of();
+	volatile List<CatalogRow> catalog = List.of();
 	@Getter
-	private volatile AvailabilitySet carried = AvailabilitySet.EMPTY;
+	volatile AvailabilitySet carried = AvailabilitySet.EMPTY;
 	/** Empty when no bank counts. */
 	@Getter
-	private volatile AvailabilitySet banked = AvailabilitySet.EMPTY;
+	volatile AvailabilitySet banked = AvailabilitySet.EMPTY;
 	/** Null when no bank counts. */
 	@Getter
-	private volatile PlayerSnapshot bankedSnapshot;
-	private long judgedBankVersion = -1;
-	private volatile boolean stale = true;
-	private Runnable unregister;
+	volatile PlayerSnapshot bankedSnapshot;
+	long judgedBankVersion = -1;
+	volatile boolean stale = true;
+	Runnable unregister;
 
 	public void start()
 	{

@@ -75,20 +75,20 @@ public class MenuLines
 	}
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private FairyDials fairyDials;
+	FairyDials fairyDials;
 	@Inject
-	private SceneObjects sceneObjects;
+	SceneObjects sceneObjects;
 	@Inject
-	private EasyTeleportsNames easyTeleportsNames;
-	private final Map<String, int[]> listLines = new HashMap<>();
-	private String listTitle;
-	private final List<int[]> rawListLines = new ArrayList<>();
-	private boolean listFresh;
-	private final Map<Integer, int[]> nexusLines = new HashMap<>();
-	private final Map<Integer, int[]> boxLines = new HashMap<>();
-	private final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
+	EasyTeleportsNames easyTeleportsNames;
+	final Map<String, int[]> listLines = new HashMap<>();
+	String listTitle;
+	final List<int[]> rawListLines = new ArrayList<>();
+	boolean listFresh;
+	final Map<Integer, int[]> nexusLines = new HashMap<>();
+	final Map<Integer, int[]> boxLines = new HashMap<>();
+	final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
 
 	/** Call from a handler at priority 2, ahead of better-teleport-menu's at 1. */
 	public void onScriptPreFired(ScriptPreFired event)
