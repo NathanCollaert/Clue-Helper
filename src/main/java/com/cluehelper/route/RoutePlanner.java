@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 
 /**
@@ -31,7 +30,6 @@ public class RoutePlanner
 	static final int COMMIT_MARGIN_TICKS = 5;
 	/** A Spellbook Swap's free cast stays pending this long after varbit 3617 turns 1. */
 	private static final int SWAP_WINDOW_TICKS = 200;
-	private static final int NOT_REFUSED = -1;
 	private static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
@@ -93,7 +91,6 @@ public class RoutePlanner
 	private List<WorldPoint> committedTargets = List.of();
 	/** The committed walk was kept once although the last plan didn't offer it. */
 	private boolean walkHeld;
-	private int swapCheckAtCapeRefusal = NOT_REFUSED;
 	private final Set<String> refusedChanges = new HashSet<>();
 
 	@Inject
@@ -201,8 +198,6 @@ public class RoutePlanner
 		{
 			return;
 		}
-		forgetCapeRefusalOnceCheckMoved(snapshot);
-		snapshot = withRefusals(snapshot);
 		updateStart(data, snapshot, runes, step);
 		if (start == null)
 		{
@@ -235,7 +230,7 @@ public class RoutePlanner
 		{
 			return null;
 		}
-		return input(step, withRefusals(snapshot), runes, required);
+		return input(step, snapshot, runes, required);
 	}
 
 	/** Client thread. The walk rows the player can take now, fixed for a search on another thread. */
@@ -252,7 +247,7 @@ public class RoutePlanner
 		return PlanInput.builder()
 			.step(step)
 			.player(snapshot)
-			.banked(banked == null ? null : withRefusals(banked))
+			.banked(banked)
 			.pinPending(bankMemory.isPinPending())
 			.atOpenBank(bankMemory.isBankOpen())
 			.required(required)
@@ -274,14 +269,15 @@ public class RoutePlanner
 		return poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
 	}
 
-	/** Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says. */
+	/**
+	 * Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says, so no cape change is
+	 * offered again this session.
+	 */
 	public void onCapeChangesRefused()
 	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		Integer used = snapshot == null ? null : snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		swapCheckAtCapeRefusal = used == null ? 0 : used;
-		lastTrigger = null;
-		log.debug("cape change refused at 4816 = {}", swapCheckAtCapeRefusal);
+		catalog.getSpellbookChanges().stream()
+			.filter(change -> change.getSpends().stream().anyMatch(spend -> spend.getKind() == Spend.Kind.CAPE_USE))
+			.forEach(change -> onRowRefused(change.getName()));
 	}
 
 	/**
@@ -295,31 +291,6 @@ public class RoutePlanner
 			lastTrigger = null;
 			log.debug("refused this session: {}", row);
 		}
-	}
-
-	/** The refused cape change counts until SB_SWAP_CHECK moves: the day's limit has reset by then. */
-	private void forgetCapeRefusalOnceCheckMoved(PlayerSnapshot snapshot)
-	{
-		Integer used = snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		if (swapCheckAtCapeRefusal != NOT_REFUSED && used != null && used != swapCheckAtCapeRefusal)
-		{
-			swapCheckAtCapeRefusal = NOT_REFUSED;
-		}
-	}
-
-	/** After a cape refusal, no cape uses are left. */
-	private PlayerSnapshot withRefusals(PlayerSnapshot snapshot)
-	{
-		if (swapCheckAtCapeRefusal == NOT_REFUSED)
-		{
-			return snapshot;
-		}
-		Map<Integer, Integer> varbits = new HashMap<>(snapshot.getVarbits());
-		varbits.put(VarbitID.SB_SWAP_CHECK, SpellbookState.CAPE_CHANGES_PER_DAY);
-		SpellbookState book = snapshot.getSpellbook();
-		SpellbookState noCapeUses = book == null ? null : new SpellbookState(book.getBook(), book.isPendingRevert(), 0,
-			book.isArceuusUnlocked(), book.isAncientAccess(), book.isLunarAccess(), book.isSwapAccess());
-		return snapshot.toBuilder().varbits(varbits).spellbook(noCapeUses).build();
 	}
 
 	private void updateStart(WalkData data, PlayerSnapshot snapshot, RuneModel runes, Step step)
