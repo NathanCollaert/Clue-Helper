@@ -55,9 +55,6 @@ public class ClueHelperPlugin extends Plugin
 	private CheckLines checkLines;
 
 	@Inject
-	private SpiritTreeMemory spiritTrees;
-
-	@Inject
 	private GrownPatches grownPatches;
 
 	@Inject
@@ -242,8 +239,7 @@ public class ClueHelperPlugin extends Plugin
 		}
 		bankMemory.onGameTick();
 		poh.onGameTick();
-		menuLines.takeFreshList(spiritTrees::onListMenu);
-		spiritTrees.onGameTick();
+		menuLines.takeFreshList(grownPatches::onListMenu);
 		fairyRings.onGameTick();
 		unlocks.onGameTick();
 		playerModel.onGameTick();
@@ -443,7 +439,6 @@ public class ClueHelperPlugin extends Plugin
 
 	private void publishMemories()
 	{
-		spiritTrees.publish();
 		grownPatches.publish();
 		fairyRings.publish();
 		unlocks.publish();

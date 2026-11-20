@@ -16,7 +16,7 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.FairyRingMemory;
-import com.cluehelper.memory.SpiritTreeMemory;
+import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.player.Position;
@@ -176,7 +176,7 @@ public class ClueHelperDevPlugin extends Plugin
 		clueHelper = find(ClueHelperPlugin.class);
 		harness = clueHelper.getInjector().getInstance(DevHarness.class);
 		harness.start();
-		logDebug(HotColdService.class, FairyRingMemory.class, SpiritTreeMemory.class);
+		logDebug(HotColdService.class, FairyRingMemory.class, GrownPatches.class);
 		frameWriter = Executors.newSingleThreadExecutor(runnable ->
 		{
 			Thread thread = new Thread(runnable, "clue-helper-dev-frames");

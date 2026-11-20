@@ -65,11 +65,10 @@ public class PlayerModel
 	private volatile boolean musicDirty;
 	private volatile boolean dirty;
 	private HouseState house = HouseState.NONE;
-	private Set<String> plantedTrees = Set.of();
 	private Set<String> unlocks = Set.of();
 	/** Items owned but known not to do what their id promises: a steel key ring the Metal key was taken off. */
 	private Set<Integer> uncounted = Set.of();
-	/** Grown patches other than spirit trees, named as the step data names them. */
+	/** Grown patches, the planted spirit trees among them, named as the catalog and the step data name them. */
 	private Set<String> grownPatches = Set.of();
 	private String lastFairyRing;
 	private long version;
@@ -173,13 +172,6 @@ public class PlayerModel
 
 	public void onStatChanged()
 	{
-		dirty = true;
-	}
-
-	/** Client thread. */
-	public void setPlantedTrees(Set<String> next)
-	{
-		plantedTrees = Set.copyOf(next);
 		dirty = true;
 	}
 
@@ -400,8 +392,6 @@ public class PlayerModel
 		Set<Integer> held = new HashSet<>(inventory.keySet());
 		held.addAll(worn.keySet());
 		Set<WorldType> worldTypes = client.getWorldType();
-		Set<String> grown = new HashSet<>(plantedTrees);
-		grown.addAll(grownPatches);
 		return PlayerSnapshot.builder()
 			.version(++version)
 			.position(now)
@@ -428,7 +418,7 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
-			.plantedTrees(grown)
+			.plantedTrees(grownPatches)
 			.unlocks(unlocks)
 			.lastFairyRing(lastFairyRing)
 			.build();
