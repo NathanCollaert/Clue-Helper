@@ -136,6 +136,10 @@ public class WaypointOverlay extends Overlay
 	/** Where the line leads for the current sub-step; null when nothing is drawn. */
 	private Goal goal(WorldView view, SubStep current)
 	{
+		if (current != null && current.getKind() == SubStep.Kind.ACT && isFighting(view, actNpc(current)))
+		{
+			return null;
+		}
 		WorldPoint waypoint = current == null ? null : current.getWaypoint();
 		if (waypoint == null && current != null)
 		{
@@ -224,7 +228,7 @@ public class WaypointOverlay extends Overlay
 	/**
 	 * Where the act is done: its NPC, else its nearest tile; null within {@code here} tiles of it, and inside a
 	 * wanderer's range with it out of view, where the player looks for it. The kill for a key leads to the NPC
-	 * dropping the key, else the stage's marker, and nowhere while fighting. A hot/cold feel without a waypoint is done where the player stands:
+	 * dropping the key, else the stage's marker. A hot/cold feel without a waypoint is done where the player stands:
 	 * the step's tiles are only the places it might be felt from.
 	 */
 	private WorldPoint actTarget(WorldView view, SubStep current, int here)
@@ -236,10 +240,6 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		boolean killForKey = isKillForKey(current);
-		if (killForKey && isFighting(view, keyHolder(step, current.getStage())))
-		{
-			return null;
-		}
 		WorldPoint target = killForKey ? nearestKeyHolder(view, step, current.getStage(), at) : nearestNamedNpc(view, step.getNpcsAtStep(), at);
 		StepIndex.Wander range = step.getData().getWander();
 		if (target == null && !killForKey && range != null && range.contains(at))
@@ -284,6 +284,19 @@ public class WaypointOverlay extends Overlay
 	private static WorldPoint nearestKeyHolder(WorldView view, Step step, Stage kill, WorldPoint at)
 	{
 		return nearestNpc(view, keyHolder(step, kill), at);
+	}
+
+	/** An NPC the act is done with: its own, the step's at the clue, or the one dropping the key. */
+	private Predicate<NPC> actNpc(SubStep act)
+	{
+		Step step = clueLink.getCurrentStep();
+		Predicate<NPC> own = npc -> act.getNpcIds().contains(npc.getId());
+		if (step == null)
+		{
+			return own;
+		}
+		Predicate<NPC> atStep = own.or(npc -> isNamed(npc, step.getNpcsAtStep()));
+		return isKillForKey(act) ? atStep.or(keyHolder(step, act.getStage())) : atStep;
 	}
 
 	private static Predicate<NPC> keyHolder(Step step, Stage kill)
@@ -574,7 +587,7 @@ public class WaypointOverlay extends Overlay
 		return AbyssObstacles.isObstacle(first.getId()) ? List.of(at, first.getWorldLocation()) : ahead;
 	}
 
-	/** Attacking one of the {@code wanted} NPCs, or attacked by one: the fight is where the player is. */
+	/** Attacking one of the {@code wanted} NPCs, or attacked by one: the fight is where the player is, so no line. */
 	private boolean isFighting(WorldView view, Predicate<NPC> wanted)
 	{
 		Player local = client.getLocalPlayer();
