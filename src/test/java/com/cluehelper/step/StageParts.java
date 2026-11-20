@@ -2,6 +2,7 @@ package com.cluehelper.step;
 
 import com.cluehelper.player.*;
 import java.util.*;
+import java.util.regex.Pattern;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
@@ -20,13 +21,24 @@ final class StageParts
 	private static final String ATTACK = "Attack";
 	private static final String ANYWHERE = "Anywhere, with what it needs";
 	private static final List<WorldPoint> CORE_TARGETS = List.of();
+	/** The cache's name for an object or NPC without one. */
+	private static final String NO_NAME = "null";
+	/** The cache names a mining rock in the plural ("Runite rocks"); the walk leads to one. */
+	private static final String ROCKS = " rocks";
+	private static final Pattern PROPER_NAME = Pattern.compile("[A-Z][^ ]*( [A-Z][^ ]*)+");
 
 	private StageParts()
 	{
 	}
 
-	/** In the order the resolver tried them: a key, then a dropped way-in item, then a Sherlock challenge. */
+	/** The stages with the name of what each is done on, for the walk there. */
 	static List<Stage> of(StepIndex.Entry entry, ClueScroll clue)
+	{
+		return stagesOf(entry, clue).stream().map(StageParts::named).collect(toUnmodifiableList());
+	}
+
+	/** In the order the resolver tried them: a key, then a dropped way-in item, then a Sherlock challenge. */
+	private static List<Stage> stagesOf(StepIndex.Entry entry, ClueScroll clue)
 	{
 		StepIndex.Target key = entry.getTargets().stream()
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
@@ -66,6 +78,27 @@ final class StageParts
 			.option(from.getOption() == null ? ATTACK : from.getOption())
 			.skippedWhenOwned(Set.copyOf(requires.getIds())).build();
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(CORE_TARGETS).build());
+	}
+
+	/**
+	 * The one name the stage's objects and NPCs share in the cache, lower-cased as a common noun ("anvil", "black
+	 * warlock", "rod fishing spot") unless every word of several is capitalised ("Mercenary Captain"); none when they go
+	 * by several.
+	 */
+	private static Stage named(Stage stage)
+	{
+		Set<String> names = new TreeSet<>();
+		stage.getObjectIds().forEach(id -> names.add(TargetNames.OBJECTS.getOrDefault(id, NO_NAME)));
+		stage.getNpcIds().forEach(id -> names.add(TargetNames.NPCS.getOrDefault(id, NO_NAME)));
+		names.remove(NO_NAME);
+		if (names.size() != 1)
+		{
+			return stage;
+		}
+		String name = names.iterator().next();
+		String common = name.toLowerCase(Locale.ROOT);
+		String one = common.endsWith(ROCKS) ? common.substring(0, common.length() - 1) : common;
+		return stage.toBuilder().targetName(PROPER_NAME.matcher(name).matches() ? name : one).build();
 	}
 
 	/** One place per distinct area. */

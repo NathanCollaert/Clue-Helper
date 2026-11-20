@@ -80,6 +80,8 @@ public class Stage
 	/** NPCs the stage is done with: outlined, and the walk ends on them. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
+	/** What the objects or NPCs are called in the game ("anvil"), for the walk there; null when they go by several names. */
+	String targetName;
 	/** Per tile, core's items that place takes others in place of (the True Blood Altar takes pure essence). */
 	@Builder.Default
 	Map<WorldPoint, List<StepIndex.Alternative>> uses = Map.of();
