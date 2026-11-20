@@ -238,7 +238,7 @@ public class MenuLines
 		}
 	}
 
-	/** Call on {@code MenuOpened}. */
+	/** Call on {@code MenuOpened}. Each alternative target colours its own option, on its own item. */
 	public void colourMenu(MenuTarget target, boolean enabled)
 	{
 		if (!enabled || target == null || target == MenuTarget.NONE)
@@ -275,6 +275,7 @@ public class MenuLines
 				colour(options[options.length - 1 - line]);
 			}
 		}
+		target.getAlternatives().forEach(alternative -> colourMenu(alternative, true));
 	}
 
 	private static void colour(MenuEntry entry)
