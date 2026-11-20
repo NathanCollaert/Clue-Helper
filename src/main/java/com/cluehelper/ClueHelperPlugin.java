@@ -262,7 +262,6 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		clueLink.onItemContainerChanged(event);
 		actWatcher.onItemContainerChanged(event);
 		playerModel.onItemContainerChanged(event);
 		bankMemory.onItemContainerChanged(event);

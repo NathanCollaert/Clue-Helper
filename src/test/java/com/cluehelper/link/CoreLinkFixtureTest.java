@@ -76,15 +76,6 @@ public class CoreLinkFixtureTest
 	}
 
 	@Test
-	public void replayAsksForAReadWheneverCoreIsOnWithoutAClueButOneIsHeld() throws IOException
-	{
-		assertEquals("run 1: client start; each beginner step done or casket opened while the unread elite is held;"
-				+ " elite picked up; withdrawn; withdrawn again after core's re-enable",
-			List.of(0, 294, 495, 566, 636, 672, 773, 841, 883, 909, 1019, 1037, 2234), replay(RUN1).readPromptStarts);
-		assertEquals("run 2: only once core is turned on at t31, and again after the Gauntlet", List.of(31, 465), replay(RUN2).readPromptStarts);
-	}
-
-	@Test
 	public void coreHandsOutStaticEntriesSoIdentityRepeatsAcrossSteps() throws IOException
 	{
 		List<JsonObject> clues = events(RUN1, "clue");
@@ -128,7 +119,6 @@ public class CoreLinkFixtureTest
 	{
 		final List<String> changes = new ArrayList<>();
 		final List<String> activeMismatches = new ArrayList<>();
-		final List<Integer> readPromptStarts = new ArrayList<>();
 	}
 
 	/**
@@ -143,8 +133,6 @@ public class CoreLinkFixtureTest
 		boolean coreActive = false;
 		String key = null;
 		Object targets = null;
-		boolean holdsClue = false;
-		boolean neededRead = false;
 		int lastTick = all.get(all.size() - 1).get("t").getAsInt();
 		int next = 0;
 		for (int tick = 0; tick <= lastTick; tick++)
@@ -167,9 +155,6 @@ public class CoreLinkFixtureTest
 					case "coreState":
 						coreActive = recordedActive(e.get("to").getAsString());
 						break;
-					case "inventory":
-						holdsClue = !e.get("clueItems").getAsString().isEmpty();
-						break;
 					case "clue":
 						key = e.has("key") ? e.get("key").getAsString() : null;
 						targets = e.has("fields") ? e.getAsJsonObject("fields").get("targets") : null;
@@ -182,7 +167,7 @@ public class CoreLinkFixtureTest
 					replay.activeMismatches.add("t" + tick + " " + e.get("event").getAsString() + ": " + state.isActive());
 				}
 			}
-			StepChange change = state.tick(coreActive, key, targets, holdsClue);
+			StepChange change = state.tick(coreActive, key, targets);
 			if (change == StepChange.NEW)
 			{
 				replay.changes.add("NEW " + key);
@@ -191,11 +176,6 @@ public class CoreLinkFixtureTest
 			{
 				replay.changes.add(change.name());
 			}
-			if (state.needsRead() && !neededRead)
-			{
-				replay.readPromptStarts.add(tick);
-			}
-			neededRead = state.needsRead();
 		}
 		return replay;
 	}
