@@ -494,9 +494,9 @@ final class LabelSearch
 	}
 
 	/**
-	 * A web's knife or sword, the Kharazi Jungle's axe and machete, or a stage's gear, is used a few legs after the bank,
-	 * where a stop that took nothing yet only walks to bank-item uses; so another stop takes them at once, one gate's
-	 * tools each, so a web's knife never brings the jungle's axe along.
+	 * A web's knife or sword, the Kharazi Jungle's axe and machete, a ride's items, or a stage's gear, is used a few legs
+	 * after the bank, where a stop that took nothing yet only walks to bank-item uses; so another stop takes them at once,
+	 * one gate's tools or one ride's items each, so a web's knife never brings the jungle's axe along.
 	 */
 	private void takeGateItems(Label from, int k, int bankHalfTicks)
 	{
@@ -504,6 +504,10 @@ final class LabelSearch
 		for (int[] tools : ctx.gates[PlanContext.BANKED].storedGateTools())
 		{
 			takeAtStop(from, k, bankHalfTicks, tools);
+		}
+		for (int[] items : ctx.storedRideItems())
+		{
+			takeAtStop(from, k, bankHalfTicks, items);
 		}
 	}
 

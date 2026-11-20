@@ -70,6 +70,7 @@ final class PlanContext
 	private final int[] stageWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
+	private List<int[]> storedRideItems;
 	private Map<Integer, Integer> rowsPerItem;
 
 	PlanContext(PlanInput in)
@@ -257,6 +258,27 @@ final class PlanContext
 			banked.located.forEach((at, rides) -> rides.forEach(ride -> bankItemUses[at] |= ride.withdraw.length > 0));
 		}
 		return node < bankItemUses.length && bankItemUses[node];
+	}
+
+	/**
+	 * Each banked ride's stored items, once per distinct set, such as the ghost captain's amulet: a bank stop takes them
+	 * at once when the ride is a few legs on, since a stop that took nothing may only go straight to a bank-item use.
+	 */
+	List<int[]> storedRideItems()
+	{
+		TransportOptions banked = options[BANKED];
+		if (banked == null)
+		{
+			return List.of();
+		}
+		if (storedRideItems == null)
+		{
+			Map<String, int[]> items = new LinkedHashMap<>();
+			banked.located.values().forEach(rides -> rides.stream().filter(ride -> ride.withdraw.length > 0)
+				.forEach(ride -> items.putIfAbsent(Arrays.toString(ride.withdraw), ride.withdraw)));
+			storedRideItems = List.copyOf(items.values());
+		}
+		return storedRideItems;
 	}
 
 	boolean isUsableBank(int node)
