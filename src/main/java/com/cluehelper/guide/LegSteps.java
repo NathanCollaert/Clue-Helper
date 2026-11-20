@@ -34,7 +34,8 @@ final class LegSteps
 		}
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
-		return walkTo(text, leg.getTo(), radius)
+		String place = stage.getKind() == Stage.Kind.TASK ? stage.atPlace(leg.getTo()).getDetail() : null;
+		return walkTo(text, leg.getTo(), radius).detail(place)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
