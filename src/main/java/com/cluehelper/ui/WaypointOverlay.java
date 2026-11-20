@@ -236,7 +236,7 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		boolean killForKey = isKillForKey(current);
-		if (killForKey && isFighting())
+		if (killForKey && isFighting(view, keyHolder(step, current.getStage())))
 		{
 			return null;
 		}
@@ -283,8 +283,12 @@ public class WaypointOverlay extends Overlay
 	/** The NPC dropping the key: the stage's own (the Mercenary Captain), else core's for the clue. */
 	private static WorldPoint nearestKeyHolder(WorldView view, Step step, Stage kill, WorldPoint at)
 	{
-		return kill.getNpcIds().isEmpty() ? nearestNamedNpc(view, step.getNpcs(), at)
-			: nearestNpc(view, npc -> kill.getNpcIds().contains(npc.getId()), at);
+		return nearestNpc(view, keyHolder(step, kill), at);
+	}
+
+	private static Predicate<NPC> keyHolder(Step step, Stage kill)
+	{
+		return kill.getNpcIds().isEmpty() ? npc -> isNamed(npc, step.getNpcs()) : npc -> kill.getNpcIds().contains(npc.getId());
 	}
 
 	private static WorldPoint nearestNamedNpc(WorldView view, List<String> names, WorldPoint at)
@@ -570,11 +574,17 @@ public class WaypointOverlay extends Overlay
 		return AbyssObstacles.isObstacle(first.getId()) ? List.of(at, first.getWorldLocation()) : ahead;
 	}
 
-	/** Attacking an NPC: the fight is where the player is, so no line leads anywhere. */
-	private boolean isFighting()
+	/** Attacking one of the {@code wanted} NPCs, or attacked by one: the fight is where the player is. */
+	private boolean isFighting(WorldView view, Predicate<NPC> wanted)
 	{
 		Player local = client.getLocalPlayer();
-		return local != null && local.getInteracting() instanceof NPC;
+		if (local == null)
+		{
+			return false;
+		}
+		Actor opponent = local.getInteracting();
+		return opponent instanceof NPC && wanted.test((NPC) opponent)
+			|| view.npcs().stream().anyMatch(npc -> npc.getInteracting() == local && wanted.test(npc));
 	}
 
 	private WorldPoint playerTile()
