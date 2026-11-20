@@ -70,7 +70,7 @@ final class PlanContext
 	private final int[] stageWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
-	private List<int[]> storedRideItems;
+	private List<TransportOptions.Teleport> storedItemRides;
 	private Map<Integer, Integer> rowsPerItem;
 
 	PlanContext(PlanInput in)
@@ -260,25 +260,20 @@ final class PlanContext
 		return node < bankItemUses.length && bankItemUses[node];
 	}
 
-	/**
-	 * Each banked ride's stored items, once per distinct set, such as the ghost captain's amulet: a bank stop takes them
-	 * at once when the ride is a few legs on, since a stop that took nothing may only go straight to a bank-item use.
-	 */
-	List<int[]> storedRideItems()
+	/** The banked rides that take stored items, such as the ghost captain's boat and its amulet. */
+	List<TransportOptions.Teleport> storedItemRides()
 	{
 		TransportOptions banked = options[BANKED];
 		if (banked == null)
 		{
 			return List.of();
 		}
-		if (storedRideItems == null)
+		if (storedItemRides == null)
 		{
-			Map<String, int[]> items = new LinkedHashMap<>();
-			banked.located.values().forEach(rides -> rides.stream().filter(ride -> ride.withdraw.length > 0)
-				.forEach(ride -> items.putIfAbsent(Arrays.toString(ride.withdraw), ride.withdraw)));
-			storedRideItems = List.copyOf(items.values());
+			storedItemRides = banked.located.values().stream().flatMap(List::stream).filter(ride -> ride.withdraw.length > 0)
+				.collect(toUnmodifiableList());
 		}
-		return storedRideItems;
+		return storedItemRides;
 	}
 
 	boolean isUsableBank(int node)

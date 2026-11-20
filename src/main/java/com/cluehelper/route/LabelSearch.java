@@ -496,19 +496,37 @@ final class LabelSearch
 	/**
 	 * A web's knife or sword, the Kharazi Jungle's axe and machete, a ride's items, or a stage's gear, is used a few legs
 	 * after the bank, where a stop that took nothing yet only walks to bank-item uses; so another stop takes them at once,
-	 * one gate's tools or one ride's items each, so a web's knife never brings the jungle's axe along.
+	 * one ride's items or one gate's tools each, so a web's knife never brings the jungle's axe along.
 	 */
 	private void takeGateItems(Label from, int k, int bankHalfTicks)
 	{
 		takeAtStop(from, k, bankHalfTicks, new int[0]);
+		for (int[] items : itemsOfRidesTowardTarget(from))
+		{
+			takeAtStop(from, k, bankHalfTicks, items);
+		}
 		for (int[] tools : ctx.gates[PlanContext.BANKED].storedGateTools())
 		{
 			takeAtStop(from, k, bankHalfTicks, tools);
 		}
-		for (int[] items : ctx.storedRideItems())
+	}
+
+	/**
+	 * The stored items of each ride that lands nearer the leg's target than the bank, once per distinct set. They come
+	 * before the gates' tools: a stop keeps only {@link #MAX_LABELS} labels, and a ride's use is surer than a web's.
+	 */
+	private Collection<int[]> itemsOfRidesTowardTarget(Label bank)
+	{
+		LowerBound bound = bounds[bank.leg];
+		Map<String, int[]> items = new LinkedHashMap<>();
+		for (TransportOptions.Teleport ride : ctx.storedItemRides())
 		{
-			takeAtStop(from, k, bankHalfTicks, items);
+			if (bound == null || ride.node != WalkTable.NO_NODE && bound.of(ride.node) < bound.of(bank.node))
+			{
+				items.putIfAbsent(Arrays.toString(ride.withdraw), ride.withdraw);
+			}
 		}
+		return items.values();
 	}
 
 	private void takeAtStop(Label from, int k, int bankHalfTicks, int[] tools)
