@@ -138,10 +138,10 @@ final class StepHighlights
 				.collect(toUnmodifiableList());
 		}
 		MenuTarget menuTarget = shown.getMenuTarget();
-		boolean ring = menuTarget.getLine() == MenuTarget.Line.FAIRY_CODE && menuTarget.getLineKey() != null;
+		boolean ring = menuTarget.getLine() == MenuLine.FAIRY_CODE && menuTarget.getLineKey() != null;
 		String firstClick = menuTarget.getPath().isEmpty() ? null : menuTarget.getPath().get(0);
 		String label = shown.getOneClickLabel();
-		boolean houseList = menuTarget.getLine() == MenuTarget.Line.NEXUS || menuTarget.getLine() == MenuTarget.Line.BOX;
+		boolean houseList = menuTarget.getLine() == MenuLine.NEXUS || menuTarget.getLine() == MenuLine.BOX;
 		return objects.stream()
 			.filter(object -> isFilledUnhovered(object) || (ring ? ringGoesTo(leftClicks.object(object), menuTarget.getLineKey())
 				: oneClickTo(leftClicks.object(object), label, firstClick) || isOpenedAlready(object, firstClick)
@@ -373,9 +373,9 @@ final class StepHighlights
 		{
 			int spell = rowTargets.spellWidget(row);
 			shown.spellWidget(spell).tab(Tab.MAGIC);
-			if (row.boatDock() != null)
+			if (row.getLine() == MenuLine.BOAT)
 			{
-				shown.menuTarget(MenuTarget.boat(row.boatDock()));
+				shown.menuTarget(RowTargets.line(row).build());
 			}
 			else
 			{
@@ -385,7 +385,7 @@ final class StepHighlights
 		else if (row.getCategory() == Category.MINIGAME)
 		{
 			shown.spellWidget(rowTargets.minigameSpellWidget(player.currentBook())).tab(Tab.MAGIC)
-				.menuTarget(MenuTarget.minigame(row.minigameName()));
+				.menuTarget(RowTargets.line(row).build());
 		}
 		else if (row.isLocated())
 		{
@@ -400,7 +400,7 @@ final class StepHighlights
 		else
 		{
 			Set<Integer> held = withHeld(shown, rowTargets.heldUses(row));
-			shown.scroll(ScrollBook.scroll(row.getName())).scrollLeftClick(rowTargets.optionPath(row).size() == 1)
+			shown.scroll(ScrollBook.scroll(row)).scrollLeftClick(row.getOptions().size() == 1)
 				.menuTarget(rowTargets.heldTeleport(current, held));
 		}
 	}
@@ -411,7 +411,7 @@ final class StepHighlights
 	 */
 	private void spellOption(Highlights.HighlightsBuilder shown, CatalogRow row, int spell)
 	{
-		List<String> choice = rowTargets.optionPath(row);
+		List<String> choice = row.getOptions();
 		String leftClick = leftClicks.spell(spell);
 		String option = choice.isEmpty() ? CAST_OPTION : choice.get(choice.size() - 1);
 		if (!MenuLabels.matches(leftClick, option))
@@ -463,7 +463,7 @@ final class StepHighlights
 	/** None for a quetzal: its option only opens the map. */
 	private String directLabel(MenuTarget menuTarget, SubStep current)
 	{
-		if (menuTarget.getLine() == MenuTarget.Line.QUETZAL)
+		if (menuTarget.getLine() == MenuLine.QUETZAL)
 		{
 			return null;
 		}
@@ -471,14 +471,15 @@ final class StepHighlights
 		{
 			return menuTarget.destination();
 		}
-		List<String> path = current.getRow() == null ? List.of() : rowTargets.optionPath(current.getRow());
+		List<String> path = current.getRow() == null ? List.of() : current.getRow().getOptions();
 		return path.isEmpty() ? null : path.get(path.size() - 1);
 	}
 
 	private Set<Integer> oneClickItems(Highlights shown, SubStep current, String label)
 	{
-		boolean signals = shown.getMenuTarget().getLine() == MenuTarget.Line.QUETZAL;
-		boolean oneDestination = label == null ? rowTargets.hasOneDestination(current) : rowTargets.namesItsOnlyLanding(current);
+		boolean signals = shown.getMenuTarget().getLine() == MenuLine.QUETZAL;
+		boolean teleport = current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null;
+		boolean oneDestination = teleport && (label == null ? current.getRow().getOptions().isEmpty() : current.getRow().isSingleLanding());
 		return shown.getHeldUses().stream()
 			.filter(use -> signals ? RowTargets.SIGNAL_OPTION.equalsIgnoreCase(leftClicks.item(use))
 				: oneDestination ? isOwnTeleport(leftClicks.item(use)) : teleportsTo(leftClicks.swappedOrLearned(use), label))
@@ -534,7 +535,7 @@ final class StepHighlights
 	private Highlights takeOutFromBook(Highlights.HighlightsBuilder shown, Set<Integer> items, SubStep current, String option)
 	{
 		boolean fromBook = current.getDone() == SubStep.Done.ITEM_CARRIED && current.getRow() != null;
-		ScrollBook.Scroll scroll = fromBook ? ScrollBook.scroll(current.getRow().getName()) : null;
+		ScrollBook.Scroll scroll = fromBook ? ScrollBook.scroll(current.getRow()) : null;
 		boolean bookOpen = scroll != null && Widgets.shown(client, InterfaceID.Bookofscrolls.CONTENTS);
 		return shown.scroll(scroll)
 			.menuTarget(bookOpen

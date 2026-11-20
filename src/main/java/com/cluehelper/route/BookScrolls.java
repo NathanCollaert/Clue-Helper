@@ -11,7 +11,6 @@ import net.runelite.api.gameval.ItemID;
  */
 public final class BookScrolls
 {
-	public static final String BOOK_ROW_PREFIX = "Master scroll book: ";
 	public static final int BOOK = ItemID.BOOKOFSCROLLS_CHARGED;
 	/** Close the bank, open the book, take the scroll out, open the bank again, deposit the book. */
 	static final int TAKE_OUT_TICKS = 6;
@@ -23,25 +22,11 @@ public final class BookScrolls
 
 	public static boolean isTakenOutAtBank(CatalogRow row, boolean bookStaysOut)
 	{
-		return bookStaysOut && row.getName().startsWith(BOOK_ROW_PREFIX) && intoWilderness(row);
+		return bookStaysOut && row.getScroll() != null && intoWilderness(row);
 	}
 
 	public static boolean intoWilderness(CatalogRow row)
 	{
 		return PositionRules.wildernessLevel(row.getDestination()) > 0;
-	}
-
-	public static String scrollName(CatalogRow row)
-	{
-		return scrollName(row.getName());
-	}
-
-	/**
-	 * "Revenant cave teleport", as the loose scroll is named: a book row's name without the book, and without the line
-	 * of the scroll's own choice ("Master scroll book: Revenant cave teleport: Level 17").
-	 */
-	public static String scrollName(String bookRowName)
-	{
-		return bookRowName.substring(BOOK_ROW_PREFIX.length()).split(": ", 2)[0];
 	}
 }

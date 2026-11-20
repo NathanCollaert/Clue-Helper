@@ -1,5 +1,6 @@
 package com.cluehelper.guide;
 
+import com.cluehelper.transport.MenuLine;
 import java.util.*;
 import lombok.*;
 
@@ -8,17 +9,6 @@ import lombok.*;
 public class MenuTarget
 {
 	public static final MenuTarget NONE = MenuTarget.builder().build();
-
-	public enum Line
-	{
-		LABEL,
-		NEXUS,
-		BOX,
-		FAIRY_CODE,
-		MINIGAME,
-		QUETZAL,
-		BOAT
-	}
 
 	@Builder.Default
 	Set<Integer> itemIds = Set.of();
@@ -38,54 +28,28 @@ public class MenuTarget
 	@Builder.Default
 	List<String> path = List.of();
 	@Builder.Default
-	Line line = Line.LABEL;
-	/** Set by the line factories below: a struct id, a box line index or a Quetzal table id. */
+	MenuLine line = MenuLine.LABEL;
+	/** A nexus line's struct id or a jewellery box line's index. */
 	int lineId;
-	/** Set by the line factories below: a map region shield or a fairy ring code. */
+	/** A nexus line's map region shield or a fairy ring code. */
 	String lineKey;
-	/** Set by the line factories below: the cache's name of a nexus destination, a minigame or a boat's dock. */
+	/** The cache's name of a nexus destination, a minigame or a boat's dock. */
 	String lineName;
+	/** Where a Quetzal site's icon sits on the map, x and y. */
+	int[] icon;
 	/** The same landing through another house menu (the jewellery box for the glory), so its lines are coloured too. */
 	@Builder.Default
 	List<MenuTarget> alternatives = List.of();
 
-	/** A nexus line: its struct id, the map region shield, and the cache's name of the destination. */
-	public static MenuTarget nexus(int structId, String region, String placeName)
-	{
-		return builder().line(Line.NEXUS).lineId(structId).lineKey(region).lineName(placeName).build();
-	}
-
-	public static MenuTarget box(int lineIndex)
-	{
-		return builder().line(Line.BOX).lineId(lineIndex).build();
-	}
-
 	/** The fairy ring dials on a code. */
 	public static MenuTarget fairyCode(String code)
 	{
-		return builder().line(Line.FAIRY_CODE).lineKey(code).build();
-	}
-
-	/** A minigame's card by its name. */
-	public static MenuTarget minigame(String name)
-	{
-		return builder().line(Line.MINIGAME).lineName(name).build();
-	}
-
-	public static MenuTarget quetzal(int tableId)
-	{
-		return builder().line(Line.QUETZAL).lineId(tableId).build();
-	}
-
-	/** The Teleport to Boat list's row of the boat moored at the dock. */
-	public static MenuTarget boat(String dock)
-	{
-		return builder().line(Line.BOAT).lineName(dock).build();
+		return builder().line(MenuLine.FAIRY_CODE).lineKey(code).build();
 	}
 
 	public boolean isEmpty()
 	{
-		return itemIds.isEmpty() && objectIds.isEmpty() && npcIds.isEmpty() && path.isEmpty() && line == Line.LABEL;
+		return itemIds.isEmpty() && objectIds.isEmpty() && npcIds.isEmpty() && path.isEmpty() && line == MenuLine.LABEL;
 	}
 
 	public String destination()

@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.Tables;
+import com.cluehelper.transport.MenuLine;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.*;
@@ -27,7 +28,7 @@ public class MenuLines
 	private static final int LIST_LINE_ALT = 9143;
 	private static final int NEXUS_LINE = 2675;
 	private static final int BOX_LINE = 1688;
-	static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int LIST_GROUP = 187;
 	private static final Pattern MINIGAME_PLACE_NUMBER = Pattern.compile("^\\d+\\. ");
 	/** A minigame card's text is its name, a break, then its places. */
@@ -52,23 +53,29 @@ public class MenuLines
 	private static final String CLOSE_OPTION = "Close";
 	/** Same cyan as {@code Highlighter.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
+	private static final int MOST_ICON_PIXELS_OFF = 24;
+	/** The grey of the info box's item lines. */
+	private static final int PICK_COLOUR = 0xBEBEBE;
 
-	/** A hotkey as the info box names it: upper case, in the colour of the menu line it presses. */
-	static String keyText(char key)
+	/** A hotkey or fairy ring code as the info box names it: upper case, in the colour of the menu line it presses. */
+	static String keyText(String key)
 	{
-		return menuColoured(String.valueOf(Character.toUpperCase(key)));
+		return coloured(TEXT_COLOUR, key.toUpperCase(Locale.ROOT));
 	}
 
-	/** What to press or dial, in the colour of the menu lines; the info box closes the colour. */
-	static String menuColoured(String text)
+	/** What to click in an item or object, apart from the white item it is clicked on. */
+	static String pickColoured(String text)
 	{
-		return String.format("<col=%06x>%s</col>", TEXT_COLOUR, text);
+		return coloured(PICK_COLOUR, text);
+	}
+
+	private static String coloured(int rgb, String text)
+	{
+		return String.format("<col=%06x>%s</col>", rgb, text);
 	}
 
 	@Inject
 	private Client client;
-	@Inject
-	private QuetzalIcons quetzalIcons;
 	@Inject
 	private FairyDials fairyDials;
 	@Inject
@@ -399,7 +406,7 @@ public class MenuLines
 				minigame(target.getLineName(), out);
 				break;
 			case QUETZAL:
-				quetzal(target.getLineId(), out);
+				quetzal(target.getIcon(), out);
 				break;
 			case BOAT:
 				boat(target.getLineName(), out);
@@ -543,13 +550,8 @@ public class MenuLines
 			.anyMatch(part -> part.getText() != null && MenuLabels.matches(part.getText().split(LINE_BREAK, 2)[0], label));
 	}
 
-	private void quetzal(int quetzalTableId, Found out)
+	private void quetzal(int[] at, Found out)
 	{
-		int[] at = quetzalIcons.position(quetzalTableId);
-		if (at == null)
-		{
-			return;
-		}
 		Widget icons = client.getWidget(InterfaceID.QuetzalMenu.ICONS);
 		if (!Widgets.visible(icons))
 		{
@@ -559,7 +561,34 @@ public class MenuLines
 		{
 			return;
 		}
-		out.add(QuetzalIcons.nearest(icons.getDynamicChildren(), at));
+		out.add(nearestIcon(icons.getDynamicChildren(), at));
+	}
+
+	private static Widget nearestIcon(Widget[] icons, int[] at)
+	{
+		Widget best = null;
+		int bestOff = MOST_ICON_PIXELS_OFF + 1;
+		for (Widget icon : icons == null ? new Widget[0] : icons)
+		{
+			if (icon == null || icon.isHidden())
+			{
+				continue;
+			}
+			int x = icon.getOriginalX();
+			int y = icon.getOriginalY();
+			int off = Math.min(off(x, y, at), off(x + icon.getWidth() / 2, y + icon.getHeight() / 2, at));
+			if (off < bestOff)
+			{
+				best = icon;
+				bestOff = off;
+			}
+		}
+		return best;
+	}
+
+	private static int off(int x, int y, int[] at)
+	{
+		return Math.max(Math.abs(x - at[0]), Math.abs(y - at[1]));
 	}
 
 	/**
@@ -681,7 +710,7 @@ public class MenuLines
 
 	private boolean isDestination(MenuEntry entry, MenuTarget target, String destination)
 	{
-		if (target.getLine() == MenuTarget.Line.FAIRY_CODE && target.getLineKey() != null)
+		if (target.getLine() == MenuLine.FAIRY_CODE && target.getLineKey() != null)
 		{
 			return MenuLabels.isRingDestination(entry.getOption(), target.getLineKey());
 		}

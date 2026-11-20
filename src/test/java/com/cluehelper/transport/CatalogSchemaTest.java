@@ -1,5 +1,6 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.Tables;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class CatalogSchemaTest
 	private static final Set<String> BOOKS = Set.of("Standard", "Ancient", "Lunar", "Arceuus");
 	private static final int MAX_COORD = (1 << 14) - 1;
 	private static final int MIN_TELEPORT_ROWS = 700;
+	private static final List<String> SCROLLS = Tables.keys("scrolls");
 
 	@Test
 	public void everyRowPassesTheSchema()
@@ -50,9 +52,42 @@ public class CatalogSchemaTest
 		Catalog catalog = CatalogLoader.load();
 		catalog.getTeleports().forEach(row -> row.getRequirements().getErrors().forEach(e -> failures.add(row.getName() + ": " + e)));
 		catalog.getSpellbookChanges().forEach(row -> row.getRequirements().getErrors().forEach(e -> failures.add(row.getName() + ": " + e)));
+		catalog.getTeleports().forEach(row -> partRules(row, failures::add, row.getName() + ": "));
+		catalog.getSpellbookChanges().stream().filter(change -> isBlank(change.getText()) || isBlank(change.getPlace()))
+			.forEach(change -> failures.add(change.getName() + ": no guide text or place"));
 
 		assertEquals("", String.join("\n", failures));
 		assertTrue(catalog.getTeleports().size() > MIN_TELEPORT_ROWS);
+	}
+
+	/** The baked parts the guide shows and clicks, so a row it can't name or find fails here rather than in the client. */
+	private static void partRules(CatalogRow row, Failures fail, String at)
+	{
+		if (isBlank(row.getLabel()))
+		{
+			fail.add(at + "no guide label");
+		}
+		boolean named = row.getLine() == MenuLine.NEXUS ? row.getLineKey() != null && row.getLineName() != null
+			: row.getLine() == MenuLine.QUETZAL ? row.getIcon() != null && row.getIcon().length == 2
+			: row.getLine() != MenuLine.BOAT && row.getLine() != MenuLine.MINIGAME || row.getLineName() != null;
+		if (!named)
+		{
+			fail.add(at + row.getLine() + " line without its name");
+		}
+		boolean spell = row.getCategory() == Category.SPELL || row.getCategory() == Category.HOME;
+		if (spell == (row.getSpell() == null))
+		{
+			fail.add(at + "spell name " + row.getSpell() + " on a " + row.getCategory() + " row");
+		}
+		if (row.getScroll() != null && !SCROLLS.contains(row.getScroll()))
+		{
+			fail.add(at + "scroll " + row.getScroll() + " isn't in the scrolls table");
+		}
+	}
+
+	private static boolean isBlank(String text)
+	{
+		return text == null || text.isBlank();
 	}
 
 	private static void teleportRules(CatalogLoader.TsvTable.Line line, Failures fail, String at)

@@ -1,13 +1,11 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.*;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.SubStep.Kind;
@@ -17,18 +15,11 @@ final class LegSteps
 {
 	/** A feel's information depends on its exact tile, so the walk ends on the marker. */
 	private static final int PROBE_ARRIVE_TILES = 0;
-	private static final String FAIRY_RING_PREFIX = "Fairy ring";
 	private static final String CODE_SEPARATOR = "-";
+	private static final int CODE_LENGTH = 3;
 	private static final String TALK_TO = "Talk to";
-	private static final String NPC_MENU = "npc ";
-	private static final Map<Category, String> RIDE_PLACES = Tables.byKey("ride places", Category::valueOf, Tables.Row::text);
-	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
-	/** The mushtree map's places in its hotkey order, 1 to 4: its buttons carry no number. */
-	private static final List<String> MUSHTREE_PLACES = Tables.keys("mushtree places");
 	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
 	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
-	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
-	private static final Map<String, String> CHANGE_WARNINGS = Tables.byKey("spellbook change warnings", Tables.Row::text);
 
 	private LegSteps()
 	{
@@ -118,7 +109,7 @@ final class LegSteps
 	{
 		CatalogRow row = leg.getRow();
 		WorldPoint standsAt = row.isLocated() && !row.isInHouse() ? leg.getFrom() : null;
-		return SubStep.of(Kind.TELEPORT, withKey(teleportText(row), hotkey(row, house))).detail(teleportDetail(row))
+		return SubStep.of(Kind.TELEPORT, travelLine(row, key(row, house))).detail(row.getDetail())
 			.waypoint(standsAt).goal(leg.getTo()).radius(SCATTERED_LANDING_TILES.getOrDefault(row.getName(), SubSteps.LANDING_TILES))
 			.row(row).build();
 	}
@@ -137,7 +128,7 @@ final class LegSteps
 		for (int i = 0; i < hops.length; i++)
 		{
 			boolean last = i == hops.length - 1;
-			steps.add(SubStep.of(Kind.FAIRY_RING, "Fairy ring " + MenuLines.menuColoured(hops[i]))
+			steps.add(SubStep.of(Kind.FAIRY_RING, travelLine(landing, hops[i]))
 				.detail("Code " + (i + 1) + " of " + hops.length + (last ? "" : ", then dial the next where you land"))
 				.waypoint(i == 0 ? leg.getFrom() : null).goal(last ? leg.getTo() : null).radius(SubSteps.LANDING_TILES)
 				.row(landing.toBuilder().code(hops[i]).build()).build());
@@ -148,43 +139,34 @@ final class LegSteps
 	private static SubStep oneRing(Leg leg)
 	{
 		CatalogRow landing = leg.getLanding();
-		String place = landing.getName();
-		int colon = place.indexOf(": ");
-		String where = place.startsWith(FAIRY_RING_PREFIX) && colon >= 0 ? place.substring(colon + 2) : place;
-		boolean coded = landing.getCode() != null && landing.getCode().length() == 3;
-		return SubStep.of(Kind.FAIRY_RING, coded ? "Fairy ring " + MenuLines.menuColoured(landing.getCode()) : "Fairy ring to " + where)
+		boolean coded = landing.getCode() != null && landing.getCode().length() == CODE_LENGTH;
+		return SubStep.of(Kind.FAIRY_RING, travelLine(landing, coded ? landing.getCode() : null))
 			.waypoint(leg.getFrom()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).row(landing).build();
 	}
 
 	static SubStep change(Leg leg)
 	{
 		SpellbookChange change = leg.getChange();
-		String book = leg.getBookAfter().label();
-		if (change.isAnywhere())
-		{
-			return SubStep.of(Kind.CHANGE_BOOK, capeName(change) + ": Spellbook → " + book)
-				.detail(change.getName().contains("(worn)") ? "Right-click the worn cape in the equipment tab" : "Right-click the cape: Spellbook")
-				.book(leg.getBookAfter()).change(change).build();
-		}
-		return SubStep.of(Kind.CHANGE_BOOK, change.getName() + " → " + book)
-			.detail(warning(change)).waypoint(change.getTile()).book(leg.getBookAfter()).change(change).build();
+		return SubStep.of(Kind.CHANGE_BOOK, change.getText() + " → " + leg.getBookAfter().label())
+			.detail(change.getDetail()).waypoint(change.getTile()).book(leg.getBookAfter()).change(change).build();
 	}
 
 	/**
-	 * The hotkey in the menu line's colour: the one the list label already carries, else put before
-	 * the destination as a list label shows it.
+	 * Every teleport reads alike, ITEM: PLACE - KEY: the item or object in the text's white, what to click in it in the
+	 * item lines' grey, and its hotkey or fairy ring code last in the menu's blue. A teleport with no item reads as
+	 * VERB: THING instead.
+	 *
+	 * @param key null when none is known
 	 */
-	static String withKey(String text, char key)
+	static String travelLine(CatalogRow row, String key)
 	{
-		if (key == 0)
+		if (row.getPick() == null)
 		{
-			return text;
+			return row.getLabel();
 		}
-		String coloured = Matcher.quoteReplacement(MenuLines.keyText(key));
-		String inLabel = text.replaceFirst("(?<=: )" + Pattern.quote(String.valueOf(key)) + "(?=[.:] )", coloured);
-		int colon = text.lastIndexOf(": ");
-		return !inLabel.equals(text) || colon < 0 ? inLabel : text.substring(0, colon + 2) + MenuLines.keyText(key) + ". "
-			+ text.substring(colon + 2);
+		String place = row.getPick().isEmpty() ? "" : MenuLines.pickColoured(row.getPick());
+		String keyed = key == null ? place : place.isEmpty() ? MenuLines.keyText(key) : place + " - " + MenuLines.keyText(key);
+		return row.getLabel() + ": " + keyed;
 	}
 
 	private static String itemLine(ItemUse use, Function<ItemUse, String> itemLines)
@@ -215,124 +197,24 @@ final class LegSteps
 			case FAIRY_RING:
 				return "the fairy ring";
 			case SPELLBOOK_CHANGE:
-				return place(next.getChange());
+				return next.getChange().getPlace();
 			case BANK:
 				return "the bank";
 			case TELEPORT:
-				return located(next.getRow());
+				return next.getRow().getApproach();
 			default:
 				return "the marker";
 		}
 	}
 
-	private static String located(CatalogRow row)
+	/** A nexus line's key is where the house's nexus lists it. */
+	private static String key(CatalogRow row, HouseState house)
 	{
-		if (row.getCategory() == Category.SPIRIT_TREE && !row.isInHouse())
+		if (row.getLine() != MenuLine.NEXUS)
 		{
-			return "the spirit tree";
+			return row.getKey();
 		}
-		if (row.getMenu() != null && row.getMenu().startsWith(NPC_MENU))
-		{
-			return "the outlined NPC";
-		}
-		return row.getCategory() == Category.QUETZAL ? "Renu" : RIDE_PLACES.getOrDefault(row.getCategory(), "the marker");
-	}
-
-	private static String teleportText(CatalogRow row)
-	{
-		String name = row.getName();
-		if (row.isLocated() || row.isQuetzalMap())
-		{
-			return houseText(row);
-		}
-		switch (row.getCategory())
-		{
-			case SPELL:
-			case HOME:
-				return "Cast " + name;
-			case MINIGAME:
-				return "Minigame teleport: " + row.minigameName();
-			case TABLET:
-				return "Break the " + name;
-			case SCROLL:
-				return name.contains(":") ? "Use " + name : "Read the " + name + " scroll";
-			default:
-				return "Use " + name;
-		}
-	}
-
-	private static String teleportDetail(CatalogRow row)
-	{
-		if (row.getCategory() == Category.SPELL && row.boatDock() == null && row.getName().contains(": "))
-		{
-			return lastOption(row) + ": its right-click option, unless Configure made it the left click";
-		}
-		return row.getCategory() == Category.SPIRIT_TREE && !row.isInHouse() ? "Travel" : null;
-	}
-
-	private static char hotkey(CatalogRow row, HouseState house)
-	{
-		if (row.getCategory() == Category.MUSHTREE)
-		{
-			int place = MUSHTREE_PLACES.indexOf(lastOption(row));
-			return place < 0 ? 0 : MenuLines.HOTKEYS.charAt(place);
-		}
-		String menu = row.getMenu();
-		if (menu != null && menu.startsWith("nexus "))
-		{
-			int struct = Integer.parseInt(menu.split(" ")[1]);
-			Integer line = house.getNexusLines().get(struct);
-			return line == null || line < 1 || line > MenuLines.HOTKEYS.length() ? 0 : MenuLines.HOTKEYS.charAt(line - 1);
-		}
-		if (menu != null && menu.startsWith("box "))
-		{
-			int line = Integer.parseInt(menu.substring("box ".length()));
-			return line < MenuLines.HOTKEYS.length() ? MenuLines.HOTKEYS.charAt(line) : 0;
-		}
-		String label = menu != null && menu.startsWith("list ") ? menu.substring("list ".length())
-			: menu != null && menu.contains(CatalogRow.MENU_STEP) ? menu.substring(menu.lastIndexOf(CatalogRow.MENU_STEP) + CatalogRow.MENU_STEP.length())
-			: lastOption(row);
-		Matcher key = LIST_HOTKEY.matcher(label);
-		return key.find() ? key.group(1).charAt(0) : 0;
-	}
-
-	private static String houseText(CatalogRow row)
-	{
-		String name = CLICK_NOTE.matcher(row.getName()).replaceFirst("");
-		int colon = name.indexOf(": ");
-		if (row.getCategory() == Category.PORTAL)
-		{
-			return "Enter the " + name.substring(colon + 2) + " portal";
-		}
-		return colon < 0 ? "Use the " + name.toLowerCase() : name;
-	}
-
-	private static String capeName(SpellbookChange change)
-	{
-		return beforeColon(change.getName()).replace(" (worn)", "");
-	}
-
-	private static String place(SpellbookChange change)
-	{
-		String where = beforeColon(change.getName());
-		return where.startsWith("Tyss") ? "Tyss" : "the " + where;
-	}
-
-	private static String beforeColon(String name)
-	{
-		int colon = name.indexOf(':');
-		return colon < 0 ? name : name.substring(0, colon);
-	}
-
-	/** The row's last option: its name after the last ": ". */
-	private static String lastOption(CatalogRow row)
-	{
-		return row.getName().substring(row.getName().lastIndexOf(": ") + 2);
-	}
-
-	private static String warning(SpellbookChange change)
-	{
-		return CHANGE_WARNINGS.entrySet().stream().filter(e -> change.getName().startsWith(e.getKey()))
-			.map(Map.Entry::getValue).findFirst().orElse(null);
+		Integer line = house.getNexusLines().get(row.getLineId());
+		return line == null || line < 1 || line > MenuLines.HOTKEYS.length() ? null : String.valueOf(MenuLines.HOTKEYS.charAt(line - 1));
 	}
 }

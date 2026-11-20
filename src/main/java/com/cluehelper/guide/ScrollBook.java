@@ -46,9 +46,9 @@ public final class ScrollBook
 	}
 
 	/** The book's scroll a row teleports with, or null when the row is not a book teleport. */
-	static Scroll scroll(String rowName)
+	static Scroll scroll(CatalogRow row)
 	{
-		return rowName.startsWith(BookScrolls.BOOK_ROW_PREFIX) ? BY_NAME.get(BookScrolls.scrollName(rowName)) : null;
+		return row.getScroll() == null ? null : BY_NAME.get(row.getScroll());
 	}
 
 	/**
@@ -82,8 +82,8 @@ public final class ScrollBook
 		CatalogRow row = bookRow ? out.get(teleportAt).getRow() : null;
 		if (bookRow)
 		{
-			String scroll = BookScrolls.scrollName(row);
-			out.set(teleportAt, out.get(teleportAt).toBuilder().text("Read the " + scroll + " scroll").actItemNamed(scroll.toLowerCase())
+			String scroll = row.getScroll();
+			out.set(teleportAt, out.get(teleportAt).toBuilder().text("Use: " + MenuLines.pickColoured(scroll + " scroll")).actItemNamed(scroll.toLowerCase())
 				.actOption(READ_OPTION).build());
 		}
 		int bank = lastBefore(out, teleportAt, Kind.BANK);
@@ -129,7 +129,7 @@ public final class ScrollBook
 	/** Opens the book, then Remove on the scroll's entry; {@code row} is the book's teleport. */
 	private static SubStep takeOut(CatalogRow row)
 	{
-		String scroll = BookScrolls.scrollName(row);
+		String scroll = row.getScroll();
 		return SubStep.of(Kind.ACT, "Take out of the master scroll book:").items(List.of(scroll))
 			.row(row).actItemNamed(BOOK_NAME).actOption(OPEN_OPTION)
 			.carriedWhenDone(scroll.toLowerCase()).done(SubStep.Done.ITEM_CARRIED).build();

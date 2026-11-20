@@ -6,6 +6,7 @@ import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.Category;
+import com.cluehelper.transport.MenuLine;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.*;
@@ -778,11 +779,11 @@ public class StepGuide
 	{
 		char key = menuLines.charterKey(highlights.getMenuTarget());
 		SubStep current = getCurrent();
-		if (key == 0 || current == null || current.getText().contains(MenuLines.keyText(key)))
+		if (key == 0 || current == null || current.getRow() == null || current.getText().contains(MenuLines.keyText(String.valueOf(key))))
 		{
 			return false;
 		}
-		return replaceCurrent(current.toBuilder().text(LegSteps.withKey(current.getText(), key)).build());
+		return replaceCurrent(current.toBuilder().text(LegSteps.travelLine(current.getRow(), String.valueOf(key))).build());
 	}
 
 	private boolean watchDestinationSet()
@@ -829,7 +830,7 @@ public class StepGuide
 		boolean onItem = menuTarget.getItemIds().contains(event.getItemId())
 			|| menuTarget.getItemNames().contains(MenuLabels.normalise(event.getMenuTarget()));
 		boolean onObject = menuTarget.getObjectIds().contains(event.getId());
-		if ((onItem || onObject) && !current.getRow().opensMenu())
+		if ((onItem || onObject) && !current.getRow().isOpensMenu())
 		{
 			teleportRefusal.clicked(client.getTickCount(), player.getPosition().getTile());
 		}
@@ -966,9 +967,9 @@ public class StepGuide
 	private void noteBoxUsed(SubStep done)
 	{
 		MenuTarget target = highlights.getMenuTarget();
-		if (done.getKind() == Kind.TELEPORT && done.getRow() != null && target.getLine() == MenuTarget.Line.BOX)
+		if (done.getKind() == Kind.TELEPORT && done.getRow() != null && target.getLine() == MenuLine.BOX)
 		{
-			leftClicks.learnBoxUsed(target.getObjectIds(), done.getRow().destination());
+			leftClicks.learnBoxUsed(target.getObjectIds(), target.destination());
 		}
 	}
 

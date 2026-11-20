@@ -68,7 +68,7 @@ public final class CatalogLoader
 		{
 			changes.add(at(SPELLBOOK_FILE, line, () -> spellbookChange(line, parser)));
 		}
-		return new Catalog(List.copyOf(teleports), List.copyOf(changes));
+		return new Catalog(RowParts.withSingleLandings(teleports), List.copyOf(changes));
 	}
 
 	static List<TsvTable.Line> read(String file)
@@ -96,7 +96,7 @@ public final class CatalogLoader
 	{
 		String code = line.get(CODE);
 		String menu = line.get(MENU);
-		return CatalogRow.builder()
+		CatalogRow row = CatalogRow.builder()
 			.name(line.get(NAME))
 			.category(category(line.get(CATEGORY)))
 			.origin(tile(line.get(ORIGIN)))
@@ -106,9 +106,9 @@ public final class CatalogLoader
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))
 			.spends(spends(line.get(SPENDS)))
 			.requirements(fairyRingStaff(parser.parse(line.getCells())))
-			.menu(menu.isEmpty() ? null : menu)
 			.objectId(objectId(line.get(OBJECT)))
 			.build();
+		return RowParts.of(row, menu.isEmpty() ? null : menu);
 	}
 
 	private static SpellbookChange spellbookChange(TsvTable.Line line, RequirementParser parser)
@@ -137,9 +137,9 @@ public final class CatalogLoader
 		if (built.isInHouse() && built.getObjectId() != SpellbookChange.NO_ID)
 		{
 			HouseNeed piece = new HouseNeed(HouseNeed.Kind.FURNITURE, List.of(built.getObjectId()));
-			return built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
+			built = built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
 		}
-		return built;
+		return RowParts.of(built);
 	}
 
 	static List<Spend> spends(String cell)

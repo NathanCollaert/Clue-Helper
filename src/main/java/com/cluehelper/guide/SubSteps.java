@@ -90,7 +90,7 @@ public final class SubSteps
 		return catalog.get().stream()
 			.filter(row -> row.getCategory() == Category.SPIRIT_TREE && tree.equals(row.getOrigin()))
 			.filter(row -> row.getRequirements().getPlantedTrees().stream().anyMatch(grown::contains))
-			.min(Comparator.comparing(CatalogRow::getMenu)).orElse(null);
+			.min(Comparator.comparing(row -> row.getClicks().toString())).orElse(null);
 	}
 
 	private Set<Integer> carriedIds()
