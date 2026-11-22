@@ -230,7 +230,7 @@ public final class ActParts
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
 		boolean items = !step.getRequirements().getItems().isEmpty();
 		acts.addAll(items ? SubSteps.remove(EmptySlots.of(step.getRequirements().getItems())) : List.of());
-		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip()) : List.of());
+		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip(step)) : List.of());
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		if (stash != null && spot != null)
 		{
@@ -250,13 +250,13 @@ public final class ActParts
 		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
 			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = !step.getRequirements().getItems().isEmpty();
-		return items ? List.of(take, equip()) : List.of(take);
+		return items ? List.of(take, equip(step)) : List.of(take);
 	}
 
-	private static SubStep equip()
+	private static SubStep equip(Step step)
 	{
-		return SubStep.of(Kind.ACT, "Equip the items")
-			.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build();
+		return SubStep.of(Kind.ACT, "Equip the items").worn(step.getRequirements().getItems()).unwearableCarried(true)
+			.done(SubStep.Done.WORN).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
 	private static SubStep music(Step step)

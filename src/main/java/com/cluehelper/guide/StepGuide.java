@@ -973,7 +973,7 @@ public class StepGuide
 	/** An act of the step itself: gear put on at the bank (a lumberjack outfit) is no sign of having reached the step. */
 	private static boolean isStepAct(SubStep sub)
 	{
-		return sub != null && sub.getKind() == Kind.ACT && !sub.isPreparation() && sub.getDone() != SubStep.Done.EQUIPPED;
+		return sub != null && sub.getKind() == Kind.ACT && !sub.isPreparation();
 	}
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
@@ -1249,12 +1249,8 @@ public class StepGuide
 	{
 		switch (act.getDone())
 		{
-			case EQUIPPED:
-			case WAY_IN_WORN:
-			case GEAR_WORN:
+			case WORN:
 			case SLOTS_EMPTY:
-			case WAY_IN_SLOTS_EMPTY:
-			case ITEM_WORN:
 				return gearActs.isDone(act, routeStep);
 			case STASH_DEPOSITED:
 				return deposit.getAt() == null || actWatcher.isDone(act.getDone(), stepSince);

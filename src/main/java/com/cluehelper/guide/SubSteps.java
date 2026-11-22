@@ -199,7 +199,7 @@ public final class SubSteps
 		int piece = gear.stream().filter(id -> carrier != null && carrier.carriedIds().contains(id) || withdrawn.contains(id))
 			.findFirst().orElse(gear.stream().sorted().findFirst().orElseThrow());
 		return SubStep.of(Kind.ACT, "Equip the " + client.getItemDefinition(piece).getName()).actItems(gear)
-			.done(SubStep.Done.ITEM_WORN).tab(Tab.INVENTORY).build();
+			.worn(List.of(anyOf(client.getItemDefinition(piece).getName(), gear))).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build();
 	}
 
 	private static boolean isEntranaShip(SubStep step)
@@ -584,13 +584,13 @@ public final class SubSteps
 	/** Take off what core's empty-slot requirements forbid; none when there are none. */
 	static List<SubStep> remove(List<ItemRequirement> emptied)
 	{
-		return emptied.isEmpty() ? List.of() : List.of(takeOff(emptied, SubStep.Done.SLOTS_EMPTY));
+		return emptied.isEmpty() ? List.of() : List.of(takeOff(emptied).build());
 	}
 
-	private static SubStep takeOff(List<ItemRequirement> emptied, SubStep.Done done)
+	private static SubStep.SubStepBuilder takeOff(List<ItemRequirement> emptied)
 	{
-		return SubStep.of(Kind.ACT, "Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied).done(done)
-			.tab(Tab.EQUIPMENT).build();
+		return SubStep.of(Kind.ACT, "Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
+			.tab(Tab.EQUIPMENT);
 	}
 
 	/**
@@ -600,7 +600,7 @@ public final class SubSteps
 	static List<SubStep> equip(List<String> wornNeeds)
 	{
 		return List.of(SubStep.of(Kind.ACT, "Equip:").items(wornNeeds)
-			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(Tab.INVENTORY).build());
+			.wornNeeds(wornNeeds).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());
 	}
 
 	/**
@@ -609,7 +609,7 @@ public final class SubSteps
 	 */
 	private static List<SubStep> withGearOnArrival(List<SubStep> steps)
 	{
-		int equip = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getDone() == SubStep.Done.GEAR_WORN).findFirst().orElse(-1);
+		int equip = IntStream.range(0, steps.size()).filter(i -> !steps.get(i).getWornNeeds().isEmpty()).findFirst().orElse(-1);
 		if (equip < 0)
 		{
 			return steps;
@@ -639,7 +639,7 @@ public final class SubSteps
 		{
 			equip.add(SubStep.of(Kind.ACT, "Equip the " + ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and ")))
 				.actItems(ownWear.stream().flatMap(need -> need.getIds().stream()).collect(toUnmodifiableSet()))
-				.done(SubStep.Done.WAY_IN_WORN).tab(Tab.INVENTORY).build());
+				.wornWayIn(true).wayIn(data.getEntry()).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());
 		}
 		return withBefore(steps, sub -> sub.getKind() == Kind.ENTER ? equip : List.of());
 	}
@@ -652,11 +652,16 @@ public final class SubSteps
 		if (!by.getFree().isEmpty())
 		{
 			List<ItemRequirement> emptied = List.of(new SlotLimitationRequirement(by.getText(), by.getFree().toArray(EquipmentInventorySlot[]::new)));
-			acts.add(takeOff(emptied, SubStep.Done.WAY_IN_SLOTS_EMPTY));
+			acts.add(takeOff(emptied).wornWayIn(true).build());
 		}
 		acts.add(SubStep.of(Kind.ACT, by.getText()).detail(by.getDetail()).npcIds(Set.copyOf(by.getNpcs())).option(by.getOption())
-			.done(SubStep.Done.WAY_IN_WORN).build());
+			.wornWayIn(true).done(SubStep.Done.WORN).build());
 		return acts;
+	}
+
+	static ItemRequirement anyOf(String name, Collection<Integer> ids)
+	{
+		return new AnyRequirementCollection(name, ids.stream().sorted().map(SingleItemRequirement::new).toArray(ItemRequirement[]::new));
 	}
 
 	/**
@@ -667,7 +672,7 @@ public final class SubSteps
 	private static List<SubStep> withWalkToWayIn(List<SubStep> steps, StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data == null ? null : data.getEntry();
-		return withBefore(steps, sub -> way != null && sub.getDone() == SubStep.Done.WAY_IN_WORN && sub.getNpcIds().isEmpty()
+		return withBefore(steps, sub -> way != null && sub.getWayIn() != null && sub.getKind() == Kind.ACT
 			? List.of(LegSteps.walkTo("Walk to " + way.getText(), way.getTile(), ARRIVE_TILES).build()) : List.of());
 	}
 

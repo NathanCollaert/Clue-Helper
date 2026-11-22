@@ -121,16 +121,12 @@ public class ActWatcher
 			case CHALLENGE_ITEM:
 				return challengeTick >= since || challengeCarried;
 			case STEP_CHANGES:
-			case EQUIPPED:
 			case ITEM_CARRIED:
 			case ITEM_GONE:
 			case ITEMS_GONE:
-			case WAY_IN_WORN:
-			case GEAR_WORN:
+			case WORN:
 			case SLOTS_EMPTY:
-			case WAY_IN_SLOTS_EMPTY:
 			case ITEM_HELD:
-			case ITEM_WORN:
 				return false;
 			default:
 				throw new IllegalArgumentException("unhandled act end " + done);
