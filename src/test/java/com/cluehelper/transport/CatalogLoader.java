@@ -176,7 +176,7 @@ public final class CatalogLoader
 			.duration(Integer.parseInt(line.get(DURATION)))
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))
 			.spends(spends(line.get(SPENDS)))
-			.requirements(fairyRingStaff(parser.parse(line.getCells())))
+			.requirements(wornOnly(parser.parse(line.getCells())))
 			.objectId(objectId(line.get(OBJECT)))
 			.build();
 		return RowParts.of(row, menu.isEmpty() ? null : menu);
@@ -229,17 +229,24 @@ public final class CatalogLoader
 		return List.copyOf(spends);
 	}
 
-	/** A fairy-ring staff clause counts only when wielded, and not at all once the Lumbridge elite diary is done. */
-	static Requirements fairyRingStaff(Requirements requirements)
+	/**
+	 * A fairy-ring staff clause counts only when wielded, and not at all once the Lumbridge elite diary is done. A
+	 * ghostspeak clause counts only when worn: the ghost captain talks only to a player wearing one.
+	 */
+	static Requirements wornOnly(Requirements requirements)
 	{
 		List<ItemClause> clauses = new ArrayList<>();
 		for (ItemClause clause : requirements.getItems())
 		{
-			boolean staffClause = clause.getBranches().stream()
-				.anyMatch(branch -> branch.getIds().stream().anyMatch(FAIRY_RING_STAVES::contains));
-			clauses.add(staffClause ? new ItemClause(clause.getBranches(), true, LUMBRIDGE_ELITE_DONE) : clause);
+			clauses.add(hasAny(clause, FAIRY_RING_STAVES) ? new ItemClause(clause.getBranches(), true, LUMBRIDGE_ELITE_DONE)
+				: hasAny(clause, Set.of(ItemID.AMULET_OF_GHOSTSPEAK)) ? new ItemClause(clause.getBranches(), true, null) : clause);
 		}
 		return requirements.toBuilder().items(List.copyOf(clauses)).build();
+	}
+
+	private static boolean hasAny(ItemClause clause, Set<Integer> ids)
+	{
+		return clause.getBranches().stream().anyMatch(branch -> branch.getIds().stream().anyMatch(ids::contains));
 	}
 
 	/** The last word of "Travel Spirit tree 26261"; -1 for an empty cell. */

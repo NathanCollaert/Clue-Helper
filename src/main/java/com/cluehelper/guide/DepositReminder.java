@@ -64,7 +64,7 @@ final class DepositReminder
 		List<SubStep> all = new ArrayList<>();
 		all.add(LegSteps.stashWalk(pending.getAt()).toBuilder().done(SubStep.Done.STASH_DEPOSITED).build());
 		all.add(SubStep.of(SubStep.Kind.ACT, "Search the STASH unit: put back the " + String.join(" and ", pending.getItems()))
-			.detail("Before moving on").done(SubStep.Done.STASH_DEPOSITED).build());
+			.done(SubStep.Done.STASH_DEPOSITED).build());
 		all.addAll(base);
 		return List.copyOf(all);
 	}

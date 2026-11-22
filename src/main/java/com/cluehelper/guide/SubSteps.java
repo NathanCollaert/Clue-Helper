@@ -24,6 +24,8 @@ import com.cluehelper.guide.StepGuide.Tab;
 @RequiredArgsConstructor
 public final class SubSteps
 {
+	private static final int DUNGEON_OFFSET = 6400;
+	private static final int DUNGEON_SOUTH_EDGE = 8800;
 	public static final int ARRIVE_TILES = 3;
 	/** The Agility Pyramid's course spans its foot; a cave's way in is a tile. */
 	private static final int ON_WAY_IN_TILES = 40;
@@ -40,6 +42,8 @@ public final class SubSteps
 	static final int AREA_ARRIVE_TILES = 15;
 
 	private static final String ENTRANA_SHIP = "Ship: Entrana";
+	private static final String DIG = "Dig";
+	private static final String WALK_TO_DIG = "Walk to the dig spot";
 	private static final String ENTRANA_RULE = "Entrana allows no weapons or armour: the deposit box by the monks";
 	private static final String DEPOSIT = "Deposit";
 
@@ -54,13 +58,15 @@ public final class SubSteps
 	final IntPredicate weaponOrArmour;
 	/** The teleports, for the spirit tree a planted-tree task travels to. */
 	final Supplier<List<CatalogRow>> catalog;
+	/** The walk table's exit a leg goes through within so many tiles of walking, or null. */
+	final BiFunction<Leg, Integer, Exit> exitBetween;
 
 	@Inject
 	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear,
 		AvailabilityService availability)
 	{
 		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
-			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog);
+			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog, routes::exitBetween);
 	}
 
 
@@ -70,12 +76,87 @@ public final class SubSteps
 	{
 		boolean takeFromStash = takeFromStash(step);
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
-			.build(this::exitOf, this::plantedTreeTeleport);
-		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds()), step.getData());
-		List<SubStep> steps = withFairyRingStaffWorn(route,
-			withRideGearWorn(route, withEntranaDeposits(withGearOnArrival(wayIn))));
-		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
-			: steps;
+			.build(this::exitOf, this::jumpedBy, this::plantedTreeTeleport);
+		Set<Integer> onHand = new HashSet<>(carriedIds());
+		onHand.addAll(withdrawnIds(route));
+		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds(), onHand,
+			id -> client.getItemDefinition(id).getName()), step.getData());
+		List<SubStep> steps = withRideItemsWorn(route, withEntranaDeposits(withGearOnArrival(wayIn)));
+		return withWalksNamedByWhatTheyLeadTo(withTrackPlayedOnTheWay(withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
+			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps)));
+	}
+
+	/**
+	 * A walk reads as what it leads to, the act or the way in after it past further walks: "Kill a hellhound", not "Walk
+	 * to the clue". Not when gear goes on between, which would read out of order, nor for a dig: "Dig" reads as now, so
+	 * its walk says where it goes. The line and outlines stay the walk's.
+	 */
+	private static List<SubStep> withWalksNamedByWhatTheyLeadTo(List<SubStep> steps)
+	{
+		List<SubStep> named = new ArrayList<>(steps);
+		for (int i = 0; i < named.size(); i++)
+		{
+			SubStep walk = named.get(i);
+			SubStep led = isWalk(walk) ? ledTo(steps, i + 1) : null;
+			if (led != null)
+			{
+				named.set(i, walk.toBuilder().text(led.getText().equals(DIG) ? WALK_TO_DIG : led.getText()).build());
+			}
+		}
+		return List.copyOf(named);
+	}
+
+	/**
+	 * The exit a walk to a kill jumps through, farther than the walk's time covers (the whirlpool down to the Ancient
+	 * Cavern), a dungeon counted where it lies under the surface; null for a plain walk. Its far side isn't loaded, so
+	 * the player's own walk search doesn't know it yet.
+	 */
+	private Exit jumpedBy(Leg leg)
+	{
+		boolean jumps = aboveGround(leg.getFrom()).distanceTo2D(aboveGround(leg.getTo())) > leg.getHalfTicks();
+		return jumps ? exitBetween.apply(leg, leg.getHalfTicks()) : null;
+	}
+
+	/** The surface tile over a dungeon's: the game lays most dungeons out this far north of where they lie. */
+	private static WorldPoint aboveGround(WorldPoint tile)
+	{
+		return tile.getY() >= DUNGEON_SOUTH_EDGE ? new WorldPoint(tile.getX(), tile.getY() - DUNGEON_OFFSET, tile.getPlane()) : tile;
+	}
+
+	private static SubStep ledTo(List<SubStep> steps, int from)
+	{
+		for (int i = from; i < steps.size(); i++)
+		{
+			SubStep sub = steps.get(i);
+			if (!isWalk(sub))
+			{
+				return !sub.isPreparation() && (sub.getKind() == Kind.ACT || sub.getKind() == Kind.ENTER) ? sub : null;
+			}
+		}
+		return null;
+	}
+
+	private static boolean isWalk(SubStep sub)
+	{
+		return sub.getKind() == Kind.WALK || sub.getKind() == Kind.WALK_TO_CLUE;
+	}
+
+	/** Played in the music tab; done once it is the track playing. */
+	static SubStep playTrack(String track)
+	{
+		return SubStep.of(Kind.ACT, "Play " + track).track(track).done(SubStep.Done.TRACK_PLAYING).tab(Tab.MUSIC).build();
+	}
+
+	/** The walk to Cecilia asks for the track already: it can be picked while running there. */
+	private static List<SubStep> withTrackPlayedOnTheWay(List<SubStep> steps)
+	{
+		SubStep play = steps.stream().filter(sub -> sub.getDone() == SubStep.Done.TRACK_PLAYING).findFirst().orElse(null);
+		if (play == null)
+		{
+			return steps;
+		}
+		return steps.stream().map(sub -> sub.getKind() == Kind.WALK_TO_CLUE ? sub.toBuilder().text(play.getText()).tab(Tab.MUSIC).build() : sub)
+			.collect(toUnmodifiableList());
 	}
 
 	/**
@@ -134,44 +215,46 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
-	/** A ride that takes worn gear (a ghostspeak amulet for the ghost captain) has it put on first. */
-	private List<SubStep> withRideGearWorn(Route route, List<SubStep> steps)
-	{
-		Set<Integer> withdrawn = withdrawnIds(route);
-		return withBefore(steps, sub -> equipForRide(sub, withdrawn));
-	}
-
 	/**
-	 * The staff goes on before the route's first fairy ring and stays on for the rest, so a chained code's later hops
-	 * follow each other with nothing between them.
+	 * What a ride takes worn (a fairy ring's staff, the ghost captain's ghostspeak amulet) goes on before its first use
+	 * in the route and stays on for the rest, so a chained code's later hops follow each other with nothing between them.
 	 */
-	private List<SubStep> withFairyRingStaffWorn(Route route, List<SubStep> steps)
+	private List<SubStep> withRideItemsWorn(Route route, List<SubStep> steps)
 	{
-		int ring = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getKind() == Kind.FAIRY_RING).findFirst().orElse(-1);
-		Set<Integer> staves = ring < 0 ? Set.of() : stavesToWield(steps.get(ring).getRow());
-		if (staves.isEmpty())
+		PlayerSnapshot player = snapshot.get();
+		Set<Integer> withdrawn = withdrawnIds(route);
+		Set<Set<Integer>> putOn = new HashSet<>();
+		List<SubStep> out = new ArrayList<>();
+		for (SubStep sub : steps)
 		{
-			return steps;
+			for (Set<Integer> items : toWear(sub.getRow(), player))
+			{
+				if (putOn.add(items))
+				{
+					out.add(equip(items, withdrawn));
+				}
+			}
+			out.add(sub);
 		}
-		List<SubStep> out = new ArrayList<>(steps);
-		out.add(ring, equip(staves, withdrawnIds(route)));
 		return List.copyOf(out);
 	}
 
-	/** None when one is worn already or the Lumbridge elite diary lets the player use fairy rings without one. */
-	private Set<Integer> stavesToWield(CatalogRow landing)
+	/**
+	 * Each of the row's must-be-worn clauses, as its items, that the player wears none of and cannot do without (the
+	 * Lumbridge elite diary lets them use fairy rings with no staff).
+	 */
+	private static List<Set<Integer>> toWear(CatalogRow row, PlayerSnapshot player)
 	{
-		PlayerSnapshot player = snapshot.get();
-		if (player == null)
+		if (row == null || player == null)
 		{
-			return Set.of();
+			return List.of();
 		}
-		Set<Integer> staves = landing.getRequirements().getItems().stream()
+		return row.getRequirements().getItems().stream()
 			.filter(ItemClause::isMustBeWorn)
 			.filter(clause -> !AvailabilityEngine.isWaived(clause, player, AvailabilityService.nowMinutes()))
-			.flatMap(ItemClause::ids)
-			.collect(toUnmodifiableSet());
-		return staves.stream().anyMatch(player.getWorn()::containsKey) ? Set.of() : staves;
+			.map(clause -> clause.ids().collect(toUnmodifiableSet()))
+			.filter(items -> items.stream().noneMatch(player.getWorn()::containsKey))
+			.collect(toList());
 	}
 
 	private static Set<Integer> withdrawnIds(Route route)
@@ -191,22 +274,6 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
-	private static Set<Integer> rideGear(CatalogRow row)
-	{
-		return row == null ? Set.of() : row.getRequirements().getItems().stream()
-			.filter(CatalogRules::isGhostspeakNeed)
-			.flatMap(ItemClause::ids)
-			.filter(CatalogRules.GHOSTSPEAK::contains)
-			.collect(toUnmodifiableSet());
-	}
-
-	/** None for any sub-step but a ride that takes worn gear. */
-	private List<SubStep> equipForRide(SubStep ride, Set<Integer> withdrawn)
-	{
-		Set<Integer> gear = ride.getKind() == Kind.TELEPORT ? rideGear(ride.getRow()) : Set.of();
-		return gear.isEmpty() ? List.of() : List.of(equip(gear, withdrawn));
-	}
-
 	/** Named by the piece the player has on them or the route withdraws, else by the lowest id of {@code gear}. */
 	private SubStep equip(Set<Integer> gear, Set<Integer> withdrawn)
 	{
@@ -214,7 +281,7 @@ public final class SubSteps
 		int piece = gear.stream().filter(id -> carrier != null && carrier.carriedIds().contains(id) || withdrawn.contains(id))
 			.findFirst().orElse(gear.stream().sorted().findFirst().orElseThrow());
 		return SubStep.of(Kind.ACT, "Equip the " + client.getItemDefinition(piece).getName()).actItems(gear)
-			.done(SubStep.Done.ITEM_WORN).tab(Tab.INVENTORY).build();
+			.worn(List.of(anyOf(client.getItemDefinition(piece).getName(), gear))).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build();
 	}
 
 	private static boolean isEntranaShip(SubStep step)
@@ -339,7 +406,7 @@ public final class SubSteps
 			return takeFromStash && stashOutsideWayIn(step);
 		}
 
-		List<SubStep> build(Function<Leg, Exit> exits, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
+		List<SubStep> build(Function<Leg, Exit> exits, Function<Leg, Exit> jumps, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
 		{
 			if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 			{
@@ -365,6 +432,11 @@ public final class SubSteps
 					if (entersStepArea(leg, step))
 					{
 						steps.add(LegSteps.enter(step.getData()));
+					}
+					Exit jump = reached.getKind() == Stage.Kind.KEY ? jumps.apply(leg) : null;
+					if (jump != null)
+					{
+						steps.add(LegSteps.jump(jump));
 					}
 					steps.add(LegSteps.walkToStage(leg, reached, step.getData()));
 				}
@@ -409,7 +481,7 @@ public final class SubSteps
 					break;
 				case WILDERNESS_EXIT:
 					steps.add(SubStep.of(Kind.WILDERNESS_EXIT, "Walk south out of deep Wilderness")
-						.detail("Teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
+						.waypoint(leg.getTo()).goal(leg.getTo()).build());
 					break;
 				case SWAP_TELEPORT:
 					steps.add(LegSteps.swap(leg));
@@ -490,8 +562,8 @@ public final class SubSteps
 	/** Ends when the stage is dropped from the step, which brings a new plan. */
 	static SubStep stageAct(Stage stage)
 	{
-		return SubStep.of(Kind.ACT, stage.getAct()).detail(stage.getDetail()).stage(stage)
-			.tab(stage.getKind() == Stage.Kind.LEARN ? Tab.QUESTS : Tab.NONE).npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
+		return SubStep.of(Kind.ACT, stage.getAct()).stage(stage)
+			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
 	/** The step's way in, when the player is on it: near its start, any floor, and not yet inside. */
@@ -504,13 +576,34 @@ public final class SubSteps
 	}
 
 	/**
-	 * A fairy ring, ride or spirit tree used where it stands: its own sub-step leads the line there and colours its menu
-	 * from the start, so no "Walk to" comes before it.
+	 * A bank, fairy ring, ride or spirit tree used where it stands: its own sub-step leads the line there and outlines it
+	 * or colours its menu from the start, so no "Walk to" comes before it.
 	 */
 	private static boolean boardedThere(Leg next)
 	{
-		return next != null && (next.getKind() == Leg.Kind.FAIRY_RING
+		return next != null && (next.getKind() == Leg.Kind.FAIRY_RING || next.getKind() == Leg.Kind.BANK
 			|| next.getKind() == Leg.Kind.TELEPORT && next.getRow() != null && next.getRow().isLocated() && !next.getRow().isInHouse());
+	}
+
+	/**
+	 * A bank stop shows what is done in the bank from the way there on, while its line and outline lead to the bank. A
+	 * bank opened only to close it again shows itself.
+	 */
+	private static List<SubStep> withBankTasksShown(List<SubStep> steps)
+	{
+		List<SubStep> out = new ArrayList<>(steps);
+		for (int i = 0; i + 1 < out.size(); i++)
+		{
+			SubStep bank = out.get(i);
+			SubStep task = out.get(i + 1);
+			boolean onlyCloses = task.getKind() == Kind.WITHDRAW && task.getItems().isEmpty();
+			if (bank.getKind() == Kind.BANK && !onlyCloses)
+			{
+				out.set(i, bank.toBuilder().text(task.getText()).items(task.getItems())
+					.detail(task.getDetail() != null ? task.getDetail() : bank.getDetail()).build());
+			}
+		}
+		return List.copyOf(out);
 	}
 
 	/** The STASH unit stands outside the step's way in (the Agility Pyramid's, at its foot): its items come first. */
@@ -558,8 +651,15 @@ public final class SubSteps
 		return step.getStages().stream().anyMatch(stage -> stage.getKind() != Stage.Kind.FINAL && !stage.getTiles().isEmpty());
 	}
 
+	/** The stage's acts after the walk there; what it does anywhere goes before that walk. */
 	private static void addStageAct(List<SubStep> steps, Stage stage)
 	{
+		int walk = steps.size();
+		while (walk > 0 && (isWalk(steps.get(walk - 1)) || steps.get(walk - 1).getKind() == Kind.ENTER))
+		{
+			walk--;
+		}
+		steps.addAll(walk, stage.getBefore().stream().filter(StepIndex.Before::isAnywhere).map(SubSteps::beforeAct).collect(toList()));
 		steps.addAll(stageActs(stage));
 	}
 
@@ -567,24 +667,33 @@ public final class SubSteps
 	static List<SubStep> stageActs(Stage stage)
 	{
 		List<SubStep> acts = new ArrayList<>(remove(stage.getEmptied()));
-		stage.getBefore().forEach(before -> acts.add(SubStep.of(Kind.ACT, before.getText())
-			.npcIds(Set.copyOf(before.getNpcs())).option(before.getOption()).groundItem(before.getGroundItem())
-			.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()));
+		stage.getBefore().stream().filter(before -> !before.isAnywhere()).forEach(before -> acts.add(beforeAct(before)));
 		acts.addAll(stage.getWorn().isEmpty() ? List.of() : equip(stage.getWorn()));
 		acts.add(stageAct(stage));
 		return List.copyOf(acts);
 	}
 
+	static SubStep beforeAct(StepIndex.Before before)
+	{
+		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, before.getText()).npcIds(Set.copyOf(before.getNpcs()))
+			.objectIds(Set.copyOf(before.getObjects())).option(before.getOption()).groundItem(before.getGroundItem());
+		return before.getGone().isEmpty()
+			? act.actItems(Set.copyOf(before.getItems())).tab(before.getItems().isEmpty() ? Tab.NONE : Tab.INVENTORY)
+				.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()
+			: act.actItems(Set.copyOf(before.getGone())).done(SubStep.Done.ITEMS_GONE).build();
+	}
+
 	/** Take off what core's empty-slot requirements forbid; none when there are none. */
 	static List<SubStep> remove(List<ItemRequirement> emptied)
 	{
-		return emptied.isEmpty() ? List.of() : List.of(takeOff(emptied, SubStep.Done.SLOTS_EMPTY));
+		return emptied.isEmpty() ? List.of() : List.of(takeOff(emptied).build());
 	}
 
-	private static SubStep takeOff(List<ItemRequirement> emptied, SubStep.Done done)
+	private static SubStep.SubStepBuilder takeOff(List<ItemRequirement> emptied)
 	{
-		return SubStep.of(Kind.ACT, "Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied).done(done)
-			.tab(Tab.EQUIPMENT).build();
+		String slots = EmptySlots.slotNames(emptied);
+		return SubStep.of(Kind.ACT, "Take off " + (slots.equals(EmptySlots.EVERYTHING) ? slots : "your " + slots)).emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
+			.tab(Tab.EQUIPMENT);
 	}
 
 	/**
@@ -594,7 +703,7 @@ public final class SubSteps
 	static List<SubStep> equip(List<String> wornNeeds)
 	{
 		return List.of(SubStep.of(Kind.ACT, "Equip:").items(wornNeeds)
-			.wornNeeds(wornNeeds).done(SubStep.Done.GEAR_WORN).tab(Tab.INVENTORY).build());
+			.wornNeeds(wornNeeds).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());
 	}
 
 	/**
@@ -603,7 +712,7 @@ public final class SubSteps
 	 */
 	private static List<SubStep> withGearOnArrival(List<SubStep> steps)
 	{
-		int equip = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getDone() == SubStep.Done.GEAR_WORN).findFirst().orElse(-1);
+		int equip = IntStream.range(0, steps.size()).filter(i -> !steps.get(i).getWornNeeds().isEmpty()).findFirst().orElse(-1);
 		if (equip < 0)
 		{
 			return steps;
@@ -618,8 +727,9 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
+	/** @param onHand carried or withdrawn on the route: one of them that is every need names the act (the Medallion of the Deep) */
 	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data, Predicate<Quest> finished,
-		Set<Integer> carried)
+		Set<Integer> carried, Set<Integer> onHand, IntFunction<String> itemName)
 	{
 		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequiresFor(finished, carried);
 		if (worn.isEmpty())
@@ -631,9 +741,12 @@ public final class SubSteps
 		List<StepIndex.Requires> ownWear = worn.stream().filter(need -> need.getPutOn() == null).collect(toList());
 		if (!ownWear.isEmpty())
 		{
-			equip.add(SubStep.of(Kind.ACT, "Equip the " + ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and ")))
+			Integer cover = ownWear.size() < 2 ? null : ownWear.get(0).getIds().stream().filter(onHand::contains)
+				.filter(id -> ownWear.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
+			String names = cover != null ? itemName.apply(cover) : ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and "));
+			equip.add(SubStep.of(Kind.ACT, "Equip the " + names)
 				.actItems(ownWear.stream().flatMap(need -> need.getIds().stream()).collect(toUnmodifiableSet()))
-				.done(SubStep.Done.WAY_IN_WORN).tab(Tab.INVENTORY).build());
+				.wornWayIn(true).wayIn(data.getEntry()).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());
 		}
 		return withBefore(steps, sub -> sub.getKind() == Kind.ENTER ? equip : List.of());
 	}
@@ -646,23 +759,35 @@ public final class SubSteps
 		if (!by.getFree().isEmpty())
 		{
 			List<ItemRequirement> emptied = List.of(new SlotLimitationRequirement(by.getText(), by.getFree().toArray(EquipmentInventorySlot[]::new)));
-			acts.add(takeOff(emptied, SubStep.Done.WAY_IN_SLOTS_EMPTY));
+			acts.add(takeOff(emptied).wornWayIn(true).build());
 		}
-		acts.add(SubStep.of(Kind.ACT, by.getText()).detail(by.getDetail()).npcIds(Set.copyOf(by.getNpcs())).option(by.getOption())
-			.done(SubStep.Done.WAY_IN_WORN).build());
+		acts.add(SubStep.of(Kind.ACT, by.getText()).npcIds(Set.copyOf(by.getNpcs())).option(by.getOption())
+			.wornWayIn(true).done(SubStep.Done.WORN).build());
 		return acts;
 	}
 
+	static ItemRequirement anyOf(String name, Collection<Integer> ids)
+	{
+		return new AnyRequirementCollection(name, ids.stream().sorted().map(SingleItemRequirement::new).toArray(ItemRequirement[]::new));
+	}
+
 	/**
-	 * On a route to the way in, its gear goes on at the way in: a sled can only be ridden at the top of Trollweiss
-	 * Mountain. Already on the way (diving to the Mogre Camp's rocks), there is nothing to walk back to. Gear an NPC puts
-	 * on goes on where the NPC stands (Larry, at the Iceberg's landing).
+	 * On a route to the way in, its gear goes on first, then the walk there: the walk reads as going in. Gear that only
+	 * works there goes on at the way in instead: a sled can only be ridden at the top of Trollweiss Mountain. Already on
+	 * the way (diving to the Mogre Camp's rocks), there is nothing to walk back to. Gear an NPC puts on goes on where the
+	 * NPC stands (Larry, at the Iceberg's landing).
 	 */
 	private static List<SubStep> withWalkToWayIn(List<SubStep> steps, StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data == null ? null : data.getEntry();
-		return withBefore(steps, sub -> way != null && sub.getDone() == SubStep.Done.WAY_IN_WORN && sub.getNpcIds().isEmpty()
-			? List.of(LegSteps.walkTo("Walk to " + way.getText(), way.getTile(), ARRIVE_TILES).build()) : List.of());
+		Predicate<SubStep> equip = sub -> sub.getWayIn() != null && sub.getKind() == Kind.ACT;
+		if (way == null || steps.stream().noneMatch(equip))
+		{
+			return steps;
+		}
+		Predicate<SubStep> walkBefore = way.isGearThere() ? equip : sub -> sub.getKind() == Kind.ENTER;
+		return withBefore(steps, sub -> walkBefore.test(sub)
+			? List.of(LegSteps.walkTo("Walk to " + way.getText(), way.getTile(), ARRIVE_TILES).wayIn(way).build()) : List.of());
 	}
 
 	/** Client thread only. Weapons and armour as the Entrana monks see them: any attack, defence or strength bonus. */

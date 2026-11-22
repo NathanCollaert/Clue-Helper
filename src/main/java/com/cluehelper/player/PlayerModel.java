@@ -1,6 +1,7 @@
 package com.cluehelper.player;
 
 import com.cluehelper.Tables;
+import com.cluehelper.guide.FairyDials;
 import com.cluehelper.memory.*;
 import com.google.gson.Gson;
 import java.util.*;
@@ -49,15 +50,11 @@ public class PlayerModel
 	@Inject
 	GrownPatches grownPatches;
 	@Inject
-	FairyRingMemory fairyRings;
-	@Inject
 	ChargeReader chargeReader;
 	@Inject
 	CheckLines checkLines;
 	@Inject
 	MusicTracks musicTracks;
-	@Inject
-	QuestPointTotal questPointTotal;
 	@Inject
 	Gson gson;
 	final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
@@ -159,11 +156,11 @@ public class PlayerModel
 
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		if (event.getVarpId() == VarPlayerID.QP)
+		if (event.getVarpId() == VarPlayerID.QP || event.getVarpId() == VarPlayerID.QP_TOTAL)
 		{
 			questsDirty = true;
 		}
-		if (watchedVarpIndices.contains(event.getVarpId()))
+		if (event.getVarpId() == VarPlayerID.FAIRYRING_HISTORY || watchedVarpIndices.contains(event.getVarpId()))
 		{
 			dirty = true;
 		}
@@ -256,7 +253,7 @@ public class PlayerModel
 		{
 			questsDirty = false;
 			quests = readQuests();
-			missingQuestPoints = Math.max(0, questPointTotal.offered() - client.getVarpValue(VarPlayerID.QP));
+			missingQuestPoints = Math.max(0, client.getVarbitValue(VarbitID.QP_MAX) - client.getVarpValue(VarPlayerID.QP));
 			questsRead = true;
 			dirty = true;
 		}
@@ -408,8 +405,14 @@ public class PlayerModel
 			.house(house)
 			.plantedTrees(grownPatches.grown())
 			.unlocks(unlockMemory.unlocks())
-			.lastFairyRing(fairyRings.lastCode())
+			.lastFairyRing(lastFairyRing())
 			.build();
+	}
+
+	/** The code the rings' Last-destination goes to, or null before the player's first ring teleport. */
+	private String lastFairyRing()
+	{
+		return client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC_SET) == 0 ? null : FairyDials.code(client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC));
 	}
 
 	private Map<Integer, Integer> contents(int containerId)

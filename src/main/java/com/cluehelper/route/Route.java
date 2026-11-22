@@ -18,8 +18,6 @@ public class Route
 	/** Half-ticks plus the ranking-only cape-use, stranding and teleport tie-break penalties. */
 	int rankHalfTicks;
 	boolean banked;
-	/** Spellbook Swap included. */
-	boolean changed;
 	/** Lunar while a Spellbook Swap is pending. */
 	Book startBook;
 	Book endBook;

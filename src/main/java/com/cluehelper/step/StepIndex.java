@@ -65,7 +65,7 @@ public final class StepIndex
 		String act;
 		/** The option the step's NPC is clicked with when it isn't Talk-to (the Monk of Entrana's Take-boat); null for a talk. */
 		String npcOption;
-		/** Where the game put the step's NPC for this player, to be learned (Viggora); null for an NPC always at its targets. */
+		/** Which quest places the step's NPC for each player (Viggora); null for an NPC always at its targets. */
 		LearnPlace learnPlace;
 		List<CacheRow> rows = List.of();
 		List<WorldPoint> tiles = List.of();
@@ -97,6 +97,10 @@ public final class StepIndex
 		Map<String, List<Integer>> optionalWith = Map.of();
 		/** What is done at the place before the task, in order: Alry's bird, then king worms for aerial fishing. */
 		List<Before> before = List.of();
+		/** Other places the key's NPCs are killed, beside the cache's key tile: any chicken drops the Seers' key. */
+		List<WorldPoint> keyAlso = List.of();
+		/** The task's line while something is carried, the first that matches: reanimate the head, then kill what rises. */
+		List<Phase> phases = List.of();
 		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
 		List<Integer> anywhereWith = List.of();
 		/** The task travels to one of the player's planted spirit trees: the route ends with the teleport to the first grown one. */
@@ -309,6 +313,24 @@ public final class StepIndex
 		String option;
 		int groundItem = -1;
 		List<Integer> held = List.of();
+		/** Items it is done with in the inventory (sacred oil on the logs), highlighted there. */
+		List<Integer> items = List.of();
+		/** Done anywhere, so before the walk to the place rather than at it. */
+		boolean anywhere;
+		/** Objects it is done on with {@code option} (the pyre site's Construct). */
+		List<Integer> objects = List.of();
+		/** Done once none of these is carried any more (the mangled bones, built into the pyre ship); else by {@code held}. */
+		List<Integer> gone = List.of();
+	}
+
+	/** The task's line while any of {@code whileCarried} is carried. */
+	@Getter
+	public static final class Phase
+	{
+		String text;
+		List<Integer> whileCarried = List.of();
+		/** The option the phase clicks on the task's object (the pyre's Build); null for the task's own. */
+		String option;
 	}
 
 	@Getter
@@ -369,22 +391,12 @@ public final class StepIndex
 		}
 	}
 
-	/** A quest journal that names, in its words, which of the step's targets the NPC stands at. */
+	/** The quest that places the step's NPC at one of its targets for each player. */
 	@Getter
 	public static final class LearnPlace
 	{
 		/** A {@link net.runelite.api.Quest} name. */
 		String quest;
-		String journal;
-		List<LearnSpot> spots = List.of();
-	}
-
-	@Getter
-	public static final class LearnSpot
-	{
-		/** The NPC id of the target it stands at. */
-		int npc;
-		List<String> words = List.of();
 	}
 
 	/** An NPC's option that puts a worn requirement on, where the item has no Wear of its own (Larry's Tuxedo-time). */
@@ -394,7 +406,6 @@ public final class StepIndex
 		List<Integer> npcs = List.of();
 		String option;
 		String text;
-		String detail;
 		/** The slots the gear goes in, emptied before the NPC is asked (the suit's cape slot, and gloves). */
 		List<EquipmentInventorySlot> free = List.of();
 	}
@@ -407,6 +418,8 @@ public final class StepIndex
 		PutOn putOn;
 		List<Integer> ids = List.of();
 		String name;
+		/** Brought only by a player owning one, the first owned of {@link #ids} (the strange old lockpick, least charged first). */
+		boolean broughtIfOwned;
 		/** Worn to go in (a diving helmet), not just carried (a spade). */
 		boolean wear;
 		/** Of a worn requirement, the items that do as well just carried (a talisman beside the tiara); empty for none. */
@@ -431,7 +444,7 @@ public final class StepIndex
 			return !unlessVarbits.isEmpty() && unlessVarbits.stream().allMatch(pair -> varbit.applyAsInt(pair[0]) == pair[1]);
 		}
 
-		private boolean isCarriedInstead(Set<Integer> carriedIds)
+		public boolean isCarriedInstead(Set<Integer> carriedIds)
 		{
 			return carried.stream().anyMatch(carriedIds::contains);
 		}
@@ -460,11 +473,32 @@ public final class StepIndex
 		List<Box> partWay = List.of();
 		/** Part way in, no line: the way can't be drawn (Pyramid Plunder's doors open in no fixed order). */
 		boolean noLine;
+		/** The way by name, as a walk leads to it: "the Nature Altar's ruins". */
 		String text;
+		/** The guide's line that goes in: "Enter the Nature Altar's ruins". */
+		String act;
+		/** The line on the way's own floors, part way in; null to keep {@link #act}. */
+		String partWayAct;
 		/** The chat options to pick, in order, when the way in is a conversation (Shantay's arrest). */
 		List<String> dialogue = List.of();
 		/** Ground items to pick up part way in before going on (the Mogre Camp's rocks); null when none. */
 		PickUp pickUp;
+		/** Its gear goes on at the way in, not before the walk there (a sled is only ridden at the top). */
+		boolean gearThere;
+		/** Entered at one of several places, the one used last remembered (the Barrows crypt with the tunnel). */
+		boolean remembered;
+		/** For a remembered way not known yet: the objects, one of which leads in, tried with its option (the six sarcophagi). */
+		List<Integer> tried = List.of();
+		/** For a remembered way: the game line that forgets the place (the Barrows chest's count, once looted). */
+		String forgetOn;
+		/** For a remembered way: its line once the place is known. */
+		String rememberedAct;
+
+		/** The line on the way's own floors. */
+		public String getPartWayLine()
+		{
+			return partWayAct != null ? partWayAct : act;
+		}
 
 		public boolean isInside(WorldPoint at)
 		{

@@ -19,8 +19,6 @@ public class Stage
 		PART,
 		/** A skill challenge's task; done once core marks the challenge completed. */
 		TASK,
-		/** Read where the step's NPC is (a quest journal); done once its place is learned. */
-		LEARN,
 		/** The step's own target, done last. */
 		FINAL
 	}

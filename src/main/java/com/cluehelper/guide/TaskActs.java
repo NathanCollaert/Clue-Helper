@@ -281,6 +281,35 @@ final class TaskActs
 		return null;
 	}
 
+	/** A task act read as its phase: the first whose items are carried, else the task's own line. */
+	SubStep phased(SubStep act, Step step)
+	{
+		Stage task = step == null || step.getData().getPhases().isEmpty() ? null : act.isTask() ? act.getStage() : taskWalkedTo(act, step);
+		if (task == null)
+		{
+			return act;
+		}
+		Set<Integer> carried = player.carriedIds();
+		StepIndex.Phase phase = step.getData().getPhases().stream()
+			.filter(candidate -> candidate.getWhileCarried().stream().anyMatch(carried::contains)).findFirst().orElse(null);
+		String text = phase == null ? task.getAct() : phase.getText();
+		String option = phase == null || phase.getOption() == null ? task.getOption() : phase.getOption();
+		return text.equals(act.getText()) && Objects.equals(option, act.getOption()) ? act : act.toBuilder().text(text).option(option).build();
+	}
+
+	/** The task a walk reads as (the walk to the pyre), by its line; null for any other sub-step. */
+	private static Stage taskWalkedTo(SubStep walk, Step step)
+	{
+		if (walk.getKind() != SubStep.Kind.WALK)
+		{
+			return null;
+		}
+		Stage task = step.getStages().stream().filter(stage -> stage.getKind() == Stage.Kind.TASK).findFirst().orElse(null);
+		boolean taskLine = task != null && (walk.getText().equals(task.getAct())
+			|| step.getData().getPhases().stream().anyMatch(phase -> phase.getText().equals(walk.getText())));
+		return taskLine ? task : null;
+	}
+
 	/** The spell's button until it is picked (the last of its buttons shown), then the items it is cast on. */
 	private Highlights withCast(Highlights shown, StepIndex.Cast cast, Set<Integer> carried)
 	{

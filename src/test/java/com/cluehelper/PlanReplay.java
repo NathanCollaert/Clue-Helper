@@ -101,6 +101,7 @@ public final class PlanReplay
 				.refusedChanges(recording.getRefusedChanges())
 				.foreignHouseStart(recording.isForeignHouseStart())
 				.followedFirstTransport(recording.getFollowedFirstTransport())
+				.followedIdentity(recording.getFollowedIdentity())
 				.build();
 			report(file.getName(), recording, input);
 		}

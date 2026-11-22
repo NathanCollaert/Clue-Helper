@@ -60,11 +60,6 @@ uncharged		ItemID.RING_OF_SHADOWS_UNCHARGED=28329
 uncharged		ItemID.TOME_OF_FIRE_UNCHARGED=20716
 uncharged		ItemID.TOME_OF_WATER_UNCHARGED=25576
 uncharged		ItemID.TOME_OF_EARTH_UNCHARGED=30066
-ghostspeak		ItemID.AMULET_OF_GHOSTSPEAK=552
-ghostspeak		ItemID.AMULET_OF_GHOSTSPEAK_ENCHANTED=4250
-ghostspeak		ItemID.MORYTANIA_LEGS_MEDIUM=13113
-ghostspeak		ItemID.MORYTANIA_LEGS_HARD=13114
-ghostspeak		ItemID.MORYTANIA_LEGS_ELITE=13115
 abyss obstacles		ObjectID.RCU_OUTER_MULTI1=26187
 abyss obstacles		ObjectID.RCU_OUTER_MULTI2=26188
 abyss obstacles		ObjectID.RCU_OUTER_MULTI3=26189
@@ -116,13 +111,11 @@ tab content	EQUIPMENT	InterfaceID.Wornitems.UNIVERSE=25362432
 tab content	MAGIC	InterfaceID.MagicSpellbook.UNIVERSE=14286848
 tab content	EMOTES	InterfaceID.Emote.UNIVERSE=14155776
 tab content	MUSIC	InterfaceID.Music.UNIVERSE=15663104
-tab content	QUESTS	InterfaceID.Questlist.UNIVERSE=26148864
 tab stones	INVENTORY	InterfaceID.Toplevel.STONE3=35913795	InterfaceID.ToplevelOsrsStretch.STONE3=10551358	InterfaceID.ToplevelPreEoc.STONE3=10747959
 tab stones	EQUIPMENT	InterfaceID.Toplevel.STONE4=35913796	InterfaceID.ToplevelOsrsStretch.STONE4=10551359	InterfaceID.ToplevelPreEoc.STONE4=10747960
 tab stones	MAGIC	InterfaceID.Toplevel.STONE6=35913798	InterfaceID.ToplevelOsrsStretch.STONE6=10551361	InterfaceID.ToplevelPreEoc.STONE6=10747962
 tab stones	EMOTES	InterfaceID.Toplevel.STONE12=35913781	InterfaceID.ToplevelOsrsStretch.STONE12=10551344	InterfaceID.ToplevelPreEoc.STONE12=10747946
 tab stones	MUSIC	InterfaceID.Toplevel.STONE13=35913782	InterfaceID.ToplevelOsrsStretch.STONE13=10551345	InterfaceID.ToplevelPreEoc.STONE13=10747947
-tab stones	QUESTS	InterfaceID.Toplevel.STONE2=35913794	InterfaceID.ToplevelOsrsStretch.STONE2=10551357	InterfaceID.ToplevelPreEoc.STONE2=10747958
 ates buttons	The Darkfrost	InterfaceID.PendantOfAtes.TELEPORT_DARKFROST=57606174
 ates buttons	Twilight Temple	InterfaceID.PendantOfAtes.TELEPORT_TWILIGHT=57606173
 ates buttons	Ralos' Rise	InterfaceID.PendantOfAtes.TELEPORT_RALOS=57606175

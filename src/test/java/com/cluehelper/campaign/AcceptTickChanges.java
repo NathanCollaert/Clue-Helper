@@ -13,10 +13,14 @@ import java.util.List;
  *
  * <p>With {@code -Pwording} it also takes the steps whose route is the same and whose guide lines only read
  * differently: a sub-step reworded on purpose, which playing again would show nothing new about.
+ *
+ * <p>With {@code -Ptargets} it takes the steps where only what a line outlines or clicks changed, and writes the
+ * targets into every recording made before they were kept whose route and guide still replay as recorded.
  */
 public final class AcceptTickChanges
 {
 	private static final String WORDING = "wording";
+	private static final String TARGETS = "targets";
 
 	private AcceptTickChanges()
 	{
@@ -29,27 +33,51 @@ public final class AcceptTickChanges
 			System.out.println("No " + CampaignFiles.CHANGED + ": run the tests first");
 			return;
 		}
-		boolean wording = args.length > 0 && args[0].equals(WORDING);
+		List<String> options = List.of(args);
+		boolean wording = options.contains(WORDING);
+		boolean targets = options.contains(TARGETS);
 		CampaignReplay replay = CampaignReplay.load();
 		int accepted = 0;
 		for (String line : Files.readAllLines(CampaignFiles.CHANGED, StandardCharsets.UTF_8))
 		{
 			String[] parts = line.split("\t");
-			if (parts.length == 3 && (wording || parts[0].equals("ticks")) && accept(replay, Paths.get(parts[2]), wording))
+			if (parts.length == 3 && (wording || targets || parts[0].equals("ticks")) && accept(replay, Paths.get(parts[2]), wording, targets))
 			{
 				accepted++;
 			}
 		}
-		System.out.println(accepted + (wording ? " tick and wording changes accepted" : " tick changes accepted"));
+		System.out.println(accepted + " changes accepted" + (wording ? ", wording too" : "") + (targets ? ", targets too" : ""));
+		if (targets)
+		{
+			System.out.println(fillTargets(replay) + " recordings given their targets");
+		}
 	}
 
-	private static boolean accept(CampaignReplay replay, Path file, boolean wording) throws IOException
+	private static int fillTargets(CampaignReplay replay) throws IOException
+	{
+		int filled = 0;
+		for (Path file : CampaignFiles.goldenFiles())
+		{
+			CampaignRecording recording = CampaignFiles.read(file);
+			Outcome now = replay.replay(recording, file.getParent());
+			if (recording.expected.lacksTargetsOf(now))
+			{
+				recording.expected = now;
+				CampaignFiles.write(file, recording);
+				filled++;
+			}
+		}
+		return filled;
+	}
+
+	private static boolean accept(CampaignReplay replay, Path file, boolean wording, boolean targets) throws IOException
 	{
 		CampaignRecording recording = CampaignFiles.read(file);
 		Outcome now = replay.replay(recording, file.getParent());
 		Outcome.Change change = recording.expected.changeTo(now);
 		boolean reworded = wording && change == Outcome.Change.ROUTE && recording.expected.isSameRouteAs(now);
-		if (change != Outcome.Change.TICKS && !reworded)
+		boolean retargeted = targets && change == Outcome.Change.TARGETS;
+		if (change != Outcome.Change.TICKS && !reworded && !retargeted)
 		{
 			System.out.println("refused " + recording.key + ": " + change + " now, play it again in the campaign");
 			return false;

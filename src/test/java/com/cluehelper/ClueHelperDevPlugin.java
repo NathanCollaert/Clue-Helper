@@ -15,7 +15,6 @@ import com.cluehelper.hotcold.HotColdService;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.memory.BankMemory;
-import com.cluehelper.memory.FairyRingMemory;
 import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.PlayerModel;
@@ -176,7 +175,7 @@ public class ClueHelperDevPlugin extends Plugin
 		clueHelper = find(ClueHelperPlugin.class);
 		harness = clueHelper.getInjector().getInstance(DevHarness.class);
 		harness.start();
-		logDebug(HotColdService.class, FairyRingMemory.class, GrownPatches.class);
+		logDebug(HotColdService.class, GrownPatches.class);
 		frameWriter = Executors.newSingleThreadExecutor(runnable ->
 		{
 			Thread thread = new Thread(runnable, "clue-helper-dev-frames");
@@ -532,7 +531,8 @@ public class ClueHelperDevPlugin extends Plugin
 	 * A mocked clue gets no reply from the game, so the act waiting for one never ends: a Sherlock task is marked done
 	 * as the game's chat line would, a kill-for-key stage's key counts as carried until the step changes, Uri or a
 	 * challenge item counts as arrived. STASH and gear acts end in the game
-	 * itself, and a step's last act ends with the campaign's Finish, which hands out the next clue.
+	 * itself. An act only the step's change ends (a kill, a dig, a talk) is the campaign's Finish, which hands out the
+	 * next clue.
 	 */
 	private void fakeActDone()
 	{
@@ -555,6 +555,11 @@ public class ClueHelperDevPlugin extends Plugin
 		else if (done == SubStep.Done.URI_HERE || done == SubStep.Done.CHALLENGE_ITEM)
 		{
 			markWatched(done == SubStep.Done.URI_HERE ? "uriTick" : "challengeTick");
+		}
+		else if (done == SubStep.Done.STEP_CHANGES && campaign != null)
+		{
+			campaign.finish();
+			return;
 		}
 		else
 		{

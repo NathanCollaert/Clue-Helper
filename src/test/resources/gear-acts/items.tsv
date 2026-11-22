@@ -1,0 +1,1311 @@
+229	Vial	-1	||||Drop
+303	Small fishing net	-1	||||Drop
+307	Fishing rod	-1	||||Drop
+335	Raw trout	-1	||||Drop
+345	Raw herring	-1	||||Drop
+373	Swordfish	-1	Eat||||Drop
+383	Raw shark	-1	||||Drop
+440	Iron ore	-1	||||Drop
+449	Adamantite ore	-1	||||Drop
+536	Dragon bones	-1	Bury||||Drop
+544	Monk's robe top	4	|Wear|||Drop
+552	Ghostspeak amulet	2	|Wear|||Drop
+556	Air rune	-1	||||Drop
+561	Nature rune	-1	||||Drop
+563	Law rune	-1	||||Drop
+564	Cosmic rune	-1	||||Drop
+565	Blood rune	-1	||||Drop
+566	Soul rune	-1	||||Drop
+577	Blue wizard robe	4	|Wear|||Drop
+579	Blue wizard hat	0	|Wear|||Drop
+590	Tinderbox	-1	||||Drop
+628	Green boots	10	|Wear|||Drop
+630	Blue boots	10	|Wear|||Drop
+636	Pink robe top	4	|Wear|||Drop
+638	Green robe top	4	|Wear|||Drop
+640	Blue robe top	4	|Wear|||Drop
+642	Cream robe top	4	|Wear|||Drop
+644	Turquoise robe top	4	|Wear|||Drop
+648	Green robe bottoms	7	|Wear|||Drop
+654	Turquoise robe bottoms	7	|Wear|||Drop
+658	Green hat	0	|Wear|||Drop
+716	Bullroarer	-1	Swing||||Drop
+775	Cooking gauntlets	9	|Wear|||Destroy
+811	Rune dart	3	|Wield|||Drop
+843	Oak shortbow	3	|Wield|||Drop
+845	Oak longbow	3	|Wield|||Drop
+851	Maple longbow	3	|Wield|||Drop
+853	Maple shortbow	3	|Wield|||Drop
+855	Yew longbow	3	|Wield|||Drop
+859	Magic longbow	3	|Wield|||Drop
+946	Knife	-1	||||Drop
+952	Spade	-1	Dig||||Drop
+954	Rope	-1	||||Drop
+995	Coins	-1	||||Drop
+1005	White apron	4	|Wear|||Drop
+1007	Red cape	1	|Wear|||Drop
+1011	Blue skirt	7	|Wear|||Drop
+1013	Pink skirt	7	|Wear|||Drop
+1019	Black cape	1	|Wear|||Drop
+1052	Cape of Legends	1	|Wear|||Drop
+1059	Leather gloves	9	|Wear|||Drop
+1061	Leather boots	10	|Wear|||Drop
+1067	Iron platelegs	7	|Wear|||Drop
+1069	Steel platelegs	7	|Wear|||Drop
+1071	Mithril platelegs	7	|Wear|||Drop
+1073	Adamant platelegs	7	|Wear|||Drop
+1075	Bronze platelegs	7	|Wear|||Drop
+1079	Rune platelegs	7	|Wear|||Drop
+1081	Iron plateskirt	7	|Wear|||Drop
+1083	Steel plateskirt	7	|Wear|||Drop
+1085	Mithril plateskirt	7	|Wear|||Drop
+1091	Adamant plateskirt	7	|Wear|||Drop
+1093	Rune plateskirt	7	|Wear|||Drop
+1095	Leather chaps	7	|Wear|||Drop
+1097	Studded chaps	7	|Wear|||Drop
+1099	Green d'hide chaps	7	|Wear|||Drop
+1101	Iron chainbody	4	|Wear|||Drop
+1103	Bronze chainbody	4	|Wear|||Drop
+1109	Mithril chainbody	4	|Wear|||Drop
+1113	Rune chainbody	4	|Wear|||Drop
+1115	Iron platebody	4	|Wear|||Drop
+1119	Steel platebody	4	|Wear|||Drop
+1121	Mithril platebody	4	|Wear|||Drop
+1123	Adamant platebody	4	|Wear|||Drop
+1125	Black platebody	4	|Wear|||Drop
+1127	Rune platebody	4	|Wear|||Drop
+1129	Leather body	4	|Wear|||Drop
+1131	Hardleather body	4	|Wear|||Drop
+1133	Studded body	4	|Wear|||Drop
+1135	Green d'hide body	4	|Wear|||Drop
+1137	Iron med helm	0	|Wear|||Drop
+1141	Steel med helm	0	|Wear|||Drop
+1143	Mithril med helm	0	|Wear|||Drop
+1145	Adamant med helm	0	|Wear|||Drop
+1147	Rune med helm	0	|Wear|||Drop
+1149	Dragon med helm	0	|Wear|||Drop
+1153	Iron full helm	0	|Wear|||Drop
+1155	Bronze full helm	0	|Wear|||Drop
+1157	Steel full helm	0	|Wear|||Drop
+1159	Mithril full helm	0	|Wear|||Drop
+1161	Adamant full helm	0	|Wear|||Drop
+1163	Rune full helm	0	|Wear|||Drop
+1167	Leather cowl	0	|Wear|||Drop
+1169	Coif	0	|Wear|||Drop
+1173	Bronze sq shield	5	|Wield|||Drop
+1177	Steel sq shield	5	|Wield|||Drop
+1183	Adamant sq shield	5	|Wield|||Drop
+1185	Rune sq shield	5	|Wield|||Drop
+1187	Dragon sq shield	5	|Wield|||Drop
+1191	Iron kiteshield	5	|Wear|||Drop
+1193	Steel kiteshield	5	|Wear|||Drop
+1201	Rune kiteshield	5	|Wear|||Drop
+1203	Iron dagger	3	|Wield|||Drop
+1205	Bronze dagger	3	|Wield|||Drop
+1211	Adamant dagger	3	|Wield|||Drop
+1213	Rune dagger	3	|Wield|||Drop
+1215	Dragon dagger	3	|Wield|||Drop
+1237	Bronze spear	3	|Wield|||Drop
+1245	Adamant spear	3	|Wield|||Drop
+1247	Rune spear	3	|Wield|||Drop
+1249	Dragon spear	3	|Wield|||Drop
+1265	Bronze pickaxe	3	|Wield|||Drop
+1267	Iron pickaxe	3	|Wield|||Drop
+1269	Steel pickaxe	3	|Wield|||Drop
+1271	Adamant pickaxe	3	|Wield|||Drop
+1273	Mithril pickaxe	3	|Wield|||Drop
+1275	Rune pickaxe	3	|Wield|||Drop
+1287	Adamant shortsword	3	|Wield|||Drop
+1289	Rune shortsword	3	|Wield|||Drop
+1295	Steel longsword	3	|Wield|||Drop
+1301	Adamant longsword	3	|Wield|||Drop
+1303	Rune longsword	3	|Wield|||Drop
+1305	Dragon longsword	3	|Wield|||Drop
+1307	Bronze 2h sword	3	|Wield|||Drop
+1309	Iron 2h sword	3	|Wield|||Drop
+1317	Adamant 2h sword	3	|Wield|||Drop
+1319	Rune 2h sword	3	|Wield|||Drop
+1323	Iron scimitar	3	|Wield|||Drop
+1329	Mithril scimitar	3	|Wield|||Drop
+1333	Rune scimitar	3	|Wield|||Drop
+1335	Iron warhammer	3	|Wield|||Drop
+1345	Adamant warhammer	3	|Wield|||Drop
+1347	Rune warhammer	3	|Wield|||Drop
+1349	Iron axe	3	|Wield|||Drop
+1351	Bronze axe	3	|Wield|||Drop
+1353	Steel axe	3	|Wield|||Drop
+1355	Mithril axe	3	|Wield|||Drop
+1357	Adamant axe	3	|Wield|||Drop
+1359	Rune axe	3	|Wield|||Drop
+1361	Black axe	3	|Wield|||Drop
+1373	Rune battleaxe	3	|Wield|||Drop
+1377	Dragon battleaxe	3	|Wield|||Drop
+1379	Staff	3	|Wield|||Drop
+1381	Staff of air	3	|Wield|||Drop
+1383	Staff of water	3	|Wield|||Drop
+1391	Battlestaff	3	|Wield|||Drop
+1393	Fire battlestaff	3	|Wield|||Drop
+1395	Water battlestaff	3	|Wield|||Drop
+1397	Air battlestaff	3	|Wield|||Drop
+1399	Earth battlestaff	3	|Wield|||Drop
+1401	Mystic fire staff	3	|Wield|||Drop
+1405	Mystic air staff	3	|Wield|||Drop
+1407	Mystic earth staff	3	|Wield|||Drop
+1409	Iban's staff	3	|Wield||Check|Drop
+1424	Steel mace	3	|Wield|||Drop
+1432	Rune mace	3	|Wield|||Drop
+1434	Dragon mace	3	|Wield|||Drop
+1462	Nature talisman	-1	|||Locate|Drop
+1511	Logs	-1	||||Drop
+1515	Yew logs	-1	||||Drop
+1523	Lockpick	-1	||||Drop
+1580	Ice gloves	9	|Wear|||Drop
+1595	Amulet mould	-1	||||Drop
+1615	Dragonstone	-1	||||Drop
+1616	null	-1	||||Drop
+1623	Uncut sapphire	-1	||||Drop
+1635	Gold ring	12	|Wear|||Drop
+1637	Sapphire ring	12	|Wear|||Drop
+1639	Emerald ring	12	|Wear|||Drop
+1641	Ruby ring	12	|Wear|||Drop
+1643	Diamond ring	12	|Wear|||Drop
+1645	Dragonstone ring	12	|Wear|||Drop
+1654	Gold necklace	2	|Wear|||Drop
+1656	Sapphire necklace	2	|Wear|||Drop
+1658	Emerald necklace	2	|Wear|||Drop
+1662	Diamond necklace	2	|Wear|||Drop
+1664	Dragon necklace	2	|Wear|||Drop
+1694	Sapphire amulet	2	|Wear|||Drop
+1696	Emerald amulet	2	|Wear|||Drop
+1698	Ruby amulet	2	|Wear|||Drop
+1702	Dragonstone amulet	2	|Wear|||Drop
+1704	Amulet of glory	2	|Wear||Rub|Drop
+1706	Amulet of glory(1)	2	|Wear||Rub|Drop
+1708	Amulet of glory(2)	2	|Wear||Rub|Drop
+1710	Amulet of glory(3)	2	|Wear||Rub|Drop
+1712	Amulet of glory(4)	2	|Wear||Rub|Drop
+1718	Holy symbol	2	|Wear|||Drop
+1725	Amulet of strength	2	|Wear|||Drop
+1731	Amulet of power	2	|Wear|||Drop
+1745	Green dragon leather	-1	||||Drop
+1753	Green dragonhide	-1	||||Drop
+1757	Brown apron	4	|Wear|||Drop
+1775	Molten glass	-1	||||Drop
+1785	Glassblowing pipe	-1	||||Drop
+1833	Desert shirt	4	|Wear|||Drop
+1949	Chef's hat	0	|Wear|||Drop
+2162	King worm	-1	Eat||||Drop
+2357	Gold bar	-1	||||Drop
+2363	Runite bar	-1	||||Drop
+2412	Saradomin cape	1	|Wear|||Drop
+2414	Zamorak cape	1	|Wear|||Drop
+2415	Saradomin staff	3	|Wield|||Drop
+2487	Blue d'hide vambraces	9	|Wear|||Drop
+2491	Black d'hide vambraces	9	|Wear|||Drop
+2493	Blue d'hide chaps	7	|Wear|||Drop
+2495	Red d'hide chaps	7	|Wear|||Drop
+2497	Black d'hide chaps	7	|Wear|||Drop
+2499	Blue d'hide body	4	|Wear|||Drop
+2501	Red d'hide body	4	|Wear|||Drop
+2503	Black d'hide body	4	|Wear|||Drop
+2552	Ring of dueling(8)	12	|Wear||Rub|Drop
+2554	Ring of dueling(7)	12	|Wear||Rub|Drop
+2556	Ring of dueling(6)	12	|Wear||Rub|Drop
+2558	Ring of dueling(5)	12	|Wear||Rub|Drop
+2560	Ring of dueling(4)	12	|Wear||Rub|Drop
+2562	Ring of dueling(3)	12	|Wear||Rub|Drop
+2564	Ring of dueling(2)	12	|Wear||Rub|Drop
+2566	Ring of dueling(1)	12	|Wear||Rub|Drop
+2568	Ring of forging	12	|Wear||Break|Drop
+2570	Ring of life	12	|Wear|Toggle-respawn||Drop
+2572	Ring of wealth	12	|Wear|Features|Rub|Drop
+2574	Sextant	-1	Look through||||Drop
+2645	Red headband	0	|Wear|||Drop
+2646	null	-1	||||Drop
+2647	Black headband	0	|Wear|||Drop
+2648	null	-1	||||Drop
+2649	Brown headband	0	|Wear|||Drop
+2657	Zamorak full helm	0	|Wear|||Drop
+2661	Saradomin platebody	4	|Wear|||Drop
+2663	Saradomin platelegs	7	|Wear|||Drop
+2665	Saradomin full helm	0	|Wear|||Drop
+2667	Saradomin kiteshield	5	|Wear|||Drop
+2890	Elemental shield	5	|Wield|||Drop
+2942	Purple gloves	9	|Wear|||Drop
+2961	Silver sickle	3	|Wield|||Drop
+2963	Silver sickle (b)	3	Cast Bloom|Wield|||Drop
+3053	Lava battlestaff	3	|Wield|||Drop
+3054	Mystic lava staff	3	|Wield|||Drop
+3105	Climbing boots	10	|Wear|||Drop
+3122	Granite shield	5	|Wear|||Drop
+3140	Dragon chainbody	4	|Wear|||Drop
+3200	Adamant halberd	3	|Wield|||Drop
+3202	Rune halberd	3	|Wield|||Drop
+3204	Dragon halberd	3	|Wield|||Drop
+3343	Pointed bruise blue snelm	0	|Wear|||Drop
+3387	Splitbark body	4	|Wear|||Drop
+3389	Splitbark legs	7	|Wear|||Drop
+3469	Silver key purple	-1	||||Drop
+3479	Saradomin plateskirt	7	|Wear|||Drop
+3695	Pet rock	3	Interact|Wield|||Drop
+3840	Holy book	5	|Wield|Preach||Drop
+3842	Unholy book	5	|Wield|Preach||Drop
+3844	Book of Balance	5	|Wield|Preach||Drop
+4024	Ninja monkey greegree	3	|Hold|||Drop
+4025	Ninja monkey greegree	3	|Hold|||Drop
+4037	Saradomin banner	3	|Wield|||Drop
+4041	Saradomin cloak	1	|Wear|||Drop
+4084	Sled	3	|Ride|||Drop
+4087	Dragon platelegs	7	|Wear|||Drop
+4089	Mystic hat	0	|Wear|||Drop
+4091	Mystic robe top	4	|Wear|||Drop
+4093	Mystic robe bottom	7	|Wear|||Drop
+4095	Mystic gloves	9	|Wear|||Drop
+4101	Mystic robe top (dark)	4	|Wear|||Drop
+4103	Mystic robe bottom (dark)	7	|Wear|||Drop
+4127	Mithril boots	10	|Wear|||Drop
+4129	Adamant boots	10	|Wear|||Drop
+4131	Rune boots	10	|Wear|||Drop
+4151	Abyssal whip	3	|Wield|||Drop
+4153	Granite maul	3	|Wield|||Drop
+4156	Mirror shield	5	|Wield|||Drop
+4164	Facemask	0	|Wear|||Drop
+4168	Nose peg	0	|Wear|||Drop
+4170	Slayer's staff	3	|Wield|||Drop
+4202	Ring of Charos	12	|Wear|||Drop
+4250	Ghostspeak amulet	2	|Wear|||Drop
+4251	Ectophial	-1	Empty||||Drop
+4300	Ham robe	7	|Wear|||Drop
+4310	Ham boots	10	|Wear|||Drop
+4315	Team-1 cape	1	|Wear|||Drop
+4317	Team-2 cape	1	|Wear|||Drop
+4319	Team-3 cape	1	|Wear|||Drop
+4321	Team-4 cape	1	|Wear|||Drop
+4323	Team-5 cape	1	|Wear|||Drop
+4325	Team-6 cape	1	|Wear|||Drop
+4327	Team-7 cape	1	|Wear|||Drop
+4329	Team-8 cape	1	|Wear|||Drop
+4331	Team-9 cape	1	|Wear|||Drop
+4333	Team-10 cape	1	|Wear|||Drop
+4335	Team-11 cape	1	|Wear|||Drop
+4337	Team-12 cape	1	|Wear|||Drop
+4339	Team-13 cape	1	|Wear|||Drop
+4341	Team-14 cape	1	|Wear|||Drop
+4343	Team-15 cape	1	|Wear|||Drop
+4345	Team-16 cape	1	|Wear|||Drop
+4347	Team-17 cape	1	|Wear|||Drop
+4349	Team-18 cape	1	|Wear|||Drop
+4351	Team-19 cape	1	|Wear|||Drop
+4353	Team-20 cape	1	|Wear|||Drop
+4355	Team-21 cape	1	|Wear|||Drop
+4357	Team-22 cape	1	|Wear|||Drop
+4359	Team-23 cape	1	|Wear|||Drop
+4361	Team-24 cape	1	|Wear|||Drop
+4363	Team-25 cape	1	|Wear|||Drop
+4365	Team-26 cape	1	|Wear|||Drop
+4367	Team-27 cape	1	|Wear|||Drop
+4369	Team-28 cape	1	|Wear|||Drop
+4371	Team-29 cape	1	|Wear|||Drop
+4373	Team-30 cape	1	|Wear|||Drop
+4375	Team-31 cape	1	|Wear|||Drop
+4377	Team-32 cape	1	|Wear|||Drop
+4379	Team-33 cape	1	|Wear|||Drop
+4381	Team-34 cape	1	|Wear|||Drop
+4383	Team-35 cape	1	|Wear|||Drop
+4385	Team-36 cape	1	|Wear|||Drop
+4387	Team-37 cape	1	|Wear|||Drop
+4389	Team-38 cape	1	|Wear|||Drop
+4391	Team-39 cape	1	|Wear|||Drop
+4393	Team-40 cape	1	|Wear|||Drop
+4395	Team-41 cape	1	|Wear|||Drop
+4397	Team-42 cape	1	|Wear|||Drop
+4399	Team-43 cape	1	|Wear|||Drop
+4401	Team-44 cape	1	|Wear|||Drop
+4403	Team-45 cape	1	|Wear|||Drop
+4405	Team-46 cape	1	|Wear|||Drop
+4407	Team-47 cape	1	|Wear|||Drop
+4409	Team-48 cape	1	|Wear|||Drop
+4411	Team-49 cape	1	|Wear|||Drop
+4413	Team-50 cape	1	|Wear|||Drop
+4446	Steel key ring	-1	Check-keys||||Drop
+4585	Dragon plateskirt	7	|Wear|||Drop
+4587	Dragon scimitar	3	|Wield|||Drop
+4657	Ring of visibility	12	|Wear|||Destroy
+4675	Ancient staff	3	|Wield|||Drop
+4708	Ahrim's hood	0	|Wear|Check||Drop
+4710	Ahrim's staff	3	|Wield|Check||Drop
+4712	Ahrim's robetop	4	|Wear|Check||Drop
+4714	Ahrim's robeskirt	7	|Wear|Check||Drop
+4716	Dharok's helm	0	|Wear|Check||Drop
+4718	Dharok's greataxe	3	|Wield|Check||Drop
+4720	Dharok's platebody	4	|Wear|Check||Drop
+4722	Dharok's platelegs	7	|Wear|Check||Drop
+4724	Guthan's helm	0	|Wear|Check||Drop
+4726	Guthan's warspear	3	|Wield|Check||Drop
+4728	Guthan's platebody	4	|Wear|Check||Drop
+4730	Guthan's chainskirt	7	|Wear|Check||Drop
+4732	Karil's coif	0	|Wear|Check||Drop
+4734	Karil's crossbow	3	|Wield|Check||Drop
+4736	Karil's leathertop	4	|Wear|Check||Drop
+4738	Karil's leatherskirt	7	|Wear|Check||Drop
+4745	Torag's helm	0	|Wear|Check||Drop
+4747	Torag's hammers	3	|Wield|Check||Drop
+4749	Torag's platebody	4	|Wear|Check||Drop
+4751	Torag's platelegs	7	|Wear|Check||Drop
+4753	Verac's helm	0	|Wear|Check||Drop
+4755	Verac's flail	3	|Wield|Check||Drop
+4757	Verac's brassard	4	|Wear|Check||Drop
+4759	Verac's plateskirt	7	|Wear|Check||Drop
+4822	Mithril nails	-1	||||Drop
+4856	Ahrim's hood 100	0	|Wear|Check||Drop
+4857	Ahrim's hood 75	0	|Wear|Check||Drop
+4858	Ahrim's hood 50	0	|Wear|Check||Drop
+4859	Ahrim's hood 25	0	|Wear|Check||Drop
+4860	Ahrim's hood 0	0	||||Drop
+4862	Ahrim's staff 100	3	|Wield|Check||Drop
+4863	Ahrim's staff 75	3	|Wield|Check||Drop
+4864	Ahrim's staff 50	3	|Wield|Check||Drop
+4865	Ahrim's staff 25	3	|Wield|Check||Drop
+4866	Ahrim's staff 0	3	||||Drop
+4868	Ahrim's robetop 100	4	|Wear|Check||Drop
+4869	Ahrim's robetop 75	4	|Wear|Check||Drop
+4870	Ahrim's robetop 50	4	|Wear|Check||Drop
+4871	Ahrim's robetop 25	4	|Wear|Check||Drop
+4872	Ahrim's robetop 0	4	||||Drop
+4874	Ahrim's robeskirt 100	7	|Wear|Check||Drop
+4875	Ahrim's robeskirt 75	7	|Wear|Check||Drop
+4876	Ahrim's robeskirt 50	7	|Wear|Check||Drop
+4877	Ahrim's robeskirt 25	7	|Wear|Check||Drop
+4878	Ahrim's robeskirt 0	7	||||Drop
+4880	Dharok's helm 100	0	|Wear|Check||Drop
+4881	Dharok's helm 75	0	|Wear|Check||Drop
+4882	Dharok's helm 50	0	|Wear|Check||Drop
+4883	Dharok's helm 25	0	|Wear|Check||Drop
+4884	Dharok's helm 0	0	||||Drop
+4886	Dharok's greataxe 100	3	|Wield|Check||Drop
+4887	Dharok's greataxe 75	3	|Wield|Check||Drop
+4888	Dharok's greataxe 50	3	|Wield|Check||Drop
+4889	Dharok's greataxe 25	3	|Wield|Check||Drop
+4890	Dharok's greataxe 0	3	||||Drop
+4892	Dharok's platebody 100	4	|Wear|Check||Drop
+4893	Dharok's platebody 75	4	|Wear|Check||Drop
+4894	Dharok's platebody 50	4	|Wear|Check||Drop
+4895	Dharok's platebody 25	4	|Wear|Check||Drop
+4896	Dharok's platebody 0	4	||||Drop
+4898	Dharok's platelegs 100	7	|Wear|Check||Drop
+4899	Dharok's platelegs 75	7	|Wear|Check||Drop
+4900	Dharok's platelegs 50	7	|Wear|Check||Drop
+4901	Dharok's platelegs 25	7	|Wear|Check||Drop
+4902	Dharok's platelegs 0	7	||||Drop
+4904	Guthan's helm 100	0	|Wear|Check||Drop
+4905	Guthan's helm 75	0	|Wear|Check||Drop
+4906	Guthan's helm 50	0	|Wear|Check||Drop
+4907	Guthan's helm 25	0	|Wear|Check||Drop
+4908	Guthan's helm 0	0	||||Drop
+4910	Guthan's warspear 100	3	|Wield|Check||Drop
+4911	Guthan's warspear 75	3	|Wield|Check||Drop
+4912	Guthan's warspear 50	3	|Wield|Check||Drop
+4913	Guthan's warspear 25	3	|Wield|Check||Drop
+4914	Guthan's warspear 0	3	||||Drop
+4916	Guthan's platebody 100	4	|Wear|Check||Drop
+4917	Guthan's platebody 75	4	|Wear|Check||Drop
+4918	Guthan's platebody 50	4	|Wear|Check||Drop
+4919	Guthan's platebody 25	4	|Wear|Check||Drop
+4920	Guthan's platebody 0	4	||||Drop
+4922	Guthan's chainskirt 100	7	|Wear|Check||Drop
+4923	Guthan's chainskirt 75	7	|Wear|Check||Drop
+4924	Guthan's chainskirt 50	7	|Wear|Check||Drop
+4925	Guthan's chainskirt 25	7	|Wear|Check||Drop
+4926	Guthan's chainskirt 0	7	||||Drop
+4928	Karil's coif 100	0	|Wear|Check||Drop
+4929	Karil's coif 75	0	|Wear|Check||Drop
+4930	Karil's coif 50	0	|Wear|Check||Drop
+4931	Karil's coif 25	0	|Wear|Check||Drop
+4932	Karil's coif 0	0	||||Drop
+4934	Karil's crossbow 100	3	|Wield|Check||Drop
+4935	Karil's crossbow 75	3	|Wield|Check||Drop
+4936	Karil's crossbow 50	3	|Wield|Check||Drop
+4937	Karil's crossbow 25	3	|Wield|Check||Drop
+4938	Karil's crossbow 0	3	||||Drop
+4940	Karil's leathertop 100	4	|Wear|Check||Drop
+4941	Karil's leathertop 75	4	|Wear|Check||Drop
+4942	Karil's leathertop 50	4	|Wear|Check||Drop
+4943	Karil's leathertop 25	4	|Wear|Check||Drop
+4944	Karil's leathertop 0	4	||||Drop
+4946	Karil's leatherskirt 100	7	|Wear|Check||Drop
+4947	Karil's leatherskirt 75	7	|Wear|Check||Drop
+4948	Karil's leatherskirt 50	7	|Wear|Check||Drop
+4949	Karil's leatherskirt 25	7	|Wear|Check||Drop
+4950	Karil's leatherskirt 0	7	||||Drop
+4952	Torag's helm 100	0	|Wear|Check||Drop
+4953	Torag's helm 75	0	|Wear|Check||Drop
+4954	Torag's helm 50	0	|Wear|Check||Drop
+4955	Torag's helm 25	0	|Wear|Check||Drop
+4956	Torag's helm 0	0	||||Drop
+4958	Torag's hammers 100	3	|Wield|Check||Drop
+4959	Torag's hammers 75	3	|Wield|Check||Drop
+4960	Torag's hammers 50	3	|Wield|Check||Drop
+4961	Torag's hammers 25	3	|Wield|Check||Drop
+4962	Torag's hammers 0	3	||||Drop
+4964	Torag's platebody 100	4	|Wear|Check||Drop
+4965	Torag's platebody 75	4	|Wear|Check||Drop
+4966	Torag's platebody 50	4	|Wear|Check||Drop
+4967	Torag's platebody 25	4	|Wear|Check||Drop
+4968	Torag's platebody 0	4	||||Drop
+4970	Torag's platelegs 100	7	|Wear|Check||Drop
+4971	Torag's platelegs 75	7	|Wear|Check||Drop
+4972	Torag's platelegs 50	7	|Wear|Check||Drop
+4973	Torag's platelegs 25	7	|Wear|Check||Drop
+4974	Torag's platelegs 0	7	||||Drop
+4976	Verac's helm 100	0	|Wear|Check||Drop
+4977	Verac's helm 75	0	|Wear|Check||Drop
+4978	Verac's helm 50	0	|Wear|Check||Drop
+4979	Verac's helm 25	0	|Wear|Check||Drop
+4980	Verac's helm 0	0	||||Drop
+4982	Verac's flail 100	3	|Wield|Check||Drop
+4983	Verac's flail 75	3	|Wield|Check||Drop
+4984	Verac's flail 50	3	|Wield|Check||Drop
+4985	Verac's flail 25	3	|Wield|Check||Drop
+4986	Verac's flail 0	3	||||Drop
+4988	Verac's brassard 100	4	|Wear|Check||Drop
+4989	Verac's brassard 75	4	|Wear|Check||Drop
+4990	Verac's brassard 50	4	|Wear|Check||Drop
+4991	Verac's brassard 25	4	|Wear|Check||Drop
+4992	Verac's brassard 0	4	||||Drop
+4994	Verac's plateskirt 100	7	|Wear|Check||Drop
+4995	Verac's plateskirt 75	7	|Wear|Check||Drop
+4996	Verac's plateskirt 50	7	|Wear|Check||Drop
+4997	Verac's plateskirt 25	7	|Wear|Check||Drop
+4998	Verac's plateskirt 0	7	||||Drop
+5016	Bone spear	3	|Wield|||Drop
+5300	Snapdragon seed	-1	||||Drop
+5321	Watermelon seed	-1	||||Drop
+5521	Binding necklace	2	|Wear|Check||Destroy
+5525	Tiara	0	|Wear|||Drop
+5527	Air tiara	0	|Wear|||Drop
+5533	Body tiara	0	|Wear|||Drop
+5541	Nature tiara	0	|Wear|||Drop
+5547	Death tiara	0	|Wear|||Drop
+5667	Rune knife(p++)	3	|Wield|||Drop
+5743	Greenman's ale(m)	-1	Drink||||Drop
+5982	Watermelon	-1	|||Eat|Drop
+6135	Spined chaps	7	|Wear|||Drop
+6317	Red topaz machete	3	|Wield|||Drop
+6324	Snakeskin chaps	7	|Wear|||Drop
+6328	Snakeskin boots	10	|Wear|||Drop
+6392	Menaphite purple hat	0	|Wear|||Drop
+6394	Menaphite purple top	4	|Wear|||Drop
+6396	Menaphite purple robe	7	|Wear|||Drop
+6397	null	-1	||||Drop
+6398	Menaphite purple kilt	7	|Wear|||Drop
+6400	Menaphite red hat	0	|Wear|||Drop
+6402	Menaphite red top	4	|Wear|||Drop
+6404	Menaphite red robe	7	|Wear|||Drop
+6405	null	-1	||||Drop
+6406	Menaphite red kilt	7	|Wear|||Drop
+6465	Ring of Charos(a)	12	|Wear|||Destroy
+6522	Toktz-xil-ul	3	|Wield|||Drop
+6524	Toktz-ket-xil	5	|Wield|||Drop
+6528	Tzhaar-ket-om	3	|Wield|||Drop
+6568	Obsidian cape	1	|Wear|||Drop
+6570	Fire cape	1	|Wear|||Drop
+6707	Camulet	2	|Wear|Check-charge|Rub|Drop
+6724	Seercull	3	|Wield|||Drop
+6735	Warrior ring	12	|Wear|||Drop
+6739	Dragon axe	3	|Wield|||Drop
+6746	Darklight	3	|Wield|||Drop
+6762	Saradomin mjolnir	3	|Wield|||Drop
+7112	Pirate bandana	0	|Wear|||Drop
+7124	Pirate bandana	0	|Wear|||Drop
+7130	Pirate bandana	0	|Wear|||Drop
+7136	Pirate bandana	0	|Wear|||Drop
+7158	Dragon 2h sword	3	|Wield|||Drop
+7159	Insulated boots	10	|Wear|||Drop
+7319	Red boater	0	|Wear|||Drop
+7321	Orange boater	0	|Wear|||Drop
+7323	Green boater	0	|Wear|||Drop
+7325	Blue boater	0	|Wear|||Drop
+7327	Black boater	0	|Wear|||Drop
+7336	Rune shield (h1)	5	|Wear|||Drop
+7342	Rune shield (h2)	5	|Wear|||Drop
+7348	Rune shield (h3)	5	|Wear|||Drop
+7354	Rune shield (h4)	5	|Wear|||Drop
+7360	Rune shield (h5)	5	|Wear|||Drop
+7409	Magic secateurs	3	|Wield|||Drop
+7445	Rolling pin	3	|Wield|||Drop
+7462	Barrows gloves	9	|Wear|||Drop
+7534	Fishbowl helmet	0	|Wear|||Drop
+7535	Diving apparatus	1	|Wear|||Drop
+7537	Crab claw	9	|Wear|||Drop
+7539	Crab helmet	0	|Wear|||Drop
+7936	Pure essence	-1	||||Drop
+8780	Teak plank	-1	||||Drop
+8794	Saw	3	||||Drop
+8842	Void knight gloves	9	|Wear|||Drop
+8851	Warrior guild token	-1	||||Drop
+8872	Bone dagger	3	|Wield|||Drop
+9044	Pharaoh's sceptre	3	Convert||||Drop
+9045	Pharaoh's sceptre	3	||||Drop
+9046	Pharaoh's sceptre	3	Convert||||Drop
+9047	Pharaoh's sceptre	3	||||Drop
+9048	Pharaoh's sceptre	3	Convert||||Drop
+9049	Pharaoh's sceptre	3	||||Drop
+9050	Pharaoh's sceptre	3	Convert||||Drop
+9051	Pharaoh's sceptre	3	||||Drop
+9185	Rune crossbow	3	|Wield|||Drop
+9674	Proselyte hauberk	4	|Wear|||Drop
+9731	Mind shield	5	|Wield|||Drop
+9765	Runecraft cape	1	|Wear|||Drop
+9766	Runecraft cape(t)	1	|Wear|||Drop
+9771	Agility cape	1	|Wear|Stamina Boost||Drop
+9772	Agility cape(t)	1	|Wear|Stamina Boost||Drop
+9790	Construct. cape(t)	1	|Wear|Teleport|Tele to POH|Drop
+9801	Cooking cape	1	|Wear|||Drop
+9802	Cooking cape(t)	1	|Wear|||Drop
+10006	Bird snare	-1	Lay||||Drop
+10008	Box trap	-1	Lay||||Drop
+10010	Insect net	3	|Wield|Check totals||Drop
+10012	Butterfly jar	-1	||||Drop
+10029	Teasing stick	3	||||Drop
+10034	Red chinchompa	3	|Wield|||Drop
+10069	Spotted cape	1	|Wear|||Drop
+10073	Spotted cape	1	|Wear|||Drop
+10148	Black salamander	3	|Wield|||Release
+10150	Noose wand	3	|Wield|||Drop
+10284	Magic comp bow	3	|Wield|||Drop
+10286	Rune helm (h1)	0	|Wear|||Drop
+10287	null	-1	||||Drop
+10288	Rune helm (h2)	0	|Wear|||Drop
+10289	null	-1	||||Drop
+10290	Rune helm (h3)	0	|Wear|||Drop
+10291	null	-1	||||Drop
+10292	Rune helm (h4)	0	|Wear|||Drop
+10293	null	-1	||||Drop
+10294	Rune helm (h5)	0	|Wear|||Drop
+10316	Bob's red shirt	4	|Wear|||Drop
+10317	null	-1	||||Drop
+10318	Bob's blue shirt	4	|Wear|||Drop
+10319	null	-1	||||Drop
+10320	Bob's green shirt	4	|Wear|||Drop
+10321	null	-1	||||Drop
+10322	Bob's black shirt	4	|Wear|||Drop
+10323	null	-1	||||Drop
+10324	Bob's purple shirt	4	|Wear|||Drop
+10384	Saradomin bracers	9	|Wear|||Drop
+10386	Saradomin d'hide body	4	|Wear|||Drop
+10388	Saradomin chaps	7	|Wear|||Drop
+10390	Saradomin coif	0	|Wear|||Drop
+10394	Flared trousers	7	|Wear|||Drop
+10440	Saradomin crozier	3	|Wield|||Drop
+10441	null	-1	||||Drop
+10442	Guthix crozier	3	|Wield|||Drop
+10443	null	-1	||||Drop
+10444	Zamorak crozier	3	|Wield|||Drop
+10446	Saradomin cloak	1	|Wear|||Drop
+10452	Saradomin mitre	0	|Wear|||Drop
+10454	Guthix mitre	0	|Wear|||Drop
+10456	Zamorak mitre	0	|Wear|||Drop
+10458	Saradomin robe top	4	|Wear|||Drop
+10464	Saradomin robe legs	7	|Wear|||Drop
+10470	Saradomin stole	2	|Wear|||Drop
+10472	Guthix stole	2	|Wear|||Drop
+10474	Zamorak stole	2	|Wear|||Drop
+10588	Salve amulet (e)	2	|Wear|||Drop
+10595	Clockwork suit	-1	Wind||||Destroy
+10596	Clockwork suit	-1	|||Release|Destroy
+10828	Helm of Neitiznot	0	|Wear|||Drop
+10858	Shadow sword	3	|Wield|||Destroy
+10887	Barrelchest anchor	3	|Wield|||Destroy
+10933	Lumberjack boots	10	|Wear|||Drop
+10939	Lumberjack top	4	|Wear|||Drop
+10940	Lumberjack legs	7	|Wear|||Drop
+10941	Lumberjack hat	0	|Wear|||Drop
+10973	Light orb	-1	||||Drop
+10981	Cave goblin wire	-1	||||Drop
+11037	Brine sabre	3	|Wield|||Drop
+11079	Castle wars bracelet(3)	9	|Wear|||Drop
+11080	null	-1	||||Drop
+11081	Castle wars bracelet(2)	9	|Wear|||Drop
+11082	null	-1	||||Drop
+11083	Castle wars bracelet(1)	9	|Wear|||Drop
+11085	Ruby bracelet	9	|Wear|||Drop
+11090	Phoenix necklace	2	|Wear|||Drop
+11092	Diamond bracelet	9	|Wear|||Drop
+11115	Dragonstone bracelet	9	|Wear|||Drop
+11118	Combat bracelet(4)	9	|Wear||Rub|Drop
+11119	null	-1	||||Drop
+11120	Combat bracelet(3)	9	|Wear||Rub|Drop
+11121	null	-1	||||Drop
+11122	Combat bracelet(2)	9	|Wear||Rub|Drop
+11123	null	-1	||||Drop
+11124	Combat bracelet(1)	9	|Wear||Rub|Drop
+11125	null	-1	||||Drop
+11126	Combat bracelet	9	|Wear||Rub|Drop
+11230	Dragon dart	3	|Wield|||Drop
+11260	Impling jar	-1	||||Drop
+11283	Dragonfire shield	5	|Wield|Inspect|Empty|Drop
+11334	Fish offcuts	-1	||||Drop
+11664	Void ranger helm	0	|Wear|||Drop
+11804	Bandos godsword	3	|Wield|Dismantle||Drop
+11806	Saradomin godsword	3	|Wield|Dismantle||Drop
+11808	Zamorak godsword	3	|Wield|Dismantle||Drop
+11826	Armadyl helmet	0	|Wear|||Drop
+11836	Bandos boots	10	|Wear|||Drop
+11838	Saradomin sword	3	|Wield|||Drop
+11840	Dragon boots	10	|Wear|||Drop
+11849	Mark of Grace	-1	||||Drop
+11850	Graceful hood	0	|Wear|||Drop
+11851	Graceful hood	0	|Wear|||Drop
+11852	Graceful cape	1	|Wear|||Drop
+11853	Graceful cape	1	|Wear|||Drop
+11854	Graceful top	4	|Wear|||Drop
+11855	Graceful top	4	|Wear|||Drop
+11856	Graceful legs	7	|Wear|||Drop
+11857	Graceful legs	7	|Wear|||Drop
+11858	Graceful gloves	9	|Wear|||Drop
+11859	Graceful gloves	9	|Wear|||Drop
+11860	Graceful boots	10	|Wear|||Drop
+11861	Graceful boots	10	|Wear|||Drop
+11864	Slayer helmet	0	|Wear|Check|Disassemble|Drop
+11865	Slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+11891	Saradomin banner	3	|Equip|||Drop
+11920	Dragon pickaxe	3	|Wield|||Drop
+11943	Lava dragon bones	-1	Bury||||Drop
+11959	Black chinchompa	3	|Wield|||Drop
+11972	Combat bracelet(6)	9	|Wear||Rub|Drop
+11974	Combat bracelet(5)	9	|Wear||Rub|Drop
+11976	Amulet of glory(5)	2	|Wear||Rub|Drop
+11978	Amulet of glory(6)	2	|Wear||Rub|Drop
+11980	Ring of wealth (5)	12	|Wear|Features|Rub|Drop
+11982	Ring of wealth (4)	12	|Wear|Features|Rub|Drop
+11984	Ring of wealth (3)	12	|Wear|Features|Rub|Drop
+11986	Ring of wealth (2)	12	|Wear|Features|Rub|Drop
+11988	Ring of wealth (1)	12	|Wear|Features|Rub|Drop
+12006	Abyssal tentacle	3	|Wield||Check|Dissolve
+12013	Prospector helmet	0	|Wear|||Drop
+12014	Prospector jacket	4	|Wear|||Drop
+12015	Prospector legs	7	|Wear|||Drop
+12016	Prospector boots	10	|Wear|||Drop
+12018	Salve amulet(ei)	2	|Wear||Uncharge|Drop
+12199	Ancient crozier	3	|Wield|||Drop
+12201	Ancient stole	2	|Wear|||Drop
+12203	Ancient mitre	0	|Wear|||Drop
+12257	Armadyl stole	2	|Wear|||Drop
+12259	Armadyl mitre	0	|Wear|||Drop
+12263	Armadyl crozier	3	|Wield|||Drop
+12269	Bandos stole	2	|Wear|||Drop
+12271	Bandos mitre	0	|Wear|||Drop
+12273	Bandos cloak	1	|Wear|||Drop
+12275	Bandos crozier	3	|Wield|||Drop
+12297	Black pickaxe	3	|Wield|||Drop
+12299	White headband	0	|Wear|||Drop
+12300	null	-1	||||Drop
+12301	Blue headband	0	|Wear|||Drop
+12302	null	-1	||||Drop
+12303	Gold headband	0	|Wear|||Drop
+12304	null	-1	||||Drop
+12305	Pink headband	0	|Wear|||Drop
+12306	null	-1	||||Drop
+12307	Green headband	0	|Wear|||Drop
+12309	Pink boater	0	|Wear|||Drop
+12311	Purple boater	0	|Wear|||Drop
+12313	White boater	0	|Wear|||Drop
+12414	Dragon chainbody (g)	4	|Wear|||Dismantle
+12416	Dragon plateskirt (g)	7	|Wear|||Dismantle
+12418	Dragon sq shield (g)	5	|Wield|||Dismantle
+12480	Bandos platebody	4	|Wear|||Drop
+12524	Black dragon mask	0	|Wear|||Drop
+12608	Book of War	5	|Wield|Preach||Drop
+12610	Book of Law	5	|Wield|Preach||Drop
+12612	Book of Darkness	5	|Wield|Preach||Drop
+12629	Stamina potion(2)	-1	Drink|||Empty|Drop
+12637	Saradomin halo	0	|Wear|||Drop
+12658	Iban's staff (u)	3	|Wield||Check|Drop
+12691	Tyrannical ring (i)	12	|Wear|Uncharge||Drop
+12773	Volcanic abyssal whip	3	|Wield|||Drop
+12774	Frozen abyssal whip	3	|Wield|||Drop
+12785	Ring of wealth (i)	12	|Wear|Features|Rub|Drop
+12788	Magic shortbow (i)	3	|Wield|||Drop
+12797	Dragon pickaxe	3	|Wield|||Revert
+12809	Saradomin's blessed sword	3	|Wield|Check||Revert
+12821	Spectral spirit shield	5	|Wield|||Drop
+12851	Amulet of the Damned (full)	2	|Wear|||Drop
+12853	Amulet of the Damned	2	|Wear||Check|Destroy
+12926	Toxic blowpipe	3	|Wield|Check|Unload|Uncharge
+12934	Zulrah's scales	-1	||||Drop
+12954	Dragon defender	5	|Wield|||Drop
+13068	Quest point cape (t)	1	|Wear|Teleport|Untrim|Drop
+13069	Achievement diary cape (t)	1	|Wear|Teleport|Untrim|Drop
+13072	Elite void top	4	|Wear|||Drop
+13073	Elite void robe	7	|Wear|||Drop
+13074	Pharaoh's sceptre	3	Convert||||Drop
+13075	Pharaoh's sceptre	3	Convert||||Drop
+13076	Pharaoh's sceptre	3	Convert||||Drop
+13077	Pharaoh's sceptre	3	Convert||||Drop
+13078	Pharaoh's sceptre	3	Convert||||Drop
+13103	Karamja gloves 4	9	|Wear|Gem Mine|Slayer Master|Drop
+13106	Varrock armour 3	4	|Wear|||Drop
+13107	Varrock armour 4	4	|Wear|||Drop
+13111	Wilderness sword 4	3	|Wield|Teleport||Drop
+13113	Morytania legs 2	7	|Wear|Ecto Teleport||Drop
+13114	Morytania legs 3	7	|Wear|Ecto Teleport|Burgh Teleport|Drop
+13115	Morytania legs 4	7	|Wear|Ecto Teleport|Burgh Teleport|Drop
+13120	Falador shield 4	5	|Wear|Recharge-prayer|Check|Drop
+13124	Ardougne cloak 4	1	|Wear|Monastery Teleport|Farm Teleport|Drop
+13128	Explorer's ring 4	12	Wear|Check|Teleport|Functions|Drop
+13132	Fremennik sea boots 4	10	|Wear|Teleport||Drop
+13136	Desert amulet 4	2	|Wear|Nardah|Kalphite cave|Drop
+13140	Kandarin headgear 4	0	|Wear|Teleport||Drop
+13144	Western banner 4	3	|Wield|Teleport||Drop
+13222	Music cape(t)	1	|Wear|Teleport|Untrim|Drop
+13239	Primordial boots	10	|Wear|||Drop
+13241	Infernal axe	3	|Wield|Check|Toggle|Drop
+13242	Infernal axe (uncharged)	3	|Wield|Toggle||Drop
+13243	Infernal pickaxe	3	|Wield|Check|Toggle|Drop
+13244	Infernal pickaxe (uncharged)	3	|Wield|Toggle||Drop
+13258	Angler hat	0	|Wear|||Drop
+13259	Angler top	4	|Wear|||Drop
+13260	Angler waders	7	|Wear|||Drop
+13261	Angler boots	10	|Wear|||Drop
+13280	Max cape	1	Wear|Teleports|Spellbook|Features|Drop
+13329	Fire max cape	1	|Wear|||Drop
+13331	Saradomin max cape	1	|Wear|||Drop
+13332	Saradomin max hood	0	|Wear|||Drop
+13333	Zamorak max cape	1	|Wear|||Drop
+13340	Agility cape	1	|Wear|Stamina Boost||Drop
+13341	Agility cape(t)	1	|Wear|Stamina Boost||Drop
+13342	Max cape	1	Wear|Teleports|POH Portals|Features|Drop
+13354	Lovakite bar	-1	||||Drop
+13381	Shayzien body (5)	4	|Wear|||Drop
+13431	Sandworms	-1	||||Drop
+13439	Raw anglerfish	-1	||||Drop
+13446	Dark essence block	-1	||||Drop
+13579	Graceful hood	0	|Wear|||Drop
+13580	Graceful hood	0	|Wear|||Drop
+13581	Graceful cape	1	|Wear|||Drop
+13582	Graceful cape	1	|Wear|||Drop
+13583	Graceful top	4	|Wear|||Drop
+13584	Graceful top	4	|Wear|||Drop
+13585	Graceful legs	7	|Wear|||Drop
+13586	Graceful legs	7	|Wear|||Drop
+13587	Graceful gloves	9	|Wear|||Drop
+13588	Graceful gloves	9	|Wear|||Drop
+13589	Graceful boots	10	|Wear|||Drop
+13590	Graceful boots	10	|Wear|||Drop
+13591	Graceful hood	0	|Wear|||Drop
+13592	Graceful hood	0	|Wear|||Drop
+13593	Graceful cape	1	|Wear|||Drop
+13594	Graceful cape	1	|Wear|||Drop
+13595	Graceful top	4	|Wear|||Drop
+13596	Graceful top	4	|Wear|||Drop
+13597	Graceful legs	7	|Wear|||Drop
+13598	Graceful legs	7	|Wear|||Drop
+13599	Graceful gloves	9	|Wear|||Drop
+13600	Graceful gloves	9	|Wear|||Drop
+13601	Graceful boots	10	|Wear|||Drop
+13602	Graceful boots	10	|Wear|||Drop
+13603	Graceful hood	0	|Wear|||Drop
+13604	Graceful hood	0	|Wear|||Drop
+13605	Graceful cape	1	|Wear|||Drop
+13606	Graceful cape	1	|Wear|||Drop
+13607	Graceful top	4	|Wear|||Drop
+13608	Graceful top	4	|Wear|||Drop
+13609	Graceful legs	7	|Wear|||Drop
+13610	Graceful legs	7	|Wear|||Drop
+13611	Graceful gloves	9	|Wear|||Drop
+13612	Graceful gloves	9	|Wear|||Drop
+13613	Graceful boots	10	|Wear|||Drop
+13614	Graceful boots	10	|Wear|||Drop
+13615	Graceful hood	0	|Wear|||Drop
+13616	Graceful hood	0	|Wear|||Drop
+13617	Graceful cape	1	|Wear|||Drop
+13618	Graceful cape	1	|Wear|||Drop
+13619	Graceful top	4	|Wear|||Drop
+13620	Graceful top	4	|Wear|||Drop
+13621	Graceful legs	7	|Wear|||Drop
+13622	Graceful legs	7	|Wear|||Drop
+13623	Graceful gloves	9	|Wear|||Drop
+13624	Graceful gloves	9	|Wear|||Drop
+13625	Graceful boots	10	|Wear|||Drop
+13626	Graceful boots	10	|Wear|||Drop
+13627	Graceful hood	0	|Wear|||Drop
+13628	Graceful hood	0	|Wear|||Drop
+13629	Graceful cape	1	|Wear|||Drop
+13630	Graceful cape	1	|Wear|||Drop
+13631	Graceful top	4	|Wear|||Drop
+13632	Graceful top	4	|Wear|||Drop
+13633	Graceful legs	7	|Wear|||Drop
+13634	Graceful legs	7	|Wear|||Drop
+13635	Graceful gloves	9	|Wear|||Drop
+13636	Graceful gloves	9	|Wear|||Drop
+13637	Graceful boots	10	|Wear|||Drop
+13638	Graceful boots	10	|Wear|||Drop
+13646	Farmer's strawhat	0	|Wear|||Drop
+13647	Farmer's strawhat	0	|Wear|||Drop
+13652	Dragon claws	3	|Wield|||Drop
+13660	Chronicle	5	|Wield|Teleport|Check charges|Destroy
+13667	Graceful hood	0	|Wear|||Drop
+13668	Graceful hood	0	|Wear|||Drop
+13669	Graceful cape	1	|Wear|||Drop
+13670	Graceful cape	1	|Wear|||Drop
+13671	Graceful top	4	|Wear|||Drop
+13672	Graceful top	4	|Wear|||Drop
+13673	Graceful legs	7	|Wear|||Drop
+13674	Graceful legs	7	|Wear|||Drop
+13675	Graceful gloves	9	|Wear|||Drop
+13676	Graceful gloves	9	|Wear|||Drop
+13677	Graceful boots	10	|Wear|||Drop
+13678	Graceful boots	10	|Wear|||Drop
+16176	Pharaoh's sceptre	3	||||Drop
+19476	Achievement diary cape	1	|Wear|Teleport|Trim|Drop
+19481	Heavy ballista	3	|Wield|||Drop
+19525	Kruk monkey greegree	3	|Hold|||Drop
+19639	Black slayer helmet	0	|Wear|Check|Disassemble|Drop
+19641	Black slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+19643	Green slayer helmet	0	|Wear|Check|Disassemble|Drop
+19645	Green slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+19647	Red slayer helmet	0	|Wear|Check|Disassemble|Drop
+19649	Red slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+19669	Redwood logs	-1	||||Drop
+19675	Arclight	3	|Wield|Check||Drop
+19720	Occult necklace (or)	2	|Wear|||Dismantle
+19722	Dragon defender (t)	5	|Wield|||Dismantle
+19933	Saradomin d'hide boots	10	|Wear|||Drop
+19936	Zamorak d'hide boots	10	|Wear|||Drop
+19941	Heavy casket	3	|Wield|Open||Drop
+20011	3rd Age axe	3	|Wield|||Drop
+20014	3rd Age pickaxe	3	|Wield|||Drop
+20205	Golden chef's hat	0	|Wear|||Drop
+20211	Team cape zero	1	|Wear|||Drop
+20214	Team cape x	1	|Wear|||Drop
+20217	Team cape i	1	|Wear|||Drop
+20223	Unholy blessing	13	|Equip|||Drop
+20232	War blessing	13	|Equip|||Drop
+20249	Clueless scroll	3	|Wield|Read||Drop
+20370	Bandos godsword (or)	3	|Wield|||Dismantle
+20372	Saradomin godsword (or)	3	|Wield|||Dismantle
+20374	Zamorak godsword (or)	3	|Wield|||Dismantle
+20657	Ring of suffering (ri)	12	|Wear|Uncharge|Check|Recoil settings
+20706	Pyromancer robe	7	|Wear|||Drop
+20714	Tome of Fire	5	|Wield|Check|Pages|Drop
+20786	Ring of wealth (i5)	12	|Wear|Features|Rub|Drop
+20787	Ring of wealth (i4)	12	|Wear|Features|Rub|Drop
+20788	Ring of wealth (i3)	12	|Wear|Features|Rub|Drop
+20789	Ring of wealth (i2)	12	|Wear|Features|Rub|Drop
+20790	Ring of wealth (i1)	12	|Wear|Features|Rub|Drop
+21000	Twisted buckler	5	|Wear|||Drop
+21003	Elder maul	3	|Wield|||Drop
+21006	Kodai wand	3	|Wield|||Drop
+21024	Ancestral robe bottom	7	|Wear|||Drop
+21031	Infernal harpoon	3	|Wield|Check|Toggle|Drop
+21061	Graceful hood	0	|Wear|||Drop
+21063	Graceful hood	0	|Wear|||Drop
+21064	Graceful cape	1	|Wear|||Drop
+21066	Graceful cape	1	|Wear|||Drop
+21067	Graceful top	4	|Wear|||Drop
+21069	Graceful top	4	|Wear|||Drop
+21070	Graceful legs	7	|Wear|||Drop
+21072	Graceful legs	7	|Wear|||Drop
+21073	Graceful gloves	9	|Wear|||Drop
+21075	Graceful gloves	9	|Wear|||Drop
+21076	Graceful boots	10	|Wear|||Drop
+21078	Graceful boots	10	|Wear|||Drop
+21123	Topaz bracelet	9	|Wear|||Drop
+21146	Necklace of passage(5)	2	|Wear||Rub|Drop
+21149	Necklace of passage(4)	2	|Wear||Rub|Drop
+21151	Necklace of passage(3)	2	|Wear||Rub|Drop
+21153	Necklace of passage(2)	2	|Wear||Rub|Drop
+21155	Necklace of passage(1)	2	|Wear||Rub|Drop
+21166	Burning amulet(5)	2	|Wear||Rub|Drop
+21169	Burning amulet(4)	2	|Wear||Rub|Drop
+21171	Burning amulet(3)	2	|Wear||Rub|Drop
+21173	Burning amulet(2)	2	|Wear||Rub|Drop
+21177	Expeditious bracelet	9	|Wear|Check|Break|Drop
+21183	Bracelet of slaughter	9	|Wear|Check|Break|Drop
+21198	Lava battlestaff	3	|Wield|||Revert
+21264	Purple slayer helmet	0	|Wear|Check|Disassemble|Drop
+21266	Purple slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+21268	Slayer ring (eternal)	12	Wear|Rub|Teleport|Check|Drop
+21276	Skull sceptre (i)	3	|Wield|Invoke|Divine|Drop
+21285	Infernal max cape	1	|Wear|||Drop
+21295	Infernal cape	1	|Wear|||Drop
+21389	Master scroll book	-1	Teleport||Open|Remove default|Drop
+21445	Pharaoh's sceptre	3	||||Drop
+21446	Pharaoh's sceptre	3	||||Drop
+21555	Numulite	-1	||||Drop
+21723	Diving apparatus	1	||||Drop
+21733	Guardian boots	10	|Wear|||Drop
+21776	Imbued Saradomin max cape	1	|Wear|||Drop
+21778	Imbued Saradomin max hood	0	|Wear|||Drop
+21791	Imbued Saradomin cape	1	|Wear|||Drop
+21793	Imbued Guthix cape	1	|Wear|||Drop
+21795	Imbued Zamorak cape	1	|Wear|||Drop
+21802	Revenant cave teleport	-1	||Teleport|Config|Drop
+21888	Turquoise slayer helmet	0	|Wear|Check|Disassemble|Drop
+21890	Turquoise slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+22109	Ava's assembler	1	|Wear||Commune|Drop
+22234	Dragon boots (g)	10	|Wear|||Dismantle
+22322	Avernic defender	5	|Wield||Dismantle|Drop
+22323	Sanguinesti staff	3	|Wield|Check|Charge|Uncharge
+22325	Scythe of Vitur	3	|Wield|Check|Uncharge|Drop
+22326	Justiciar faceguard	0	|Wear|||Drop
+22327	Justiciar chestguard	4	|Wear|||Drop
+22328	Justiciar legguards	7	|Wear|||Drop
+22368	Bryophyta's staff (uncharged)	3	|Wield|Check||Drop
+22369	null	-1	||||Drop
+22370	Bryophyta's staff	3	|Wield|Check|Uncharge|Drop
+22400	Drakan's medallion	2	Wear|Teleport|||Drop
+22557	Amulet of avarice	2	|Wear|||Drop
+22603	Basalt	-1	||||Drop
+22675	Scroll sack	1	|Wear|||Destroy
+22816	Cormorant's glove	3	|Wear|||Drop
+22817	Cormorant's glove	3	|Wear|||Drop
+22846	Pearl fishing rod	3	|Wield|||Drop
+22947	Rada's blessing 4	13	|Equip|Kourend Woodland|Mount Karuulm|Drop
+22954	Devout boots	10	|Wear|||Dismantle
+22978	Dragon hunter lance	3	|Wield|||Drop
+22981	Ferocious gloves	9	|Wear|||Drop
+22986	Bonecrusher necklace	2	|Wear|Activity|Check/Uncharge|Dismantle
+23073	Hydra slayer helmet	0	|Wear|Check|Disassemble|Drop
+23075	Hydra slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+23191	Saradomin d'hide shield	5	|Wield|||Drop
+23276	Gilded pickaxe	3	|Wield|||Drop
+23279	Gilded axe	3	|Wield|||Drop
+23294	Demon feet	10	|Wear|||Drop
+23413	Climbing boots (g)	10	|Wear|||Drop
+23458	Enchanted lyre(i)	3	Play|Equip|||Drop
+23607	Imbued Saradomin cape	1	|Wear|||Drop
+23673	Crystal axe	3	|Wield|Check|Revert|Drop
+23675	Crystal axe (inactive)	3	|Wield||Revert|Drop
+23677	Dragon pickaxe (or)	3	|Wield|||Revert
+23680	Crystal pickaxe	3	|Wield|Check|Revert|Drop
+23682	Crystal pickaxe (inactive)	3	|Wield||Revert|Drop
+23946	Eternal teleport crystal	-1	Lletya|Prifddinas|Toggle||Drop
+23983	Crystal bow	3	|Wield|Check|Revert|Drop
+23987	Crystal halberd	3	|Wield|Check|Revert|Drop
+23991	Crystal shield	5	|Wield|Check|Revert|Drop
+24123	Crystal bow	3	|Wield|Check|Revert|Drop
+24133	Infernal max cape (l)	1	|Wear|||Drop
+24134	Fire max cape (l)	1	|Wear|||Drop
+24143	Dragon defender (l)	5	|Wield|||Drop
+24169	Saradomin halo (l)	0	|Wear|||Drop
+24175	Fighter torso (l)	4	|Wear|||Drop
+24186	Avernic defender (l)	5	|Wield||Dismantle|Drop
+24223	Fire cape (l)	1	|Wear|||Drop
+24224	Infernal cape (l)	1	|Wear|||Drop
+24232	Imbued Saradomin max cape (l)	1	|Wear|||Drop
+24248	Imbued Saradomin cape (l)	1	|Wear|||Drop
+24266	V's shield	5	|Wield|||Drop
+24362	Scroll box (easy)	-1	Open||||Drop
+24370	Twisted slayer helmet	0	|Wear|Check|Disassemble|Drop
+24419	Inquisitor's great helm	0	|Wear|||Drop
+24420	Inquisitor's hauberk	4	|Wear|||Drop
+24421	Inquisitor's plateskirt	7	|Wear|||Drop
+24423	Harmonised Nightmare staff	3	|Wield||Dismantle|Drop
+24444	Twisted slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+24664	Twisted ancestral hat	0	|Wear|||Dismantle
+24666	Twisted ancestral robe top	4	|Wear|||Dismantle
+24704	Daeyalt essence	-1	||||Drop
+24736	Ring of endurance	12	|Wear||Check|Uncharge
+24738	Strange old lockpick	-1	|||Inspect|Drop
+24743	Graceful hood	0	|Wear|||Drop
+24745	Graceful hood	0	|Wear|||Drop
+24746	Graceful cape	1	|Wear|||Drop
+24748	Graceful cape	1	|Wear|||Drop
+24749	Graceful top	4	|Wear|||Drop
+24751	Graceful top	4	|Wear|||Drop
+24752	Graceful legs	7	|Wear|||Drop
+24754	Graceful legs	7	|Wear|||Drop
+24755	Graceful gloves	9	|Wear|||Drop
+24757	Graceful gloves	9	|Wear|||Drop
+24758	Graceful boots	10	|Wear|||Drop
+24760	Graceful boots	10	|Wear|||Drop
+24780	Amulet of blood fury	2	|Wear||Check|Revert
+24855	Mythical max cape	1	|Wear|Teleport||Drop
+25063	Infernal pickaxe (or)	3	Wield|Check|Revert|Options|Drop
+25066	Infernal axe (or)	3	Wield|Check|Revert|Options|Drop
+25069	Graceful hood	0	|Wear|||Dismantle
+25071	Graceful hood	0	|Wear|||Drop
+25072	Graceful cape	1	|Wear|||Dismantle
+25074	Graceful cape	1	|Wear|||Drop
+25075	Graceful top	4	|Wear|||Dismantle
+25077	Graceful top	4	|Wear|||Drop
+25078	Graceful legs	7	|Wear|||Dismantle
+25080	Graceful legs	7	|Wear|||Drop
+25081	Graceful gloves	9	|Wear|||Dismantle
+25083	Graceful gloves	9	|Wear|||Drop
+25084	Graceful boots	10	|Wear|||Dismantle
+25086	Graceful boots	10	|Wear|||Drop
+25110	Echo axe	3	|Wield|Toggle||Destroy
+25112	Echo pickaxe	3	|Wield|Toggle||Destroy
+25177	Slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25179	Black slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25181	Green slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25183	Red slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25185	Purple slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25187	Turquoise slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25189	Hydra slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25191	Twisted slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25369	Infernal pickaxe (uncharged)	3	Wield||Revert|Options|Drop
+25371	Infernal axe (uncharged)	3	Wield||Revert|Options|Drop
+25376	Dragon pickaxe (or)	3	Wield||Revert|Change-Style|Drop
+25378	Dragon axe (or)	3	Wield||Revert|Change-Style|Drop
+25404	Bloodbark body	4	|Wear|||Drop
+25410	Bloodbark boots	10	|Wear|||Drop
+25413	Bloodbark helm	0	|Wear|||Drop
+25416	Bloodbark legs	7	|Wear|||Drop
+25424	Gold key red	-1	||||Drop
+25545	Celestial signet	12	Wear|Check|Charge||Uncharge
+25549	Golden prospector helmet	0	|Wear|||Drop
+25551	Golden prospector jacket	4	|Wear|||Drop
+25553	Golden prospector legs	7	|Wear|||Drop
+25555	Golden prospector boots	10	|Wear|||Drop
+25592	Spirit angler headband	0	|Wear|||Drop
+25594	Spirit angler top	4	|Wear|||Drop
+25596	Spirit angler waders	7	|Wear|||Drop
+25598	Spirit angler boots	10	|Wear|||Drop
+25644	Imcando hammer	3	|Wield|Swap||Drop
+25818	Book of the Dead	5	Wield|Reminisce|Read|Check|Destroy
+25849	Amethyst dart	3	|Wield|||Drop
+25865	Bow of Faerdhinen	3	|Wield|Check|Uncharge|Drop
+25867	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25869	Bow of Faerdhinen (c)	-1	||||Drop
+25884	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25886	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25888	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25890	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25892	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25894	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25896	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+25898	Tztok slayer helmet	0	|Wear|Check|Disassemble|Drop
+25900	Tztok slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25902	Tztok slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25904	Vampyric slayer helmet	0	|Wear|Check|Disassemble|Drop
+25906	Vampyric slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25908	Vampyric slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25910	Tzkal slayer helmet	0	|Wear|Check|Disassemble|Drop
+25912	Tzkal slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25914	Tzkal slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+25932	Ghommal's hilt 4	5	|Wield|Trollheim|Mor Ul Rek|Drop
+25975	Lightbearer	12	|Wear|||Drop
+25981	Keris partisan of breaching	3	|Wield|Dismantle||Drop
+25985	Elidinis' ward	5	|Wield|||Drop
+26219	Osmumten's fang	3	|Wield|||Drop
+26235	Zaryte vambraces	9	|Wear|||Drop
+26374	Zaryte crossbow	3	|Wield|||Drop
+26382	Torva full helm	0	|Wear|||Drop
+26482	Abyssal whip (or)	3	|Wield|||Dismantle kit
+26484	Abyssal tentacle (or)	3	|Wield|Check|Dissolve|Dismantle kit
+26486	Rune crossbow (or)	3	|Wield|||Dismantle
+26488	Book of Balance (or)	5	|Wield|Preach||Dismantle
+26490	Book of Darkness (or)	5	|Wield|Preach||Dismantle
+26492	Book of Law (or)	5	|Wield|Preach||Dismantle
+26494	Book of War (or)	5	|Wield|Preach||Dismantle
+26496	Holy book (or)	5	|Wield|Preach||Dismantle
+26498	Unholy book (or)	5	|Wield|Preach||Dismantle
+26674	Slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26675	Black slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26676	Green slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26677	Red slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26678	Purple slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26679	Turquoise slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26680	Hydra slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26681	Twisted slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26682	Tztok slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26683	Vampyric slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26684	Tzkal slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+26764	Ring of the gods (i)	12	|Wear|Uncharge||Drop
+26798	Catalytic talisman	-1	|||Locate|Drop
+26801	Catalytic tiara	0	|Wear|||Drop
+26818	Ring of the elements	12	|Wear|Rub|Last Destination|Uncharge
+26914	Amulet of the Eye	2	|Wear|Teleport||Destroy
+26945	Pharaoh's sceptre (uncharged)	3	Wield|||Check|Drop
+26948	Pharaoh's sceptre	3	Wield|Teleport|Last-Teleport|Check|Uncharge
+26950	Pharaoh's sceptre	3	Wield|Teleport|Last-Teleport|Check|Uncharge
+27165	Saradomin halo	0	|Wear|||Drop
+27182	Saradomin chaps	7	|Wear|||Drop
+27187	Bow of Faerdhinen (c)	3	|Wield|||Drop
+27235	Masori mask (f)	0	|Wear|||Drop
+27238	Masori body (f)	4	|Wear|||Drop
+27241	Masori chaps (f)	7	|Wear|||Drop
+27275	Tumeken's shadow	3	|Wield|Check|Charge|Uncharge
+27287	Keris partisan of corruption	3	|Wield|Dismantle||Drop
+27291	Keris partisan of the sun	3	|Wield|Dismantle||Drop
+27374	Masori assembler	1	|Wear|Dismantle|Commune|Drop
+27444	Graceful hood	0	|Wear|||Drop
+27446	Graceful hood	0	|Wear|||Drop
+27447	Graceful cape	1	|Wear|||Drop
+27449	Graceful cape	1	|Wear|||Drop
+27450	Graceful top	4	|Wear|||Drop
+27452	Graceful top	4	|Wear|||Drop
+27453	Graceful legs	7	|Wear|||Drop
+27455	Graceful legs	7	|Wear|||Drop
+27456	Graceful gloves	9	|Wear|||Drop
+27458	Graceful gloves	9	|Wear|||Drop
+27459	Graceful boots	10	|Wear|||Drop
+27461	Graceful boots	10	|Wear|||Drop
+27550	Ghommal's avernic defender 5	5	|Wield|Destinations|Dismantle|Drop
+27551	Ghommal's avernic defender 5 (l)	5	|Wield|Destinations|Dismantle|Drop
+27552	Ghommal's avernic defender 6	5	|Wield|Destinations|Dismantle|Drop
+27553	Ghommal's avernic defender 6 (l)	5	|Wield|Destinations|Dismantle|Drop
+27610	Venator bow	3	|Wield|Check||Uncharge
+27624	Ancient sceptre	3	|Wield|||Drop
+27626	Ancient sceptre (l)	3	|Wield|||Drop
+27655	Webweaver bow	3	|Wield|Check||Uncharge
+27660	Ursine chainmace	3	|Wield|Check||Uncharge
+27665	Accursed sceptre	3	|Wield|Check|Swap|Uncharge
+27690	Voidwaker	3	|Wield|||Drop
+28037	Dragon battleaxe (cr)	3	|Wield|||Dismantle
+28169	Forestry top	4	|Wear|||Drop
+28171	Forestry legs	7	|Wear|||Drop
+28173	Forestry hat	0	|Wear|||Drop
+28175	Forestry boots	10	|Wear|||Drop
+28196	Bronze felling axe	3	|Wield|||Drop
+28199	Iron felling axe	3	|Wield|||Drop
+28202	Steel felling axe	3	|Wield|||Drop
+28205	Black felling axe	3	|Wield|||Drop
+28208	Mithril felling axe	3	|Wield|||Drop
+28211	Adamant felling axe	3	|Wield|||Drop
+28214	Rune felling axe	3	|Wield|||Drop
+28217	Dragon felling axe	3	|Wield|||Drop
+28220	Crystal felling axe	3	|Wield|Check|Revert|Drop
+28223	Crystal felling axe (inactive)	3	|Wield||Revert|Drop
+28226	3rd Age felling axe	3	|Wield|||Drop
+28260	Blood ancient sceptre	3	|Wield|Dismantle||Drop
+28262	Ice ancient sceptre	3	|Wield|Dismantle||Drop
+28264	Smoke ancient sceptre	3	|Wield|Dismantle||Drop
+28266	Shadow ancient sceptre	3	|Wield|Dismantle||Drop
+28307	Ultor ring	12	|Wear|||Drop
+28310	Venator ring	12	|Wear|||Drop
+28313	Magus ring	12	|Wear|||Drop
+28316	Bellator ring	12	|Wear|||Drop
+28327	Ring of shadows	12	Wear|Teleport|Check|Charge|Uncharge
+28329	Ring of shadows (uncharged)	12	Wear|||Charge|Destroy
+28473	Blood ancient sceptre (l)	3	|Wield|||Drop
+28474	Ice ancient sceptre (l)	3	|Wield|||Drop
+28475	Smoke ancient sceptre (l)	3	|Wield|||Drop
+28476	Shadow ancient sceptre (l)	3	|Wield|||Drop
+28682	Dinh's blazing bulwark	3	|Wear||Revert|Drop
+28792	Bone mace	3	|Wield|||Drop
+28902	Dizana's max cape	1	|Wear|Open|Empty|Destroy
+28922	Tonalztics of Ralos	3	|Wield|Check|Charge|Uncharge
+28933	Sunfire fanatic helm	0	|Wear|||Drop
+28936	Sunfire fanatic cuirass	4	|Wear|||Drop
+28939	Sunfire fanatic chausses	7	|Wear|||Drop
+28945	Echo boots	10	|Wear|Check|Toggle-activity|Revert
+28988	Blue Moon spear	3	|Wield|||Drop
+28997	Dual macuahuitl	3	|Wield|||Drop
+29013	Blue Moon chestplate	4	|Wear|||Drop
+29016	Blue Moon tassets	7	|Wear|||Drop
+29019	Blue Moon helm	0	|Wear|||Drop
+29022	Blood Moon chestplate	4	|Wear|||Drop
+29025	Blood Moon tassets	7	|Wear|||Drop
+29028	Blood Moon helm	0	|Wear|||Drop
+29037	Blue Moon chestplate	4	|Wear|Check||Drop
+29039	Blue Moon tassets	7	|Wear|Check||Drop
+29041	Blue Moon helm	0	|Wear|Check||Drop
+29263	Guild hunter headwear	0	|Wear|||Drop
+29265	Guild hunter top	4	|Wear|||Drop
+29267	Guild hunter legs	7	|Wear|||Drop
+29269	Guild hunter boots	10	|Wear|||Drop
+29280	Mixed hide top	4	|Wear|||Drop
+29283	Mixed hide legs	7	|Wear|||Drop
+29309	Huntsman's kit	-1	View|Fill|Empty||Destroy
+29577	Burning claws	3	|Wield|||Drop
+29589	Emberlight	3	|Wield||Revert|Drop
+29591	Scorching bow	3	|Wield||Revert|Drop
+29594	Purging staff	3	|Wield||Revert|Drop
+29775	Imcando hammer (off-hand)	5	|Wield|Swap||Drop
+29796	Noxious halberd	3	|Wield|||Drop
+29804	Amulet of rancour (s)	2	|Wear|||Revert
+29806	Aranea boots	10	|Wear|||Drop
+29816	Araxyte slayer helmet	0	|Wear|Check|Disassemble|Drop
+29818	Araxyte slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+29820	Araxyte slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+29822	Araxyte slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+29893	Pendant of Ates	2	|Wear|Rub|Check|Uncharge
+29920	Costume needle	-1	||||Destroy
+30045	Graceful hood	0	|Wear|||Drop
+30047	Graceful hood	0	|Wear|||Drop
+30048	Graceful cape	1	|Wear|||Drop
+30050	Graceful cape	1	|Wear|||Drop
+30051	Graceful top	4	|Wear|||Drop
+30053	Graceful top	4	|Wear|||Drop
+30054	Graceful legs	7	|Wear|||Drop
+30056	Graceful legs	7	|Wear|||Drop
+30057	Graceful gloves	9	|Wear|||Drop
+30059	Graceful gloves	9	|Wear|||Drop
+30060	Graceful boots	10	|Wear|||Drop
+30062	Graceful boots	10	|Wear|||Drop
+30073	Hueycoatl hide coif	0	|Wear|||Drop
+30082	Hueycoatl hide vambraces	9	|Wear|||Drop
+30305	Arclight (inactive)	3	|Wield|Check||Drop
+30345	Infernal pickaxe (or)	3	Wield|Check|Revert|Options|Drop
+30346	Infernal pickaxe (uncharged)	3	Wield||Revert|Options|Drop
+30347	Infernal axe (or)	3	Wield|Check|Revert|Options|Drop
+30348	Infernal axe (uncharged)	3	Wield||Revert|Options|Drop
+30351	Dragon pickaxe (or)	3	Wield||Revert|Change-Style|Drop
+30352	Dragon axe (or)	3	Wield||Revert|Change-Style|Drop
+30445	Echo ahrim's hood	0	|Wear|Check||Detach
+30447	Echo ahrim's robetop	4	|Wear|Check||Detach
+30449	Echo ahrim's robeskirt	7	|Wear|Check||Detach
+30519	Echo ahrim's hood 100	0	|Wear|Check||Detach
+30521	Echo ahrim's robetop 100	4	|Wear|Check||Detach
+30523	Echo ahrim's robeskirt 100	7	|Wear|Check||Detach
+30525	Echo ahrim's hood 75	0	|Wear|Check||Detach
+30527	Echo ahrim's robetop 75	4	|Wear|Check||Detach
+30529	Echo ahrim's robeskirt 75	7	|Wear|Check||Detatch
+30531	Echo ahrim's hood 50	0	|Wear|Check||Detach
+30533	Echo ahrim's robetop 50	4	|Wear|Check||Detach
+30535	Echo ahrim's robeskirt 50	7	|Wear|Check||Detach
+30537	Echo ahrim's hood 25	0	|Wear|Check||Detach
+30539	Echo ahrim's robetop 25	4	|Wear|Check||Detach
+30541	Echo ahrim's robeskirt 25	7	|Wear|Check||Detach
+30543	Echo ahrim's hood 0	0	||||Detach
+30545	Echo ahrim's robetop 0	4	||||Detach
+30547	Echo ahrim's robeskirt 0	7	||||Detach
+30568	Echo ahrim's staff	3	|Wield|Check||Detach
+30570	Echo ahrim's staff 100	3	|Wield|Check||Detach
+30571	Echo ahrim's staff 75	3	|Wield|Check||Detach
+30572	Echo ahrim's staff 50	3	|Wield|Check||Detach
+30573	Echo ahrim's staff 25	3	|Wield|Check||Detach
+30574	Echo ahrim's staff 0	3	||||Detach
+30638	Giantsoul amulet	2	|Wear|Check|Rub|Drop
+30750	Oathplate helm	0	|Wear|||Drop
+30753	Oathplate chest	4	|Wear|||Drop
+30756	Oathplate legs	7	|Wear|||Drop
+30759	Soulflame horn	3	|Wield||Configure|Drop
+30773	Diabolic worms	-1	||||Drop
+30843	Aether rune	-1	||||Drop
+31097	Avernic treads (max)	10	|Wear|Dismantle||Drop
+31106	Confliction gauntlets	9	|Wear|Inspect||Drop
+31398	Tortugan shield	1	|Wear|||Drop
+31583	Rosewood blowpipe	3	|Wield|Check||Unload
+31719	Nickel ore	-1	||||Drop
+32017	Dragon keel parts	-1	||||Drop
+32386	Medallion of the Deep	2	|Wear|||Destroy
+32399	Sailors' amulet	2	|Wear|Teleport|Check|Destroy
+33021	Bow of Faerdhinen (c)	3	|Wield||Uncharge|Drop
+33066	Hooded slayer helmet	0	|Wear|Check|Disassemble|Drop
+33068	Hooded slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+33070	Hooded slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+33072	Hooded slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+33104	Cowbell amulet	2	Teleport|Wear|Ring|Check|Uncharge
+33120	Perfected quetzal whistle(i)	-1	Signal||Rumour|Last-destination|Drop
+33338	Oathplate slayer helmet	0	|Wear|Check|Disassemble|Drop
+33340	Radiant slayer helmet	0	|Wear|Check|Disassemble|Revert
+33439	Oathplate slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+33441	Oathplate slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+33443	Oathplate slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+33445	Radiant slayer helmet (i)	0	|Wear|Check|Disassemble|Revert
+33447	Radiant slayer helmet (i)	0	|Wear|Check|Disassemble|Revert
+33449	Radiant slayer helmet (i)	0	|Wear|Check|Disassemble|Revert
+33595	Seeking dragon arrow	13	|Wield|||Drop
+33631	Crimson kisten	3	|Wield|||Drop
+33639	Necklace of rupture	2	|Wear|||Drop
+33718	Hallowed flail	3	|Wield|Bloom||Drop
+33722	Sunspear	3	|Wield|||Drop
+34027	Hallowfell	3	|Wield|||Drop
+34428	Elemental amulet	2	|Wear|||Drop
+34631	Net trap	-1	||||Drop
+34723	Archivist's folio	-1	Read||Charge|Check|Drop

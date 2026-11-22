@@ -75,6 +75,21 @@ public class FairyDials
 		return letters;
 	}
 
+	/**
+	 * The code a ring's last-destination varbit names: two bits per dial, the left dial highest, each counted as the
+	 * dial's own varbit is.
+	 */
+	public static String code(int lastLocation)
+	{
+		StringBuilder code = new StringBuilder();
+		for (int dial = 0; dial < COUNT; dial++)
+		{
+			int varbit = lastLocation >> 2 * (COUNT - 1 - dial) & LETTERS_PER_DIAL - 1;
+			code.append(LETTERS.charAt(dial * LETTERS_PER_DIAL + (LETTERS_PER_DIAL - varbit) % LETTERS_PER_DIAL));
+		}
+		return code.toString();
+	}
+
 	/** The travel log lists every code alphabetically, starting at AIP. */
 	static int logIndex(String letters)
 	{

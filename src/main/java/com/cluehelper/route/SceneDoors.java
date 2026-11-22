@@ -6,6 +6,8 @@ import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.ObjectID;
 
 /**
  * The walk table, like Shortest Path, takes doors as open: a closed one costs a click, not a detour. A locked door
@@ -34,6 +36,10 @@ public final class SceneDoors
 	private static final int ALL_SIDES = CollisionDataFlag.BLOCK_MOVEMENT_WEST | CollisionDataFlag.BLOCK_MOVEMENT_NORTH
 		| CollisionDataFlag.BLOCK_MOVEMENT_EAST | CollisionDataFlag.BLOCK_MOVEMENT_SOUTH;
 
+	/** The Barrows tunnels' locked doors, in the form their door varbit gives them: a strange old lockpick opens one. */
+	private static final Set<Integer> BARROWS_LOCKED = Set.of(ObjectID.BARROWS_DOOR_LOCKED_R, ObjectID.BARROWS_DOOR_LOCKED_L);
+	private static final Set<Integer> LOCKPICKS = Set.of(ItemID.STRANGE_OLD_LOCKPICK, ItemID.STRANGE_OLD_LOCKPICK_FULL);
+
 	private static final String NONE = "";
 	/** The option that opens each object: Open, Slash, Squeeze-through, Walk-through, or NONE. */
 	final Map<Integer, String> openOptions = new HashMap<>();
@@ -43,8 +49,15 @@ public final class SceneDoors
 	/** From each new snapshot's walk gates: a web opens only to a player carrying or wielding something that slashes. */
 	@Setter
 	volatile boolean canSlash;
+	/** From each new snapshot: a strange old lockpick is carried. */
+	volatile boolean canPickBarrowsLocks;
 	@Inject
 	Client client;
+
+	public void setCarried(Set<Integer> carriedIds)
+	{
+		canPickBarrowsLocks = carriedIds.stream().anyMatch(LOCKPICKS::contains);
+	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
@@ -135,8 +148,20 @@ public final class SceneDoors
 
 	private boolean opens(int id)
 	{
+		if (BARROWS_LOCKED.contains(currentForm(id)))
+		{
+			return canPickBarrowsLocks;
+		}
 		String option = openOption(id);
 		return isOpening(option) && (canSlash || !SLASH.equals(option));
+	}
+
+	/** The object as the player's varbits show it now: a Barrows door is unlocked, locked or no door at all per run. */
+	private int currentForm(int id)
+	{
+		ObjectComposition object = client.getObjectDefinition(id);
+		ObjectComposition form = object == null || object.getImpostorIds() == null ? object : object.getImpostor();
+		return form == null ? id : form.getId();
 	}
 
 	private static boolean isOpening(String action)
@@ -147,13 +172,9 @@ public final class SceneDoors
 	/** Client thread only. The option that opens a door, web, fence to squeeze through or doorway, or "" for anything else. */
 	public String openOption(int id)
 	{
-		return openOptions.computeIfAbsent(id, key ->
+		return openOptions.computeIfAbsent(currentForm(id), key ->
 		{
 			ObjectComposition object = client.getObjectDefinition(key);
-			if (object != null && object.getImpostorIds() != null)
-			{
-				object = object.getImpostor();
-			}
 			String option = NONE;
 			for (String action : object == null || object.getActions() == null ? new String[0] : object.getActions())
 			{

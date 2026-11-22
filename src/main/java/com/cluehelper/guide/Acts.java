@@ -3,6 +3,7 @@ package com.cluehelper.guide;
 import com.cluehelper.step.*;
 import java.util.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.SubStep.Kind;
 
@@ -66,7 +67,7 @@ final class Acts
 				return emote(step, takeFromStash, baked);
 			case ClueTypes.FALO:
 				return handInItems.isEmpty() ? baked
-					: List.of(baked.get(0).toBuilder().text("Use on Falo the Bard:").detail(null).items(handInItems).build());
+					: List.of(baked.get(0).toBuilder().text("Use " + String.join(" and ", inLine(handInItems)) + " on Falo the Bard").detail(null).build());
 			case ClueTypes.SKILL:
 				return List.of(handIn(step, handInItems));
 			default:
@@ -94,29 +95,58 @@ final class Acts
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
 		boolean items = !step.getRequirements().getItems().isEmpty();
 		acts.addAll(items ? SubSteps.remove(EmptySlots.of(step.getRequirements().getItems())) : List.of());
-		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip()) : List.of());
+		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip(step.getRequirements().getItems())) : List.of());
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		if (stash != null && spot != null)
 		{
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES, step.getData()));
 		}
-		acts.addAll(baked);
+		acts.addAll(items ? withItemsBackOnForUri(step, baked) : baked);
 		return List.copyOf(acts);
+	}
+
+	/** Core's names read mid-line: "Any completed god book" is "any completed god book". */
+	private static List<String> inLine(List<String> names)
+	{
+		return names.stream().map(name -> name.startsWith("Any ") ? "a" + name.substring(1) : name).collect(toList());
+	}
+
+	/**
+	 * After the emote, before Uri: the items go back on if they came off (to fight the double agent). Each act is done at
+	 * once while they stay on.
+	 */
+	private static List<SubStep> withItemsBackOnForUri(Step step, List<SubStep> performThenTalk)
+	{
+		if (performThenTalk.size() < 2)
+		{
+			return performThenTalk;
+		}
+		List<ItemRequirement> items = step.getRequirements().getItems();
+		List<SubStep> acts = new ArrayList<>(performThenTalk.subList(0, 1));
+		acts.addAll(SubSteps.remove(EmptySlots.of(items)));
+		acts.add(equip(items));
+		acts.addAll(performThenTalk.subList(1, performThenTalk.size()));
+		return acts;
 	}
 
 	/** Take the items out of the STASH unit and put them on. */
 	static List<SubStep> fromStash(Step step)
 	{
-		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
-			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
+		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = !step.getRequirements().getItems().isEmpty();
-		return items ? List.of(take, equip()) : List.of(take);
+		return items ? List.of(take, equip(itemsToPutOn(step))) : List.of(take);
 	}
 
-	private static SubStep equip()
+	/** At the STASH unit only the items go on: what must come off is taken off at the clue (inside the axe hut). */
+	private static List<ItemRequirement> itemsToPutOn(Step step)
 	{
-		return SubStep.of(Kind.ACT, "Equip the items")
-			.done(SubStep.Done.EQUIPPED).tab(StepGuide.Tab.INVENTORY).build();
+		return step.getRequirements().getItems().stream().filter(item -> !EmptySlots.metByEmptySlots(item)).collect(toList());
+	}
+
+	private static SubStep equip(List<ItemRequirement> items)
+	{
+		return SubStep.of(Kind.ACT, "Equip the items").worn(items).unwearableCarried(true)
+			.done(SubStep.Done.WORN).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
 	/** Charlie's item is listed by name, as the withdraw and equip steps list theirs. */
@@ -124,9 +154,9 @@ final class Acts
 	{
 		if (!"beginner".equals(step.getTier()))
 		{
-			return act("Talk to Sherlock", "Task done: hand it in");
+			return act("Talk to Sherlock", null);
 		}
-		return handInItems.isEmpty() ? act("Give Charlie the item", "He wants what the clue names")
+		return handInItems.isEmpty() ? act("Give Charlie the item", null)
 			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 

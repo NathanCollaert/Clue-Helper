@@ -267,8 +267,8 @@ public final class AvailabilityEngine
 			return Paid.with(used);
 		}
 		String what = itemNames.apply(ids.get(0)) + (ids.size() > 1 ? " (any of " + ids.size() + ")" : "");
-		return Paid.missing((mustBeWorn ? "needs to wield " : "needs ")
-			+ (branch.getQuantity() > 1 ? branch.getQuantity() + " x " : "") + what + (emptied ? ", no charges left" : ""));
+		return Paid.missing("needs " + (branch.getQuantity() > 1 ? branch.getQuantity() + " x " : "") + what
+			+ (emptied ? ", no charges left" : ""));
 	}
 
 	/** Whether the player does without the clause's items: the Lumbridge elite diary for a fairy ring's staff. */

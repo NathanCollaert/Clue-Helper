@@ -33,7 +33,7 @@ public class StepGuide
 {
 	public enum Tab
 	{
-		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC, QUESTS
+		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC
 	}
 
 	static final String KEEP_GOING = "Keep going: ";
@@ -80,6 +80,8 @@ public class StepGuide
 	PlayerModel player;
 	@Inject
 	BankMemory bankMemory;
+	@Inject
+	WayInMemory wayInMemory;
 	@Inject
 	UnlockMemory unlocks;
 	@Inject
@@ -141,6 +143,8 @@ public class StepGuide
 	WorldPoint jumpedFrom;
 	/** The step whose task the player has started on its object (a pyre built, a net trap set), or null. */
 	String taskStartedKey;
+	/** The step whose items went into an object (the mangled bones, into the pyre ship): it finishes there. */
+	String spentStepKey;
 	/** The clicked object's tile, for {@link #taskStartedKey}. */
 	WorldPoint taskStartedAt;
 	/** A route that came while a teleport was under way, followed once it lands. */
@@ -189,87 +193,47 @@ public class StepGuide
 		return boxView != null ? boxView : listedAt(index);
 	}
 
-	/** During a fight, the act to do again. */
+	/** During a fight, the act to do again. Past a bank stop, what follows its task, which the stop shows already. */
 	public SubStep getNext()
 	{
-		return fight != null && fight.getAgain() != null ? fight.getAgain() : listedAt(index + 1);
+		if (fight != null && fight.getAgain() != null)
+		{
+			return fight.getAgain();
+		}
+		SubStep listed = listedAt(index);
+		int at = index + 1;
+		while (listed != null && listedAt(at) != null && (listedAt(at).getText().equals(listed.getText()) || isDonePreparation(listedAt(at))))
+		{
+			at++;
+		}
+		SubStep next = listedAt(at);
+		return next == null ? null : taskActs.phased(next, routeStep);
+	}
+
+	/**
+	 * Items built into an object by one of the step's own acts (the bones into the pyre ship) are not fetched again: the
+	 * step finishes where they went, whatever a new plan says.
+	 */
+	private void noteItemsSpent(SubStep done)
+	{
+		boolean spent = done.getKind() == Kind.ACT && done.getDone() == SubStep.Done.ITEMS_GONE && routeStep != null
+			&& routeStep.getData().getBefore().stream().anyMatch(before -> !before.getGone().isEmpty() && before.getText().equals(done.getText()));
+		if (spent)
+		{
+			spentStepKey = routeStep.getKey();
+		}
+	}
+
+	/** Gear already on, or an item already held: passed over at once when reached, so not shown next. */
+	private boolean isDonePreparation(SubStep sub)
+	{
+		return sub.getKind() == Kind.ACT && sub.isPreparation() && isActDone(sub);
 	}
 
 	/** The listed sub-step at {@code at}, or null past the end. */
 	private SubStep listedAt(int at)
 	{
 		return at < steps.size() ? steps.get(at) : null;
-	}
-
-	/**
-	 * What the box asks for. Walking to a bank and opening it aren't shown: what to do in it is, from the walk on, while
-	 * the line and outline still lead to the bank.
-	 */
-	public SubStep getShown()
-	{
-		if (fight != null || boxView != null || index >= steps.size())
-		{
-			return getCurrent();
-		}
-		return shownAt(index);
-	}
-
-	/** The sub-step after the shown one, past a walk to a bank and its opening as well. */
-	public SubStep getShownNext()
-	{
-		if (fight != null || boxView != null || index >= steps.size())
-		{
-			return getNext();
-		}
-		int next = shownIndex(index) + 1;
-		return next < steps.size() ? shownAt(next) : null;
-	}
-
-	private SubStep shownAt(int at)
-	{
-		int shownIndex = shownIndex(at);
-		SubStep shown = steps.get(shownIndex);
-		if (shownIndex == at)
-		{
-			return shown;
-		}
-		String bankDetail = steps.get(shownIndex - 1).getDetail();
-		return shown.getDetail() == null && bankDetail != null ? shown.toBuilder().detail(bankDetail).build() : shown;
-	}
-
-	/**
-	 * For a walk to a bank or its opening, the sub-step done in that bank; else {@code at}. A bank opened only to close
-	 * it again has nothing to show, so its walk and opening are shown as they are.
-	 */
-	private int shownIndex(int at)
-	{
-		SubStep step = steps.get(at);
-		boolean walkToBank = step.getKind() == Kind.WALK && at + 1 < steps.size()
-			&& steps.get(at + 1).getKind() == Kind.BANK;
-		int bank = step.getKind() == Kind.BANK ? at : walkToBank ? at + 1 : -1;
-		if (bank < 0 || bank + 1 >= steps.size())
-		{
-			return at;
-		}
-		SubStep task = steps.get(bank + 1);
-		boolean onlyCloses = task.getKind() == Kind.WITHDRAW && task.getItems().isEmpty();
-		return onlyCloses ? at : bank + 1;
-	}
-
-	/** At the bank, or walking to it: acts done on the spot first (a scroll taken out of its book) still end there. */
-	private boolean isBankStop()
-	{
-		SubStep current = getCurrent();
-		if (current == null || current.getKind() == Kind.BANK)
-		{
-			return current != null;
-		}
-		if (current.getKind() != Kind.WALK || fight != null && fight.getAgain() != null)
-		{
-			return false;
-		}
-		return steps.stream().skip(index + 1L).map(SubStep::getKind).filter(kind -> kind != Kind.ACT).findFirst()
-			.map(kind -> kind == Kind.BANK).orElse(false);
 	}
 
 	/**
@@ -343,7 +307,7 @@ public class StepGuide
 			{
 				route = null;
 				routeStep = step;
-				steps = inWayIn(step, goIn);
+				steps = withRememberedWayIn(inWayIn(step, goIn), step);
 				index = 0;
 				updateHighlights();
 				refreshObjects();
@@ -351,13 +315,13 @@ public class StepGuide
 			}
 			return;
 		}
-		if (isPlannedBeforeJump(start))
+		if (isPlannedBeforeJump(start) || isPlannedBeforeGoingIn(step, routes.getCommitted()))
 		{
 			return;
 		}
 		Route committed = routes.getCommitted();
 		boolean sameStep = step != null && routeStep != null && step.getKey().equals(routeStep.getKey());
-		if (committed != null && committed.isBanked() && sameStep && isTaskUnderway())
+		if (committed != null && committed.isBanked() && sameStep && isTaskUnderway() || sameStep && step.getKey().equals(spentStepKey))
 		{
 			return;
 		}
@@ -373,6 +337,13 @@ public class StepGuide
 	 * A task begun on its object goes on there, not back to a bank: its items are in the object now (the pyre logs, built
 	 * into the pyre), so the step's needs no longer read as carried.
 	 */
+	/** The task's spell cast on one of its items (the ensouled head): the head is spent, the task goes on where it was cast. */
+	private boolean isTaskCastItem(int itemId)
+	{
+		StepIndex.Cast cast = routeStep == null ? null : routeStep.getData().getCast();
+		return cast != null && itemId > 0 && cast.getOn().contains(itemId) && client.isWidgetSelected();
+	}
+
 	private boolean isTaskObject(int objectId)
 	{
 		return routeStep != null && routeStep.getStages().stream()
@@ -429,6 +400,7 @@ public class StepGuide
 	public void onGameTick()
 	{
 		WorldPoint tile = player.getPosition().getTile();
+		wayInMemory.onTick(wayInOf(routeStep), tile);
 		boolean jumped = PositionRules.teleported(lastTile, tile);
 		WorldPoint from = lastTile;
 		lastTile = tile;
@@ -471,8 +443,9 @@ public class StepGuide
 		changed |= watchDestinationSet();
 		changed |= keyFromCharterList();
 		changed |= partWayIn(tile);
+		changed |= dropToPickUp();
 		changed |= pickUpForAct(tile);
-		changed |= refreshGear();
+		changed |= refreshCurrent();
 		changed |= showMaking();
 		checkRefusal();
 		checkTeleportRefusal();
@@ -505,7 +478,7 @@ public class StepGuide
 	private void refreshObjects()
 	{
 		SubStep current = getCurrent();
-		boolean bank = isBankStop();
+		boolean bank = current != null && current.getKind() == Kind.BANK;
 		SubStep ahead = objectActAhead(current);
 		SubStep optionOf = ahead != null ? ahead : current;
 		List<String> option = optionOf == null || optionOf.getOption() == null ? List.of() : List.of(optionOf.getOption());
@@ -682,6 +655,49 @@ public class StepGuide
 		}
 	}
 
+	/**
+	 * A plan searched from outside the way in, published once the player is through it: its route's first leg starts
+	 * outside. The plan from inside follows.
+	 */
+	private boolean isPlannedBeforeGoingIn(Step step, Route committed)
+	{
+		WorldPoint at = player.getPosition() == null ? null : player.getPosition().getTile();
+		WorldPoint plannedFrom = committed == null || committed.getLegs().isEmpty() ? null : committed.getLegs().get(0).getFrom();
+		return plannedFrom != null && at != null && isInsideWayIn(step, at) && !isInsideWayIn(step, plannedFrom);
+	}
+
+	private static StepIndex.WayIn wayInOf(Step step)
+	{
+		return step == null ? null : step.getData().getEntry();
+	}
+
+	/** A way in entered at one of several places leads to the one the player used last (the crypt with the tunnel). */
+	private List<SubStep> withRememberedWayIn(List<SubStep> listed, Step step)
+	{
+		StepIndex.WayIn way = wayInOf(step);
+		WayInMemory.Entered entered = wayInMemory.enteredBy(way);
+		if (entered == null)
+		{
+			return way == null || way.getTried().isEmpty() ? listed : withWayInTried(listed, way);
+		}
+		WorldPoint at = entered.getFrom();
+		boolean clicked = entered.getObject() >= 0;
+		Set<Integer> objects = clicked ? Set.of(entered.getObject()) : Set.copyOf(way.getTried());
+		String option = clicked ? entered.getOption() : way.getOption();
+		return listed.stream().map(sub -> sub.getWayIn() == way && (sub.getKind() == Kind.ENTER || sub.getKind() == Kind.WALK)
+			? sub.toBuilder().text(way.getRememberedAct()).waypoint(at).goal(sub.getGoal() == null ? null : at)
+				.objectIds(objects).option(option).build() : sub)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
+	/** Not known yet where the way leads in: its objects are each tried (a sarcophagus searched in each crypt). */
+	private static List<SubStep> withWayInTried(List<SubStep> listed, StepIndex.WayIn way)
+	{
+		return listed.stream().map(sub -> sub.getWayIn() == way && sub.getKind() == Kind.ENTER
+			? sub.toBuilder().objectIds(Set.copyOf(way.getTried())).option(way.getOption()).build() : sub)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
 	private static boolean isInsideWayIn(Step step, WorldPoint at)
 	{
 		StepIndex.WayIn way = step == null ? null : step.getData().getEntry();
@@ -701,7 +717,8 @@ public class StepGuide
 			rest.add(LegSteps.walkToClue(step.getTargets().get(0), SubSteps.ARRIVE_TILES, StepIndex.Entry.NONE));
 		}
 		rest.addAll(subSteps.acts(step));
-		return SubSteps.withWayInEquipped(rest, step.getData(), player::finished, player.carriedIds());
+		return SubSteps.withWayInEquipped(rest, step.getData(), player::finished, player.carriedIds(), player.carriedIds(),
+			id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Part way up a way in (the pyramid's lower levels), the step points on, not back to its ground-floor start. */
@@ -716,14 +733,14 @@ public class StepGuide
 		{
 			return pickUpOnTheWay(current, pickUp, tile);
 		}
-		if (way == null || current.getText().startsWith(KEEP_GOING))
+		if (way == null)
 		{
 			return false;
 		}
 		WorldPoint to = way.getTo();
 		boolean toNearby = !way.isNoLine() && to != null && tile != null && to.getPlane() == tile.getPlane()
 			&& to.distanceTo2D(tile) <= PART_WAY_LINE_TILES;
-		return replaceCurrent(current.toBuilder().text(KEEP_GOING + way.getText()).waypoint(toNearby ? to : null).build());
+		return replaceCurrent(current.toBuilder().text(way.getPartWayLine()).waypoint(toNearby ? to : null).build());
 	}
 
 	/**
@@ -749,6 +766,34 @@ public class StepGuide
 		List<WorldPoint> tiles = pickUpTiles.isEmpty() ? pickUp.getSpawnTiles() : pickUpTiles;
 		return tile == null || on == null ? null
 			: tiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile) + at.distanceTo2D(on))).orElse(null);
+	}
+
+	/**
+	 * A kill for a key or an item, once it lies on the ground: picked up before anything else, not another kill (the
+	 * mangled bones by the barbarian just killed).
+	 */
+	private boolean dropToPickUp()
+	{
+		SubStep current = getCurrent();
+		Stage stage = current == null || current.getGroundItem() >= 0 ? null
+			: current.getKind() == Kind.ACT ? current.getStage() : isWalk(current) && leadsToKillForItem() ? listedAt(index + 1).getStage() : null;
+		if (stage == null || stage.getKind() != Stage.Kind.KEY)
+		{
+			return false;
+		}
+		int dropped = stage.getItemIds().stream().filter(id -> !sceneObjects.groundItemTiles(id).isEmpty()).findFirst().orElse(-1);
+		if (dropped < 0)
+		{
+			return false;
+		}
+		String name = stage.getItemName() != null ? stage.getItemName() : client.getItemDefinition(dropped).getName();
+		return replaceCurrent(SubStep.of(Kind.ACT, "Pick up the " + name.toLowerCase(Locale.ROOT)).groundItem(dropped)
+			.heldWhenDone(Set.copyOf(stage.getItemIds())).done(SubStep.Done.ITEM_HELD).build());
+	}
+
+	private static boolean isWalk(SubStep sub)
+	{
+		return sub.getKind() == Kind.WALK || sub.getKind() == Kind.WALK_TO_CLUE;
 	}
 
 	/** An act's ground item (king worms): outlined where it lies, the nearest as the waypoint. */
@@ -816,12 +861,21 @@ public class StepGuide
 			travelClickTick = client.getTickCount();
 		}
 		SubStep current = getCurrent();
+		if (event.getMenuAction().name().startsWith("GAME_OBJECT"))
+		{
+			wayInMemory.onObjectClicked(wayInOf(routeStep), player.getPosition().getTile(), event.getId(), event.getMenuOption());
+		}
 		// The object is often clicked from afar, during the walk to it: the click counts whatever the sub-step.
 		if (isTaskObject(event.getId()))
 		{
 			taskStartedKey = routeStep.getKey();
 			WorldView view = client.getTopLevelWorldView();
 			taskStartedAt = view == null ? null : WorldPoint.fromScene(view, event.getParam0(), event.getParam1(), view.getPlane());
+		}
+		else if (isTaskCastItem(event.getItemId()))
+		{
+			taskStartedKey = routeStep.getKey();
+			taskStartedAt = player.getPosition().getTile();
 		}
 		if (current == null || current.getKind() != Kind.TELEPORT || current.getRow() == null)
 		{
@@ -842,6 +896,10 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean gameLine = message.getType() == ChatMessageType.GAMEMESSAGE || message.getType() == ChatMessageType.MESBOX;
+		if (gameLine)
+		{
+			wayInMemory.onGameLine(message.getMessage());
+		}
 		if (gameLine && current != null && current.getKind() == Kind.TELEPORT && current.getRow() != null)
 		{
 			teleportRefusal.onGameLine(current.getRow().getName(), client.getTickCount());
@@ -900,11 +958,15 @@ public class StepGuide
 		boolean atStep = step != null && !itemsFirst(committed, step) && (stillAtAct(step, tile) || arrived(step));
 		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
 			: subSteps.of(committed, step);
-		steps = withoutRingHopsDone(deposit.before(base, tile));
+		steps = withRememberedWayIn(withoutRingHopsDone(deposit.before(base, tile)), step);
 		index = 0;
 		resetTravel();
 		advance(tile);
-		refreshGear();
+		// A plan comes each tick while walking: the rewrites a tick makes are made again before anything is shown
+		partWayIn(tile);
+		dropToPickUp();
+		pickUpForAct(tile);
+		refreshCurrent();
 		showMaking();
 		updateHighlights();
 		refreshObjects();
@@ -1022,6 +1084,7 @@ public class StepGuide
 		{
 			noteRingHop(steps.get(index));
 			noteBoxUsed(steps.get(index));
+			noteItemsSpent(steps.get(index));
 			index++;
 			resetTravel();
 			moved = true;
@@ -1037,7 +1100,7 @@ public class StepGuide
 	/** An act of the step itself: gear put on at the bank (a lumberjack outfit) is no sign of having reached the step. */
 	private static boolean isStepAct(SubStep sub)
 	{
-		return sub != null && sub.getKind() == Kind.ACT && !sub.isPreparation() && sub.getDone() != SubStep.Done.EQUIPPED;
+		return sub != null && sub.getKind() == Kind.ACT && !sub.isPreparation();
 	}
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
@@ -1221,11 +1284,18 @@ public class StepGuide
 	 */
 	private boolean stageNpcNearby(SubStep step, WorldPoint tile)
 	{
-		WorldPoint goal = step.getKind() == Kind.WALK_TO_CLUE ? null : step.getGoal();
+		WorldPoint goal = step.getKind() == Kind.WALK_TO_CLUE || leadsToKillForItem() ? null : step.getGoal();
 		return !step.getNpcIds().isEmpty() && tile != null && scene.getNpcs().stream()
 			.map(NPC::getWorldLocation)
 			.anyMatch(at -> at.getPlane() == tile.getPlane() && at.distanceTo2D(tile) <= SubSteps.AREA_ARRIVE_TILES
 				&& (goal == null || at.distanceTo2D(goal) <= SubSteps.AREA_ARRIVE_TILES));
+	}
+
+	/** The walk leads to a kill for a key or an item: any of its NPCs close by will do, wherever the planned spot is. */
+	private boolean leadsToKillForItem()
+	{
+		SubStep next = listedAt(index + 1);
+		return next != null && next.getStage() != null && next.getStage().getKind() == Stage.Kind.KEY;
 	}
 
 	/**
@@ -1313,12 +1383,8 @@ public class StepGuide
 	{
 		switch (act.getDone())
 		{
-			case EQUIPPED:
-			case WAY_IN_WORN:
-			case GEAR_WORN:
+			case WORN:
 			case SLOTS_EMPTY:
-			case WAY_IN_SLOTS_EMPTY:
-			case ITEM_WORN:
 				return gearActs.isDone(act, routeStep);
 			case STASH_DEPOSITED:
 				return deposit.getAt() == null || actWatcher.isDone(act.getDone(), stepSince);
@@ -1332,9 +1398,17 @@ public class StepGuide
 				return act.getActItems().stream().noneMatch(player.carriedIds()::contains);
 			case ITEM_HELD:
 				return act.getHeldWhenDone().stream().anyMatch(player.carriedIds()::contains);
+			case TRACK_PLAYING:
+				return isPlaying(act.getTrack());
 			default:
 				return actWatcher.isDone(act.getDone(), stepSince);
 		}
+	}
+
+	private boolean isPlaying(String track)
+	{
+		Widget nowPlaying = client.getWidget(InterfaceID.Music.NOW_PLAYING_TEXT);
+		return nowPlaying != null && Text.removeTags(nowPlaying.getText()).trim().equalsIgnoreCase(track);
 	}
 
 	/** The scene is searched again for the new sub-step's objects and NPCs. */
@@ -1352,7 +1426,7 @@ public class StepGuide
 	private int stashAhead()
 	{
 		SubStep current = getCurrent();
-		SubStep next = getNext();
+		SubStep next = listedAt(index + 1);
 		return current != null && current.getKind() == Kind.WALK && next != null ? stepHighlights.stashOf(next, routeStep) : StepRequirements.NO_STASH;
 	}
 
@@ -1376,10 +1450,10 @@ public class StepGuide
 	}
 
 	/** A gear act listing what to put on or take off now. */
-	private boolean refreshGear()
+	private boolean refreshCurrent()
 	{
 		SubStep current = getCurrent();
-		return current != null && replaceCurrent(gearActs.refresh(current, routeStep));
+		return current != null && replaceCurrent(taskActs.phased(gearActs.refresh(current, routeStep), routeStep));
 	}
 
 	/** The current sub-step rewritten; the caller's tick updates the highlights once for every change. */

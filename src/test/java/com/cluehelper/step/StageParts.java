@@ -2,7 +2,7 @@ package com.cluehelper.step;
 
 import com.cluehelper.player.*;
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.SkillChallengeClue;
@@ -25,6 +25,8 @@ final class StageParts
 	private static final String NO_NAME = "null";
 	/** The cache names a mining rock in the plural ("Runite rocks"); the walk leads to one. */
 	private static final String ROCKS = " rocks";
+	/** "Kill any Hill Giant for a medium key", "Kill Penda in the Toad and Chicken": who, up to where or why. */
+	private static final Pattern KEY_KILL = Pattern.compile("Kill (any |an? |the |one of the )?(.+?)(?= (?:in|at|located|around|for|to)\\b|\\.|,|$)");
 	private static final Pattern PROPER_NAME = Pattern.compile("[A-Z][^ ]*( [A-Z][^ ]*)+");
 
 	private StageParts()
@@ -44,7 +46,7 @@ final class StageParts
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
 		if (key != null)
 		{
-			return killForKey(key);
+			return killForKey(key, entry.getKeyAlso());
 		}
 		StepIndex.Requires dropped = entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
 		if (dropped != null)
@@ -59,11 +61,38 @@ final class StageParts
 	}
 
 	/** Kill one of the key's NPCs where the cache says, then search the step's own object. */
-	private static List<Stage> killForKey(StepIndex.Target key)
+	private static List<Stage> killForKey(StepIndex.Target key, List<WorldPoint> also)
 	{
-		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act("Get the key from " + Step.NPC_NAME)
-			.detail(key.getText()).tiles(List.of(key.getKeyTile())).ourMarker(true).radius(KEY_AREA_TILES).itemIds(List.of(key.getKey())).build();
+		List<WorldPoint> tiles = new ArrayList<>(List.of(key.getKeyTile()));
+		tiles.addAll(also);
+		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act(keyAct(key.getText())).npcIds(Set.copyOf(key.getNpcs())).option(ATTACK)
+			.tiles(List.copyOf(tiles)).ourMarker(true).radius(KEY_AREA_TILES).itemIds(List.of(key.getKey())).build();
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(CORE_TARGETS).build());
+	}
+
+	/**
+	 * The kill as the line says it, from the cache's how-to: "Kill any Chicken to obtain a key" is "Kill a chicken to get a
+	 * key", "Kill Penda" stays, "Kill one of the Wizards" is "Kill a wizard".
+	 */
+	static String keyAct(String text)
+	{
+		Matcher kill = KEY_KILL.matcher(text == null ? "" : text);
+		if (!kill.find())
+		{
+			return "Get the key from " + Step.NPC_NAME;
+		}
+		String who = kill.group(2).trim();
+		String quantifier = kill.group(1) == null ? "" : kill.group(1).trim().toLowerCase(Locale.ROOT);
+		if (quantifier.equals("the"))
+		{
+			return "Kill the " + who + " to get a key";
+		}
+		if (quantifier.isEmpty())
+		{
+			return "Kill " + who + " to get a key";
+		}
+		String one = (quantifier.equals("one of the") && who.endsWith("s") ? who.substring(0, who.length() - 1) : who).toLowerCase(Locale.ROOT);
+		return "Kill " + (one.matches("[aeiou].*") ? "an " : "a ") + one + " to get a key";
 	}
 
 	/**

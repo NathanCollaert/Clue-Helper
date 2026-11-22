@@ -99,6 +99,13 @@ public class RoutePlanner
 		startRunner = new PlannerRunner(executor, clientThread);
 	}
 
+	/** The walk table's exit a walk leg goes through within so many tiles of walking; null for none, or before it loads. */
+	public Exit exitBetween(Leg leg, int tiles)
+	{
+		WalkData loaded = walk;
+		return loaded == null ? null : loaded.getTable().exitBetween(leg.getFrom(), leg.getTo(), tiles);
+	}
+
 	/** The guide takes such a scroll out at the bank as the plan does. */
 	public boolean keepsScrollBookOutOfWilderness()
 	{
@@ -214,7 +221,9 @@ public class RoutePlanner
 		}
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, required);
-		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
+		Route followed = followed(step);
+		PlanInput followingInput = followed == null ? input
+			: input.toBuilder().followedFirstTransport(followed.getFirstTransportKey()).followedIdentity(followed.getIdentity()).build();
 		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
 	}
 
@@ -369,6 +378,7 @@ public class RoutePlanner
 		WalkGates gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
 		rowOpen = gates.rowOpen();
 		doors.setCanSlash(gates.canSlash());
+		doors.setCarried(snapshot.carriedIds());
 		gatesVersion = snapshot.getVersion();
 	}
 
@@ -418,9 +428,9 @@ public class RoutePlanner
 			: Math.max(PlanInput.NO_REVERT_WINDOW, SWAP_WINDOW_TICKS - (client.getTickCount() - since));
 	}
 
-	private String followedFirstTransport(Step step)
+	private Route followed(Step step)
 	{
-		return committed != null && step.getKey().equals(committedStep) ? committed.getFirstTransportKey() : null;
+		return committed != null && step.getKey().equals(committedStep) ? committed : null;
 	}
 
 	private void onPlanned(Plan planned, PlanInput input)
@@ -502,10 +512,7 @@ public class RoutePlanner
 	{
 		List<Route> routes = new ArrayList<>();
 		routes.add(planned.getBest());
-		routes.add(planned.getDirect());
-		routes.add(planned.getSameBook());
 		routes.add(planned.getFollowed());
-		planned.getCandidates().forEach(candidate -> routes.add(candidate.getRoute()));
 		return routes;
 	}
 

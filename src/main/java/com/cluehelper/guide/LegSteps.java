@@ -21,11 +21,13 @@ final class LegSteps
 	private static final String TALK_TO = "Talk to";
 	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
 	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
-	/**
-	 * A task's place that reads as the walk's end ("The nearest anvil"), else what the stage is done on ("the nearest
-	 * black warlock"); a longer place, with how-tos, goes under the walk.
-	 */
-	private static final Pattern SHORT_PLACE = Pattern.compile("(The|An?) [^:,(]+");
+	/** A task's place that reads as the walk's end ("The nearest anvil"), else what the stage is done on ("the nearest black warlock"). */
+	private static final Pattern SHORT_PLACE = Pattern.compile("(The|An?) [^:,(.]+");
+
+	private static boolean isPlaceName(String place)
+	{
+		return place != null && SHORT_PLACE.matcher(place).matches();
+	}
 
 	private LegSteps()
 	{
@@ -41,10 +43,10 @@ final class LegSteps
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
 		String place = stage.getKind() == Stage.Kind.TASK ? stage.atPlace(leg.getTo()).getDetail() : null;
-		boolean placeNamed = place != null && SHORT_PLACE.matcher(place).matches();
+		boolean placeNamed = isPlaceName(place);
 		String walk = placeNamed ? "Walk to " + Character.toLowerCase(place.charAt(0)) + place.substring(1)
 			: stage.getTargetName() != null ? "Walk to the nearest " + stage.getTargetName() : text;
-		return walkTo(walk, leg.getTo(), radius).detail(placeNamed ? null : place)
+		return walkTo(walk, leg.getTo(), radius)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
@@ -104,13 +106,20 @@ final class LegSteps
 	static SubStep enter(StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data.getEntry();
-		return SubStep.of(Kind.ENTER, "Go in: " + way.getText()).waypoint(way.getTile()).wayIn(way).build();
+		return SubStep.of(Kind.ENTER, way.getAct()).waypoint(way.getTile()).wayIn(way).build();
 	}
 
 	static SubStep exit(Leg leg, Exit exit)
 	{
 		return SubStep.of(Kind.EXIT, exitText(exit))
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).exit(exit).build();
+	}
+
+	/** Through an exit whose far side isn't loaded yet: done on landing. */
+	static SubStep jump(Exit exit)
+	{
+		return SubStep.of(Kind.EXIT, exitText(exit))
+			.waypoint(exit.getOrigin()).goal(exit.getDestination()).radius(SubSteps.LANDING_TILES).exit(exit).build();
 	}
 
 	/** The Swap's book is its spell's, not the leg's: after the cast the player is back on Lunar. */
