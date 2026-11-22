@@ -516,7 +516,7 @@ cryptic:speak to uglug nar.	*	cryptic	medium	ANY_OF	2444,3049,0	Uglug Nar				non
 cryptic:speak to ulizius.	*	cryptic	medium	ANY_OF	3444,3461,0	Ulizius				none	1357	Speak to Ulizius.
 cryptic:strength potions with red spiders' eggs? he is quite a herbalist.	*	cryptic	easy	ANY_OF	3194,3403,0	Apothecary				none	1261	Strength potions with red spiders' eggs? He is quite a herbalist.
 cryptic:surprising? i bet he is...	*	cryptic	hard	ANY_OF	3205,3474,0	Sir Prysin				none	1388	Surprising? I bet he is...
-cryptic:surround my bones in fire, ontop the wooden pyre. finally lay me to rest, before my one last test.	*	cryptic	elite	AREA	1761,5322,0					none	1458	Surround my bones in fire, ontop the wooden pyre. Finally lay me to rest, before my one last test.
+cryptic:surround my bones in fire, ontop the wooden pyre. finally lay me to rest, before my one last test.	*	cryptic	elite	SEQUENCE	1761,5322,0|2505,3488,0					none	1458	Surround my bones in fire, ontop the wooden pyre. Finally lay me to rest, before my one last test.
 cryptic:surrounded by white walls and gems.	*	cryptic	easy	ANY_OF	2945,3335,0	Herquin				none	1264	Surrounded by white walls and gems.
 cryptic:surviving.	*	cryptic	hard	ANY_OF	2982,3336,2	Sir Vyvin				none	1383	Surviving.
 cryptic:talk to a party-goer in falador.	*	cryptic	easy	ANY_OF	3046,3383,1	Lucy				none	1250	Talk to a party-goer in Falador.
@@ -578,7 +578,7 @@ cryptic:you must be 100 to play with me.	*	cryptic	elite	ANY_OF	2638,2656,0	Squi
 cryptic:you were 3 and i was the 6th. come speak to me.	*	cryptic	elite	ANY_OF	3146,9913,0	Vannaka				none	1430	You were 3 and I was the 6th. Come speak to me.
 cryptic:you will have to fly high where a sword cannot help you.	*	cryptic	elite	AREA	2882,5311,2					none	1461	You will have to fly high where a sword cannot help you.
 cryptic:you will need to under-cook to solve this one.	*	cryptic	hard	ANY_OF	3219,9617,0			357		none	1406	You will need to under-cook to solve this one.
-cryptic:you'll get licked.	*	cryptic	elite	AREA	3410,3570,1|2092,10096,0|1672,10071,0|1691,10016,0|3239,12433,0|3594,9742,0|2894,5350,2|3412,9935,3|2465,9830,0					none	1460	You'll get licked.
+cryptic:you'll get licked.	*	cryptic	elite	AREA	3410,3570,1|2092,10096,0|1672,10071,0|1691,10016,0|3239,12433,0|3594,9742,0|2894,5350,2|2465,9830,0					none	1460	You'll get licked.
 cryptic:you'll have to plug your nose if you use this source of herbs.	*	cryptic	elite	AREA	3418,3548,1|1621,10004,0|2055,9209,0|2458,9780,0					none	1454	You'll have to plug your nose if you use this source of herbs.
 cryptic:you'll need to look for a town with a central fountain. look for a locked chest in the town's chapel.	*	cryptic	medium	SEQUENCE	2615,3209,0|3256,3487,0	Monk	10290	5108		none	2288	You'll need to look for a town with a central fountain. Look for a locked chest in the town's chapel.
 emote:10180	*	emote	easy	ANY_OF	3203,3169,0					3 item requirements	2104	Dance in the shack in Lumbridge Swamp. Equip a bronze dagger, iron full helmet and a gold ring.

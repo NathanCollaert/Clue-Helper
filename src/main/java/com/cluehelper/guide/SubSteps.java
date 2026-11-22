@@ -40,6 +40,8 @@ public final class SubSteps
 	static final int AREA_ARRIVE_TILES = 15;
 
 	private static final String ENTRANA_SHIP = "Ship: Entrana";
+	private static final String DIG = "Dig";
+	private static final String WALK_TO_DIG = "Walk to the dig spot";
 	private static final String ENTRANA_RULE = "Entrana allows no weapons or armour: the deposit box by the monks";
 	private static final String DEPOSIT = "Deposit";
 
@@ -71,10 +73,51 @@ public final class SubSteps
 		boolean takeFromStash = takeFromStash(step);
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
 			.build(this::exitOf, this::plantedTreeTeleport);
-		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds()), step.getData());
+		Set<Integer> onHand = new HashSet<>(carriedIds());
+		onHand.addAll(withdrawnIds(route));
+		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds(), onHand,
+			id -> client.getItemDefinition(id).getName()), step.getData());
 		List<SubStep> steps = withRideItemsWorn(route, withEntranaDeposits(withGearOnArrival(wayIn)));
-		return withTrackPlayedOnTheWay(withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
-			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps));
+		return withWalksNamedByWhatTheyLeadTo(withTrackPlayedOnTheWay(withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
+			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps)));
+	}
+
+	/**
+	 * A walk reads as what it leads to, the act or the way in after it past gear put on and further walks: "Kill a
+	 * hellhound", not "Walk to the clue". A dig is the exception: "Dig" reads as now, so its walk says where it goes. The
+	 * line and outlines stay the walk's.
+	 */
+	private static List<SubStep> withWalksNamedByWhatTheyLeadTo(List<SubStep> steps)
+	{
+		List<SubStep> named = new ArrayList<>(steps);
+		for (int i = 0; i < named.size(); i++)
+		{
+			SubStep walk = named.get(i);
+			SubStep led = isWalk(walk) ? ledTo(steps, i + 1) : null;
+			if (led != null)
+			{
+				named.set(i, walk.toBuilder().text(led.getText().equals(DIG) ? WALK_TO_DIG : led.getText()).build());
+			}
+		}
+		return List.copyOf(named);
+	}
+
+	private static SubStep ledTo(List<SubStep> steps, int from)
+	{
+		for (int i = from; i < steps.size(); i++)
+		{
+			SubStep sub = steps.get(i);
+			if (!isWalk(sub) && !sub.isPreparation())
+			{
+				return sub.getKind() == Kind.ACT || sub.getKind() == Kind.ENTER ? sub : null;
+			}
+		}
+		return null;
+	}
+
+	private static boolean isWalk(SubStep sub)
+	{
+		return sub.getKind() == Kind.WALK || sub.getKind() == Kind.WALK_TO_CLUE;
 	}
 
 	/** Played in the music tab; done once it is the track playing. */
@@ -582,8 +625,15 @@ public final class SubSteps
 		return step.getStages().stream().anyMatch(stage -> stage.getKind() != Stage.Kind.FINAL && !stage.getTiles().isEmpty());
 	}
 
+	/** The stage's acts after the walk there; what it does anywhere goes before that walk. */
 	private static void addStageAct(List<SubStep> steps, Stage stage)
 	{
+		int walk = steps.size();
+		while (walk > 0 && (isWalk(steps.get(walk - 1)) || steps.get(walk - 1).getKind() == Kind.ENTER))
+		{
+			walk--;
+		}
+		steps.addAll(walk, stage.getBefore().stream().filter(StepIndex.Before::isAnywhere).map(SubSteps::beforeAct).collect(toList()));
 		steps.addAll(stageActs(stage));
 	}
 
@@ -591,12 +641,20 @@ public final class SubSteps
 	static List<SubStep> stageActs(Stage stage)
 	{
 		List<SubStep> acts = new ArrayList<>(remove(stage.getEmptied()));
-		stage.getBefore().forEach(before -> acts.add(SubStep.of(Kind.ACT, before.getText())
-			.npcIds(Set.copyOf(before.getNpcs())).option(before.getOption()).groundItem(before.getGroundItem())
-			.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()));
+		stage.getBefore().stream().filter(before -> !before.isAnywhere()).forEach(before -> acts.add(beforeAct(before)));
 		acts.addAll(stage.getWorn().isEmpty() ? List.of() : equip(stage.getWorn()));
 		acts.add(stageAct(stage));
 		return List.copyOf(acts);
+	}
+
+	static SubStep beforeAct(StepIndex.Before before)
+	{
+		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, before.getText()).npcIds(Set.copyOf(before.getNpcs()))
+			.objectIds(Set.copyOf(before.getObjects())).option(before.getOption()).groundItem(before.getGroundItem());
+		return before.getGone().isEmpty()
+			? act.actItems(Set.copyOf(before.getItems())).tab(before.getItems().isEmpty() ? Tab.NONE : Tab.INVENTORY)
+				.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()
+			: act.actItems(Set.copyOf(before.getGone())).done(SubStep.Done.ITEMS_GONE).build();
 	}
 
 	/** Take off what core's empty-slot requirements forbid; none when there are none. */
@@ -643,8 +701,9 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
+	/** @param onHand carried or withdrawn on the route: one of them that is every need names the act (the Medallion of the Deep) */
 	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data, Predicate<Quest> finished,
-		Set<Integer> carried)
+		Set<Integer> carried, Set<Integer> onHand, IntFunction<String> itemName)
 	{
 		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequiresFor(finished, carried);
 		if (worn.isEmpty())
@@ -656,7 +715,10 @@ public final class SubSteps
 		List<StepIndex.Requires> ownWear = worn.stream().filter(need -> need.getPutOn() == null).collect(toList());
 		if (!ownWear.isEmpty())
 		{
-			equip.add(SubStep.of(Kind.ACT, "Equip the " + ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and ")))
+			Integer cover = ownWear.size() < 2 ? null : ownWear.get(0).getIds().stream().filter(onHand::contains)
+				.filter(id -> ownWear.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
+			String names = cover != null ? itemName.apply(cover) : ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and "));
+			equip.add(SubStep.of(Kind.ACT, "Equip the " + names)
 				.actItems(ownWear.stream().flatMap(need -> need.getIds().stream()).collect(toUnmodifiableSet()))
 				.wornWayIn(true).wayIn(data.getEntry()).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());
 		}

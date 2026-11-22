@@ -208,9 +208,10 @@ public final class ActParts
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KILL).findFirst().orElse(null);
 		if (kill != null)
 		{
-			String text = kill.getText() != null ? kill.getText().replaceAll("\\.$", "") : "Kill the monster";
-			return List.of(SubStep.of(Kind.ACT, text).option(ATTACK_OPTION)
-				.npcIds(Set.copyOf(kill.getNpcs())).build());
+			String text = data.getAct() != null ? data.getAct() : kill.getText() != null ? kill.getText().replaceAll("\\.$", "") : "Kill the monster";
+			List<SubStep> acts = data.getBefore().stream().map(SubSteps::beforeAct).collect(toList());
+			acts.add(SubStep.of(Kind.ACT, text).option(ATTACK_OPTION).npcIds(Set.copyOf(kill.getNpcs())).build());
+			return List.copyOf(acts);
 		}
 		if (isDig(step))
 		{

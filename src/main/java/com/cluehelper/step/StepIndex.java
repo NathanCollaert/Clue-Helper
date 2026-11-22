@@ -313,6 +313,14 @@ public final class StepIndex
 		String option;
 		int groundItem = -1;
 		List<Integer> held = List.of();
+		/** Items it is done with in the inventory (sacred oil on the logs), highlighted there. */
+		List<Integer> items = List.of();
+		/** Done anywhere, so before the walk to the place rather than at it. */
+		boolean anywhere;
+		/** Objects it is done on with {@code option} (the pyre site's Construct). */
+		List<Integer> objects = List.of();
+		/** Done once none of these is carried any more (the mangled bones, built into the pyre ship); else by {@code held}. */
+		List<Integer> gone = List.of();
 	}
 
 	/** The task's line while any of {@code whileCarried} is carried. */
@@ -466,6 +474,12 @@ public final class StepIndex
 		List<String> dialogue = List.of();
 		/** Ground items to pick up part way in before going on (the Mogre Camp's rocks); null when none. */
 		PickUp pickUp;
+		/** Entered at one of several places, the one used last remembered (the Barrows crypt with the tunnel). */
+		boolean remembered;
+		/** For a remembered way: the game line that forgets the place (the Barrows chest's count, once looted). */
+		String forgetOn;
+		/** For a remembered way: its text once the place is known. */
+		String rememberedText;
 
 		public boolean isInside(WorldPoint at)
 		{

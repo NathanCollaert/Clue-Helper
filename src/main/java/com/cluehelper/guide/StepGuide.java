@@ -81,6 +81,8 @@ public class StepGuide
 	@Inject
 	BankMemory bankMemory;
 	@Inject
+	WayInMemory wayInMemory;
+	@Inject
 	UnlockMemory unlocks;
 	@Inject
 	MenuLines menuLines;
@@ -197,9 +199,13 @@ public class StepGuide
 			return fight.getAgain();
 		}
 		SubStep listed = listedAt(index);
-		SubStep next = listedAt(index + 1);
-		boolean bankTask = listed != null && next != null && listed.getKind() == Kind.BANK && next.getText().equals(listed.getText());
-		return bankTask ? listedAt(index + 2) : next;
+		int at = index + 1;
+		while (listed != null && listedAt(at) != null && listedAt(at).getText().equals(listed.getText()))
+		{
+			at++;
+		}
+		SubStep next = listedAt(at);
+		return next == null ? null : taskActs.phased(next, routeStep);
 	}
 
 	/** The listed sub-step at {@code at}, or null past the end. */
@@ -287,7 +293,7 @@ public class StepGuide
 			}
 			return;
 		}
-		if (isPlannedBeforeJump(start))
+		if (isPlannedBeforeJump(start) || isPlannedBeforeGoingIn(step, start))
 		{
 			return;
 		}
@@ -309,6 +315,13 @@ public class StepGuide
 	 * A task begun on its object goes on there, not back to a bank: its items are in the object now (the pyre logs, built
 	 * into the pyre), so the step's needs no longer read as carried.
 	 */
+	/** The task's spell cast on one of its items (the ensouled head): the head is spent, the task goes on where it was cast. */
+	private boolean isTaskCastItem(int itemId)
+	{
+		StepIndex.Cast cast = routeStep == null ? null : routeStep.getData().getCast();
+		return cast != null && itemId > 0 && cast.getOn().contains(itemId) && client.isWidgetSelected();
+	}
+
 	private boolean isTaskObject(int objectId)
 	{
 		return routeStep != null && routeStep.getStages().stream()
@@ -365,6 +378,7 @@ public class StepGuide
 	public void onGameTick()
 	{
 		WorldPoint tile = player.getPosition().getTile();
+		wayInMemory.onTick(wayInOf(routeStep), tile);
 		boolean jumped = PositionRules.teleported(lastTile, tile);
 		WorldPoint from = lastTile;
 		lastTile = tile;
@@ -618,6 +632,32 @@ public class StepGuide
 		}
 	}
 
+	/** A plan searched from outside the way in, published once the player is through it: the plan from inside follows. */
+	private boolean isPlannedBeforeGoingIn(Step step, PlanStart start)
+	{
+		WorldPoint at = player.getPosition() == null ? null : player.getPosition().getTile();
+		return start != null && start.getTile() != null && at != null && isInsideWayIn(step, at) && !isInsideWayIn(step, start.getTile());
+	}
+
+	private static StepIndex.WayIn wayInOf(Step step)
+	{
+		return step == null ? null : step.getData().getEntry();
+	}
+
+	/** A way in entered at one of several places leads to the one the player used last (the crypt with the tunnel). */
+	private List<SubStep> withRememberedWayIn(List<SubStep> listed, Step step)
+	{
+		StepIndex.WayIn way = wayInOf(step);
+		WorldPoint at = wayInMemory.enteredAt(way);
+		if (at == null)
+		{
+			return listed;
+		}
+		return listed.stream().map(sub -> sub.getWayIn() == way && (sub.getKind() == Kind.ENTER || sub.getKind() == Kind.WALK)
+			? sub.toBuilder().text("Go in: " + way.getRememberedText()).waypoint(at).goal(sub.getGoal() == null ? null : at).build() : sub)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
 	private static boolean isInsideWayIn(Step step, WorldPoint at)
 	{
 		StepIndex.WayIn way = step == null ? null : step.getData().getEntry();
@@ -637,7 +677,8 @@ public class StepGuide
 			rest.add(LegSteps.walkToClue(step.getTargets().get(0), SubSteps.ARRIVE_TILES, StepIndex.Entry.NONE));
 		}
 		rest.addAll(subSteps.acts(step));
-		return SubSteps.withWayInEquipped(rest, step.getData(), player::finished, player.carriedIds());
+		return SubSteps.withWayInEquipped(rest, step.getData(), player::finished, player.carriedIds(), player.carriedIds(),
+			id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Part way up a way in (the pyramid's lower levels), the step points on, not back to its ground-floor start. */
@@ -759,6 +800,11 @@ public class StepGuide
 			WorldView view = client.getTopLevelWorldView();
 			taskStartedAt = view == null ? null : WorldPoint.fromScene(view, event.getParam0(), event.getParam1(), view.getPlane());
 		}
+		else if (isTaskCastItem(event.getItemId()))
+		{
+			taskStartedKey = routeStep.getKey();
+			taskStartedAt = player.getPosition().getTile();
+		}
 		if (current == null || current.getKind() != Kind.TELEPORT || current.getRow() == null)
 		{
 			return;
@@ -778,6 +824,10 @@ public class StepGuide
 	{
 		SubStep current = getCurrent();
 		boolean gameLine = message.getType() == ChatMessageType.GAMEMESSAGE || message.getType() == ChatMessageType.MESBOX;
+		if (gameLine)
+		{
+			wayInMemory.onGameLine(wayInOf(routeStep), message.getMessage());
+		}
 		if (gameLine && current != null && current.getKind() == Kind.TELEPORT && current.getRow() != null)
 		{
 			teleportRefusal.onGameLine(current.getRow().getName(), client.getTickCount());
@@ -836,7 +886,7 @@ public class StepGuide
 		boolean atStep = step != null && !itemsFirst(committed, step) && (stillAtAct(step, tile) || arrived(step));
 		List<SubStep> base = step == null || committed == null && !atStep ? List.of() : atStep ? actsHere(step, tile)
 			: subSteps.of(committed, step);
-		steps = withoutRingHopsDone(deposit.before(base, tile));
+		steps = withRememberedWayIn(withoutRingHopsDone(deposit.before(base, tile)), step);
 		index = 0;
 		resetTravel();
 		advance(tile);
@@ -1292,7 +1342,7 @@ public class StepGuide
 	private int stashAhead()
 	{
 		SubStep current = getCurrent();
-		SubStep next = getNext();
+		SubStep next = listedAt(index + 1);
 		return current != null && current.getKind() == Kind.WALK && next != null ? stepHighlights.stashOf(next, routeStep) : StepRequirements.NO_STASH;
 	}
 

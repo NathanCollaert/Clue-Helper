@@ -7,6 +7,7 @@
 383	Raw shark	-1	||||Drop
 440	Iron ore	-1	||||Drop
 449	Adamantite ore	-1	||||Drop
+536	Dragon bones	-1	Bury||||Drop
 544	Monk's robe top	4	|Wear|||Drop
 552	Ghostspeak amulet	2	|Wear|||Drop
 556	Air rune	-1	||||Drop
@@ -186,6 +187,7 @@
 1725	Amulet of strength	2	|Wear|||Drop
 1731	Amulet of power	2	|Wear|||Drop
 1745	Green dragon leather	-1	||||Drop
+1753	Green dragonhide	-1	||||Drop
 1757	Brown apron	4	|Wear|||Drop
 1775	Molten glass	-1	||||Drop
 1785	Glassblowing pipe	-1	||||Drop
@@ -729,6 +731,7 @@
 12851	Amulet of the Damned (full)	2	|Wear|||Drop
 12853	Amulet of the Damned	2	|Wear||Check|Destroy
 12926	Toxic blowpipe	3	|Wield|Check|Unload|Uncharge
+12934	Zulrah's scales	-1	||||Drop
 12954	Dragon defender	5	|Wield|||Drop
 13068	Quest point cape (t)	1	|Wear|Teleport|Untrim|Drop
 13069	Achievement diary cape (t)	1	|Wear|Teleport|Untrim|Drop
@@ -853,6 +856,7 @@
 13677	Graceful boots	10	|Wear|||Drop
 13678	Graceful boots	10	|Wear|||Drop
 16176	Pharaoh's sceptre	3	||||Drop
+19476	Achievement diary cape	1	|Wear|Teleport|Trim|Drop
 19481	Heavy ballista	3	|Wield|||Drop
 19525	Kruk monkey greegree	3	|Hold|||Drop
 19639	Black slayer helmet	0	|Wear|Check|Disassemble|Drop
@@ -1181,6 +1185,7 @@
 28682	Dinh's blazing bulwark	3	|Wear||Revert|Drop
 28792	Bone mace	3	|Wield|||Drop
 28902	Dizana's max cape	1	|Wear|Open|Empty|Destroy
+28922	Tonalztics of Ralos	3	|Wield|Check|Charge|Uncharge
 28933	Sunfire fanatic helm	0	|Wear|||Drop
 28936	Sunfire fanatic cuirass	4	|Wear|||Drop
 28939	Sunfire fanatic chausses	7	|Wear|||Drop
