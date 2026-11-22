@@ -50,3 +50,6 @@ demo/
 # Planning, findings, offline tools and spikes live in their own repo, cloned here: this one holds only what the
 # plugin needs to run
 Clue-Helper-Tools/
+
+# Claude Code's local skills and session worktrees belong to this machine
+.claude/
