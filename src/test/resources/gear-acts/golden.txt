@@ -4993,9 +4993,9 @@
   worn [1091, 1287, 1694] inv [] done
 -- worn
   worn [1091, 1287, 1694] inv [] done
-== emote:23046 #6 Equip the items
+== emote:23046 #3 Equip the items
 -- recorded
-  worn [13342] inv [952, 995, 13068, 13069, 13103, 13111, 13124, 13222, 13660, 21151, 21268, 21276, 21389, 25818, 26818, 29893, 30638]
+  worn [13342, 28329, 29796, 32386, 33066] inv [554, 555, 556, 557, 560, 561, 562, 563, 564, 565, 566, 4697, 9075, 21880, 22947, 30843]
    -> Equip: [Adamant warhammer, Ring of life, Mithril boots]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -5011,9 +5011,9 @@
   worn [1345, 2570, 4127] inv [] done
 -- worn
   worn [1345, 2570, 4127] inv [] done
-== emote:23046 #9 Equip the items
+== emote:23046 #6 Equip the items
 -- recorded
-  worn [13342] inv [952, 995, 13068, 13069, 13103, 13111, 13124, 13222, 13660, 21151, 21268, 21276, 21389, 25818, 26818, 29893, 30638]
+  worn [13342, 28329, 29796, 32386, 33066] inv [554, 555, 556, 557, 560, 561, 562, 563, 564, 565, 566, 4697, 9075, 21880, 22947, 30843]
    -> Equip: [Adamant warhammer, Ring of life, Mithril boots]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck

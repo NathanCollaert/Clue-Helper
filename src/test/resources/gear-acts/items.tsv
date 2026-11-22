@@ -10,8 +10,13 @@
 536	Dragon bones	-1	Bury||||Drop
 544	Monk's robe top	4	|Wear|||Drop
 552	Ghostspeak amulet	2	|Wear|||Drop
+554	Fire rune	-1	||||Drop
+555	Water rune	-1	||||Drop
 556	Air rune	-1	||||Drop
+557	Earth rune	-1	||||Drop
+560	Death rune	-1	||||Drop
 561	Nature rune	-1	||||Drop
+562	Chaos rune	-1	||||Drop
 563	Law rune	-1	||||Drop
 564	Cosmic rune	-1	||||Drop
 565	Blood rune	-1	||||Drop
@@ -332,6 +337,7 @@
 4587	Dragon scimitar	3	|Wield|||Drop
 4657	Ring of visibility	12	|Wear|||Destroy
 4675	Ancient staff	3	|Wield|||Drop
+4697	Smoke rune	-1	||||Drop
 4708	Ahrim's hood	0	|Wear|Check||Drop
 4710	Ahrim's staff	3	|Wield|Check||Drop
 4712	Ahrim's robetop	4	|Wear|Check||Drop
@@ -552,6 +558,7 @@
 9049	Pharaoh's sceptre	3	||||Drop
 9050	Pharaoh's sceptre	3	Convert||||Drop
 9051	Pharaoh's sceptre	3	||||Drop
+9075	Astral rune	-1	||||Drop
 9185	Rune crossbow	3	|Wield|||Drop
 9674	Proselyte hauberk	4	|Wear|||Drop
 9731	Mind shield	5	|Wield|||Drop
@@ -941,6 +948,7 @@
 21793	Imbued Guthix cape	1	|Wear|||Drop
 21795	Imbued Zamorak cape	1	|Wear|||Drop
 21802	Revenant cave teleport	-1	||Teleport|Config|Drop
+21880	Wrath rune	-1	||||Drop
 21888	Turquoise slayer helmet	0	|Wear|Check|Disassemble|Drop
 21890	Turquoise slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
 22109	Ava's assembler	1	|Wear||Commune|Drop
