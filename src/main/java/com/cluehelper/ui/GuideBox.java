@@ -81,7 +81,7 @@ public class GuideBox
 		if (now != null)
 		{
 			box.now(now.getText()).nowItems(now.getItems()).nowDetail(now.getDetail())
-				.next(next == null ? null : next.getText());
+				.next(next == null ? null : upcomingLine(next));
 		}
 		List<String> notes = new ArrayList<>();
 		if (plan.getNote() != null && !plan.getNote().equals(Plan.NONE.getNote()))
@@ -108,6 +108,17 @@ public class GuideBox
 			notes.add(plan == Plan.NONE ? NO_PLAN_YET : NO_ROUTE);
 		}
 		return box.notes(notes).build();
+	}
+
+	/** The next line has no item lines under it, so a line that introduces its items ("Withdraw from the bank:") lists them inline. */
+	private static String upcomingLine(SubStep next)
+	{
+		String text = next.getText();
+		if (!text.endsWith(":"))
+		{
+			return text;
+		}
+		return next.getItems().isEmpty() ? text.substring(0, text.length() - 1) : text + " " + String.join(", ", next.getItems());
 	}
 
 	static String bookName(Book book)
