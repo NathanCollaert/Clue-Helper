@@ -72,8 +72,7 @@ public final class SubSteps
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
 			.build(this::exitOf, this::plantedTreeTeleport);
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds()), step.getData());
-		List<SubStep> steps = withFairyRingStaffWorn(route,
-			withRideGearWorn(route, withEntranaDeposits(withGearOnArrival(wayIn))));
+		List<SubStep> steps = withRideItemsWorn(route, withEntranaDeposits(withGearOnArrival(wayIn)));
 		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
 			: steps;
 	}
@@ -134,44 +133,46 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
-	/** A ride that takes worn gear (a ghostspeak amulet for the ghost captain) has it put on first. */
-	private List<SubStep> withRideGearWorn(Route route, List<SubStep> steps)
-	{
-		Set<Integer> withdrawn = withdrawnIds(route);
-		return withBefore(steps, sub -> equipForRide(sub, withdrawn));
-	}
-
 	/**
-	 * The staff goes on before the route's first fairy ring and stays on for the rest, so a chained code's later hops
-	 * follow each other with nothing between them.
+	 * What a ride takes worn (a fairy ring's staff, the ghost captain's ghostspeak amulet) goes on before its first use
+	 * in the route and stays on for the rest, so a chained code's later hops follow each other with nothing between them.
 	 */
-	private List<SubStep> withFairyRingStaffWorn(Route route, List<SubStep> steps)
+	private List<SubStep> withRideItemsWorn(Route route, List<SubStep> steps)
 	{
-		int ring = IntStream.range(0, steps.size()).filter(i -> steps.get(i).getKind() == Kind.FAIRY_RING).findFirst().orElse(-1);
-		Set<Integer> staves = ring < 0 ? Set.of() : stavesToWield(steps.get(ring).getRow());
-		if (staves.isEmpty())
+		PlayerSnapshot player = snapshot.get();
+		Set<Integer> withdrawn = withdrawnIds(route);
+		Set<Set<Integer>> putOn = new HashSet<>();
+		List<SubStep> out = new ArrayList<>();
+		for (SubStep sub : steps)
 		{
-			return steps;
+			for (Set<Integer> items : toWear(sub.getRow(), player))
+			{
+				if (putOn.add(items))
+				{
+					out.add(equip(items, withdrawn));
+				}
+			}
+			out.add(sub);
 		}
-		List<SubStep> out = new ArrayList<>(steps);
-		out.add(ring, equip(staves, withdrawnIds(route)));
 		return List.copyOf(out);
 	}
 
-	/** None when one is worn already or the Lumbridge elite diary lets the player use fairy rings without one. */
-	private Set<Integer> stavesToWield(CatalogRow landing)
+	/**
+	 * Each of the row's must-be-worn clauses, as its items, that the player wears none of and cannot do without (the
+	 * Lumbridge elite diary lets them use fairy rings with no staff).
+	 */
+	private static List<Set<Integer>> toWear(CatalogRow row, PlayerSnapshot player)
 	{
-		PlayerSnapshot player = snapshot.get();
-		if (player == null)
+		if (row == null || player == null)
 		{
-			return Set.of();
+			return List.of();
 		}
-		Set<Integer> staves = landing.getRequirements().getItems().stream()
+		return row.getRequirements().getItems().stream()
 			.filter(ItemClause::isMustBeWorn)
 			.filter(clause -> !AvailabilityEngine.isWaived(clause, player, AvailabilityService.nowMinutes()))
-			.flatMap(ItemClause::ids)
-			.collect(toUnmodifiableSet());
-		return staves.stream().anyMatch(player.getWorn()::containsKey) ? Set.of() : staves;
+			.map(clause -> clause.ids().collect(toUnmodifiableSet()))
+			.filter(items -> items.stream().noneMatch(player.getWorn()::containsKey))
+			.collect(toList());
 	}
 
 	private static Set<Integer> withdrawnIds(Route route)
@@ -189,22 +190,6 @@ public final class SubSteps
 			out.add(sub);
 		}
 		return List.copyOf(out);
-	}
-
-	private static Set<Integer> rideGear(CatalogRow row)
-	{
-		return row == null ? Set.of() : row.getRequirements().getItems().stream()
-			.filter(CatalogRules::isGhostspeakNeed)
-			.flatMap(ItemClause::ids)
-			.filter(CatalogRules.GHOSTSPEAK::contains)
-			.collect(toUnmodifiableSet());
-	}
-
-	/** None for any sub-step but a ride that takes worn gear. */
-	private List<SubStep> equipForRide(SubStep ride, Set<Integer> withdrawn)
-	{
-		Set<Integer> gear = ride.getKind() == Kind.TELEPORT ? rideGear(ride.getRow()) : Set.of();
-		return gear.isEmpty() ? List.of() : List.of(equip(gear, withdrawn));
 	}
 
 	/** Named by the piece the player has on them or the route withdraws, else by the lowest id of {@code gear}. */
