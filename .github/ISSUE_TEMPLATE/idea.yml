@@ -1,0 +1,35 @@
+name: Idea or improvement
+description: Something Clue Helper could do better, or a new thing it could do.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "Keep it short: a sentence or two per box is plenty."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happens today, and why it gets in your way.
+      placeholder: Only the master scroll book is banked before going into the Wilderness. Everything else I carry goes in with me, with no warning about what I risk.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Possible solution
+      description: What you'd like Clue Helper to do instead.
+      placeholder: A setting for the most I'm willing to risk. Before a Wilderness step the guide tells me what to bank to stay under it.
+    validations:
+      required: true
+  - type: textarea
+    id: to-work-out
+    attributes:
+      label: To work out
+      description: Open questions or choices, one short line each. Leave empty if you have none.
+      placeholder: "- What untradeable items are worth."
+  - type: textarea
+    id: where-to-look
+    attributes:
+      label: Where to look
+      description: For contributors who know the code. Files or methods involved, one line each. Leave empty if you don't know.
+      placeholder: "- `ScrollBook.java`: builds the bank stop before the Wilderness."
