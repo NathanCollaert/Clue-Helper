@@ -61,7 +61,7 @@ required spade: carried, to Draynor (dig)
   best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
 required spade: nowhere, at a tool leprechaun
   best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
-  needs     Not found on you or in your bank:
+  needs     Required but not found:
   needs     - Spade
   needs     Your spade is with a tool leprechaun
 emote item in the bank, STASH filled

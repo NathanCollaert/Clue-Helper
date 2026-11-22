@@ -77,24 +77,49 @@ final class GearActs
 		{
 			return act;
 		}
-		Integer coversAll = unmet.size() < 2 ? null : inventory.stream().sorted()
+		Integer carriedCover = unmet.size() < 2 ? null : inventory.stream().sorted()
 			.filter(id -> unmet.stream().allMatch(requirement -> requirement.fulfilledBy(PlayerSnapshot.oneOfEach(Set.of(id)))))
 			.findFirst().orElse(null);
+		if (carriedCover != null)
+		{
+			return equipping(act, List.of(carriedCover), names(List.of(carriedCover)));
+		}
+		Map<ItemRequirement, List<Integer>> carried = new LinkedHashMap<>();
+		unmet.forEach(requirement -> carried.put(requirement, toEquip(requirement, worn, inventory)));
+		long notCarried = carried.values().stream().filter(List::isEmpty).count();
+		Integer cover = notCarried > 1 ? wayInCover(act, step) : null;
+		if (cover != null)
+		{
+			return equipping(act, List.of(), names(List.of(cover)));
+		}
 		List<Integer> chosen = new ArrayList<>();
 		List<String> names = new ArrayList<>();
-		for (ItemRequirement requirement : coversAll != null ? List.<ItemRequirement>of() : unmet)
+		carried.forEach((requirement, pieces) ->
 		{
-			List<Integer> carried = toEquip(requirement, worn, inventory);
-			chosen.addAll(carried);
-			names.addAll(carried.isEmpty() ? List.of(requirement.getCollectiveName(client)) : names(carried));
-		}
-		if (coversAll != null)
+			chosen.addAll(pieces);
+			names.addAll(pieces.isEmpty() ? List.of(requirement.getCollectiveName(client)) : names(pieces));
+		});
+		return equipping(act, chosen, names);
+	}
+
+	private static SubStep equipping(SubStep act, List<Integer> chosen, List<String> names)
+	{
+		return act.toBuilder().text(EQUIP_TEXT).items(names.stream().distinct().collect(toList())).actItems(Set.copyOf(chosen)).build();
+	}
+
+	/**
+	 * One item that is every one of the way in's needs at once (the Medallion of the Deep for the diving helmet and
+	 * apparatus); null for none. The fewest items to fetch when the player has two or more of the set to find.
+	 */
+	private Integer wayInCover(SubStep act, Step step)
+	{
+		if (!act.isWornWayIn())
 		{
-			chosen.add(coversAll);
-			names.addAll(names(chosen));
+			return null;
 		}
-		return act.toBuilder().text(EQUIP_TEXT).items(names.stream().distinct().collect(toList()))
-			.actItems(Set.copyOf(chosen)).build();
+		List<StepIndex.Requires> needs = step.getData().wornRequiresFor(player::finished, player.carriedIds());
+		return needs.size() < 2 ? null : needs.get(0).getIds().stream().sorted()
+			.filter(id -> needs.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
 	}
 
 	/** The worn items an act wants off, refreshed as each comes off. */

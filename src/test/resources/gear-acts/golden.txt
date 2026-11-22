@@ -1079,15 +1079,15 @@
   worn [28933] inv [28936, 28939] done
 -- worn
   worn [28933, 28936, 28939] inv [] done
-== map:19782 #4 Equip the Fishbowl helmet and Diving apparatus, or the Medallion of the Deep for both
+== map:19782 #4 Equip the Fishbowl helmet and Diving apparatus
 -- recorded
   worn [13342] inv [952, 13069, 13111, 23458, 23946, 26948, 28939]
-   -> Equip: [Fishbowl helmet, Diving apparatus, or the Medallion of the Deep for both]
+   -> Equip: [Medallion of the Deep]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
 -- bare
   worn [] inv []
-   -> Equip: [Fishbowl helmet, Diving apparatus, or the Medallion of the Deep for both]
+   -> Equip: [Medallion of the Deep]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
 -- carried

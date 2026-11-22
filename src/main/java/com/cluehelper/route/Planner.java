@@ -18,7 +18,7 @@ public final class Planner
 	private static final int BLOCKED_RIDE_TILES = 50;
 	/** The engine words each shortfall as "needs 25 x Ecto-token"; under a "needs:" heading the word goes. */
 	private static final String NEEDS = "needs ";
-	private static final String NOT_FOUND = "Not found on you or in your bank:";
+	private static final String NOT_FOUND = "Required but not found:";
 	private static final String LEVELS_SHORT = "Levels too low:";
 	private static final String QUESTS_UNFINISHED = "Quests not finished:";
 	private static final String NOT_YET = "Not possible yet:";
