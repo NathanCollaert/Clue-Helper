@@ -34,9 +34,6 @@ final class RouteDump
 		List<String> lines = new ArrayList<>();
 		line(lines, "Best", plan.getBest());
 		line(lines, "Committed", routes.getCommitted() == plan.getBest() ? null : routes.getCommitted());
-		line(lines, "Direct", plan.getDirect());
-		line(lines, "Same book", plan.getSameBook());
-		line(lines, "Faster, under the margin", plan.getFasterUnqualified());
 		return lines;
 	}
 

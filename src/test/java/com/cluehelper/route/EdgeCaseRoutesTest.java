@@ -492,9 +492,7 @@ public class EdgeCaseRoutesTest
 		Plan plan = Planner.plan(input);
 		List<Route> routes = new ArrayList<>();
 		routes.add(plan.getBest());
-		routes.add(plan.getDirect());
-		routes.add(plan.getSameBook());
-		plan.getCandidates().forEach(c -> routes.add(c.getRoute()));
+		routes.add(plan.getFollowed());
 		for (Route route : routes)
 		{
 			if (route != null)
@@ -536,18 +534,6 @@ public class EdgeCaseRoutesTest
 	{
 		StringBuilder out = new StringBuilder(name);
 		out.append("\n  best      ").append(RouteText.describe(plan.getBest()));
-		if (plan.getDirect() != null)
-		{
-			out.append("\n  direct    ").append(RouteText.describe(plan.getDirect()));
-		}
-		if (plan.getSameBook() != null)
-		{
-			out.append("\n  same book ").append(RouteText.describe(plan.getSameBook()));
-		}
-		if (plan.getFasterUnqualified() != null)
-		{
-			out.append("\n  faster, under the margin ").append(RouteText.describe(plan.getFasterUnqualified()));
-		}
 		if (plan.getNote() != null)
 		{
 			out.append("\n  note      ").append(plan.getNote());

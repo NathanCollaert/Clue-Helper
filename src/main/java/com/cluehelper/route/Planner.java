@@ -14,7 +14,6 @@ import static java.util.stream.Collectors.*;
 /** Pure, so it runs on the executor with snapshot data only. */
 public final class Planner
 {
-	/** A route with a bank stop or a walked change must beat its reference by this much: near-ties stay on fewer steps. */
 	/** A transport landing this near a target unreached is taken as its way in when the note says what is missing. */
 	private static final int BLOCKED_RIDE_TILES = 50;
 	/** The engine words each shortfall as "needs 25 x Ecto-token"; under a "needs:" heading the word goes. */
@@ -63,8 +62,8 @@ public final class Planner
 		Searches searches = new Searches(ctx, area, probes);
 
 		LabelSearch first = searches.bestOrder(orders, probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
-		Picks picks = new Picks(ctx, first);
-		if (picks.best == null && ctx.avoidsWilderness && !probes)
+		Route best = RouteBuilder.build(ctx, first.goal);
+		if (best == null && ctx.avoidsWilderness && !probes)
 		{
 			Plan throughWilderness = plan(wildernessAllowed(in));
 			if (throughWilderness.getBest() != null)
@@ -73,17 +72,14 @@ public final class Planner
 					.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels()).build();
 			}
 		}
-		plan.best(picks.best).direct(picks.direct != picks.best ? picks.direct : null)
-			.sameBook(picks.best != null && picks.best.isChanged() ? picks.sameBook : null)
-			.fasterUnqualified(picks.fasterUnqualified)
-			.candidates(picks.candidates());
+		plan.best(best);
 		Map<WorldPoint, Integer> probeRanks = new LinkedHashMap<>();
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
-		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
+		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, first.goal, best));
 		List<String> requirementNotes = requirementNotes(ctx);
 		boolean missingNamed = requirementNotes.contains(NOT_FOUND);
-		List<String> noRoute = probes || picks.best != null || missingNamed ? List.of() : noRouteNotes(ctx, orders);
-		plan.note(!noRoute.isEmpty() ? noRoute.get(0) : picks.best != null && ctx.onlyInWilderness ? "Wilderness target" : null);
+		List<String> noRoute = probes || best != null || missingNamed ? List.of() : noRouteNotes(ctx, orders);
+		plan.note(!noRoute.isEmpty() ? noRoute.get(0) : best != null && ctx.onlyInWilderness ? "Wilderness target" : null);
 		List<String> notes = new ArrayList<>(noRoute.subList(Math.min(1, noRoute.size()), noRoute.size()));
 		notes.addAll(requirementNotes);
 		plan.requirementNotes(List.copyOf(notes));
@@ -186,16 +182,16 @@ public final class Planner
 		return Running.halfTicks(radius / 2);
 	}
 
-	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
+	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, LabelSearch.Label bestGoal, Route best)
 	{
 		String first = in.getFollowedFirstTransport();
-		if (first == null || picks.best == null || first.equals(picks.best.getFirstTransportKey()))
+		if (first == null || best == null || first.equals(best.getFirstTransportKey()))
 		{
 			return null;
 		}
-		int limit = picks.best.getRankHalfTicks() + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
+		int limit = bestGoal.rank + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
 		LabelSearch search = searches.firstBy(orders, first, limit);
-		return search == null ? null : new Picks(searches.ctx, search).best;
+		return search == null ? null : RouteBuilder.build(searches.ctx, search.goal);
 	}
 
 	private static int probeRankLimitHalfTicks(PlanInput in)
@@ -208,15 +204,12 @@ public final class Planner
 	private static Map<WorldPoint, Integer> probeTicks(PlanContext ctx, LabelSearch search, Map<WorldPoint, Integer> ranks)
 	{
 		Map<WorldPoint, Integer> ticks = new LinkedHashMap<>();
-		search.probeBest.forEach((node, best) ->
+		search.probeBest.forEach((node, goal) ->
 		{
-			Route pick = new Picks(Picks.routes(ctx, best)).best;
-			if (pick != null)
-			{
-				WorldPoint tile = ctx.standTile(node);
-				ticks.put(tile, pick.getTicks());
-				ranks.put(tile, (pick.getRankHalfTicks() + 1) / 2);
-			}
+			Route pick = RouteBuilder.build(ctx, goal);
+			WorldPoint tile = ctx.standTile(node);
+			ticks.put(tile, pick.getTicks());
+			ranks.put(tile, (pick.getRankHalfTicks() + 1) / 2);
 		});
 		return ticks;
 	}
@@ -453,49 +446,39 @@ public final class Planner
 		final boolean probes;
 		int labels;
 
-		/**
-		 * Each order after the first stops at the best rank so far, which leaves out its slower direct and same-book
-		 * routes; so a bounded winner runs once more in full.
-		 */
+		/** Each order after the first stops at the best rank so far. */
 		LabelSearch bestOrder(List<List<int[]>> orders, int rankLimit)
 		{
 			LabelSearch best = null;
-			List<int[]> bestOrder = null;
-			int bestRank = Integer.MAX_VALUE;
-			boolean bestBounded = false;
 			for (List<int[]> order : orders)
 			{
-				int limit = Math.min(rankLimit, bestRank);
-				LabelSearch search = run(order, limit);
-				Route pick = new Picks(ctx, search).best;
-				int rank = pick == null ? Integer.MAX_VALUE : pick.getRankHalfTicks();
-				if (best == null || rank < bestRank)
+				LabelSearch search = run(order, Math.min(rankLimit, rankOf(best)));
+				if (best == null || rankOf(search) < rankOf(best))
 				{
 					best = search;
-					bestOrder = order;
-					bestRank = rank;
-					bestBounded = limit != rankLimit;
 				}
 			}
-			return bestBounded ? run(bestOrder, rankLimit) : best;
+			return best;
 		}
 
 		/** The best order's search of the routes that start with transport {@code first}; null when none is in the limit. */
 		LabelSearch firstBy(List<List<int[]>> orders, String first, int rankLimit)
 		{
 			LabelSearch best = null;
-			int bestRank = Integer.MAX_VALUE;
 			for (List<int[]> order : orders)
 			{
 				LabelSearch search = run(new LabelSearch(ctx, order, area, first, rankLimit));
-				Route pick = new Picks(ctx, search).best;
-				if (pick != null && pick.getRankHalfTicks() < bestRank)
+				if (search.goal != null && rankOf(search) < rankOf(best))
 				{
 					best = search;
-					bestRank = pick.getRankHalfTicks();
 				}
 			}
 			return best;
+		}
+
+		private static int rankOf(LabelSearch search)
+		{
+			return search == null || search.goal == null ? Integer.MAX_VALUE : search.goal.rank;
 		}
 
 		private LabelSearch run(List<int[]> order, int rankLimit)
@@ -511,96 +494,16 @@ public final class Planner
 		}
 	}
 
-	static final class Picks
-	{
-		final Route[][] routes;
-		Route best;
-		Route direct;
-		Route sameBook;
-		Route fasterUnqualified;
-
-		Picks(PlanContext ctx, LabelSearch search)
-		{
-			this(routes(ctx, search.goals));
-		}
-
-		Picks(Route[][] r)
-		{
-			routes = r;
-			Route plain = faster(r[0][LabelSearch.NONE], r[0][LabelSearch.CHANGED]);
-			Route bankOnly = faster(r[1][LabelSearch.NONE], r[1][LabelSearch.CHANGED]);
-			Route walkedOnly = r[0][LabelSearch.WALKED];
-			Route both = r[1][LabelSearch.WALKED];
-			Route pickBank = qualifies(bankOnly, plain) ? bankOnly : plain;
-			Route pickWalked = qualifies(walkedOnly, plain) ? walkedOnly : plain;
-			Route reference = faster(pickBank, pickWalked);
-			Route pickBoth = qualifies(both, reference) ? both : reference;
-			best = fastest(Stream.of(plain, pickBank, pickWalked, pickBoth));
-			direct = pickWalked;
-			Route sameBookBanked = r[1][LabelSearch.NONE];
-			sameBook = qualifies(sameBookBanked, r[0][LabelSearch.NONE]) ? sameBookBanked : r[0][LabelSearch.NONE];
-			Route fastest = fastest(Stream.of(r[0], r[1]).flatMap(Stream::of));
-			fasterUnqualified = fastest != null && best != null && fastest.getRankHalfTicks() < best.getRankHalfTicks() ? fastest : null;
-		}
-
-		/** Every goal route, by bank state and change category. */
-		List<Plan.Candidate> candidates()
-		{
-			List<Plan.Candidate> candidates = new ArrayList<>();
-			for (int b = 0; b < 2; b++)
-			{
-				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
-				{
-					if (routes[b][c] != null)
-					{
-						candidates.add(new Plan.Candidate(category(b, c), routes[b][c]));
-					}
-				}
-			}
-			return candidates;
-		}
-
-		static Route[][] routes(PlanContext ctx, LabelSearch.Label[][] goals)
-		{
-			Route[][] routes = new Route[2][LabelSearch.CATEGORIES];
-			for (int b = 0; b < 2; b++)
-			{
-				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
-				{
-					LabelSearch.Label goal = goals[b][c];
-					routes[b][c] = goal == null ? null : RouteBuilder.build(ctx, goal, goal.rank);
-				}
-			}
-			return routes;
-		}
-
-		private static String category(int b, int c)
-		{
-			return (b == 1 ? "bank" : "no bank") + ", " + (c == LabelSearch.NONE ? "no change" : c == LabelSearch.CHANGED ? "carried change" : "walked change");
-		}
-
-		private static Route faster(Route a, Route b)
-		{
-			return a == null ? b : b == null ? a : b.getRankHalfTicks() < a.getRankHalfTicks() ? b : a;
-		}
-
-		private static boolean qualifies(Route route, Route reference)
-		{
-			return route != null
-				&& (reference == null || route.getRankHalfTicks() < reference.getRankHalfTicks() - LabelSearch.MARGIN_HALF_TICKS);
-		}
-
-		private static Route fastest(Stream<Route> routes)
-		{
-			return routes.filter(Objects::nonNull).min(Comparator.comparingInt(Route::getRankHalfTicks)).orElse(null);
-		}
-	}
-
 	/** A searched goal label as the route the guide follows: its legs, withdraw list and what it spends. */
 	private static final class RouteBuilder
 	{
-		static Route build(PlanContext ctx, LabelSearch.Label goal, int rank)
+		/** Null for no goal. The rank leaves out the penalties that only choose between routes. */
+		static Route build(PlanContext ctx, LabelSearch.Label goal)
 		{
+			if (goal == null)
+			{
+				return null;
+			}
 			List<Leg> legs = new ArrayList<>();
 			WorldPoint at = ctx.in.getStart().getTile();
 			boolean stageReached = false;
@@ -640,12 +543,11 @@ public final class Planner
 			return Route.builder()
 				.legs(List.copyOf(legs))
 				.halfTicks(goal.half + extra)
-				.rankHalfTicks(rank + extra)
+				.rankHalfTicks(goal.rank - goal.choicePenalty + extra)
 				.banked(banked)
 				.withdraw(withdraw)
 				.depositFirst(depositFirst)
 				.openBankStart(banked && !bankLeg)
-				.changed(goal.c != LabelSearch.NONE)
 				.startBook(ctx.homeBook)
 				.endBook(goal.endBook != null ? goal.endBook : LabelSearch.endBook(goal.k))
 				.spent(spent)

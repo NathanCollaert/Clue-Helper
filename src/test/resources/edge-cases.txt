@@ -4,15 +4,12 @@ consumption: minigame teleports only, bank on, to Varrock bank crates
   best      66t: Soul Wars Minigame Teleport → walk 2 → bank → Varrock tablet → walk 28 {cooldown:888=1, item:8007=1} withdraw [8007]
 Lunar, swap runes and Max cape carried, to Varrock: Spellbook Swap, not the cape
   best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
-  same book 40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
 Lunar, swap runes and Max cape, Spellbook Swap only
   best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
-  same book 40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
 pending revert to Lunar on Standard, 150 ticks left: Standard teleport at +0
   best      32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
 pending revert, window unknown: plans from Lunar
   best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
-  same book 40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
 pending revert on Standard, Ancient target: the cape from a pending revert
   best      44t: Teleport to House → Portal nexus: Senntisten → walk 30 {item:556=1, item:557=1, item:563=1}
 99 Magic, no cape uses left today, Ancient target
@@ -56,7 +53,6 @@ bank tipping point with the PIN still to come: mid-ironman, map:3599
   best      73t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011]
 bank tipping point: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      42t: Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
-  faster, under the margin 40t: Ring of dueling: Castle Wars → walk 4 → bank → Combat bracelet: Champions' Guild → walk 20 {charge:2552=1, charge:11972=1} withdraw [11972]
 bank tipping point with the PIN still to come: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
   best      42t: Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
 required spade: glory(1) carried, a spade in the bank, to Draynor (dig)
@@ -89,7 +85,6 @@ house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)
   best      79t (rank 109): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
-  same book 144t: Games necklace: Corporeal Beast → walk 139 {charge:3853=1}
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
   best      77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62
@@ -161,7 +156,6 @@ sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium
   best      9t: Max cape: Other Teleports: The Pandemonium → walk 4
 gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave
   best      89t (rank 97): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
-  same book 97t: Teleport to House → Portal nexus: Fenken' Castle → walk 83 {item:556=1, item:557=1, item:563=1}
 quest gate: maxed without Song of the Elves, to Prifddinas: no route, the quest named
   best      none
   note      Quests not finished:

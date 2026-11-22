@@ -502,10 +502,7 @@ public class RoutePlanner
 	{
 		List<Route> routes = new ArrayList<>();
 		routes.add(planned.getBest());
-		routes.add(planned.getDirect());
-		routes.add(planned.getSameBook());
 		routes.add(planned.getFollowed());
-		planned.getCandidates().forEach(candidate -> routes.add(candidate.getRoute()));
 		return routes;
 	}
 
