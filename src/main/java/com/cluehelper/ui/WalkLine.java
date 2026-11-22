@@ -42,7 +42,7 @@ final class WalkLine
 	void follow(WorldView view, WalkCosts here, WalkGoal goal)
 	{
 		boolean newGoal = !goal.equals(this.goal);
-		boolean again = stale || isLeft() || walk.isEmpty() && here != this.here;
+		boolean again = stale || isLeft() || here != this.here && (walk.isEmpty() || !isInSearchedScene());
 		if (newGoal || again && !runner.isWorking())
 		{
 			search(view, here, goal);
@@ -133,6 +133,18 @@ final class WalkLine
 			walk = found;
 			passed = 0;
 		});
+	}
+
+	/**
+	 * Right after a teleport the walk is searched from the landing with the scene left behind: the world map stands in
+	 * for the landing's surroundings and can miss a way the scene has (past Mount Karuulm's elevator), so the walk is
+	 * searched again once a scene around the player comes.
+	 */
+	private boolean isInSearchedScene()
+	{
+		Player local = client.getLocalPlayer();
+		LoadedScene scene = here == null ? null : here.getScene();
+		return local == null || scene != null && scene.contains(local.getWorldLocation());
 	}
 
 	private boolean isLeft()

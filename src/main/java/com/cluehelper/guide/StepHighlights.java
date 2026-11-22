@@ -81,7 +81,7 @@ final class StepHighlights
 			case ENTER:
 				return wayInHighlights(shown, current, step);
 			case SPELLBOOK_SWAP:
-				shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(Tab.MAGIC);
+				swapHighlights(shown, current.getBook());
 				break;
 			case TELEPORT:
 				teleportHighlights(shown, current);
@@ -449,6 +449,14 @@ final class StepHighlights
 		{
 			shown.menuTarget(MenuTarget.builder().widgetIds(Set.of(spell)).path(List.of(option)).build()).spellRightClick(true);
 		}
+	}
+
+	/** Spellbook Swap's right-click menu names each book it can swap to ("Arceuus"), so the step's book is marked there. */
+	private static void swapHighlights(Highlights.HighlightsBuilder shown, Book book)
+	{
+		int spell = InterfaceID.MagicSpellbook.SPELLBOOK_SWAP;
+		shown.spellWidget(spell).tab(Tab.MAGIC).spellRightClick(true)
+			.menuTarget(MenuTarget.builder().widgetIds(Set.of(spell)).path(List.of(book.label())).build());
 	}
 
 	/** An item that changes the book anywhere (a cape), or house furniture that does. */
