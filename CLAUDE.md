@@ -5,6 +5,9 @@
 - Instance fields in `src/main/java` are private by default through `lombok.config`: leave out `private` on them, and
   keep it on static fields, which the setting does not cover. A field another class reads takes `@PackagePrivate`, or
   `@FieldDefaults(level = AccessLevel.PACKAGE)` on its class. Tests keep explicit modifiers (`src/test/lombok.config`).
+- `ConventionsTest` fails on any call spelled like one of the Clue Scroll plugin's mutators (`.update(`, `.reset(`,
+  `.signal(` and the others in its pattern) in a main file that imports core's `cluescrolls` package, whatever the
+  receiver is. Read its list before naming a method such a file will call.
 
 ## Branches
 
