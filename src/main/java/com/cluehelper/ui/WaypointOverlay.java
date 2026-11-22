@@ -118,7 +118,7 @@ public class WaypointOverlay extends Overlay
 			drawLine(graphics, view, line);
 			return null;
 		}
-		guide.getPickUpTiles().stream().filter(tile -> tile.getPlane() == view.getPlane()).forEach(tile -> drawTile(graphics, view, tile));
+		guide.getPickUpTiles().stream().filter(tile -> tile.getPlane() == view.getPlane()).forEach(tile -> drawPickUp(graphics, view, tile));
 		Goal goal = goal(view, guide.getCurrent());
 		if (goal == null)
 		{
@@ -215,6 +215,22 @@ public class WaypointOverlay extends Overlay
 	{
 		boolean stepOrPartAct = current.getStage() == null || current.getStage().getKind() == Stage.Kind.PART || isKillForKey(current);
 		return current.getKind() == SubStep.Kind.ACT && stepOrPartAct && current.getActItemNamed() == null && !outlined();
+	}
+
+	/** The items to pick up, outlined where they lie, else their tile. */
+	private void drawPickUp(Graphics2D graphics, WorldView view, WorldPoint at)
+	{
+		LocalPoint local = LocalPoint.fromWorld(view, at);
+		Tile tile = local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
+		ItemLayer items = tile == null ? null : tile.getItemLayer();
+		if (items != null)
+		{
+			highlighter.object(graphics, items, false);
+		}
+		else
+		{
+			drawTile(graphics, view, at);
+		}
 	}
 
 	private void drawTile(Graphics2D graphics, WorldView view, WorldPoint waypoint)

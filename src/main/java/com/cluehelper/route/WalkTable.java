@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.ToIntFunction;
 import java.util.zip.GZIPInputStream;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
@@ -234,6 +235,16 @@ public final class WalkTable
 	public int rowGate(int row)
 	{
 		return rowGate[row];
+	}
+
+	/**
+	 * The exit a walk of {@code tiles} from {@code from} to {@code to} goes through, the one with the least walking either
+	 * side of it (the whirlpool down to the Ancient Cavern); null when none fits.
+	 */
+	public Exit exitBetween(WorldPoint from, WorldPoint to, int tiles)
+	{
+		ToIntFunction<Exit> walked = exit -> from.distanceTo2D(exit.getOrigin()) + exit.getDestination().distanceTo2D(to);
+		return exits.values().stream().filter(exit -> walked.applyAsInt(exit) <= tiles).min(Comparator.comparingInt(walked)).orElse(null);
 	}
 
 	/** Null unless the row from {@code origin} to {@code destination} is an {@link Exit}. */

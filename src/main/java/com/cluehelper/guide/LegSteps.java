@@ -106,13 +106,20 @@ final class LegSteps
 	static SubStep enter(StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data.getEntry();
-		return SubStep.of(Kind.ENTER, "Go in: " + way.getText()).waypoint(way.getTile()).wayIn(way).build();
+		return SubStep.of(Kind.ENTER, way.getAct()).waypoint(way.getTile()).wayIn(way).build();
 	}
 
 	static SubStep exit(Leg leg, Exit exit)
 	{
 		return SubStep.of(Kind.EXIT, exitText(exit))
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).exit(exit).build();
+	}
+
+	/** Through an exit whose far side isn't loaded yet: done on landing. */
+	static SubStep jump(Exit exit)
+	{
+		return SubStep.of(Kind.EXIT, exitText(exit))
+			.waypoint(exit.getOrigin()).goal(exit.getDestination()).radius(SubSteps.LANDING_TILES).exit(exit).build();
 	}
 
 	/** The Swap's book is its spell's, not the leg's: after the cast the player is back on Lunar. */

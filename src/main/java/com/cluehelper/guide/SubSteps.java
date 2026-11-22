@@ -24,6 +24,8 @@ import com.cluehelper.guide.StepGuide.Tab;
 @RequiredArgsConstructor
 public final class SubSteps
 {
+	private static final int DUNGEON_OFFSET = 6400;
+	private static final int DUNGEON_SOUTH_EDGE = 8800;
 	public static final int ARRIVE_TILES = 3;
 	/** The Agility Pyramid's course spans its foot; a cave's way in is a tile. */
 	private static final int ON_WAY_IN_TILES = 40;
@@ -56,13 +58,15 @@ public final class SubSteps
 	final IntPredicate weaponOrArmour;
 	/** The teleports, for the spirit tree a planted-tree task travels to. */
 	final Supplier<List<CatalogRow>> catalog;
+	/** The walk table's exit a leg goes through within so many tiles of walking, or null. */
+	final BiFunction<Leg, Integer, Exit> exitBetween;
 
 	@Inject
 	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear,
 		AvailabilityService availability)
 	{
 		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
-			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog);
+			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog, routes::exitBetween);
 	}
 
 
@@ -72,7 +76,7 @@ public final class SubSteps
 	{
 		boolean takeFromStash = takeFromStash(step);
 		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
-			.build(this::exitOf, this::plantedTreeTeleport);
+			.build(this::exitOf, this::jumpedBy, this::plantedTreeTeleport);
 		Set<Integer> onHand = new HashSet<>(carriedIds());
 		onHand.addAll(withdrawnIds(route));
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds(), onHand,
@@ -100,6 +104,23 @@ public final class SubSteps
 			}
 		}
 		return List.copyOf(named);
+	}
+
+	/**
+	 * The exit a walk to a kill jumps through, farther than the walk's time covers (the whirlpool down to the Ancient
+	 * Cavern), a dungeon counted where it lies under the surface; null for a plain walk. Its far side isn't loaded, so
+	 * the player's own walk search doesn't know it yet.
+	 */
+	private Exit jumpedBy(Leg leg)
+	{
+		boolean jumps = aboveGround(leg.getFrom()).distanceTo2D(aboveGround(leg.getTo())) > leg.getHalfTicks();
+		return jumps ? exitBetween.apply(leg, leg.getHalfTicks()) : null;
+	}
+
+	/** The surface tile over a dungeon's: the game lays most dungeons out this far north of where they lie. */
+	private static WorldPoint aboveGround(WorldPoint tile)
+	{
+		return tile.getY() >= DUNGEON_SOUTH_EDGE ? new WorldPoint(tile.getX(), tile.getY() - DUNGEON_OFFSET, tile.getPlane()) : tile;
 	}
 
 	private static SubStep ledTo(List<SubStep> steps, int from)
@@ -385,7 +406,7 @@ public final class SubSteps
 			return takeFromStash && stashOutsideWayIn(step);
 		}
 
-		List<SubStep> build(Function<Leg, Exit> exits, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
+		List<SubStep> build(Function<Leg, Exit> exits, Function<Leg, Exit> jumps, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
 		{
 			if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 			{
@@ -411,6 +432,11 @@ public final class SubSteps
 					if (entersStepArea(leg, step))
 					{
 						steps.add(LegSteps.enter(step.getData()));
+					}
+					Exit jump = reached.getKind() == Stage.Kind.KEY ? jumps.apply(leg) : null;
+					if (jump != null)
+					{
+						steps.add(LegSteps.jump(jump));
 					}
 					steps.add(LegSteps.walkToStage(leg, reached, step.getData()));
 				}

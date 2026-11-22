@@ -165,7 +165,8 @@ public final class CampaignReplay
 			.build();
 		Plan plan = Planner.plan(input);
 		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start,
-			recording.settings::isScrollBookOutOfWilderness, id -> false, catalog::getTeleports);
+			recording.settings::isScrollBookOutOfWilderness, id -> false, catalog::getTeleports,
+			(leg, tiles) -> table.exitBetween(leg.getFrom(), leg.getTo(), tiles));
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 		return new Guide(recording.key, travel, needs, player, recordedNames(recording), plan, guide);
 	}

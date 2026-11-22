@@ -22,6 +22,7 @@ import com.cluehelper.guide.StepGuide.Tab;
 @Singleton
 final class StepHighlights
 {
+	private static final String TAKE_OPTION = "Take";
 	static final String SEARCH_OPTION = "Search";
 	private static final String REMOVE_OPTION = "Remove";
 	private static final String OPEN_OPTION = "Open";
@@ -204,6 +205,10 @@ final class StepHighlights
 	private Highlights actHighlights(Highlights.HighlightsBuilder shown, SubStep current, Step step)
 	{
 		shown.tab(current.getTab());
+		if (current.getGroundItem() >= 0)
+		{
+			return shown.menuTarget(MenuTarget.builder().itemIds(Set.of(current.getGroundItem())).path(List.of(TAKE_OPTION)).build()).build();
+		}
 		int stash = stashOf(current, step);
 		if (stash != StepRequirements.NO_STASH)
 		{
@@ -280,7 +285,7 @@ final class StepHighlights
 		}
 		if (way.getObject() < 0 && !current.getObjectIds().isEmpty())
 		{
-			return shown.menuTarget(wayTarget(current.getObjectIds().iterator().next(), current.getOption())).build();
+			return shown.menuTarget(wayTarget(current.getObjectIds(), current.getOption())).build();
 		}
 		Set<Integer> instead = carriedInsteadOfWorn(step);
 		return instead.isEmpty() ? shown.menuTarget(enterTarget(current)).build()
@@ -383,7 +388,11 @@ final class StepHighlights
 	/** Shortest Path names objects and NPCs alike by id, so the id is looked for as both. */
 	private static MenuTarget wayTarget(int id, String option)
 	{
-		Set<Integer> ids = id < 0 ? Set.of() : Set.of(id);
+		return wayTarget(id < 0 ? Set.of() : Set.of(id), option);
+	}
+
+	private static MenuTarget wayTarget(Set<Integer> ids, String option)
+	{
 		return MenuTarget.builder().objectIds(ids).npcIds(ids).path(option == null || option.isEmpty() ? List.of() : List.of(option)).build();
 	}
 

@@ -56,7 +56,7 @@ public class WayInMemory
 		else if (way.isInside(at) && way.isPartWay(before) && partWayFrom != null)
 		{
 			Ways ways = remembered.get().copy();
-			ways.entered.put(way.getText(), new Place(partWayFrom, clicked, clickedOption));
+			ways.entered.put(way.getText(), new Place(partWayFrom, clicked, clickedOption, way.getForgetOn()));
 			remembered.set(ways);
 		}
 	}
@@ -71,12 +71,12 @@ public class WayInMemory
 		}
 	}
 
-	public void onGameLine(StepIndex.WayIn way, String line)
+	/** Whatever the step: the Barrows chest looted on any trip moves the tunnel. */
+	public void onGameLine(String line)
 	{
-		if (way != null && way.getForgetOn() != null && line.contains(way.getForgetOn()) && remembered.get().entered.containsKey(way.getText()))
+		Ways ways = remembered.get().copy();
+		if (ways.entered.values().removeIf(place -> place.forgetOn != null && line.contains(place.forgetOn)))
 		{
-			Ways ways = remembered.get().copy();
-			ways.entered.remove(way.getText());
 			remembered.set(ways);
 		}
 	}
@@ -108,18 +108,21 @@ public class WayInMemory
 		int plane;
 		int object;
 		String option;
+		/** The way's forget line, kept with the place so it is forgotten whatever step is on. */
+		String forgetOn;
 
 		Place()
 		{
 		}
 
-		Place(WorldPoint tile, int object, String option)
+		Place(WorldPoint tile, int object, String option, String forgetOn)
 		{
 			x = tile.getX();
 			y = tile.getY();
 			plane = tile.getPlane();
 			this.object = object;
 			this.option = option;
+			this.forgetOn = forgetOn;
 		}
 	}
 }

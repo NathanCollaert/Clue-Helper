@@ -43,6 +43,8 @@ public class StepNeeds
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
 	final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
 	final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
+	/** One requirement per item id picked from a brought-if-owned entry, for the same reason. */
+	final Map<Integer, ItemRequirement> ownedPicks = new HashMap<>();
 
 	@Inject
 	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)
@@ -87,10 +89,11 @@ public class StepNeeds
 				continue;
 			}
 			boolean fetchedOnTheWay = gettingLeft && way.getFrom() != null;
-			if (!fetchedOnTheWay && !usedUpGoingIn(way, step))
+			ItemRequirement item = way.isBroughtIfOwned() ? firstOwned(way) : wayInItems.computeIfAbsent(way, w -> anyOf(w.getName(), w.getIds()));
+			if (!fetchedOnTheWay && !usedUpGoingIn(way, step) && item != null)
 			{
 				// Worn gear keeps the player alive or gets them in (a mirror shield, a sled): no route without it
-				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, w -> anyOf(w.getName(), w.getIds())), false, way.isWear()));
+				needs.add(new RequiredItems.Need(way.getName(), item, false, way.isWear()));
 			}
 		}
 		ItemRequirement key = ownedKey(step);
@@ -109,6 +112,14 @@ public class StepNeeds
 			.stash(stash(requirements))
 			.spadeAtLeprechaun(client.getVarbitValue(VarbitID.FARMING_TOOLS_SPADE) > 0)
 			.build();
+	}
+
+	/** The first of the item's ids the player owns, as its own requirement; null while none is owned. */
+	private ItemRequirement firstOwned(StepIndex.Requires way)
+	{
+		Set<Integer> owned = ownedItemIds.get();
+		return way.getIds().stream().filter(owned::contains).findFirst()
+			.map(id -> ownedPicks.computeIfAbsent(id, first -> anyOf(way.getName(), List.of(first)))).orElse(null);
 	}
 
 	private boolean isOptional(String name, StepIndex.Entry data)

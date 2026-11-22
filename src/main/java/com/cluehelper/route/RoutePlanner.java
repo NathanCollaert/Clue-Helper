@@ -99,6 +99,13 @@ public class RoutePlanner
 		startRunner = new PlannerRunner(executor, clientThread);
 	}
 
+	/** The walk table's exit a walk leg goes through within so many tiles of walking; null for none, or before it loads. */
+	public Exit exitBetween(Leg leg, int tiles)
+	{
+		WalkData loaded = walk;
+		return loaded == null ? null : loaded.getTable().exitBetween(leg.getFrom(), leg.getTo(), tiles);
+	}
+
 	/** The guide takes such a scroll out at the bank as the plan does. */
 	public boolean keepsScrollBookOutOfWilderness()
 	{
@@ -371,6 +378,7 @@ public class RoutePlanner
 		WalkGates gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
 		rowOpen = gates.rowOpen();
 		doors.setCanSlash(gates.canSlash());
+		doors.setCarried(snapshot.carriedIds());
 		gatesVersion = snapshot.getVersion();
 	}
 

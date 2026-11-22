@@ -11,6 +11,7 @@
 544	Monk's robe top	4	|Wear|||Drop
 552	Ghostspeak amulet	2	|Wear|||Drop
 556	Air rune	-1	||||Drop
+561	Nature rune	-1	||||Drop
 563	Law rune	-1	||||Drop
 564	Cosmic rune	-1	||||Drop
 565	Blood rune	-1	||||Drop
@@ -865,6 +866,7 @@
 19645	Green slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
 19647	Red slayer helmet	0	|Wear|Check|Disassemble|Drop
 19649	Red slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
+19669	Redwood logs	-1	||||Drop
 19675	Arclight	3	|Wield|Check||Drop
 19720	Occult necklace (or)	2	|Wear|||Dismantle
 19722	Dragon defender (t)	5	|Wield|||Dismantle
@@ -1005,6 +1007,7 @@
 24666	Twisted ancestral robe top	4	|Wear|||Dismantle
 24704	Daeyalt essence	-1	||||Drop
 24736	Ring of endurance	12	|Wear||Check|Uncharge
+24738	Strange old lockpick	-1	|||Inspect|Drop
 24743	Graceful hood	0	|Wear|||Drop
 24745	Graceful hood	0	|Wear|||Drop
 24746	Graceful cape	1	|Wear|||Drop

@@ -2103,12 +2103,9 @@
   worn [4024] inv [4025, 19525] done
 -- worn
   worn [19525] inv [4024, 4025] done
-== skill:SHERLOCK:craft a nature rune. #4 Equip the Nature talisman or tiara (or a catalytic one, Runecraft or Max cape)
+== skill:SHERLOCK:craft a nature rune. #1 Equip the Nature talisman or tiara (or a catalytic one, Runecraft or Max cape)
 -- recorded
-  worn [4587, 6465, 10933, 10939, 10940, 10941, 11283, 22981, 24133, 29804] inv [564, 811, 952, 1785, 10973, 13069, 13115, 13140, 13222, 13241, 13280, 21389, 22326, 22327, 22328, 22603, 28329, 31097]
-   -> Equip: [Max cape]
-   outline [13280] fill [13280] tab INVENTORY menu [[Wear]@[13280]]
-  worn [4587, 6465, 10933, 10939, 10940, 10941, 11283, 13280, 22981, 29804] inv [564, 811, 952, 1785, 10973, 13069, 13115, 13140, 13222, 13241, 21389, 22326, 22327, 22328, 22603, 24133, 28329, 31097] done
+  worn [13342, 28329, 29796, 32386, 33066] inv [307, 552, 564, 590, 946, 952, 1523, 7936, 12934, 13111, 13140, 13241, 19476, 19669, 21268, 21389, 26948, 28260] done
 -- bare
   worn [] inv []
    -> Equip: [Nature talisman or tiara (or a catalytic one, Runecraft or Max cape)]
@@ -3528,9 +3525,9 @@
   worn [2491, 2503, 12524] inv [] done
 -- worn
   worn [2491, 2503, 12524] inv [] done
-== emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #8 Equip the items
+== emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #5 Equip the items
 -- recorded
-  worn [13342, 25549, 25551, 25553, 25555] inv [565, 4151, 13069, 13140, 21268]
+  worn [13342, 28329, 29796, 32386, 33066] inv [307, 552, 561, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13241, 19476, 19669, 21268, 21389, 24738, 26948, 28260]
    -> Equip: [Any full barrows set]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3554,9 +3551,9 @@
    outline [4714] fill [4714] tab INVENTORY menu [[Wear]@[4714]]
 -- worn
   worn [30543, 30545, 30547, 30574] inv [4708, 4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30568, 30570, 30571, 30572, 30573] done
-== emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #11 Equip the items
+== emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #8 Equip the items
 -- recorded
-  worn [13342, 25549, 25551, 25553, 25555] inv [565, 4151, 13069, 13140, 21268]
+  worn [13342, 28329, 29796, 32386, 33066] inv [307, 552, 561, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13241, 19476, 19669, 21268, 21389, 24738, 26948, 28260]
    -> Equip: [Any full barrows set]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck

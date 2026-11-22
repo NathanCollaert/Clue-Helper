@@ -22,6 +22,9 @@ import static java.util.stream.Collectors.*;
 @Singleton
 public class MenuLines
 {
+	private static final Set<MenuAction> GROUND_ITEM_OPTIONS = EnumSet.of(MenuAction.GROUND_ITEM_FIRST_OPTION,
+		MenuAction.GROUND_ITEM_SECOND_OPTION, MenuAction.GROUND_ITEM_THIRD_OPTION, MenuAction.GROUND_ITEM_FOURTH_OPTION,
+		MenuAction.GROUND_ITEM_FIFTH_OPTION);
 	private static final int LIST_TITLE = 219;
 	private static final int LIST_TITLE_ALT = 9142;
 	private static final int LIST_LINE = 218;
@@ -757,6 +760,10 @@ public class MenuLines
 			return true;
 		}
 		if (entry.getItemId() <= 0 && target.getItemNames().contains(MenuLabels.normalise(entry.getTarget())))
+		{
+			return true;
+		}
+		if (GROUND_ITEM_OPTIONS.contains(entry.getType()) && target.getItemIds().contains(entry.getIdentifier()))
 		{
 			return true;
 		}

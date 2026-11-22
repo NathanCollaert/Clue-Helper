@@ -90,7 +90,8 @@ public final class CampaignRecorder
 		RequiredItems required = needs.of(travel);
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
 			input.getSettings()::isScrollBookOutOfWilderness, id -> false,
-			() -> input.getCatalog() == null ? List.of() : input.getCatalog().getTeleports());
+			() -> input.getCatalog() == null ? List.of() : input.getCatalog().getTeleports(),
+			(leg, tiles) -> input.getTable().exitBetween(leg.getFrom(), leg.getTo(), tiles));
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 		// A replay that plans another route asks about other items: every owned one is on the recording
 		StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()).forEach(id ->

@@ -307,7 +307,7 @@ public class StepGuide
 			{
 				route = null;
 				routeStep = step;
-				steps = inWayIn(step, goIn);
+				steps = withRememberedWayIn(inWayIn(step, goIn), step);
 				index = 0;
 				updateHighlights();
 				refreshObjects();
@@ -315,7 +315,7 @@ public class StepGuide
 			}
 			return;
 		}
-		if (isPlannedBeforeJump(start) || isPlannedBeforeGoingIn(step, start))
+		if (isPlannedBeforeJump(start) || isPlannedBeforeGoingIn(step, routes.getCommitted()))
 		{
 			return;
 		}
@@ -655,11 +655,15 @@ public class StepGuide
 		}
 	}
 
-	/** A plan searched from outside the way in, published once the player is through it: the plan from inside follows. */
-	private boolean isPlannedBeforeGoingIn(Step step, PlanStart start)
+	/**
+	 * A plan searched from outside the way in, published once the player is through it: its route's first leg starts
+	 * outside. The plan from inside follows.
+	 */
+	private boolean isPlannedBeforeGoingIn(Step step, Route committed)
 	{
 		WorldPoint at = player.getPosition() == null ? null : player.getPosition().getTile();
-		return start != null && start.getTile() != null && at != null && isInsideWayIn(step, at) && !isInsideWayIn(step, start.getTile());
+		WorldPoint plannedFrom = committed == null || committed.getLegs().isEmpty() ? null : committed.getLegs().get(0).getFrom();
+		return plannedFrom != null && at != null && isInsideWayIn(step, at) && !isInsideWayIn(step, plannedFrom);
 	}
 
 	private static StepIndex.WayIn wayInOf(Step step)
@@ -674,13 +678,23 @@ public class StepGuide
 		WayInMemory.Entered entered = wayInMemory.enteredBy(way);
 		if (entered == null)
 		{
-			return listed;
+			return way == null || way.getTried().isEmpty() ? listed : withWayInTried(listed, way);
 		}
 		WorldPoint at = entered.getFrom();
-		Set<Integer> object = entered.getObject() < 0 ? Set.of() : Set.of(entered.getObject());
+		boolean clicked = entered.getObject() >= 0;
+		Set<Integer> objects = clicked ? Set.of(entered.getObject()) : Set.copyOf(way.getTried());
+		String option = clicked ? entered.getOption() : way.getOption();
 		return listed.stream().map(sub -> sub.getWayIn() == way && (sub.getKind() == Kind.ENTER || sub.getKind() == Kind.WALK)
-			? sub.toBuilder().text("Go in: " + way.getRememberedText()).waypoint(at).goal(sub.getGoal() == null ? null : at)
-				.objectIds(object).option(entered.getOption()).build() : sub)
+			? sub.toBuilder().text(way.getRememberedAct()).waypoint(at).goal(sub.getGoal() == null ? null : at)
+				.objectIds(objects).option(option).build() : sub)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
+	/** Not known yet where the way leads in: its objects are each tried (a sarcophagus searched in each crypt). */
+	private static List<SubStep> withWayInTried(List<SubStep> listed, StepIndex.WayIn way)
+	{
+		return listed.stream().map(sub -> sub.getWayIn() == way && sub.getKind() == Kind.ENTER
+			? sub.toBuilder().objectIds(Set.copyOf(way.getTried())).option(way.getOption()).build() : sub)
 			.collect(Collectors.toUnmodifiableList());
 	}
 
@@ -719,14 +733,14 @@ public class StepGuide
 		{
 			return pickUpOnTheWay(current, pickUp, tile);
 		}
-		if (way == null || current.getText().startsWith(KEEP_GOING))
+		if (way == null)
 		{
 			return false;
 		}
 		WorldPoint to = way.getTo();
 		boolean toNearby = !way.isNoLine() && to != null && tile != null && to.getPlane() == tile.getPlane()
 			&& to.distanceTo2D(tile) <= PART_WAY_LINE_TILES;
-		return replaceCurrent(current.toBuilder().text(KEEP_GOING + way.getText()).waypoint(toNearby ? to : null).build());
+		return replaceCurrent(current.toBuilder().text(way.getPartWayLine()).waypoint(toNearby ? to : null).build());
 	}
 
 	/**
@@ -884,7 +898,7 @@ public class StepGuide
 		boolean gameLine = message.getType() == ChatMessageType.GAMEMESSAGE || message.getType() == ChatMessageType.MESBOX;
 		if (gameLine)
 		{
-			wayInMemory.onGameLine(wayInOf(routeStep), message.getMessage());
+			wayInMemory.onGameLine(message.getMessage());
 		}
 		if (gameLine && current != null && current.getKind() == Kind.TELEPORT && current.getRow() != null)
 		{
@@ -948,6 +962,10 @@ public class StepGuide
 		index = 0;
 		resetTravel();
 		advance(tile);
+		// A plan comes each tick while walking: the rewrites a tick makes are made again before anything is shown
+		partWayIn(tile);
+		dropToPickUp();
+		pickUpForAct(tile);
 		refreshCurrent();
 		showMaking();
 		updateHighlights();

@@ -418,6 +418,8 @@ public final class StepIndex
 		PutOn putOn;
 		List<Integer> ids = List.of();
 		String name;
+		/** Brought only by a player owning one, the first owned of {@link #ids} (the strange old lockpick, least charged first). */
+		boolean broughtIfOwned;
 		/** Worn to go in (a diving helmet), not just carried (a spade). */
 		boolean wear;
 		/** Of a worn requirement, the items that do as well just carried (a talisman beside the tiara); empty for none. */
@@ -471,7 +473,12 @@ public final class StepIndex
 		List<Box> partWay = List.of();
 		/** Part way in, no line: the way can't be drawn (Pyramid Plunder's doors open in no fixed order). */
 		boolean noLine;
+		/** The way by name, as a walk leads to it: "the Nature Altar's ruins". */
 		String text;
+		/** The guide's line that goes in: "Enter the Nature Altar's ruins". */
+		String act;
+		/** The line on the way's own floors, part way in; null to keep {@link #act}. */
+		String partWayAct;
 		/** The chat options to pick, in order, when the way in is a conversation (Shantay's arrest). */
 		List<String> dialogue = List.of();
 		/** Ground items to pick up part way in before going on (the Mogre Camp's rocks); null when none. */
@@ -480,10 +487,18 @@ public final class StepIndex
 		boolean gearThere;
 		/** Entered at one of several places, the one used last remembered (the Barrows crypt with the tunnel). */
 		boolean remembered;
+		/** For a remembered way not known yet: the objects, one of which leads in, tried with its option (the six sarcophagi). */
+		List<Integer> tried = List.of();
 		/** For a remembered way: the game line that forgets the place (the Barrows chest's count, once looted). */
 		String forgetOn;
-		/** For a remembered way: its text once the place is known. */
-		String rememberedText;
+		/** For a remembered way: its line once the place is known. */
+		String rememberedAct;
+
+		/** The line on the way's own floors. */
+		public String getPartWayLine()
+		{
+			return partWayAct != null ? partWayAct : act;
+		}
 
 		public boolean isInside(WorldPoint at)
 		{
