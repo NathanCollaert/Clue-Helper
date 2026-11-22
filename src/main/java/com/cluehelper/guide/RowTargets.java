@@ -7,7 +7,9 @@ import java.util.*;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.DBTableID;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 import static java.util.stream.Collectors.*;
 
 /** What to click for a catalog row: its object or NPC and menu path, its held items, or its spell's button. Client thread only. */
@@ -16,6 +18,7 @@ final class RowTargets
 {
 	static final String SIGNAL_OPTION = "Signal";
 
+	private static final String LAST_DESTINATION_OPTION = "Last-destination";
 	private static final String SPELLBOOK_OPTION = "Spellbook";
 	private static final int PARAM_SPELL_WIDGET = 596;
 	/** Catalog landings spread 0–2 tiles, so another menu's line within this lands at the same place. */
@@ -43,22 +46,58 @@ final class RowTargets
 			.icon(row.getIcon());
 	}
 
-	/** The teleport's object, with the house furniture that lands at the same place as alternatives. */
+	/**
+	 * The teleport's object or NPC, with the house furniture that lands at the same place as alternatives; Renu's
+	 * Last-destination when the quetzal flies there.
+	 */
 	MenuTarget locatedTeleport(SubStep teleport)
 	{
-		return located(teleport.getRow()).toBuilder().alternatives(sameLanding(teleport)).build();
+		CatalogRow row = teleport.getRow();
+		MenuTarget.MenuTargetBuilder target = isLastQuetzalSite(row) ? lastDestination() : line(row).path(row.getClicks());
+		return target.objectIds(row.getObjects()).npcIds(row.getNpcs()).alternatives(sameLanding(teleport)).build();
 	}
 
 	/**
-	 * The held items with the teleport's option, or Signal for a quetzal; a boat teleport's list row; house furniture
-	 * landing there as alternatives.
+	 * The held items with the teleport's option; for a quetzal, Last-destination when it flies there, else Signal and
+	 * the site on the map; a boat teleport's list row; house furniture landing there as alternatives.
 	 */
 	MenuTarget heldTeleport(SubStep teleport, Set<Integer> held)
 	{
 		CatalogRow row = teleport.getRow();
-		List<String> path = row.getLine() == MenuLine.QUETZAL ? List.of(SIGNAL_OPTION)
-			: row.getOptions().isEmpty() ? wornOption(held) : row.getOptions();
-		return withItems(line(row).path(path), held).alternatives(sameLanding(teleport)).build();
+		MenuTarget.MenuTargetBuilder target = isLastQuetzalSite(row) ? lastDestination()
+			: row.getLine() == MenuLine.QUETZAL ? line(row).path(List.of(SIGNAL_OPTION))
+			: line(row).path(row.getOptions().isEmpty() ? wornOption(held) : row.getOptions());
+		return withItems(target, held).alternatives(sameLanding(teleport)).build();
+	}
+
+	/** The whistle and Renu share it, so it flies straight there with no map. */
+	private static MenuTarget.MenuTargetBuilder lastDestination()
+	{
+		return MenuTarget.builder().path(List.of(LAST_DESTINATION_OPTION));
+	}
+
+	/** The game keeps the quetzals' last site by its id in the quetzal table, whose map icon is where the row's is. */
+	private boolean isLastQuetzalSite(CatalogRow row)
+	{
+		if (row.getLine() != MenuLine.QUETZAL || row.getIcon() == null)
+		{
+			return false;
+		}
+		int lastId = client.getVarbitValue(VarbitID.QUETZAL_LAST_DESTINATION);
+		List<Integer> sites = client.getDBRowsByValue(DBTableID.Quetzal.ID, DBTableID.Quetzal.COL_ID, 0, lastId);
+		if (sites.isEmpty())
+		{
+			return false;
+		}
+		int site = sites.get(0);
+		int[] icon = row.getIcon();
+		return icon[0] == quetzalField(site, DBTableID.Quetzal.COL_IF_X_POS) && icon[1] == quetzalField(site, DBTableID.Quetzal.COL_IF_Y_POS);
+	}
+
+	private int quetzalField(int site, int column)
+	{
+		Object[] values = client.getDBTableField(site, column, 0);
+		return values.length == 0 ? -1 : (int) values[0];
 	}
 
 	/**
