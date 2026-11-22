@@ -46,7 +46,7 @@ final class StageParts
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
 		if (key != null)
 		{
-			return killForKey(key);
+			return killForKey(key, entry.getKeyAlso());
 		}
 		StepIndex.Requires dropped = entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
 		if (dropped != null)
@@ -61,10 +61,12 @@ final class StageParts
 	}
 
 	/** Kill one of the key's NPCs where the cache says, then search the step's own object. */
-	private static List<Stage> killForKey(StepIndex.Target key)
+	private static List<Stage> killForKey(StepIndex.Target key, List<WorldPoint> also)
 	{
+		List<WorldPoint> tiles = new ArrayList<>(List.of(key.getKeyTile()));
+		tiles.addAll(also);
 		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act(keyAct(key.getText()))
-			.tiles(List.of(key.getKeyTile())).ourMarker(true).radius(KEY_AREA_TILES).itemIds(List.of(key.getKey())).build();
+			.tiles(List.copyOf(tiles)).ourMarker(true).radius(KEY_AREA_TILES).itemIds(List.of(key.getKey())).build();
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(CORE_TARGETS).build());
 	}
 

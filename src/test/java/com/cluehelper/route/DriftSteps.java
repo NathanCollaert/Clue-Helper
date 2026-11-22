@@ -50,16 +50,28 @@ public final class DriftSteps
 					: Arrays.stream(c[7].split("\\|")).map(Integer::parseInt).collect(Collectors.toList());
 				TargetKind kind = c[4].isEmpty() ? TargetKind.ANY_OF : TargetKind.valueOf(c[4]);
 				read.put(c[0], Step.builder().key(c[0]).type(c[2]).tier(c[3]).kind(kind).targets(targets).regions(regions)
-					.stages(challengeStages(c[2], kind, targets, index.entry(c[0]))).text(c[12]).build());
+					.stages(stages(c[2], kind, targets, index.entry(c[0]))).text(c[12]).build());
 			}
 		}
 		return read;
 	}
 
-	/** A skill challenge's targets are its task's places, any one of them, then the hand-in, as the resolver builds it. */
-	private static List<Stage> challengeStages(String type, TargetKind kind, List<WorldPoint> targets, StepIndex.Entry entry)
+	/**
+	 * A skill challenge's targets are its task's places, any one of them, then the hand-in; a key's are the places its
+	 * NPCs are killed, any one of them, then what the key opens. As the resolver builds them.
+	 */
+	private static List<Stage> stages(String type, TargetKind kind, List<WorldPoint> targets, StepIndex.Entry entry)
 	{
-		if (!ClueTypes.SKILL.equals(type) || kind != TargetKind.SEQUENCE || targets.size() < 2)
+		if (kind != TargetKind.SEQUENCE || targets.size() < 2)
+		{
+			return List.of();
+		}
+		if (hasKey(entry))
+		{
+			return List.of(Stage.builder().kind(Stage.Kind.KEY).tiles(List.copyOf(targets.subList(0, targets.size() - 1))).build(),
+				Stage.builder().kind(Stage.Kind.FINAL).tiles(List.of(targets.get(targets.size() - 1))).build());
+		}
+		if (!ClueTypes.SKILL.equals(type))
 		{
 			return List.of();
 		}
@@ -70,5 +82,9 @@ public final class DriftSteps
 		return List.of(Stage.builder().kind(Stage.Kind.TASK).tiles(List.copyOf(places)).grownOnly(grownOnly).takesStepItems(true)
 				.book(book).build(),
 			Stage.builder().kind(Stage.Kind.FINAL).tiles(List.of(targets.get(targets.size() - 1))).build());
+	}
+	private static boolean hasKey(StepIndex.Entry entry)
+	{
+		return entry != null && entry.getTargets().stream().anyMatch(target -> target.getKind() == StepIndex.Target.Kind.KEY);
 	}
 }
