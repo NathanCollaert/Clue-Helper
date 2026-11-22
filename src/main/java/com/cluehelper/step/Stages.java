@@ -79,13 +79,6 @@ public final class Stages
 		return left.size() == step.getStages().size() ? step : withStagesLeft(step, left);
 	}
 
-	/** Before any travel, the act that learns which of the step's targets its NPC is at. */
-	public static Step learnFirst(Step step, String act, String detail)
-	{
-		Stage learn = Stage.builder().kind(Stage.Kind.LEARN).act(act).detail(detail).tiles(List.of()).build();
-		return withStagesLeft(step, List.of(learn, Stage.builder().kind(Stage.Kind.FINAL).tiles(step.getTargets()).build()));
-	}
-
 	/** Only the targets the NPC stands at; all of them when the data has none for it. */
 	public static Step atNpc(Step step, int npcId)
 	{

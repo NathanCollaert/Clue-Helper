@@ -2,6 +2,7 @@ package com.cluehelper.dev;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.HotColdTrace;
+import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.hotcold.FeelLogs;
 import com.cluehelper.hotcold.HotColdPlan;
@@ -26,6 +27,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.gameval.DBTableID;
+import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
@@ -66,6 +71,12 @@ public class DevHarness
 	private volatile DevCommands commands;
 	private static final int NO_VARBIT = -1;
 	private int watchedVarbit = NO_VARBIT;
+	/** The varps holding QP, QP_MAX, the fairy rings' last destination and Viggora's place. */
+	private static final Set<Integer> CLIENT_VAR_VARPS = Set.of(VarPlayerID.QP, VarPlayerID.QP_TOTAL, VarPlayerID.FAIRYRING_HISTORY,
+		VarPlayerID.DAGGANOTH_AREA_PROJECT);
+	/** Viggora's targets in the order of the clue's target rows, which script 6657 picks by SECRET_GHOST_RANDOMISER. */
+	private static final String[] VIGGORA_PLACES = {"Rogues' Castle (6117)", "Slayer Tower (6122)", "Paddewwa (6123)"};
+	private boolean watchingClientVars;
 	private final HotColdService hotCold;
 	private final MemoryStore memory;
 	private final ConfigManager configManager;
@@ -97,13 +108,19 @@ public class DevHarness
 		DevCommands c = new DevCommands(this::reply);
 		c.register("steplog", "[clear] show or clear this profile's step log", this::stepLog);
 		c.register("poh", "[forget] show what is known about your house, or forget it", this::house);
-		c.register("forget", "<key> forget what this profile remembers under the key (npcPlaces: where Viggora was learned)", this::forget);
+		c.register("forget", "<key> forget what this profile remembers under the key (poh: your house)", this::forget);
 		c.register("stash", "compare every STASH unit's built varbit, the core check (script 1479) and what we remember",
 			args -> clientThread.invokeLater(this::stashes));
 		c.register("hotcold", "[reset] show the hot/cold step's feel log, or restart it keeping its last reading as the anchor",
 			args -> clientThread.invokeLater(() -> hotColdLog(args)));
 		c.register("varbit", "<id> log the varbit's value now and every time it changes",
 			args -> clientThread.invokeLater(() -> watchVarbit(args)));
+		c.register("vars", "log the quest point, fairy ring and Viggora vars beside what the plugin used to compute or learn, now"
+			+ " and every time one changes", args -> clientThread.invokeLater(() ->
+			{
+				watchingClientVars = true;
+				tellClientVars();
+			}));
 		stepLogger.setEnabled(true);
 		unregister.add(clueLink.addListener(this::onStepChange));
 		unregister.add(routes.addListener(this::onPlanned));
@@ -133,10 +150,46 @@ public class DevHarness
 
 	public void onVarbitChanged(VarbitChanged event)
 	{
+		if (watchingClientVars && CLIENT_VAR_VARPS.contains(event.getVarpId()))
+		{
+			clientThread.invokeLater(this::tellClientVars);
+		}
 		if (watchedVarbit != NO_VARBIT && event.getVarbitId() == watchedVarbit)
 		{
 			tellVarbit(event.getValue());
 		}
+	}
+
+	private void tellClientVars()
+	{
+		int ghost = client.getVarbitValue(VarbitID.SECRET_GHOST_RANDOMISER);
+		String[] lines = {
+			"QP " + client.getVarpValue(VarPlayerID.QP) + ", QP_MAX " + client.getVarbitValue(VarbitID.QP_MAX)
+				+ ", quest table sum " + questTablePoints(),
+			"FAIRYRING_LASTLOC " + client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC) + ", _SET "
+				+ client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC_SET) + " = " + FairyDials.code(client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC))
+				+ ", learned " + configManager.getRSProfileConfiguration(ClueHelperConfig.GROUP, "fairyRing"),
+			"SECRET_GHOST_RANDOMISER " + ghost + " = " + (ghost >= 1 && ghost <= VIGGORA_PLACES.length ? VIGGORA_PLACES[ghost - 1] : "unplaced")
+				+ ", learned " + configManager.getRSProfileConfiguration(ClueHelperConfig.GROUP, "npcPlaces")};
+		for (String line : lines)
+		{
+			log.info("client vars: {}", line);
+			reply(line);
+		}
+	}
+
+	/** The quest points the game offers, summed from its Quest table as the plugin did before reading QP_MAX. */
+	private int questTablePoints()
+	{
+		int total = 0;
+		for (int quest : client.getDBTableRows(DBTableID.Quest.ID))
+		{
+			if ((Integer) client.getDBTableField(quest, DBTableID.Quest.COL_RELEASE_TYPE, 0)[0] != 0)
+			{
+				total += (Integer) client.getDBTableField(quest, DBTableID.Quest.COL_QUESTPOINTS_OVERRIDE, 0)[0];
+			}
+		}
+		return total;
 	}
 
 	private void tellVarbit(int value)
@@ -285,7 +338,7 @@ public class DevHarness
 	{
 		if (args.length == 0)
 		{
-			reply("usage: ::ch-forget <key>, e.g. npcPlaces");
+			reply("usage: ::ch-forget <key>, e.g. poh");
 			return;
 		}
 		clientThread.invoke(() ->

@@ -1,6 +1,5 @@
 package com.cluehelper.link;
 
-import com.cluehelper.memory.NpcPlaceMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
@@ -12,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.events.PluginChanged;
 import net.runelite.client.plugins.*;
 import net.runelite.client.plugins.cluescrolls.*;
@@ -26,6 +26,11 @@ import net.runelite.client.plugins.cluescrolls.clues.*;
 @Singleton
 public class ClueLink
 {
+	/**
+	 * By the quest that places a clue's NPC, the varbit the game's own clue script reads for which of the step's targets
+	 * the NPC stands at, counting from 1 in the targets' order; 0 before the quest places it.
+	 */
+	private static final Map<String, Integer> PLACE_VARBITS = Map.of("CURSE_OF_THE_EMPTY_LORD", VarbitID.SECRET_GHOST_RANDOMISER);
 
 	@Inject
 	PluginManager pluginManager;
@@ -39,8 +44,6 @@ public class ClueLink
 	AvailabilityService availability;
 	@Inject
 	PlayerModel player;
-	@Inject
-	NpcPlaceMemory npcPlaces;
 	final LinkState state = new LinkState();
 	final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
@@ -138,7 +141,7 @@ public class ClueLink
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : Stages.adjusted(npcPlaces.adjusted(resolve(clue)), this::owns, playerTile());
+		Step step = clue == null ? null : Stages.adjusted(atPlacedNpc(resolve(clue)), this::owns, playerTile());
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
 			step == null ? null : List.of(step.getTargets(), step.getStages()));
 		if (change != StepChange.UNCHANGED)
@@ -163,6 +166,19 @@ public class ClueLink
 			}
 			return StepResolver.unreadable(clue);
 		}
+	}
+
+	/** The step at the one target the game placed its NPC at; at all of them before the game has placed it. */
+	private Step atPlacedNpc(Step step)
+	{
+		StepIndex.LearnPlace learn = step.getData().getLearnPlace();
+		if (learn == null)
+		{
+			return step;
+		}
+		int place = client.getVarbitValue(PLACE_VARBITS.get(learn.getQuest()));
+		List<StepIndex.Target> targets = step.getData().getTargets();
+		return place < 1 || place > targets.size() ? step : Stages.atNpc(step, targets.get(place - 1).getNpcs().get(0));
 	}
 
 	private WorldPoint playerTile()

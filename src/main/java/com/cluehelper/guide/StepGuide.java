@@ -33,7 +33,7 @@ public class StepGuide
 {
 	public enum Tab
 	{
-		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC, QUESTS
+		NONE, INVENTORY, EQUIPMENT, MAGIC, EMOTES, MUSIC
 	}
 
 	static final String KEEP_GOING = "Keep going: ";

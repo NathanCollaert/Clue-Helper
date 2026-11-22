@@ -65,7 +65,7 @@ public final class StepIndex
 		String act;
 		/** The option the step's NPC is clicked with when it isn't Talk-to (the Monk of Entrana's Take-boat); null for a talk. */
 		String npcOption;
-		/** Where the game put the step's NPC for this player, to be learned (Viggora); null for an NPC always at its targets. */
+		/** Which quest places the step's NPC for each player (Viggora); null for an NPC always at its targets. */
 		LearnPlace learnPlace;
 		List<CacheRow> rows = List.of();
 		List<WorldPoint> tiles = List.of();
@@ -369,22 +369,12 @@ public final class StepIndex
 		}
 	}
 
-	/** A quest journal that names, in its words, which of the step's targets the NPC stands at. */
+	/** The quest that places the step's NPC at one of its targets for each player. */
 	@Getter
 	public static final class LearnPlace
 	{
 		/** A {@link net.runelite.api.Quest} name. */
 		String quest;
-		String journal;
-		List<LearnSpot> spots = List.of();
-	}
-
-	@Getter
-	public static final class LearnSpot
-	{
-		/** The NPC id of the target it stands at. */
-		int npc;
-		List<String> words = List.of();
 	}
 
 	/** An NPC's option that puts a worn requirement on, where the item has no Wear of its own (Larry's Tuxedo-time). */

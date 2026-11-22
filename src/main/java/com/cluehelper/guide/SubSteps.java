@@ -491,7 +491,7 @@ public final class SubSteps
 	static SubStep stageAct(Stage stage)
 	{
 		return SubStep.of(Kind.ACT, stage.getAct()).detail(stage.getDetail()).stage(stage)
-			.tab(stage.getKind() == Stage.Kind.LEARN ? Tab.QUESTS : Tab.NONE).npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
+			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
 	/** The step's way in, when the player is on it: near its start, any floor, and not yet inside. */

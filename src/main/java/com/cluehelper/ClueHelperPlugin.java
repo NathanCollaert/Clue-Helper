@@ -64,12 +64,6 @@ public class ClueHelperPlugin extends Plugin
 	KeyRingMemory keyRing;
 
 	@Inject
-	NpcPlaceMemory npcPlaces;
-
-	@Inject
-	FairyRingMemory fairyRings;
-
-	@Inject
 	PohService poh;
 
 	@Inject
@@ -154,9 +148,6 @@ public class ClueHelperPlugin extends Plugin
 	@Inject
 	RouteReport routeReport;
 
-	@Inject
-	JournalScroll journalScroll;
-
 
 	final List<Runnable> unregister = new ArrayList<>();
 	boolean shownWorking;
@@ -229,8 +220,6 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe(priority = -1)
 	public void onGameTick(GameTick tick)
 	{
-		npcPlaces.onGameTick();
-		journalScroll.onGameTick();
 		if (clueLink.onGameTick())
 		{
 			box.refresh();
@@ -239,7 +228,6 @@ public class ClueHelperPlugin extends Plugin
 		bankMemory.onGameTick();
 		poh.onGameTick();
 		menuLines.takeFreshList(grownPatches::onListMenu);
-		fairyRings.onGameTick();
 		unlocks.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
@@ -289,11 +277,6 @@ public class ClueHelperPlugin extends Plugin
 	public void onPostMenuSort(PostMenuSort event)
 	{
 		guide.onPostMenuSort();
-		MenuEntry[] entries = client.getMenu().getMenuEntries();
-		if (!client.isMenuOpen() && entries.length > 0)
-		{
-			fairyRings.onMenuEntries(new MenuEntry[]{entries[entries.length - 1]});
-		}
 	}
 
 	/** Runs after other plugins build the menu; only colours our option, never adds, removes or reorders entries. */
@@ -306,7 +289,6 @@ public class ClueHelperPlugin extends Plugin
 		{
 			menuLines.colourMenu(pathObject, config.highlightMenus());
 		}
-		fairyRings.onMenuEntries(event.getMenuEntries());
 	}
 
 	/** Reads the menu scripts' arguments before better-teleport-menu (priority 1) rewrites them. */
@@ -328,9 +310,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		stashMemory.onMenuOptionClicked(event);
 		keyRing.onMenuOptionClicked(event);
-		npcPlaces.onMenuOptionClicked(event);
 		sceneDoors.onMenuOptionClicked(event);
-		fairyRings.onMenuOptionClicked(event);
 		bankMemory.onMenuOptionClicked(event);
 		poh.onMenuOptionClicked(event);
 		guide.onMenuOptionClicked(event);
