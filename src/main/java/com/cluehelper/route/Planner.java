@@ -184,13 +184,13 @@ public final class Planner
 
 	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, LabelSearch.Label bestGoal, Route best)
 	{
-		String first = in.getFollowedFirstTransport();
-		if (first == null || best == null || first.equals(best.getFirstTransportKey()))
+		String identity = in.getFollowedIdentity();
+		if (identity == null || best == null || identity.equals(best.getIdentity()))
 		{
 			return null;
 		}
 		int limit = bestGoal.rank + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
-		LabelSearch search = searches.firstBy(orders, first, limit);
+		LabelSearch search = searches.followed(orders, in.getFollowedFirstTransport(), identity, limit);
 		return search == null ? null : RouteBuilder.build(searches.ctx, search.goal);
 	}
 
@@ -462,12 +462,13 @@ public final class Planner
 		}
 
 		/** The best order's search of the routes that start with transport {@code first}; null when none is in the limit. */
-		LabelSearch firstBy(List<List<int[]>> orders, String first, int rankLimit)
+		LabelSearch followed(List<List<int[]>> orders, String first, String identity, int rankLimit)
 		{
 			LabelSearch best = null;
 			for (List<int[]> order : orders)
 			{
-				LabelSearch search = run(new LabelSearch(ctx, order, area, first, rankLimit));
+				LabelSearch search = run(new LabelSearch(ctx, order, area, first,
+					goal -> identity.equals(RouteBuilder.build(ctx, goal).getIdentity()), rankLimit));
 				if (search.goal != null && rankOf(search) < rankOf(best))
 				{
 					best = search;

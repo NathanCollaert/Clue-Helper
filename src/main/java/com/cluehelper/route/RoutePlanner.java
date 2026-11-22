@@ -214,7 +214,9 @@ public class RoutePlanner
 		}
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, required);
-		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
+		Route followed = followed(step);
+		PlanInput followingInput = followed == null ? input
+			: input.toBuilder().followedFirstTransport(followed.getFirstTransportKey()).followedIdentity(followed.getIdentity()).build();
 		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
 	}
 
@@ -418,9 +420,9 @@ public class RoutePlanner
 			: Math.max(PlanInput.NO_REVERT_WINDOW, SWAP_WINDOW_TICKS - (client.getTickCount() - since));
 	}
 
-	private String followedFirstTransport(Step step)
+	private Route followed(Step step)
 	{
-		return committed != null && step.getKey().equals(committedStep) ? committed.getFirstTransportKey() : null;
+		return committed != null && step.getKey().equals(committedStep) ? committed : null;
 	}
 
 	private void onPlanned(Plan planned, PlanInput input)

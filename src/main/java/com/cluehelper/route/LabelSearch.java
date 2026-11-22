@@ -3,6 +3,7 @@ package com.cluehelper.route;
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import java.util.*;
+import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.experimental.*;
 import net.runelite.api.coords.WorldPoint;
@@ -39,6 +40,8 @@ final class LabelSearch
 	final int revertHalfTicks;
 	/** Only routes whose first transport has this key, a way into the house aside; null for any. */
 	final String onlyFirst;
+	/** Whether a label at the goal is the route searched for; any is, but on the followed route's search. */
+	final Predicate<Label> wantedGoal;
 	final boolean requireTransport;
 	final int rankLimit;
 	final Label[] slots;
@@ -55,17 +58,22 @@ final class LabelSearch
 
 	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, int rankLimit)
 	{
-		this(ctx, legTargets, probes, areaHalfTicks, null, rankLimit);
+		this(ctx, legTargets, probes, areaHalfTicks, null, goal -> true, rankLimit);
 	}
 
-	/** The routes that start with transport {@code onlyFirst} ({@link Route#WALK} for none), up to {@code rankLimit}. */
-	LabelSearch(PlanContext ctx, List<int[]> legTargets, int areaHalfTicks, String onlyFirst, int rankLimit)
+	/**
+	 * The followed route again: the best route that starts with transport {@code onlyFirst} ({@link Route#WALK} for none)
+	 * and whose goal label is {@code wantedGoal}, up to {@code rankLimit}. A bank stop is a state of its own, so the route
+	 * with it and the one without both reach the goal.
+	 */
+	LabelSearch(PlanContext ctx, List<int[]> legTargets, int areaHalfTicks, String onlyFirst, Predicate<Label> wantedGoal,
+		int rankLimit)
 	{
-		this(ctx, legTargets, false, areaHalfTicks, onlyFirst, rankLimit);
+		this(ctx, legTargets, false, areaHalfTicks, onlyFirst, wantedGoal, rankLimit);
 	}
 
 	private LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, String onlyFirst,
-		int rankLimit)
+		Predicate<Label> wantedGoal, int rankLimit)
 	{
 		this.rankLimit = rankLimit;
 		this.ctx = ctx;
@@ -73,6 +81,7 @@ final class LabelSearch
 		this.probes = probes;
 		this.areaHalfTicks = areaHalfTicks;
 		this.onlyFirst = onlyFirst;
+		this.wantedGoal = wantedGoal;
 		this.requireTransport = onlyFirst != null && !Route.WALK.equals(onlyFirst);
 		this.nodes = ctx.nodeCount();
 		this.revertHalfTicks = ctx.startPending ? 2 * ctx.in.getRevertTicksLeft() : -1;
@@ -105,8 +114,12 @@ final class LabelSearch
 			}
 			if (label.node == ctx.goal)
 			{
-				goal = label;
-				break;
+				if (wantedGoal.test(label))
+				{
+					goal = label;
+					break;
+				}
+				continue;
 			}
 			expand(label);
 		}

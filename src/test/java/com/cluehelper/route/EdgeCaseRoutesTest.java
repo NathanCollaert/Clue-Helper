@@ -2,6 +2,7 @@ package com.cluehelper.route;
 
 import com.cluehelper.memory.StashMemory;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
@@ -145,6 +146,25 @@ public class EdgeCaseRoutesTest
 	{
 		int gate = table.rowGate(row);
 		return gate == 0 || table.getGates().get(gate - 1).getItems().isEmpty();
+	}
+
+	/**
+	 * A route followed without the bank is planned again as it was while the banked route is less than the commit margin
+	 * faster, so the guide doesn't switch to the bank for a tick or two.
+	 */
+	@Test
+	public void followedRouteWithoutTheBankIsKeptWithinTheMargin()
+	{
+		PlannerSettings bankOn = PlannerSettings.builder().bankEdge(true).build();
+		PlayerSnapshot mid = ready(Loadouts.load("mid-ironman").getCarried());
+		Step digsite = step("cryptic:search the bush at the digsite centre.");
+		Route plain = Planner.plan(input(mid, digsite, PlanStart.teleportOnly(ANYWHERE), bankOn).build()).getBest();
+		PlanInput withBank = input(mid, digsite, PlanStart.teleportOnly(ANYWHERE), bankOn)
+			.banked(ready(Loadouts.load("mid-ironman").getBankedSnapshot()))
+			.followedFirstTransport(plain.getFirstTransportKey()).followedIdentity(plain.getIdentity()).build();
+		Plan plan = Planner.plan(withBank);
+		assertTrue("the banked route is the faster", plan.getBest().isBanked() && plan.getBest().getTicks() < plain.getTicks());
+		assertEquals(plain.getIdentity(), plan.getFollowed().getIdentity());
 	}
 
 	@Test

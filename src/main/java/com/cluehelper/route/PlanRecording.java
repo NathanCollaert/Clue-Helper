@@ -36,6 +36,7 @@ public final class PlanRecording
 	Set<String> refusedChanges;
 	boolean foreignHouseStart;
 	String followedFirstTransport;
+	String followedIdentity;
 	String stash;
 	List<RecordedNeed> needs;
 	long liveMillis;
@@ -68,6 +69,7 @@ public final class PlanRecording
 		r.refusedChanges = input.getRefusedChanges();
 		r.foreignHouseStart = input.isForeignHouseStart();
 		r.followedFirstTransport = input.getFollowedFirstTransport();
+		r.followedIdentity = input.getFollowedIdentity();
 		r.stash = input.getRequired().getStash().name();
 		r.needs = needs(input);
 		r.liveMillis = plan.getSearchNanos() / NANOS_PER_MILLI;
