@@ -103,7 +103,7 @@ public final class ScrollBook
 		out.add(bank + 1, deposit());
 		if (bookRow)
 		{
-			out.add(walkToBank(out, bank), takeOut(row));
+			out.add(bank, takeOut(row));
 		}
 		return List.copyOf(out);
 	}
@@ -118,12 +118,6 @@ public final class ScrollBook
 			}
 		}
 		return -1;
-	}
-
-	/** A carried book's scroll comes out where the player stands, before the walk to the bank the book is left at. */
-	private static int walkToBank(List<SubStep> steps, int bank)
-	{
-		return bank > 0 && steps.get(bank - 1).getKind() == Kind.WALK ? bank - 1 : bank;
 	}
 
 	/** Opens the book, then Remove on the scroll's entry; {@code row} is the book's teleport. */

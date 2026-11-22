@@ -189,87 +189,23 @@ public class StepGuide
 		return boxView != null ? boxView : listedAt(index);
 	}
 
-	/** During a fight, the act to do again. */
+	/** During a fight, the act to do again. Past a bank stop, what follows its task, which the stop shows already. */
 	public SubStep getNext()
 	{
-		return fight != null && fight.getAgain() != null ? fight.getAgain() : listedAt(index + 1);
+		if (fight != null && fight.getAgain() != null)
+		{
+			return fight.getAgain();
+		}
+		SubStep listed = listedAt(index);
+		SubStep next = listedAt(index + 1);
+		boolean bankTask = listed != null && next != null && listed.getKind() == Kind.BANK && next.getText().equals(listed.getText());
+		return bankTask ? listedAt(index + 2) : next;
 	}
 
 	/** The listed sub-step at {@code at}, or null past the end. */
 	private SubStep listedAt(int at)
 	{
 		return at < steps.size() ? steps.get(at) : null;
-	}
-
-	/**
-	 * What the box asks for. Walking to a bank and opening it aren't shown: what to do in it is, from the walk on, while
-	 * the line and outline still lead to the bank.
-	 */
-	public SubStep getShown()
-	{
-		if (fight != null || boxView != null || index >= steps.size())
-		{
-			return getCurrent();
-		}
-		return shownAt(index);
-	}
-
-	/** The sub-step after the shown one, past a walk to a bank and its opening as well. */
-	public SubStep getShownNext()
-	{
-		if (fight != null || boxView != null || index >= steps.size())
-		{
-			return getNext();
-		}
-		int next = shownIndex(index) + 1;
-		return next < steps.size() ? shownAt(next) : null;
-	}
-
-	private SubStep shownAt(int at)
-	{
-		int shownIndex = shownIndex(at);
-		SubStep shown = steps.get(shownIndex);
-		if (shownIndex == at)
-		{
-			return shown;
-		}
-		String bankDetail = steps.get(shownIndex - 1).getDetail();
-		return shown.getDetail() == null && bankDetail != null ? shown.toBuilder().detail(bankDetail).build() : shown;
-	}
-
-	/**
-	 * For a walk to a bank or its opening, the sub-step done in that bank; else {@code at}. A bank opened only to close
-	 * it again has nothing to show, so its walk and opening are shown as they are.
-	 */
-	private int shownIndex(int at)
-	{
-		SubStep step = steps.get(at);
-		boolean walkToBank = step.getKind() == Kind.WALK && at + 1 < steps.size()
-			&& steps.get(at + 1).getKind() == Kind.BANK;
-		int bank = step.getKind() == Kind.BANK ? at : walkToBank ? at + 1 : -1;
-		if (bank < 0 || bank + 1 >= steps.size())
-		{
-			return at;
-		}
-		SubStep task = steps.get(bank + 1);
-		boolean onlyCloses = task.getKind() == Kind.WITHDRAW && task.getItems().isEmpty();
-		return onlyCloses ? at : bank + 1;
-	}
-
-	/** At the bank, or walking to it: acts done on the spot first (a scroll taken out of its book) still end there. */
-	private boolean isBankStop()
-	{
-		SubStep current = getCurrent();
-		if (current == null || current.getKind() == Kind.BANK)
-		{
-			return current != null;
-		}
-		if (current.getKind() != Kind.WALK || fight != null && fight.getAgain() != null)
-		{
-			return false;
-		}
-		return steps.stream().skip(index + 1L).map(SubStep::getKind).filter(kind -> kind != Kind.ACT).findFirst()
-			.map(kind -> kind == Kind.BANK).orElse(false);
 	}
 
 	/**
@@ -505,7 +441,7 @@ public class StepGuide
 	private void refreshObjects()
 	{
 		SubStep current = getCurrent();
-		boolean bank = isBankStop();
+		boolean bank = current != null && current.getKind() == Kind.BANK;
 		SubStep ahead = objectActAhead(current);
 		SubStep optionOf = ahead != null ? ahead : current;
 		List<String> option = optionOf == null || optionOf.getOption() == null ? List.of() : List.of(optionOf.getOption());

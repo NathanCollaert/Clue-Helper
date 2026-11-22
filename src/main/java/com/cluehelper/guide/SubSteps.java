@@ -73,8 +73,8 @@ public final class SubSteps
 			.build(this::exitOf, this::plantedTreeTeleport);
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds()), step.getData());
 		List<SubStep> steps = withRideItemsWorn(route, withEntranaDeposits(withGearOnArrival(wayIn)));
-		return scrollBookOutOfWilderness.getAsBoolean() ? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step))
-			: steps;
+		return withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
+			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps);
 	}
 
 	/**
@@ -489,13 +489,34 @@ public final class SubSteps
 	}
 
 	/**
-	 * A fairy ring, ride or spirit tree used where it stands: its own sub-step leads the line there and colours its menu
-	 * from the start, so no "Walk to" comes before it.
+	 * A bank, fairy ring, ride or spirit tree used where it stands: its own sub-step leads the line there and outlines it
+	 * or colours its menu from the start, so no "Walk to" comes before it.
 	 */
 	private static boolean boardedThere(Leg next)
 	{
-		return next != null && (next.getKind() == Leg.Kind.FAIRY_RING
+		return next != null && (next.getKind() == Leg.Kind.FAIRY_RING || next.getKind() == Leg.Kind.BANK
 			|| next.getKind() == Leg.Kind.TELEPORT && next.getRow() != null && next.getRow().isLocated() && !next.getRow().isInHouse());
+	}
+
+	/**
+	 * A bank stop shows what is done in the bank from the way there on, while its line and outline lead to the bank. A
+	 * bank opened only to close it again shows itself.
+	 */
+	private static List<SubStep> withBankTasksShown(List<SubStep> steps)
+	{
+		List<SubStep> out = new ArrayList<>(steps);
+		for (int i = 0; i + 1 < out.size(); i++)
+		{
+			SubStep bank = out.get(i);
+			SubStep task = out.get(i + 1);
+			boolean onlyCloses = task.getKind() == Kind.WITHDRAW && task.getItems().isEmpty();
+			if (bank.getKind() == Kind.BANK && !onlyCloses)
+			{
+				out.set(i, bank.toBuilder().text(task.getText()).items(task.getItems())
+					.detail(task.getDetail() != null ? task.getDetail() : bank.getDetail()).build());
+			}
+		}
+		return List.copyOf(out);
 	}
 
 	/** The STASH unit stands outside the step's way in (the Agility Pyramid's, at its foot): its items come first. */
