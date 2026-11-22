@@ -475,7 +475,7 @@ public final class SubSteps
 	/** Ends when the stage is dropped from the step, which brings a new plan. */
 	static SubStep stageAct(Stage stage)
 	{
-		return SubStep.of(Kind.ACT, stage.getAct()).detail(stage.getDetail()).stage(stage)
+		return SubStep.of(Kind.ACT, stage.getAct()).detail(LegSteps.isPlaceName(stage.getDetail()) ? null : stage.getDetail()).stage(stage)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
@@ -654,7 +654,7 @@ public final class SubSteps
 			List<ItemRequirement> emptied = List.of(new SlotLimitationRequirement(by.getText(), by.getFree().toArray(EquipmentInventorySlot[]::new)));
 			acts.add(takeOff(emptied).wornWayIn(true).build());
 		}
-		acts.add(SubStep.of(Kind.ACT, by.getText()).detail(by.getDetail()).npcIds(Set.copyOf(by.getNpcs())).option(by.getOption())
+		acts.add(SubStep.of(Kind.ACT, by.getText()).npcIds(Set.copyOf(by.getNpcs())).option(by.getOption())
 			.wornWayIn(true).done(SubStep.Done.WORN).build());
 		return acts;
 	}
@@ -673,7 +673,7 @@ public final class SubSteps
 	{
 		StepIndex.WayIn way = data == null ? null : data.getEntry();
 		return withBefore(steps, sub -> way != null && sub.getWayIn() != null && sub.getKind() == Kind.ACT
-			? List.of(LegSteps.walkTo("Walk to " + way.getText(), way.getTile(), ARRIVE_TILES).build()) : List.of());
+			? List.of(LegSteps.walkTo("Walk to " + way.getText(), way.getTile(), ARRIVE_TILES).wayIn(way).build()) : List.of());
 	}
 
 	/** Client thread only. Weapons and armour as the Entrana monks see them: any attack, defence or strength bonus. */

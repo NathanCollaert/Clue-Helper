@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import com.cluehelper.Tables;
 import com.cluehelper.step.*;
+import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import java.util.*;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
@@ -230,7 +231,7 @@ public final class ActParts
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
 		boolean items = !step.getRequirements().getItems().isEmpty();
 		acts.addAll(items ? SubSteps.remove(EmptySlots.of(step.getRequirements().getItems())) : List.of());
-		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip(step)) : List.of());
+		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip(step.getRequirements().getItems())) : List.of());
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		if (stash != null && spot != null)
 		{
@@ -250,12 +251,18 @@ public final class ActParts
 		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
 			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = !step.getRequirements().getItems().isEmpty();
-		return items ? List.of(take, equip(step)) : List.of(take);
+		return items ? List.of(take, equip(itemsToPutOn(step))) : List.of(take);
 	}
 
-	private static SubStep equip(Step step)
+	/** At the STASH unit only the items go on: what must come off is taken off at the clue (inside the axe hut). */
+	private static List<ItemRequirement> itemsToPutOn(Step step)
 	{
-		return SubStep.of(Kind.ACT, "Equip the items").worn(step.getRequirements().getItems()).unwearableCarried(true)
+		return step.getRequirements().getItems().stream().filter(item -> !EmptySlots.metByEmptySlots(item)).collect(toList());
+	}
+
+	private static SubStep equip(List<ItemRequirement> items)
+	{
+		return SubStep.of(Kind.ACT, "Equip the items").worn(items).unwearableCarried(true)
 			.done(SubStep.Done.WORN).tab(StepGuide.Tab.INVENTORY).build();
 	}
 

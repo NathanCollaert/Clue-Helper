@@ -25,7 +25,13 @@ final class LegSteps
 	 * A task's place that reads as the walk's end ("The nearest anvil"), else what the stage is done on ("the nearest
 	 * black warlock"); a longer place, with how-tos, goes under the walk.
 	 */
-	private static final Pattern SHORT_PLACE = Pattern.compile("(The|An?) [^:,(]+");
+	private static final Pattern SHORT_PLACE = Pattern.compile("(The|An?) [^:,(.]+");
+
+	/** A place that is only a name ("The Nature Altar"): the walk to it says it, so nothing goes under the act. */
+	static boolean isPlaceName(String place)
+	{
+		return place != null && SHORT_PLACE.matcher(place).matches();
+	}
 
 	private LegSteps()
 	{
@@ -41,7 +47,7 @@ final class LegSteps
 		String text = !stage.getNpcIds().isEmpty() ? "Walk to the outlined NPC"
 			: !stage.getObjectIds().isEmpty() ? "Walk to the outlined object" : "Walk to the marker";
 		String place = stage.getKind() == Stage.Kind.TASK ? stage.atPlace(leg.getTo()).getDetail() : null;
-		boolean placeNamed = place != null && SHORT_PLACE.matcher(place).matches();
+		boolean placeNamed = isPlaceName(place);
 		String walk = placeNamed ? "Walk to " + Character.toLowerCase(place.charAt(0)) + place.substring(1)
 			: stage.getTargetName() != null ? "Walk to the nearest " + stage.getTargetName() : text;
 		return walkTo(walk, leg.getTo(), radius).detail(placeNamed ? null : place)

@@ -71,9 +71,14 @@ final class StepHighlights
 				Set<Integer> forms = new HashSet<>(way.getObjectIds());
 				forms.addAll(exit.getOtherForms());
 				return shown.menuTarget(withDialogue(way.toBuilder().objectIds(Set.copyOf(forms)).build(), wayInOf(step, exit))).build();
+			case WALK:
+				if (current.getWayIn() != null)
+				{
+					return wayInHighlights(shown, current, step);
+				}
+				break;
 			case ENTER:
-				return current.getWayIn().getUse().isEmpty() ? shown.menuTarget(enterTarget(current)).build()
-					: useOnWayIn(shown, current.getWayIn());
+				return wayInHighlights(shown, current, step);
 			case SPELLBOOK_SWAP:
 				shown.spellWidget(InterfaceID.MagicSpellbook.SPELLBOOK_SWAP).tab(Tab.MAGIC);
 				break;
@@ -260,6 +265,36 @@ final class StepHighlights
 			target = target.toBuilder().objectIds(Set.of(way.getObject(), way.getClosed())).path(List.of(OPEN_OPTION, way.getOption())).build();
 		}
 		return withDialogue(target, way);
+	}
+
+	/**
+	 * The way in's object to click, or the item to use on it: its own use items, or a carried item that stands in for
+	 * gear nothing worn meets (a talisman on the altar ruins, which a tiara or Runecraft cape opens with a left click).
+	 */
+	private Highlights wayInHighlights(Highlights.HighlightsBuilder shown, SubStep current, Step step)
+	{
+		StepIndex.WayIn way = current.getWayIn();
+		if (!way.getUse().isEmpty())
+		{
+			return useOnWayIn(shown, way);
+		}
+		Set<Integer> instead = carriedInsteadOfWorn(step);
+		return instead.isEmpty() ? shown.menuTarget(enterTarget(current)).build()
+			: useOn(shown, MenuTarget.builder().objectIds(Set.of(way.getObject())), instead, Set.of());
+	}
+
+	private Set<Integer> carriedInsteadOfWorn(Step step)
+	{
+		if (step == null || step.getData() == null)
+		{
+			return Set.of();
+		}
+		Set<Integer> worn = player.wornIds();
+		Set<Integer> inventory = player.inventoryIds();
+		return step.getData().getRequires().stream()
+			.filter(need -> need.isWear() && need.getIds().stream().noneMatch(worn::contains))
+			.flatMap(need -> inventory.stream().filter(id -> need.isCarriedInstead(Set.of(id))))
+			.collect(toUnmodifiableSet());
 	}
 
 	/** The carried item to use until one is picked, then the way's object it is used on. */

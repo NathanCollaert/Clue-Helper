@@ -384,7 +384,6 @@ public final class StepIndex
 		List<Integer> npcs = List.of();
 		String option;
 		String text;
-		String detail;
 		/** The slots the gear goes in, emptied before the NPC is asked (the suit's cape slot, and gloves). */
 		List<EquipmentInventorySlot> free = List.of();
 	}
@@ -421,7 +420,7 @@ public final class StepIndex
 			return !unlessVarbits.isEmpty() && unlessVarbits.stream().allMatch(pair -> varbit.applyAsInt(pair[0]) == pair[1]);
 		}
 
-		private boolean isCarriedInstead(Set<Integer> carriedIds)
+		public boolean isCarriedInstead(Set<Integer> carriedIds)
 		{
 			return carried.stream().anyMatch(carriedIds::contains);
 		}

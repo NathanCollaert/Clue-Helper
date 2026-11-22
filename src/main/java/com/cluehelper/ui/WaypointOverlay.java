@@ -149,7 +149,7 @@ public class WaypointOverlay extends Overlay
 			{
 				return pathToClue(view, current);
 			}
-			if (current.isPreparation())
+			if (current.isPreparation() && current.getNpcIds().isEmpty())
 			{
 				return null;
 			}
