@@ -154,9 +154,9 @@ final class Acts
 	{
 		if (!"beginner".equals(step.getTier()))
 		{
-			return act("Talk to Sherlock", "Task done: hand it in");
+			return act("Talk to Sherlock", null);
 		}
-		return handInItems.isEmpty() ? act("Give Charlie the item", "He wants what the clue names")
+		return handInItems.isEmpty() ? act("Give Charlie the item", null)
 			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 

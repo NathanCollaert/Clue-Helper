@@ -94,7 +94,7 @@ public final class CampaignReplay
 		}
 		catch (RuntimeException e)
 		{
-			return new Outcome(List.of("replay failed: " + e), List.of());
+			return new Outcome(List.of("replay failed: " + e), List.of(), List.of());
 		}
 	}
 
