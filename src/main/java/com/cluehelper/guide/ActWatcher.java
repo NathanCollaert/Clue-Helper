@@ -127,6 +127,7 @@ public class ActWatcher
 			case WORN:
 			case SLOTS_EMPTY:
 			case ITEM_HELD:
+			case TRACK_PLAYING:
 				return false;
 			default:
 				throw new IllegalArgumentException("unhandled act end " + done);

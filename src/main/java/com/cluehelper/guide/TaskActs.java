@@ -281,6 +281,19 @@ final class TaskActs
 		return null;
 	}
 
+	/** A task act read as its phase: the first whose items are carried, else the task's own line. */
+	SubStep phased(SubStep act, Step step)
+	{
+		if (!act.isTask() || step == null || step.getData().getPhases().isEmpty())
+		{
+			return act;
+		}
+		Set<Integer> carried = player.carriedIds();
+		String text = step.getData().getPhases().stream().filter(phase -> phase.getWhileCarried().stream().anyMatch(carried::contains))
+			.map(StepIndex.Phase::getText).findFirst().orElse(act.getStage().getAct());
+		return text.equals(act.getText()) ? act : act.toBuilder().text(text).build();
+	}
+
 	/** The spell's button until it is picked (the last of its buttons shown), then the items it is cast on. */
 	private Highlights withCast(Highlights shown, StepIndex.Cast cast, Set<Integer> carried)
 	{

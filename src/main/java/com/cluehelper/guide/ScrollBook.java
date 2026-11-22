@@ -143,7 +143,7 @@ public final class ScrollBook
 
 	private static SubStep deposit()
 	{
-		return SubStep.of(Kind.ACT, "Deposit in the bank:").items(List.of(BOOK_SHOWN)).detail("It stays out of the Wilderness")
+		return SubStep.of(Kind.ACT, "Deposit in the bank:").items(List.of(BOOK_SHOWN))
 			.actItemNamed(BOOK_NAME).done(SubStep.Done.ITEM_GONE).build();
 	}
 

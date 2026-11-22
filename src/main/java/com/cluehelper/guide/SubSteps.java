@@ -73,8 +73,26 @@ public final class SubSteps
 			.build(this::exitOf, this::plantedTreeTeleport);
 		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds()), step.getData());
 		List<SubStep> steps = withRideItemsWorn(route, withEntranaDeposits(withGearOnArrival(wayIn)));
-		return withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
-			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps);
+		return withTrackPlayedOnTheWay(withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
+			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps));
+	}
+
+	/** Played in the music tab; done once it is the track playing. */
+	static SubStep playTrack(String track)
+	{
+		return SubStep.of(Kind.ACT, "Play " + track).track(track).done(SubStep.Done.TRACK_PLAYING).tab(Tab.MUSIC).build();
+	}
+
+	/** The walk to Cecilia asks for the track already: it can be picked while running there. */
+	private static List<SubStep> withTrackPlayedOnTheWay(List<SubStep> steps)
+	{
+		SubStep play = steps.stream().filter(sub -> sub.getDone() == SubStep.Done.TRACK_PLAYING).findFirst().orElse(null);
+		if (play == null)
+		{
+			return steps;
+		}
+		return steps.stream().map(sub -> sub.getKind() == Kind.WALK_TO_CLUE ? sub.toBuilder().text(play.getText()).tab(Tab.MUSIC).build() : sub)
+			.collect(toUnmodifiableList());
 	}
 
 	/**
@@ -394,7 +412,7 @@ public final class SubSteps
 					break;
 				case WILDERNESS_EXIT:
 					steps.add(SubStep.of(Kind.WILDERNESS_EXIT, "Walk south out of deep Wilderness")
-						.detail("Teleports work from there").waypoint(leg.getTo()).goal(leg.getTo()).build());
+						.waypoint(leg.getTo()).goal(leg.getTo()).build());
 					break;
 				case SWAP_TELEPORT:
 					steps.add(LegSteps.swap(leg));
@@ -475,7 +493,7 @@ public final class SubSteps
 	/** Ends when the stage is dropped from the step, which brings a new plan. */
 	static SubStep stageAct(Stage stage)
 	{
-		return SubStep.of(Kind.ACT, stage.getAct()).detail(LegSteps.isPlaceName(stage.getDetail()) ? null : stage.getDetail()).stage(stage)
+		return SubStep.of(Kind.ACT, stage.getAct()).stage(stage)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
@@ -589,7 +607,8 @@ public final class SubSteps
 
 	private static SubStep.SubStepBuilder takeOff(List<ItemRequirement> emptied)
 	{
-		return SubStep.of(Kind.ACT, "Take off your " + EmptySlots.slotNames(emptied)).emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
+		String slots = EmptySlots.slotNames(emptied);
+		return SubStep.of(Kind.ACT, "Take off " + (slots.equals(EmptySlots.EVERYTHING) ? slots : "your " + slots)).emptied(emptied).done(SubStep.Done.SLOTS_EMPTY)
 			.tab(Tab.EQUIPMENT);
 	}
 

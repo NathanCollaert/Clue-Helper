@@ -97,6 +97,8 @@ public final class StepIndex
 		Map<String, List<Integer>> optionalWith = Map.of();
 		/** What is done at the place before the task, in order: Alry's bird, then king worms for aerial fishing. */
 		List<Before> before = List.of();
+		/** The task's line while something is carried, the first that matches: reanimate the head, then kill what rises. */
+		List<Phase> phases = List.of();
 		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
 		List<Integer> anywhereWith = List.of();
 		/** The task travels to one of the player's planted spirit trees: the route ends with the teleport to the first grown one. */
@@ -309,6 +311,14 @@ public final class StepIndex
 		String option;
 		int groundItem = -1;
 		List<Integer> held = List.of();
+	}
+
+	/** The task's line while any of {@code whileCarried} is carried. */
+	@Getter
+	public static final class Phase
+	{
+		String text;
+		List<Integer> whileCarried = List.of();
 	}
 
 	@Getter

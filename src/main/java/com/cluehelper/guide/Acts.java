@@ -67,7 +67,7 @@ final class Acts
 				return emote(step, takeFromStash, baked);
 			case ClueTypes.FALO:
 				return handInItems.isEmpty() ? baked
-					: List.of(baked.get(0).toBuilder().text("Use on Falo the Bard:").detail(null).items(handInItems).build());
+					: List.of(baked.get(0).toBuilder().text("Use " + String.join(" and ", inLine(handInItems)) + " on Falo the Bard").detail(null).build());
 			case ClueTypes.SKILL:
 				return List.of(handIn(step, handInItems));
 			default:
@@ -101,15 +101,38 @@ final class Acts
 		{
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES, step.getData()));
 		}
-		acts.addAll(baked);
+		acts.addAll(items ? withItemsBackOnForUri(step, baked) : baked);
 		return List.copyOf(acts);
+	}
+
+	/** Core's names read mid-line: "Any completed god book" is "any completed god book". */
+	private static List<String> inLine(List<String> names)
+	{
+		return names.stream().map(name -> name.startsWith("Any ") ? "a" + name.substring(1) : name).collect(toList());
+	}
+
+	/**
+	 * After the emote, before Uri: the items go back on if they came off (to fight the double agent). Each act is done at
+	 * once while they stay on.
+	 */
+	private static List<SubStep> withItemsBackOnForUri(Step step, List<SubStep> performThenTalk)
+	{
+		if (performThenTalk.size() < 2)
+		{
+			return performThenTalk;
+		}
+		List<ItemRequirement> items = step.getRequirements().getItems();
+		List<SubStep> acts = new ArrayList<>(performThenTalk.subList(0, 1));
+		acts.addAll(SubSteps.remove(EmptySlots.of(items)));
+		acts.add(equip(items));
+		acts.addAll(performThenTalk.subList(1, performThenTalk.size()));
+		return acts;
 	}
 
 	/** Take the items out of the STASH unit and put them on. */
 	static List<SubStep> fromStash(Step step)
 	{
-		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
-			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
+		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = !step.getRequirements().getItems().isEmpty();
 		return items ? List.of(take, equip(itemsToPutOn(step))) : List.of(take);
 	}

@@ -34,7 +34,9 @@ public class SubStep
 		/** Core's {@code emptied} slot requirements are met by what is worn, or the way in's gear is on already (Larry's suit). */
 		SLOTS_EMPTY,
 		/** One of {@code heldWhenDone} is carried or worn. */
-		ITEM_HELD
+		ITEM_HELD,
+		/** The music tab's now playing is {@code track}. */
+		TRACK_PLAYING
 	}
 
 	public enum Kind
@@ -121,6 +123,8 @@ public class SubStep
 	/** For {@link Done#SLOTS_EMPTY}: core's empty-slot requirements. */
 	@Builder.Default
 	List<ItemRequirement> emptied = List.of();
+	/** For {@link Done#TRACK_PLAYING}: the track's name. */
+	String track;
 	/** For {@link Done#ITEM_HELD}: any of these. */
 	@Builder.Default
 	Set<Integer> heldWhenDone = Set.of();

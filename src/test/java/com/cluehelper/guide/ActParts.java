@@ -15,7 +15,6 @@ import com.cluehelper.guide.SubStep.Kind;
  */
 public final class ActParts
 {
-	private static final String STAY_EQUIPPED = "Stay equipped until Uri is done";
 	private static final String TALK_OPTION = "Talk-to";
 	private static final String ATTACK_OPTION = "Attack";
 	static final String USE_OPTION = "Use";
@@ -100,8 +99,7 @@ public final class ActParts
 		if (step.isKeyFromNpc())
 		{
 			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
-			return SubStep.of(Kind.ACT, "Search " + what + " with the key")
-				.detail("The key comes from " + step.getNpcs().get(0)).build();
+			return SubStep.of(Kind.ACT, "Search " + what).build();
 		}
 		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, actText(step));
 		String npc = talkedTo(step);
@@ -197,7 +195,7 @@ public final class ActParts
 			case ClueTypes.EMOTE:
 				return emote(step, takeFromStash);
 			case ClueTypes.MUSIC:
-				return List.of(music(step));
+				return music(step);
 			case ClueTypes.FALO:
 				return List.of(useOnFalo(handInItems).option(USE_OPTION).npcIds(targetNpcs(step)).build());
 			case ClueTypes.SKILL:
@@ -210,8 +208,8 @@ public final class ActParts
 			.filter(target -> target.getKind() == StepIndex.Target.Kind.KILL).findFirst().orElse(null);
 		if (kill != null)
 		{
-			String text = kill.getText() != null ? kill.getText() : "Kill the monster";
-			return List.of(SubStep.of(Kind.ACT, text).detail(area(data)).option(ATTACK_OPTION)
+			String text = kill.getText() != null ? kill.getText().replaceAll("\\.$", "") : "Kill the monster";
+			return List.of(SubStep.of(Kind.ACT, text).option(ATTACK_OPTION)
 				.npcIds(Set.copyOf(kill.getNpcs())).build());
 		}
 		if (isDig(step))
@@ -238,9 +236,9 @@ public final class ActParts
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES, step.getData()));
 		}
 		String emotes = step.getEmotes().isEmpty() ? "the emote" : String.join(", then ", step.getEmotes());
-		acts.add(SubStep.of(Kind.ACT, "Perform " + emotes).detail(items ? STAY_EQUIPPED : null)
+		acts.add(SubStep.of(Kind.ACT, "Perform " + emotes)
 			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
-		acts.add(SubStep.of(Kind.ACT, "Talk to Uri").detail(items ? "Stay equipped" : null)
+		acts.add(SubStep.of(Kind.ACT, "Talk to Uri")
 			.option(TALK_OPTION).npcIds(URI_IDS).build());
 		return List.copyOf(acts);
 	}
@@ -248,8 +246,7 @@ public final class ActParts
 	/** Take the items out of the STASH unit and put them on. */
 	static List<SubStep> fromStash(Step step)
 	{
-		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items")
-			.detail("Then equip them").done(SubStep.Done.STASH_WITHDRAWN).build();
+		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = !step.getRequirements().getItems().isEmpty();
 		return items ? List.of(take, equip(itemsToPutOn(step))) : List.of(take);
 	}
@@ -266,19 +263,17 @@ public final class ActParts
 			.done(SubStep.Done.WORN).tab(StepGuide.Tab.INVENTORY).build();
 	}
 
-	private static SubStep music(Step step)
+	/** The track goes on first, on the way there; Cecilia ends the step only while it plays. */
+	private static List<SubStep> music(Step step)
 	{
 		StepIndex.Music music = step.getData().getMusic();
 		String track = music != null && music.getTrack() != null ? music.getTrack() : step.getText();
-		String unlock = music == null || music.getUnlock() == null ? null : "Unlocked: " + music.getUnlock();
-		return act("Talk to Cecilia, then play " + track, unlock == null ? "Music tab" : "Music tab. " + unlock).toBuilder()
-			.tab(StepGuide.Tab.MUSIC).build();
+		return List.of(SubSteps.playTrack(track), act("Talk to Cecilia", null));
 	}
 
 	private static SubStep.SubStepBuilder useOnFalo(List<String> handInItems)
 	{
-		return handInItems.isEmpty() ? SubStep.of(Kind.ACT, "Use the item on Falo the Bard").detail("The item the Clue Scroll plugin lists")
-			: SubStep.of(Kind.ACT, "Use on Falo the Bard:").items(handInItems);
+		return SubStep.of(Kind.ACT, "Use " + (handInItems.isEmpty() ? "the item" : String.join(" and ", handInItems)) + " on Falo the Bard");
 	}
 
 	/** Charlie's item is listed by name, as the withdraw and equip steps list theirs. */
@@ -286,9 +281,9 @@ public final class ActParts
 	{
 		if (!"beginner".equals(step.getTier()))
 		{
-			return act("Talk to Sherlock", "Task done: hand it in");
+			return act("Talk to Sherlock", null);
 		}
-		return handInItems.isEmpty() ? act("Give Charlie the item", "He wants what the clue names")
+		return handInItems.isEmpty() ? act("Give Charlie the item", null)
 			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 
@@ -334,11 +329,6 @@ public final class ActParts
 	private static String note(Step step)
 	{
 		return step.getData().getNote();
-	}
-
-	private static String area(StepIndex.Entry data)
-	{
-		return data.getArea() == null ? null : data.getArea().getText();
 	}
 
 	/**

@@ -408,7 +408,7 @@ public class StepGuide
 		changed |= keyFromCharterList();
 		changed |= partWayIn(tile);
 		changed |= pickUpForAct(tile);
-		changed |= refreshGear();
+		changed |= refreshCurrent();
 		changed |= showMaking();
 		checkRefusal();
 		checkTeleportRefusal();
@@ -840,7 +840,7 @@ public class StepGuide
 		index = 0;
 		resetTravel();
 		advance(tile);
-		refreshGear();
+		refreshCurrent();
 		showMaking();
 		updateHighlights();
 		refreshObjects();
@@ -1264,9 +1264,17 @@ public class StepGuide
 				return act.getActItems().stream().noneMatch(player.carriedIds()::contains);
 			case ITEM_HELD:
 				return act.getHeldWhenDone().stream().anyMatch(player.carriedIds()::contains);
+			case TRACK_PLAYING:
+				return isPlaying(act.getTrack());
 			default:
 				return actWatcher.isDone(act.getDone(), stepSince);
 		}
+	}
+
+	private boolean isPlaying(String track)
+	{
+		Widget nowPlaying = client.getWidget(InterfaceID.Music.NOW_PLAYING_TEXT);
+		return nowPlaying != null && Text.removeTags(nowPlaying.getText()).trim().equalsIgnoreCase(track);
 	}
 
 	/** The scene is searched again for the new sub-step's objects and NPCs. */
@@ -1308,10 +1316,10 @@ public class StepGuide
 	}
 
 	/** A gear act listing what to put on or take off now. */
-	private boolean refreshGear()
+	private boolean refreshCurrent()
 	{
 		SubStep current = getCurrent();
-		return current != null && replaceCurrent(gearActs.refresh(current, routeStep));
+		return current != null && replaceCurrent(taskActs.phased(gearActs.refresh(current, routeStep), routeStep));
 	}
 
 	/** The current sub-step rewritten; the caller's tick updates the highlights once for every change. */

@@ -21,14 +21,10 @@ final class LegSteps
 	private static final String TALK_TO = "Talk to";
 	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
 	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
-	/**
-	 * A task's place that reads as the walk's end ("The nearest anvil"), else what the stage is done on ("the nearest
-	 * black warlock"); a longer place, with how-tos, goes under the walk.
-	 */
+	/** A task's place that reads as the walk's end ("The nearest anvil"), else what the stage is done on ("the nearest black warlock"). */
 	private static final Pattern SHORT_PLACE = Pattern.compile("(The|An?) [^:,(.]+");
 
-	/** A place that is only a name ("The Nature Altar"): the walk to it says it, so nothing goes under the act. */
-	static boolean isPlaceName(String place)
+	private static boolean isPlaceName(String place)
 	{
 		return place != null && SHORT_PLACE.matcher(place).matches();
 	}
@@ -50,7 +46,7 @@ final class LegSteps
 		boolean placeNamed = isPlaceName(place);
 		String walk = placeNamed ? "Walk to " + Character.toLowerCase(place.charAt(0)) + place.substring(1)
 			: stage.getTargetName() != null ? "Walk to the nearest " + stage.getTargetName() : text;
-		return walkTo(walk, leg.getTo(), radius).detail(placeNamed ? null : place)
+		return walkTo(walk, leg.getTo(), radius)
 			.npcIds(stage.getNpcIds()).objectIds(stage.getObjectIds()).option(stage.getOption()).spans(stage.getSpans()).build();
 	}
 
