@@ -3,20 +3,41 @@ package com.cluehelper.memory;
 import com.cluehelper.step.StepIndex;
 import java.util.*;
 import javax.inject.*;
+import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
 /**
  * Client thread only. Where the player went into a way in entered at one of several places, learnt as they go in: the
- * Barrows crypt with the tunnel is only known once its sarcophagus is searched. Kept until the way's forget line shows
- * in chat (the chest's count once it is looted).
+ * Barrows crypt with the tunnel is only known once its sarcophagus is searched. Kept across sessions until the way's
+ * forget line shows in chat (the chest's count once it is looted).
  */
 @Singleton
 public class WayInMemory
 {
-	final Map<String, WorldPoint> entered = new HashMap<>();
+	static final String KEY = "waysIn";
+
+	/** Where the player stepped onto the way's part-way floors, and the object they then went in by. */
+	@Value
+	public static class Entered
+	{
+		WorldPoint from;
+		int object;
+		String option;
+	}
+
+	MemorySlot<Ways> remembered;
 	WorldPoint last;
 	/** The tile the player last stepped from onto the way's part-way floors (a crypt), for the way being watched. */
 	WorldPoint partWayFrom;
+	/** The object last clicked on the part-way floors (the sarcophagus searched); -1 for none. */
+	int clicked = -1;
+	String clickedOption;
+
+	@Inject
+	void init(MemoryStore memory)
+	{
+		remembered = memory.slot(KEY, Ways.class, Ways::new);
+	}
 
 	/** Each tick, with the current step's way in: notes the place the player goes in by. */
 	public void onTick(StepIndex.WayIn way, WorldPoint at)
@@ -30,24 +51,75 @@ public class WayInMemory
 		if (way.isPartWay(at) && !way.isPartWay(before) && !way.isInside(before))
 		{
 			partWayFrom = before;
+			clicked = -1;
 		}
 		else if (way.isInside(at) && way.isPartWay(before) && partWayFrom != null)
 		{
-			entered.put(way.getText(), partWayFrom);
+			Ways ways = remembered.get().copy();
+			ways.entered.put(way.getText(), new Place(partWayFrom, clicked, clickedOption));
+			remembered.set(ways);
+		}
+	}
+
+	/** An object clicked while on the way's part-way floors: the last one before going in is how the player went in. */
+	public void onObjectClicked(StepIndex.WayIn way, WorldPoint at, int objectId, String option)
+	{
+		if (way != null && way.isRemembered() && at != null && way.isPartWay(at))
+		{
+			clicked = objectId;
+			clickedOption = option;
 		}
 	}
 
 	public void onGameLine(StepIndex.WayIn way, String line)
 	{
-		if (way != null && way.getForgetOn() != null && line.contains(way.getForgetOn()))
+		if (way != null && way.getForgetOn() != null && line.contains(way.getForgetOn()) && remembered.get().entered.containsKey(way.getText()))
 		{
-			entered.remove(way.getText());
+			Ways ways = remembered.get().copy();
+			ways.entered.remove(way.getText());
+			remembered.set(ways);
 		}
 	}
 
-	/** Where the player went in last time; null while it isn't known. */
-	public WorldPoint enteredAt(StepIndex.WayIn way)
+	/** How the player went in last time; null while it isn't known. */
+	public Entered enteredBy(StepIndex.WayIn way)
 	{
-		return way == null ? null : entered.get(way.getText());
+		Place place = way == null ? null : remembered.get().entered.get(way.getText());
+		return place == null ? null : new Entered(new WorldPoint(place.x, place.y, place.plane), place.object, place.option);
+	}
+
+	/** Stored as plain numbers, by the way's text. */
+	static final class Ways
+	{
+		Map<String, Place> entered = new HashMap<>();
+
+		Ways copy()
+		{
+			Ways copy = new Ways();
+			copy.entered.putAll(entered);
+			return copy;
+		}
+	}
+
+	static final class Place
+	{
+		int x;
+		int y;
+		int plane;
+		int object;
+		String option;
+
+		Place()
+		{
+		}
+
+		Place(WorldPoint tile, int object, String option)
+		{
+			x = tile.getX();
+			y = tile.getY();
+			plane = tile.getPlane();
+			this.object = object;
+			this.option = option;
+		}
 	}
 }

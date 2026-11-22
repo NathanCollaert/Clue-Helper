@@ -1300,9 +1300,12 @@
   worn [4156] inv [24266] done
 -- worn
   worn [24266] inv [4156] done
-== cryptic:you'll get licked. #1 Equip:
+== cryptic:you'll get licked. #2 Equip:
 -- recorded
-  worn [4156, 13342, 33066] inv [952, 10595, 13069, 13140, 21268] done
+  worn [28329, 32386] inv [229, 307, 552, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13280, 19476, 21268, 21389, 26948, 28260, 33066]
+   -> Equip: [Hooded slayer helmet]
+   outline [33066] fill [33066] tab INVENTORY menu [[Wear]@[33066]]
+  worn [28329, 32386, 33066] inv [229, 307, 552, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13280, 19476, 21268, 21389, 26948, 28260] done
 -- bare
   worn [] inv []
    -> Equip: [Nose peg (or a slayer helmet)]
@@ -1438,7 +1441,7 @@
   worn [2497, 7445, 10069] inv [10073] done
 -- worn
   worn [2497, 7445, 10073] inv [10069] done
-== emote:12076 #5 Equip the Ring of visibility (or ring of shadows)
+== emote:12076 #4 Equip the Ring of visibility (or ring of shadows)
 -- recorded
   worn [4587, 11283, 22326, 22327, 22328, 22981, 24133, 29804, 31097] inv [590, 855, 946, 952, 954, 995, 1523, 3695, 4156, 6317, 12629, 13069, 13111, 13115, 13124, 13140, 13241, 13280, 21268, 23680, 23946, 24855, 28682, 29893, 32399, 33066]
    -> Equip: [Ring of visibility (or ring of shadows)]
@@ -2058,12 +2061,9 @@
   worn [28933] inv [28936, 28939] done
 -- worn
   worn [28933, 28936, 28939] inv [] done
-== map:19782 #4 Equip the Medallion of the Deep
+== map:19782 #1 Equip the Medallion of the Deep
 -- recorded
-  worn [13342] inv [952, 13069, 13111, 23458, 23946, 26948, 28939]
-   -> Equip: [Medallion of the Deep]
-   outline [] fill [] tab INVENTORY menu [[]@[]]
-   stuck
+  worn [28329, 29796, 32386, 33066] inv [229, 307, 552, 564, 590, 946, 952, 1523, 7936, 12934, 13111, 13140, 13241, 13280, 19476, 21268, 21389, 26948, 28260] done
 -- bare
   worn [] inv []
    -> Equip: [Medallion of the Deep]
@@ -2103,7 +2103,7 @@
   worn [4024] inv [4025, 19525] done
 -- worn
   worn [19525] inv [4024, 4025] done
-== skill:SHERLOCK:craft a nature rune. #5 Equip the Nature talisman or tiara (or a catalytic one, Runecraft or Max cape)
+== skill:SHERLOCK:craft a nature rune. #4 Equip the Nature talisman or tiara (or a catalytic one, Runecraft or Max cape)
 -- recorded
   worn [4587, 6465, 10933, 10939, 10940, 10941, 11283, 22981, 24133, 29804] inv [564, 811, 952, 1785, 10973, 13069, 13115, 13140, 13222, 13241, 13280, 21389, 22326, 22327, 22328, 22603, 28329, 31097]
    -> Equip: [Max cape]
@@ -2118,7 +2118,7 @@
   worn [] inv [1462, 5541, 7936, 9765, 9766, 13280, 13342, 24704, 26798, 26801] done
 -- worn
   worn [13342, 26801] inv [1462, 5541, 7936, 9765, 9766, 13280, 24704, 26798] done
-== skill:SHERLOCK:score a goal in skullball. #3 Equip the Ring of Charos
+== skill:SHERLOCK:score a goal in skullball. #2 Equip the Ring of Charos
 -- recorded
   worn [4587, 6465, 11283, 22326, 22327, 22328, 22981, 24133, 29804, 31097] inv [564, 952, 1775, 1785, 7936, 10933, 10939, 10940, 10941, 10981, 13069, 13115, 13140, 13241, 13280, 21389, 28329] done
 -- bare
@@ -2151,7 +2151,7 @@
   worn [4164] inv [11864, 11865, 19639, 19641, 19643, 19645, 19647, 19649, 21264, 21266, 21888, 21890, 23073, 23075, 24370, 24444, 25177, 25179, 25181, 25183, 25185, 25187, 25189, 25191, 25898, 25900, 25902, 25904, 25906, 25908, 25910, 25912, 25914, 26674, 26675, 26676, 26677, 26678, 26679, 26680, 26681, 26682, 26683, 26684, 29816, 29818, 29820, 29822, 33066, 33068, 33070, 33072, 33338, 33340, 33439, 33441, 33443, 33445, 33447, 33449] done
 -- worn
   worn [33449] inv [4164, 11864, 11865, 19639, 19641, 19643, 19645, 19647, 19649, 21264, 21266, 21888, 21890, 23073, 23075, 24370, 24444, 25177, 25179, 25181, 25183, 25185, 25187, 25189, 25191, 25898, 25900, 25902, 25904, 25906, 25908, 25910, 25912, 25914, 26674, 26675, 26676, 26677, 26678, 26679, 26680, 26681, 26682, 26683, 26684, 29816, 29818, 29820, 29822, 33066, 33068, 33070, 33072, 33338, 33340, 33439, 33441, 33443, 33445, 33447] done
-== cryptic:in the city where merchants are said to have lived, talk to a man with a splendid cape, but a hat dropped by goblins. #3 Equip the Chef's hat (or cooking cape, Max cape, Varrock armour 3)
+== cryptic:in the city where merchants are said to have lived, talk to a man with a splendid cape, but a hat dropped by goblins. #2 Equip the Chef's hat (or cooking cape, Max cape, Varrock armour 3)
 -- recorded
   worn [13342] inv [952, 13103] done
 -- bare
@@ -3024,7 +3024,7 @@
   worn [26219] inv [775, 1203, 1213, 1215, 1245, 1247, 1275, 1289, 1301, 1303, 1305, 1317, 1319, 1333, 1359, 1373, 1377, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1432, 1434, 1704, 2963, 3053, 3054, 3202, 3204, 4151, 4153, 4170, 4587, 6317, 6528, 6746, 7158, 7409, 7462, 7537, 10828, 10887, 11126, 11283, 11804, 11806, 11808, 11840, 13103, 13111, 13132, 13144, 13241, 13652, 19941, 21003, 21031, 21276, 22322, 22325, 22557, 22978, 22981, 22986, 23680, 23987, 24133, 24175, 24419, 24420, 24421, 24780, 24855, 25981, 26382, 26948, 27287, 27291, 27660, 27690, 28260, 28262, 28307, 28316, 28327, 28329, 28682, 28792, 28945, 28997, 29022, 29025, 29028, 29280, 29577, 29589, 29594, 29796, 29804, 29806, 30750, 30753, 30756, 30759, 31097, 33631, 33718, 33722, 34027] done
 -- worn
   worn [22322, 22981, 24855, 28329, 29804, 30750, 30753, 30756, 31097, 34027] inv [775, 1203, 1213, 1215, 1245, 1247, 1275, 1289, 1301, 1303, 1305, 1317, 1319, 1333, 1359, 1373, 1377, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1432, 1434, 1704, 2963, 3053, 3054, 3202, 3204, 4151, 4153, 4170, 4587, 6317, 6528, 6746, 7158, 7409, 7462, 7537, 10828, 10887, 11126, 11283, 11804, 11806, 11808, 11840, 13103, 13111, 13132, 13144, 13241, 13652, 19941, 21003, 21031, 21276, 22325, 22557, 22978, 22986, 23680, 23987, 24133, 24175, 24419, 24420, 24421, 24780, 25981, 26219, 26382, 26948, 27287, 27291, 27660, 27690, 28260, 28262, 28307, 28316, 28327, 28682, 28792, 28945, 28997, 29022, 29025, 29028, 29280, 29577, 29589, 29594, 29796, 29806, 30759, 33631, 33718, 33722] done
-== cryptic:the far north eastern corner where 1 of 4 was defeated, the shadows still linger. #5 Equip the Ring of visibility (or ring of shadows)
+== cryptic:the far north eastern corner where 1 of 4 was defeated, the shadows still linger. #4 Equip the Ring of visibility (or ring of shadows)
 -- recorded
   worn [4151, 11664, 13072, 21793] inv [952, 13280]
    -> Equip: [Ring of visibility (or ring of shadows)]

@@ -278,6 +278,10 @@ final class StepHighlights
 		{
 			return useOnWayIn(shown, way);
 		}
+		if (way.getObject() < 0 && !current.getObjectIds().isEmpty())
+		{
+			return shown.menuTarget(wayTarget(current.getObjectIds().iterator().next(), current.getOption())).build();
+		}
 		Set<Integer> instead = carriedInsteadOfWorn(step);
 		return instead.isEmpty() ? shown.menuTarget(enterTarget(current)).build()
 			: useOn(shown, MenuTarget.builder().objectIds(Set.of(way.getObject())), instead, Set.of());

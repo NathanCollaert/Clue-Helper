@@ -329,6 +329,8 @@ public final class StepIndex
 	{
 		String text;
 		List<Integer> whileCarried = List.of();
+		/** The option the phase clicks on the task's object (the pyre's Build); null for the task's own. */
+		String option;
 	}
 
 	@Getter
@@ -474,6 +476,8 @@ public final class StepIndex
 		List<String> dialogue = List.of();
 		/** Ground items to pick up part way in before going on (the Mogre Camp's rocks); null when none. */
 		PickUp pickUp;
+		/** Its gear goes on at the way in, not before the walk there (a sled is only ridden at the top). */
+		boolean gearThere;
 		/** Entered at one of several places, the one used last remembered (the Barrows crypt with the tunnel). */
 		boolean remembered;
 		/** For a remembered way: the game line that forgets the place (the Barrows chest's count, once looted). */

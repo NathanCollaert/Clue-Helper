@@ -65,7 +65,7 @@ final class StageParts
 	{
 		List<WorldPoint> tiles = new ArrayList<>(List.of(key.getKeyTile()));
 		tiles.addAll(also);
-		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act(keyAct(key.getText()))
+		Stage kill = Stage.builder().kind(Stage.Kind.KEY).act(keyAct(key.getText())).npcIds(Set.copyOf(key.getNpcs())).option(ATTACK)
 			.tiles(List.copyOf(tiles)).ourMarker(true).radius(KEY_AREA_TILES).itemIds(List.of(key.getKey())).build();
 		return List.of(kill, Stage.builder().kind(Stage.Kind.FINAL).tiles(CORE_TARGETS).build());
 	}

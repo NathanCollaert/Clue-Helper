@@ -83,9 +83,9 @@ public final class SubSteps
 	}
 
 	/**
-	 * A walk reads as what it leads to, the act or the way in after it past gear put on and further walks: "Kill a
-	 * hellhound", not "Walk to the clue". A dig is the exception: "Dig" reads as now, so its walk says where it goes. The
-	 * line and outlines stay the walk's.
+	 * A walk reads as what it leads to, the act or the way in after it past further walks: "Kill a hellhound", not "Walk
+	 * to the clue". Not when gear goes on between, which would read out of order, nor for a dig: "Dig" reads as now, so
+	 * its walk says where it goes. The line and outlines stay the walk's.
 	 */
 	private static List<SubStep> withWalksNamedByWhatTheyLeadTo(List<SubStep> steps)
 	{
@@ -107,9 +107,9 @@ public final class SubSteps
 		for (int i = from; i < steps.size(); i++)
 		{
 			SubStep sub = steps.get(i);
-			if (!isWalk(sub) && !sub.isPreparation())
+			if (!isWalk(sub))
 			{
-				return sub.getKind() == Kind.ACT || sub.getKind() == Kind.ENTER ? sub : null;
+				return !sub.isPreparation() && (sub.getKind() == Kind.ACT || sub.getKind() == Kind.ENTER) ? sub : null;
 			}
 		}
 		return null;
@@ -746,14 +746,21 @@ public final class SubSteps
 	}
 
 	/**
-	 * On a route to the way in, its gear goes on at the way in: a sled can only be ridden at the top of Trollweiss
-	 * Mountain. Already on the way (diving to the Mogre Camp's rocks), there is nothing to walk back to. Gear an NPC puts
-	 * on goes on where the NPC stands (Larry, at the Iceberg's landing).
+	 * On a route to the way in, its gear goes on first, then the walk there: the walk reads as going in. Gear that only
+	 * works there goes on at the way in instead: a sled can only be ridden at the top of Trollweiss Mountain. Already on
+	 * the way (diving to the Mogre Camp's rocks), there is nothing to walk back to. Gear an NPC puts on goes on where the
+	 * NPC stands (Larry, at the Iceberg's landing).
 	 */
 	private static List<SubStep> withWalkToWayIn(List<SubStep> steps, StepIndex.Entry data)
 	{
 		StepIndex.WayIn way = data == null ? null : data.getEntry();
-		return withBefore(steps, sub -> way != null && sub.getWayIn() != null && sub.getKind() == Kind.ACT
+		Predicate<SubStep> equip = sub -> sub.getWayIn() != null && sub.getKind() == Kind.ACT;
+		if (way == null || steps.stream().noneMatch(equip))
+		{
+			return steps;
+		}
+		Predicate<SubStep> walkBefore = way.isGearThere() ? equip : sub -> sub.getKind() == Kind.ENTER;
+		return withBefore(steps, sub -> walkBefore.test(sub)
 			? List.of(LegSteps.walkTo("Walk to " + way.getText(), way.getTile(), ARRIVE_TILES).wayIn(way).build()) : List.of());
 	}
 
