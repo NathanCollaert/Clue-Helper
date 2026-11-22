@@ -4,11 +4,8 @@ import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.*;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
 import javax.inject.*;
 import lombok.Getter;
-import net.runelite.api.Client;
 
 /** Client thread, except the getters. Also judges again when a cooldown clears, since no var changes then. */
 @Singleton
@@ -17,32 +14,28 @@ public class AvailabilityService
 	private static final long MILLIS_PER_MINUTE = 60_000L;
 
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private Client client;
+	BankMemory bankMemory;
 	@Inject
-	private BankMemory bankMemory;
-	@Inject
-	private ClueHelperConfig config;
-	private final Set<Integer> catalogItems = new HashSet<>();
-	/** Items that walk gates ask for (a long rope), named with the catalog's for no-route notes. */
-	private final Set<Integer> gateItems = ConcurrentHashMap.newKeySet();
-	private final Map<Integer, String> itemNames = new ConcurrentHashMap<>();
-	private final List<Consumer<AvailabilitySet>> listeners = new CopyOnWriteArrayList<>();
+	ClueHelperConfig config;
+	volatile Set<Integer> catalogItems = Set.of();
+	/** The catalog's items and the walk gates' (a long rope), for no-route notes. */
+	volatile Map<Integer, String> itemNames = Map.of();
 
 	@Getter
-	private volatile List<CatalogRow> catalog = List.of();
+	volatile List<CatalogRow> catalog = List.of();
 	@Getter
-	private volatile AvailabilitySet carried = AvailabilitySet.EMPTY;
+	volatile AvailabilitySet carried = AvailabilitySet.EMPTY;
 	/** Empty when no bank counts. */
 	@Getter
-	private volatile AvailabilitySet banked = AvailabilitySet.EMPTY;
+	volatile AvailabilitySet banked = AvailabilitySet.EMPTY;
 	/** Null when no bank counts. */
 	@Getter
-	private volatile PlayerSnapshot bankedSnapshot;
-	private long judgedBankVersion = -1;
-	private volatile boolean stale = true;
-	private Runnable unregister;
+	volatile PlayerSnapshot bankedSnapshot;
+	long judgedBankVersion = -1;
+	volatile boolean stale = true;
+	Runnable unregister;
 
 	public void start()
 	{
@@ -62,26 +55,12 @@ public class AvailabilityService
 	}
 
 	/** Any thread. The rows' vars are watched from the next tick on. */
-	public void setCatalog(List<CatalogRow> rows)
+	public void setCatalog(Catalog loaded)
 	{
-		Set<Integer> varbits = new HashSet<>();
-		Set<Integer> varps = new HashSet<>();
-		for (CatalogRow row : rows)
-		{
-			Requirements req = row.getRequirements();
-			req.getVars().forEach(check -> (check.getKind() == VarCheck.Kind.VARBIT ? varbits : varps).add(check.getId()));
-			req.getItems().stream().filter(clause -> clause.getWaivedBy() != null)
-				.forEach(clause -> varbits.add(clause.getWaivedBy().getId()));
-		}
-		player.watch(varbits, varps);
-		catalog = List.copyOf(rows);
-		stale = true;
-	}
-
-	/** Any thread. */
-	public void nameItemsOf(List<Requirements> gates)
-	{
-		gates.forEach(gate -> gate.getItems().forEach(clause -> clause.getBranches().forEach(branch -> gateItems.addAll(branch.getIds()))));
+		player.watch(loaded.getWatchedVarbits(), loaded.getWatchedVarps());
+		catalogItems = loaded.getItems();
+		itemNames = loaded.getItemNames();
+		catalog = loaded.getTeleports();
 		stale = true;
 	}
 
@@ -100,13 +79,10 @@ public class AvailabilityService
 		{
 			stale = false;
 			judgedBankVersion = bankMemory.getVersion();
-			nameCatalogItems();
 			AvailabilityEngine engine = new AvailabilityEngine(runes, this::itemName);
 			carried = engine.carried(catalog, snapshot, now);
 			bankedSnapshot = withBank(snapshot);
 			banked = bankedSnapshot == null ? AvailabilitySet.EMPTY : engine.carried(catalog, bankedSnapshot, now);
-			AvailabilitySet judged = carried;
-			listeners.forEach(listener -> listener.accept(judged));
 		}
 	}
 
@@ -139,40 +115,14 @@ public class AvailabilityService
 			.build();
 	}
 
-	/** Listeners run on the client thread, each time the catalog is judged again. */
-	public Runnable addListener(Consumer<AvailabilitySet> listener)
-	{
-		listeners.add(listener);
-		return () -> listeners.remove(listener);
-	}
-
 	public static long nowMinutes()
 	{
 		return System.currentTimeMillis() / MILLIS_PER_MINUTE;
 	}
 
-	/** Any thread: the catalog's items are named on the client thread on the first tick after it loads. */
+	/** Any thread. */
 	public String itemName(int id)
 	{
 		return itemNames.getOrDefault(id, "item " + id);
-	}
-
-	private void nameCatalogItems()
-	{
-		gateItems.forEach(id -> itemNames.computeIfAbsent(id, i -> client.getItemDefinition(i).getName()));
-		for (CatalogRow row : catalog)
-		{
-			for (ItemClause clause : row.getRequirements().getItems())
-			{
-				for (ItemClause.Branch branch : clause.getBranches())
-				{
-					branch.getIds().forEach(id ->
-					{
-						catalogItems.add(id);
-						itemNames.computeIfAbsent(id, i -> client.getItemDefinition(i).getName());
-					});
-				}
-			}
-		}
 	}
 }

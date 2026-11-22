@@ -46,50 +46,37 @@ public final class ProbePlanner
 	}
 
 	@Value
-	public static class Branch
-	{
-		Band band;
-		/** Null when the reading would have no comparison. */
-		Comparison comparison;
-		double probability;
-		/** Spot name to its share within this branch, largest first. */
-		Map<String, Double> spots;
-	}
-
-	@Value
 	public static class Choice
 	{
 		Probe probe;
 		double bits;
 		int costTicks;
-		/** Most likely first. */
-		List<Branch> branches;
 	}
 
 	/**
 	 * @param previous the log's last reading, or null; the next reading is compared against it
 	 * @return null when no probe tells the spots apart
 	 */
-	public static Choice choose(Hypotheses.Samples samples, HotColdTier tier, Reading previous, List<Probe> probes, Costs costs)
+	public static Choice choose(Hypotheses grid, HotColdTier tier, Reading previous, List<Probe> probes, Costs costs)
 	{
 		WorldPoint before = previous == null ? null : previous.tiles().get(0);
-		double prior = entropy(spotMasses(samples));
-		double[] table = new double[OUTCOMES * samples.spotCount()];
-		int[] touched = new int[samples.x.length];
+		double prior = entropy(grid.spotMasses());
+		double[] table = new double[OUTCOMES * grid.spotCount()];
+		int[] touched = new int[grid.x.length];
 		double[] outcomeMass = new double[OUTCOMES];
-		int[] digTicks = samples.spotCount() <= ONWARD_SPOTS ? digTicks(samples, probes) : null;
+		int[] digTicks = grid.spotCount() <= ONWARD_SPOTS ? digTicks(grid, probes) : null;
 		Probe best = null;
 		double bestScore = 0;
 		double bestBits = 0;
 		int bestCost = 0;
 		for (Probe probe : probes)
 		{
-			double bits = prior - conditionalEntropy(table, touched, outcomeMass, samples, tier, before, probe.getTile());
+			double bits = prior - conditionalEntropy(table, touched, outcomeMass, grid, tier, before, probe.getTile());
 			if (bits < MIN_BITS)
 			{
 				continue;
 			}
-			int cost = cost(probe, costs) + (digTicks == null ? 0 : onward(samples, digTicks, probe.getTile()));
+			int cost = cost(probe, costs) + (digTicks == null ? 0 : onward(grid, digTicks, probe.getTile()));
 			double score = bits / cost;
 			if (best == null || score > bestScore || score == bestScore && cost < bestCost)
 			{
@@ -103,7 +90,7 @@ public final class ProbePlanner
 		{
 			return null;
 		}
-		return new Choice(best, bestBits, bestCost, branches(samples, tier, before, best.getTile()));
+		return new Choice(best, bestBits, bestCost);
 	}
 
 	/**
@@ -113,21 +100,21 @@ public final class ProbePlanner
 	 *
 	 * @param landingsWithin landing probes whose ranking ticks are at most the given number
 	 */
-	public static List<Probe> worthTrying(Hypotheses.Samples samples, HotColdTier tier, Reading previous, List<Probe> nearby,
+	public static List<Probe> worthTrying(Hypotheses grid, HotColdTier tier, Reading previous, List<Probe> nearby,
 		IntFunction<List<Probe>> landingsWithin, Costs costs)
 	{
 		List<Probe> probes = new ArrayList<>(nearby);
-		if (samples.spotCount() <= ONWARD_SPOTS)
+		if (grid.spotCount() <= ONWARD_SPOTS)
 		{
 			probes.addAll(landingsWithin.apply(Integer.MAX_VALUE));
 			return probes;
 		}
-		double mostBits = mostBits(samples, previous);
-		int limit = rankTicksWorthTrying(mostBits, choose(samples, tier, previous, probes, costs));
+		double mostBits = mostBits(grid, previous);
+		int limit = rankTicksWorthTrying(mostBits, choose(grid, tier, previous, probes, costs));
 		if (limit > FIRST_LANDING_TICKS)
 		{
 			probes.addAll(landingsWithin.apply(FIRST_LANDING_TICKS));
-			limit = rankTicksWorthTrying(mostBits, choose(samples, tier, previous, probes, costs));
+			limit = rankTicksWorthTrying(mostBits, choose(grid, tier, previous, probes, costs));
 			if (limit <= FIRST_LANDING_TICKS)
 			{
 				return probes;
@@ -150,11 +137,11 @@ public final class ProbePlanner
 	}
 
 	/** No feel tells more than the spots' uncertainty, nor more than its possible readings can tell apart. */
-	private static double mostBits(Hypotheses.Samples samples, Reading previous)
+	private static double mostBits(Hypotheses grid, Reading previous)
 	{
 		int bands = Band.values().length;
 		int readings = previous == null ? bands : 1 + (bands - 1) * Comparison.values().length;
-		return Math.min(entropy(spotMasses(samples)), Math.log(readings) / LOG2);
+		return Math.min(entropy(grid.spotMasses()), Math.log(readings) / LOG2);
 	}
 
 	static int cost(Probe probe, Costs costs)
@@ -166,13 +153,13 @@ public final class ProbePlanner
 	 * Each spot's dig as if reached from here: the cheapest probe near it plus the walk, which teleports make about the
 	 * same from anywhere.
 	 */
-	private static int[] digTicks(Hypotheses.Samples samples, List<Probe> probes)
+	private static int[] digTicks(Hypotheses grid, List<Probe> probes)
 	{
-		int spots = samples.spotCount();
+		int spots = grid.spotCount();
 		int[] ticks = new int[spots];
 		for (int s = 0; s < spots; s++)
 		{
-			WorldPoint centre = centre(samples, s);
+			WorldPoint centre = centre(grid, s);
 			int best = Integer.MAX_VALUE;
 			for (Probe probe : probes)
 			{
@@ -184,12 +171,12 @@ public final class ProbePlanner
 	}
 
 	/** The expected trip from the probe to the dig: a walk when it's near, else as from here. */
-	private static int onward(Hypotheses.Samples samples, int[] digTicks, WorldPoint at)
+	private static int onward(Hypotheses grid, int[] digTicks, WorldPoint at)
 	{
 		double ticks = 0;
-		for (int i = 0; i < samples.x.length; i++)
+		for (int i = 0; i < grid.x.length; i++)
 		{
-			ticks += samples.weight[i] * Math.min(walkTicks(at, samples.x[i], samples.y[i]), digTicks[samples.spot[i]]);
+			ticks += grid.weight[i] * Math.min(walkTicks(at, grid.x[i], grid.y[i]), digTicks[grid.spot[i]]);
 		}
 		return (int) Math.round(ticks);
 	}
@@ -199,35 +186,35 @@ public final class ProbePlanner
 		return (Running.halfTicks(Hypotheses.distance(from, x, y)) + 1) / 2;
 	}
 
-	private static WorldPoint centre(Hypotheses.Samples samples, int spot)
+	private static WorldPoint centre(Hypotheses grid, int spot)
 	{
 		double x = 0, y = 0, mass = 0;
-		for (int i = 0; i < samples.x.length; i++)
+		for (int i = 0; i < grid.x.length; i++)
 		{
-			if (samples.spot[i] == spot)
+			if (grid.spot[i] == spot)
 			{
-				x += samples.weight[i] * samples.x[i];
-				y += samples.weight[i] * samples.y[i];
-				mass += samples.weight[i];
+				x += grid.weight[i] * grid.x[i];
+				y += grid.weight[i] * grid.y[i];
+				mass += grid.weight[i];
 			}
 		}
 		return new WorldPoint((int) Math.round(x / mass), (int) Math.round(y / mass), 0);
 	}
 
 	/** {@code table} must be all zeros, and is again on return; {@code touched} holds at least one slot per sample. */
-	private static double conditionalEntropy(double[] table, int[] touched, double[] outcomeMass, Hypotheses.Samples samples,
+	private static double conditionalEntropy(double[] table, int[] touched, double[] outcomeMass, Hypotheses grid,
 		HotColdTier tier, WorldPoint before, WorldPoint at)
 	{
-		int spots = samples.spotCount();
+		int spots = grid.spotCount();
 		int n = 0;
-		for (int i = 0; i < samples.x.length; i++)
+		for (int i = 0; i < grid.x.length; i++)
 		{
-			int cell = outcome(samples.x[i], samples.y[i], tier, before, at) * spots + samples.spot[i];
+			int cell = outcome(grid.x[i], grid.y[i], tier, before, at) * spots + grid.spot[i];
 			if (table[cell] == 0)
 			{
 				touched[n++] = cell;
 			}
-			table[cell] += samples.weight[i];
+			table[cell] += grid.weight[i];
 		}
 		double spread = 0;
 		for (int t = 0; t < n; t++)
@@ -259,45 +246,6 @@ public final class ProbePlanner
 			return band.ordinal() * COMPARISONS;
 		}
 		return band.ordinal() * COMPARISONS + 1 + Comparison.of(distance, Hypotheses.distance(before, hx, hy)).ordinal();
-	}
-
-	private static List<Branch> branches(Hypotheses.Samples samples, HotColdTier tier, WorldPoint before, WorldPoint at)
-	{
-		int spots = samples.spotCount();
-		double[] table = new double[OUTCOMES * spots];
-		for (int i = 0; i < samples.x.length; i++)
-		{
-			table[outcome(samples.x[i], samples.y[i], tier, before, at) * spots + samples.spot[i]] += samples.weight[i];
-		}
-		List<Branch> branches = new ArrayList<>();
-		for (int o = 0; o < OUTCOMES; o++)
-		{
-			double[] row = Arrays.copyOfRange(table, o * spots, (o + 1) * spots);
-			double total = 0;
-			for (double mass : row)
-			{
-				total += mass;
-			}
-			if (total <= 0)
-			{
-				continue;
-			}
-			Map<String, Double> shares = Hypotheses.sharesLargestFirst(row, total, samples.names::get);
-			int c = o % COMPARISONS;
-			branches.add(new Branch(Band.values()[o / COMPARISONS], c == 0 ? null : Comparison.values()[c - 1], total, shares));
-		}
-		branches.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
-		return branches;
-	}
-
-	private static double[] spotMasses(Hypotheses.Samples samples)
-	{
-		double[] mass = new double[samples.spotCount()];
-		for (int i = 0; i < samples.x.length; i++)
-		{
-			mass[samples.spot[i]] += samples.weight[i];
-		}
-		return mass;
 	}
 
 	private static double entropy(double[] masses)

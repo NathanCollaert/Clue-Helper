@@ -1,6 +1,7 @@
 package com.cluehelper.transport;
 
 import lombok.Value;
+import lombok.experimental.PackagePrivate;
 
 @Value
 public class VarCheck
@@ -16,23 +17,12 @@ public class VarCheck
 		/** The var holds the epoch minute a cooldown started; it passes once more than {@code value} minutes have gone by. */
 		COOLDOWN_MINUTES("@");
 
-		private final String code;
+		@PackagePrivate
+		final String code;
 
 		Op(String code)
 		{
 			this.code = code;
-		}
-
-		static Op of(char code)
-		{
-			for (Op op : values())
-			{
-				if (op.code.charAt(0) == code)
-				{
-					return op;
-				}
-			}
-			throw new IllegalArgumentException("no var operator " + code);
 		}
 	}
 

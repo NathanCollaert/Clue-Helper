@@ -1,95 +1,16 @@
 package com.cluehelper.step;
 
-import java.util.Locale;
-import lombok.Getter;
+import lombok.Value;
 
-/**
- * Field names match the "fields" object of the replay fixtures and of the dev harness's step-dump
- * log lines, so recorded clues replay through the same key rule.
- */
-@Getter
-public final class ClueFacts
+/** A clue as the step data knows it, read from core's public getters by {@link CoreClueReader#facts}. */
+@Value
+public class ClueFacts
 {
-	private static final int NO_ITEM = -1;
-
-	private String type;
-	private int itemId = NO_ITEM;
-	private String text;
-	private int[] tile;
-	private int widgetGroupId = -1;
-	private String tier;
-	private String npc;
-	private String challengeType;
-	private String rawChallenge;
-
-	private ClueFacts()
-	{
-	}
-
-	static ClueFacts of(String type)
-	{
-		ClueFacts facts = new ClueFacts();
-		facts.type = type;
-		return facts;
-	}
-
-	ClueFacts itemId(int itemId)
-	{
-		this.itemId = itemId;
-		return this;
-	}
-
-	ClueFacts text(String text)
-	{
-		this.text = text;
-		return this;
-	}
-
-	ClueFacts tile(int x, int y, int plane)
-	{
-		this.tile = new int[]{x, y, plane};
-		return this;
-	}
-
-	ClueFacts widgetGroupId(int widgetGroupId)
-	{
-		this.widgetGroupId = widgetGroupId;
-		return this;
-	}
-
-	ClueFacts tier(String tier)
-	{
-		this.tier = tier;
-		return this;
-	}
-
-	ClueFacts npc(String npc)
-	{
-		this.npc = npc;
-		return this;
-	}
-
-	ClueFacts challenge(String challengeType, String rawChallenge)
-	{
-		this.challengeType = challengeType;
-		this.rawChallenge = rawChallenge;
-		return this;
-	}
-
-	public int[] getTile()
-	{
-		return tile == null ? null : tile.clone();
-	}
-
-	public static String normalise(String text)
-	{
-		if (text == null)
-		{
-			return "";
-		}
-		return text.replaceAll("<[^>]*>", " ")
-			.replaceAll("\\s+", " ")
-			.trim()
-			.toLowerCase(Locale.ROOT);
-	}
+	String type;
+	/** See {@link StepKey}. */
+	String key;
+	/** The step's text as the guide shows it. */
+	String text;
+	/** A hot/cold clue's tier name; null for other types. */
+	String tier;
 }

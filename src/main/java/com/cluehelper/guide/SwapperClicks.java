@@ -26,9 +26,9 @@ public class SwapperClicks
 	private static final int LAST_WORN_OPTION_ID = 9;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ConfigManager configManager;
+	ConfigManager configManager;
 
 	String object(ObjectComposition shown)
 	{

@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public final class CacheRow
 {
-	private int id;
-	private String name;
+	int id;
+	String name;
 	/** Null when the step has one row for every branch. */
-	private Branch when;
+	Branch when;
 
 	@Override
 	public String toString()
@@ -18,9 +18,9 @@ public final class CacheRow
 
 	public static final class Branch
 	{
-		private int varbit;
-		private Integer equals;
-		private Integer notEquals;
+		int varbit;
+		Integer equals;
+		Integer notEquals;
 
 		@Override
 		public String toString()

@@ -54,6 +54,7 @@ public class CoreDriftTest
 		SPOT_PREFIX + "SAIL_ISLE_OF_SERPENTS"));
 
 	private static StepIndex index;
+	private static Map<String, StepLoader.CacheSpot> cacheSpots;
 	private static Map<String, ClueScroll> steps;
 	private static final Map<String, List<String>> SOURCES_BY_KEY = new TreeMap<>();
 	/** Step key → snapshot columns → the var states that resolve to them. */
@@ -62,9 +63,10 @@ public class CoreDriftTest
 	private static final Map<String, Step> FIRST_BRANCH = new TreeMap<>();
 
 	@BeforeClass
-	public static void resolveEverything() throws ReflectiveOperationException
+	public static void resolveEverything() throws ReflectiveOperationException, java.io.IOException
 	{
 		index = StepIndex.read(new Gson());
+		cacheSpots = StepLoader.cacheSpots();
 		steps = CoreClues.steps();
 		ClueScrollPlugin plugin = CoreClues.plugin();
 		StepResolver resolver = new StepResolver(() -> index);
@@ -118,7 +120,7 @@ public class CoreDriftTest
 		{
 			spotNames.add(spot.name());
 		}
-		assertEquals("hot/cold spots core no longer has", Set.of(), difference(index.getHotColdSpots().keySet(), spotNames));
+		assertEquals("hot/cold spots core no longer has", Set.of(), difference(cacheSpots.keySet(), spotNames));
 
 		Set<String> withoutRow = new TreeSet<>();
 		index.getSteps().forEach((key, entry) ->
@@ -130,7 +132,7 @@ public class CoreDriftTest
 		});
 		for (String name : spotNames)
 		{
-			if (!index.getHotColdSpots().containsKey(name))
+			if (!cacheSpots.containsKey(name))
 			{
 				withoutRow.add(SPOT_PREFIX + name);
 			}
@@ -202,7 +204,7 @@ public class CoreDriftTest
 		for (String start : List.of("the doorman of the warriors' guild", "she's small but can build", "my life was spared"))
 		{
 			CrypticClue part = (CrypticClue) CoreClues.entries("CrypticClue").stream()
-				.filter(c -> ClueFacts.normalise(((CrypticClue) c).getText()).startsWith(start))
+				.filter(c -> StepKey.normalise(((CrypticClue) c).getText()).startsWith(start))
 				.findFirst().orElseThrow(() -> new AssertionError("no cryptic starting " + start));
 			parts.add(new AbstractMap.SimpleEntry<>(part, false));
 		}
@@ -252,7 +254,7 @@ public class CoreDriftTest
 			step.getRegions().stream().map(String::valueOf).collect(Collectors.joining("|")),
 			step.getObjectIds().stream().map(String::valueOf).collect(Collectors.joining("|")),
 			String.join("|", step.getObjectNames()),
-			step.getRequirements().toString(),
+			RequirementsText.describe(step.getRequirements()),
 			step.getCacheRows().stream().map(row -> String.valueOf(row.getId())).collect(Collectors.joining("|")),
 			oneLine(step.getText()));
 	}
@@ -265,7 +267,7 @@ public class CoreDriftTest
 			lines.add(key + "\t" + (branches.size() == 1 ? "*" : states.stream().map(String::valueOf).collect(Collectors.joining(","))) + "\t" + columns)));
 		for (HotColdLocation spot : HotColdLocation.values())
 		{
-			StepIndex.Spot row = index.getHotColdSpots().get(spot.name());
+			StepLoader.CacheSpot row = cacheSpots.get(spot.name());
 			lines.add(SPOT_PREFIX + spot.name() + "\t*\thotcold spot\t" + spot.getType().name().toLowerCase() + "\t\t"
 				+ tiles(List.of(spot.getWorldPoint())) + "\t\t\t\t\t\t" + (row == null ? "" : row.getRow()) + "\t" + oneLine(spot.getArea()));
 		}
@@ -286,7 +288,7 @@ public class CoreDriftTest
 			row.put("targetCount", step.getTargets().size());
 			row.put("npcs", String.join(", ", step.getNpcs()));
 			row.put("objects", step.getObjectIds() + " " + step.getObjectNames());
-			row.put("needs", step.getRequirements().toString());
+			row.put("needs", RequirementsText.describe(step.getRequirements()));
 			row.put("rows", step.getCacheRows().stream().map(CacheRow::getName).collect(Collectors.joining(", ")));
 			row.put("branches", SNAPSHOT.get(key).size());
 			row.put("text", oneLine(step.getText()));

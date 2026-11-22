@@ -4,25 +4,29 @@ import com.cluehelper.step.HotColdTier;
 import java.util.*;
 import java.util.function.IntFunction;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 
 /**
  * Every tile within each spot's radius of its centre, kept while it explains the step's readings exactly: the band from
  * the Chebyshev distance, and each comparison against the previous reading of the log. When no tile explains them all,
- * the tiles with the fewest misses are kept instead, so the grid never empties.
+ * the tiles with the fewest misses are kept instead, so the grid never empties. Only spots with a kept tile are held,
+ * and the tiles' weights sum to 1.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PACKAGE)
 public final class Hypotheses
 {
 	/** 133 of 140 cache centres equal core's, so a spot's prior sits mostly on its centre. */
 	private static final double CENTRE_SHARE = 0.5;
 
 	private final List<Spot> spots;
-	private final int[] x;
-	private final int[] y;
-	private final int[] spot;
-	private final double[] weight;
+	final int[] x;
+	final int[] y;
+	/** Indexes into {@link #spots}. */
+	final int[] spot;
+	final double[] weight;
 	private final int misses;
 
 	/**
@@ -108,15 +112,27 @@ public final class Hypotheses
 		int[] y = new int[n];
 		int[] spot = new int[n];
 		double[] weight = new double[n];
+		List<Spot> keptSpots = new ArrayList<>();
+		double total = 0;
 		for (int i = 0; i < n; i++)
 		{
 			int[] h = kept.get(i);
+			Spot owner = spots.get(h[2]);
+			if (!keptSpots.contains(owner))
+			{
+				keptSpots.add(owner);
+			}
 			x[i] = h[0];
 			y[i] = h[1];
-			spot[i] = h[2];
-			weight[i] = priorWeight(spots.get(h[2]), h[3] == 1);
+			spot[i] = keptSpots.size() - 1;
+			weight[i] = priorWeight(owner, h[3] == 1);
+			total += weight[i];
 		}
-		return new Hypotheses(spots, x, y, spot, weight, fewest == Integer.MAX_VALUE ? 0 : fewest);
+		for (int i = 0; i < n; i++)
+		{
+			weight[i] /= total;
+		}
+		return new Hypotheses(List.copyOf(keptSpots), x, y, spot, weight, fewest == Integer.MAX_VALUE ? 0 : fewest);
 	}
 
 	/** Counting stops past {@code enough}: such a tile is dropped anyway. */
@@ -184,14 +200,7 @@ public final class Hypotheses
 	/** Each kept spot's share of the posterior, largest first. */
 	public Map<String, Double> spotShares()
 	{
-		double[] mass = new double[spots.size()];
-		double total = 0;
-		for (int i = 0; i < x.length; i++)
-		{
-			mass[spot[i]] += weight[i];
-			total += weight[i];
-		}
-		return sharesLargestFirst(mass, total, s -> spots.get(s).getName());
+		return sharesLargestFirst(spotMasses(), 1, s -> spots.get(s).getName());
 	}
 
 	/** Each index with mass, by its name, to its share of {@code total}; largest first, ties in index order. */
@@ -252,103 +261,19 @@ public final class Hypotheses
 			: new WorldPoint((minX + maxX) / 2, (minY + maxY) / 2, 0);
 	}
 
-	/** Up to {@code perSpot} kept tiles of each spot, the centre first, weighted to keep each spot's share. */
-	public Samples sample(int perSpot)
+	int spotCount()
 	{
-		List<Integer> spotIndex = new ArrayList<>();
-		List<String> names = new ArrayList<>();
-		List<int[]> picked = new ArrayList<>();
-		List<Double> weights = new ArrayList<>();
-		double total = 0;
-		for (double w : weight)
-		{
-			total += w;
-		}
-		for (int s = 0; s < spots.size(); s++)
-		{
-			List<Integer> mine = new ArrayList<>();
-			double mass = 0;
-			for (int i = 0; i < x.length; i++)
-			{
-				if (spot[i] == s)
-				{
-					mine.add(i);
-					mass += weight[i];
-				}
-			}
-			if (mine.isEmpty())
-			{
-				continue;
-			}
-			int compact = names.size();
-			names.add(spots.get(s).getName());
-			spotIndex.add(s);
-			List<Integer> chosen = spread(mine, perSpot, spots.get(s));
-			double chosenMass = 0;
-			for (int i : chosen)
-			{
-				chosenMass += weight[i];
-			}
-			for (int i : chosen)
-			{
-				picked.add(new int[]{x[i], y[i], compact});
-				weights.add(weight[i] / chosenMass * mass / total);
-			}
-		}
-		int n = picked.size();
-		int[] sx = new int[n];
-		int[] sy = new int[n];
-		int[] ss = new int[n];
-		double[] sw = new double[n];
-		for (int i = 0; i < n; i++)
-		{
-			sx[i] = picked.get(i)[0];
-			sy[i] = picked.get(i)[1];
-			ss[i] = picked.get(i)[2];
-			sw[i] = weights.get(i);
-		}
-		return new Samples(List.copyOf(names), sx, sy, ss, sw);
+		return spots.size();
 	}
 
-	private List<Integer> spread(List<Integer> mine, int perSpot, Spot owner)
+	/** Each spot's share of the weight, by its index. */
+	double[] spotMasses()
 	{
-		if (mine.size() <= perSpot)
+		double[] mass = new double[spots.size()];
+		for (int i = 0; i < x.length; i++)
 		{
-			return mine;
+			mass[spot[i]] += weight[i];
 		}
-		List<Integer> chosen = new ArrayList<>();
-		for (int i : mine)
-		{
-			if (x[i] == owner.getX() && y[i] == owner.getY())
-			{
-				chosen.add(i);
-			}
-		}
-		int wanted = perSpot - chosen.size();
-		for (int k = 0; k < wanted; k++)
-		{
-			int i = mine.get((int) ((long) k * mine.size() / wanted));
-			if (!chosen.contains(i))
-			{
-				chosen.add(i);
-			}
-		}
-		return chosen;
-	}
-
-	/** Sampled hypotheses with weights summing to 1; spots are indexed into {@link #names}. */
-	@AllArgsConstructor(access = AccessLevel.PACKAGE)
-	public static final class Samples
-	{
-		final List<String> names;
-		final int[] x;
-		final int[] y;
-		final int[] spot;
-		final double[] weight;
-
-		public int spotCount()
-		{
-			return names.size();
-		}
+		return mass;
 	}
 }

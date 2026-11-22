@@ -1,13 +1,14 @@
 package com.cluehelper.player;
 
 import com.cluehelper.Tables;
-import com.cluehelper.memory.BankMemory;
+import com.cluehelper.guide.FairyDials;
+import com.cluehelper.memory.*;
+import com.google.gson.Gson;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 import javax.inject.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -19,10 +20,10 @@ import net.runelite.api.gameval.VarbitID;
  * Event handlers run on the client thread and only mark the model dirty; {@link #onGameTick()} rebuilds the snapshot
  * at most once per tick. Off the client thread, read snapshots only.
  */
-@Slf4j
 @Singleton
 public class PlayerModel
 {
+	private static final PlayerSnapshot EMPTY = PlayerSnapshot.builder().build();
 	private static final Set<Integer> RUNE_POUCHES = Tables.idSet("rune pouches");
 	private static final int[] POUCH_TYPES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(0)).toArray();
 	private static final int[] POUCH_QUANTITIES = Tables.rows("rune pouch slots").stream().mapToInt(row -> row.id(1)).toArray();
@@ -37,61 +38,62 @@ public class PlayerModel
 	private static final int INVENTORY_SLOTS = 28;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private ChargeReader chargeReader;
+	MemoryStore memory;
 	@Inject
-	private CheckLines checkLines;
+	UnlockMemory unlockMemory;
 	@Inject
-	private MusicTracks musicTracks;
+	KeyRingMemory keyRing;
 	@Inject
-	private QuestPointTotal questPointTotal;
-	private final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
-	private final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
-	private final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
+	GrownPatches grownPatches;
+	@Inject
+	ChargeReader chargeReader;
+	@Inject
+	CheckLines checkLines;
+	@Inject
+	MusicTracks musicTracks;
+	@Inject
+	Gson gson;
+	final List<Consumer<PlayerSnapshot>> listeners = new CopyOnWriteArrayList<>();
+	final Queue<Integer> pendingVarbits = new ConcurrentLinkedQueue<>();
+	final Queue<Integer> pendingVarps = new ConcurrentLinkedQueue<>();
 
-	private final Set<Integer> watchedVarbits = new HashSet<>();
-	private final Set<Integer> watchedVarps = new HashSet<>();
-	private final Set<Integer> watchedVarpIndices = new HashSet<>();
-	private Map<Quest, QuestState> quests = Map.of();
-	private boolean questsRead;
-	private volatile boolean questsDirty;
-	private int lockedMusicTracks;
-	private int missingQuestPoints;
-	private volatile boolean musicDirty;
-	private volatile boolean dirty;
-	private HouseState house = HouseState.NONE;
-	private Set<String> plantedTrees = Set.of();
-	private Set<String> unlocks = Set.of();
-	/** Items owned but known not to do what their id promises: a steel key ring the Metal key was taken off. */
-	private Set<Integer> uncounted = Set.of();
-	/** Grown patches other than spirit trees, named as the step data names them. */
-	private Set<String> grownPatches = Set.of();
-	private String lastFairyRing;
-	private String dirtyBecause;
-	private long version;
-	private Map<Integer, Integer> fakeCarried = Map.of();
+	final Set<Integer> watchedVarbits = new HashSet<>();
+	final Set<Integer> watchedVarps = new HashSet<>();
+	final Set<Integer> watchedVarpIndices = new HashSet<>();
+	Map<Quest, QuestState> quests = Map.of();
+	boolean questsRead;
+	volatile boolean questsDirty;
+	int lockedMusicTracks;
+	int missingQuestPoints;
+	volatile boolean musicDirty;
+	volatile boolean dirty;
+	HouseState house = HouseState.NONE;
+	long memoryVersion = -1;
+	long version;
+	Map<Integer, Integer> fakeCarried = Map.of();
 
 	/** Null until the first tick after login. */
 	@Getter
-	private volatile RuneModel runeModel;
+	volatile RuneModel runeModel;
 	/** Null while logged out. */
 	@Getter
-	private volatile PlayerSnapshot snapshot;
+	volatile PlayerSnapshot snapshot;
 	/**
 	 * Read every tick. A snapshot copies it only when its kind or Wilderness level changes, so walking doesn't make a
 	 * new snapshot version.
 	 */
 	@Getter
-	private volatile Position position = Position.NONE;
+	volatile Position position = Position.NONE;
 	/**
 	 * The tick a pending Spellbook Swap began; {@link #UNKNOWN_TICK} when none is pending, or it was already pending
 	 * when first seen.
 	 */
 	@Getter
-	private volatile int pendingRevertSinceTick = UNKNOWN_TICK;
+	volatile int pendingRevertSinceTick = UNKNOWN_TICK;
 
 	public void start()
 	{
@@ -103,7 +105,7 @@ public class PlayerModel
 		}
 		varbits.addAll(ChargeReader.chargeVarbits());
 		watch(varbits, OWN_VARPS);
-		markDirty("start");
+		dirty = true;
 		questsDirty = true;
 	}
 
@@ -132,7 +134,7 @@ public class PlayerModel
 		{
 			questsDirty = true;
 			musicDirty = true;
-			markDirty("login");
+			dirty = true;
 		}
 		else if (event.getGameState() == GameState.LOGIN_SCREEN)
 		{
@@ -148,19 +150,19 @@ public class PlayerModel
 		if (event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN
 			|| event.getContainerId() == InventoryID.HUNTSMANS_KIT)
 		{
-			markDirty("items");
+			dirty = true;
 		}
 	}
 
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		if (event.getVarpId() == VarPlayerID.QP)
+		if (event.getVarpId() == VarPlayerID.QP || event.getVarpId() == VarPlayerID.QP_TOTAL)
 		{
 			questsDirty = true;
 		}
-		if (watchedVarpIndices.contains(event.getVarpId()))
+		if (event.getVarpId() == VarPlayerID.FAIRYRING_HISTORY || watchedVarpIndices.contains(event.getVarpId()))
 		{
-			markDirty("vars");
+			dirty = true;
 		}
 	}
 
@@ -172,81 +174,51 @@ public class PlayerModel
 
 	public void onStatChanged()
 	{
-		markDirty("stats");
-	}
-
-	/** Client thread. */
-	public void setPlantedTrees(Set<String> next)
-	{
-		plantedTrees = Set.copyOf(next);
-		markDirty("spirit trees");
-	}
-
-	/** Client thread. */
-	public void setUnlocks(Set<String> next)
-	{
-		unlocks = Set.copyOf(next);
-		markDirty("unlocks");
-	}
-
-	/** Client thread. */
-	public void setUncounted(Set<Integer> next)
-	{
-		uncounted = Set.copyOf(next);
-		markDirty("uncounted items");
+		dirty = true;
 	}
 
 	/** Whether owning {@code itemId} counts for what it would bring: false for an uncounted one. */
 	public boolean counts(int itemId)
 	{
-		return !uncounted.contains(itemId);
+		return !keyRing.uncounted().contains(itemId);
 	}
 
 	/** {@code items} without the uncounted ones. */
 	public Map<Integer, Integer> counted(Map<Integer, Integer> items)
 	{
 		Map<Integer, Integer> counted = new HashMap<>(items);
-		counted.keySet().removeAll(uncounted);
+		counted.keySet().removeAll(keyRing.uncounted());
 		return counted;
-	}
-
-	/** Client thread. */
-	public void setGrownPatches(Set<String> next)
-	{
-		grownPatches = Set.copyOf(next);
-		markDirty("grown patches");
-	}
-
-	/** Client thread. */
-	public void setLastFairyRing(String code)
-	{
-		lastFairyRing = code;
-		markDirty("fairy ring");
 	}
 
 	/** Client thread. */
 	public void setHouse(HouseState next)
 	{
 		house = next;
-		markDirty("house");
+		dirty = true;
+	}
+
+	/** Time Tracking stored one of the patches {@link GrownPatches} reads. */
+	public void onGrownPatchChanged()
+	{
+		dirty = true;
 	}
 
 	public void onChargesLearned()
 	{
-		markDirty("charges");
+		dirty = true;
 	}
 
 	/** Client thread. Also answers for items that aren't held, such as the remembered bank's. */
 	public Map<Integer, Charge> charges(Collection<Integer> itemIds)
 	{
-		chargeReader.rememberVarbitCharges(itemIds);
 		Map<Integer, Charge> charges = new HashMap<>(chargeReader.read(itemIds));
 		for (int id : itemIds)
 		{
 			CheckLines.Checked checked = checkLines.charges().get(id);
 			if (checked != null)
 			{
-				charges.putIfAbsent(id, new Charge(checked.charges, Charge.Source.CHECK_LINE));
+				charges.putIfAbsent(id, new Charge(checked.charges));
 			}
 		}
 		return charges;
@@ -260,8 +232,8 @@ public class PlayerModel
 		}
 		if (runeModel == null)
 		{
-			runeModel = RuneModel.load(new ClientCacheView(client));
-			markDirty("rune model");
+			runeModel = RuneModel.read(gson);
+			dirty = true;
 		}
 		resolveWatches();
 		Position now = readPosition();
@@ -269,29 +241,33 @@ public class PlayerModel
 		if (last == null || now.getKind() != last.getPosition().getKind()
 			|| wildernessLevel(now) != last.getWildernessLevel())
 		{
-			markDirty("place");
+			dirty = true;
 		}
 		position = now;
+		if (memory.getVersion() != memoryVersion)
+		{
+			memoryVersion = memory.getVersion();
+			dirty = true;
+		}
 		if (questsDirty)
 		{
 			questsDirty = false;
 			quests = readQuests();
-			missingQuestPoints = Math.max(0, questPointTotal.offered() - client.getVarpValue(VarPlayerID.QP));
+			missingQuestPoints = Math.max(0, client.getVarbitValue(VarbitID.QP_MAX) - client.getVarpValue(VarPlayerID.QP));
 			questsRead = true;
-			markDirty("quests");
+			dirty = true;
 		}
 		if (musicDirty)
 		{
 			musicDirty = false;
 			lockedMusicTracks = musicTracks.locked();
-			markDirty("music");
+			dirty = true;
 		}
 		if (dirty)
 		{
 			dirty = false;
 			PlayerSnapshot built = build(now);
 			trackPendingRevert(last, built);
-			log.debug("snapshot rebuilt ({})", dirtyBecause);
 			snapshot = built;
 			listeners.forEach(listener -> listener.accept(built));
 		}
@@ -315,15 +291,6 @@ public class PlayerModel
 	public void fakeCarried(Map<Integer, Integer> items)
 	{
 		fakeCarried = Map.copyOf(items);
-		markDirty("fake carried items");
-	}
-
-	private void markDirty(String because)
-	{
-		if (!dirty)
-		{
-			dirtyBecause = because;
-		}
 		dirty = true;
 	}
 
@@ -353,7 +320,7 @@ public class PlayerModel
 		}
 		if (added)
 		{
-			markDirty("watch");
+			dirty = true;
 		}
 	}
 
@@ -410,20 +377,15 @@ public class PlayerModel
 		Set<Integer> held = new HashSet<>(inventory.keySet());
 		held.addAll(worn.keySet());
 		Set<WorldType> worldTypes = client.getWorldType();
-		Set<String> grown = new HashSet<>(plantedTrees);
-		grown.addAll(grownPatches);
 		return PlayerSnapshot.builder()
 			.version(++version)
-			.tick(client.getTickCount())
 			.position(now)
 			.wildernessLevel(wildernessLevel(now))
 			.membersWorld(worldTypes.contains(WorldType.MEMBERS))
-			.pvpWorld(WorldType.isPvpWorld(worldTypes))
 			.dormantReason(dormantReason(worldTypes))
 			.accountType(AccountType.of(client.getVarbitValue(VarbitID.IRONMAN)))
 			.inventory(bankMemory.withKit(inventory))
 			.worn(worn)
-			.pouchHeld(pouchHeld)
 			.pouch(pouchHeld ? pouch() : Map.of())
 			.boostedLevels(boosted)
 			.realLevels(real)
@@ -441,10 +403,16 @@ public class PlayerModel
 			.charges(charges(held))
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
-			.plantedTrees(grown)
-			.unlocks(unlocks)
-			.lastFairyRing(lastFairyRing)
+			.plantedTrees(grownPatches.grown())
+			.unlocks(unlockMemory.unlocks())
+			.lastFairyRing(lastFairyRing())
 			.build();
+	}
+
+	/** The code the rings' Last-destination goes to, or null before the player's first ring teleport. */
+	private String lastFairyRing()
+	{
+		return client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC_SET) == 0 ? null : FairyDials.code(client.getVarbitValue(VarbitID.FAIRYRING_LASTLOC));
 	}
 
 	private Map<Integer, Integer> contents(int containerId)
@@ -500,112 +468,47 @@ public class PlayerModel
 	/** Client thread. Whether an inventory item's name starts with {@code nameStart}, lower case. */
 	public boolean carriesItemNamed(String nameStart)
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
+		return now().carriesItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Client thread. Held or worn: an item put away (in a deposit box) is gone from both. */
 	public boolean holdsOrWearsItemNamed(String nameStart)
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.holdsOrWearsItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
+		return now().holdsOrWearsItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
 	}
 
 	/** Inventory and worn; empty while logged out. */
 	public Set<Integer> carriedIds()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null ? Set.of() : snapshot.carriedIds();
+		return now().carriedIds();
 	}
 
 	public Set<Integer> inventoryIds()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null ? Set.of() : snapshot.getInventory().keySet();
+		return Collections.unmodifiableSet(now().getInventory().keySet());
 	}
 
 	public boolean finished(Quest quest)
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot != null && snapshot.finished(quest);
+		return now().finished(quest);
 	}
 
 	public Set<Integer> wornIds()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null ? Set.of() : snapshot.getWorn().keySet();
+		return Collections.unmodifiableSet(now().getWorn().keySet());
 	}
 
 	/** The standard book until the spellbook is read. */
 	public Book currentBook()
 	{
-		PlayerSnapshot snapshot = getSnapshot();
-		return snapshot == null || snapshot.getSpellbook() == null ? Book.STANDARD : snapshot.getSpellbook().getBook();
+		SpellbookState spellbook = now().getSpellbook();
+		return spellbook == null ? Book.STANDARD : spellbook.getBook();
 	}
 
-	/** Client thread only. */
-	@RequiredArgsConstructor
-	static final class ClientCacheView implements CacheView
+	/** The snapshot, or an empty one while logged out. */
+	private PlayerSnapshot now()
 	{
-		private static final int MULTIRUNES_TABLE = 91;
-		private static final int REQUIRED_RUNE_COLUMN = 0;
-		private static final int ALSO_COUNTS_COLUMN = 1;
-
-		private final Client client;
-
-		@Override
-		public int[] enumKeys(int enumId)
-		{
-			EnumComposition e = client.getEnum(enumId);
-			return e == null ? new int[0] : e.getKeys();
-		}
-
-		@Override
-		public int[] enumIntValues(int enumId)
-		{
-			EnumComposition e = client.getEnum(enumId);
-			return e == null ? new int[0] : e.getIntVals();
-		}
-
-		@Override
-		public int itemIntParam(int itemId, int param, int absent)
-		{
-			ItemComposition item = client.getItemDefinition(itemId);
-			return hasParam(item, param) ? item.getIntValue(param) : absent;
-		}
-
-		@Override
-		public String itemStringParam(int itemId, int param)
-		{
-			ItemComposition item = client.getItemDefinition(itemId);
-			return hasParam(item, param) ? item.getStringValue(param) : null;
-		}
-
-		private static boolean hasParam(ItemComposition item, int param)
-		{
-			return item.getParams() != null && item.getParams().get(param) != null;
-		}
-
-		@Override
-		public String itemName(int itemId)
-		{
-			return client.getItemDefinition(itemId).getName();
-		}
-
-		@Override
-		public List<int[]> multirunes()
-		{
-			List<int[]> rows = new ArrayList<>();
-			for (int row : client.getDBTableRows(MULTIRUNES_TABLE))
-			{
-				Object[] required = client.getDBTableField(row, REQUIRED_RUNE_COLUMN, 0);
-				Object[] alsoCounts = client.getDBTableField(row, ALSO_COUNTS_COLUMN, 0);
-				if (required.length > 0 && alsoCounts.length > 0)
-				{
-					rows.add(new int[]{(Integer) required[0], (Integer) alsoCounts[0]});
-				}
-			}
-			return rows;
-		}
+		PlayerSnapshot snapshot = getSnapshot();
+		return snapshot == null ? EMPTY : snapshot;
 	}
 }

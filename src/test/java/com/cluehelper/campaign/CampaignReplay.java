@@ -28,17 +28,21 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogData;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
@@ -72,7 +76,7 @@ public final class CampaignReplay
 	/** The bundled walk table and world map, catalog and step data, and the rune model slice the tests plan with. */
 	public static CampaignReplay load() throws IOException
 	{
-		return new CampaignReplay(WalkTable.load(RuneLiteAPI.GSON), WorldMap.load(), CatalogData.read(RuneLiteAPI.GSON), NoTeleportAreas.load(), Loadouts.runeModel(),
+		return new CampaignReplay(WalkTable.load(RuneLiteAPI.GSON), WorldMap.load(), Catalog.read(RuneLiteAPI.GSON), NoTeleportAreas.load(), Loadouts.runeModel(),
 			StepIndex.read(new Gson()));
 	}
 
@@ -90,11 +94,46 @@ public final class CampaignReplay
 		}
 		catch (RuntimeException e)
 		{
-			return new Outcome(List.of("replay failed: " + e), List.of());
+			return new Outcome(List.of("replay failed: " + e), List.of(), List.of());
 		}
 	}
 
 	private Outcome plan(CampaignRecording recording, Path folder) throws IOException
+	{
+		Guide guide = guide(recording, folder);
+		return Outcome.of(guide.plan, guide.subSteps);
+	}
+
+	/** Every finished step whose replayed guide has a sub-step {@code kept}, with the step and needs it was written for. */
+	public static List<Guide> guides(Predicate<SubStep> kept) throws IOException
+	{
+		CampaignReplay replay = load();
+		List<Guide> guides = new ArrayList<>();
+		for (Path file : CampaignFiles.goldenFiles())
+		{
+			Guide guide = replay.guide(CampaignFiles.read(file), file.getParent());
+			if (guide.subSteps.stream().anyMatch(kept))
+			{
+				guides.add(guide);
+			}
+		}
+		return guides;
+	}
+
+	@Value
+	public static class Guide
+	{
+		String key;
+		Step step;
+		StepNeeds needs;
+		PlayerSnapshot player;
+		/** The item names the client gave while the step was recorded, by id. */
+		Map<Integer, String> names;
+		Plan plan;
+		List<SubStep> subSteps;
+	}
+
+	private Guide guide(CampaignRecording recording, Path folder) throws IOException
 	{
 		ClientTape tape = ClientTape.replaying(recording.client);
 		Client client = tape.client();
@@ -102,7 +141,8 @@ public final class CampaignReplay
 		Step travel = StageTarget.travelStep(asLive(resolve(recording, client), player, recording.banked),
 			StageTarget.owned(player, recording.banked));
 		StepNeeds needs = new StepNeeds(client, id -> stashState(recording, id), (bonus, owned) -> gearPieces(recording, bonus.name(), owned),
-			() -> StepNeeds.ownedItemIds(player, recording.banked), player::finished);
+			() -> StepNeeds.ownedItemIds(player, recording.banked), player::finished,
+			() -> new WorldPoint(recording.startTile[0], recording.startTile[1], recording.startTile[2]));
 		AvailabilityEngine engine = new AvailabilityEngine(runes, id -> recordedName(recording, id));
 		PlanStart start = start(recording, folder, engine);
 		PlanInput input = PlanInput.builder()
@@ -123,11 +163,27 @@ public final class CampaignReplay
 			.refusedChanges(recording.refusedChanges)
 			.foreignHouseStart(recording.foreignHouseStart)
 			.build();
-		Plan plan = Planner.withoutAlternatives(input);
+		Plan plan = Planner.plan(input);
 		SubSteps subSteps = new SubSteps(client, () -> player, id -> onlyInBankedKit(recording, id), needs, () -> start,
-			recording.settings::isScrollBookOutOfWilderness, id -> false, catalog::getTeleports);
+			recording.settings::isScrollBookOutOfWilderness, id -> false, catalog::getTeleports,
+			(leg, tiles) -> table.exitBetween(leg.getFrom(), leg.getTo(), tiles));
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
-		return Outcome.of(plan, guide);
+		return new Guide(recording.key, travel, needs, player, recordedNames(recording), plan, guide);
+	}
+
+	private static Map<Integer, String> recordedNames(CampaignRecording recording)
+	{
+		Pattern read = Pattern.compile("getItemDefinition\\((\\d+)\\)\\.getName\\(\\)");
+		Map<Integer, String> names = new HashMap<>();
+		recording.client.forEach((call, value) ->
+		{
+			Matcher name = read.matcher(call);
+			if (name.matches() && value != null)
+			{
+				names.put(Integer.parseInt(name.group(1)), value.toString());
+			}
+		});
+		return names;
 	}
 
 	/** A recording without taped NPC shows resolves with every NPC shown. */

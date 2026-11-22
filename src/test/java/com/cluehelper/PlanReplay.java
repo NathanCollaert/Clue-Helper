@@ -25,7 +25,6 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogData;
 import com.cluehelper.ui.RouteReport;
 import com.google.gson.Gson;
 import java.io.ByteArrayInputStream;
@@ -76,7 +75,7 @@ public final class PlanReplay
 		Arrays.sort(files);
 		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 		WorldMap map = WorldMap.load();
-		Catalog catalog = CatalogData.read(RuneLiteAPI.GSON);
+		Catalog catalog = Catalog.read(RuneLiteAPI.GSON);
 		NoTeleportAreas noTeleport = NoTeleportAreas.load();
 		Map<String, Step> steps = DriftSteps.read();
 		AvailabilityEngine engine = new AvailabilityEngine(Loadouts.runeModel(), id -> "item " + id);
@@ -102,6 +101,7 @@ public final class PlanReplay
 				.refusedChanges(recording.getRefusedChanges())
 				.foreignHouseStart(recording.isForeignHouseStart())
 				.followedFirstTransport(recording.getFollowedFirstTransport())
+				.followedIdentity(recording.getFollowedIdentity())
 				.build();
 			report(file.getName(), recording, input);
 		}
@@ -132,13 +132,13 @@ public final class PlanReplay
 		Plan plan = null;
 		for (int i = 0; i < WARM_UP; i++)
 		{
-			plan = Planner.withoutAlternatives(input);
+			plan = Planner.plan(input);
 		}
 		long best = Long.MAX_VALUE;
 		for (int i = 0; i < TIMED; i++)
 		{
 			long started = System.nanoTime();
-			plan = Planner.withoutAlternatives(input);
+			plan = Planner.plan(input);
 			best = Math.min(best, System.nanoTime() - started);
 		}
 		System.out.printf("%s: live %d ms %d labels | replay %d ms %d labels | %s%n", name, recording.getLiveMillis(),

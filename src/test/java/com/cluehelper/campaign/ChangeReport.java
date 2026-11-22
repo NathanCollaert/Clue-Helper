@@ -21,6 +21,7 @@ final class ChangeReport
 {
 	private static final String TICKS_ONLY = "Ticks only";
 	private static final String GUIDE_ONLY = "Guide lines only";
+	private static final String TARGETS_ONLY = "Outlines and clicks only";
 	private static final String FIRST_LEG_END = " → ";
 
 	@Value
@@ -82,6 +83,10 @@ final class ChangeReport
 		{
 			return TICKS_ONLY;
 		}
+		if (step.getChange() == Outcome.Change.TARGETS)
+		{
+			return TARGETS_ONLY;
+		}
 		Outcome before = step.getRecording().expected;
 		Outcome now = step.getNow();
 		if (before.getRoute().equals(now.getRoute()))
@@ -91,10 +96,10 @@ final class ChangeReport
 		return "Route: " + firstLeg(before) + FIRST_LEG_END + firstLeg(now);
 	}
 
-	/** Route changes first, then guide-only changes, then tick-only ones. */
+	/** Route changes first, then guide-only changes, then outline-only ones, then tick-only ones. */
 	private static int rank(String group)
 	{
-		return group.equals(TICKS_ONLY) ? 2 : group.equals(GUIDE_ONLY) ? 1 : 0;
+		return group.equals(TICKS_ONLY) ? 3 : group.equals(TARGETS_ONLY) ? 2 : group.equals(GUIDE_ONLY) ? 1 : 0;
 	}
 
 	private static String firstLeg(Outcome outcome)
@@ -120,6 +125,11 @@ final class ChangeReport
 		appendLines(cell, shown.getRoute(), other.getRoute());
 		cell.append("\n");
 		appendLines(cell, shown.getGuide(), other.getGuide());
+		if (shown.getTargets() != null && other.getTargets() != null)
+		{
+			cell.append("\n");
+			appendLines(cell, shown.getTargets(), other.getTargets());
+		}
 		return cell.toString();
 	}
 

@@ -1,14 +1,13 @@
 package com.cluehelper.route;
 
-import com.cluehelper.player.PlayerSnapshot;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.inject.*;
-import lombok.Value;
+import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.ObjectID;
 
 /**
  * The walk table, like Shortest Path, takes doors as open: a closed one costs a click, not a detour. A locked door
@@ -37,23 +36,27 @@ public final class SceneDoors
 	private static final int ALL_SIDES = CollisionDataFlag.BLOCK_MOVEMENT_WEST | CollisionDataFlag.BLOCK_MOVEMENT_NORTH
 		| CollisionDataFlag.BLOCK_MOVEMENT_EAST | CollisionDataFlag.BLOCK_MOVEMENT_SOUTH;
 
+	/** The Barrows tunnels' locked doors, in the form their door varbit gives them: a strange old lockpick opens one. */
+	private static final Set<Integer> BARROWS_LOCKED = Set.of(ObjectID.BARROWS_DOOR_LOCKED_R, ObjectID.BARROWS_DOOR_LOCKED_L);
+	private static final Set<Integer> LOCKPICKS = Set.of(ItemID.STRANGE_OLD_LOCKPICK, ItemID.STRANGE_OLD_LOCKPICK_FULL);
+
 	private static final String NONE = "";
-	/** Shortest Path's SLASH items (knives, axes, blades), as the catalog generator writes them. */
-	private static final Set<Integer> SLASH_ITEMS = slashItems();
-
 	/** The option that opens each object: Open, Slash, Squeeze-through, Walk-through, or NONE. */
-	private final Map<Integer, String> openOptions = new HashMap<>();
+	final Map<Integer, String> openOptions = new HashMap<>();
 	/** By place: doors share ids across the game, and one locked door doesn't lock every other one like it. */
-	private final Set<Door> locked = new HashSet<>();
-	private Door lastOpened;
-	private volatile boolean canSlash;
+	final Set<Door> locked = new HashSet<>();
+	Door lastOpened;
+	/** From each new snapshot's walk gates: a web opens only to a player carrying or wielding something that slashes. */
+	@Setter
+	volatile boolean canSlash;
+	/** From each new snapshot: a strange old lockpick is carried. */
+	volatile boolean canPickBarrowsLocks;
 	@Inject
-	private Client client;
+	Client client;
 
-	/** From each new snapshot: a web opens only to a player carrying or wielding something that slashes. */
-	public void playerChanged(PlayerSnapshot player)
+	public void setCarried(Set<Integer> carriedIds)
 	{
-		canSlash = player.carriedIds().stream().anyMatch(SLASH_ITEMS::contains);
+		canPickBarrowsLocks = carriedIds.stream().anyMatch(LOCKPICKS::contains);
 	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
@@ -145,8 +148,20 @@ public final class SceneDoors
 
 	private boolean opens(int id)
 	{
+		if (BARROWS_LOCKED.contains(currentForm(id)))
+		{
+			return canPickBarrowsLocks;
+		}
 		String option = openOption(id);
 		return isOpening(option) && (canSlash || !SLASH.equals(option));
+	}
+
+	/** The object as the player's varbits show it now: a Barrows door is unlocked, locked or no door at all per run. */
+	private int currentForm(int id)
+	{
+		ObjectComposition object = client.getObjectDefinition(id);
+		ObjectComposition form = object == null || object.getImpostorIds() == null ? object : object.getImpostor();
+		return form == null ? id : form.getId();
 	}
 
 	private static boolean isOpening(String action)
@@ -157,13 +172,9 @@ public final class SceneDoors
 	/** Client thread only. The option that opens a door, web, fence to squeeze through or doorway, or "" for anything else. */
 	public String openOption(int id)
 	{
-		return openOptions.computeIfAbsent(id, key ->
+		return openOptions.computeIfAbsent(currentForm(id), key ->
 		{
 			ObjectComposition object = client.getObjectDefinition(key);
-			if (object != null && object.getImpostorIds() != null)
-			{
-				object = object.getImpostor();
-			}
 			String option = NONE;
 			for (String action : object == null || object.getActions() == null ? new String[0] : object.getActions())
 			{
@@ -175,26 +186,6 @@ public final class SceneDoors
 			}
 			return option;
 		});
-	}
-
-	private static Set<Integer> slashItems()
-	{
-		try (InputStream in = WalkTable.open("slash.txt"))
-		{
-			Set<Integer> ids = new HashSet<>();
-			for (String line : new String(in.readAllBytes(), StandardCharsets.UTF_8).split("\\R"))
-			{
-				if (!line.isBlank() && !line.startsWith("#"))
-				{
-					ids.add(Integer.parseInt(line.trim()));
-				}
-			}
-			return Set.copyOf(ids);
-		}
-		catch (IOException e)
-		{
-			throw new IllegalStateException("can't read slash.txt", e);
-		}
 	}
 
 	private static void clearWall(int[][] flags, int[][] doorSides, int x, int y, int orientation)

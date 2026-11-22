@@ -23,7 +23,7 @@ public final class WorldMap
 	private static final int MAX_COORDINATE = 1 << 14;
 
 	/** Each region's flag words by region x << 8 | region y; null where the map has none. */
-	private final long[][] regions = new long[1 << 16][];
+	final long[][] regions = new long[1 << 16][];
 
 	private WorldMap()
 	{

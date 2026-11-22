@@ -84,13 +84,12 @@ public final class HotColdTrace
 	public static String describe(HotColdPlan planned)
 	{
 		StringBuilder line = new StringBuilder(planned.getAction().name()).append(' ').append(planned.getTile())
-			.append(" kept ").append(planned.getKept().size()).append(planned.isExact() ? "" : " (closest fits)");
+			.append(" kept ").append(planned.getKept().size());
 		if (planned.getChoice() != null)
 		{
 			ProbePlanner.Choice choice = planned.getChoice();
 			line.append(" probe ").append(choice.getProbe().getKind()).append(' ').append(choice.getProbe().getTicks()).append('t')
-				.append(String.format(" %.2f bits cost %d", choice.getBits(), choice.getCostTicks()))
-				.append(" branches ").append(choice.getBranches().size());
+				.append(String.format(" %.2f bits cost %d", choice.getBits(), choice.getCostTicks()));
 		}
 		return line.append(" probes ").append(planned.getConsidered().size()).toString();
 	}

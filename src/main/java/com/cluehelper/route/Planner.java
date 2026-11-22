@@ -14,43 +14,23 @@ import static java.util.stream.Collectors.*;
 /** Pure, so it runs on the executor with snapshot data only. */
 public final class Planner
 {
-	/** A route with a bank stop or a walked change must beat its reference by this much: near-ties stay on fewer steps. */
 	/** A transport landing this near a target unreached is taken as its way in when the note says what is missing. */
 	private static final int BLOCKED_RIDE_TILES = 50;
 	/** The engine words each shortfall as "needs 25 x Ecto-token"; under a "needs:" heading the word goes. */
 	private static final String NEEDS = "needs ";
-	private static final String NOT_FOUND = "Not found on you or in your bank:";
+	private static final String NOT_FOUND = "Required but not found:";
 	private static final String LEVELS_SHORT = "Levels too low:";
 	private static final String QUESTS_UNFINISHED = "Quests not finished:";
 	private static final String NOT_YET = "Not possible yet:";
 	/** A hand-written need named with its other ways: "Chef's hat (or cooking cape, Max cape, Varrock armour 3)". */
 	private static final Pattern OTHER_WAYS = Pattern.compile("(.+) \\(or (?:an? )?(.+)\\)");
 	private static final int REGION_SIZE = 64;
-	private static final int ALTERNATIVE_SLACK_HALF_TICKS = 60;
-	/** Catalog landings of one place spread 0–2 tiles. */
-	private static final int SAME_LANDING_TILES = 2;
-	/** Rejected repeats and round trips count against this too. */
-	private static final int MOST_ALTERNATIVE_SEARCHES = 12;
 
 	private Planner()
 	{
 	}
 
 	public static Plan plan(PlanInput in)
-	{
-		return plan(in, true);
-	}
-
-	/**
-	 * Without the alternatives, whose searches take most of a plan's time; the followed route's way is planned again
-	 * instead, bounded by the best route plus the commit margin.
-	 */
-	public static Plan withoutAlternatives(PlanInput in)
-	{
-		return plan(in, false);
-	}
-
-	private static Plan plan(PlanInput in, boolean withAlternatives)
 	{
 		long started = System.nanoTime();
 		Step step = in.getStep();
@@ -59,7 +39,7 @@ public final class Planner
 		{
 			return plan.note("not guided: a step outside the normal game (Leagues, or removed)").build();
 		}
-		if (step == null || step.getTargets() == null || step.getTargets().isEmpty())
+		if (step == null || step.getTargets().isEmpty())
 		{
 			return plan.note(step == null ? "no step"
 				: ClueTypes.HOT_COLD.equals(step.getType()) ? "choosing where to feel" : "no target tile for this step yet").build();
@@ -81,29 +61,25 @@ public final class Planner
 		boolean probes = step.getKind() == TargetKind.PROBES;
 		Searches searches = new Searches(ctx, area, probes);
 
-		LabelSearch first = searches.bestOrder(orders, Set.of(), probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
-		Picks picks = new Picks(ctx, first);
-		if (picks.best == null && ctx.avoidsWilderness && !probes)
+		LabelSearch first = searches.bestOrder(orders, probes ? probeRankLimitHalfTicks(in) : Integer.MAX_VALUE);
+		Route best = RouteBuilder.build(ctx, first.goal);
+		if (best == null && ctx.avoidsWilderness && !probes)
 		{
-			Plan throughWilderness = plan(wildernessAllowed(in), withAlternatives);
+			Plan throughWilderness = plan(wildernessAllowed(in));
 			if (throughWilderness.getBest() != null)
 			{
 				return throughWilderness.toBuilder().note("only reachable through the Wilderness")
 					.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels()).build();
 			}
 		}
-		plan.best(picks.best).direct(picks.direct != picks.best ? picks.direct : null)
-			.sameBook(picks.best != null && picks.best.isChanged() ? picks.sameBook : null)
-			.fasterUnqualified(picks.fasterUnqualified)
-			.candidates(picks.candidates());
+		plan.best(best);
 		Map<WorldPoint, Integer> probeRanks = new LinkedHashMap<>();
 		plan.probeTicks(probes ? probeTicks(ctx, first, probeRanks) : Map.of()).probeRanks(probeRanks);
-		plan.alternatives(probes || orders.size() > 1 || !withAlternatives ? List.of() : alternatives(in, searches, orders, picks));
-		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, picks));
+		plan.followed(probes || orders.size() > 1 ? null : followed(in, searches, orders, first.goal, best));
 		List<String> requirementNotes = requirementNotes(ctx);
 		boolean missingNamed = requirementNotes.contains(NOT_FOUND);
-		List<String> noRoute = probes || picks.best != null || missingNamed ? List.of() : noRouteNotes(ctx, orders);
-		plan.note(!noRoute.isEmpty() ? noRoute.get(0) : picks.best != null && ctx.onlyInWilderness ? "Wilderness target" : null);
+		List<String> noRoute = probes || best != null || missingNamed ? List.of() : noRouteNotes(ctx, orders);
+		plan.note(!noRoute.isEmpty() ? noRoute.get(0) : best != null && ctx.onlyInWilderness ? "Wilderness target" : null);
 		List<String> notes = new ArrayList<>(noRoute.subList(Math.min(1, noRoute.size()), noRoute.size()));
 		notes.addAll(requirementNotes);
 		plan.requirementNotes(List.copyOf(notes));
@@ -206,112 +182,16 @@ public final class Planner
 		return Running.halfTicks(radius / 2);
 	}
 
-	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
+	private static Route followed(PlanInput in, Searches searches, List<List<int[]>> orders, LabelSearch.Label bestGoal, Route best)
 	{
-		String first = in.getFollowedFirstTransport();
-		if (first == null || picks.best == null || first.equals(picks.best.getFirstTransportKey()))
+		String identity = in.getFollowedIdentity();
+		if (identity == null || best == null || identity.equals(best.getIdentity()))
 		{
 			return null;
 		}
-		int limit = picks.best.getRankHalfTicks() + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
-		LabelSearch search = searches.firstBy(orders, first, limit);
-		return search == null ? null : new Picks(searches.ctx, search).best;
-	}
-
-	private static List<Route> alternatives(PlanInput in, Searches searches, List<List<int[]>> orders, Picks picks)
-	{
-		List<Route> alternatives = new ArrayList<>();
-		Set<String> excluded = new HashSet<>();
-		Set<String> identities = new HashSet<>();
-		List<Route> shown = new ArrayList<>();
-		Stream.of(picks.best, picks.direct, picks.sameBook, picks.fasterUnqualified).filter(Objects::nonNull).forEach(route ->
-		{
-			excluded.add(route.getFirstTransportKey());
-			excludeAfterBank(route, excluded);
-			identities.add(route.getIdentity());
-			shown.add(route);
-		});
-		if (excluded.isEmpty())
-		{
-			return alternatives;
-		}
-		int limit = picks.best == null ? Integer.MAX_VALUE
-			: picks.best.getRankHalfTicks() + Math.max(picks.best.getRankHalfTicks(), ALTERNATIVE_SLACK_HALF_TICKS);
-		for (int tries = 0; alternatives.size() < in.getSettings().getRouteCount() - 1 && tries < MOST_ALTERNATIVE_SEARCHES; tries++)
-		{
-			LabelSearch search = searches.bestOrder(orders, Set.copyOf(excluded), limit);
-			Route next = new Picks(searches.ctx, search).best;
-			if (next == null || !excluded.add(next.getFirstTransportKey()))
-			{
-				break;
-			}
-			excludeAfterBank(next, excluded);
-			if (!repeats(next, shown) && !loops(next) && identities.add(next.getIdentity()))
-			{
-				alternatives.add(next);
-				shown.add(next);
-			}
-		}
-		return alternatives;
-	}
-
-	private static void excludeAfterBank(Route route, Set<String> excluded)
-	{
-		String afterBank = route.getAfterBankTransportKey();
-		if (afterBank != null)
-		{
-			excluded.add(afterBank);
-		}
-	}
-
-	/**
-	 * Leaving the shown routes' transports out can leave a round trip as the cheapest route with a transport ("walk to
-	 * ring BIP, ring to DIP, ring back to BIP, walk 35").
-	 */
-	private static boolean loops(Route route)
-	{
-		List<WorldPoint> places = new ArrayList<>();
-		for (Leg leg : route.getLegs())
-		{
-			WorldPoint from = leg.getFrom();
-			WorldPoint to = leg.getTo();
-			if (from == null || to == null || to.equals(from))
-			{
-				continue;
-			}
-			if (places.isEmpty())
-			{
-				places.add(from);
-			}
-			List<WorldPoint> before = places.subList(0, places.size() - 1);
-			if (before.stream().anyMatch(seen -> seen.distanceTo(to) <= SAME_LANDING_TILES))
-			{
-				return true;
-			}
-			places.add(to);
-		}
-		return false;
-	}
-
-	private static WorldPoint firstLanding(Route route)
-	{
-		Leg first = route.getFirstTransport();
-		return first == null ? null : first.getTo();
-	}
-
-	/**
-	 * Two capes to the same place are one alternative, while a free home teleport beside a paid spell
-	 * stays.
-	 */
-	private static boolean repeats(Route route, List<Route> shown)
-	{
-		WorldPoint landing = firstLanding(route);
-		return landing != null && shown.stream().anyMatch(other ->
-		{
-			WorldPoint at = firstLanding(other);
-			return at != null && at.distanceTo(landing) <= SAME_LANDING_TILES
-				&& route.getSpent().keySet().containsAll(other.getSpent().keySet());
-		});
+		int limit = bestGoal.rank + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
+		LabelSearch search = searches.followed(orders, in.getFollowedFirstTransport(), identity, limit);
+		return search == null ? null : RouteBuilder.build(searches.ctx, search.goal);
 	}
 
 	private static int probeRankLimitHalfTicks(PlanInput in)
@@ -324,15 +204,12 @@ public final class Planner
 	private static Map<WorldPoint, Integer> probeTicks(PlanContext ctx, LabelSearch search, Map<WorldPoint, Integer> ranks)
 	{
 		Map<WorldPoint, Integer> ticks = new LinkedHashMap<>();
-		search.probeBest.forEach((node, best) ->
+		search.probeBest.forEach((node, goal) ->
 		{
-			Route pick = new Picks(Picks.routes(ctx, best)).best;
-			if (pick != null)
-			{
-				WorldPoint tile = ctx.standTile(node);
-				ticks.put(tile, pick.getTicks());
-				ranks.put(tile, (pick.getRankHalfTicks() + 1) / 2);
-			}
+			Route pick = RouteBuilder.build(ctx, goal);
+			WorldPoint tile = ctx.standTile(node);
+			ticks.put(tile, pick.getTicks());
+			ranks.put(tile, (pick.getRankHalfTicks() + 1) / 2);
 		});
 		return ticks;
 	}
@@ -440,13 +317,14 @@ public final class Planner
 
 	/**
 	 * The items owned nowhere that shut every way into the targets, each with its ways round (the sled down Trollweiss
-	 * Mountain): only gates that items alone keep shut.
+	 * Mountain): only gates that items alone keep shut. Without the bank edge there are no banked gates, so the
+	 * player's own gates are judged with the bank instead.
 	 */
 	private static List<List<String>> lockingItems(PlanContext ctx, Set<Integer> targets)
 	{
 		PlayerSnapshot judged = withBank(ctx);
 		Set<List<String>> missing = new LinkedHashSet<>();
-		shutWaysInto(ctx, ctx.gates[PlanContext.BANKED], targets).flatMap(List::stream)
+		shutWaysInto(ctx, ctx.gates[ctx.gates[PlanContext.BANKED] != null ? PlanContext.BANKED : PlanContext.NOT_BANKED], targets).flatMap(List::stream)
 			.map(gate -> ctx.judge("gate", gate, judged))
 			.filter(verdict -> !verdict.isAvailable() && verdict.getMissingItems().size() == verdict.getWhyNot().size())
 			.forEach(verdict -> missing.addAll(verdict.getMissingItems()));
@@ -568,54 +446,45 @@ public final class Planner
 		final boolean probes;
 		int labels;
 
-		/**
-		 * Each order after the first stops at the best rank so far, which leaves out its slower direct and same-book
-		 * routes; so a bounded winner runs once more in full.
-		 */
-		LabelSearch bestOrder(List<List<int[]>> orders, Set<String> excluded, int rankLimit)
+		/** Each order after the first stops at the best rank so far. */
+		LabelSearch bestOrder(List<List<int[]>> orders, int rankLimit)
 		{
 			LabelSearch best = null;
-			List<int[]> bestOrder = null;
-			int bestRank = Integer.MAX_VALUE;
-			boolean bestBounded = false;
 			for (List<int[]> order : orders)
 			{
-				int limit = Math.min(rankLimit, bestRank);
-				LabelSearch search = run(order, excluded, limit);
-				Route pick = new Picks(ctx, search).best;
-				int rank = pick == null ? Integer.MAX_VALUE : pick.getRankHalfTicks();
-				if (best == null || rank < bestRank)
+				LabelSearch search = run(order, Math.min(rankLimit, rankOf(best)));
+				if (best == null || rankOf(search) < rankOf(best))
 				{
 					best = search;
-					bestOrder = order;
-					bestRank = rank;
-					bestBounded = limit != rankLimit;
-				}
-			}
-			return bestBounded ? run(bestOrder, excluded, rankLimit) : best;
-		}
-
-		/** The best order's search of the routes that start with transport {@code first}; null when none is in the limit. */
-		LabelSearch firstBy(List<List<int[]>> orders, String first, int rankLimit)
-		{
-			LabelSearch best = null;
-			int bestRank = Integer.MAX_VALUE;
-			for (List<int[]> order : orders)
-			{
-				LabelSearch search = run(new LabelSearch(ctx, order, area, first, rankLimit));
-				Route pick = new Picks(ctx, search).best;
-				if (pick != null && pick.getRankHalfTicks() < bestRank)
-				{
-					best = search;
-					bestRank = pick.getRankHalfTicks();
 				}
 			}
 			return best;
 		}
 
-		private LabelSearch run(List<int[]> order, Set<String> excluded, int rankLimit)
+		/** The best order's search of the routes that start with transport {@code first}; null when none is in the limit. */
+		LabelSearch followed(List<List<int[]>> orders, String first, String identity, int rankLimit)
 		{
-			return run(new LabelSearch(ctx, order, probes, area, excluded, rankLimit));
+			LabelSearch best = null;
+			for (List<int[]> order : orders)
+			{
+				LabelSearch search = run(new LabelSearch(ctx, order, area, first,
+					goal -> identity.equals(RouteBuilder.build(ctx, goal).getIdentity()), rankLimit));
+				if (search.goal != null && rankOf(search) < rankOf(best))
+				{
+					best = search;
+				}
+			}
+			return best;
+		}
+
+		private static int rankOf(LabelSearch search)
+		{
+			return search == null || search.goal == null ? Integer.MAX_VALUE : search.goal.rank;
+		}
+
+		private LabelSearch run(List<int[]> order, int rankLimit)
+		{
+			return run(new LabelSearch(ctx, order, probes, area, rankLimit));
 		}
 
 		private LabelSearch run(LabelSearch search)
@@ -626,99 +495,18 @@ public final class Planner
 		}
 	}
 
-	static final class Picks
-	{
-		final Route[][] routes;
-		Route best;
-		Route direct;
-		Route sameBook;
-		Route fasterUnqualified;
-
-		Picks(PlanContext ctx, LabelSearch search)
-		{
-			this(routes(ctx, search.goals));
-		}
-
-		Picks(Route[][] r)
-		{
-			routes = r;
-			Route plain = faster(r[0][LabelSearch.NONE], r[0][LabelSearch.CHANGED]);
-			Route bankOnly = faster(r[1][LabelSearch.NONE], r[1][LabelSearch.CHANGED]);
-			Route walkedOnly = r[0][LabelSearch.WALKED];
-			Route both = r[1][LabelSearch.WALKED];
-			Route pickBank = qualifies(bankOnly, plain) ? bankOnly : plain;
-			Route pickWalked = qualifies(walkedOnly, plain) ? walkedOnly : plain;
-			Route reference = faster(pickBank, pickWalked);
-			Route pickBoth = qualifies(both, reference) ? both : reference;
-			best = fastest(Stream.of(plain, pickBank, pickWalked, pickBoth));
-			direct = pickWalked;
-			Route sameBookBanked = r[1][LabelSearch.NONE];
-			sameBook = qualifies(sameBookBanked, r[0][LabelSearch.NONE]) ? sameBookBanked : r[0][LabelSearch.NONE];
-			Route fastest = fastest(Stream.of(r[0], r[1]).flatMap(Stream::of));
-			fasterUnqualified = fastest != null && best != null && fastest.getRankHalfTicks() < best.getRankHalfTicks() ? fastest : null;
-		}
-
-		/** Every goal route, by bank state and change category. */
-		List<Plan.Candidate> candidates()
-		{
-			List<Plan.Candidate> candidates = new ArrayList<>();
-			for (int b = 0; b < 2; b++)
-			{
-				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
-				{
-					if (routes[b][c] != null)
-					{
-						candidates.add(new Plan.Candidate(category(b, c), routes[b][c]));
-					}
-				}
-			}
-			return candidates;
-		}
-
-		static Route[][] routes(PlanContext ctx, LabelSearch.Label[][] goals)
-		{
-			Route[][] routes = new Route[2][LabelSearch.CATEGORIES];
-			for (int b = 0; b < 2; b++)
-			{
-				for (int c = 0; c < LabelSearch.CATEGORIES; c++)
-				{
-					LabelSearch.Label goal = goals[b][c];
-					routes[b][c] = goal == null ? null : RouteBuilder.build(ctx, goal, goal.rank);
-				}
-			}
-			return routes;
-		}
-
-		private static String category(int b, int c)
-		{
-			return (b == 1 ? "bank" : "no bank") + ", " + (c == LabelSearch.NONE ? "no change" : c == LabelSearch.CHANGED ? "carried change" : "walked change");
-		}
-
-		private static Route faster(Route a, Route b)
-		{
-			return a == null ? b : b == null ? a : b.getRankHalfTicks() < a.getRankHalfTicks() ? b : a;
-		}
-
-		private static boolean qualifies(Route route, Route reference)
-		{
-			return route != null
-				&& (reference == null || route.getRankHalfTicks() < reference.getRankHalfTicks() - LabelSearch.MARGIN_HALF_TICKS);
-		}
-
-		private static Route fastest(Stream<Route> routes)
-		{
-			return routes.filter(Objects::nonNull).min(Comparator.comparingInt(Route::getRankHalfTicks)).orElse(null);
-		}
-	}
-
 	/** A searched goal label as the route the guide follows: its legs, withdraw list and what it spends. */
 	private static final class RouteBuilder
 	{
-		static Route build(PlanContext ctx, LabelSearch.Label goal, int rank)
+		/** Null for no goal. The rank leaves out the penalties that only choose between routes. */
+		static Route build(PlanContext ctx, LabelSearch.Label goal)
 		{
+			if (goal == null)
+			{
+				return null;
+			}
 			List<Leg> legs = new ArrayList<>();
 			WorldPoint at = ctx.in.getStart().getTile();
-			boolean wilderness = false;
 			boolean stageReached = false;
 			for (LabelSearch.Label label : goal.chain())
 			{
@@ -741,7 +529,6 @@ public final class Planner
 					legs.add(leg);
 				}
 				at = leg.getTo();
-				wilderness |= at != null && ctx.isWilderness(at);
 			}
 			Map<String, Integer> spent = new LinkedHashMap<>();
 			for (LabelSearch.Label label : goal.chain())
@@ -757,18 +544,14 @@ public final class Planner
 			return Route.builder()
 				.legs(List.copyOf(legs))
 				.halfTicks(goal.half + extra)
-				.rankHalfTicks(rank + extra)
-				.tieBreakHalfTicks(goal.teleports * PlanContext.TELEPORT_TIE_HALF_TICKS)
+				.rankHalfTicks(goal.rank - goal.choicePenalty + extra)
 				.banked(banked)
 				.withdraw(withdraw)
 				.depositFirst(depositFirst)
 				.openBankStart(banked && !bankLeg)
-				.changed(goal.c != LabelSearch.NONE)
 				.startBook(ctx.homeBook)
 				.endBook(goal.endBook != null ? goal.endBook : LabelSearch.endBook(goal.k))
 				.spent(spent)
-				.confidence(goal.confidence())
-				.wilderness(wilderness)
 				.build();
 		}
 

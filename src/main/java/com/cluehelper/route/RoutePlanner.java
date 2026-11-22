@@ -1,6 +1,6 @@
 package com.cluehelper.route;
 
-import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.*;
 import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.BankMemory;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 
 /**
@@ -31,7 +30,6 @@ public class RoutePlanner
 	static final int COMMIT_MARGIN_TICKS = 5;
 	/** A Spellbook Swap's free cast stays pending this long after varbit 3617 turns 1. */
 	private static final int SWAP_WINDOW_TICKS = 200;
-	private static final int NOT_REFUSED = -1;
 	private static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
@@ -40,68 +38,72 @@ public class RoutePlanner
 	private static final long NO_SCENE = Long.MIN_VALUE;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private CatalogData catalogData;
+	BundledData bundledData;
 	@Inject
-	private WalkData walkData;
-	@Inject
-	private PlannerRunner runner;
+	PlannerRunner runner;
 	/** The walk from the player's tile, searched apart so it never supersedes a plan. */
-	private PlannerRunner startRunner;
+	PlannerRunner startRunner;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private StepNeeds stepNeeds;
+	StepNeeds stepNeeds;
 	@Inject
-	private PohService poh;
+	PohService poh;
 	@Inject
-	private ProbeTarget probeTarget;
+	ProbeTarget probeTarget;
 	@Inject
-	private StageTarget stageTarget;
+	StageTarget stageTarget;
 	@Inject
-	private SceneDoors doors;
-	private final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
-	private final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
+	SceneDoors doors;
+	final List<Consumer<Plan>> listeners = new CopyOnWriteArrayList<>();
+	final List<BiConsumer<Plan, PlanInput>> inputListeners = new CopyOnWriteArrayList<>();
 
 	/** Loaded walk data; null until it is. */
 	@Getter
-	private volatile WalkData.Loaded walk;
-	private volatile Catalog catalog;
-	private long gatesVersion = -1;
-	private boolean[] rowOpen;
-	private WorldPoint lastTile;
+	volatile WalkData walk;
+	volatile Catalog catalog;
+	long gatesVersion = -1;
+	boolean[] rowOpen;
+	WorldPoint lastTile;
 	/** After a teleport the scene loads a tick after the tile moves: a walk over the old scene must be redone. */
-	private long lastSceneBase = NO_SCENE;
+	long lastSceneBase = NO_SCENE;
 	@Getter
-	private volatile PlanStart start;
-	private volatile int nearestNode = WalkTable.NO_NODE;
-	private int targetWalkBucket = NO_TARGET_NEAR;
-	private Trigger lastTrigger;
+	volatile PlanStart start;
+	volatile int nearestNode = WalkTable.NO_NODE;
+	int targetWalkBucket = NO_TARGET_NEAR;
+	Trigger lastTrigger;
 	@Getter
-	private volatile Plan plan = Plan.NONE;
+	volatile Plan plan = Plan.NONE;
 	@Getter
-	private volatile Route committed;
-	private String committedStep;
+	volatile Route committed;
+	String committedStep;
 	/** The step's targets when it was committed: a hot/cold step keeps its key while its target moves. */
-	private List<WorldPoint> committedTargets = List.of();
+	List<WorldPoint> committedTargets = List.of();
 	/** The committed walk was kept once although the last plan didn't offer it. */
-	private boolean walkHeld;
-	private int swapCheckAtCapeRefusal = NOT_REFUSED;
-	private final Set<String> refusedChanges = new HashSet<>();
+	boolean walkHeld;
+	final Set<String> refusedChanges = new HashSet<>();
 
 	@Inject
 	void init(ScheduledExecutorService executor, ClientThread clientThread)
 	{
 		startRunner = new PlannerRunner(executor, clientThread);
+	}
+
+	/** The walk table's exit a walk leg goes through within so many tiles of walking; null for none, or before it loads. */
+	public Exit exitBetween(Leg leg, int tiles)
+	{
+		WalkData loaded = walk;
+		return loaded == null ? null : loaded.getTable().exitBetween(leg.getFrom(), leg.getTo(), tiles);
 	}
 
 	/** The guide takes such a scroll out at the bank as the plan does. */
@@ -112,13 +114,12 @@ public class RoutePlanner
 
 	public void start()
 	{
-		catalogData.get().thenAccept(loaded -> catalog = loaded);
-		walkData.get().thenAccept(loaded ->
+		bundledData.getCatalog().thenAccept(loaded -> catalog = loaded);
+		bundledData.getWalk().thenAccept(loaded ->
 		{
 			if (loaded != null)
 			{
-				watchGateVars(loaded.getTable());
-				availability.nameItemsOf(loaded.getTable().getGates());
+				player.watch(loaded.getTable().getWatchedVarbits(), loaded.getTable().getWatchedVarps());
 				walk = loaded;
 			}
 		});
@@ -189,7 +190,7 @@ public class RoutePlanner
 		Step step = travelStep();
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
-		WalkData.Loaded data = walk;
+		WalkData data = walk;
 		boolean dormant = snapshot != null && snapshot.getDormantReason() != null;
 		if (step == null || snapshot == null || runes == null || data == null || catalog == null || dormant)
 		{
@@ -204,8 +205,6 @@ public class RoutePlanner
 		{
 			return;
 		}
-		forgetCapeRefusalOnceCheckMoved(snapshot);
-		snapshot = withRefusals(snapshot);
 		updateStart(data, snapshot, runes, step);
 		if (start == null)
 		{
@@ -222,8 +221,10 @@ public class RoutePlanner
 		}
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, required);
-		PlanInput followingInput = input.toBuilder().followedFirstTransport(followedFirstTransport(step)).build();
-		runner.submit(() -> Planner.withoutAlternatives(followingInput), planned -> onPlanned(planned, followingInput));
+		Route followed = followed(step);
+		PlanInput followingInput = followed == null ? input
+			: input.toBuilder().followedFirstTransport(followed.getFirstTransportKey()).followedIdentity(followed.getIdentity()).build();
+		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
 	}
 
 	/**
@@ -238,7 +239,7 @@ public class RoutePlanner
 		{
 			return null;
 		}
-		return input(step, withRefusals(snapshot), runes, required);
+		return input(step, snapshot, runes, required);
 	}
 
 	/** Client thread. The walk rows the player can take now, fixed for a search on another thread. */
@@ -255,7 +256,7 @@ public class RoutePlanner
 		return PlanInput.builder()
 			.step(step)
 			.player(snapshot)
-			.banked(banked == null ? null : withRefusals(banked))
+			.banked(banked)
 			.pinPending(bankMemory.isPinPending())
 			.atOpenBank(bankMemory.isBankOpen())
 			.required(required)
@@ -277,14 +278,15 @@ public class RoutePlanner
 		return poh.isInHouse() && poh.getOwnership() == HouseOwnership.Ownership.FOREIGN;
 	}
 
-	/** Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says. */
+	/**
+	 * Client thread. The game refused a cape change for today's limit, whatever SB_SWAP_CHECK says, so no cape change is
+	 * offered again this session.
+	 */
 	public void onCapeChangesRefused()
 	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		Integer used = snapshot == null ? null : snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		swapCheckAtCapeRefusal = used == null ? 0 : used;
-		lastTrigger = null;
-		log.debug("cape change refused at 4816 = {}", swapCheckAtCapeRefusal);
+		catalog.getSpellbookChanges().stream()
+			.filter(change -> change.getSpends().stream().anyMatch(spend -> spend.getKind() == Spend.Kind.CAPE_USE))
+			.forEach(change -> onRowRefused(change.getName()));
 	}
 
 	/**
@@ -300,32 +302,7 @@ public class RoutePlanner
 		}
 	}
 
-	/** The refused cape change counts until SB_SWAP_CHECK moves: the day's limit has reset by then. */
-	private void forgetCapeRefusalOnceCheckMoved(PlayerSnapshot snapshot)
-	{
-		Integer used = snapshot.varbit(VarbitID.SB_SWAP_CHECK);
-		if (swapCheckAtCapeRefusal != NOT_REFUSED && used != null && used != swapCheckAtCapeRefusal)
-		{
-			swapCheckAtCapeRefusal = NOT_REFUSED;
-		}
-	}
-
-	/** After a cape refusal, no cape uses are left. */
-	private PlayerSnapshot withRefusals(PlayerSnapshot snapshot)
-	{
-		if (swapCheckAtCapeRefusal == NOT_REFUSED)
-		{
-			return snapshot;
-		}
-		Map<Integer, Integer> varbits = new HashMap<>(snapshot.getVarbits());
-		varbits.put(VarbitID.SB_SWAP_CHECK, SpellbookState.CAPE_CHANGES_PER_DAY);
-		SpellbookState book = snapshot.getSpellbook();
-		SpellbookState noCapeUses = book == null ? null : new SpellbookState(book.getBook(), book.isPendingRevert(), 0,
-			book.isArceuusUnlocked(), book.isAncientAccess(), book.isLunarAccess(), book.isSwapAccess());
-		return snapshot.toBuilder().varbits(varbits).spellbook(noCapeUses).build();
-	}
-
-	private void updateStart(WalkData.Loaded data, PlayerSnapshot snapshot, RuneModel runes, Step step)
+	private void updateStart(WalkData data, PlayerSnapshot snapshot, RuneModel runes, Step step)
 	{
 		Position position = player.getPosition();
 		WalkTable table = data.getTable();
@@ -400,7 +377,8 @@ public class RoutePlanner
 		}
 		WalkGates gates = new WalkGates(table, snapshot, new AvailabilityEngine(runes, id -> ""), AvailabilityService.nowMinutes());
 		rowOpen = gates.rowOpen();
-		doors.playerChanged(snapshot);
+		doors.setCanSlash(gates.canSlash());
+		doors.setCarried(snapshot.carriedIds());
 		gatesVersion = snapshot.getVersion();
 	}
 
@@ -450,9 +428,9 @@ public class RoutePlanner
 			: Math.max(PlanInput.NO_REVERT_WINDOW, SWAP_WINDOW_TICKS - (client.getTickCount() - since));
 	}
 
-	private String followedFirstTransport(Step step)
+	private Route followed(Step step)
 	{
-		return committed != null && step.getKey().equals(committedStep) ? committed.getFirstTransportKey() : null;
+		return committed != null && step.getKey().equals(committedStep) ? committed : null;
 	}
 
 	private void onPlanned(Plan planned, PlanInput input)
@@ -534,29 +512,8 @@ public class RoutePlanner
 	{
 		List<Route> routes = new ArrayList<>();
 		routes.add(planned.getBest());
-		routes.add(planned.getDirect());
-		routes.add(planned.getSameBook());
-		routes.addAll(planned.getAlternatives());
 		routes.add(planned.getFollowed());
-		planned.getCandidates().forEach(candidate -> routes.add(candidate.getRoute()));
 		return routes;
-	}
-
-	private void watchGateVars(WalkTable table)
-	{
-		Set<Integer> varbits = new HashSet<>();
-		Set<Integer> varps = new HashSet<>();
-		for (Requirements gate : table.getGates())
-		{
-			List<VarCheck> checks = new ArrayList<>(gate.getVars());
-			gate.getItems().forEach(clause -> clause.getBranches().stream().filter(ItemClause.Branch::isVar)
-				.forEach(branch -> checks.add(branch.getVar())));
-			for (VarCheck check : checks)
-			{
-				(check.getKind() == VarCheck.Kind.VARBIT ? varbits : varps).add(check.getId());
-			}
-		}
-		player.watch(varbits, varps);
 	}
 
 	/** Walking changes it only through the nearest node or the walk to a target in the scene. */

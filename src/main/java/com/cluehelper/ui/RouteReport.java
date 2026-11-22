@@ -39,22 +39,22 @@ public class RouteReport
 	private static final String IN_THE_BANK = "in the bank";
 
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private ConfigManager configManager;
+	ConfigManager configManager;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private ChatMessageManager chat;
+	ChatMessageManager chat;
 	@Inject
-	private Gson gson;
-	private volatile PlanInput lastInput;
-	private volatile Plan lastPlan;
-	private Runnable unregister;
+	Gson gson;
+	volatile PlanInput lastInput;
+	volatile Plan lastPlan;
+	Runnable unregister;
 
 	public void start()
 	{
@@ -153,11 +153,6 @@ public class RouteReport
 		}
 		route(out, "followed", routes.getCommitted());
 		route(out, "best", plan.getBest());
-		route(out, "best without the bank", plan.getDirect());
-		route(out, "best without a spellbook change", plan.getSameBook());
-		route(out, "faster but within the margin", plan.getFasterUnqualified());
-		plan.getAlternatives().forEach(alternative -> route(out, "alternative", alternative));
-		plan.getCandidates().forEach(candidate -> route(out, "candidate " + candidate.getCategory(), candidate.getRoute()));
 		plan.getRequirementNotes().forEach(note -> line(out, "requirement", note));
 	}
 

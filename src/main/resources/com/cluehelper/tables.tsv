@@ -60,11 +60,6 @@ uncharged		ItemID.RING_OF_SHADOWS_UNCHARGED=28329
 uncharged		ItemID.TOME_OF_FIRE_UNCHARGED=20716
 uncharged		ItemID.TOME_OF_WATER_UNCHARGED=25576
 uncharged		ItemID.TOME_OF_EARTH_UNCHARGED=30066
-ghostspeak		ItemID.AMULET_OF_GHOSTSPEAK=552
-ghostspeak		ItemID.AMULET_OF_GHOSTSPEAK_ENCHANTED=4250
-ghostspeak		ItemID.MORYTANIA_LEGS_MEDIUM=13113
-ghostspeak		ItemID.MORYTANIA_LEGS_HARD=13114
-ghostspeak		ItemID.MORYTANIA_LEGS_ELITE=13115
 abyss obstacles		ObjectID.RCU_OUTER_MULTI1=26187
 abyss obstacles		ObjectID.RCU_OUTER_MULTI2=26188
 abyss obstacles		ObjectID.RCU_OUTER_MULTI3=26189
@@ -116,13 +111,11 @@ tab content	EQUIPMENT	InterfaceID.Wornitems.UNIVERSE=25362432
 tab content	MAGIC	InterfaceID.MagicSpellbook.UNIVERSE=14286848
 tab content	EMOTES	InterfaceID.Emote.UNIVERSE=14155776
 tab content	MUSIC	InterfaceID.Music.UNIVERSE=15663104
-tab content	QUESTS	InterfaceID.Questlist.UNIVERSE=26148864
 tab stones	INVENTORY	InterfaceID.Toplevel.STONE3=35913795	InterfaceID.ToplevelOsrsStretch.STONE3=10551358	InterfaceID.ToplevelPreEoc.STONE3=10747959
 tab stones	EQUIPMENT	InterfaceID.Toplevel.STONE4=35913796	InterfaceID.ToplevelOsrsStretch.STONE4=10551359	InterfaceID.ToplevelPreEoc.STONE4=10747960
 tab stones	MAGIC	InterfaceID.Toplevel.STONE6=35913798	InterfaceID.ToplevelOsrsStretch.STONE6=10551361	InterfaceID.ToplevelPreEoc.STONE6=10747962
 tab stones	EMOTES	InterfaceID.Toplevel.STONE12=35913781	InterfaceID.ToplevelOsrsStretch.STONE12=10551344	InterfaceID.ToplevelPreEoc.STONE12=10747946
 tab stones	MUSIC	InterfaceID.Toplevel.STONE13=35913782	InterfaceID.ToplevelOsrsStretch.STONE13=10551345	InterfaceID.ToplevelPreEoc.STONE13=10747947
-tab stones	QUESTS	InterfaceID.Toplevel.STONE2=35913794	InterfaceID.ToplevelOsrsStretch.STONE2=10551357	InterfaceID.ToplevelPreEoc.STONE2=10747958
 ates buttons	The Darkfrost	InterfaceID.PendantOfAtes.TELEPORT_DARKFROST=57606174
 ates buttons	Twilight Temple	InterfaceID.PendantOfAtes.TELEPORT_TWILIGHT=57606173
 ates buttons	Ralos' Rise	InterfaceID.PendantOfAtes.TELEPORT_RALOS=57606175
@@ -165,9 +158,9 @@ ride places	LEVER	the lever
 ride places	BALLOON	the balloon basket
 ride places	MUSHTREE	the mushtree
 ride places	WILDERNESS_OBELISK	the obelisk
-spellbook change warnings	Ancient Pyramid altar	"Drains your Prayer
-spellbook change warnings	and the way in crosses desert heat"	Astral altar
-spellbook change warnings	Aggressive suqahs nearby	Tyss
+spellbook change warnings	Ancient Pyramid altar	Drains your Prayer, and the way in crosses desert heat
+spellbook change warnings	Astral altar	Aggressive suqahs nearby
+spellbook change warnings	Tyss	Right-click Tyss: Spellbook
 mushtree places	House on the Hill
 mushtree places	Verdant Valley
 mushtree places	Sticky Swamp
@@ -196,12 +189,17 @@ unlock hints	STORED_OAK_LOGS	if the balloons' log storage holds oak logs, fly on
 unlock hints	STORED_WILLOW_LOGS	if the balloons' log storage holds willow logs, fly once without carrying any
 unlock hints	STORED_YEW_LOGS	if the balloons' log storage holds yew logs, fly once without carrying any
 unlock hints	STORED_MAGIC_LOGS	if the balloons' log storage holds magic logs, fly once without carrying any
-balloon fares	2808 3354 0	ItemID.LOGS=1511	STORED_LOGS
-balloon fares	2941 3420 0	ItemID.LOGS=1511	STORED_LOGS
-balloon fares	2923 3302 0	ItemID.OAK_LOGS=1521	STORED_OAK_LOGS
-balloon fares	3299 3482 0	ItemID.WILLOW_LOGS=1519	STORED_WILLOW_LOGS
-balloon fares	2459 3110 0	ItemID.YEW_LOGS=1515	STORED_YEW_LOGS
-balloon fares	2478 3456 0	ItemID.MAGIC_LOGS=1513	STORED_MAGIC_LOGS
+# landing unlocks: the landing, the fare item a landing there must not have dropped (0 for none), the unlock it shows, and
+# where the trip must start: anywhere, or beside another balloon (a scroll landing near one is no flight). Only a
+# balloon stores its fare, so only a refused flight unlearns one.
+landing unlocks	1254 3560 0	0	XERICS_HONOUR	anywhere
+landing unlocks	3792 3560 0	ItemID.ECTOTOKEN=4278	DRAGONTOOTH	anywhere
+landing unlocks	2808 3354 0	ItemID.LOGS=1511	STORED_LOGS	balloon
+landing unlocks	2941 3420 0	ItemID.LOGS=1511	STORED_LOGS	balloon
+landing unlocks	2923 3302 0	ItemID.OAK_LOGS=1521	STORED_OAK_LOGS	balloon
+landing unlocks	3299 3482 0	ItemID.WILLOW_LOGS=1519	STORED_WILLOW_LOGS	balloon
+landing unlocks	2459 3110 0	ItemID.YEW_LOGS=1515	STORED_YEW_LOGS	balloon
+landing unlocks	2478 3456 0	ItemID.MAGIC_LOGS=1513	STORED_MAGIC_LOGS	balloon
 not teleports	wield
 not teleports	wear
 not teleports	equip
@@ -212,3 +210,206 @@ not teleports	examine
 not teleports	check
 not teleports	inspect
 not teleports	read
+# Easy Teleports (easy-pharaoh-sceptre) names: game name, its rename setting, its enable setting, the rename used while unset.
+# Taken from that plugin's replacers and config at commit de19c2f.
+easy teleports names	Kandarin Monastery	replacementArdougneCloakKandarinMonastery	enableArdougneCloak	
+easy teleports names	Monastery Teleport	replacementArdougneCloakKandarinMonastery	enableArdougneCloak	
+easy teleports names	Ardougne Farm	replacementArdougneCloakArdougneFarm	enableArdougneCloak	
+easy teleports names	Farm Teleport	replacementArdougneCloakArdougneFarm	enableArdougneCloak	
+easy teleports names	Nardah	replacementDesertNardah	enableDesertAmulet	
+easy teleports names	Kalphite cave	replacementDesertKalphiteCave	enableDesertAmulet	
+easy teleports names	Ardougne: Two-pints	replacementArdougne	enableDiaryCape	Ardougne: Bar
+easy teleports names	Desert: Jarr	replacementDesert	enableDiaryCape	Desert: Shantay Pass
+easy teleports names	Falador: Sir Rebral	replacementFalador	enableDiaryCape	Falador: Castle
+easy teleports names	Fremennik: Thorodin	replacementFremennik	enableDiaryCape	Fremennik: POH Portal
+easy teleports names	Kandarin: Flax keeper	replacementKandarin	enableDiaryCape	Kandarin: Flax
+easy teleports names	Karamja: Pirate Jackie the Fruit	replacementKaramjaJackie	enableDiaryCape	Karamja: Agility Arena
+easy teleports names	Karamja: Kaleb Paramaya (retired)	replacementKaramjaKaleb	enableDiaryCape	Karamja: Shilo Village
+easy teleports names	Karamja: Jungle forester (retired)	replacementKaramjaForester	enableDiaryCape	Karamja: Kharazi Jungle
+easy teleports names	Karamja: TzHaar-Mej (retired)	replacementKaramjaTzhaar	enableDiaryCape	Karamja: Mor-Ul-Rek
+easy teleports names	Kourend & Kebos: Elise	replacementKourend	enableDiaryCape	Kourend: Castle
+easy teleports names	Lumbridge & Draynor: Hatius Cosaintus	replacementLumbridge	enableDiaryCape	Lumbridge: Town Square
+easy teleports names	Morytania: Le-sabrè	replacementMorytania	enableDiaryCape	Morytania: Canifis
+easy teleports names	Varrock: Toby	replacementVarrock	enableDiaryCape	Varrock: Rooftops
+easy teleports names	Wilderness: Lesser Fanatic	replacementWilderness	enableDiaryCape	Wilderness: Edgeville
+easy teleports names	Western Provinces: Elder Gnome child	replacementWestern	enableDiaryCape	Western: Gnome Stronghold
+easy teleports names	Ardougne	replacementArdougne	enableDiaryCape	Ardougne: Bar
+easy teleports names	Desert	replacementDesert	enableDiaryCape	Desert: Shantay Pass
+easy teleports names	Falador	replacementFalador	enableDiaryCape	Falador: Castle
+easy teleports names	Fremennik	replacementFremennik	enableDiaryCape	Fremennik: POH Portal
+easy teleports names	Kandarin	replacementKandarin	enableDiaryCape	Kandarin: Flax
+easy teleports names	Karamja (Shilo)	replacementKaramjaKaleb	enableDiaryCape	Karamja: Shilo Village
+easy teleports names	Karamja (Jungle)	replacementKaramjaForester	enableDiaryCape	Karamja: Kharazi Jungle
+easy teleports names	Karamja (Mor Ul Rek)	replacementKaramjaTzhaar	enableDiaryCape	Karamja: Mor-Ul-Rek
+easy teleports names	Karamja	replacementKaramjaJackie	enableDiaryCape	Karamja: Agility Arena
+easy teleports names	Kourend & Kebos	replacementKourend	enableDiaryCape	Kourend: Castle
+easy teleports names	Lumbridge & Draynor	replacementLumbridge	enableDiaryCape	Lumbridge: Town Square
+easy teleports names	Morytania	replacementMorytania	enableDiaryCape	Morytania: Canifis
+easy teleports names	Varrock	replacementVarrock	enableDiaryCape	Varrock: Rooftops
+easy teleports names	Wilderness	replacementWilderness	enableDiaryCape	Wilderness: Edgeville
+easy teleports names	Western Provinces	replacementWestern	enableDiaryCape	Western: Gnome Stronghold
+easy teleports names	Twiggy O'Korn	replacementTwiggy	enableDiaryCape	Diary Master: Draynor Village
+easy teleports names	Gem Mine	replacementKaramjaGemMine	enableKaramjaGloves	<col=8800ff>Gem Mine</col>
+easy teleports names	Slayer Master	replacementKaramjaSlayerMaster	enableKaramjaGloves	<col=ff0000>Duradel</col>
+easy teleports names	Ectofuntus Pit	replacementMorytaniaEctofuntus	enableMorytaniaLegs	Ectofuntus
+easy teleports names	Ecto Teleport	replacementMorytaniaEctofuntus	enableMorytaniaLegs	Ectofuntus
+easy teleports names	Burgh de Rott	replacementMorytaniaBurgh	enableMorytaniaLegs	Burgh de Rott
+easy teleports names	Burgh Teleport	replacementMorytaniaBurgh	enableMorytaniaLegs	Burgh de Rott
+easy teleports names	Kourend Woodland	replacementRadasKourendWoodland	enableRadasBlessing	<col=2aae4f>Kourend Woodland</col>
+easy teleports names	Mount Karuulm	replacementRadasMountKaruulm	enableRadasBlessing	<col=8800ff>Konar</col>
+easy teleports names	Edgeville	replacementGloryEdgeville	enableAmuletOfGlory	
+easy teleports names	Karamja	replacementGloryKaramja	enableAmuletOfGlory	
+easy teleports names	Draynor Village	replacementGloryDraynorVillage	enableAmuletOfGlory	
+easy teleports names	Al Kharid	replacementGloryAlKharid	enableAmuletOfGlory	
+easy teleports names	Chaos Temple	replacementBurningChaosTemple	enableBurningAmulet	<col=ff0000>Chaos Temple</col>
+easy teleports names	Bandit Camp	replacementBurningBanditCamp	enableBurningAmulet	<col=ff0000>Bandit Camp</col>
+easy teleports names	Lava Maze	replacementBurningLavaMaze	enableBurningAmulet	<col=ff0000>Lava Maze</col>
+easy teleports names	Warriors' Guild	replacementCombatWarriorsGuild	enableCombatBracelet	
+easy teleports names	Champions' Guild	replacementCombatChampionsGuild	enableCombatBracelet	
+easy teleports names	Monastery	replacementCombatMonastery	enableCombatBracelet	
+easy teleports names	Ranging Guild	replacementCombatRangingGuild	enableCombatBracelet	
+easy teleports names	Digsite	replacementDigsite	enableDigsitePendant	
+easy teleports names	Fossil Island	replacementFossilIsland	enableDigsitePendant	
+easy teleports names	Lithkren Dungeon	replacementLithkren	enableDigsitePendant	
+easy teleports names	Lithkren	replacementLithkren	enableDigsitePendant	
+easy teleports names	Burthorpe	replacementGamesBurthorpe	enableGamesNecklace	
+easy teleports names	Barbarian Outpost	replacementGamesBarbarianOutpost	enableGamesNecklace	
+easy teleports names	Corporeal Beast	replacementGamesCorporealBeast	enableGamesNecklace	
+easy teleports names	Tears of Guthix	replacementGamesTearsOfGuthix	enableGamesNecklace	
+easy teleports names	Wintertodt Camp	replacementGamesWintertodtCamp	enableGamesNecklace	
+easy teleports names	Wizards' Tower	replacementWizardTower	enableNecklaceOfPassage	
+easy teleports names	The Outpost	replacementOutpost	enableNecklaceOfPassage	NW of West Ardougne
+easy teleports names	Eagles' Eyrie	replacementEagleEyrie	enableNecklaceOfPassage	NW of Uzer (Desert)
+easy teleports names	Eagle's Eyrie	replacementEagleEyrie	enableNecklaceOfPassage	NW of Uzer (Desert)
+easy teleports names	Emir's Arena	replacementPvPArena	enableRingOfDueling	Emir's Arena
+easy teleports names	Castle Wars Arena	replacementCastleWars	enableRingOfDueling	
+easy teleports names	Ferox Enclave	replacementFeroxEnclave	enableRingOfDueling	
+easy teleports names	Fortis Colosseum	replacementFortisColosseum	enableRingOfDueling	
+easy teleports names	Castle Wars	replacementCastleWars	enableRingOfDueling	
+easy teleports names	Miscellania	replacementWealthMiscellania	enableRingOfWealth	
+easy teleports names	Grand Exchange	replacementWealthGrandExchange	enableRingOfWealth	
+easy teleports names	Falador Park	replacementWealthFalador	enableRingOfWealth	
+easy teleports names	Falador	replacementWealthFalador	enableRingOfWealth	
+easy teleports names	Dondakan's Rock	replacementWealthDondakan	enableRingOfWealth	
+easy teleports names	Dondakan	replacementWealthDondakan	enableRingOfWealth	
+easy teleports names	Fishing Guild	replacementSkillsFishingGuild	enableSkillsNecklace	
+easy teleports names	Mining Guild	replacementSkillsMiningGuild	enableSkillsNecklace	
+easy teleports names	Crafting Guild	replacementSkillsCraftingGuild	enableSkillsNecklace	
+easy teleports names	Cooking Guild	replacementSkillsCookingGuild	enableSkillsNecklace	
+easy teleports names	Woodcutting Guild	replacementSkillsWoodcuttingGuild	enableSkillsNecklace	
+easy teleports names	Farming Guild	replacementSkillsFarmingGuild	enableSkillsNecklace	
+easy teleports names	Teleport to the Stronghold Slayer Cave	replacementSlayerStronghold	enableSlayerRing	Gnome Stronghold Caves
+easy teleports names	Stronghold Slayer Cave	replacementSlayerStronghold	enableSlayerRing	Gnome Stronghold Caves
+easy teleports names	Stronghold	replacementSlayerStronghold	enableSlayerRing	Gnome Stronghold Caves
+easy teleports names	Teleport to the Morytania Slayer Tower	replacementSlayerTower	enableSlayerRing	Slayer Tower
+easy teleports names	Morytania Slayer Tower	replacementSlayerTower	enableSlayerRing	Slayer Tower
+easy teleports names	Teleport to the Rellekka Slayer Caves	replacementSlayerRellekka	enableSlayerRing	Rellekka Caves
+easy teleports names	Slayer Tower	replacementSlayerTower	enableSlayerRing	Slayer Tower
+easy teleports names	Teleport to the Fremennik Slayer Dungeon	replacementSlayerRellekka	enableSlayerRing	Rellekka Caves
+easy teleports names	Fremennik Slayer Dungeon	replacementSlayerRellekka	enableSlayerRing	Rellekka Caves
+easy teleports names	Fremennik Dungeon	replacementSlayerRellekka	enableSlayerRing	Rellekka Caves
+easy teleports names	Teleport to Tarn's Lair	replacementTarns	enableSlayerRing	Haunted Mine
+easy teleports names	Tarn's Lair	replacementTarns	enableSlayerRing	Haunted Mine
+easy teleports names	Teleport to Dark Beasts	replacementDarkBeasts	enableSlayerRing	ME2 Caves
+easy teleports names	Dark Beasts	replacementDarkBeasts	enableSlayerRing	ME2 Caves
+easy teleports names	Demons' Run	replacementAncientShardDemonsRun	enableAncientShard	NE - Lesser demons
+easy teleports names	Dragons' Den	replacementAncientShardDragonsDen	enableAncientShard	NW - Brutal blue dragons
+easy teleports names	Reeking Cove	replacementAncientShardReekingCove	enableAncientShard	SW - Deviant spectres
+easy teleports names	The Shallows	replacementAncientShardTheShallows	enableAncientShard	SE - King sand crabs
+easy teleports names	Activate	replacementDiskOfReturningActivate	enableDiskOfReturning	
+easy teleports names	Blackout	replacementDiskOfReturningBlackout	enableDiskOfReturning	
+easy teleports names	Trollheim	replacementGhommalTrollheim	enableGhommalsHilt	<col=2a94ae>God Wars</col>
+easy teleports names	Mor Ul Rek	replacementGhommalMorUlRek	enableGhommalsHilt	<col=ff0000>The Inferno</col>
+easy teleports names	Bryophyta's lair	replacementBryophyta	enableGiantsoulAmulet	<col=2aae4f>Bryo</col>
+easy teleports names	Obor's lair	replacementObor	enableGiantsoulAmulet	<col=ffca00>Obor</col>
+easy teleports names	Branda and Eldric's lair	replacementBrandaAndEldric	enableGiantsoulAmulet	<col=ff0000>Royal</col> <col=2a94ae>Titans</col>
+easy teleports names	Bryophyta	replacementBryophyta	enableGiantsoulAmulet	<col=2aae4f>Bryo</col>
+easy teleports names	Obor	replacementObor	enableGiantsoulAmulet	<col=ffca00>Obor</col>
+easy teleports names	Branda and Eldric	replacementBrandaAndEldric	enableGiantsoulAmulet	<col=ff0000>Royal</col> <col=2a94ae>Titans</col>
+easy teleports names	Launch	replacementPodLaunch	enableGrandSeedPod	Gnome Glider
+easy teleports names	Squash	replacementPodSquash	enableGrandSeedPod	Grand Tree (King Narnode)
+easy teleports names	Darkfrost	replacementDarkfrost	enablePendantOfAtes	<col=2a94ae>Hueycoatl</col>
+easy teleports names	Twilight Temple	replacementTwilightTemple	enablePendantOfAtes	<col=ae2a2a>Amoxliatl</col>
+easy teleports names	Ralos' Rise	replacementRalosRise	enablePendantOfAtes	<col=ae8b2a>Moons of Peril</col>
+easy teleports names	North Aldarin	replacementNorthAldarin	enablePendantOfAtes	<col=8800ff>Mastering Mixology</col>
+easy teleports names	Kastori	replacementKastori	enablePendantOfAtes	<col=65684f>Gemstone Crab</col>
+easy teleports names	Nemus Retreat	replacementNemusRetreat	enablePendantOfAtes	<col=80b37c>Vale Totems</col>
+easy teleports names	Jalsavrah	replacementJalsavrah	enablePharaohSceptre	Pyramid Plunder
+easy teleports names	Jaleustrophos	replacementJaleustrophos	enablePharaohSceptre	Agility Pyramid
+easy teleports names	Jaldraocht	replacementJaldraocht	enablePharaohSceptre	Ancients Pyramid
+easy teleports names	Jaltevas	replacementJaltevas	enablePharaohSceptre	Necropolis
+easy teleports names	Air Altar	replacementAirAltar	enableRingOfTheElements	<col=ffffff>Air Altar</col>
+easy teleports names	Water Altar	replacementWaterAltar	enableRingOfTheElements	<col=2a94ae>Water Altar</col>
+easy teleports names	Earth Altar	replacementEarthAltar	enableRingOfTheElements	<col=2aae4f>Earth Altar</col>
+easy teleports names	Fire Altar	replacementFireAltar	enableRingOfTheElements	<col=ff0000>Fire Altar</col>
+easy teleports names	The Pandemonium	replacementSailorsPandemonium	enableSailorsAmulet	
+easy teleports names	Port Roberts	replacementSailorsPortRoberts	enableSailorsAmulet	
+easy teleports names	Deepfin Point	replacementSailorsDeepfinPoint	enableSailorsAmulet	
+easy teleports names	Red Rock	replacementSailorsRedRock	enableSailorsAmulet	
+easy teleports names	Xeric's Lookout	replacementLookout	enableXericsTalisman	Shayzien
+easy teleports names	Xeric's Glade	replacementGlade	enableXericsTalisman	Hosidius
+easy teleports names	Xeric's Inferno	replacementInferno	enableXericsTalisman	Lovakengj
+easy teleports names	Xeric's Heart	replacementHeart	enableXericsTalisman	Kourend Castle
+easy teleports names	Xeric's Honour	replacementHonour	enableXericsTalisman	Chambers of Xeric
+easy teleports names	Enakhra's Temple	replacementCamuletEnakhrasTemple	enableCamulet	Inside Enakhra's Temple
+easy teleports names	Enakhra's Temple Entrance	replacementCamuletEnakhrasTempleEntrance	enableCamulet	Bandit Camp Quarry
+easy teleports names	Temple	replacementCamuletEnakhrasTemple	enableCamulet	Inside Enakhra's Temple
+easy teleports names	Surface	replacementCamuletEnakhrasTempleEntrance	enableCamulet	Bandit Camp Quarry
+easy teleports names	Ver Sinhaza	replacementVerSinhaza	enableDrakans	Theatre of Blood
+easy teleports names	Darkmeyer	replacementDarkmeyer	enableDrakans	Vampyre City
+easy teleports names	Slepe	replacementSlepe	enableDrakans	Nightmare
+easy teleports names	Castle Drakan	replacementCastleDrakan	enableDrakans	Castle Drakan
+easy teleports names	Rellekka	replacementLyreRellekka	enableEnchantedLyre	
+easy teleports names	Waterbirth Island	replacementLyreWaterbirthIsland	enableEnchantedLyre	
+easy teleports names	Neitiznot	replacementLyreNeitiznot	enableEnchantedLyre	
+easy teleports names	Jatizso	replacementLyreJatizso	enableEnchantedLyre	
+easy teleports names	Jatiszo	replacementLyreJatizso	enableEnchantedLyre	
+easy teleports names	Prifddinas	replacementEternalPrifddinas	enableEternalTeleportCrystal	<col=2a94ae>Prifddinas</col>
+easy teleports names	Lletya	replacementEternalLletya	enableEternalTeleportCrystal	<col=2aae4f>Lletya</col>
+easy teleports names	Lunch by the Lancalliums	replacementLancalliums	enableKharedstsMemoirs	<col=2aae4f>Hosidius</col>
+easy teleports names	The Fisher's Flute	replacementFishers	enableKharedstsMemoirs	<col=2a94ae>Port Piscarilius</col>
+easy teleports names	History and Hearsay	replacementHistory	enableKharedstsMemoirs	<col=ae2a2a>Shayzien</col>
+easy teleports names	Jewellery of Jubilation	replacementJubilation	enableKharedstsMemoirs	<col=ae842a>Lovakengj</col>
+easy teleports names	A Dark Disposition	replacementDisposition	enableKharedstsMemoirs	<col=8800ff>Arceuus</col>
+easy teleports names	'Lunch by the Lancalliums' - Hosidius	replacementLancalliums	enableKharedstsMemoirs	<col=2aae4f>Hosidius</col>
+easy teleports names	'The Fisher's Flute' - Piscarilius	replacementFishers	enableKharedstsMemoirs	<col=2a94ae>Port Piscarilius</col>
+easy teleports names	'History and Hearsay' - Shayzien	replacementHistory	enableKharedstsMemoirs	<col=ae2a2a>Shayzien</col>
+easy teleports names	'Jewellery of Jubilation' - Lovakengj	replacementJubilation	enableKharedstsMemoirs	<col=ae842a>Lovakengj</col>
+easy teleports names	'A Dark Disposition' - Arceuus	replacementDisposition	enableKharedstsMemoirs	<col=8800ff>Arceuus</col>
+easy teleports names	The Ancient Vault	replacementAncientVault	enableRingOfShadows	<col=aea92a>DT2 Vault</col>
+easy teleports names	Ancient Vault	replacementAncientVault	enableRingOfShadows	<col=aea92a>DT2 Vault</col>
+easy teleports names	Ghorrock Dungeon	replacementGhorrockDungeon	enableRingOfShadows	<col=2a94ae>Duke Sucellus</col>
+easy teleports names	The Scar	replacementScar	enableRingOfShadows	<col=ae2a43>Leviathan</col>
+easy teleports names	Lassar Undercity	replacementLassarUndercity	enableRingOfShadows	<col=5f2aae>Whisperer</col>
+easy teleports names	The Stranglewood	replacementStranglewood	enableRingOfShadows	<col=ae2a2a>Vardorvis</col>
+easy teleports names	Warrior's Guild	replacementMaxCapeWarriorsGuild	enableMaxCape	
+easy teleports names	Fishing Guild	replacementMaxCapeFishingGuild	enableMaxCape	
+easy teleports names	Crafting Guild	replacementMaxCapeCraftingGuild	enableMaxCape	<col=ffca00>Crafting Guild</col>
+easy teleports names	Farming Guild	replacementMaxCapeFarmingGuild	enableMaxCape	
+easy teleports names	Otto's Grotto	replacementMaxCapeOttosGrotto	enableMaxCape	Barbarian fishing
+easy teleports names	Carnivorous chinchompas (Feldip Hills)	replacementMaxCapeFeldipHills	enableMaxCape	Red chinchompas
+easy teleports names	Feldip Hills	replacementMaxCapeFeldipHills	enableMaxCape	Red chinchompas
+easy teleports names	Carnivorous chinchompas	replacementMaxCapeFeldipHills	enableMaxCape	Red chinchompas
+easy teleports names	Black Chinchompas (Wilderness)	replacementMaxCapeBlackChinchompas	enableMaxCape	<col=ff0000>Black chinchompas</col>
+easy teleports names	Black chinchompas (Wilderness)	replacementMaxCapeBlackChinchompas	enableMaxCape	<col=ff0000>Black chinchompas</col>
+easy teleports names	Black Chinchompas	replacementMaxCapeBlackChinchompas	enableMaxCape	<col=ff0000>Black chinchompas</col>
+easy teleports names	Black chinchompas	replacementMaxCapeBlackChinchompas	enableMaxCape	<col=ff0000>Black chinchompas</col>
+easy teleports names	Hunter Guild	replacementMaxCapeHunterGuild	enableMaxCape	
+easy teleports names	Tele to POH	replacementMaxCapeHome	enableMaxCape	<col=8800ff>Home</col>
+easy teleports names	Home	replacementMaxCapeHome	enableMaxCape	<col=8800ff>Home</col>
+easy teleports names	Rimmington	replacementMaxCapeRimmington	enableMaxCape	
+easy teleports names	Taverley	replacementMaxCapeTaverley	enableMaxCape	
+easy teleports names	Pollnivneach	replacementMaxCapePollnivneach	enableMaxCape	
+easy teleports names	Hosidius	replacementMaxCapeHosidius	enableMaxCape	
+easy teleports names	Aldarin	replacementMaxCapeAldarin	enableMaxCape	
+easy teleports names	Rellekka	replacementMaxCapeRellekka	enableMaxCape	
+easy teleports names	Brimhaven	replacementMaxCapeBrimhaven	enableMaxCape	
+easy teleports names	Yanille	replacementMaxCapeYanille	enableMaxCape	
+easy teleports names	Prifddinas	replacementMaxCapePrifddinas	enableMaxCape	
+easy teleports names	The Pandemonium	replacementMaxCapePandemonium	enableMaxCape	
+# Core's ClueScrollOverlay.HAS_LIGHT item ids (1.13.2).
+light sources		594	33	32	4531	4534	4524	4539	4550	4702	9065	5013	9804	9805	13137	13138	13139	13140	20720	29777	13280	13342	26824	26826	26828	26830	26832	26834	26836	26838	26840	26842	26844	26846	26848	30363
+# no teleport: minX, minY, maxX, maxY, plane (-1 any), then the varbit that lifts the area once it reaches the value after it.
+# Swimming by Mogre Camp: inventory, gear and spellbook are locked until five rocks weigh the player down; the anchor (2963 9478)
+# climbs out; the cavern and the crab pen, both entered at y 9515 (walked live 2026-10-30), are outside.
+no teleport	swimming by Mogre Camp	2930	9450	3010	9514	1	VarbitID.HUNDRED_PIRATE_ROCKS=1869	5

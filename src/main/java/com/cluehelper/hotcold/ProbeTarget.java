@@ -25,8 +25,8 @@ public class ProbeTarget
 		boolean here;
 	}
 
-	private volatile Target target;
-	private volatile boolean enabled;
+	volatile Target target;
+	volatile boolean enabled;
 
 	/** With the planner off a hot/cold step stays core's, which has no route. */
 	public void setEnabled(boolean planner)

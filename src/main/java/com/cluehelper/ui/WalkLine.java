@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.coords.*;
 import net.runelite.client.callback.ClientThread;
 
 /**
@@ -18,19 +18,19 @@ final class WalkLine
 	private static final int OFF_WALK_TILES = 2;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private WorldWalk walker;
-	private PlannerRunner runner;
+	WorldWalk walker;
+	PlannerRunner runner;
 
-	private WalkGoal goal;
-	private WalkCosts here;
-	private List<WorldPoint> walk = List.of();
+	WalkGoal goal;
+	WalkCosts here;
+	List<WorldPoint> walk = List.of();
 	/** The index of the walk's tile the player last stood nearest. */
-	private int passed;
-	private boolean stale;
+	int passed;
+	boolean stale;
 
 	@Inject
 	void init(ScheduledExecutorService executor, ClientThread clientThread)
@@ -42,7 +42,7 @@ final class WalkLine
 	void follow(WorldView view, WalkCosts here, WalkGoal goal)
 	{
 		boolean newGoal = !goal.equals(this.goal);
-		boolean again = stale || isLeft() || walk.isEmpty() && here != this.here;
+		boolean again = stale || isLeft() || here != this.here && (walk.isEmpty() || !isInSearchedScene());
 		if (newGoal || again && !runner.isWorking())
 		{
 			search(view, here, goal);
@@ -69,17 +69,12 @@ final class WalkLine
 		}
 		WorldPoint at = local.getWorldLocation();
 		int nearestDistance = Integer.MAX_VALUE;
-		LoadedScene live = null;
 		for (int i = passed; i < walk.size(); i++)
 		{
 			WorldPoint tile = walk.get(i);
 			int distance = tile.getPlane() == at.getPlane() ? tile.distanceTo2D(at) : Integer.MAX_VALUE;
 			boolean neighbourTie = distance == nearestDistance && distance == 1;
-			if (neighbourTie && live == null)
-			{
-				live = LoadedScene.capture(client.getTopLevelWorldView());
-			}
-			if (distance < nearestDistance || distance == nearestDistance && !(neighbourTie && isClosedOff(live, at, tile)))
+			if (distance < nearestDistance || distance == nearestDistance && !(neighbourTie && isClosedOff(client.getTopLevelWorldView(), at, tile)))
 			{
 				passed = i;
 				nearestDistance = distance;
@@ -92,9 +87,10 @@ final class WalkLine
 	 * miss the tile in front of the door: standing there, the tile behind a door not yet opened is as near as the one
 	 * before it, but not passed.
 	 */
-	private static boolean isClosedOff(LoadedScene live, WorldPoint at, WorldPoint tile)
+	private static boolean isClosedOff(WorldView view, WorldPoint at, WorldPoint tile)
 	{
-		return live != null && live.contains(at) && live.contains(tile) && !live.canStep(at, tile);
+		return !view.isInstance() && view.contains(at) && view.contains(tile)
+			&& !new WorldArea(at, 1, 1).canTravelInDirection(view, tile.getX() - at.getX(), tile.getY() - at.getY());
 	}
 
 	/** The walk from the player on: from the tile {@link #advance} reached. */
@@ -120,7 +116,7 @@ final class WalkLine
 		this.here = here;
 		stale = false;
 		Player local = client.getLocalPlayer();
-		WalkData.Loaded data = routes.getWalk();
+		WalkData data = routes.getWalk();
 		if (local == null || data == null)
 		{
 			return;
@@ -137,6 +133,18 @@ final class WalkLine
 			walk = found;
 			passed = 0;
 		});
+	}
+
+	/**
+	 * Right after a teleport the walk is searched from the landing with the scene left behind: the world map stands in
+	 * for the landing's surroundings and can miss a way the scene has (past Mount Karuulm's elevator), so the walk is
+	 * searched again once a scene around the player comes.
+	 */
+	private boolean isInSearchedScene()
+	{
+		Player local = client.getLocalPlayer();
+		LoadedScene scene = here == null ? null : here.getScene();
+		return local == null || scene != null && scene.contains(local.getWorldLocation());
 	}
 
 	private boolean isLeft()

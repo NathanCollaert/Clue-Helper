@@ -1,6 +1,6 @@
 package com.cluehelper.hotcold;
 
-import com.cluehelper.ClueHelperConfig;
+import com.cluehelper.*;
 import com.cluehelper.link.*;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
@@ -45,38 +45,38 @@ public class HotColdService
 	private static final int HERE_DRIFT_TILES = 2;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private ProbeTarget probeTarget;
+	ProbeTarget probeTarget;
 	@Inject
-	private StepData stepData;
+	BundledData bundledData;
 	@Inject
-	private StepNeeds stepNeeds;
+	StepNeeds stepNeeds;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private ClueHelperConfig config;
-	private PlannerRunner runner;
-	private MemorySlot<FeelLogs> logs;
-	private final List<Consumer<Planned>> planListeners = new CopyOnWriteArrayList<>();
-	private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
+	ClueHelperConfig config;
+	PlannerRunner runner;
+	MemorySlot<FeelLogs> logs;
+	final List<Consumer<Planned>> planListeners = new CopyOnWriteArrayList<>();
+	final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 
-	private Runnable unregisterStep;
-	private List<Spot> beginnerSpots;
-	private List<Spot> masterSpots;
-	private List<WorldPoint> landingTiles;
-	private boolean planPending;
-	private WorldPoint lastTile;
+	Runnable unregisterStep;
+	List<Spot> beginnerSpots;
+	List<Spot> masterSpots;
+	List<WorldPoint> landingTiles;
+	boolean planPending;
+	WorldPoint lastTile;
 	@Getter
-	private volatile HotColdPlan plan;
-	private volatile Set<String> coreSpots = Set.of();
-	private volatile boolean coreReset;
+	volatile HotColdPlan plan;
+	volatile Set<String> coreSpots = Set.of();
+	volatile boolean coreReset;
 
 	/** A plan with what it was planned from, for replays. */
 	@lombok.Value
@@ -275,7 +275,7 @@ public class HotColdService
 
 	private void submit(Step step)
 	{
-		WalkData.Loaded walk = routes.getWalk();
+		WalkData walk = routes.getWalk();
 		Step landings = walk == null ? null : landingStep(step, walk.getTable());
 		PlanInput landingSearch = landings == null ? null : routes.inputFor(landings, stepNeeds.of(landings));
 		if (landingSearch == null)
@@ -345,7 +345,7 @@ public class HotColdService
 			.requirements(step.getRequirements().plus(HotColdTier.of(step.getTier()).getDevice())).build();
 	}
 
-	private List<Probe> localProbes(WalkData.Loaded walk)
+	private List<Probe> localProbes(WalkData walk)
 	{
 		PlanStart start = routes.getStart();
 		WorldPoint here = player.getPosition().getTile();
@@ -381,8 +381,8 @@ public class HotColdService
 	{
 		if (beginnerSpots == null)
 		{
-			beginnerSpots = Spots.of(stepData.index(), HotColdTier.BEGINNER);
-			masterSpots = Spots.of(stepData.index(), HotColdTier.MASTER);
+			beginnerSpots = Spots.of(bundledData.stepIndex(), HotColdTier.BEGINNER);
+			masterSpots = Spots.of(bundledData.stepIndex(), HotColdTier.MASTER);
 		}
 		return tier == HotColdTier.BEGINNER ? beginnerSpots : masterSpots;
 	}

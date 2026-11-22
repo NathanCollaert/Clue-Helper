@@ -1,6 +1,5 @@
 package com.cluehelper.link;
 
-import com.cluehelper.memory.NpcPlaceMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
@@ -11,9 +10,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.events.PluginChanged;
 import net.runelite.client.plugins.*;
 import net.runelite.client.plugins.cluescrolls.*;
@@ -28,41 +26,40 @@ import net.runelite.client.plugins.cluescrolls.clues.*;
 @Singleton
 public class ClueLink
 {
-	private static final int NO_CLUE_PARAM = -1;
+	/**
+	 * By the quest that places a clue's NPC, the varbit the game's own clue script reads for which of the step's targets
+	 * the NPC stands at, counting from 1 in the targets' order; 0 before the quest places it.
+	 */
+	private static final Map<String, Integer> PLACE_VARBITS = Map.of("CURSE_OF_THE_EMPTY_LORD", VarbitID.SECRET_GHOST_RANDOMISER);
 
 	@Inject
-	private PluginManager pluginManager;
+	PluginManager pluginManager;
 	@Inject
-	private ClueScrollService service;
+	ClueScrollService service;
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepResolver resolver;
+	StepResolver resolver;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private PlayerModel player;
-	@Inject
-	private NpcPlaceMemory npcPlaces;
-	private final LinkState state = new LinkState();
-	private final List<StepListener> listeners = new CopyOnWriteArrayList<>();
-	private final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
+	PlayerModel player;
+	final LinkState state = new LinkState();
+	final List<StepListener> listeners = new CopyOnWriteArrayList<>();
+	final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
 
 	/** Null if the client has no Clue Scroll plugin. */
 	@Getter
-	private volatile ClueScrollPlugin core;
+	volatile ClueScrollPlugin core;
 	/** Null when core has no clue. */
 	@Getter
-	private volatile Step currentStep;
-	private volatile boolean inventoryChanged;
-	private boolean inventoryHoldsClue;
+	volatile Step currentStep;
 
 	/** Swing thread. Core's instance exists even while it is off. */
 	public void start()
 	{
 		core = findCore();
 		currentStep = null;
-		inventoryChanged = true;
 		state.start(isCoreActive());
 	}
 
@@ -76,11 +73,6 @@ public class ClueLink
 	public boolean isActive()
 	{
 		return state.isActive();
-	}
-
-	public boolean needsRead()
-	{
-		return state.needsRead();
 	}
 
 	public boolean hasStep()
@@ -137,36 +129,27 @@ public class ClueLink
 		return c != null && event.getPlugin() == c && state.onPluginChanged(event.isLoaded());
 	}
 
-	public void onItemContainerChanged(ItemContainerChanged event)
-	{
-		if (event.getContainerId() == InventoryID.INV)
-		{
-			inventoryChanged = true;
-		}
-	}
-
 	/**
 	 * Call from a GameTick handler at priority -1.
 	 *
-	 * @return whether anything the box shows changed: active, needs-read or has-step
+	 * @return whether anything the box shows changed: active or has-step
 	 */
 	public boolean onGameTick()
 	{
 		boolean wasActive = state.isActive();
-		boolean neededRead = state.needsRead();
 		boolean hadStep = state.hasStep();
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : Stages.adjusted(npcPlaces.adjusted(resolve(clue)), this::owns, playerTile());
+		Step step = clue == null ? null : Stages.adjusted(atPlacedNpc(resolve(clue)), this::owns, playerTile());
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
-			step == null ? null : List.of(step.getTargets(), step.getStages()), clue == null && carriesClue());
+			step == null ? null : List.of(step.getTargets(), step.getStages()));
 		if (change != StepChange.UNCHANGED)
 		{
 			currentStep = step;
 			listeners.forEach(listener -> listener.onStepChange(change, step));
 		}
-		return wasActive != state.isActive() || neededRead != state.needsRead() || hadStep != state.hasStep();
+		return wasActive != state.isActive() || hadStep != state.hasStep();
 	}
 
 	private Step resolve(ClueScroll clue)
@@ -183,6 +166,19 @@ public class ClueLink
 			}
 			return StepResolver.unreadable(clue);
 		}
+	}
+
+	/** The step at the one target the game placed its NPC at; at all of them before the game has placed it. */
+	private Step atPlacedNpc(Step step)
+	{
+		StepIndex.LearnPlace learn = step.getData().getLearnPlace();
+		if (learn == null)
+		{
+			return step;
+		}
+		int place = client.getVarbitValue(PLACE_VARBITS.get(learn.getQuest()));
+		List<StepIndex.Target> targets = step.getData().getTargets();
+		return place < 1 || place > targets.size() ? step : Stages.atNpc(step, targets.get(place - 1).getNpcs().get(0));
 	}
 
 	private WorldPoint playerTile()
@@ -202,37 +198,6 @@ public class ClueLink
 	{
 		ItemContainer items = client.getItemContainer(containerId);
 		return items != null && items.contains(itemId);
-	}
-
-	/** Client thread only. Whether the inventory holds a clue item, read or not. */
-	public boolean carriesClue()
-	{
-		if (inventoryChanged)
-		{
-			inventoryChanged = false;
-			inventoryHoldsClue = inventoryHoldsClue();
-		}
-		return inventoryHoldsClue;
-	}
-
-	/** A clue item has item param 623, except the shared beginner and master clues, which have none. */
-	private boolean inventoryHoldsClue()
-	{
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		if (inventory == null)
-		{
-			return false;
-		}
-		for (Item item : inventory.getItems())
-		{
-			int id = item.getId();
-			if (id == ItemID.TRAIL_CLUE_BEGINNER || id == ItemID.TRAIL_CLUE_MASTER
-				|| id > 0 && client.getItemDefinition(id).getIntValue(ParamID.CLUE_SCROLL) != NO_CLUE_PARAM)
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private ClueScrollPlugin findCore()
@@ -261,16 +226,14 @@ public class ClueLink
 	static final class LinkState
 	{
 		@Getter
-		private volatile boolean active;
-		private volatile boolean needsRead;
-		private volatile boolean hasStep;
-		private String lastKey;
-		private Object lastTargets;
+		volatile boolean active;
+		volatile boolean hasStep;
+		String lastKey;
+		Object lastTargets;
 
 		void start(boolean coreActive)
 		{
 			hasStep = false;
-			needsRead = false;
 			lastKey = null;
 			lastTargets = null;
 			setActive(coreActive);
@@ -282,21 +245,15 @@ public class ClueLink
 			return setActive(loaded);
 		}
 
-		StepChange tick(boolean coreActive, String key, Object targets, boolean inventoryHoldsClue)
+		StepChange tick(boolean coreActive, String key, Object targets)
 		{
 			setActive(coreActive);
 			String seen = coreActive ? key : null;
-			needsRead = coreActive && seen == null && inventoryHoldsClue;
 			StepChange change = observe(seen, targets);
 			lastKey = seen;
 			lastTargets = seen == null ? null : targets;
 			hasStep = seen != null;
 			return change;
-		}
-
-		boolean needsRead()
-		{
-			return needsRead;
 		}
 
 		boolean hasStep()

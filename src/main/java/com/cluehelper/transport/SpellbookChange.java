@@ -29,6 +29,12 @@ public class SpellbookChange
 	@Builder.Default
 	List<Spend> spends = List.of();
 	Requirements requirements;
+	/** The guide's line before the book it goes to: "Max cape: Spellbook", "Astral altar: Pray". */
+	String text;
+	/** The guide's second line, or null. */
+	String detail;
+	/** What a walk to it heads for: "the Astral altar". */
+	String place;
 
 	public boolean isAnywhere()
 	{

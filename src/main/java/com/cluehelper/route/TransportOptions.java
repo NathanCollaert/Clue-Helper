@@ -3,8 +3,11 @@ package com.cluehelper.route;
 import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 /** The teleports and spellbook changes available on one side of the bank stop, placed by where each is used from. */
+@FieldDefaults(level = AccessLevel.PACKAGE)
 final class TransportOptions
 {
 	/** A row the scroll book rules keep until a bank stop. */
@@ -15,6 +18,7 @@ final class TransportOptions
 	private static final int HOUSE_LOAD_HALF_TICKS = 2;
 
 	/** A teleport or a spellbook change as the search takes it: where it ends, what it costs and what it spends. */
+	@FieldDefaults(level = AccessLevel.PACKAGE)
 	static class Edge
 	{
 		int node = WalkTable.NO_NODE;
@@ -23,9 +27,9 @@ final class TransportOptions
 		int[] amounts;
 		int[] withdraw;
 		List<ItemUse> withdrawUses;
-		RowAvailability.Confidence confidence;
 	}
 
+	@FieldDefaults(level = AccessLevel.PACKAGE)
 	static final class Teleport extends Edge
 	{
 		CatalogRow row;
@@ -34,6 +38,7 @@ final class TransportOptions
 		int maxWilderness;
 	}
 
+	@FieldDefaults(level = AccessLevel.PACKAGE)
 	static final class Change extends Edge
 	{
 		SpellbookChange change;
@@ -253,7 +258,6 @@ final class TransportOptions
 		units.forEach(ctx.resources::used);
 		edge.res = units.keySet().stream().mapToInt(Integer::intValue).toArray();
 		edge.amounts = units.values().stream().mapToInt(Integer::intValue).toArray();
-		edge.confidence = judged.getConfidence();
 		edge.withdrawUses = withdrawUses(witness);
 		edge.withdraw = ids(edge.withdrawUses);
 	}

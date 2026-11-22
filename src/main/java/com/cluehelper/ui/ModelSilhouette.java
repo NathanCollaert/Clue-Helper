@@ -22,7 +22,7 @@ final class ModelSilhouette
 	private static final int NO_ROTATION = 0;
 
 	@Inject
-	private Client client;
+	Client client;
 
 	Shape of(TileObject object)
 	{

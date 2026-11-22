@@ -24,11 +24,10 @@ public class Highlights
 	int spellWidget = -1;
 	/** The spell's teleport is its right-click option (a second landing set with Configure), so it is outlined, not filled. */
 	boolean spellRightClick;
-	/** A scroll book entry, or {@link ScrollBook#NO_WIDGET}. */
-	@Builder.Default
-	int menuWidget = ScrollBook.NO_WIDGET;
+	/** A scroll whose book entry is outlined; null for none. */
+	ScrollBook.Scroll scroll;
 	/** The entry's left click is the step's click: a scroll that teleports with no choice after it, so it is filled. */
-	boolean menuWidgetLeftClick;
+	boolean scrollLeftClick;
 	@Builder.Default
 	StepGuide.Tab tab = StepGuide.Tab.NONE;
 	@Builder.Default

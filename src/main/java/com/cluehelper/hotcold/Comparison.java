@@ -11,7 +11,7 @@ public enum Comparison
 	COLDER("colder");
 
 	@Getter
-	private final String text;
+	final String text;
 
 	public static Comparison of(int distance, int previousDistance)
 	{

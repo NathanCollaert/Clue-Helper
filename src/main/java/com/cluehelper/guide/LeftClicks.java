@@ -39,11 +39,11 @@ public final class LeftClicks
 	private static final int LEFT_CLICK_OBJECT_OPS = 4;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private SwapperClicks swapperClicks;
+	SwapperClicks swapperClicks;
 	/** Kept in the profile, so a hover once is enough for every later session. */
-	private MemorySlot<Learned> remembered;
+	MemorySlot<Learned> remembered;
 
 	@Inject
 	void init(MemoryStore memory)

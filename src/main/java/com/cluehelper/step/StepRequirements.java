@@ -16,18 +16,18 @@ public final class StepRequirements
 	/** The {@code stashObjectId} of a step without a STASH unit. */
 	public static final int NO_STASH = -1;
 
-	private final SpadeNeed spade;
+	final SpadeNeed spade;
 	@Getter(AccessLevel.NONE)
-	private final boolean light;
+	final boolean light;
 	/** The varbit that says the step's fire pit is lit, so no light is needed; -1 for none. */
-	private final int firePitVarbitId;
+	final int firePitVarbitId;
 	/** Core's light-source varbit of a coordinate clue; -1 for none. */
-	private final int lightSourceVarbitId;
-	private final List<ItemRequirement> items;
+	final int lightSourceVarbitId;
+	final List<ItemRequirement> items;
 	/** Items the step's route needs that core's *clue* bank tag doesn't list: Charlie's item. */
-	private final List<ItemRequirement> ownItems;
+	final List<ItemRequirement> ownItems;
 	/** The emote step's STASH unit object, or {@link #NO_STASH}. */
-	private final int stashObjectId;
+	final int stashObjectId;
 
 	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
 		List<ItemRequirement> ownItems, int stashObjectId)
@@ -73,32 +73,5 @@ public final class StepRequirements
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-		if (spade != SpadeNeed.NONE)
-		{
-			text.append("spade");
-		}
-		if (light)
-		{
-			text.append(text.length() > 0 ? ", " : "").append("light");
-			if (firePitVarbitId != -1)
-			{
-				text.append(" (fire pit ").append(firePitVarbitId).append(')');
-			}
-		}
-		if (lightSourceVarbitId != -1)
-		{
-			text.append(text.length() > 0 ? ", " : "").append("light varbit ").append(lightSourceVarbitId);
-		}
-		if (!items.isEmpty())
-		{
-			text.append(text.length() > 0 ? ", " : "").append(items.size()).append(" item requirement").append(items.size() == 1 ? "" : "s");
-		}
-		return text.length() == 0 ? "none" : text.toString();
 	}
 }

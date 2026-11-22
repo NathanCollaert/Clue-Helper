@@ -1,10 +1,12 @@
 package com.cluehelper.transport;
 
-import com.cluehelper.player.Book;
+import com.cluehelper.player.*;
+import com.cluehelper.route.WalkLoader;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.regex.*;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
@@ -21,6 +23,7 @@ public final class CatalogLoader
 	static final List<String> TELEPORT_FILES = List.of("spells.tsv", "home_teleports.tsv", "minigames.tsv", "items.tsv",
 		"fairy_rings.tsv", "poh.tsv", "spirit_trees.tsv", "quetzals.tsv", "rides.tsv", "sailing.tsv");
 	static final String SPELLBOOK_FILE = "spellbooks.tsv";
+	private static final String ITEM_NAMES = "item-names.tsv";
 
 	static final String CATEGORY = "Category";
 	static final String NAME = "Display info";
@@ -68,7 +71,75 @@ public final class CatalogLoader
 		{
 			changes.add(at(SPELLBOOK_FILE, line, () -> spellbookChange(line, parser)));
 		}
-		return new Catalog(List.copyOf(teleports), List.copyOf(changes));
+		Set<Integer> varbits = new TreeSet<>();
+		Set<Integer> varps = new TreeSet<>();
+		for (CatalogRow row : teleports)
+		{
+			Requirements req = row.getRequirements();
+			req.getVars().forEach(check -> (check.getKind() == VarCheck.Kind.VARBIT ? varbits : varps).add(check.getId()));
+			req.getItems().stream().filter(clause -> clause.getWaivedBy() != null)
+				.forEach(clause -> varbits.add(clause.getWaivedBy().getId()));
+		}
+		Set<Integer> items = itemIds(teleports.stream().map(CatalogRow::getRequirements).collect(Collectors.toList()));
+		Set<Integer> named = new TreeSet<>(items);
+		named.addAll(itemIds(gates()));
+		return new Catalog(RowParts.withSingleLandings(teleports), List.copyOf(changes), items, itemNames(named), varbits, varps,
+			housePieces(teleports, changes));
+	}
+
+	/** The nexus, every piece of furniture a row needs, and the in-house spellbook altars. */
+	private static Set<Integer> housePieces(List<CatalogRow> teleports, List<SpellbookChange> changes)
+	{
+		Set<Integer> ids = new TreeSet<>(HouseState.NEXUS_OBJECTS);
+		for (CatalogRow row : teleports)
+		{
+			HouseNeed need = row.getRequirements().getHouse();
+			if (need != null && need.getKind() == HouseNeed.Kind.FURNITURE)
+			{
+				ids.addAll(need.getIds());
+			}
+		}
+		for (SpellbookChange change : changes)
+		{
+			if (change.isInHouse() && change.getObjectId() != SpellbookChange.NO_ID)
+			{
+				ids.add(change.getObjectId());
+			}
+		}
+		return ids;
+	}
+
+	private static Set<Integer> itemIds(List<Requirements> requirements)
+	{
+		return requirements.stream().flatMap(req -> req.getItems().stream()).flatMap(clause -> clause.getBranches().stream())
+			.flatMap(branch -> branch.getIds().stream()).collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	private static List<Requirements> gates()
+	{
+		try
+		{
+			return WalkLoader.gates();
+		}
+		catch (IOException e)
+		{
+			throw new IllegalStateException("can't read the walk gates", e);
+		}
+	}
+
+	/** From the names Clue-Helper-Tools/tools/catalog/item_names.py takes from a cache dump. */
+	private static Map<Integer, String> itemNames(Set<Integer> ids)
+	{
+		Map<Integer, String> all = new HashMap<>();
+		read(ITEM_NAMES).forEach(line -> all.put(Integer.parseInt(line.get("id")), line.get("name")));
+		List<Integer> missing = ids.stream().filter(id -> !all.containsKey(id)).collect(Collectors.toList());
+		if (!missing.isEmpty())
+		{
+			throw new IllegalStateException(ITEM_NAMES + " has no name for " + missing + ": run Clue-Helper-Tools/tools/catalog/item_names.py");
+		}
+		Map<Integer, String> names = new TreeMap<>();
+		ids.forEach(id -> names.put(id, all.get(id)));
+		return names;
 	}
 
 	static List<TsvTable.Line> read(String file)
@@ -87,23 +158,28 @@ public final class CatalogLoader
 		}
 	}
 
+	static Category category(String cell)
+	{
+		return Category.valueOf(cell.trim().toUpperCase(Locale.ROOT).replace(' ', '_'));
+	}
+
 	private static CatalogRow teleport(TsvTable.Line line, RequirementParser parser)
 	{
 		String code = line.get(CODE);
 		String menu = line.get(MENU);
-		return CatalogRow.builder()
+		CatalogRow row = CatalogRow.builder()
 			.name(line.get(NAME))
-			.category(Category.of(line.get(CATEGORY)))
+			.category(category(line.get(CATEGORY)))
 			.origin(tile(line.get(ORIGIN)))
 			.destination(tile(line.get(DESTINATION)))
 			.code(code.isEmpty() ? null : code)
 			.duration(Integer.parseInt(line.get(DURATION)))
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))
 			.spends(spends(line.get(SPENDS)))
-			.requirements(fairyRingStaff(parser.parse(line.getCells())))
-			.menu(menu.isEmpty() ? null : menu)
+			.requirements(wornOnly(parser.parse(line.getCells())))
 			.objectId(objectId(line.get(OBJECT)))
 			.build();
+		return RowParts.of(row, menu.isEmpty() ? null : menu);
 	}
 
 	private static SpellbookChange spellbookChange(TsvTable.Line line, RequirementParser parser)
@@ -132,9 +208,9 @@ public final class CatalogLoader
 		if (built.isInHouse() && built.getObjectId() != SpellbookChange.NO_ID)
 		{
 			HouseNeed piece = new HouseNeed(HouseNeed.Kind.FURNITURE, List.of(built.getObjectId()));
-			return built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
+			built = built.toBuilder().requirements(built.getRequirements().toBuilder().house(piece).build()).build();
 		}
-		return built;
+		return RowParts.of(built);
 	}
 
 	static List<Spend> spends(String cell)
@@ -153,17 +229,24 @@ public final class CatalogLoader
 		return List.copyOf(spends);
 	}
 
-	/** A fairy-ring staff clause counts only when wielded, and not at all once the Lumbridge elite diary is done. */
-	static Requirements fairyRingStaff(Requirements requirements)
+	/**
+	 * A fairy-ring staff clause counts only when wielded, and not at all once the Lumbridge elite diary is done. A
+	 * ghostspeak clause counts only when worn: the ghost captain talks only to a player wearing one.
+	 */
+	static Requirements wornOnly(Requirements requirements)
 	{
 		List<ItemClause> clauses = new ArrayList<>();
 		for (ItemClause clause : requirements.getItems())
 		{
-			boolean staffClause = clause.getBranches().stream()
-				.anyMatch(branch -> branch.getIds().stream().anyMatch(FAIRY_RING_STAVES::contains));
-			clauses.add(staffClause ? clause.wornOnly(LUMBRIDGE_ELITE_DONE) : clause);
+			clauses.add(hasAny(clause, FAIRY_RING_STAVES) ? new ItemClause(clause.getBranches(), true, LUMBRIDGE_ELITE_DONE)
+				: hasAny(clause, Set.of(ItemID.AMULET_OF_GHOSTSPEAK)) ? new ItemClause(clause.getBranches(), true, null) : clause);
 		}
 		return requirements.toBuilder().items(List.copyOf(clauses)).build();
+	}
+
+	private static boolean hasAny(ItemClause clause, Set<Integer> ids)
+	{
+		return clause.getBranches().stream().anyMatch(branch -> branch.getIds().stream().anyMatch(ids::contains));
 	}
 
 	/** The last word of "Travel Spirit tree 26261"; -1 for an empty cell. */

@@ -16,10 +16,10 @@ public final class Ground
 	private static final int[] NO_ROWS = new int[0];
 	private static final int WORLD_TILE_LIMIT = 150_000;
 
-	private final WorldMap map;
-	private final LoadedScene scene;
-	private final WalkTable table;
-	private final IntPredicate rowOpen;
+	final WorldMap map;
+	final LoadedScene scene;
+	final WalkTable table;
+	final IntPredicate rowOpen;
 
 	/** {@code scene}: the loaded scene with its doors open, or null; {@code rowOpen}: by row of {@code table}. */
 	public static Ground world(WorldMap map, LoadedScene scene, WalkTable table, IntPredicate rowOpen)

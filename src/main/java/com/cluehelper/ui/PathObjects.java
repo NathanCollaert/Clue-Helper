@@ -5,6 +5,7 @@ import com.cluehelper.route.*;
 import java.awt.Rectangle;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.Value;
 import net.runelite.api.*;
@@ -34,13 +35,13 @@ final class PathObjects
 	}
 	private static final String OPEN = "Open";
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private AbyssObstacles abyss;
+	AbyssObstacles abyss;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 	@Inject
-	private SceneDoors doors;
+	SceneDoors doors;
 
 	/** Client thread only. Each object with the menu option that takes the path through it. */
 	Map<TileObject, String> along(WorldView view, WalkTable table, List<WorldPoint> path)
@@ -167,15 +168,22 @@ final class PathObjects
 	List<TileObject> sameNamed(WorldView view, TileObject crossed, Rectangle around)
 	{
 		String name = nameOf(crossed);
+		return objectsIn(view, around, crossed.getPlane()).stream().filter(object -> name != null && name.equals(nameOf(object)))
+			.collect(Collectors.toList());
+	}
+
+	/** The objects on the rectangle's tiles, west to east, south to north. */
+	private static List<TileObject> objectsIn(WorldView view, Rectangle around, int plane)
+	{
 		List<TileObject> found = new ArrayList<>();
 		for (int x = around.x; x < around.x + around.width; x++)
 		{
 			for (int y = around.y; y < around.y + around.height; y++)
 			{
-				Tile tile = tile(view, new WorldPoint(x, y, crossed.getPlane()));
+				Tile tile = tile(view, new WorldPoint(x, y, plane));
 				if (tile != null)
 				{
-					SceneObjects.objectsOn(tile).stream().filter(object -> name != null && name.equals(nameOf(object))).forEach(found::add);
+					found.addAll(SceneObjects.objectsOn(tile));
 				}
 			}
 		}
@@ -192,24 +200,13 @@ final class PathObjects
 	{
 		List<Exit> rows = rows(table, from, to);
 		Map<Integer, TileObject> nearestByRow = new LinkedHashMap<>();
-		for (int x = around.x; !rows.isEmpty() && x < around.x + around.width; x++)
+		for (TileObject object : rows.isEmpty() ? List.<TileObject>of() : objectsIn(view, around, from.getPlane()))
 		{
-			for (int y = around.y; y < around.y + around.height; y++)
+			for (Exit row : rows)
 			{
-				Tile tile = tile(view, new WorldPoint(x, y, from.getPlane()));
-				if (tile == null)
+				if (row.getObjectId() >= 0 && isObject(object, row.getObjectId()))
 				{
-					continue;
-				}
-				for (TileObject object : SceneObjects.objectsOn(tile))
-				{
-					for (Exit row : rows)
-					{
-						if (row.getObjectId() >= 0 && isObject(object, row.getObjectId()))
-						{
-							nearestByRow.merge(row.getObjectId(), object, (kept, other) -> nearer(from, to, kept, other));
-						}
-					}
+					nearestByRow.merge(row.getObjectId(), object, (kept, other) -> nearer(from, to, kept, other));
 				}
 			}
 		}

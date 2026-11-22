@@ -15,16 +15,16 @@ import net.runelite.api.coords.WorldPoint;
 final class LineTargets
 {
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private SceneDoors doors;
+	SceneDoors doors;
 
-	private WorldPoint instanceTile;
-	private WalkCosts instanceWalk;
+	WorldPoint instanceTile;
+	WalkCosts instanceWalk;
 
 	/** The outlined object cheapest to walk to: the game walks to the nearest side of the booth or chest clicked. */
 	TileObject object(WorldView view)
@@ -34,7 +34,7 @@ final class LineTargets
 		int bestCost = WalkCosts.UNREACHED;
 		for (TileObject object : guide.getHighlightObjects())
 		{
-			int cost = here == null ? WalkCosts.UNREACHED : here.cost(beside(view, here, object));
+			int cost = here == null ? WalkCosts.UNREACHED : here.cost(walkedTo(view, object));
 			if (best == null || cost < bestCost)
 			{
 				best = object;
@@ -128,19 +128,10 @@ final class LineTargets
 		}
 	}
 
-	private static WorldPoint beside(WorldView view, WalkCosts here, TileObject object)
+	/** Where the game walks to use the object: a side of a game object, either side of a wall's door, else its own tile. */
+	private static WalkGoal walkedTo(WorldView view, TileObject object)
 	{
-		WorldPoint[] sides = wallSides(object);
-		if (sides != null)
-		{
-			return here.cost(sides[0]) <= here.cost(sides[1]) ? sides[0] : sides[1];
-		}
-		if (!(object instanceof GameObject))
-		{
-			return object.getWorldLocation();
-		}
-		WalkGoal goal = objectGoal(view, object);
-		WorldPoint side = here.cheapestBeside(goal.getSouthWest(), goal.getSizeX(), goal.getSizeY());
-		return side != null ? side : object.getWorldLocation();
+		boolean hasSides = object instanceof GameObject || wallSides(object) != null;
+		return hasSides ? objectGoal(view, object) : WalkGoal.tile(object.getWorldLocation());
 	}
 }

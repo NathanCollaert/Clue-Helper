@@ -7,12 +7,10 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.step.*;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.util.*;
 import javax.inject.Inject;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 import net.runelite.client.ui.overlay.*;
@@ -27,24 +25,20 @@ public class WidgetHighlightOverlay extends Overlay
 	/** Per tab: its stone in the fixed, resizable classic and resizable modern layouts. */
 	private static final Map<Tab, int[]> TAB_STONES = Tables.byKey("tab stones", Tab::valueOf, Tables.Row::ids);
 
-	/** The quest list's settings that hide a quest's journal (completed quests, miniquests), by their line in the settings. */
-	private static final Map<Integer, String> QUEST_HIDING_SETTINGS = Map.of(VarbitID.QUESTLIST_HIDE_COMPLETED, "hide completed quests",
-		VarbitID.QUESTLIST_HIDE_MINIQUESTS, "hide miniquests");
-
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private MenuLines menuLines;
+	MenuLines menuLines;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PrayerFilters prayerFilters;
+	PrayerFilters prayerFilters;
 
 	WidgetHighlightOverlay()
 	{
@@ -67,7 +61,7 @@ public class WidgetHighlightOverlay extends Overlay
 		guide.getHighlightChoice().forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 		if (config.highlightMenus())
 		{
-			outlineEntry(graphics, guide.getHighlights().getMenuWidget(), guide.getHighlights().isMenuWidgetLeftClick());
+			outlineEntry(graphics, guide.getHighlights().getScroll(), guide.getHighlights().isScrollLeftClick());
 		}
 		if (config.highlightItems())
 		{
@@ -75,11 +69,6 @@ public class WidgetHighlightOverlay extends Overlay
 		}
 		Tab tab = guide.getHighlights().getTab();
 		boolean wanted = tab == Tab.MAGIC ? config.highlightSpells() : config.highlightItems();
-		if (tab == Tab.QUESTS && wanted)
-		{
-			outlineJournal(graphics);
-			return null;
-		}
 		if (tab != Tab.NONE && wanted && !Widgets.shown(client, TAB_CONTENT.get(tab)))
 		{
 			outline(graphics, tabStone(TAB_STONES.get(tab)));
@@ -163,59 +152,6 @@ public class WidgetHighlightOverlay extends Overlay
 		toggles.forEach(widget -> highlighter.box(graphics, widget.getBounds()));
 	}
 
-	/**
-	 * The way to the step's quest journal: the quest tab, its Quest List button, then the quest in the list. A quest the
-	 * list hides (completed, or a miniquest) needs the list's settings, where the lines hiding it are outlined.
-	 */
-	private void outlineJournal(Graphics2D graphics)
-	{
-		Step step = clueLink.getCurrentStep();
-		StepIndex.LearnPlace learn = step == null ? null : step.getData().getLearnPlace();
-		if (learn == null || Widgets.shown(client, InterfaceID.Questjournal.UNIVERSE))
-		{
-			return;
-		}
-		List<String> hiding = QUEST_HIDING_SETTINGS.entrySet().stream().filter(setting -> client.getVarbitValue(setting.getKey()) == 1)
-			.map(Map.Entry::getValue).collect(toList());
-		if (Widgets.shown(client, InterfaceID.Settings.UNIVERSE))
-		{
-			outlineLines(graphics, InterfaceID.Settings.CONTENT, hiding);
-			return;
-		}
-		if (!Widgets.shown(client, InterfaceID.SideJournal.UNIVERSE))
-		{
-			outline(graphics, tabStone(TAB_STONES.get(Tab.QUESTS)));
-			return;
-		}
-		if (!Widgets.shown(client, InterfaceID.Questlist.LIST))
-		{
-			outline(graphics, InterfaceID.SideJournal.QUEST_LIST);
-			return;
-		}
-		Widget quest = Widgets.descendants(client.getWidget(InterfaceID.Questlist.LIST)).stream()
-			.filter(line -> Widgets.visible(line) && line.getText() != null && Text.removeTags(line.getText()).equalsIgnoreCase(learn.getJournal()))
-			.findFirst().orElse(null);
-		if (quest == null || !hiding.isEmpty())
-		{
-			outline(graphics, InterfaceID.Questlist.SETTINGS_BUTTON);
-			return;
-		}
-		Widget shownPart = client.getWidget(InterfaceID.Questlist.LIST_CONTAINER);
-		Rectangle bounds = shownPart == null ? quest.getBounds() : quest.getBounds().intersection(shownPart.getBounds());
-		if (!bounds.isEmpty())
-		{
-			highlighter.box(graphics, bounds);
-		}
-	}
-
-	/** The lines of an open interface whose text has one of the phrases. */
-	private void outlineLines(Graphics2D graphics, int parentId, List<String> phrases)
-	{
-		Widgets.descendants(client.getWidget(parentId)).stream()
-			.filter(widget -> Widgets.visible(widget) && phrases.stream().anyMatch(phrase -> plainText(widget).contains(phrase)))
-			.forEach(widget -> highlighter.box(graphics, widget.getBounds()));
-	}
-
 	/** Lower case without tags; "" for a widget without text. */
 	private static String plainText(Widget widget)
 	{
@@ -239,12 +175,16 @@ public class WidgetHighlightOverlay extends Overlay
 	 * A scroll book entry gets its scroll's outline, from the item's icon scaled to the book's larger model of it, and
 	 * MenuLines colours its name and charges.
 	 */
-	private void outlineEntry(Graphics2D graphics, int widgetId, boolean leftClick)
+	private void outlineEntry(Graphics2D graphics, ScrollBook.Scroll scroll, boolean leftClick)
 	{
-		Widget picture = widgetId < 0 ? null : client.getWidget(ScrollBook.picture(widgetId));
+		if (scroll == null)
+		{
+			return;
+		}
+		Widget picture = client.getWidget(scroll.getPicture());
 		if (picture == null || picture.isHidden() || picture.getItemId() <= 0)
 		{
-			outline(graphics, widgetId);
+			outline(graphics, scroll.getEntry());
 			return;
 		}
 		highlighter.itemScaled(graphics, picture.getItemId(), picture.getBounds(), leftClick);

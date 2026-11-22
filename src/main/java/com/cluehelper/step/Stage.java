@@ -19,8 +19,6 @@ public class Stage
 		PART,
 		/** A skill challenge's task; done once core marks the challenge completed. */
 		TASK,
-		/** Read where the step's NPC is (a quest journal); done once its place is learned. */
-		LEARN,
 		/** The step's own target, done last. */
 		FINAL
 	}
@@ -36,6 +34,11 @@ public class Stage
 	int radius;
 	/** The key: the stage is done once it is carried. Null for other stages. */
 	ItemRequirement item;
+	/** Baked for {@link #item}: the key's id, or any of a way in's item ids. */
+	@Builder.Default
+	List<Integer> itemIds = List.of();
+	/** Baked for {@link #item}: a way in's item by name; null for a key. */
+	String itemName;
 	/** Any of these owned anywhere, the bank too, skips the stage: the way in's requires bring it from there. */
 	@Builder.Default
 	Set<Integer> skippedWhenOwned = Set.of();
@@ -75,6 +78,8 @@ public class Stage
 	/** NPCs the stage is done with: outlined, and the walk ends on them. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
+	/** What the objects or NPCs are called in the game ("anvil"), for the walk there; null when they go by several names. */
+	String targetName;
 	/** Per tile, core's items that place takes others in place of (the True Blood Altar takes pure essence). */
 	@Builder.Default
 	Map<WorldPoint, List<StepIndex.Alternative>> uses = Map.of();

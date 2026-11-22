@@ -4,76 +4,43 @@ import com.cluehelper.Tables;
 import com.cluehelper.player.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.NpcID;
-import net.runelite.api.gameval.ObjectID;
 import static java.util.stream.Collectors.*;
 
 /** What to click for a catalog row: its object or NPC and menu path, its held items, or its spell's button. Client thread only. */
-@Slf4j
 @Singleton
 final class RowTargets
 {
 	static final String SIGNAL_OPTION = "Signal";
 
-	private static final String TRAVEL_OPTION = "Travel";
-	private static final String TREE_OPTION = "Tree";
 	private static final String SPELLBOOK_OPTION = "Spellbook";
 	private static final int PARAM_SPELL_WIDGET = 596;
 	/** Catalog landings spread 0–2 tiles, so another menu's line within this lands at the same place. */
 	private static final int SAME_LANDING_TILES = 3;
-	/** The patch objects are multilocs on their transmit varbits; the grown tree is the form they show. */
-	private static final Set<Integer> PLANTED_SPIRIT_TREES = Tables.idSet("planted spirit trees");
 	/** Minigame Teleport is a spell on every book, so it is cast rather than picked from the Grouping tab. */
 	private static final Map<Book, Integer> MINIGAME_SPELLS = Tables.byKey("minigame spells", Book::valueOf, row -> row.id(0));
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private AvailabilityService availability;
-	private final Map<String, Integer> spellWidgets = new HashMap<>();
+	AvailabilityService availability;
 
 	/** The row's object or NPC, with the menu its catalog line names. */
 	MenuTarget located(CatalogRow row)
 	{
-		Set<Integer> objects = objectsOf(row);
-		MenuTarget.MenuTargetBuilder target = MenuTarget.builder().objectIds(objects);
-		String menu = row.getMenu();
-		if (menu == null)
-		{
-			return target.build();
-		}
-		String[] parts = menu.split(" ", 2);
-		boolean outside = !row.isInHouse();
-		switch (parts[0])
-		{
-			case "quetzal":
-				return MenuTarget.quetzal(row.quetzalTableId()).toBuilder().objectIds(objects)
-					.npcIds(Set.of(NpcID.QUETZAL_CHILD_GREEN)).path(List.of(TRAVEL_OPTION)).build();
-			case "list":
-				return target.path(listPath(row, outside, parts[1])).build();
-			case "nexus":
-			{
-				String[] nexus = parts[1].split(" ", 2);
-				return MenuTarget.nexus(Integer.parseInt(nexus[0]), nexus[1], row.nexusPlace()).toBuilder()
-					.objectIds(objects).build();
-			}
-			case "box":
-				// The ornate box's own option repeats the last place it sent the player to: one click when it's this one.
-				return MenuTarget.box(Integer.parseInt(parts[1])).toBuilder().objectIds(objects)
-					.path(List.of(row.destination())).build();
-			case "npc":
-				return MenuTarget.builder().npcIds(Set.of(row.getObjectId())).path(List.of(parts[1].split(CatalogRow.MENU_STEP))).build();
-			default:
-				return target.path(List.of(parts[1].split(CatalogRow.MENU_STEP))).build();
-		}
+		return line(row).objectIds(row.getObjects()).npcIds(row.getNpcs()).path(row.getClicks()).build();
+	}
+
+	/** The menu line the row picks, by its kind and what identifies it. */
+	static MenuTarget.MenuTargetBuilder line(CatalogRow row)
+	{
+		return MenuTarget.builder().line(row.getLine()).lineId(row.getLineId()).lineKey(row.getLineKey()).lineName(row.getLineName())
+			.icon(row.getIcon());
 	}
 
 	/** The teleport's object, with the house furniture that lands at the same place as alternatives. */
@@ -89,15 +56,9 @@ final class RowTargets
 	MenuTarget heldTeleport(SubStep teleport, Set<Integer> held)
 	{
 		CatalogRow row = teleport.getRow();
-		List<String> path = optionPath(row);
-		MenuTarget.MenuTargetBuilder target = row.isQuetzalMap()
-			? MenuTarget.quetzal(row.quetzalTableId()).toBuilder().path(List.of(SIGNAL_OPTION))
-			: MenuTarget.builder().path(path.isEmpty() ? wornOption(held) : path);
-		if (row.boatDock() != null)
-		{
-			target.line(MenuTarget.Line.BOAT).lineName(row.boatDock());
-		}
-		return withItems(target, held).alternatives(sameLanding(teleport)).build();
+		List<String> path = row.getLine() == MenuLine.QUETZAL ? List.of(SIGNAL_OPTION)
+			: row.getOptions().isEmpty() ? wornOption(held) : row.getOptions();
+		return withItems(line(row).path(path), held).alternatives(sameLanding(teleport)).build();
 	}
 
 	/**
@@ -134,44 +95,6 @@ final class RowTargets
 		return withItems(MenuTarget.builder(), itemIds).path(List.of(option)).build();
 	}
 
-	/** The options the row's name lists after its item, one per colon. */
-	List<String> optionPath(CatalogRow row)
-	{
-		String[] parts = row.getName().split(": ");
-		return parts.length < 2 ? List.of() : List.of(parts).subList(1, parts.length);
-	}
-
-	boolean hasOneDestination(SubStep current)
-	{
-		return current != null && current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
-			&& optionPath(current.getRow()).isEmpty();
-	}
-
-	/**
-	 * The row's name ends in where its items land, and they land nowhere else, so it holds no option to pick (Shortest
-	 * Path's "Royal seed pod: Grand Tree"): any left click of the item's own is the teleport.
-	 */
-	boolean namesItsOnlyLanding(SubStep current)
-	{
-		if (current == null || current.getKind() != SubStep.Kind.TELEPORT || current.getRow() == null)
-		{
-			return false;
-		}
-		CatalogRow row = current.getRow();
-		Set<Integer> items = itemIds(row);
-		return !items.isEmpty() && !optionPath(row).isEmpty() && availability.getCatalog().stream()
-			.noneMatch(other -> !Objects.equals(other.getDestination(), row.getDestination())
-				&& !Collections.disjoint(itemIds(other), items));
-	}
-
-	private static Set<Integer> itemIds(CatalogRow row)
-	{
-		return row.getRequirements().getItems().stream()
-			.flatMap(clause -> clause.getBranches().stream())
-			.flatMap(branch -> branch.getIds().stream())
-			.collect(Collectors.toSet());
-	}
-
 	/** The row's carried items; runes are left out, as the spell widget covers those. */
 	List<ItemUse> heldUses(CatalogRow row)
 	{
@@ -196,26 +119,8 @@ final class RowTargets
 	/** -1 when none is known. */
 	int spellWidget(CatalogRow row)
 	{
-		RuneModel runes = player.getRuneModel();
-		if (runes == null)
-		{
-			return -1;
-		}
-		return spellWidgets.computeIfAbsent(row.getName(), name ->
-		{
-			String spellName = spellName(name);
-			Book book = row.getRequirements().getBook();
-			for (Spell spell : runes.getSpells())
-			{
-				if (spell.getName().equalsIgnoreCase(spellName) && (book == null || spell.getBook() == book))
-				{
-					int widget = client.getItemDefinition(spell.getObj()).getIntValue(PARAM_SPELL_WIDGET);
-					return widget > 0 ? widget : -1;
-				}
-			}
-			log.debug("no spell widget for {}", name);
-			return -1;
-		});
+		int widget = row.getSpellObj() < 0 ? -1 : client.getItemDefinition(row.getSpellObj()).getIntValue(PARAM_SPELL_WIDGET);
+		return widget > 0 ? widget : -1;
 	}
 
 	int minigameSpellWidget(Book book)
@@ -239,44 +144,14 @@ final class RowTargets
 			return List.of();
 		}
 		return availability.getCarried().available().stream().map(RowAvailability::getRow)
-			.filter(row -> row.isInHouse() && row.getMenu() != null && row != current.getRow() && row.getDestination() != null
+			.filter(row -> row.isInHouse() && hasMenu(row) && row != current.getRow() && row.getDestination() != null
 				&& PositionRules.near(row.getDestination(), landing, SAME_LANDING_TILES))
 			.map(this::located).collect(toUnmodifiableList());
 	}
 
-	/** On the house's spiritual fairy tree "Ring-configure" opens a list too, so the Tree option is named. */
-	private static List<String> listPath(CatalogRow row, boolean outside, String line)
+	/** Furniture with no option or menu line to pick is used by its left click: the portal chamber's portals. */
+	private static boolean hasMenu(CatalogRow row)
 	{
-		if (outside)
-		{
-			return List.of(TRAVEL_OPTION, line);
-		}
-		return row.getCategory() == Category.SPIRIT_TREE ? List.of(TREE_OPTION, line) : List.of(line);
-	}
-
-	private static Set<Integer> objectsOf(CatalogRow row)
-	{
-		HouseNeed need = row.isInHouse() ? row.getRequirements().getHouse() : null;
-		if (need != null)
-		{
-			return Set.copyOf(need.getKind() == HouseNeed.Kind.NEXUS ? HouseState.NEXUS_OBJECTS : need.getIds());
-		}
-		if (row.getObjectId() == ObjectID.SPIRIT_TREE_FULLYGROWN)
-		{
-			return PLANTED_SPIRIT_TREES;
-		}
-		return row.getObjectId() < 0 ? Set.of() : Set.of(row.getObjectId());
-	}
-
-	private static String spellName(String rowName)
-	{
-		String name = rowName;
-		int colon = name.indexOf(':');
-		if (colon >= 0)
-		{
-			name = name.substring(0, colon);
-		}
-		int bracket = name.indexOf(" (");
-		return bracket >= 0 ? name.substring(0, bracket) : name;
+		return row.getLine() != MenuLine.LABEL || !row.getClicks().isEmpty();
 	}
 }

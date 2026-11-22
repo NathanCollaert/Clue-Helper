@@ -40,126 +40,117 @@ public class ClueHelperPlugin extends Plugin
 	private static final String GUIDE_BOX_KEY = "guideBox";
 
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 
 	@Inject
-	private MemoryStore memory;
+	MemoryStore memory;
 
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 
 	@Inject
-	private StashMemory stashMemory;
+	StashMemory stashMemory;
 
 	@Inject
-	private CheckLines checkLines;
+	CheckLines checkLines;
 
 	@Inject
-	private SpiritTreeMemory spiritTrees;
+	GrownPatches grownPatches;
 
 	@Inject
-	private GrownPatches grownPatches;
+	UnlockMemory unlocks;
 
 	@Inject
-	private UnlockMemory unlocks;
+	KeyRingMemory keyRing;
 
 	@Inject
-	private KeyRingMemory keyRing;
+	PohService poh;
 
 	@Inject
-	private NpcPlaceMemory npcPlaces;
+	PlayerModel playerModel;
 
 	@Inject
-	private FairyRingMemory fairyRings;
+	AvailabilityService availability;
 
 	@Inject
-	private PohService poh;
+	BundledData bundledData;
 
 	@Inject
-	private PlayerModel playerModel;
+	PlannerRunner planner;
 
 	@Inject
-	private AvailabilityService availability;
+	RoutePlanner routes;
 
 	@Inject
-	private CatalogData catalog;
+	StepGuide guide;
 
 	@Inject
-	private PlannerRunner planner;
+	ActWatcher actWatcher;
 
 	@Inject
-	private RoutePlanner routes;
+	HotColdService hotCold;
 
 	@Inject
-	private StepGuide guide;
+	ClientThread clientThread;
 
 	@Inject
-	private ActWatcher actWatcher;
+	Client client;
 
 	@Inject
-	private HotColdService hotCold;
+	ClueHelperConfig config;
 
 	@Inject
-	private ClientThread clientThread;
+	ConfigManager configManager;
 
 	@Inject
-	private Client client;
+	OverlayManager overlayManager;
 
 	@Inject
-	private ClueHelperConfig config;
+	ItemHighlightOverlay itemOverlay;
 
 	@Inject
-	private ConfigManager configManager;
+	WidgetHighlightOverlay widgetOverlay;
 
 	@Inject
-	private OverlayManager overlayManager;
+	MenuLineOverlay menuLineOverlay;
 
 	@Inject
-	private ItemHighlightOverlay itemOverlay;
+	FurnitureOverlay furnitureOverlay;
 
 	@Inject
-	private WidgetHighlightOverlay widgetOverlay;
+	WanderAreaOverlay wanderAreaOverlay;
 
 	@Inject
-	private MenuLineOverlay menuLineOverlay;
+	MenuLines menuLines;
 
 	@Inject
-	private FurnitureOverlay furnitureOverlay;
+	EasyTeleportsNames easyTeleportsNames;
 
 	@Inject
-	private WanderAreaOverlay wanderAreaOverlay;
+	WaypointOverlay waypointOverlay;
 
 	@Inject
-	private MenuLines menuLines;
+	MinimapPathOverlay minimapPathOverlay;
 
 	@Inject
-	private WaypointOverlay waypointOverlay;
+	GuideOverlay guideOverlay;
+	@Inject
+	GuideBoxPresenter box;
+	@Inject
+	CoreBoxMerge coreBoxMerge;
 
 	@Inject
-	private MinimapPathOverlay minimapPathOverlay;
+	SceneDoors sceneDoors;
 
 	@Inject
-	private GuideOverlay guideOverlay;
-	@Inject
-	private GuideBoxPresenter box;
-	@Inject
-	private CoreBoxMerge coreBoxMerge;
+	WithdrawTab withdrawTab;
 
 	@Inject
-	private SceneDoors sceneDoors;
-
-	@Inject
-	private WithdrawTab withdrawTab;
-
-	@Inject
-	private RouteReport routeReport;
-
-	@Inject
-	private JournalScroll journalScroll;
+	RouteReport routeReport;
 
 
-	private final List<Runnable> unregister = new ArrayList<>();
-	private boolean shownWorking;
+	final List<Runnable> unregister = new ArrayList<>();
+	boolean shownWorking;
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -175,9 +166,8 @@ public class ClueHelperPlugin extends Plugin
 		clueLink.start();
 		playerModel.start();
 		poh.start();
-		clientThread.invokeLater(this::publishMemories);
 		availability.start();
-		catalog.get().thenAccept(loaded -> availability.setCatalog(loaded.getTeleports()));
+		bundledData.getCatalog().thenAccept(availability::setCatalog);
 		routes.start();
 		guide.start();
 		hotCold.start();
@@ -230,8 +220,6 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe(priority = -1)
 	public void onGameTick(GameTick tick)
 	{
-		npcPlaces.onGameTick();
-		journalScroll.onGameTick();
 		if (clueLink.onGameTick())
 		{
 			box.refresh();
@@ -239,9 +227,7 @@ public class ClueHelperPlugin extends Plugin
 		}
 		bankMemory.onGameTick();
 		poh.onGameTick();
-		menuLines.takeFreshList(spiritTrees::onListMenu);
-		spiritTrees.onGameTick();
-		fairyRings.onGameTick();
+		menuLines.takeFreshList(grownPatches::onListMenu);
 		unlocks.onGameTick();
 		playerModel.onGameTick();
 		availability.onGameTick();
@@ -259,7 +245,6 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		clueLink.onItemContainerChanged(event);
 		actWatcher.onItemContainerChanged(event);
 		playerModel.onItemContainerChanged(event);
 		bankMemory.onItemContainerChanged(event);
@@ -284,7 +269,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
-		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getMenuWidget(), config.highlightMenus());
+		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getScroll(), config.highlightMenus());
 	}
 
 	/** Runs after Menu Entry Swapper's swaps, so the menu's top entry is the real left click. */
@@ -292,11 +277,6 @@ public class ClueHelperPlugin extends Plugin
 	public void onPostMenuSort(PostMenuSort event)
 	{
 		guide.onPostMenuSort();
-		MenuEntry[] entries = client.getMenu().getMenuEntries();
-		if (!client.isMenuOpen() && entries.length > 0)
-		{
-			fairyRings.onMenuEntries(new MenuEntry[]{entries[entries.length - 1]});
-		}
 	}
 
 	/** Runs after other plugins build the menu; only colours our option, never adds, removes or reorders entries. */
@@ -309,7 +289,6 @@ public class ClueHelperPlugin extends Plugin
 		{
 			menuLines.colourMenu(pathObject, config.highlightMenus());
 		}
-		fairyRings.onMenuEntries(event.getMenuEntries());
 	}
 
 	/** Reads the menu scripts' arguments before better-teleport-menu (priority 1) rewrites them. */
@@ -331,9 +310,7 @@ public class ClueHelperPlugin extends Plugin
 	{
 		stashMemory.onMenuOptionClicked(event);
 		keyRing.onMenuOptionClicked(event);
-		npcPlaces.onMenuOptionClicked(event);
 		sceneDoors.onMenuOptionClicked(event);
-		fairyRings.onMenuOptionClicked(event);
 		bankMemory.onMenuOptionClicked(event);
 		poh.onMenuOptionClicked(event);
 		guide.onMenuOptionClicked(event);
@@ -387,9 +364,10 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
+		easyTeleportsNames.onConfigChanged(event);
 		if (grownPatches.isOurs(event))
 		{
-			clientThread.invokeLater(grownPatches::publish);
+			playerModel.onGrownPatchChanged();
 		}
 		if (!ClueHelperConfig.GROUP.equals(event.getGroup()))
 		{
@@ -414,7 +392,6 @@ public class ClueHelperPlugin extends Plugin
 		bankMemory.onProfileChanged();
 		poh.onProfileChanged();
 		hotCold.onProfileChanged();
-		publishMemories();
 	}
 
 	/** A player who turned the old "Show the box" off keeps no box. */
@@ -436,15 +413,6 @@ public class ClueHelperPlugin extends Plugin
 	private void mergeCoreBox()
 	{
 		coreBoxMerge.apply(clueLink.isActive() ? clueLink.getCore() : null);
-	}
-
-	private void publishMemories()
-	{
-		spiritTrees.publish();
-		grownPatches.publish();
-		fairyRings.publish();
-		unlocks.publish();
-		keyRing.publish();
 	}
 
 	private Overlay[] overlays()

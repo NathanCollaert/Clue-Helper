@@ -9,6 +9,7 @@ final class WalkSearch
 	static final int UNREACHED = Integer.MAX_VALUE;
 	static final int NONE = -1;
 	private static final int BUCKETS = 1024;
+	private static final int[] NO_ROWS = {};
 
 	/** Told of each tile as its cost settles: the cost after which the search may stop, or {@link #UNREACHED}. */
 	interface Stop
@@ -16,19 +17,21 @@ final class WalkSearch
 		int after(int tile, int cost);
 	}
 
-	private final Ground ground;
-	private final int maxCost;
-	private final boolean exitsEnd;
-	private final int slotMask;
-	private final int slotShift;
-	private final int[] keys;
-	private final int[] costs;
-	private final int[] parents;
-	private final int[] vias;
-	private final boolean[] used;
-	private final IntList exitLandings = new IntList();
-	private int reached;
-	private int settledBelow;
+	final Ground ground;
+	final int maxCost;
+	final boolean exitsEnd;
+	final boolean stepsOnly;
+	final int tileLimit;
+	final int slotMask;
+	final int slotShift;
+	final int[] keys;
+	final int[] costs;
+	final int[] parents;
+	final int[] vias;
+	final boolean[] used;
+	final IntList exitLandings = new IntList();
+	int reached;
+	int settledBelow;
 
 	/**
 	 * @param maxCost no tile past this cost is reached
@@ -36,10 +39,27 @@ final class WalkSearch
 	 */
 	WalkSearch(Ground ground, int maxCost, boolean exitsEnd)
 	{
+		this(ground, maxCost, exitsEnd, false, ground.tileLimit());
+	}
+
+	/**
+	 * The game's own search when the player clicks a tile, as deep as {@code depth}: steps of one tile, through no row
+	 * and no closed door. Sized from the depth, so a click allocates no world-sized table.
+	 */
+	static WalkSearch clicked(Ground ground, int depth)
+	{
+		int side = 2 * depth + 1;
+		return new WalkSearch(ground, depth, false, true, side * side);
+	}
+
+	private WalkSearch(Ground ground, int maxCost, boolean exitsEnd, boolean stepsOnly, int tileLimit)
+	{
 		this.ground = ground;
 		this.maxCost = maxCost;
 		this.exitsEnd = exitsEnd;
-		int slots = Integer.highestOneBit(ground.tileLimit()) << 2;
+		this.stepsOnly = stepsOnly;
+		this.tileLimit = tileLimit;
+		int slots = Integer.highestOneBit(tileLimit) << 2;
 		slotMask = slots - 1;
 		slotShift = Integer.SIZE - Integer.numberOfTrailingZeros(slots);
 		keys = new int[slots];
@@ -61,7 +81,7 @@ final class WalkSearch
 		int pending = 1;
 		int stopAfter = UNREACHED;
 		int cost = 0;
-		for (; pending > 0 && cost <= stopAfter && reached < ground.tileLimit(); cost++)
+		for (; pending > 0 && cost <= stopAfter && reached < tileLimit; cost++)
 		{
 			IntList bucket = buckets[cost % BUCKETS];
 			for (int i = 0; i < bucket.size; i++)
@@ -142,7 +162,7 @@ final class WalkSearch
 		int y = y(tile);
 		int plane = plane(tile);
 		int pushed = 0;
-		for (int row : ground.openRowsFrom(tile))
+		for (int row : stepsOnly ? NO_ROWS : ground.openRowsFrom(tile))
 		{
 			pushed += push(buckets, ground.rowDestination(row), cost + ground.rowCost(row), tile, row);
 		}
@@ -157,9 +177,10 @@ final class WalkSearch
 			int next = WalkTable.pack(nx, ny, plane);
 			if (ground.canMove(x, y, plane, d))
 			{
-				pushed += push(buckets, next, cost + ground.stepCost(x, y, plane, d), tile, NONE);
+				int stepCost = ground.stepCost(x, y, plane, d);
+				pushed += stepsOnly && stepCost != 1 ? 0 : push(buckets, next, cost + stepCost, tile, NONE);
 			}
-			else if (d < Directions.STRAIGHT && ground.isBlocked(nx, ny, plane) && ground.openRowsFrom(next).length > 0
+			else if (!stepsOnly && d < Directions.STRAIGHT && ground.isBlocked(nx, ny, plane) && ground.openRowsFrom(next).length > 0
 				&& !ground.isWallBetween(x, y, plane, Directions.DX[d], Directions.DY[d]))
 			{
 				pushed += push(buckets, next, cost + 1, tile, NONE);

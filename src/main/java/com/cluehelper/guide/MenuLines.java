@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.Tables;
+import com.cluehelper.transport.MenuLine;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.*;
@@ -21,13 +22,16 @@ import static java.util.stream.Collectors.*;
 @Singleton
 public class MenuLines
 {
+	private static final Set<MenuAction> GROUND_ITEM_OPTIONS = EnumSet.of(MenuAction.GROUND_ITEM_FIRST_OPTION,
+		MenuAction.GROUND_ITEM_SECOND_OPTION, MenuAction.GROUND_ITEM_THIRD_OPTION, MenuAction.GROUND_ITEM_FOURTH_OPTION,
+		MenuAction.GROUND_ITEM_FIFTH_OPTION);
 	private static final int LIST_TITLE = 219;
 	private static final int LIST_TITLE_ALT = 9142;
 	private static final int LIST_LINE = 218;
 	private static final int LIST_LINE_ALT = 9143;
 	private static final int NEXUS_LINE = 2675;
 	private static final int BOX_LINE = 1688;
-	static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int LIST_GROUP = 187;
 	private static final Pattern MINIGAME_PLACE_NUMBER = Pattern.compile("^\\d+\\. ");
 	/** A minigame card's text is its name, a break, then its places. */
@@ -52,34 +56,42 @@ public class MenuLines
 	private static final String CLOSE_OPTION = "Close";
 	/** Same cyan as {@code Highlighter.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
+	private static final int MOST_ICON_PIXELS_OFF = 24;
+	/** The grey of the info box's item lines. */
+	private static final int PICK_COLOUR = 0xBEBEBE;
 
-	/** A hotkey as the info box names it: upper case, in the colour of the menu line it presses. */
-	static String keyText(char key)
+	/** A hotkey or fairy ring code as the info box names it: upper case, in the colour of the menu line it presses. */
+	static String keyText(String key)
 	{
-		return menuColoured(String.valueOf(Character.toUpperCase(key)));
+		return coloured(TEXT_COLOUR, key.toUpperCase(Locale.ROOT));
 	}
 
-	/** What to press or dial, in the colour of the menu lines; the info box closes the colour. */
-	static String menuColoured(String text)
+	/** What to click in an item or object, apart from the white item it is clicked on. */
+	static String pickColoured(String text)
 	{
-		return String.format("<col=%06x>%s</col>", TEXT_COLOUR, text);
+		return coloured(PICK_COLOUR, text);
+	}
+
+	private static String coloured(int rgb, String text)
+	{
+		return String.format("<col=%06x>%s</col>", rgb, text);
 	}
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private QuetzalIcons quetzalIcons;
+	FairyDials fairyDials;
 	@Inject
-	private FairyDials fairyDials;
+	SceneObjects sceneObjects;
 	@Inject
-	private SceneObjects sceneObjects;
-	private final Map<String, int[]> listLines = new HashMap<>();
-	private String listTitle;
-	private final List<int[]> rawListLines = new ArrayList<>();
-	private boolean listFresh;
-	private final Map<Integer, int[]> nexusLines = new HashMap<>();
-	private final Map<Integer, int[]> boxLines = new HashMap<>();
-	private final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
+	EasyTeleportsNames easyTeleportsNames;
+	final Map<String, int[]> listLines = new HashMap<>();
+	String listTitle;
+	final List<int[]> rawListLines = new ArrayList<>();
+	boolean listFresh;
+	final Map<Integer, int[]> nexusLines = new HashMap<>();
+	final Map<Integer, int[]> boxLines = new HashMap<>();
+	final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
 
 	/** Call from a handler at priority 2, ahead of better-teleport-menu's at 1. */
 	public void onScriptPreFired(ScriptPreFired event)
@@ -188,9 +200,9 @@ public class MenuLines
 	/**
 	 * Call every client tick: it also puts back the colour of lines no longer wanted.
 	 *
-	 * @param entryWidget a scroll book entry whose name and charges are coloured too, or -1
+	 * @param scroll a scroll whose book entry's name and charges are coloured too, or null
 	 */
-	public void colourLines(MenuTarget target, int entryWidget, boolean enabled)
+	public void colourLines(MenuTarget target, ScrollBook.Scroll scroll, boolean enabled)
 	{
 		Set<Widget> wanted = Collections.newSetFromMap(new IdentityHashMap<>());
 		if (enabled)
@@ -198,9 +210,9 @@ public class MenuLines
 			Found found = lineWidgets(target);
 			found.widgets.stream().filter(line -> !found.mapButtons.contains(line)).flatMap(line -> Widgets.descendants(line).stream())
 				.filter(Widgets::hasText).forEach(wanted::add);
-			if (entryWidget != ScrollBook.NO_WIDGET)
+			if (scroll != null)
 			{
-				for (int text : ScrollBook.texts(entryWidget))
+				for (int text : new int[]{scroll.getCharges(), scroll.getTitle()})
 				{
 					Widget line = client.getWidget(text);
 					if (Widgets.visible(line) && Widgets.hasText(line))
@@ -229,7 +241,7 @@ public class MenuLines
 		}
 	}
 
-	/** Call on {@code MenuOpened}. */
+	/** Call on {@code MenuOpened}. Each alternative target colours its own option, on its own item. */
 	public void colourMenu(MenuTarget target, boolean enabled)
 	{
 		if (!enabled || target == null || target == MenuTarget.NONE)
@@ -254,7 +266,7 @@ public class MenuLines
 			boolean named = false;
 			for (MenuEntry option : options)
 			{
-				if (MenuLabels.matches(option.getOption(), destination))
+				if (shows(option.getOption(), destination))
 				{
 					colour(option);
 					named = true;
@@ -266,6 +278,7 @@ public class MenuLines
 				colour(options[options.length - 1 - line]);
 			}
 		}
+		target.getAlternatives().forEach(alternative -> colourMenu(alternative, true));
 	}
 
 	private static void colour(MenuEntry entry)
@@ -397,7 +410,7 @@ public class MenuLines
 				minigame(target.getLineName(), out);
 				break;
 			case QUETZAL:
-				quetzal(target.getLineId(), out);
+				quetzal(target.getIcon(), out);
 				break;
 			case BOAT:
 				boat(target.getLineName(), out);
@@ -541,13 +554,8 @@ public class MenuLines
 			.anyMatch(part -> part.getText() != null && MenuLabels.matches(part.getText().split(LINE_BREAK, 2)[0], label));
 	}
 
-	private void quetzal(int quetzalTableId, Found out)
+	private void quetzal(int[] at, Found out)
 	{
-		int[] at = quetzalIcons.position(quetzalTableId);
-		if (at == null)
-		{
-			return;
-		}
 		Widget icons = client.getWidget(InterfaceID.QuetzalMenu.ICONS);
 		if (!Widgets.visible(icons))
 		{
@@ -557,7 +565,34 @@ public class MenuLines
 		{
 			return;
 		}
-		out.add(QuetzalIcons.nearest(icons.getDynamicChildren(), at));
+		out.add(nearestIcon(icons.getDynamicChildren(), at));
+	}
+
+	private static Widget nearestIcon(Widget[] icons, int[] at)
+	{
+		Widget best = null;
+		int bestOff = MOST_ICON_PIXELS_OFF + 1;
+		for (Widget icon : icons == null ? new Widget[0] : icons)
+		{
+			if (icon == null || icon.isHidden())
+			{
+				continue;
+			}
+			int x = icon.getOriginalX();
+			int y = icon.getOriginalY();
+			int off = Math.min(off(x, y, at), off(x + icon.getWidth() / 2, y + icon.getHeight() / 2, at));
+			if (off < bestOff)
+			{
+				best = icon;
+				bestOff = off;
+			}
+		}
+		return best;
+	}
+
+	private static int off(int x, int y, int[] at)
+	{
+		return Math.max(Math.abs(x - at[0]), Math.abs(y - at[1]));
 	}
 
 	/**
@@ -644,7 +679,7 @@ public class MenuLines
 		{
 			for (Widget option : lines)
 			{
-				if (Widgets.visible(option) && MenuLabels.matches(option.getText(), labels.get(i)))
+				if (Widgets.visible(option) && shows(option.getText(), labels.get(i)))
 				{
 					out.add(option);
 					return;
@@ -665,34 +700,40 @@ public class MenuLines
 	}
 
 	/** An option named exactly so wins over one that only starts the same: a ladder's "Climb-up" over its "Climb". */
-	private static boolean isExactly(MenuEntry entry, String destination)
+	private boolean isExactly(MenuEntry entry, String destination)
 	{
-		return destination != null && entry.getOption() != null
-			&& MenuLabels.normalise(entry.getOption()).equals(MenuLabels.normalise(destination));
+		return destination != null && entry.getOption() != null && easyTeleportsNames.readings(entry.getOption()).stream()
+			.anyMatch(option -> MenuLabels.normalise(option).equals(MenuLabels.normalise(destination)));
+	}
+
+	/** Whether the shown option or line names the label, also under a name Easy Teleports gave it. */
+	private boolean shows(String shown, String label)
+	{
+		return easyTeleportsNames.readings(shown).stream().anyMatch(reading -> MenuLabels.matches(reading, label));
 	}
 
 	private boolean isDestination(MenuEntry entry, MenuTarget target, String destination)
 	{
-		if (target.getLine() == MenuTarget.Line.FAIRY_CODE && target.getLineKey() != null)
+		if (target.getLine() == MenuLine.FAIRY_CODE && target.getLineKey() != null)
 		{
 			return MenuLabels.isRingDestination(entry.getOption(), target.getLineKey());
 		}
-		return destination != null && MenuLabels.matches(entry.getOption(), destination);
+		return destination != null && shows(entry.getOption(), destination);
 	}
 
-	private static boolean leadsToDestination(MenuEntry entry, MenuTarget target, String destination)
+	private boolean leadsToDestination(MenuEntry entry, MenuTarget target, String destination)
 	{
 		List<String> path = target.getPath();
 		for (int i = 0; i < path.size() - 1; i++)
 		{
-			if (MenuLabels.matches(entry.getOption(), path.get(i)))
+			if (shows(entry.getOption(), path.get(i)))
 			{
 				return true;
 			}
 		}
 		Menu sub = entry.getSubMenu();
 		return sub != null && destination != null
-			&& Arrays.stream(sub.getMenuEntries()).anyMatch(option -> MenuLabels.matches(option.getOption(), destination));
+			&& Arrays.stream(sub.getMenuEntries()).anyMatch(option -> shows(option.getOption(), destination));
 	}
 
 	private int find(MenuEntry[] entries, MenuTarget target, Predicate<MenuEntry> wanted)
@@ -719,6 +760,10 @@ public class MenuLines
 			return true;
 		}
 		if (entry.getItemId() <= 0 && target.getItemNames().contains(MenuLabels.normalise(entry.getTarget())))
+		{
+			return true;
+		}
+		if (GROUND_ITEM_OPTIONS.contains(entry.getType()) && target.getItemIds().contains(entry.getIdentifier()))
 		{
 			return true;
 		}

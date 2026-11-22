@@ -6,10 +6,13 @@ import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
+import lombok.AccessLevel;
+import lombok.experimental.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 import static java.util.stream.Collectors.*;
 
+@FieldDefaults(level = AccessLevel.PACKAGE)
 final class PlanContext
 {
 	static final int NOT_BANKED = 0;
@@ -70,6 +73,7 @@ final class PlanContext
 	private final int[] stageWithdraw;
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
+	private List<TransportOptions.Teleport> storedItemRides;
 	private Map<Integer, Integer> rowsPerItem;
 
 	PlanContext(PlanInput in)
@@ -259,9 +263,25 @@ final class PlanContext
 		return node < bankItemUses.length && bankItemUses[node];
 	}
 
+	/** The banked rides that take stored items, such as the ghost captain's boat and its amulet. */
+	List<TransportOptions.Teleport> storedItemRides()
+	{
+		TransportOptions banked = options[BANKED];
+		if (banked == null)
+		{
+			return List.of();
+		}
+		if (storedItemRides == null)
+		{
+			storedItemRides = banked.located.values().stream().flatMap(List::stream).filter(ride -> ride.withdraw.length > 0)
+				.collect(toUnmodifiableList());
+		}
+		return storedItemRides;
+	}
+
 	boolean isUsableBank(int node)
 	{
-		if (!isTableNode(node) || !table.isBank(node))
+		if (!isTableNode(node))
 		{
 			return false;
 		}
@@ -273,7 +293,7 @@ final class PlanContext
 		{
 			PlayerSnapshot judgedAt = in.getPlayer().toBuilder().wildernessLevel(0).build();
 			boolean usable = table.banks(node).stream()
-				.anyMatch(bank -> !bank.isDepositOnly() && judge(bank.getName(), bank.getRequirements(), judgedAt).isAvailable());
+				.anyMatch(bank -> judge(bank.getName(), bank.getRequirements(), judgedAt).isAvailable());
 			bankUsable[node] = (byte) (usable ? 1 : 2);
 		}
 		return bankUsable[node] == 1;
@@ -494,9 +514,10 @@ final class PlanContext
 		/** Assumed: no route uses one resource more often than this. */
 		private static final int MOST_USES_PER_ROUTE = 8;
 
-		private final Map<String, Integer> ids = new LinkedHashMap<>();
-		private final List<int[]> available = new ArrayList<>();
-		private final List<Integer> mostPerUse = new ArrayList<>();
+		final Map<String, Integer> ids = new LinkedHashMap<>();
+		final List<int[]> available = new ArrayList<>();
+		final List<Integer> mostPerUse = new ArrayList<>();
+		@PackagePrivate
 		int cape = -1;
 
 		int item(int itemId, PlayerSnapshot player, int bankState)

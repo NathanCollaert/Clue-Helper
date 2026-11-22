@@ -32,5 +32,7 @@ public class MenuLabelsTest
 		assertFalse(MenuLabels.isLastDestination("Last-destination (CKS)", "BKS"));
 		assertTrue(MenuLabels.isRingDestination("<col=40d0ff>Ring-Zanaris</col>", "ZANARIS"));
 		assertFalse(MenuLabels.isRingDestination("<col=40d0ff>Ring-configure</col>", "ZANARIS"));
+		assertTrue(MenuLabels.isRingDestination("Ring-Zanaris (BKS)", "BKS"));
+		assertTrue(MenuLabels.isLastDestination("Last-destination (Zanaris (BKS))", "BKS"));
 	}
 }

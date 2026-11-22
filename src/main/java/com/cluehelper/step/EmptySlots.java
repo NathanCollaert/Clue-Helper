@@ -15,6 +15,7 @@ public final class EmptySlots
 	private static final int SIZE = Arrays.stream(SLOTS).mapToInt(EquipmentInventorySlot::getSlotIdx).max().orElse(0) + 1;
 	private static final int EMPTY = -1;
 	private static final int SOME_ITEM = 1;
+	public static final String EVERYTHING = "everything";
 
 	private EmptySlots()
 	{
@@ -46,7 +47,7 @@ public final class EmptySlots
 			.collect(toList());
 		if (names.size() == SLOTS.length)
 		{
-			return "everything";
+			return EVERYTHING;
 		}
 		return names.size() < 2 ? String.join("", names)
 			: String.join(", ", names.subList(0, names.size() - 1)) + " and " + names.get(names.size() - 1);

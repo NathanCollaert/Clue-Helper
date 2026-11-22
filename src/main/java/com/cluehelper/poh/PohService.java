@@ -1,6 +1,6 @@
 package com.cluehelper.poh;
 
-import com.cluehelper.Tables;
+import com.cluehelper.*;
 import com.cluehelper.guide.SceneObjects;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.stream.*;
 import javax.inject.*;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.*;
@@ -18,7 +17,6 @@ import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
 /** Client thread only, except {@link #getHouse()}. */
-@Slf4j
 @Singleton
 public class PohService
 {
@@ -44,24 +42,24 @@ public class PohService
 	private static final int DIGSITE_FIRST = ObjectID.POH_AMULET_DIG_DIGSITE;
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
+	PlayerModel player;
 	@Inject
-	private CatalogData catalogData;
-	private MemorySlot<Profile> stored;
-	private final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
+	BundledData bundledData;
+	MemorySlot<Profile> stored;
+	final HouseOwnership ownership = new HouseOwnership(System::currentTimeMillis);
 
-	private volatile Set<Integer> pieces = Set.of();
+	volatile Set<Integer> pieces = Set.of();
 	/** Any thread. */
 	@Getter
-	private volatile HouseState house = HouseState.NONE;
-	private boolean seenATick;
-	private boolean wasInside;
-	private int scanAtTick = -1;
-	private boolean varsDirty = true;
-	private boolean houseDirty = true;
-	private boolean nexusLinesDirty;
+	volatile HouseState house = HouseState.NONE;
+	boolean seenATick;
+	boolean wasInside;
+	int scanAtTick = -1;
+	boolean varsDirty = true;
+	boolean houseDirty = true;
+	boolean nexusLinesDirty;
 
 	@Inject
 	void init(MemoryStore memory)
@@ -71,7 +69,7 @@ public class PohService
 
 	public void start()
 	{
-		catalogData.get().thenAccept(this::learnPieces);
+		bundledData.getCatalog().thenAccept(this::learnPieces);
 		seenATick = false;
 		wasInside = false;
 		readHouseAgain();
@@ -174,18 +172,15 @@ public class PohService
 				ownership.startedInside(buildMode);
 			}
 			scanAtTick = client.getTickCount() + SCAN_DELAY_TICKS;
-			tell("entered a house: " + ownership.getOwnership() + (ownership.getEntryClick() == null ? "" : " (" + ownership.getEntryClick() + ")"));
 		}
 		else if (!inside && wasInside)
 		{
 			ownership.left();
 			scanAtTick = -1;
-			tell("left the house");
 		}
 		else if (inside && buildMode && ownership.getOwnership() != HouseOwnership.Ownership.OWNED)
 		{
 			ownership.buildModeSeen();
-			tell("build mode: the house is the player's");
 		}
 		wasInside = inside;
 		seenATick = true;
@@ -202,10 +197,6 @@ public class PohService
 		if (ownership.getOwnership() == HouseOwnership.Ownership.OWNED)
 		{
 			scan();
-		}
-		else
-		{
-			tell("no scan: " + ownership.getOwnership() + " house");
 		}
 	}
 
@@ -231,29 +222,12 @@ public class PohService
 			nexusLinesDirty = false;
 			stored.set(stored.get());
 			houseDirty = true;
-			tell("nexus hotkeys learned: " + stored.get().nexusLines.size() + " lines");
 		}
 	}
 
 	private void learnPieces(Catalog catalog)
 	{
-		Set<Integer> ids = new HashSet<>(HouseState.NEXUS_OBJECTS);
-		for (CatalogRow row : catalog.getTeleports())
-		{
-			HouseNeed need = row.getRequirements().getHouse();
-			if (need != null && need.getKind() == HouseNeed.Kind.FURNITURE)
-			{
-				ids.addAll(need.getIds());
-			}
-		}
-		for (SpellbookChange change : catalog.getSpellbookChanges())
-		{
-			if (change.isInHouse() && change.getObjectId() != SpellbookChange.NO_ID)
-			{
-				ids.add(change.getObjectId());
-			}
-		}
-		pieces = Set.copyOf(ids);
+		pieces = catalog.getHousePieces();
 		houseDirty = true;
 	}
 
@@ -277,8 +251,6 @@ public class PohService
 		{
 			profile.vars = values;
 			stored.set(profile);
-			tell("house varbits: " + nexusKeys(profile).size() + " nexus destinations, Xeric " + values.get(VarbitID.POH_NEXUS_XERIC)
-				+ ", digsite " + values.get(VarbitID.POH_NEXUS_DIGSITE) + ", box " + values.get(VarbitID.POH_JEWELLERYBOX_MULTI));
 		}
 	}
 
@@ -290,8 +262,9 @@ public class PohService
 		{
 			return;
 		}
-		Map<Integer, List<WorldPoint>> found = findPieces(view.getScene());
-		WalkCosts walk = walkFrom(view, local.getLocalLocation());
+		Map<Integer, List<WorldPoint>> found = findPieces(view);
+		LoadedScene scene = LoadedScene.captureLoaded(view);
+		WalkCosts walk = scene == null ? null : WalkCosts.from(Ground.sceneOnly(scene), local.getWorldLocation());
 		Map<Integer, Integer> ticks = new HashMap<>();
 		found.forEach((id, cells) ->
 		{
@@ -303,24 +276,18 @@ public class PohService
 			}
 		});
 		Profile profile = stored.get();
-		Set<Integer> before = new HashSet<>(profile.furniture);
 		profile.furniture = new ArrayList<>(found.keySet());
 		profile.walkTicks = ticks;
 		profile.scannedAt = System.currentTimeMillis();
 		stored.set(profile);
 		houseDirty = true;
-		Set<Integer> added = new HashSet<>(found.keySet());
-		added.removeAll(before);
-		before.removeAll(found.keySet());
-		tell(String.format("scan: %d pieces %s, walk ticks %s, added %s, gone %s", found.size(), found.keySet(), ticks, added,
-			before));
 	}
 
-	/** By piece, its scene tiles: a large piece is on each tile it covers. */
-	private Map<Integer, List<WorldPoint>> findPieces(Scene scene)
+	/** By piece, its tiles: a large piece is on each tile it covers. */
+	private Map<Integer, List<WorldPoint>> findPieces(WorldView view)
 	{
 		Map<Integer, List<WorldPoint>> found = new HashMap<>();
-		Tile[][][] tiles = scene.getTiles();
+		Tile[][][] tiles = view.getScene().getTiles();
 		for (int z = 0; z < tiles.length; z++)
 		{
 			for (int x = 0; x < tiles[z].length; x++)
@@ -332,30 +299,13 @@ public class PohService
 					{
 						if (pieces.contains(object.getId()))
 						{
-							found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(new WorldPoint(x, y, z));
+							found.computeIfAbsent(object.getId(), k -> new ArrayList<>()).add(WorldPoint.fromScene(view, x, y, z));
 						}
 					}
 				}
 			}
 		}
 		return found;
-	}
-
-	/** Uses the instance's own collision flags; its points are scene coordinates, not world ones. */
-	private static WalkCosts walkFrom(WorldView view, LocalPoint at)
-	{
-		CollisionData[] maps = view.getCollisionMaps();
-		if (maps == null || at == null)
-		{
-			return null;
-		}
-		int[][][] flags = new int[maps.length][][];
-		for (int plane = 0; plane < maps.length; plane++)
-		{
-			flags[plane] = maps[plane] == null ? null : maps[plane].getFlags();
-		}
-		LoadedScene scene = new LoadedScene(0, 0, view.getSizeX(), view.getSizeY(), flags);
-		return WalkCosts.from(Ground.sceneOnly(scene), new WorldPoint(at.getSceneX(), at.getSceneY(), view.getPlane()));
 	}
 
 	private void publish()
@@ -370,8 +320,6 @@ public class PohService
 		{
 			house = next;
 			player.setHouse(next);
-			tell("house: " + next.getSource() + ", " + next.getFurniture().size() + " pieces, " + next.getNexusKeys().size()
-				+ " nexus destinations");
 		}
 	}
 
@@ -426,11 +374,6 @@ public class PohService
 	{
 		return Arrays.stream(NEXUS_SLOTS).mapToObj(id -> profile.vars.getOrDefault(id, 0)).filter(key -> key > 0)
 			.collect(Collectors.toUnmodifiableSet());
-	}
-
-	private void tell(String line)
-	{
-		log.debug("poh: {}", line);
 	}
 
 	static final class Profile

@@ -122,9 +122,9 @@ final class PohTrace
 			{
 				logMinigameCards();
 			}
-			if (pendingInterface == InterfaceID.BOOKOFSCROLLS && guide.getHighlights().getMenuWidget() >= 0)
+			if (pendingInterface == InterfaceID.BOOKOFSCROLLS && guide.getHighlights().getScroll() != null)
 			{
-				logScrollEntry(guide.getHighlights().getMenuWidget());
+				logScrollEntry(guide.getHighlights().getScroll().getEntry());
 			}
 			if (pendingInterface == NEXUS_GROUP)
 			{

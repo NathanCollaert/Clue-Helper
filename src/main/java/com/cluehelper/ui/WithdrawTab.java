@@ -25,23 +25,23 @@ public class WithdrawTab
 	private static final String TAG = "clue helper";
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private BankTagsService bankTags;
+	BankTagsService bankTags;
 	@Inject
-	private TagManager tagManager;
+	TagManager tagManager;
 	@Inject
-	private LayoutManager layoutManager;
+	LayoutManager layoutManager;
 	@Inject
-	private ClientThread clientThread;
+	ClientThread clientThread;
 
 	/** In the order they joined, which is their place in the layout. */
-	private List<Integer> shownItems = List.of();
-	private boolean bankOpen;
+	List<Integer> shownItems = List.of();
+	boolean bankOpen;
 
 	public void start()
 	{

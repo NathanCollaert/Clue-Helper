@@ -16,8 +16,8 @@ final class AlternativeRequirement implements ItemRequirement
 		ItemRequirement requirement;
 	}
 
-	private final ItemRequirement item;
-	private final List<Part> parts;
+	final ItemRequirement item;
+	final List<Part> parts;
 
 	AlternativeRequirement(ItemRequirement item, List<Part> parts)
 	{

@@ -11,15 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemorySlot<T>
 {
-	private final String key;
-	private final Class<T> type;
-	private final Supplier<T> fresh;
-	private final ProfileConfig profile;
-	private final Gson gson;
+	final String key;
+	final Class<T> type;
+	final Supplier<T> fresh;
+	final ProfileConfig profile;
+	final Gson gson;
+	final Runnable onSet;
 
-	private boolean loaded;
-	private String loadedProfile;
-	private T value;
+	boolean loaded;
+	String loadedProfile;
+	T value;
+	boolean held;
 
 	public synchronized T get()
 	{
@@ -40,6 +42,7 @@ public final class MemorySlot<T>
 		value = newValue;
 		loadedProfile = currentProfile;
 		loaded = true;
+		onSet.run();
 		if (currentProfile == null)
 		{
 			log.debug("{} kept in memory only: no RuneScape profile yet", key);
@@ -48,17 +51,27 @@ public final class MemorySlot<T>
 		profile.set(key, gson.toJson(newValue));
 	}
 
-	public synchronized void clear()
+	/** Kept in memory until {@link #saveHeld()}: for a value that changes too often to write every time. */
+	public synchronized void hold(T newValue)
 	{
-		forget();
-		if (profile.profileKey() != null)
+		value = newValue;
+		loadedProfile = profile.profileKey();
+		loaded = true;
+		held = true;
+	}
+
+	public synchronized void saveHeld()
+	{
+		if (held)
 		{
-			profile.unset(key);
+			held = false;
+			set(value);
 		}
 	}
 
 	synchronized void forget()
 	{
+		held = false;
 		loaded = false;
 		loadedProfile = null;
 		value = null;

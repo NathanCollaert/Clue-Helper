@@ -13,7 +13,6 @@ import com.cluehelper.guide.SubStep.Kind;
 /** The master scroll book: its interface's widget per scroll, and the bank stops that keep it out of the Wilderness. */
 public final class ScrollBook
 {
-	public static final int NO_WIDGET = -1;
 	static final String BOOK_NAME = "master scroll book";
 	private static final String BOOK_SHOWN = "Master scroll book";
 	static final String REMOVE_OPTION = "Remove";
@@ -22,48 +21,34 @@ public final class ScrollBook
 
 	/** The book's widgets per scroll: later scrolls don't sit in entry, picture, charges, name order. */
 	@Value
-	private static class Scroll
+	public static class Scroll
 	{
 		String name;
 		int entry;
 		int picture;
 		int charges;
 		int title;
+
+		/** The entry, picture, charges and name, whose menus all offer the scroll's options. */
+		Set<Integer> widgets()
+		{
+			return Set.of(entry, picture, charges, title);
+		}
 	}
 
 	private static final List<Scroll> SCROLLS = Tables.rows("scrolls").stream()
 		.map(row -> new Scroll(row.getKey(), row.id(0), row.id(1), row.id(2), row.id(3))).collect(toUnmodifiableList());
 	private static final Map<String, Scroll> BY_NAME = SCROLLS.stream().collect(toUnmodifiableMap(Scroll::getName, Function.identity()));
-	private static final Map<Integer, Scroll> BY_ENTRY = SCROLLS.stream().collect(toUnmodifiableMap(Scroll::getEntry, Function.identity()));
+
 
 	private ScrollBook()
 	{
 	}
 
-	public static int picture(int entry)
+	/** The book's scroll a row teleports with, or null when the row is not a book teleport. */
+	static Scroll scroll(CatalogRow row)
 	{
-		Scroll scroll = BY_ENTRY.get(entry);
-		return scroll == null ? NO_WIDGET : scroll.getPicture();
-	}
-
-	static int[] texts(int entry)
-	{
-		Scroll scroll = BY_ENTRY.get(entry);
-		return scroll == null ? new int[0] : new int[]{scroll.getCharges(), scroll.getTitle()};
-	}
-
-	/** The scroll's entry, picture, charges and name, whose menus all offer its options. */
-	static Set<Integer> widgets(String rowName)
-	{
-		int entry = entry(rowName);
-		Scroll scroll = BY_ENTRY.get(entry);
-		return scroll == null ? Set.of() : Set.of(scroll.getEntry(), scroll.getPicture(), scroll.getCharges(), scroll.getTitle());
-	}
-
-	static int entry(String rowName)
-	{
-		Scroll scroll = rowName.startsWith(BookScrolls.BOOK_ROW_PREFIX) ? BY_NAME.get(BookScrolls.scrollName(rowName)) : null;
-		return scroll == null ? NO_WIDGET : scroll.getEntry();
+		return row.getScroll() == null ? null : BY_NAME.get(row.getScroll());
 	}
 
 	/**
@@ -97,8 +82,8 @@ public final class ScrollBook
 		CatalogRow row = bookRow ? out.get(teleportAt).getRow() : null;
 		if (bookRow)
 		{
-			String scroll = BookScrolls.scrollName(row);
-			out.set(teleportAt, out.get(teleportAt).toBuilder().text("Read the " + scroll + " scroll").actItemNamed(scroll.toLowerCase())
+			String scroll = row.getScroll();
+			out.set(teleportAt, out.get(teleportAt).toBuilder().text("Use: " + MenuLines.pickColoured(scroll + " scroll")).actItemNamed(scroll.toLowerCase())
 				.actOption(READ_OPTION).build());
 		}
 		int bank = lastBefore(out, teleportAt, Kind.BANK);
@@ -118,7 +103,7 @@ public final class ScrollBook
 		out.add(bank + 1, deposit());
 		if (bookRow)
 		{
-			out.add(walkToBank(out, bank), takeOut(row));
+			out.add(bank, takeOut(row));
 		}
 		return List.copyOf(out);
 	}
@@ -135,16 +120,10 @@ public final class ScrollBook
 		return -1;
 	}
 
-	/** A carried book's scroll comes out where the player stands, before the walk to the bank the book is left at. */
-	private static int walkToBank(List<SubStep> steps, int bank)
-	{
-		return bank > 0 && steps.get(bank - 1).getKind() == Kind.WALK ? bank - 1 : bank;
-	}
-
 	/** Opens the book, then Remove on the scroll's entry; {@code row} is the book's teleport. */
 	private static SubStep takeOut(CatalogRow row)
 	{
-		String scroll = BookScrolls.scrollName(row);
+		String scroll = row.getScroll();
 		return SubStep.of(Kind.ACT, "Take out of the master scroll book:").items(List.of(scroll))
 			.row(row).actItemNamed(BOOK_NAME).actOption(OPEN_OPTION)
 			.carriedWhenDone(scroll.toLowerCase()).done(SubStep.Done.ITEM_CARRIED).build();
@@ -164,7 +143,7 @@ public final class ScrollBook
 
 	private static SubStep deposit()
 	{
-		return SubStep.of(Kind.ACT, "Deposit in the bank:").items(List.of(BOOK_SHOWN)).detail("It stays out of the Wilderness")
+		return SubStep.of(Kind.ACT, "Deposit in the bank:").items(List.of(BOOK_SHOWN))
 			.actItemNamed(BOOK_NAME).done(SubStep.Done.ITEM_GONE).build();
 	}
 

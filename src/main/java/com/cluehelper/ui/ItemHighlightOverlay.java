@@ -12,15 +12,15 @@ import net.runelite.client.ui.overlay.WidgetItemOverlay;
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 	@Inject
-	private LeftClicks leftClicks;
+	LeftClicks leftClicks;
 
 	ItemHighlightOverlay()
 	{

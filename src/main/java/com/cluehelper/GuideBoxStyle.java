@@ -13,7 +13,7 @@ public enum GuideBoxStyle
 		return this == COMBINED || this == HELPER_ONLY;
 	}
 
-	private final String label;
+	final String label;
 
 	GuideBoxStyle(String label)
 	{

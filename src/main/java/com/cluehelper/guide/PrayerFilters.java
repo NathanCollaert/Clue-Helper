@@ -25,19 +25,19 @@ public class PrayerFilters
 		LACK_LEVEL(VarbitID.PRAYER_FILTER_BLOCKLACKLEVEL, "prayer level", 1),
 		LACK_REQUIREMENTS(VarbitID.PRAYER_FILTER_BLOCKLOCKED, "requirements", 1);
 
-		private final int varbit;
+		final int varbit;
 		@Getter
-		private final String phrase;
-		private final int hidingValue;
+		final String phrase;
+		final int hidingValue;
 	}
 
 	/** Only these can hide a prayer the player could turn on: the level and requirement filters hide ones they can't. */
 	private static final List<Filter> TIERS = List.of(Filter.LOWER_TIERS, Filter.MULTI_SKILL);
 
 	@Inject
-	private Client client;
-	private String stepKey;
-	private Map<Filter, Integer> found = Map.of();
+	Client client;
+	String stepKey;
+	Map<Filter, Integer> found = Map.of();
 
 	/** Notes the filters the first time a step is seen, before its task has anyone change them. */
 	public void rememberFor(Step step)

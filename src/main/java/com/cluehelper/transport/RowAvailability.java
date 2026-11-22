@@ -7,18 +7,8 @@ import lombok.Value;
 @Value
 public class RowAvailability
 {
-	public enum Confidence
-	{
-		SURE,
-		/** Available, but an item it spends charges of has no known count. A tier, not a why-not. */
-		CHARGES_UNKNOWN,
-		/** Something it depends on hasn't been read yet (quests before the first tick, an unwatched var). */
-		UNREAD
-	}
-
 	CatalogRow row;
 	boolean available;
-	Confidence confidence;
 	/** Empty when unavailable. */
 	List<ItemUse> witness;
 	List<String> whyNot;

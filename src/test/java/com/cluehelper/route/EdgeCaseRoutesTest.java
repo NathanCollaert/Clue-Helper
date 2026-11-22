@@ -2,6 +2,7 @@ package com.cluehelper.route;
 
 import com.cluehelper.memory.StashMemory;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
@@ -18,7 +19,6 @@ import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.TargetKind;
 import com.cluehelper.transport.AvailabilityEngine;
 import com.cluehelper.transport.Catalog;
-import com.cluehelper.transport.CatalogData;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -83,7 +83,7 @@ public class EdgeCaseRoutesTest
 	{
 		table = WalkTable.load(RuneLiteAPI.GSON);
 		map = WorldMap.load();
-		catalog = CatalogData.read(RuneLiteAPI.GSON);
+		catalog = Catalog.read(RuneLiteAPI.GSON);
 		runes = Loadouts.runeModel();
 		steps = DriftSteps.read();
 	}
@@ -148,6 +148,25 @@ public class EdgeCaseRoutesTest
 		return gate == 0 || table.getGates().get(gate - 1).getItems().isEmpty();
 	}
 
+	/**
+	 * A route followed without the bank is planned again as it was while the banked route is less than the commit margin
+	 * faster, so the guide doesn't switch to the bank for a tick or two.
+	 */
+	@Test
+	public void followedRouteWithoutTheBankIsKeptWithinTheMargin()
+	{
+		PlannerSettings bankOn = PlannerSettings.builder().bankEdge(true).build();
+		PlayerSnapshot mid = ready(Loadouts.load("mid-ironman").getCarried());
+		Step digsite = step("cryptic:search the bush at the digsite centre.");
+		Route plain = Planner.plan(input(mid, digsite, PlanStart.teleportOnly(ANYWHERE), bankOn).build()).getBest();
+		PlanInput withBank = input(mid, digsite, PlanStart.teleportOnly(ANYWHERE), bankOn)
+			.banked(ready(Loadouts.load("mid-ironman").getBankedSnapshot()))
+			.followedFirstTransport(plain.getFirstTransportKey()).followedIdentity(plain.getIdentity()).build();
+		Plan plan = Planner.plan(withBank);
+		assertTrue("the banked route is the faster", plan.getBest().isBanked() && plan.getBest().getTicks() < plain.getTicks());
+		assertEquals(plain.getIdentity(), plan.getFollowed().getIdentity());
+	}
+
 	@Test
 	public void edgeCasesMatchTheirGoldenFile() throws IOException
 	{
@@ -162,7 +181,7 @@ public class EdgeCaseRoutesTest
 		Step edgeville = step("cryptic:talk to the mother of a basement dwelling son.");
 
 		PlayerSnapshot glory1 = mid.toBuilder().inventory(Map.of(itemId("AMULET_OF_GLORY_1"), 1)).charges(Map.of(
-			itemId("AMULET_OF_GLORY_1"), new Charge(1, Charge.Source.ITEM_ID))).build();
+			itemId("AMULET_OF_GLORY_1"), new Charge(1))).build();
 		lines.add(line("consumption: glory(1) carried, bank on with glory(1), to Draynor",
 			checked(input(glory1, draynor, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(glory1).build())));
 		PlayerSnapshot minigames = mid.toBuilder().inventory(Map.of()).build();
@@ -259,7 +278,7 @@ public class EdgeCaseRoutesTest
 		Step draynorDig = step("map:w348");
 		RequiredItems spade = required(StashMemory.State.NONE, need("spade", ItemRequirements.item(ItemID.SPADE), false));
 		PlayerSnapshot glory1 = mid.toBuilder().inventory(Map.of(itemId("AMULET_OF_GLORY_1"), 1)).charges(Map.of(
-			itemId("AMULET_OF_GLORY_1"), new Charge(1, Charge.Source.ITEM_ID))).build();
+			itemId("AMULET_OF_GLORY_1"), new Charge(1))).build();
 		lines.add(line("required spade: glory(1) carried, a spade in the bank, to Draynor (dig)",
 			checked(input(glory1, draynorDig, PlanStart.teleportOnly(ANYWHERE), bankOn).required(spade)
 				.banked(withBank(glory1, Map.of(ItemID.SPADE, 1))).build())));
@@ -363,8 +382,8 @@ public class EdgeCaseRoutesTest
 			checked(input(maxed, aldarin, civitas, plain).build())));
 		PlayerSnapshot noPassage = withoutAll(mid, Set.of(ItemID.NECKLACE_OF_PASSAGE_5, ItemID.NECKLACE_OF_PASSAGE_2));
 		Map<Integer, Charge> passageCharges = new HashMap<>(noPassage.getCharges());
-		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_5, new Charge(5, Charge.Source.ITEM_ID));
-		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_2, new Charge(2, Charge.Source.ITEM_ID));
+		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_5, new Charge(5));
+		passageCharges.put(ItemID.NECKLACE_OF_PASSAGE_2, new Charge(2));
 		PlayerSnapshot twoPassages = noPassage.toBuilder().charges(passageCharges).build();
 		lines.add(line("partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
 			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().bankEdge(true).build())
@@ -434,7 +453,7 @@ public class EdgeCaseRoutesTest
 		varps.put(MINIGAME_TELEPORT_TIMER_VARP, (int) NOW_MINUTES);
 		return player.toBuilder().inventory(Map.of(ItemID.COINS, 1_000_000, ItemID.DRAGON_AXE, 1, ItemID.LOGS, 1, ItemID.OAK_LOGS, 1,
 				ItemID.WILLOW_LOGS, 1, ItemID.YEW_LOGS, 1, ItemID.MAGIC_LOGS, 1, ItemID.ECTOTOKEN, 100))
-			.worn(Map.of()).pouchHeld(false).charges(Map.of()).house(HouseState.NONE).varps(varps).build();
+			.worn(Map.of()).charges(Map.of()).house(HouseState.NONE).varps(varps).build();
 	}
 
 	private static PlayerSnapshot withVarbits(PlayerSnapshot player, Map<Integer, Integer> values)
@@ -493,10 +512,7 @@ public class EdgeCaseRoutesTest
 		Plan plan = Planner.plan(input);
 		List<Route> routes = new ArrayList<>();
 		routes.add(plan.getBest());
-		routes.add(plan.getDirect());
-		routes.add(plan.getSameBook());
-		routes.addAll(plan.getAlternatives());
-		plan.getCandidates().forEach(c -> routes.add(c.getRoute()));
+		routes.add(plan.getFollowed());
 		for (Route route : routes)
 		{
 			if (route != null)
@@ -538,22 +554,6 @@ public class EdgeCaseRoutesTest
 	{
 		StringBuilder out = new StringBuilder(name);
 		out.append("\n  best      ").append(RouteText.describe(plan.getBest()));
-		if (plan.getDirect() != null)
-		{
-			out.append("\n  direct    ").append(RouteText.describe(plan.getDirect()));
-		}
-		if (plan.getSameBook() != null)
-		{
-			out.append("\n  same book ").append(RouteText.describe(plan.getSameBook()));
-		}
-		if (plan.getFasterUnqualified() != null)
-		{
-			out.append("\n  faster, under the margin ").append(RouteText.describe(plan.getFasterUnqualified()));
-		}
-		for (Route alternative : plan.getAlternatives())
-		{
-			out.append("\n  alt       ").append(RouteText.describe(alternative));
-		}
 		if (plan.getNote() != null)
 		{
 			out.append("\n  note      ").append(plan.getNote());

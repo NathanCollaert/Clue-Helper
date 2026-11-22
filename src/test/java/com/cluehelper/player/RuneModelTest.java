@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,15 @@ import org.junit.Test;
 
 public class RuneModelTest
 {
-	private final RuneModel model = RuneModel.load(new SliceCacheView("/runes/cache-runes.json"));
+	/** A spell's three {rune, rune count} item params. */
+	private static final int[][] RUNE_PARAMS = {{365, 366}, {367, 368}, {369, 370}};
+	private static final int PARAM_MEMBERS = 603;
+	private static final int PARAM_LEVEL = 604;
+	private static final int PARAM_QUEST = 1189;
+	private static final int ABSENT = -1;
+
+	private final SliceCacheView cache = new SliceCacheView("/runes/cache-runes.json");
+	private final RuneModel model = RuneLoader.load(cache);
 
 	@Test
 	public void everySpellAgreesWithTheCacheSpellTable() throws Exception
@@ -41,9 +50,10 @@ public class RuneModelTest
 				expected.add(String.join(" | ", c[0].toUpperCase(), c[1], c[2], c[3], c[4], c[6]));
 			}
 		}
-		List<String> ours = model.getSpells().stream().map(s -> String.join(" | ", s.getBook().name(), s.getName(),
-			String.valueOf(s.getLevel()), s.isMembers() ? "1" : "0", s.getQuest() == null ? "" : String.valueOf(s.getQuest().getId()),
-			s.getRunes().stream().map(r -> r.getRune() + "x" + r.getQuantity()).collect(Collectors.joining(";"))))
+		List<String> ours = RuneLoader.spells(cache).stream().map(s -> String.join(" | ", s.getBook().name(), s.getName(),
+			String.valueOf(Math.max(0, cache.itemIntParam(s.getObj(), PARAM_LEVEL, 0))),
+			cache.itemIntParam(s.getObj(), PARAM_MEMBERS, 0) == 1 ? "1" : "0", quest(s),
+			runes(s).stream().map(r -> r[0] + "x" + r[1]).collect(Collectors.joining(";"))))
 			.collect(Collectors.toList());
 		assertEquals(String.join("\n", expected), String.join("\n", ours));
 	}
@@ -64,7 +74,7 @@ public class RuneModelTest
 
 	private Set<String> lunarCastable(PlayerSnapshot player)
 	{
-		return model.getSpells().stream()
+		return RuneLoader.spells(cache).stream()
 			.filter(spell -> spell.getBook() == Book.LUNAR && affords(spell, player))
 			.map(Spell::getName).collect(Collectors.toCollection(TreeSet::new));
 	}
@@ -72,7 +82,29 @@ public class RuneModelTest
 	/** The test account is maxed with every quest done on a members world, so only the runes decide. */
 	private boolean affords(Spell spell, PlayerSnapshot player)
 	{
-		return spell.getRunes().stream().allMatch(cost -> model.supply(cost.getRune(), cost.getQuantity(), player).isEnough());
+		return runes(spell).stream().allMatch(cost -> model.supply(cost[0], cost[1], player).isEnough());
+	}
+
+	/** Each {rune, quantity} the spell costs. */
+	private List<int[]> runes(Spell spell)
+	{
+		List<int[]> runes = new ArrayList<>();
+		for (int[] param : RUNE_PARAMS)
+		{
+			int rune = cache.itemIntParam(spell.getObj(), param[0], ABSENT);
+			if (rune > 0)
+			{
+				runes.add(new int[]{rune, cache.itemIntParam(spell.getObj(), param[1], 0)});
+			}
+		}
+		return runes;
+	}
+
+	/** The gating quest's id as the cache table writes it, if it names a quest the client knows; blank for none. */
+	private String quest(Spell spell)
+	{
+		int id = cache.itemIntParam(spell.getObj(), PARAM_QUEST, ABSENT);
+		return Arrays.stream(Quest.values()).anyMatch(quest -> quest.getId() == id) ? String.valueOf(id) : "";
 	}
 
 	private static PlayerSnapshot maxedWithOnlyARunePouch(Map<Integer, Integer> pouch)
@@ -90,7 +122,6 @@ public class RuneModelTest
 		return PlayerSnapshot.builder()
 			.membersWorld(true)
 			.inventory(Map.of(ItemID.DIVINE_RUNE_POUCH, 1))
-			.pouchHeld(true)
 			.pouch(pouch)
 			.boostedLevels(levels)
 			.realLevels(levels)

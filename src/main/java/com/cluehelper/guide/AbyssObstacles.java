@@ -22,11 +22,11 @@ public class AbyssObstacles
 	private static final Map<String, String> TOOLS = Map.of("Rock", "pickaxe", "Tendrils", "axe", "Boil", "tinderbox");
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private SceneObjects sceneObjects;
+	SceneObjects sceneObjects;
 	/** Kept while it stays in sight and passable, so the pick doesn't flip to another as the player runs past. */
-	private TileObject chosen;
+	TileObject chosen;
 
 	public static boolean isObstacle(int objectId)
 	{

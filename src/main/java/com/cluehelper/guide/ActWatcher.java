@@ -23,17 +23,17 @@ public class ActWatcher
 	private static final Set<String> CHALLENGE_ITEMS = Set.of("challenge scroll", "puzzle box", "light box");
 
 	@Inject
-	private Client client;
+	Client client;
 	@Inject
-	private PlayerModel player;
-	private int withdrawTick = NEVER;
-	private int depositTick = NEVER;
-	private int uriTick = NEVER;
-	private int challengeTick = NEVER;
-	private int enemyTick = NEVER;
-	private NPC enemy;
-	private boolean inventoryChanged = true;
-	private boolean challengeCarried;
+	PlayerModel player;
+	int withdrawTick = NEVER;
+	int depositTick = NEVER;
+	int uriTick = NEVER;
+	int challengeTick = NEVER;
+	int enemyTick = NEVER;
+	NPC enemy;
+	boolean inventoryChanged = true;
+	boolean challengeCarried;
 
 	public void onChatMessage(ChatMessage message)
 	{
@@ -121,16 +121,13 @@ public class ActWatcher
 			case CHALLENGE_ITEM:
 				return challengeTick >= since || challengeCarried;
 			case STEP_CHANGES:
-			case EQUIPPED:
 			case ITEM_CARRIED:
 			case ITEM_GONE:
 			case ITEMS_GONE:
-			case WAY_IN_WORN:
-			case GEAR_WORN:
+			case WORN:
 			case SLOTS_EMPTY:
-			case WAY_IN_SLOTS_EMPTY:
 			case ITEM_HELD:
-			case ITEM_WORN:
+			case TRACK_PLAYING:
 				return false;
 			default:
 				throw new IllegalArgumentException("unhandled act end " + done);

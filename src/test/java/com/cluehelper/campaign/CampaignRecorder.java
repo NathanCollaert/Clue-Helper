@@ -20,6 +20,7 @@ import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.CatalogRow;
+import com.cluehelper.transport.ItemClause;
 import com.cluehelper.transport.Requirements;
 import com.google.gson.Gson;
 import java.time.LocalDate;
@@ -84,11 +85,13 @@ public final class CampaignRecorder
 		recording.onlyInBankedKit = new TreeMap<>();
 		StepNeeds needs = new StepNeeds(tape.client(), id -> recordStash(recording, id),
 			(bonus, owned) -> recordGear(recording, bonus.name(), gearPieces.of(bonus, owned)),
-			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()), input.getPlayer()::finished);
+			() -> StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()), input.getPlayer()::finished,
+			() -> input.getStart() == null ? null : input.getStart().getTile());
 		RequiredItems required = needs.of(travel);
 		SubSteps subSteps = new SubSteps(tape.client(), input::getPlayer, id -> recordKit(recording, id), needs, input::getStart,
 			input.getSettings()::isScrollBookOutOfWilderness, id -> false,
-			() -> input.getCatalog() == null ? List.of() : input.getCatalog().getTeleports());
+			() -> input.getCatalog() == null ? List.of() : input.getCatalog().getTeleports(),
+			(leg, tiles) -> input.getTable().exitBetween(leg.getFrom(), leg.getTo(), tiles));
 		List<SubStep> guide = plan.getBest() == null ? List.of() : subSteps.of(plan.getBest(), travel);
 		// A replay that plans another route asks about other items: every owned one is on the recording
 		StepNeeds.ownedItemIds(input.getPlayer(), input.getBanked()).forEach(id ->
@@ -141,8 +144,7 @@ public final class CampaignRecorder
 		Stream<Requirements> gates = input.getTable() == null ? Stream.empty() : input.getTable().getGates().stream();
 		Stream.concat(rows, gates)
 			.flatMap(requirements -> requirements.getItems().stream())
-			.flatMap(clause -> clause.getBranches().stream())
-			.flatMap(branch -> branch.getIds().stream())
+			.flatMap(ItemClause::ids)
 			.distinct()
 			.filter(id -> notes.stream().anyMatch(note -> note.contains(client.getItemDefinition(id).getName())))
 			.forEach(id -> tape.client().getItemDefinition(id).getName());

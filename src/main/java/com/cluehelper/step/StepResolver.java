@@ -1,5 +1,6 @@
 package com.cluehelper.step;
 
+import com.cluehelper.BundledData;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
@@ -20,17 +21,17 @@ public class StepResolver
 	private static final String UNKNOWN_TIER = "unknown";
 	private static final String THREE_STEP_TIER = "master";
 
-	private final Supplier<StepIndex> index;
+	final Supplier<StepIndex> index;
 	/** Whether an NPC id shows for the player: a multiloc NPC is hidden in the form its quest state doesn't use. */
-	private final IntPredicate npcShown;
-	private final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
+	final IntPredicate npcShown;
+	final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
 	/** One requirement per key or tool entry, so a re-read step equals the last one. */
-	private final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
+	final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
 
 	@Inject
-	StepResolver(StepData data, Client client)
+	StepResolver(BundledData data, Client client)
 	{
-		this(data::index, id -> isShown(client, id));
+		this(data::stepIndex, id -> isShown(client, id));
 	}
 
 	public StepResolver(Supplier<StepIndex> index)
@@ -56,7 +57,7 @@ public class StepResolver
 	public Step resolve(ClueScroll clue, ClueScrollPlugin plugin)
 	{
 		ClueFacts facts = CoreClueReader.facts(clue, plugin);
-		String key = StepKey.of(facts);
+		String key = facts.getKey();
 		StepIndex.Entry found = clue instanceof ThreeStepCrypticClue
 			? threeStepEntry((ThreeStepCrypticClue) clue)
 			: index.get().entry(key);
@@ -73,7 +74,7 @@ public class StepResolver
 			.key(key)
 			.type(facts.getType())
 			.tier(tier)
-			.text(CoreClueReader.displayText(clue, facts, plugin))
+			.text(facts.getText())
 			.kind(stages.isEmpty() ? kind(clue, entry) : TargetKind.SEQUENCE)
 			.targets(stages.isEmpty() ? targets : Stages.tiles(stages))
 			.npcs(npcs)
@@ -88,6 +89,7 @@ public class StepResolver
 			.build();
 	}
 
+	/** The entry's baked stages, given what only the game knows: core's targets, NPC name and empty-slot needs, and the items. */
 	private List<Stage> stages(ClueScroll clue, ClueScrollPlugin plugin, StepIndex.Entry entry, List<WorldPoint> targets,
 		List<String> npcs)
 	{
@@ -95,26 +97,32 @@ public class StepResolver
 		{
 			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::wornFor);
 		}
-		StepIndex.Target key = entry.getTargets().stream()
-			.filter(target -> target.getKind() == StepIndex.Target.Kind.KEY && target.getKeyTile() != null).findFirst().orElse(null);
-		if (key != null)
+		if (CoreClueReader.challengeCompleted(clue))
 		{
-			return Stages.killForKey(key, npcs.isEmpty() ? null : npcs.get(0), keyRequirements.computeIfAbsent(key.getKey(),
-				Stages::keyItem), targets);
+			return List.of();
 		}
-		StepIndex.Requires dropped = entry.getRequires().stream().filter(requires -> requires.getFrom() != null).findFirst().orElse(null);
-		if (dropped != null)
+		Step named = Step.builder().npcs(npcs).build();
+		List<ItemRequirement> emptied = EmptySlots.of(CoreClueReader.itemRequirements(clue));
+		return entry.getStages().stream().map(stage -> stage.toBuilder()
+			.tiles(stage.getKind() == Stage.Kind.FINAL ? targets : stage.getTiles())
+			.act(named.namingNpc(stage.getAct()))
+			.item(item(stage))
+			.emptied(stage.getKind() == Stage.Kind.TASK ? emptied : List.of())
+			.build()).collect(toUnmodifiableList());
+	}
+
+	/** A key by its id, one requirement per key so a re-read step equals the last one; a way in's item, any of its ids. */
+	private ItemRequirement item(Stage stage)
+	{
+		if (stage.getItemIds().isEmpty())
 		{
-			ItemRequirement item = ItemRequirements.any(dropped.getName(), dropped.getIds().stream().map(ItemRequirements::item)
-				.toArray(ItemRequirement[]::new));
-			return Stages.killForWayIn(dropped, item, targets);
+			return null;
 		}
-		if (clue instanceof SkillChallengeClue)
+		if (stage.getItemName() == null)
 		{
-			return Stages.challenge(entry, ((SkillChallengeClue) clue).getRawChallenge(), CoreClueReader.challengeCompleted(clue),
-				CoreClueReader.returnItem(clue), targets, EmptySlots.of(CoreClueReader.itemRequirements(clue)));
+			return keyRequirements.computeIfAbsent(stage.getItemIds().get(0), Stages::keyItem);
 		}
-		return List.of();
+		return ItemRequirements.any(stage.getItemName(), stage.getItemIds().stream().map(ItemRequirements::item).toArray(ItemRequirement[]::new));
 	}
 
 	/** Cache tiles the step is also done at, off core's targets: Brimstail inside his cave, Martin Thwait in the den. */
@@ -133,12 +141,6 @@ public class StepResolver
 			.tier(UNKNOWN_TIER)
 			.text("")
 			.kind(TargetKind.ANY_OF)
-			.targets(List.of())
-			.npcs(List.of())
-			.regions(List.of())
-			.objectIds(List.of())
-			.objectNames(List.of())
-			.requirements(StepRequirements.none())
 			.build();
 	}
 
@@ -168,7 +170,7 @@ public class StepResolver
 
 	private StepIndex.Entry partEntry(CrypticClue part)
 	{
-		return index.get().entry(StepKey.of(ClueFacts.of(ClueTypes.CRYPTIC).text(part.getText())));
+		return index.get().entry(CoreClueReader.byText(ClueTypes.CRYPTIC, part.getText()).getKey());
 	}
 
 	private List<String> wornFor(CrypticClue part)
@@ -201,7 +203,7 @@ public class StepResolver
 		{
 			return List.of(entry.getStand());
 		}
-		if (entry.getArea() != null && entry.getArea().getTile() != null)
+		if (entry.getArea() != null && !entry.getArea().getTiles().isEmpty())
 		{
 			return entry.getArea().getTiles();
 		}

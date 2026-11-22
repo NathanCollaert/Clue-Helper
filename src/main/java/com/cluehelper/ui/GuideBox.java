@@ -4,11 +4,8 @@ import com.cluehelper.guide.SubStep;
 import com.cluehelper.hotcold.HotColdView;
 import com.cluehelper.player.Book;
 import com.cluehelper.route.*;
-import java.awt.Color;
 import java.util.*;
-import java.util.regex.*;
 import lombok.*;
-import net.runelite.client.util.ColorUtil;
 import static java.util.stream.Collectors.*;
 
 /** Built on the client thread and handed to the overlay as one immutable value. */
@@ -19,21 +16,6 @@ public class GuideBox
 	public static final GuideBox EMPTY = GuideBox.builder().state(BoxState.NO_CLUE).build();
 	private static final String NO_ROUTE = "No route from what you have";
 	private static final String NO_PLAN_YET = "Waiting for the first plan";
-	/** The withdraw step's item lines' grey: what to click, apart from the white item it is clicked on. */
-	private static final Color DESTINATION = new Color(190, 190, 190);
-	/** A hotkey the guide coloured, with the ". " after it. */
-	private static final Pattern HOTKEY_LABEL = Pattern.compile("(<col=[0-9a-f]{6}>[^<]+</col>)\\. ");
-	private static final String FAIRY_RING = "Fairy ring";
-	private static final String HOTKEY_DASH = " - ";
-	private static final String CAST = "Cast";
-	private static final String BREAK = "Break";
-	private static final String READ = "Read";
-	private static final String USE = "Use";
-	private static final String TABLET = " tablet";
-	private static final String TAB = " tab";
-	private static final String TELEPORT_TO = "Teleport to ";
-	/** A verb, then "the" and what it is done to. */
-	private static final Pattern VERB_THE = Pattern.compile("^(\\w+) the (.+)$");
 	private static final Set<String> ROUTE_NOTES = Set.of(NO_ROUTE, NO_PLAN_YET, "Walk too long", "No target tile for this step yet");
 
 	BoxState state;
@@ -98,8 +80,8 @@ public class GuideBox
 		}
 		if (now != null)
 		{
-			box.now(travelText(now)).nowItems(now.getItems()).nowDetail(now.getDetail())
-				.next(next == null ? null : travelText(next));
+			box.now(now.getText()).nowItems(now.getItems()).nowDetail(now.getDetail())
+				.next(next == null ? null : upcomingLine(next));
 		}
 		List<String> notes = new ArrayList<>();
 		if (plan.getNote() != null && !plan.getNote().equals(Plan.NONE.getNote()))
@@ -128,80 +110,15 @@ public class GuideBox
 		return box.notes(notes).build();
 	}
 
-	/**
-	 * Every teleport reads alike, ITEM: DESTINATION HOTKEY: the item or object in the text's white, what to click in it
-	 * in the item lines' grey, and its hotkey last in the menu's blue. A step with no item
-	 * reads as VERB: THING instead (see actionText), the thing in grey.
-	 */
-	private static String travelText(SubStep step)
+	/** The next line has no item lines under it, so a line that introduces its items ("Withdraw from the bank:") lists them inline. */
+	private static String upcomingLine(SubStep next)
 	{
-		String text = step.getText();
-		if (!step.isTravel())
+		String text = next.getText();
+		if (!text.endsWith(":"))
 		{
 			return text;
 		}
-		String destination = step.getRow() != null ? step.getRow().destination() : "";
-		if (step.getKind() == SubStep.Kind.FAIRY_RING && text.startsWith(FAIRY_RING + " "))
-		{
-			String code = text.substring(FAIRY_RING.length() + 1);
-			boolean coded = code.startsWith("<col");
-			String where = coded ? destination : code.replaceFirst("^to ", "");
-			String place = where.isEmpty() ? "" : coloured(where);
-			return FAIRY_RING + ": " + (coded ? withHotkey(place, code) : place);
-		}
-		int colon = text.indexOf(": ");
-		if (colon < 0)
-		{
-			return actionText(text, destination);
-		}
-		String item = text.substring(0, colon).replaceFirst("^Use ", "");
-		Matcher hotkey = HOTKEY_LABEL.matcher(text.substring(colon + 2));
-		String click = hotkey.replaceFirst("");
-		return item + ": " + (hotkey.reset().find() ? withHotkey(coloured(click), hotkey.group(1)) : coloured(click));
-	}
-
-	/**
-	 * A teleport with no item, as VERB: THING.
-	 */
-	private static String actionText(String text, String destination)
-	{
-		if (text.startsWith(CAST + " "))
-		{
-			return CAST + ": " + coloured(destination.isEmpty() ? text.substring(CAST.length() + 1) : destination);
-		}
-		Matcher action = VERB_THE.matcher(text);
-		if (!action.matches())
-		{
-			return text;
-		}
-		String verb = action.group(1);
-		String thing = action.group(2);
-		if (BREAK.equals(verb))
-		{
-			return BREAK + ": " + coloured(tabName(thing));
-		}
-		return (READ.equals(verb) ? USE : verb) + ": " + coloured(capitalise(thing));
-	}
-
-	/** A tablet as its item is called: a teleport tab. */
-	private static String tabName(String tablet)
-	{
-		if (!tablet.contains(TABLET))
-		{
-			return tablet + TAB;
-		}
-		return tablet.replace(TABLET, tablet.startsWith(TELEPORT_TO) ? TAB : " teleport" + TAB);
-	}
-
-	/** The place, then the hotkey after a dash in the text's white. */
-	private static String withHotkey(String place, String hotkey)
-	{
-		return place.isEmpty() ? hotkey : place + HOTKEY_DASH + hotkey;
-	}
-
-	private static String coloured(String destination)
-	{
-		return ColorUtil.wrapWithColorTag(destination, DESTINATION);
+		return next.getItems().isEmpty() ? text.substring(0, text.length() - 1) : text + " " + String.join(", ", next.getItems());
 	}
 
 	static String bookName(Book book)

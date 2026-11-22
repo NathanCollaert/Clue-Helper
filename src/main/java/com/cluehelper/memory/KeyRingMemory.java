@@ -1,6 +1,5 @@
 package com.cluehelper.memory;
 
-import com.cluehelper.player.PlayerModel;
 import java.util.*;
 import javax.inject.*;
 import net.runelite.api.Client;
@@ -24,10 +23,8 @@ public class KeyRingMemory
 	private static final String ON_THE_RING = METAL_KEY + " -> steel key ring";
 
 	@Inject
-	private Client client;
-	@Inject
-	private PlayerModel player;
-	private MemorySlot<Ring> remembered;
+	Client client;
+	MemorySlot<Ring> remembered;
 
 	@Inject
 	void init(MemoryStore memory)
@@ -35,10 +32,10 @@ public class KeyRingMemory
 		remembered = memory.slot(KEY, Ring.class, Ring::new);
 	}
 
-	/** Call on start and after a profile change. */
-	public void publish()
+	/** Items owned but known not to do what their id promises: a steel key ring the Metal key was taken off. */
+	public Set<Integer> uncounted()
 	{
-		player.setUncounted(remembered.get().metalKeyOff ? Set.of(ItemID.FAVOUR_KEY_RING) : Set.of());
+		return remembered.get().metalKeyOff ? Set.of(ItemID.FAVOUR_KEY_RING) : Set.of();
 	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
@@ -66,7 +63,6 @@ public class KeyRingMemory
 		Ring ring = new Ring();
 		ring.metalKeyOff = metalKeyOff;
 		remembered.set(ring);
-		publish();
 	}
 
 	static final class Ring

@@ -23,6 +23,7 @@ public final class MenuLabels
 	private static final int SHORTEST_PARTIAL = 4;
 	private static final String TELEPORT_SUFFIX = " teleport";
 	private static final String RING_PREFIX = "ring ";
+	private static final String RENAMED_RING_PREFIX = "RING-";
 
 	private MenuLabels()
 	{
@@ -108,17 +109,31 @@ public final class MenuLabels
 		return TELEPORT_LIST_OPENERS.contains(normalise(option));
 	}
 
-	/** Rings also offer a place as an option of its own, prefixed Ring- on the house's spiritual fairy tree. */
+	/**
+	 * Rings also offer a place as an option of its own, prefixed Ring- on the house's spiritual fairy tree. Easy Teleports
+	 * names the place and keeps the code after it: "Ring-Zanaris (BKS)".
+	 */
 	static boolean isRingDestination(String option, String code)
 	{
 		String plain = normalise(option);
 		String place = code.toLowerCase(Locale.ROOT);
-		return isLastDestination(option, code) || plain.equals(place) || plain.equals(RING_PREFIX + place);
+		return isLastDestination(option, code) || plain.equals(place) || plain.equals(RING_PREFIX + place)
+			|| compact(option).startsWith(RENAMED_RING_PREFIX) && namesCode(option, code);
 	}
 
 	static boolean isLastDestination(String option, String code)
 	{
-		String plain = TAGS.matcher(option == null ? "" : option).replaceAll("").toUpperCase(Locale.ROOT).replace(" ", "");
-		return plain.contains("LAST-DESTINATION") && plain.contains("(" + code.replace("-", "") + ")");
+		return compact(option).contains("LAST-DESTINATION") && namesCode(option, code);
+	}
+
+	private static boolean namesCode(String option, String code)
+	{
+		return compact(option).contains("(" + code.replace("-", "") + ")");
+	}
+
+	/** Upper case without tags or spaces. */
+	private static String compact(String option)
+	{
+		return TAGS.matcher(option == null ? "" : option).replaceAll("").toUpperCase(Locale.ROOT).replace(" ", "");
 	}
 }

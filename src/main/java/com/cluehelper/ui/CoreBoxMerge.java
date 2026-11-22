@@ -14,12 +14,12 @@ import net.runelite.client.ui.overlay.*;
 public class CoreBoxMerge
 {
 	@Inject
-	private OverlayManager overlayManager;
+	OverlayManager overlayManager;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private GuideOverlay guideOverlay;
-	private ClueScrollOverlay hidden;
+	GuideOverlay guideOverlay;
+	ClueScrollOverlay hidden;
 
 	/** @param activeCore the Clue Scroll plugin while it runs, which is when its box belongs in the overlay manager */
 	public void apply(ClueScrollPlugin activeCore)

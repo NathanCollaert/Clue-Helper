@@ -1,14 +1,17 @@
 package com.cluehelper.route;
 
+import com.cluehelper.Tables;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.IntStream;
 import javax.inject.*;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
@@ -20,34 +23,34 @@ import static java.util.stream.Collectors.*;
 public class StepNeeds
 {
 	/** Copy of core's {@code ClueScrollOverlay.HAS_SPADE} (1.13.2). */
-	public static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
+	private static final ItemRequirement SPADE = ItemRequirements.any("Spade", ItemRequirements.item(ItemID.SPADE),
 		ItemRequirements.item(ItemID.EASTER23_SPADE));
-	/** Core's {@code ClueScrollOverlay.HAS_LIGHT} item ids (1.13.2). */
-	private static final List<Integer> LIGHT_SOURCES = List.of(594, 33, 32, 4531, 4534, 4524, 4539, 4550, 4702, 9065, 5013, 9804, 9805, 13137,
-		13138, 13139, 13140, 20720, 29777, 13280, 13342, 26824, 26826, 26828, 26830, 26832, 26834, 26836, 26838, 26840, 26842,
-		26844, 26846, 26848, 30363);
 	/** Core's {@code ClueScrollOverlay.HAS_LIGHT}. */
-	public static final ItemRequirement LIGHT = anyOf("Light source", LIGHT_SOURCES);
+	private static final ItemRequirement LIGHT = anyOf("Light source", IntStream.of(Tables.ids("light sources")).boxed().collect(toList()));
 	private static final int NO_FIRE_PIT = -1;
 	private static final int LIT = 1;
 
 	/** Names, real levels and varbits. */
-	private final Client client;
-	private final IntFunction<StashMemory.State> stashStates;
-	private final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
+	final Client client;
+	final IntFunction<StashMemory.State> stashStates;
+	final BiFunction<GearBonus, Collection<Integer>, Map<Integer, GearPicker.Piece>> gearPieces;
 	/** What gear is picked from: carried, and stored while banking counts. */
-	private final Supplier<Set<Integer>> ownedItemIds;
+	final Supplier<Set<Integer>> ownedItemIds;
 	/** The quests that waive a step's way-in items. */
-	private final Predicate<Quest> finishedQuests;
+	final Predicate<Quest> finishedQuests;
+	/** Where the player stands; null while unknown. */
+	final Supplier<WorldPoint> playerTile;
 	/** One requirement per hand-data entry, so a re-plan's needs equal the last ones. */
-	private final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
-	private final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
+	final Map<StepIndex.Requires, ItemRequirement> wayInItems = new HashMap<>();
+	final Map<StepIndex.Alternative, ItemRequirement> widened = new HashMap<>();
+	/** One requirement per item id picked from a brought-if-owned entry, for the same reason. */
+	final Map<Integer, ItemRequirement> ownedPicks = new HashMap<>();
 
 	@Inject
 	StepNeeds(Client client, StashMemory stash, GearPieces gearPieces, AvailabilityService availability, PlayerModel player)
 	{
 		this(client, stash::state, gearPieces::of, () -> ownedItemIds(player.getSnapshot(), availability.getBankedSnapshot()),
-			player::finished);
+			player::finished, () -> player.getPosition().getTile());
 	}
 
 	public RequiredItems of(Step step)
@@ -86,10 +89,11 @@ public class StepNeeds
 				continue;
 			}
 			boolean fetchedOnTheWay = gettingLeft && way.getFrom() != null;
-			if (!fetchedOnTheWay)
+			ItemRequirement item = way.isBroughtIfOwned() ? firstOwned(way) : wayInItems.computeIfAbsent(way, w -> anyOf(w.getName(), w.getIds()));
+			if (!fetchedOnTheWay && !usedUpGoingIn(way, step) && item != null)
 			{
 				// Worn gear keeps the player alive or gets them in (a mirror shield, a sled): no route without it
-				needs.add(new RequiredItems.Need(way.getName(), wayInItems.computeIfAbsent(way, w -> anyOf(w.getName(), w.getIds())), false, way.isWear()));
+				needs.add(new RequiredItems.Need(way.getName(), item, false, way.isWear()));
 			}
 		}
 		ItemRequirement key = ownedKey(step);
@@ -108,6 +112,14 @@ public class StepNeeds
 			.stash(stash(requirements))
 			.spadeAtLeprechaun(client.getVarbitValue(VarbitID.FARMING_TOOLS_SPADE) > 0)
 			.build();
+	}
+
+	/** The first of the item's ids the player owns, as its own requirement; null while none is owned. */
+	private ItemRequirement firstOwned(StepIndex.Requires way)
+	{
+		Set<Integer> owned = ownedItemIds.get();
+		return way.getIds().stream().filter(owned::contains).findFirst()
+			.map(id -> ownedPicks.computeIfAbsent(id, first -> anyOf(way.getName(), List.of(first)))).orElse(null);
 	}
 
 	private boolean isOptional(String name, StepIndex.Entry data)
@@ -145,6 +157,14 @@ public class StepNeeds
 		return ClueTypes.SKILL.equals(step.getType()) && step.getStages().stream().noneMatch(stage -> stage.getKind() == Stage.Kind.TASK);
 	}
 
+	/** An item used on the way in (the rope tied to the Genie's crevice) is no longer needed once inside. */
+	private boolean usedUpGoingIn(StepIndex.Requires way, Step step)
+	{
+		StepIndex.WayIn wayIn = step.getData().getEntry();
+		WorldPoint tile = playerTile.get();
+		return wayIn != null && tile != null && wayIn.isInside(tile) && way.getIds().stream().anyMatch(wayIn.getUse()::contains);
+	}
+
 	/** Gear is picked from all of these, the bank only while banking counts. */
 	public static Set<Integer> ownedItemIds(PlayerSnapshot snapshot, PlayerSnapshot banked)
 	{
@@ -162,7 +182,7 @@ public class StepNeeds
 	}
 
 	/** A lit fire pit lights the step, as core counts it. */
-	public static boolean isFirePitLit(int firePitVarbitId, Client client)
+	private static boolean isFirePitLit(int firePitVarbitId, Client client)
 	{
 		return firePitVarbitId != NO_FIRE_PIT && client.getVarbitValue(firePitVarbitId) == LIT;
 	}

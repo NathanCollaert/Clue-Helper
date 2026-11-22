@@ -20,8 +20,6 @@ public class SubStep
 		STEP_CHANGES,
 		STASH_WITHDRAWN,
 		STASH_DEPOSITED,
-		/** Core's item requirements are met by what is worn. */
-		EQUIPPED,
 		URI_HERE,
 		/** A challenge scroll, puzzle box or light box arrives in the inventory. */
 		CHALLENGE_ITEM,
@@ -31,18 +29,14 @@ public class SubStep
 		ITEM_GONE,
 		/** None of {@code actItems} is carried or worn any more (weapons and armour left before Entrana). */
 		ITEMS_GONE,
-		/** The way in's worn requirements (diving gear) are all worn. */
-		WAY_IN_WORN,
-		/** The needs named in {@code wornNeeds} are met by worn items alone. */
-		GEAR_WORN,
-		/** Core's {@code emptied} slot requirements are met by what is worn. */
+		/** {@code worn} and the needs named in {@code wornNeeds} are met by what is worn, or carried as {@code unwearableCarried} allows. */
+		WORN,
+		/** Core's {@code emptied} slot requirements are met by what is worn, or the way in's gear is on already (Larry's suit). */
 		SLOTS_EMPTY,
-		/** As {@code SLOTS_EMPTY}, or the way in's worn requirements are on already (the suit Larry puts in the cape slot). */
-		WAY_IN_SLOTS_EMPTY,
 		/** One of {@code heldWhenDone} is carried or worn. */
 		ITEM_HELD,
-		/** One of {@code actItems} is worn (a ghostspeak amulet before the ghost captain's boat). */
-		ITEM_WORN
+		/** The music tab's now playing is {@code track}. */
+		TRACK_PLAYING
 	}
 
 	public enum Kind
@@ -110,12 +104,27 @@ public class SubStep
 	String actItemNamed;
 	/** The option the act takes on its item: filled when that is the item's left click, coloured in its menu. */
 	String actOption;
-	/** For {@link Done#GEAR_WORN}: the step's needs to wear, by name. */
+	/** For {@link Done#WORN}: what to put on (an emote's items, a ghostspeak amulet). */
+	@Builder.Default
+	List<ItemRequirement> worn = List.of();
+	/**
+	 * For {@link Done#WORN}: an item that can't be worn counts when carried. Only an emote's own items: core lists the axe
+	 * hut's lockpick among them. Gear an NPC puts on (Larry's Clockwork suit) can't be worn either, and must be.
+	 */
+	boolean unwearableCarried;
+	/**
+	 * For {@link Done#WORN} or {@code SLOTS_EMPTY}: the way in's worn requirements are wanted too, as they are judged again
+	 * each tick (a carried talisman or a finished quest waives one).
+	 */
+	boolean wornWayIn;
+	/** For {@link Done#WORN}: the step's needs to wear, by name, as the needs are judged again each tick. */
 	@Builder.Default
 	List<String> wornNeeds = List.of();
 	/** For {@link Done#SLOTS_EMPTY}: core's empty-slot requirements. */
 	@Builder.Default
 	List<ItemRequirement> emptied = List.of();
+	/** For {@link Done#TRACK_PLAYING}: the track's name. */
+	String track;
 	/** For {@link Done#ITEM_HELD}: any of these. */
 	@Builder.Default
 	Set<Integer> heldWhenDone = Set.of();
@@ -139,8 +148,7 @@ public class SubStep
 	/** Gear put on or taken off, or something fetched before the act: done where the player stands, no line to the place. */
 	public boolean isPreparation()
 	{
-		return done == Done.GEAR_WORN || done == Done.WAY_IN_WORN || done == Done.SLOTS_EMPTY || done == Done.WAY_IN_SLOTS_EMPTY || done == Done.ITEM_HELD
-			|| done == Done.ITEM_WORN;
+		return done == Done.WORN || done == Done.SLOTS_EMPTY || done == Done.ITEM_HELD;
 	}
 
 	/** Its items go into a bank or deposit box (the master scroll book, weapons before Entrana). */

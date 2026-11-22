@@ -18,32 +18,32 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 public class GuideBoxPresenter
 {
 	@Inject
-	private ClueLink clueLink;
+	ClueLink clueLink;
 	@Inject
-	private PlayerModel playerModel;
+	PlayerModel playerModel;
 	@Inject
-	private PlannerRunner planner;
+	PlannerRunner planner;
 	@Inject
-	private RoutePlanner routes;
+	RoutePlanner routes;
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private HotColdService hotCold;
+	HotColdService hotCold;
 	@Inject
-	private BankMemory bankMemory;
+	BankMemory bankMemory;
 	@Inject
-	private PohService poh;
+	PohService poh;
 	@Inject
-	private AvailabilityService availability;
+	AvailabilityService availability;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private GuideOverlay overlay;
+	GuideOverlay overlay;
 
 	public void refresh()
 	{
-		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getShown(),
-			config.showNextStep() ? guide.getShownNext() : null, stuckBookOnF2p(), prompts());
+		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
+			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
 		GuideBox.GuideBoxBuilder shown = atStep.toBuilder();
 		if (repeatsCoreSolution(atStep.getNowDetail()))
@@ -66,7 +66,7 @@ public class GuideBoxPresenter
 
 	private BoxState boxState()
 	{
-		return BoxState.of(isDormant(), clueLink.isActive(), clueLink.needsRead(), clueLink.hasStep(), guide.owesStashPutBack(),
+		return BoxState.of(isDormant(), clueLink.isActive(), clueLink.hasStep(), guide.owesStashPutBack(),
 			planner.isWorking());
 	}
 

@@ -1,15 +1,18 @@
 package com.cluehelper.transport;
 
-import com.cluehelper.route.WalkTable;
+import com.cluehelper.player.RuneLoader;
+import com.cluehelper.route.WalkLoader;
+import com.cluehelper.step.StepLoader;
 import com.google.gson.Gson;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.zip.GZIPInputStream;
 import net.runelite.http.api.RuneLiteAPI;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-/** The shipped JSON must be what the source tables parse to today, and must read back to the same values. */
+/** The shipped data must be what the source tables parse to today. */
 public class BakedDataTest
 {
 	private static final String STALE = " is out of date with its source tables: run gradlew bakeData";
@@ -18,13 +21,30 @@ public class BakedDataTest
 	@Test
 	public void catalogIsBakedFromTheCurrentTables() throws IOException
 	{
-		assertEquals(DataBake.CATALOG + STALE, CatalogLoader.load(), CatalogData.read(gson));
+		assertEquals(DataBake.CATALOG + STALE, CatalogLoader.load(), Catalog.read(gson));
 	}
 
 	@Test
-	public void walkRequirementsAreBakedFromTheCurrentTables() throws IOException
+	public void walkDataIsBakedFromTheCurrentTables() throws IOException
 	{
-		assertEquals(DataBake.WALK_REQUIREMENTS + STALE, DataBake.walkRequirements().get("gates"), WalkTable.load(gson).getGates());
+		WalkLoader.Baked walk = WalkLoader.load();
+		assertEquals(WalkLoader.JSON + STALE, DataBake.walkJson(walk), Files.readString(WalkLoader.JSON, StandardCharsets.UTF_8));
+		try (InputStream baked = new GZIPInputStream(Files.newInputStream(WalkLoader.COLUMNS)))
+		{
+			assertArrayEquals(WalkLoader.COLUMNS + STALE, walk.getColumns(), baked.readAllBytes());
+		}
+	}
+
+	@Test
+	public void stepDataIsBakedFromTheCurrentStepFiles() throws IOException
+	{
+		assertEquals(StepLoader.JSON + STALE, DataBake.stepsJson().strip(), Files.readString(StepLoader.JSON, StandardCharsets.UTF_8).strip());
+	}
+
+	@Test
+	public void runeModelIsBakedFromTheCurrentCacheSlice() throws IOException
+	{
+		assertEquals(RuneLoader.JSON + STALE, RuneLoader.json(DataBake.GSON).strip(), Files.readString(RuneLoader.JSON, StandardCharsets.UTF_8).strip());
 	}
 
 	@Test

@@ -7,7 +7,7 @@ import lombok.*;
 import net.runelite.api.Skill;
 
 @Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class LevelNeed
 {
 	@RequiredArgsConstructor
@@ -20,10 +20,10 @@ public class LevelNeed
 		MUSIC_TRACKS("every music track", player -> -player.getLockedMusicTracks(), "still locked"),
 		ALL_QUEST_POINTS("every quest point", player -> -player.getMissingQuestPoints(), "short");
 
-		private final String format;
-		private final ToIntFunction<PlayerSnapshot> have;
+		final String format;
+		final ToIntFunction<PlayerSnapshot> have;
 		/** How what is missing is worded, for a need held against 0; null for a level. */
-		private final String missingAs;
+		final String missingAs;
 	}
 
 	/** Null for an aggregate. */
@@ -35,23 +35,6 @@ public class LevelNeed
 	public static LevelNeed ofSkill(Skill skill, int level)
 	{
 		return new LevelNeed(skill, null, level);
-	}
-
-	public static LevelNeed ofAggregate(Aggregate aggregate, int level)
-	{
-		return new LevelNeed(null, aggregate, level);
-	}
-
-	/** The Music cape's need, which grows with every track a game update adds. */
-	public static LevelNeed everyMusicTrack()
-	{
-		return new LevelNeed(null, Aggregate.MUSIC_TRACKS, 0);
-	}
-
-	/** The Quest point cape's need, which grows with every quest a game update adds. */
-	public static LevelNeed everyQuestPoint()
-	{
-		return new LevelNeed(null, Aggregate.ALL_QUEST_POINTS, 0);
 	}
 
 	/**

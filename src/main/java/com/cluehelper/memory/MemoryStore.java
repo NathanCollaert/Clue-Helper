@@ -4,6 +4,7 @@ import com.cluehelper.ClueHelperConfig;
 import com.google.gson.Gson;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import javax.inject.*;
 import lombok.*;
@@ -17,9 +18,10 @@ import net.runelite.client.config.ConfigManager;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class MemoryStore
 {
-	private final ProfileConfig profile;
-	private final Gson gson;
-	private final List<MemorySlot<?>> slots = new CopyOnWriteArrayList<>();
+	final ProfileConfig profile;
+	final Gson gson;
+	final List<MemorySlot<?>> slots = new CopyOnWriteArrayList<>();
+	final AtomicLong version = new AtomicLong();
 
 	@Inject
 	MemoryStore(ConfigManager configManager, Gson gson)
@@ -34,7 +36,7 @@ public class MemoryStore
 	 */
 	public <T> MemorySlot<T> slot(String key, Class<T> type, Supplier<T> fresh)
 	{
-		MemorySlot<T> slot = new MemorySlot<>(key, type, fresh, profile, gson);
+		MemorySlot<T> slot = new MemorySlot<>(key, type, fresh, profile, gson, version::incrementAndGet);
 		slots.add(slot);
 		return slot;
 	}
@@ -46,12 +48,19 @@ public class MemoryStore
 		{
 			slot.forget();
 		}
+		version.incrementAndGet();
+	}
+
+	/** Moves on whenever a slot is set or the profile's slots are reloaded. */
+	public long getVersion()
+	{
+		return version.get();
 	}
 
 	@RequiredArgsConstructor
 	private static final class RuneLiteProfileConfig implements ProfileConfig
 	{
-		private final ConfigManager configManager;
+		final ConfigManager configManager;
 
 		@Override
 		public String profileKey()
@@ -69,12 +78,6 @@ public class MemoryStore
 		public void set(String key, String value)
 		{
 			configManager.setRSProfileConfiguration(ClueHelperConfig.GROUP, key, value);
-		}
-
-		@Override
-		public void unset(String key)
-		{
-			configManager.unsetRSProfileConfiguration(ClueHelperConfig.GROUP, key);
 		}
 	}
 }

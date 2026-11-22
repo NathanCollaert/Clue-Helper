@@ -1,7 +1,7 @@
 package com.cluehelper.route;
 
 import java.util.Set;
-import lombok.*;
+import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -20,7 +20,6 @@ public class Exit
 	/** -1 when unknown. */
 	int objectId;
 	/** The other objects a row between the same tiles goes through (the Viyeldi winch before its rope is tied). */
-	@With
 	Set<Integer> otherForms;
 	/** The chat option the talk picks; empty for none. */
 	String chat;

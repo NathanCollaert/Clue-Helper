@@ -12,9 +12,6 @@ import net.runelite.api.coords.WorldPoint;
 @Builder
 public class ProbeJob
 {
-	/** Kept tiles per spot that the scoring sees; a radius of at most 3 gives up to 49. */
-	private static final int SAMPLES_PER_SPOT = 9;
-
 	String stepKey;
 	HotColdTier tier;
 	List<Spot> spots;
@@ -52,7 +49,7 @@ public class ProbeJob
 			grid = Hypotheses.filter(spots, tier, List.of(last.asAnchor()));
 		}
 		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares())
-			.exact(grid.isExact()).considered(List.copyOf(nearby));
+			.considered(List.copyOf(nearby));
 		if (shook && core.isFelt())
 		{
 			return plan.action(HotColdPlan.Action.DIG_HERE).tile(new WorldPoint(last.getX(), last.getY(), last.getPlane())).build();
@@ -62,10 +59,9 @@ public class ProbeJob
 		{
 			return plan.action(HotColdPlan.Action.DIG_SPOT).tile(grid.digTile(kept.get(0).getName())).build();
 		}
-		Hypotheses.Samples samples = grid.sample(SAMPLES_PER_SPOT);
-		List<Probe> probes = ProbePlanner.worthTrying(samples, tier, last, nearby, landingsWithin, costs);
+		List<Probe> probes = ProbePlanner.worthTrying(grid, tier, last, nearby, landingsWithin, costs);
 		plan.considered(List.copyOf(probes));
-		ProbePlanner.Choice choice = ProbePlanner.choose(samples, tier, last, probes, costs);
+		ProbePlanner.Choice choice = ProbePlanner.choose(grid, tier, last, probes, costs);
 		if (choice == null)
 		{
 			return plan.action(HotColdPlan.Action.NONE).build();

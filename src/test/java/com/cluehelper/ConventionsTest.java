@@ -78,10 +78,11 @@ public class ConventionsTest
 
 	/**
 	 * These change core's shared state, which every overlay of core reads. Safe only offline. Core's hot/cold set is
-	 * live, so it is only ever copied; a solver of our own over it would share the set.
+	 * live, so it is only ever copied; a solver of our own over it would share the set. {@code makeOverlayHint} is
+	 * allowed: the combined box calls it in place of core's box, which calls it every frame.
 	 */
 	private static final Pattern MUTATING_CORE_CALL = Pattern.compile(
-		"\\.(forText|forChatboxText|update|reset|resetClue|setChallengeCompleted|makeOverlayHint|makeWorldOverlayHint|makeSTASHOverlay|signal)\\s*\\("
+		"\\.(forText|forChatboxText|update|reset|resetClue|setChallengeCompleted|makeWorldOverlayHint|makeSTASHOverlay|signal)\\s*\\("
 			+ "|getPossibleLocations\\(\\)\\s*\\.\\s*(add|addAll|remove|removeIf|removeAll|retainAll|clear|iterator)\\s*\\("
 			+ "|new\\s+HotColdSolver\\s*\\(");
 	private static final String CORE_CLUE_PACKAGE = "import net.runelite.client.plugins.cluescrolls";

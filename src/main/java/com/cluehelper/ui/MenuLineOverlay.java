@@ -2,6 +2,7 @@ package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.*;
+import com.cluehelper.transport.MenuLine;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -11,15 +12,15 @@ import net.runelite.client.ui.overlay.*;
 public class MenuLineOverlay extends Overlay
 {
 	@Inject
-	private StepGuide guide;
+	StepGuide guide;
 	@Inject
-	private MenuLines lines;
+	MenuLines lines;
 	@Inject
-	private FairyDials dials;
+	FairyDials dials;
 	@Inject
-	private ClueHelperConfig config;
+	ClueHelperConfig config;
 	@Inject
-	private Highlighter highlighter;
+	Highlighter highlighter;
 
 	MenuLineOverlay()
 	{
@@ -39,7 +40,7 @@ public class MenuLineOverlay extends Overlay
 		{
 			highlighter.box(graphics, line);
 		}
-		if (target.getLine() == MenuTarget.Line.FAIRY_CODE)
+		if (target.getLine() == MenuLine.FAIRY_CODE)
 		{
 			dials.shapes(target.getLineKey()).forEach(shape -> highlighter.box(graphics, shape));
 		}
