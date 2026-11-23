@@ -1,0 +1,29 @@
+name: Enhancement
+description: A new thing Clue Helper could do.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "Keep it short: a sentence or two per box is plenty."
+  - type: textarea
+    id: what
+    attributes:
+      label: What it should do
+      description: The new thing, as you would see it in game.
+      placeholder: When the True Clue Areas plugin is on, the route ends at the nearest tile of a step's dig or emote area instead of its single tile.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it helps
+      description: What it saves or adds, like time, clicks or a kind of clue it doesn't cover yet.
+      placeholder: Most steps accept a whole area, so walking to the exact tile wastes steps, and some teleports already land inside the area.
+    validations:
+      required: true
+  - type: textarea
+    id: to-work-out
+    attributes:
+      label: To work out
+      description: Open questions or choices, one short line each. Leave empty if you have none.
+      placeholder: "- Should it still use the areas when that plugin isn't installed?"

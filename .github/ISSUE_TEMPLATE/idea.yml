@@ -1,5 +1,5 @@
-name: Idea or improvement
-description: Something Clue Helper could do better, or a new thing it could do.
+name: Issue
+description: Something in how Clue Helper works today gets in your way.
 labels: ["enhancement"]
 body:
   - type: markdown
