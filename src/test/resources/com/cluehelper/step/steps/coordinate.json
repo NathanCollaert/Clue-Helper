@@ -1,5 +1,4 @@
 {
-"dump": "2026-11-19",
 "steps": {
 "coordinate:12033": {"items":[12033],"regions":[4],"rows":[{"id":1946,"name":"CLUEHELPER_COORDINATE_MEDIUM_23"}],"targets":[{"kind":"coord","text":"South-east of Feldip Hills, by the crimson swifts (AKS).","tile":[2594,2899,0]}],"tier":"medium","tiles":[[2594,2899,0]]},
 "coordinate:12035": {"items":[12035],"regions":[6],"rows":[{"id":1932,"name":"CLUEHELPER_COORDINATE_MEDIUM_9"}],"targets":[{"kind":"coord","text":"East of Uzer. Fairy ring (DLQ).","tile":[3510,3074,0]}],"tier":"medium","tiles":[[3510,3074,0]]},

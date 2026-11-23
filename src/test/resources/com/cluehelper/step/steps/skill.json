@@ -1,5 +1,4 @@
 {
-"dump": "2026-11-19",
 "steps": {
 "skill:CHARLIE:i need to give charlie a cooked pike.": {"manual":["sources"],"regions":[1],"rows":[{"id":1812,"name":"CLUEHELPER_SKILLCHALLENGE_BEGINNER_1"}],"sources":[{"text":"Bait fishing at Barbarian Village, then cook it on the fire there","tile":[3104,3424,0],"tools":[{"ids":[307],"name":"Fishing rod"},{"ids":[313],"name":"Fishing bait"}]}],"targets":[{"kind":"npc","npcs":[5209],"text":"Next to the south entrance of Varrock.","tile":[3209,3392,0]}],"tier":"beginner","tiles":[[3209,3392,0]]},
 "skill:CHARLIE:i need to give charlie a cooked trout.": {"manual":["sources"],"regions":[1],"rows":[{"id":1811,"name":"CLUEHELPER_SKILLCHALLENGE_BEGINNER_0"}],"sources":[{"text":"Fly fishing at Barbarian Village, then cook it on the fire there","tile":[3104,3424,0],"tools":[{"ids":[309],"name":"Fly fishing rod"},{"ids":[314],"name":"Feathers"}]}],"targets":[{"kind":"npc","npcs":[5209],"text":"Next to the south entrance of Varrock.","tile":[3209,3392,0]}],"tier":"beginner","tiles":[[3209,3392,0]]},

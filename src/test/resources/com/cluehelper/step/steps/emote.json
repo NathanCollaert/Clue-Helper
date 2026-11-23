@@ -1,5 +1,4 @@
 {
-"dump": "2026-11-19",
 "steps": {
 "emote:10180": {"emotes":[12],"items":[10180],"outfit":{"slots":{"HAT":[1153],"RHAND":[1205],"RING":[1635]},"text":"Equip a bronze dagger, iron full helmet and a gold ring."},"regions":[1],"rows":[{"id":2104,"name":"CLUEHELPER_EMOTE_EASY_14"}],"stash":{"object":28958,"tile":[3201,3171,0]},"targets":[{"kind":"coord","text":"Near the shed in Lumbridge Swamp.","tile":[3203,3169,0]}],"tier":"easy","tiles":[[3203,3169,0]]},
 "emote:10182": {"emotes":[20],"items":[10182],"outfit":{"slots":{"HAT":[1137],"RING":[1639],"TORSO":[1005]},"text":"Equip an iron medium helmet, emerald ring and a white apron."},"regions":[1],"rows":[{"id":2098,"name":"CLUEHELPER_EMOTE_EASY_8"}],"stash":{"object":28959,"tile":[3115,3194,0]},"targets":[{"kind":"coord","text":"On the bridge to the Misthalin Wizards' Tower.","tile":[3113,3196,0]}],"tier":"easy","tiles":[[3113,3196,0]]},
