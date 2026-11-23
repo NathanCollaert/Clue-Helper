@@ -18,8 +18,11 @@ public class AbyssObstacles
 	private static final Set<Integer> IDS = Tables.idSet("abyss obstacles");
 	/** The forms crossed without a pickaxe, an axe or a tinderbox. */
 	private static final Set<String> WITHOUT_TOOLS = Set.of("Passage", "Gap", "Eyes");
-	/** The tool each other form takes, as the last word of the tool's name: a rune pickaxe mines, an infernal axe chops. */
-	private static final Map<String, String> TOOLS = Map.of("Rock", "pickaxe", "Tendrils", "axe", "Boil", "tinderbox");
+	/** The tools each other form takes, as the last word of the tool's name: a rune pickaxe mines, an Imcando hatchet chops. */
+	private static final Map<String, Set<String>> TOOLS = Map.of("Rock", Set.of("pickaxe"), "Tendrils", Set.of("axe", "hatchet"),
+		"Boil", Set.of("tinderbox"));
+	/** A variant's suffix: "Dragon pickaxe (or)", "Crystal axe (inactive)". */
+	private static final String VARIANT_SUFFIX = " \\(.*\\)$";
 
 	@Inject
 	Client client;
@@ -48,7 +51,7 @@ public class AbyssObstacles
 			return chosen;
 		}
 		WorldPoint from = local.getWorldLocation();
-		chosen = obstacles.stream().filter(obstacle -> isObstacle(obstacle.getId()) && canPass(obstacle, tools))
+		chosen = obstacles.stream().filter(obstacle -> canPass(obstacle, tools))
 			.min(Comparator.comparingInt(obstacle -> obstacle.getWorldLocation().distanceTo2D(from))).orElse(null);
 		return chosen;
 	}
@@ -56,10 +59,10 @@ public class AbyssObstacles
 	private boolean canPass(TileObject obstacle, Set<String> tools)
 	{
 		String form = LeftClicks.shownForm(client.getObjectDefinition(obstacle.getId())).getName();
-		return WITHOUT_TOOLS.contains(form) || tools.contains(TOOLS.get(form));
+		return WITHOUT_TOOLS.contains(form) || TOOLS.getOrDefault(form, Set.of()).stream().anyMatch(tools::contains);
 	}
 
-	/** The last word of every item carried or worn: "pickaxe" for a rune pickaxe. */
+	/** The tool word of every item carried or worn. */
 	private Set<String> carriedToolWords()
 	{
 		Set<String> words = new HashSet<>();
@@ -70,11 +73,17 @@ public class AbyssObstacles
 			{
 				if (item.getId() >= 0)
 				{
-					String[] name = client.getItemDefinition(item.getId()).getName().toLowerCase(Locale.ROOT).split(" ");
-					words.add(name[name.length - 1]);
+					words.add(toolWord(client.getItemDefinition(item.getId()).getName()));
 				}
 			}
 		}
 		return words;
+	}
+
+	/** The last word of an item's name, past any variant suffix: "pickaxe" for a dragon pickaxe (or). */
+	static String toolWord(String itemName)
+	{
+		String[] words = itemName.replaceFirst(VARIANT_SUFFIX, "").toLowerCase(Locale.ROOT).split(" ");
+		return words[words.length - 1];
 	}
 }

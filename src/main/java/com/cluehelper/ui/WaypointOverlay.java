@@ -635,7 +635,8 @@ public class WaypointOverlay extends Overlay
 	 */
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (pathObjects.keySet().stream().anyMatch(object -> object.getId() == event.getId()))
+		TileObject clicked = pathObjects.keySet().stream().filter(object -> object.getId() == event.getId()).findFirst().orElse(null);
+		if (clicked != null && !isRunToAbyssObstacle(clicked))
 		{
 			crossingFrom = client.getTickCount();
 		}
@@ -643,6 +644,16 @@ public class WaypointOverlay extends Overlay
 		{
 			enteringFrom = client.getTickCount();
 		}
+	}
+
+	/**
+	 * An Abyss obstacle clicked from afar is run to first: the walk data's own way through the ring can be another spot,
+	 * so the line keeps leading to the one clicked rather than following that walk.
+	 */
+	private boolean isRunToAbyssObstacle(TileObject clicked)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		return AbyssObstacles.isObstacle(clicked.getId()) && view != null && !besidePlayer(view, clicked);
 	}
 
 	/** The step's way in taken (a slope slid down): no line is drawn until the player is through and stands idle. */
