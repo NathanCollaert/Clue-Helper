@@ -2061,9 +2061,12 @@
   worn [28933] inv [28936, 28939] done
 -- worn
   worn [28933, 28936, 28939] inv [] done
-== map:19782 #1 Equip the Medallion of the Deep
+== map:19782 #3 Equip the Medallion of the Deep
 -- recorded
-  worn [28329, 29796, 32386, 33066] inv [229, 307, 552, 564, 590, 946, 952, 1523, 7936, 12934, 13111, 13140, 13241, 13280, 19476, 21268, 21389, 26948, 28260] done
+  worn [13342] inv [952, 995, 1359, 1511, 6317, 19476, 33120]
+   -> Equip: [Medallion of the Deep]
+   outline [] fill [] tab INVENTORY menu [[]@[]]
+   stuck
 -- bare
   worn [] inv []
    -> Equip: [Medallion of the Deep]
@@ -4111,12 +4114,9 @@
   worn [25592, 25594, 25596, 25598] inv [307, 13258, 13259, 13260, 13261, 13431, 22846, 30773] done
 -- worn
   worn [22846, 25592, 25594, 25596, 25598] inv [307, 13258, 13259, 13260, 13261, 13431, 30773] done
-== skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear. #3 Equip:
+== skill:SHERLOCK:chop a redwood log whilst sporting the finest lumberjack gear. #4 Equip:
 -- recorded
-  worn [13342] inv [952, 1127, 1523, 13069, 13111, 13222, 21795, 25932]
-   -> Equip: [Lumberjack outfit]
-   outline [] fill [] tab INVENTORY menu [[]@[]]
-   stuck
+  worn [10933, 10939, 10940, 10941, 13342, 32386] inv [952, 995, 13140, 19476, 19669, 34631] done
 -- bare
   worn [] inv []
    -> Equip: [Lumberjack outfit]
