@@ -1,6 +1,6 @@
 name: Issue
-description: Something in how Clue Helper works today gets in your way.
-labels: ["enhancement"]
+description: Something in Clue Helper doesn't work, looks wrong or gets in your way.
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
