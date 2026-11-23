@@ -639,11 +639,12 @@ public final class SubSteps
 
 	/**
 	 * A walk covers at most a tile a half-tick, so one that starts further from the way in than its time allows goes in
-	 * another way (into an altar out of the Abyss, not through its ruins).
+	 * another way (into an altar out of the Abyss, not through its ruins). Dungeon tiles are measured from above them:
+	 * up through the Trollheim cave to the Trollweiss slope is a short walk.
 	 */
 	private static boolean canPass(Leg leg, StepIndex.WayIn way)
 	{
-		return way.getTile() == null || leg.getFrom().distanceTo2D(way.getTile()) <= leg.getHalfTicks();
+		return way.getTile() == null || aboveGround(leg.getFrom()).distanceTo2D(aboveGround(way.getTile())) <= leg.getHalfTicks();
 	}
 
 	private static boolean hasPlacedStages(Step step)

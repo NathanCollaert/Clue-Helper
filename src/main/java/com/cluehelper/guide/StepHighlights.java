@@ -72,7 +72,8 @@ final class StepHighlights
 				forms.addAll(exit.getOtherForms());
 				return shown.menuTarget(withDialogue(way.toBuilder().objectIds(Set.copyOf(forms)).build(), wayInOf(step, exit))).build();
 			case WALK:
-				if (current.getWayIn() != null)
+				// Gear that only works at the way in goes on there first: its walk leads to the spot, not the object
+				if (current.getWayIn() != null && !current.getWayIn().isGearThere())
 				{
 					return wayInHighlights(shown, current, step);
 				}

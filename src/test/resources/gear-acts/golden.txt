@@ -1264,12 +1264,12 @@
   worn [552] inv [4250, 13113, 13114, 13115] done
 -- worn
   worn [4250, 13115] inv [552, 13113, 13114] done
-== cryptic:green is the colour of my death as the winter-guise, i swoop towards the ground. #2 Equip the Sled
+== cryptic:green is the colour of my death as the winter-guise, i swoop towards the ground. #1 Equip the Sled
 -- recorded
-  worn [552, 13342, 21268] inv [383, 449, 564, 952, 1623, 4084, 13069, 13140, 25932, 32399]
+  worn [13342] inv [952, 4084, 25932]
    -> Equip: [Sled]
    outline [4084] fill [4084] tab INVENTORY menu [[Ride]@[4084]]
-  worn [552, 4084, 13342, 21268] inv [383, 449, 564, 952, 1623, 13069, 13140, 25932, 32399] done
+  worn [4084, 13342] inv [952, 25932] done
 -- bare
   worn [] inv []
    -> Equip: [Sled]
