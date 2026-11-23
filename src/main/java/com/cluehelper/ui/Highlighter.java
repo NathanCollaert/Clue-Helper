@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -16,8 +17,8 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
+import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.ImageUtil;
 
 /**
@@ -35,6 +36,14 @@ public class Highlighter
 	static final Color COLOUR = new Color(64, 208, 255);
 	static final Color FILL = new Color(64, 208, 255, 40);
 	static final Color ONE_CLICK_FILL = new Color(64, 208, 255, 90);
+	/** Where to stand: pale ice, close to the cyan of the line that leads there but apart from it. */
+	private static final Color TARGET = new Color(170, 235, 255, 230);
+	private static final int RIPPLE_ALPHA = 140;
+	private static final int RIPPLES = 2;
+	private static final long RIPPLE_MILLIS = 3200;
+	/** How much bigger than the tile a ring is when it has faded away. */
+	private static final double RIPPLE_GROWTH = 0.7;
+	private static final BasicStroke RIPPLE_STROKE = new BasicStroke(1.5f);
 	private static final int OUTLINE_WIDTH = 2;
 	private static final int FEATHER = 0;
 	private static final int ARC = 6;
@@ -236,9 +245,30 @@ public class Highlighter
 		graphics.draw(shape);
 	}
 
-	/** A spot to walk to with nothing on it to outline. */
+	/** A spot to walk to with nothing on it to outline: a steady outline, with rings slowly spreading from it. */
 	public void tile(Graphics2D graphics, Polygon tile)
 	{
-		OverlayUtil.renderPolygon(graphics, tile, COLOUR);
+		graphics.setStroke(STROKE);
+		graphics.setColor(TARGET);
+		graphics.draw(tile);
+		double start = System.currentTimeMillis() % RIPPLE_MILLIS / (double) RIPPLE_MILLIS;
+		for (int ring = 0; ring < RIPPLES; ring++)
+		{
+			ripple(graphics, tile, (start + (double) ring / RIPPLES) % 1);
+		}
+	}
+
+	/** {@code phase} runs from 0, the ring on the tile's outline, to 1, the ring spread out and faded away. */
+	private static void ripple(Graphics2D graphics, Polygon tile, double phase)
+	{
+		Rectangle bounds = tile.getBounds();
+		double easedOut = 1 - (1 - phase) * (1 - phase);
+		double scale = 1 + RIPPLE_GROWTH * easedOut;
+		AffineTransform spread = AffineTransform.getTranslateInstance(bounds.getCenterX(), bounds.getCenterY());
+		spread.scale(scale, scale);
+		spread.translate(-bounds.getCenterX(), -bounds.getCenterY());
+		graphics.setStroke(RIPPLE_STROKE);
+		graphics.setColor(ColorUtil.colorWithAlpha(TARGET, (int) (RIPPLE_ALPHA * (1 - phase))));
+		graphics.draw(spread.createTransformedShape(tile));
 	}
 }
