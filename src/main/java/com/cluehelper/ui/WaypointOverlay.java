@@ -5,7 +5,6 @@ import com.cluehelper.guide.*;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
-import com.cluehelper.transport.Category;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -38,7 +37,8 @@ public class WaypointOverlay extends Overlay
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	/** {@code Actor.getHealthRatio} while no health bar is shown: not hit lately. */
 	private static final int NO_HEALTH_BAR = -1;
-	private static final int OBELISK_PLATFORM_TILES = 3;
+	/** An obelisk row's origin is the south-west corner of its 3 by 3 platform, which teleports whole. */
+	private static final int TO_PLATFORM_MIDDLE = 1;
 	private static final BasicStroke PATH_STROKE = new BasicStroke(2f);
 	private static final int COVER_STEP_PIXELS = 3;
 	/** A climb's far end can stand a few tiles off the walk data's landing tile (the Observatory's rocks). */
@@ -172,9 +172,10 @@ public class WaypointOverlay extends Overlay
 		{
 			return null;
 		}
-		if (isObeliskTeleport(current))
+		if (guide.isObeliskActivated())
 		{
-			return path(view, WalkGoal.area(waypoint, OBELISK_PLATFORM_TILES, OBELISK_PLATFORM_TILES), false);
+			WorldPoint middle = waypoint.dx(TO_PLATFORM_MIDDLE).dy(TO_PLATFORM_MIDDLE);
+			return path(view, WalkGoal.tile(middle), middle.getPlane() == view.getPlane());
 		}
 		TileObject object = outlined() ? targets.object(view) : null;
 		NPC approached = object == null && approachOutlined() ? targets.npc() : null;
@@ -398,13 +399,6 @@ public class WaypointOverlay extends Overlay
 	{
 		SubStep current = guide.getCurrent();
 		return current != null && !current.getNpcIds().isEmpty() || !guide.getHighlights().getMenuTarget().getNpcIds().isEmpty();
-	}
-
-	/** Its row's origin is the south-west corner of the platform, and the whole platform teleports. */
-	private static boolean isObeliskTeleport(SubStep current)
-	{
-		return current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
-			&& current.getRow().getCategory() == Category.WILDERNESS_OBELISK;
 	}
 
 	private boolean approachOutlined()

@@ -66,7 +66,6 @@ public class StepGuide
 	private static final int ARRIVED_WALK_TILES = 40;
 	/** Part way in, the line leads on to where the way ends when that is this close on this floor (the cavern, not the pyramid's top). */
 	private static final int PART_WAY_LINE_TILES = 60;
-	private static final String SET_DESTINATION = "Set Destination";
 	private static final String ATTACK = "Attack";
 	/** The fixed, resizable classic and resizable modern layouts, whose stones open the side panel tabs. */
 	private static final Set<Integer> TOPLEVELS = Set.of(InterfaceID.TOPLEVEL, InterfaceID.TOPLEVEL_OSRS_STRETCH,
@@ -164,6 +163,7 @@ public class StepGuide
 	public void start()
 	{
 		unregister = routes.addListener(this::onPlan);
+		obelisk.start();
 	}
 
 	public void stop()
@@ -173,6 +173,7 @@ public class StepGuide
 			unregister.run();
 			unregister = null;
 		}
+		obelisk.stop();
 		clear();
 	}
 
@@ -418,6 +419,7 @@ public class StepGuide
 			teleportAnimatedTick = client.getTickCount();
 		}
 		ringVanished |= isRingStep() && isVanishing();
+		obelisk.onGameTick(getCurrent());
 		// Before the early returns below: a follow on every tick near the step would starve them (a deposit never seen)
 		actWatcher.onGameTick(routeStep);
 		deposit.onGameTick(tile);
@@ -440,7 +442,7 @@ public class StepGuide
 		boolean changed = advance(tile);
 		changed |= refreshFight();
 		changed |= refreshBox();
-		changed |= watchDestinationSet();
+		changed |= obelisk.takeChanged();
 		changed |= keyFromCharterList();
 		changed |= partWayIn(tile);
 		changed |= dropToPickUp();
@@ -832,13 +834,10 @@ public class StepGuide
 		return replaceCurrent(current.toBuilder().text(LegSteps.travelLine(current.getRow(), String.valueOf(key))).build());
 	}
 
-	private boolean watchDestinationSet()
+	/** The current step's obelisk is lit: what is left is the wait on its platform. */
+	public boolean isObeliskActivated()
 	{
-		MenuTarget menuTarget = highlights.getMenuTarget();
-		List<String> path = menuTarget.getPath();
-		SubStep current = getCurrent();
-		boolean watching = current != null && current.getRow() != null && path.size() == 2 && SET_DESTINATION.equals(path.get(0));
-		return obelisk.onGameTick(watching, watching && menuLines.showing(menuTarget), watching ? current.getRow().getName() : null);
+		return obelisk.isLit();
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
@@ -860,6 +859,7 @@ public class StepGuide
 		{
 			travelClickTick = client.getTickCount();
 		}
+		obelisk.onMenuOptionClicked(event);
 		SubStep current = getCurrent();
 		if (event.getMenuAction().name().startsWith("GAME_OBJECT"))
 		{
