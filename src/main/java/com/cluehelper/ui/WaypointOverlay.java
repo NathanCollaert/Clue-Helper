@@ -33,6 +33,8 @@ public class WaypointOverlay extends Overlay
 	/** A crossing has started once the player has had a tick to step in. */
 	private static final int CROSSING_START_TICKS = 2;
 	private static final int CROSSING_TICKS = 10;
+	/** A way in can carry the player a while: the sled ride down the Trollweiss slope takes 18 ticks. */
+	private static final int ENTERING_TICKS = 30;
 	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	/** {@code Actor.getHealthRatio} while no health bar is shown: not hit lately. */
@@ -74,6 +76,7 @@ public class WaypointOverlay extends Overlay
 	ModelSilhouette silhouette;
 
 	int crossingFrom = NOT_CROSSING;
+	int enteringFrom = NOT_CROSSING;
 	List<WorldPoint> drawnWalk = List.of();
 	/** Client thread. The tiles the line was last drawn through. */
 	@Getter
@@ -103,7 +106,11 @@ public class WaypointOverlay extends Overlay
 		}
 		WorldView view = client.getTopLevelWorldView();
 		expireCrossing();
-		if (view == null)
+		if (enteringFrom != NOT_CROSSING && isOver(enteringFrom, ENTERING_TICKS))
+		{
+			enteringFrom = NOT_CROSSING;
+		}
+		if (view == null || enteringFrom != NOT_CROSSING)
 		{
 			return null;
 		}
@@ -632,6 +639,18 @@ public class WaypointOverlay extends Overlay
 		{
 			crossingFrom = client.getTickCount();
 		}
+		else if (isWayInClicked(event))
+		{
+			enteringFrom = client.getTickCount();
+		}
+	}
+
+	/** The step's way in taken (a slope slid down): no line is drawn until the player is through and stands idle. */
+	private boolean isWayInClicked(MenuOptionClicked event)
+	{
+		SubStep current = guide.getCurrent();
+		return current != null && current.getKind() == SubStep.Kind.ENTER
+			&& guide.getHighlights().getMenuTarget().getObjectIds().contains(event.getId());
 	}
 
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
@@ -646,18 +665,20 @@ public class WaypointOverlay extends Overlay
 	/** A crossing ends once its time is up, or once the player has had a tick to step in and stands idle: the line then picks its walk again. */
 	private void expireCrossing()
 	{
-		if (crossingFrom == NOT_CROSSING)
-		{
-			return;
-		}
-		Player local = client.getLocalPlayer();
-		int since = client.getTickCount() - crossingFrom;
-		boolean idle = local != null && local.getAnimation() == NO_ANIMATION && local.getPoseAnimation() == local.getIdlePoseAnimation();
-		if (since > CROSSING_TICKS || since >= CROSSING_START_TICKS && idle)
+		if (crossingFrom != NOT_CROSSING && isOver(crossingFrom, CROSSING_TICKS))
 		{
 			crossingFrom = NOT_CROSSING;
 			walkLine.forget();
 		}
+	}
+
+	/** Its time is up, or the player has had a tick to step in and stands idle. */
+	private boolean isOver(int fromTick, int maxTicks)
+	{
+		Player local = client.getLocalPlayer();
+		int since = client.getTickCount() - fromTick;
+		boolean idle = local != null && local.getAnimation() == NO_ANIMATION && local.getPoseAnimation() == local.getIdlePoseAnimation();
+		return since > maxTicks || since >= CROSSING_START_TICKS && idle;
 	}
 
 	private boolean isCrossing()
