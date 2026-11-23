@@ -17,7 +17,9 @@ public class HotColdPlan
 		/** One spot is left, and one dig covers every tile of it the grid keeps. */
 		DIG_SPOT,
 		/** Spots are left but no probe tells them apart. */
-		NONE
+		NONE,
+		/** Every spot left is in the Wilderness, which the player stays out of: the tile is one of them, and isn't guided to. */
+		ONLY_WILDERNESS
 	}
 
 	String stepKey;

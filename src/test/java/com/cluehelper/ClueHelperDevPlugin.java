@@ -8,6 +8,7 @@ import com.cluehelper.campaign.Outcome;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.ActWatcher;
 import com.cluehelper.guide.FairyDials;
+import com.cluehelper.guide.LeftClicks;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.guide.SubStep;
@@ -64,6 +65,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.WorldView;
 import net.runelite.api.WallObject;
 import net.runelite.api.Tile;
+import net.runelite.api.TileObject;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.ObjectComposition;
 import net.runelite.api.Player;
@@ -653,12 +655,23 @@ public class ClueHelperDevPlugin extends Plugin
 		String now = (current == null ? "no sub-step" : current.getKind() + " " + current.getText())
 			+ " | line " + (line.isEmpty() ? "to nothing" : "from " + text(line.get(0)) + " to " + text(line.get(line.size() - 1)))
 			+ " | outlined " + (objects.isEmpty() ? "nothing" : objects)
+			+ " | guide outlines " + guideOutlines()
 			+ " | plan start " + (start == null ? "none" : start.getKind() + (start.getTile() == null ? "" : " " + text(start.getTile())));
 		if (!now.equals(lastLineTrace))
 		{
 			lastLineTrace = now;
 			log.info("{} line: {}", TAG, now);
 		}
+	}
+
+	/** Each object the guide outlines, with its tile and shown name: which Abyss obstacle, and does the line end there. */
+	private String guideOutlines()
+	{
+		List<TileObject> outlined = service(StepGuide.class).getHighlightObjects();
+		return outlined.isEmpty() ? "nothing" : outlined.stream()
+			.map(object -> object.getId() + " '" + LeftClicks.shownForm(client.getObjectDefinition(object.getId())).getName() + "' at "
+				+ text(object.getWorldLocation()))
+			.collect(Collectors.joining(", "));
 	}
 
 	private void checkLanding()

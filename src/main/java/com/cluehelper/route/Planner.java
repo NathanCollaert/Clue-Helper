@@ -22,6 +22,8 @@ public final class Planner
 	private static final String LEVELS_SHORT = "Levels too low:";
 	private static final String QUESTS_UNFINISHED = "Quests not finished:";
 	private static final String NOT_YET = "Not possible yet:";
+	private static final String THROUGH_WILDERNESS = "only reachable through the Wilderness";
+	private static final String STEP_IS = "No guide: this clue step is ";
 	/** A hand-written need named with its other ways: "Chef's hat (or cooking cape, Max cape, Varrock armour 3)". */
 	private static final Pattern OTHER_WAYS = Pattern.compile("(.+) \\(or (?:an? )?(.+)\\)");
 	private static final int REGION_SIZE = 64;
@@ -44,12 +46,16 @@ public final class Planner
 			return plan.note(step == null ? "no step"
 				: ClueTypes.HOT_COLD.equals(step.getType()) ? "choosing where to feel" : "no target tile for this step yet").build();
 		}
+		PlanContext ctx = new PlanContext(in);
+		if (in.getSettings().isStopWildernessClues() && ctx.onlyInWilderness)
+		{
+			return plan.danger(STEP_IS + "in the Wilderness").build();
+		}
 		List<String> shortLevels = shortLevels(step, in.getPlayer());
 		if (!shortLevels.isEmpty())
 		{
 			return plan.requirementNotes(shortLevels).build();
 		}
-		PlanContext ctx = new PlanContext(in);
 		if (ctx.stageVerdicts().stream().anyMatch(verdict -> !verdict.getMissing().isEmpty())
 			|| ctx.required.getMissing().stream().anyMatch(RequiredItems.Need::isBlocksRoute))
 		{
@@ -68,8 +74,9 @@ public final class Planner
 			Plan throughWilderness = plan(wildernessAllowed(in));
 			if (throughWilderness.getBest() != null)
 			{
-				return throughWilderness.toBuilder().note("only reachable through the Wilderness")
-					.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels()).build();
+				Plan.PlanBuilder reached = in.getSettings().isStopWildernessClues() ? plan.danger(STEP_IS + THROUGH_WILDERNESS)
+					: throughWilderness.toBuilder().note(THROUGH_WILDERNESS);
+				return reached.searchNanos(System.nanoTime() - started).labels(searches.labels + throughWilderness.getLabels()).build();
 			}
 		}
 		plan.best(best);
@@ -86,10 +93,10 @@ public final class Planner
 		return plan.searchNanos(System.nanoTime() - started).labels(searches.labels).build();
 	}
 
-	/** Avoiding the Wilderness never hides the only way to a step outside it. */
+	/** Unless Wilderness clues are stopped, avoiding the Wilderness never hides the only way to a step outside it. */
 	private static PlanInput wildernessAllowed(PlanInput in)
 	{
-		return in.toBuilder().settings(in.getSettings().toBuilder().avoidWilderness(false).build()).build();
+		return in.toBuilder().settings(in.getSettings().toBuilder().avoidWilderness(false).stopWildernessClues(false).build()).build();
 	}
 
 	private static List<List<int[]>> legOrders(PlanContext ctx, Step step)

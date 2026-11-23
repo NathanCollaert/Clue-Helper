@@ -30,6 +30,7 @@ public class GuideOverlay extends OverlayPanel
 	private static final Color TEXT = Color.WHITE;
 	private static final Color MUTED = new Color(190, 190, 190);
 	private static final Color WARNING = new Color(255, 170, 60);
+	private static final Color DANGER = new Color(255, 60, 60);
 	/** Dimmer than the item lines, so the step after this one reads as not yet. */
 	private static final Color UPCOMING = new Color(135, 135, 135);
 	private static final String OPEN_COLOUR = "<col";
@@ -143,10 +144,11 @@ public class GuideOverlay extends OverlayPanel
 			gap();
 			hotCold(shown.getHotCold());
 		}
-		if (!shown.getNotes().isEmpty() && hasTextUnder(title))
+		if ((!shown.getNotes().isEmpty() || shown.getDanger() != null) && hasTextUnder(title))
 		{
 			gap();
 		}
+		line(shown.getDanger(), DANGER);
 		shown.getNotes().forEach(note -> line(note, WARNING));
 		if (shown.getNext() != null)
 		{

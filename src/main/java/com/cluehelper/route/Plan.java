@@ -22,6 +22,8 @@ public class Plan
 	@Builder.Default
 	Map<WorldPoint, Integer> probeRanks = Map.of();
 	String note;
+	/** Why the step gets no guide where the player is kept out of it; shown in red, alone. */
+	String danger;
 	@Builder.Default
 	List<String> requirementNotes = List.of();
 	long searchNanos;

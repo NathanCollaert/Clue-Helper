@@ -34,7 +34,7 @@ import net.runelite.client.ui.overlay.*;
 @PluginDependency(BankTagsPlugin.class)
 public class ClueHelperPlugin extends Plugin
 {
-	private static final Set<String> HOT_COLD_KEYS = Set.of("hotColdPlanner", "avoidWilderness");
+	private static final Set<String> HOT_COLD_KEYS = Set.of("avoidWilderness", "stopWildernessClues");
 	/** The on/off setting the Overlay dropdown replaced. */
 	private static final String OLD_SHOW_BOX_KEY = "showBox";
 	private static final String GUIDE_BOX_KEY = "guideBox";

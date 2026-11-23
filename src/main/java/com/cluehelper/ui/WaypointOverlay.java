@@ -2,10 +2,10 @@ package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.*;
+import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
-import com.cluehelper.transport.Category;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -21,6 +21,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.*;
 
 /** Waypoints are never core's target, so the path ends where core's marker takes over. */
@@ -34,11 +35,14 @@ public class WaypointOverlay extends Overlay
 	/** A crossing has started once the player has had a tick to step in. */
 	private static final int CROSSING_START_TICKS = 2;
 	private static final int CROSSING_TICKS = 10;
+	/** A way in can carry the player a while: the sled ride down the Trollweiss slope takes 18 ticks. */
+	private static final int ENTERING_TICKS = 30;
 	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
 	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	/** {@code Actor.getHealthRatio} while no health bar is shown: not hit lately. */
 	private static final int NO_HEALTH_BAR = -1;
-	private static final int OBELISK_PLATFORM_TILES = 3;
+	/** An obelisk row's origin is the south-west corner of its 3 by 3 platform, which teleports whole. */
+	private static final int TO_PLATFORM_MIDDLE = 1;
 	private static final BasicStroke PATH_STROKE = new BasicStroke(2f);
 	private static final int COVER_STEP_PIXELS = 3;
 	/** A climb's far end can stand a few tiles off the walk data's landing tile (the Observatory's rocks). */
@@ -72,8 +76,13 @@ public class WaypointOverlay extends Overlay
 	LeftClicks leftClicks;
 	@Inject
 	ModelSilhouette silhouette;
+	@Inject
+	ProbeTarget probeTarget;
+	@Inject
+	ItemManager itemManager;
 
 	int crossingFrom = NOT_CROSSING;
+	int enteringFrom = NOT_CROSSING;
 	List<WorldPoint> drawnWalk = List.of();
 	/** Client thread. The tiles the line was last drawn through. */
 	@Getter
@@ -103,7 +112,11 @@ public class WaypointOverlay extends Overlay
 		}
 		WorldView view = client.getTopLevelWorldView();
 		expireCrossing();
-		if (view == null)
+		if (enteringFrom != NOT_CROSSING && isOver(enteringFrom, ENTERING_TICKS))
+		{
+			enteringFrom = NOT_CROSSING;
+		}
+		if (view == null || enteringFrom != NOT_CROSSING)
 		{
 			return null;
 		}
@@ -131,6 +144,7 @@ public class WaypointOverlay extends Overlay
 		if (goal.isMarkTile())
 		{
 			drawTile(graphics, view, goal.getWalk().getSouthWest());
+			drawDeviceToFeelWith(graphics, view, goal.getWalk().getSouthWest());
 		}
 		return null;
 	}
@@ -172,9 +186,10 @@ public class WaypointOverlay extends Overlay
 		{
 			return null;
 		}
-		if (isObeliskTeleport(current))
+		if (guide.isObeliskActivated())
 		{
-			return path(view, WalkGoal.area(waypoint, OBELISK_PLATFORM_TILES, OBELISK_PLATFORM_TILES), false);
+			WorldPoint middle = waypoint.dx(TO_PLATFORM_MIDDLE).dy(TO_PLATFORM_MIDDLE);
+			return path(view, WalkGoal.tile(middle), middle.getPlane() == view.getPlane());
 		}
 		TileObject object = outlined() ? targets.object(view) : null;
 		NPC approached = object == null && approachOutlined() ? targets.npc() : null;
@@ -240,6 +255,16 @@ public class WaypointOverlay extends Overlay
 		if (tile != null)
 		{
 			highlighter.tile(graphics, tile);
+		}
+	}
+
+	private void drawDeviceToFeelWith(Graphics2D graphics, WorldView view, WorldPoint tile)
+	{
+		HotColdTier tier = probeTarget.feltOn(tile);
+		LocalPoint local = tier == null ? null : LocalPoint.fromWorld(view, tile);
+		if (local != null)
+		{
+			OverlayUtil.renderImageLocation(client, graphics, local, itemManager.getImage(tier.getDeviceItemId()), 0);
 		}
 	}
 
@@ -398,13 +423,6 @@ public class WaypointOverlay extends Overlay
 	{
 		SubStep current = guide.getCurrent();
 		return current != null && !current.getNpcIds().isEmpty() || !guide.getHighlights().getMenuTarget().getNpcIds().isEmpty();
-	}
-
-	/** Its row's origin is the south-west corner of the platform, and the whole platform teleports. */
-	private static boolean isObeliskTeleport(SubStep current)
-	{
-		return current.getKind() == SubStep.Kind.TELEPORT && current.getRow() != null
-			&& current.getRow().getCategory() == Category.WILDERNESS_OBELISK;
 	}
 
 	private boolean approachOutlined()
@@ -634,10 +652,33 @@ public class WaypointOverlay extends Overlay
 	 */
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (pathObjects.keySet().stream().anyMatch(object -> object.getId() == event.getId()))
+		TileObject clicked = pathObjects.keySet().stream().filter(object -> object.getId() == event.getId()).findFirst().orElse(null);
+		if (clicked != null && !isRunToAbyssObstacle(clicked))
 		{
 			crossingFrom = client.getTickCount();
 		}
+		else if (isWayInClicked(event))
+		{
+			enteringFrom = client.getTickCount();
+		}
+	}
+
+	/**
+	 * An Abyss obstacle clicked from afar is run to first: the walk data's own way through the ring can be another spot,
+	 * so the line keeps leading to the one clicked rather than following that walk.
+	 */
+	private boolean isRunToAbyssObstacle(TileObject clicked)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		return AbyssObstacles.isObstacle(clicked.getId()) && view != null && !besidePlayer(view, clicked);
+	}
+
+	/** The step's way in taken (a slope slid down): no line is drawn until the player is through and stands idle. */
+	private boolean isWayInClicked(MenuOptionClicked event)
+	{
+		SubStep current = guide.getCurrent();
+		return current != null && current.getKind() == SubStep.Kind.ENTER
+			&& guide.getHighlights().getMenuTarget().getObjectIds().contains(event.getId());
 	}
 
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
@@ -652,18 +693,20 @@ public class WaypointOverlay extends Overlay
 	/** A crossing ends once its time is up, or once the player has had a tick to step in and stands idle: the line then picks its walk again. */
 	private void expireCrossing()
 	{
-		if (crossingFrom == NOT_CROSSING)
-		{
-			return;
-		}
-		Player local = client.getLocalPlayer();
-		int since = client.getTickCount() - crossingFrom;
-		boolean idle = local != null && local.getAnimation() == NO_ANIMATION && local.getPoseAnimation() == local.getIdlePoseAnimation();
-		if (since > CROSSING_TICKS || since >= CROSSING_START_TICKS && idle)
+		if (crossingFrom != NOT_CROSSING && isOver(crossingFrom, CROSSING_TICKS))
 		{
 			crossingFrom = NOT_CROSSING;
 			walkLine.forget();
 		}
+	}
+
+	/** Its time is up, or the player has had a tick to step in and stands idle. */
+	private boolean isOver(int fromTick, int maxTicks)
+	{
+		Player local = client.getLocalPlayer();
+		int since = client.getTickCount() - fromTick;
+		boolean idle = local != null && local.getAnimation() == NO_ANIMATION && local.getPoseAnimation() == local.getIdlePoseAnimation();
+		return since > maxTicks || since >= CROSSING_START_TICKS && idle;
 	}
 
 	private boolean isCrossing()

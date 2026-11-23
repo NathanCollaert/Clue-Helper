@@ -23,15 +23,18 @@ public class ProbeTarget
 		boolean dig;
 		/** Feel where you stand: the tile is where the plan was made, not a place to walk to. */
 		boolean here;
+		/** Null while the first plan is still being made. */
+		HotColdTier tier;
 	}
 
 	volatile Target target;
-	volatile boolean enabled;
 
-	/** With the planner off a hot/cold step stays core's, which has no route. */
-	public void setEnabled(boolean planner)
+	/** The tier whose strange device is felt with on this tile, the chosen spot to walk to; null for any other tile. */
+	public HotColdTier feltOn(WorldPoint tile)
 	{
-		enabled = planner;
+		Target chosen = target;
+		boolean feel = chosen != null && chosen.getAct() != null && !chosen.isDig() && !chosen.isHere();
+		return feel && tile.equals(chosen.getTile()) ? chosen.getTier() : null;
 	}
 
 	public void set(Target chosen)
@@ -47,7 +50,7 @@ public class ProbeTarget
 	/** Until the first plan arrives the step has no target, rather than core's NPC the player needn't visit. */
 	public void choosing(String stepKey)
 	{
-		target = new Target(stepKey, null, null, false, false);
+		target = new Target(stepKey, null, null, false, false, null);
 	}
 
 	/**
@@ -56,7 +59,7 @@ public class ProbeTarget
 	 */
 	public Step travelStep(Step step)
 	{
-		if (step == null || !enabled || !ClueTypes.HOT_COLD.equals(step.getType()) || step.getKind() != TargetKind.PROBES)
+		if (step == null || !ClueTypes.HOT_COLD.equals(step.getType()) || step.getKind() != TargetKind.PROBES)
 		{
 			return step;
 		}

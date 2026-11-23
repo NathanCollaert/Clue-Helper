@@ -26,7 +26,8 @@ public class GuideBox
 	String next;
 	@Builder.Default
 	List<String> notes = List.of();
-	/** Null outside a hot/cold step, with the probe planner off, or when the route says it all. */
+	String danger;
+	/** Null outside a hot/cold step, or when the route says it all. */
 	HotColdView hotCold;
 
 	/** What the player is asked to do once, so that what they own counts. */
@@ -56,7 +57,7 @@ public class GuideBox
 
 	private boolean hasGuidance()
 	{
-		return now != null || hotCold != null || !notes.isEmpty();
+		return now != null || hotCold != null || !notes.isEmpty() || danger != null;
 	}
 
 	/** At the step itself nothing is travelled: no notes about routes. */
@@ -77,6 +78,10 @@ public class GuideBox
 		if (!state.showsRoutes() || plan == null)
 		{
 			return box.build();
+		}
+		if (plan.getDanger() != null)
+		{
+			return box.danger(plan.getDanger()).build();
 		}
 		if (now != null)
 		{

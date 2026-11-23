@@ -157,6 +157,18 @@ public class MenuLines
 		reader.accept(listTitle, texts);
 	}
 
+	public boolean isListOpen(String title)
+	{
+		return !listLines.isEmpty() && MenuLabels.matches(listTitle, title);
+	}
+
+	/** The open list's line named so (also a map button drawn over the list), counted from 0; -1 for none. */
+	public int listIndex(String label)
+	{
+		int[] line = listLines.get(MenuLabels.normalise(label));
+		return line == null ? -1 : line[1];
+	}
+
 	public void onWidgetClosed(WidgetClosed event)
 	{
 		originalTextColours.keySet().removeIf(line -> line.getId() >>> 16 == event.getGroupId());

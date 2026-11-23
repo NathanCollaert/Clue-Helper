@@ -233,6 +233,14 @@ public class EdgeCaseRoutesTest
 		lines.add(line("avoidWilderness, start at the level 50 obelisk (3306,3915), to Varrock: out by the obelisk",
 			checked(input(maxed, varrock, PlanStart.atNode(table, table.node(new WorldPoint(3306, 3915, 0))),
 				plain.toBuilder().avoidWilderness(true).build()).build())));
+		PlannerSettings stopped = plain.toBuilder().avoidWilderness(true).stopWildernessClues(true).build();
+		lines.add(line("stopWildernessClues with a Wilderness target: stopped",
+			checked(input(hcim, wildTarget, PlanStart.teleportOnly(ANYWHERE), stopped).build())));
+		lines.add(line("stopWildernessClues, targets in and out of it: to the one outside",
+			checked(input(hcim, inAndOut, PlanStart.teleportOnly(ANYWHERE), stopped).build())));
+		lines.add(line("stopWildernessClues, King Black Dragon's lair: only reachable through it, stopped",
+			checked(input(maxed, step("emote:dance in the king black dragon's lair. beware of double agents! equip a black dragonhide body, black dragonhide vambraces and a black dragon mask."),
+				PlanStart.teleportOnly(ANYWHERE), stopped).build())));
 
 		PlayerSnapshot midBank = ready(Loadouts.load("mid-ironman").getBankedSnapshot());
 		lines.add(line("bank tipping point: mid-ironman, bank on, to Varrock bank crates",
@@ -557,6 +565,10 @@ public class EdgeCaseRoutesTest
 		if (plan.getNote() != null)
 		{
 			out.append("\n  note      ").append(plan.getNote());
+		}
+		if (plan.getDanger() != null)
+		{
+			out.append("\n  danger    ").append(plan.getDanger());
 		}
 		plan.getRequirementNotes().forEach(note -> out.append("\n  needs     ").append(note));
 		return out.toString();

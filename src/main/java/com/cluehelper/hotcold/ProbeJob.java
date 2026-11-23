@@ -4,6 +4,7 @@ import com.cluehelper.route.*;
 import com.cluehelper.step.HotColdTier;
 import java.util.*;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -24,10 +25,24 @@ public class ProbeJob
 	PlanInput landingSearch;
 	ProbePlanner.Costs costs;
 	boolean avoidWilderness;
+	/** No feel in the Wilderness, and no spot there is travelled to. */
+	boolean stopWildernessClues;
 
 	public HotColdPlan run()
 	{
-		return decide(stepKey, spots, tier, readings, core, nearby(), this::landingsWithin, costs);
+		HotColdPlan plan = decide(stepKey, spots, tier, readings, core, nearby(), this::landingsWithin, costs);
+		return stopWildernessClues ? stoppedWhereOnlyWildernessIsLeft(plan) : plan;
+	}
+
+	private HotColdPlan stoppedWhereOnlyWildernessIsLeft(HotColdPlan plan)
+	{
+		List<WorldPoint> centres = spots.stream().filter(spot -> plan.getKept().containsKey(spot.getName()))
+			.map(spot -> new WorldPoint(spot.getX(), spot.getY(), 0)).collect(Collectors.toList());
+		if (centres.isEmpty() || !centres.stream().allMatch(this::wilderness))
+		{
+			return plan;
+		}
+		return plan.toBuilder().action(HotColdPlan.Action.ONLY_WILDERNESS).tile(centres.get(0)).choice(null).build();
 	}
 
 	/**
@@ -72,7 +87,7 @@ public class ProbeJob
 	private List<Probe> nearby()
 	{
 		List<Probe> probes = new ArrayList<>();
-		if (here != null)
+		if (here != null && !(stopWildernessClues && wilderness(here)))
 		{
 			probes.add(new Probe(here, Probe.Kind.HERE, 0, 0, wilderness(here)));
 		}
@@ -104,7 +119,7 @@ public class ProbeJob
 		landings.getProbeTicks().forEach((tile, ticks) ->
 		{
 			int rank = ranks.getOrDefault(tile, ticks);
-			if (rank <= rankTicksLimit)
+			if (rank <= rankTicksLimit && !(stopWildernessClues && wilderness(tile)))
 			{
 				probes.add(new Probe(tile, Probe.Kind.LANDING, ticks, rank, wilderness(tile)));
 			}

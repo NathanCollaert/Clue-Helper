@@ -30,7 +30,6 @@ final class StepHighlights
 	private static final String BANK_OPTION = "Bank";
 	private static final String CAST_OPTION = "Cast";
 	private static final String CLOSE_OPTION = "Close";
-	private static final String TELEPORT_TO_DESTINATION = "Teleport to Destination";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Tables.idSet("fairy ring objects");
 	/** The house's spiritual fairy tree lists its ring options above "Tree", so a left click never opens the tree list. */
 	private static final Set<Integer> NOT_FILLED_UNHOVERED = Set.of(ObjectID.POH_SPIRIT_RING, ObjectID.LEAGUE_5_POH_SPIRIT_RING,
@@ -73,7 +72,8 @@ final class StepHighlights
 				forms.addAll(exit.getOtherForms());
 				return shown.menuTarget(withDialogue(way.toBuilder().objectIds(Set.copyOf(forms)).build(), wayInOf(step, exit))).build();
 			case WALK:
-				if (current.getWayIn() != null)
+				// Gear that only works at the way in goes on there first: its walk leads to the spot, not the object
+				if (current.getWayIn() != null && !current.getWayIn().isGearThere())
 				{
 					return wayInHighlights(shown, current, step);
 				}
@@ -420,9 +420,7 @@ final class StepHighlights
 		}
 		else if (row.isLocated())
 		{
-			MenuTarget target = rowTargets.locatedTeleport(current);
-			boolean set = obelisk.isSetFor(row.getName());
-			shown.menuTarget(set ? target.toBuilder().path(List.of(TELEPORT_TO_DESTINATION)).build() : target);
+			shown.menuTarget(obelisk.nextClick(rowTargets.locatedTeleport(current)));
 		}
 		else if (current.getActItemNamed() != null)
 		{

@@ -60,8 +60,6 @@ public class HotColdService
 	StepNeeds stepNeeds;
 	@Inject
 	AvailabilityService availability;
-	@Inject
-	ClueHelperConfig config;
 	PlannerRunner runner;
 	MemorySlot<FeelLogs> logs;
 	final List<Consumer<Planned>> planListeners = new CopyOnWriteArrayList<>();
@@ -95,7 +93,6 @@ public class HotColdService
 
 	public void start()
 	{
-		probeTarget.setEnabled(config.hotColdPlanner());
 		unregisterStep = clueLink.addListener(this::onStepChange);
 		planPending = true;
 	}
@@ -125,12 +122,6 @@ public class HotColdService
 
 	public void onConfigChanged()
 	{
-		probeTarget.setEnabled(config.hotColdPlanner());
-		if (!config.hotColdPlanner())
-		{
-			runner.cancelAll();
-			clearPlan();
-		}
 		planPending = true;
 	}
 
@@ -180,7 +171,7 @@ public class HotColdService
 	public void onGameTick()
 	{
 		Step step = clueLink.getCurrentStep();
-		if (!isHotCold(step) || !config.hotColdPlanner())
+		if (!isHotCold(step))
 		{
 			return;
 		}
@@ -227,7 +218,7 @@ public class HotColdService
 		if (change == StepChange.NEW && isHotCold(step))
 		{
 			planPending = true;
-			if (config.hotColdPlanner() && ownsDevice(step))
+			if (ownsDevice(step))
 			{
 				probeTarget.choosing(step.getKey());
 			}
@@ -297,6 +288,7 @@ public class HotColdService
 			.costs(ProbePlanner.Costs.builder()
 				.wildernessPenaltyTicks(landingSearch.getSettings().isAvoidWilderness() ? WILDERNESS_PENALTY_TICKS : 0).build())
 			.avoidWilderness(landingSearch.getSettings().isAvoidWilderness())
+			.stopWildernessClues(landingSearch.getSettings().isStopWildernessClues())
 			.build();
 		runner.submit(job::run, result -> onPlanned(job, result));
 	}
@@ -322,10 +314,12 @@ public class HotColdService
 			case FEEL:
 				boolean here = planned.getChoice().getProbe().getKind() == Probe.Kind.HERE;
 				return new ProbeTarget.Target(planned.getStepKey(), planned.getTile(), here ? "Feel the device where you stand"
-					: "Feel the device here", false, here);
+					: "Feel the device here", false, here, planned.getTier());
 			case DIG_HERE:
 			case DIG_SPOT:
-				return new ProbeTarget.Target(planned.getStepKey(), planned.getTile(), "Dig here", true, false);
+				return new ProbeTarget.Target(planned.getStepKey(), planned.getTile(), "Dig here", true, false, planned.getTier());
+			case ONLY_WILDERNESS:
+				return new ProbeTarget.Target(planned.getStepKey(), planned.getTile(), null, false, false, planned.getTier());
 			case NONE:
 				return null;
 			default:

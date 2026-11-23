@@ -36,6 +36,14 @@ avoidWilderness, King Black Dragon's lair: outside it, but only reachable throug
   note      only reachable through the Wilderness
 avoidWilderness, start at the level 50 obelisk (3306,3915), to Varrock: out by the obelisk
   best      45t: Obelisk: Level 13 Wilderness → Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+stopWildernessClues with a Wilderness target: stopped
+  best      none
+  danger    No guide: this clue step is in the Wilderness
+stopWildernessClues, targets in and out of it: to the one outside
+  best      4t: Varrock Teleport {item:556=3, item:554=1, item:563=1}
+stopWildernessClues, King Black Dragon's lair: only reachable through it, stopped
+  best      none
+  danger    No guide: this clue step is only reachable through the Wilderness
 bank tipping point: mid-ironman, bank on, to Varrock bank crates
   best      32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
 Fountain of Rune case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked
