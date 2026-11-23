@@ -1,5 +1,4 @@
 {
-"dump": "2026-11-19",
 "steps": {
 "fairyring:a i q 0 4 4 0": {"fairyRing":{"ring":3,"steps":[0,4,4,0]},"items":[19862],"regions":[3],"rows":[{"id":1902,"name":"CLUEHELPER_FAIRYRING_HARD_1"}],"targets":[{"kind":"coord","text":"Near fairy ring (AIQ).","tile":[3000,3110,0]}],"tier":"hard","tiles":[[3000,3110,0]]},
 "fairyring:a i r 2 3 3 1": {"fairyRing":{"ring":2,"steps":[2,3,3,1]},"items":[19864],"regions":[2],"rows":[{"id":1901,"name":"CLUEHELPER_FAIRYRING_HARD_0"}],"targets":[{"kind":"coord","text":"Near fairy ring (AIR).","tile":[2702,3246,0]}],"tier":"hard","tiles":[[2702,3246,0]]},
