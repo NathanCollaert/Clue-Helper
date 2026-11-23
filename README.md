@@ -7,7 +7,7 @@
 <p>
   <a href="https://runelite.net/plugin-hub/show/clue-helper"><img src="https://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/clue-helper" alt="Plugin Hub installs"></a>
   <a href="https://github.com/NathanCollaert/Clue-Helper/issues/new?template=route-report.yml"><img src="https://img.shields.io/badge/report-slow%20route-orange" alt="Report a slow route"></a>
-  <a href="https://github.com/NathanCollaert/Clue-Helper/issues/new?template=bug-report.yml"><img src="https://img.shields.io/badge/report-bug-red" alt="Report a bug"></a>
+  <a href="https://github.com/NathanCollaert/Clue-Helper/issues/new?template=issue.yml"><img src="https://img.shields.io/badge/report-bug-red" alt="Report a bug"></a>
 </p>
 
 Clue Helper runs alongside RuneLite's built-in **Clue Scroll** plugin. Clue Scroll tells you *what* the step is; Clue
@@ -51,7 +51,7 @@ what the route was planned from, so the exact plan can be replayed and fixed. Th
 quests, what you carry and wear, and only those banked items a route could use: teleports, runes, tools for shortcuts
 and the step's own items. It never includes the rest of your bank, your username or your login.
 
-Something else wrong? [Open a bug report](https://github.com/NathanCollaert/Clue-Helper/issues/new?template=bug-report.yml).
+Something else wrong? [Open an issue](https://github.com/NathanCollaert/Clue-Helper/issues/new?template=issue.yml).
 
 
 ## Settings
