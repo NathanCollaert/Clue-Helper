@@ -31,6 +31,7 @@ final class WalkLine
 	/** The index of the walk's tile the player last stood nearest. */
 	int passed;
 	boolean stale;
+	WorldPoint searchedFrom;
 
 	@Inject
 	void init(ScheduledExecutorService executor, ClientThread clientThread)
@@ -42,7 +43,7 @@ final class WalkLine
 	void follow(WorldView view, WalkCosts here, WalkGoal goal)
 	{
 		boolean newGoal = !goal.equals(this.goal);
-		boolean again = stale || isLeft() || here != this.here && (walk.isEmpty() || !isInSearchedScene());
+		boolean again = stale || isLeft() || isStandingOff() || here != this.here && (walk.isEmpty() || !isInSearchedScene());
 		if (newGoal || again && !runner.isWorking())
 		{
 			search(view, here, goal);
@@ -124,6 +125,7 @@ final class WalkLine
 		Ground ground = view.isInstance() ? Ground.sceneOnly(here.getScene())
 			: Ground.world(data.getMap(), here.getScene(), data.getTable(), routes.openRows());
 		WorldPoint from = local.getWorldLocation();
+		searchedFrom = from;
 		runner.submit(() -> walker.path(ground, from, goal), found ->
 		{
 			if (found.isEmpty() && sameGoal)
@@ -145,6 +147,21 @@ final class WalkLine
 		Player local = client.getLocalPlayer();
 		LoadedScene scene = here == null ? null : here.getScene();
 		return local == null || scene != null && scene.contains(local.getWorldLocation());
+	}
+
+	/**
+	 * Stopped beside the walk rather than on it: the line starts at the player again. Only once stopped, as a walk's own
+	 * steps often cut a corner the other way.
+	 */
+	private boolean isStandingOff()
+	{
+		Player local = client.getLocalPlayer();
+		if (local == null || walk.isEmpty() || local.getPoseAnimation() != local.getIdlePoseAnimation())
+		{
+			return false;
+		}
+		WorldPoint at = local.getWorldLocation();
+		return !at.equals(searchedFrom) && !getAhead().contains(at);
 	}
 
 	private boolean isLeft()

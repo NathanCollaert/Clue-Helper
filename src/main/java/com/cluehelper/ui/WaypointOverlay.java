@@ -37,8 +37,6 @@ public class WaypointOverlay extends Overlay
 	private static final int CROSSING_TICKS = 10;
 	/** A way in can carry the player a while: the sled ride down the Trollweiss slope takes 18 ticks. */
 	private static final int ENTERING_TICKS = 30;
-	/** Near a stop where only an NPC (a banker) is outlined, the outline is guidance enough. */
-	private static final int NEAR_OUTLINED_NPC_TILES = 6;
 	/** {@code Actor.getHealthRatio} while no health bar is shown: not hit lately. */
 	private static final int NO_HEALTH_BAR = -1;
 	/** An obelisk row's origin is the south-west corner of its 3 by 3 platform, which teleports whole. */
@@ -197,7 +195,7 @@ public class WaypointOverlay extends Overlay
 		{
 			return approach(approached);
 		}
-		if (object == null && besideOutlinedNpc(waypoint) || object != null && besidePlayer(view, object))
+		if (object != null && besidePlayer(view, object))
 		{
 			return null;
 		}
@@ -404,12 +402,6 @@ public class WaypointOverlay extends Overlay
 	private boolean inConversation()
 	{
 		return Arrays.stream(CONVERSATION).anyMatch(dialogue -> Widgets.shown(client, dialogue));
-	}
-
-	private boolean besideOutlinedNpc(WorldPoint waypoint)
-	{
-		WorldPoint at = playerTile();
-		return outlined() && at != null && at.distanceTo2D(waypoint) <= NEAR_OUTLINED_NPC_TILES;
 	}
 
 	/** The step's bank, portal, ladder or NPC is outlined, which marks the spot better than its tile. */

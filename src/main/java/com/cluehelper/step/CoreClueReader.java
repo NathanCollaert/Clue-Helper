@@ -1,6 +1,7 @@
 package com.cluehelper.step;
 
 import java.util.*;
+import java.util.function.IntFunction;
 import java.util.stream.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
@@ -16,8 +17,26 @@ import static java.util.stream.Collectors.*;
  */
 public final class CoreClueReader
 {
+	/** Core's own lookups when a clue is read, in its order. */
+	private static final List<IntFunction<ClueScroll>> ITEM_LOOKUPS = List.of(MapClue::forItemId, MusicClue::forItemId,
+		CoordinateClue::forItemId, AnagramClue::forItemId, CipherClue::forItemId, CrypticClue::forItemId, EmoteClue::forItemId,
+		FairyRingClue::forItemId);
+
 	private CoreClueReader()
 	{
+	}
+
+	/**
+	 * The clue core activates when this item is read; null for any other item, and for a beginner or master clue, whose
+	 * item doesn't say which step it is.
+	 */
+	public static ClueScroll clueOfItem(int itemId)
+	{
+		if (!StepKey.hasOwnItem(itemId))
+		{
+			return null;
+		}
+		return ITEM_LOOKUPS.stream().map(lookup -> lookup.apply(itemId)).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 
 	public static ClueFacts facts(ClueScroll clue, ClueScrollPlugin plugin)

@@ -16,6 +16,7 @@ import net.runelite.client.events.PluginChanged;
 import net.runelite.client.plugins.*;
 import net.runelite.client.plugins.cluescrolls.*;
 import net.runelite.client.plugins.cluescrolls.clues.*;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 /**
  * Core is read once per tick, at GameTick priority -1, after core's own handlers have updated it. Its active state
@@ -54,12 +55,24 @@ public class ClueLink
 	/** Null when core has no clue. */
 	@Getter
 	volatile Step currentStep;
+	/**
+	 * Null while core has a clue. Otherwise the step of the easy-to-elite clue that came into the inventory last, which
+	 * the planner plans ahead so reading it guides at once; nothing shows it.
+	 */
+	@Getter
+	volatile Step aheadStep;
+	/** Client thread. The inventory's easy-to-elite clues by item, in the order they came in. */
+	final Map<Integer, ClueScroll> heldClues = new LinkedHashMap<>();
+	Set<Integer> inventoryIds = Set.of();
 
 	/** Swing thread. Core's instance exists even while it is off. */
 	public void start()
 	{
 		core = findCore();
 		currentStep = null;
+		aheadStep = null;
+		heldClues.clear();
+		inventoryIds = Set.of();
 		state.start(isCoreActive());
 	}
 
@@ -67,6 +80,7 @@ public class ClueLink
 	{
 		core = null;
 		currentStep = null;
+		aheadStep = null;
 		state.start(false);
 	}
 
@@ -141,7 +155,10 @@ public class ClueLink
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : Stages.adjusted(atPlacedNpc(resolve(clue)), this::owns, playerTile());
+		Step step = clue == null ? null : stepOf(clue);
+		trackHeldClues();
+		ClueScroll held = newestHeldClue();
+		aheadStep = active && clue == null && held != null ? stepOf(held) : null;
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
 			step == null ? null : List.of(step.getTargets(), step.getStages()));
 		if (change != StepChange.UNCHANGED)
@@ -150,6 +167,39 @@ public class ClueLink
 			listeners.forEach(listener -> listener.onStepChange(change, step));
 		}
 		return wasActive != state.isActive() || hadStep != state.hasStep();
+	}
+
+	/** The clue's step as the player's state leaves it. */
+	private Step stepOf(ClueScroll clue)
+	{
+		return Stages.adjusted(atPlacedNpc(resolve(clue)), this::owns, playerTile());
+	}
+
+	/** Notes each clue item that came into the inventory since the last tick, and forgets those that left it. */
+	private void trackHeldClues()
+	{
+		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
+		if (inventory == null)
+		{
+			return;
+		}
+		Set<Integer> ids = Arrays.stream(inventory.getItems()).map(Item::getId).collect(toUnmodifiableSet());
+		heldClues.keySet().retainAll(ids);
+		for (int id : ids)
+		{
+			ClueScroll clue = inventoryIds.contains(id) ? null : CoreClueReader.clueOfItem(id);
+			if (clue != null)
+			{
+				heldClues.put(id, clue);
+			}
+		}
+		inventoryIds = ids;
+	}
+
+	private ClueScroll newestHeldClue()
+	{
+		List<ClueScroll> held = List.copyOf(heldClues.values());
+		return held.isEmpty() ? null : held.get(held.size() - 1);
 	}
 
 	private Step resolve(ClueScroll clue)

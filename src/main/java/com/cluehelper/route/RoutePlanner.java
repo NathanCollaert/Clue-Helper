@@ -82,10 +82,10 @@ public class RoutePlanner
 	volatile int nearestNode = WalkTable.NO_NODE;
 	int targetWalkBucket = NO_TARGET_NEAR;
 	Trigger lastTrigger;
-	@Getter
 	volatile Plan plan = Plan.NONE;
-	@Getter
 	volatile Route committed;
+	/** The plan is for {@link ClueLink#getAheadStep()}: listeners and getters see none until core shows that step. */
+	volatile boolean ahead;
 	String committedStep;
 	/** The step's targets when it was committed: a hot/cold step keeps its key while its target moves. */
 	List<WorldPoint> committedTargets = List.of();
@@ -137,6 +137,17 @@ public class RoutePlanner
 		lastTrigger = null;
 		lastTile = null;
 		start = null;
+		ahead = false;
+	}
+
+	public Plan getPlan()
+	{
+		return ahead ? Plan.NONE : plan;
+	}
+
+	public Route getCommitted()
+	{
+		return ahead ? null : committed;
 	}
 
 	/** Listeners run on the client thread with each new plan. */
@@ -146,17 +157,25 @@ public class RoutePlanner
 		return () -> listeners.remove(listener);
 	}
 
-	/** Like {@link #addListener}, with what each plan was planned from. */
+	/** Like {@link #addListener}, with what each plan was planned from, and told of the plans made ahead too. */
 	public Runnable addInputListener(BiConsumer<Plan, PlanInput> listener)
 	{
 		inputListeners.add(listener);
 		return () -> inputListeners.remove(listener);
 	}
 
-	/** The step to travel to now: the clue's step, with a hot/cold probe as its target and the stages already done dropped. */
+	/**
+	 * The step to travel to now: the clue's step, with a hot/cold probe as its target and the stages already done dropped;
+	 * null while core shows no clue.
+	 */
 	public Step travelStep()
 	{
-		return stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
+		return travelStep(clueLink.getCurrentStep());
+	}
+
+	private Step travelStep(Step step)
+	{
+		return stageTarget.travelStep(probeTarget.travelStep(step));
 	}
 
 	/** Call after the player model's and availability's GameTick handlers. */
@@ -187,7 +206,8 @@ public class RoutePlanner
 	/** The start walk from a new tile first, then a plan once any of its inputs changed. */
 	private void refresh()
 	{
-		Step step = travelStep();
+		Step shown = travelStep();
+		Step step = shown != null ? shown : travelStep(clueLink.getAheadStep());
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		WalkData data = walk;
@@ -196,10 +216,13 @@ public class RoutePlanner
 		{
 			if ((step == null || dormant) && plan != Plan.NONE)
 			{
-				stop();
-				listeners.forEach(listener -> listener.accept(Plan.NONE));
+				dropPlan();
 			}
 			return;
+		}
+		if (shown == null && !ahead && (plan != Plan.NONE || runner.isWorking()))
+		{
+			dropPlan();
 		}
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
@@ -215,6 +238,12 @@ public class RoutePlanner
 		Trigger trigger = new Trigger(step, snapshot.getVersion(), carried.getSnapshotVersion(), carried.getValidUntilMinute(),
 			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), PlannerSettings.from(config, snapshot.getAccountType()),
 			Set.copyOf(refusedChanges), bankMemory.getVersion(), bankMemory.isBankOpen(), required, isForeignHouse());
+		boolean wasAhead = ahead;
+		ahead = shown == null;
+		if (wasAhead && shown != null)
+		{
+			reveal(shown);
+		}
 		if (trigger.equals(lastTrigger))
 		{
 			return;
@@ -225,6 +254,33 @@ public class RoutePlanner
 		PlanInput followingInput = followed == null ? input
 			: input.toBuilder().followedFirstTransport(followed.getFirstTransportKey()).followedIdentity(followed.getIdentity()).build();
 		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
+	}
+
+	/**
+	 * Core now shows a step: the plan made ahead for it is the guide's at once. Whatever the read changed for the planner
+	 * still starts a new plan, which replaces it when it comes in.
+	 */
+	private void reveal(Step shown)
+	{
+		if (shown.getKey().equals(plan.getStepKey()))
+		{
+			listeners.forEach(listener -> listener.accept(plan));
+		}
+		else
+		{
+			plan = Plan.NONE;
+		}
+	}
+
+	/** Listeners hear of it only if they were shown the plan. */
+	private void dropPlan()
+	{
+		boolean shown = !ahead;
+		stop();
+		if (shown)
+		{
+			listeners.forEach(listener -> listener.accept(Plan.NONE));
+		}
 	}
 
 	/**
@@ -439,7 +495,10 @@ public class RoutePlanner
 		committed = commit(planned, input.getStep().getTargets());
 		committedStep = planned.getStepKey();
 		committedTargets = input.getStep().getTargets();
-		listeners.forEach(listener -> listener.accept(planned));
+		if (!ahead)
+		{
+			listeners.forEach(listener -> listener.accept(planned));
+		}
 		inputListeners.forEach(listener -> listener.accept(planned, input));
 	}
 
