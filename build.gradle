@@ -27,7 +27,7 @@ dependencies {
 }
 
 group = 'com.cluehelper'
-version = '1.7.0'
+version = '1.8.0'
 sourceCompatibility = '11'
 
 tasks.withType(JavaCompile) {
