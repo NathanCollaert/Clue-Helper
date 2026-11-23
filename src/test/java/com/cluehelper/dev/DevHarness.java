@@ -24,10 +24,14 @@ import com.cluehelper.step.Step;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.AvailabilitySet;
 import com.google.gson.Gson;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +45,8 @@ import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.util.AsyncBufferedImage;
 import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
 
 @Slf4j
@@ -50,6 +56,7 @@ public class DevHarness
 	private static final int STEP_LOG_LINES = 5;
 	private static final int CORE_STASH_SCRIPT = 1479;
 	private static final String GUIDE_TAG = "[CH-GUIDE]";
+	private static final File SPRITES = new File("build/sprites");
 
 	private final Client client;
 	private final ClientThread clientThread;
@@ -80,12 +87,14 @@ public class DevHarness
 	private final HotColdService hotCold;
 	private final MemoryStore memory;
 	private final ConfigManager configManager;
+	private final ItemManager itemManager;
 
 	@Inject
 	DevHarness(Client client, ClientThread clientThread, StepLogger stepLogger, ClueLink clueLink, Gson gson, PlayerModel player,
 		AvailabilityService availability, RoutePlanner routes, StepGuide guide, PohService poh, StashMemory stash, HotColdService hotCold,
-		MemoryStore memory, ConfigManager configManager)
+		MemoryStore memory, ConfigManager configManager, ItemManager itemManager)
 	{
+		this.itemManager = itemManager;
 		this.configManager = configManager;
 		this.hotCold = hotCold;
 		this.memory = memory;
@@ -121,6 +130,8 @@ public class DevHarness
 				watchingClientVars = true;
 				tellClientVars();
 			}));
+		c.register("sprite", "<item id> save the item's icon, as the client draws it, to build/sprites/<id>.png",
+			args -> clientThread.invokeLater(() -> saveSprite(args)));
 		stepLogger.setEnabled(true);
 		unregister.add(clueLink.addListener(this::onStepChange));
 		unregister.add(routes.addListener(this::onPlanned));
@@ -146,6 +157,37 @@ public class DevHarness
 		}
 		watchedVarbit = Integer.parseInt(args[0]);
 		tellVarbit(client.getVarbitValue(watchedVarbit));
+	}
+
+	private void saveSprite(String[] args)
+	{
+		if (args.length != 1 || !args[0].matches("\\d+"))
+		{
+			reply("usage: ::ch-sprite <item id>, e.g. 19939");
+			return;
+		}
+		int itemId = Integer.parseInt(args[0]);
+		AsyncBufferedImage image = itemManager.getImage(itemId);
+		image.onLoaded(() -> writeSprite(itemId, image));
+	}
+
+	private void writeSprite(int itemId, BufferedImage image)
+	{
+		File file = new File(SPRITES, itemId + ".png");
+		try
+		{
+			if (!SPRITES.isDirectory() && !SPRITES.mkdirs())
+			{
+				throw new IOException("could not create " + SPRITES.getAbsolutePath());
+			}
+			ImageIO.write(image, "png", file);
+			reply("saved " + file.getAbsolutePath());
+		}
+		catch (IOException e)
+		{
+			log.warn("could not save the icon of item {}", itemId, e);
+			reply("could not save the icon of item " + itemId + ": " + e.getMessage());
+		}
 	}
 
 	public void onVarbitChanged(VarbitChanged event)

@@ -47,11 +47,10 @@ public class ConventionsTest
 	}
 
 	private static final Set<String> CONFIG_KEYS = new TreeSet<>(Arrays.asList(
-		"avoidWilderness", "scrollBookOutOfWilderness",
+		"avoidWilderness", "stopWildernessClues", "scrollBookOutOfWilderness",
 		"highlightItems", "withdrawTab", "highlightSpells", "highlightMenus",
 		"pathLine", "guideBox", "showNextStep",
-		"spellbookChanges", "useBank",
-		"hotColdPlanner"));
+		"spellbookChanges", "useBank"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 

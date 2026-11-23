@@ -151,6 +151,10 @@ public class RouteReport
 		{
 			line(out, "note", plan.getNote());
 		}
+		if (plan.getDanger() != null)
+		{
+			line(out, "danger", plan.getDanger());
+		}
 		route(out, "followed", routes.getCommitted());
 		route(out, "best", plan.getBest());
 		plan.getRequirementNotes().forEach(note -> line(out, "requirement", note));

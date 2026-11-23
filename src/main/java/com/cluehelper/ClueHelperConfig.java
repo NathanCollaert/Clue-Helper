@@ -28,31 +28,36 @@ public interface ClueHelperConfig extends Config
 	)
 	String guidanceSection = "guidance";
 
-	@ConfigSection(
-		name = "Hot/cold",
-		description = "Where to feel the strange device next",
-		position = 3
-	)
-	String hotColdSection = "hotCold";
-
 	@ConfigItem(
 		keyName = "avoidWilderness",
 		name = "Avoid Wilderness",
-		description = "Leave out Wilderness routes for steps outside it. Hardcore only: just on Hardcore Ironman and Hardcore Group Ironman accounts",
+		description = "Leave out Wilderness routes for steps outside it",
 		section = routesSection,
 		position = 0
 	)
 	default AvoidWilderness avoidWilderness()
 	{
-		return AvoidWilderness.ALWAYS;
+		return AvoidWilderness.NEVER;
+	}
+
+	@ConfigItem(
+		keyName = "stopWildernessClues",
+		name = "Stop Wilderness clues",
+		description = "Show a red warning instead of guiding into the Wilderness",
+		section = routesSection,
+		position = 1
+	)
+	default boolean stopWildernessClues()
+	{
+		return false;
 	}
 
 	@ConfigItem(
 		keyName = "scrollBookOutOfWilderness",
-		name = "Scroll book stays out of Wilderness",
+		name = "Bank the scroll book",
 		description = "Bank the master scroll book before a teleport into the Wilderness",
 		section = routesSection,
-		position = 1
+		position = 2
 	)
 	default boolean scrollBookOutOfWilderness()
 	{
@@ -62,9 +67,9 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "useBank",
 		name = "Use the bank",
-		description = "Count banked teleports and items (and GIM group storage). A bank stop is shown as Best only when it beats going direct by more than 2 ticks",
+		description = "Count banked teleports and items, and GIM group storage",
 		section = routesSection,
-		position = 2
+		position = 3
 	)
 	default boolean useBank()
 	{
@@ -134,7 +139,7 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "pathLine",
 		name = "Path",
-		description = "Draw the path to where to go next. Never drawn onto the clue's own target",
+		description = "Draw the path to where to go next",
 		section = guidanceSection,
 		position = 4
 	)
@@ -146,7 +151,7 @@ public interface ClueHelperConfig extends Config
 	@ConfigItem(
 		keyName = "guideBox",
 		name = "Overlay",
-		description = "None: no Clue Helper overlay; highlights and the path still work. Separate: its own overlay under the Clue Scroll plugin's. Combined: one overlay, the Clue Scroll plugin's text on top. Helper only: the Clue Helper overlay alone, the Clue Scroll plugin's hidden",
+		description = "How the box sits with the Clue Scroll plugin's",
 		section = guidanceSection,
 		position = 5
 	)
@@ -163,18 +168,6 @@ public interface ClueHelperConfig extends Config
 		position = 6
 	)
 	default boolean showNextStep()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "hotColdPlanner",
-		name = "Probe planner",
-		description = "Suggest where to feel next, from your feels so far, and route there. Off: the Clue Scroll plugin's list only",
-		section = hotColdSection,
-		position = 0
-	)
-	default boolean hotColdPlanner()
 	{
 		return true;
 	}

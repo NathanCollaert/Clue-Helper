@@ -58,8 +58,9 @@ Something else wrong? [Open a bug report](https://github.com/NathanCollaert/Clue
 
 | Setting | What it does | Default |
 |---|---|---|
-| Avoid Wilderness | Leave out Wilderness routes for steps outside it | Always |
-| Scroll book stays out of Wilderness | Bank the master scroll book before a teleport into the Wilderness | On |
+| Avoid Wilderness | Leave out Wilderness routes for steps outside it | Never |
+| Stop Wilderness clues | Show a red warning instead of guiding into the Wilderness | Off |
+| Bank the scroll book | Bank the master scroll book before a teleport into the Wilderness | On |
 | Use the bank | Count banked teleports and items, and GIM group storage | On |
 | Spellbook changes | Which spellbook changes routes may use | All |
 | Highlight items / spells / menu lines | What gets highlighted for the current action | On |
@@ -67,7 +68,6 @@ Something else wrong? [Open a bug report](https://github.com/NathanCollaert/Clue
 | Path | Draw the path line to where to go next, in the scene and on the minimap | On |
 | Overlay | None, Separate (its own overlay under Clue Scroll's), Combined (one overlay with Clue Scroll's text on top) or Helper only (Clue Scroll's overlay hidden) | Combined |
 | Show the next step | Show the action after the current one in the box | On |
-| Probe planner | Suggest where to feel next on hot/cold steps | On |
 
 
 ## Good to know

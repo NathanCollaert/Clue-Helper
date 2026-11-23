@@ -79,7 +79,7 @@ public class GuideBoxPresenter
 	private HotColdView hotColdView()
 	{
 		Step step = clueLink.getCurrentStep();
-		if (step == null || !ClueTypes.HOT_COLD.equals(step.getType()) || !config.hotColdPlanner())
+		if (step == null || !ClueTypes.HOT_COLD.equals(step.getType()))
 		{
 			return null;
 		}

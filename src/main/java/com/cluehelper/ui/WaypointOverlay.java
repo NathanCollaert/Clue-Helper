@@ -2,6 +2,7 @@ package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.*;
+import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
@@ -20,6 +21,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.*;
 
 /** Waypoints are never core's target, so the path ends where core's marker takes over. */
@@ -74,6 +76,10 @@ public class WaypointOverlay extends Overlay
 	LeftClicks leftClicks;
 	@Inject
 	ModelSilhouette silhouette;
+	@Inject
+	ProbeTarget probeTarget;
+	@Inject
+	ItemManager itemManager;
 
 	int crossingFrom = NOT_CROSSING;
 	int enteringFrom = NOT_CROSSING;
@@ -138,6 +144,7 @@ public class WaypointOverlay extends Overlay
 		if (goal.isMarkTile())
 		{
 			drawTile(graphics, view, goal.getWalk().getSouthWest());
+			drawDeviceToFeelWith(graphics, view, goal.getWalk().getSouthWest());
 		}
 		return null;
 	}
@@ -248,6 +255,16 @@ public class WaypointOverlay extends Overlay
 		if (tile != null)
 		{
 			highlighter.tile(graphics, tile);
+		}
+	}
+
+	private void drawDeviceToFeelWith(Graphics2D graphics, WorldView view, WorldPoint tile)
+	{
+		HotColdTier tier = probeTarget.feltOn(tile);
+		LocalPoint local = tier == null ? null : LocalPoint.fromWorld(view, tile);
+		if (local != null)
+		{
+			OverlayUtil.renderImageLocation(client, graphics, local, itemManager.getImage(tier.getDeviceItemId()), 0);
 		}
 	}
 
