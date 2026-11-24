@@ -19,6 +19,8 @@ public class GuideBox
 	private static final Set<String> ROUTE_NOTES = Set.of(NO_ROUTE, NO_PLAN_YET, "Walk too long", "No target tile for this step yet");
 
 	BoxState state;
+	/** Above the rest, in the highlight colour: the three-step held is the one to keep. */
+	String headline;
 	String now;
 	@Builder.Default
 	List<String> nowItems = List.of();

@@ -28,6 +28,13 @@ public interface ClueHelperConfig extends Config
 	)
 	String guidanceSection = "guidance";
 
+	@ConfigSection(
+		name = "Master clues",
+		description = "Juggling a quick three-step",
+		position = 3
+	)
+	String masterSection = "master";
+
 	@ConfigItem(
 		keyName = "avoidWilderness",
 		name = "Avoid Wilderness",
@@ -170,5 +177,29 @@ public interface ClueHelperConfig extends Config
 	default boolean showNextStep()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "threeStepSwaps",
+		name = "Three-step swaps",
+		description = "Keep the quickest three-step and guide combining its pieces onto slower ones",
+		section = masterSection,
+		position = 0
+	)
+	default boolean threeStepSwaps()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "threeStepKeep",
+		name = "Three-step to keep",
+		description = "Score three-steps by your teleports now, or as a maxed account would",
+		section = masterSection,
+		position = 1
+	)
+	default ThreeStepKeep threeStepKeep()
+	{
+		return ThreeStepKeep.QUICKEST_NOW;
 	}
 }

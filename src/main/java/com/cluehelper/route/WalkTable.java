@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
@@ -191,6 +192,12 @@ public final class WalkTable
 	public List<Bank> banks(int node)
 	{
 		return banks.getOrDefault(node, List.of());
+	}
+
+	/** Where each bank is, whatever it asks of the player. */
+	public List<WorldPoint> bankTiles()
+	{
+		return banks.keySet().stream().map(this::tile).collect(Collectors.toUnmodifiableList());
 	}
 
 	public int rowCount()

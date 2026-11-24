@@ -45,6 +45,8 @@ public class ClueLink
 	AvailabilityService availability;
 	@Inject
 	PlayerModel player;
+	@Inject
+	ThreeStepSwap threeStepSwap;
 	final LinkState state = new LinkState();
 	final List<StepListener> listeners = new CopyOnWriteArrayList<>();
 	final Set<String> loggedFailures = ConcurrentHashMap.newKeySet();
@@ -52,7 +54,7 @@ public class ClueLink
 	/** Null if the client has no Clue Scroll plugin. */
 	@Getter
 	volatile ClueScrollPlugin core;
-	/** Null when core has no clue. */
+	/** Null when core has no clue and no three-step swap is under way. */
 	@Getter
 	volatile Step currentStep;
 	/**
@@ -155,10 +157,12 @@ public class ClueLink
 
 		boolean active = isCoreActive();
 		ClueScroll clue = active ? service.getClue() : null;
-		Step step = clue == null ? null : stepOf(clue);
+		Step coreStep = clue == null ? null : stepOf(clue);
+		threeStepSwap.onGameTick(clue, coreStep);
+		Step step = threeStepSwap.guided(coreStep);
 		trackHeldClues();
 		ClueScroll held = newestHeldClue();
-		aheadStep = active && clue == null && held != null ? stepOf(held) : null;
+		aheadStep = active && step == null && held != null ? stepOf(held) : null;
 		StepChange change = state.tick(active, step == null ? null : step.getKey(),
 			step == null ? null : List.of(step.getTargets(), step.getStages()));
 		if (change != StepChange.UNCHANGED)

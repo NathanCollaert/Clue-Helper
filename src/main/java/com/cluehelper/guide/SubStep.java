@@ -134,6 +134,8 @@ public class SubStep
 	/** A ground item to pick up, outlined where it lies, the nearest as the waypoint; -1 for none. */
 	@Builder.Default
 	int groundItem = -1;
+	/** Where the one {@link #groundItem} to pick up lies, of several (two master clues); null for any of them. */
+	WorldPoint groundItemTile;
 	/** For {@link Done#ITEM_CARRIED}: the start of the item's name, lower case. */
 	String carriedWhenDone;
 	/** The side tab the act is done in: Emotes for an emote, Music for a track. */

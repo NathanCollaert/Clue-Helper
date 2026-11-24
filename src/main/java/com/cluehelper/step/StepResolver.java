@@ -168,9 +168,48 @@ public class StepResolver
 		return StepIndex.Entry.ofParts(THREE_STEP_TIER, rows, unsolved);
 	}
 
+	/**
+	 * A three-step known by its parts' texts alone, in core's order (a master clue put down after one read): the parts
+	 * not in {@code done}, by the step data. Null unless the data has every part.
+	 */
+	public Step threeStep(List<String> parts, Set<Integer> done, IntFunction<String> npcName)
+	{
+		List<StepIndex.Entry> entries = parts.stream().map(this::crypticEntry).collect(toList());
+		if (entries.stream().anyMatch(entry -> entry == null || entry.getTargets().isEmpty()))
+		{
+			return null;
+		}
+		List<StepIndex.Entry> unsolved = new ArrayList<>();
+		for (int part = 0; part < entries.size(); part++)
+		{
+			if (!done.contains(part))
+			{
+				unsolved.add(entries.get(part));
+			}
+		}
+		List<Stage> stages = unsolved.stream().map(entry -> Stages.part(entry, npcName)).collect(toUnmodifiableList());
+		List<CacheRow> rows = entries.stream().flatMap(entry -> entry.getRows().stream()).collect(toList());
+		String text = String.join(" ", parts);
+		return Step.builder()
+			.key(CoreClueReader.byText(ClueTypes.THREE_STEP, text).getKey())
+			.type(ClueTypes.THREE_STEP)
+			.tier(THREE_STEP_TIER)
+			.text(text)
+			.kind(TargetKind.SEQUENCE)
+			.targets(Stages.tiles(stages))
+			.stages(stages)
+			.data(StepIndex.Entry.ofParts(THREE_STEP_TIER, rows, unsolved))
+			.build();
+	}
+
+	private StepIndex.Entry crypticEntry(String text)
+	{
+		return index.get().entry(CoreClueReader.byText(ClueTypes.CRYPTIC, text).getKey());
+	}
+
 	private StepIndex.Entry partEntry(CrypticClue part)
 	{
-		return index.get().entry(CoreClueReader.byText(ClueTypes.CRYPTIC, part.getText()).getKey());
+		return crypticEntry(part.getText());
 	}
 
 	private List<String> wornFor(CrypticClue part)

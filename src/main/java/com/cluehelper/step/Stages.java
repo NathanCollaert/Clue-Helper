@@ -1,5 +1,6 @@
 package com.cluehelper.step;
 
+import com.cluehelper.guide.SubStep;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.*;
@@ -42,6 +43,18 @@ public final class Stages
 			}
 		}
 		return List.copyOf(stages);
+	}
+
+	/** A part known by its text alone, from the step data: its act at its first target, which is outlined. */
+	static Stage part(StepIndex.Entry entry, IntFunction<String> npcName)
+	{
+		StepIndex.Target target = entry.getTargets().get(0);
+		String name = target.getNpcs().isEmpty() ? target.getTalkTo() : npcName.apply(target.getNpcs().get(0));
+		Step named = Step.builder().npcs(name == null ? List.of() : List.of(NpcAliases.either(name))).build();
+		SubStep act = entry.getMainAct();
+		return Stage.builder().kind(Stage.Kind.PART).act(act == null ? "Search it" : named.namingNpc(act.getText()))
+			.option(act == null ? null : act.getOption()).tiles(List.of(entry.getStand() != null ? entry.getStand() : target.getTile()))
+			.worn(entry.getWornNeeds()).npcIds(Set.copyOf(target.getNpcs())).objectIds(target.getLocs()).build();
 	}
 
 	private static String partAct(CrypticClue part, ClueScrollPlugin plugin)

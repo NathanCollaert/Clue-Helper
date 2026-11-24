@@ -144,6 +144,14 @@ public final class StepIndex
 			return entry;
 		}
 
+		/** A step of the plugin's own, done by these acts alone (a master clue dropped where another is picked up). */
+		public static Entry ofActs(List<SubStep> acts)
+		{
+			Entry entry = new Entry();
+			entry.acts = List.copyOf(acts);
+			return entry;
+		}
+
 		/** A three-step: every part's rows, and what its unsolved parts need. */
 		static Entry ofParts(String tier, List<CacheRow> rows, List<Entry> unsolved)
 		{

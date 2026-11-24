@@ -150,6 +150,7 @@ public class StepGuide
 	Waiting waiting;
 	/** While an enemy attacks during a dig or an emote. */
 	Fight fight;
+	boolean onActTile;
 	RingChain ringChain;
 	/** After a talk that hands over a puzzle or light box: open it (core solves it), then talk again. */
 	SubStep boxView;
@@ -345,6 +346,13 @@ public class StepGuide
 		return cast != null && itemId > 0 && cast.getOn().contains(itemId) && client.isWidgetSelected();
 	}
 
+	/** A task done with its own items (logs lit), begun on one of them: they are gone before core marks the task done. */
+	private boolean usesTaskItem(SubStep current, int itemId)
+	{
+		return current != null && current.isTask() && routeStep != null && itemId > 0
+			&& routeStep.getRequirements().getItems().stream().anyMatch(item -> item.fulfilledBy(itemId));
+	}
+
 	private boolean isTaskObject(int objectId)
 	{
 		return routeStep != null && routeStep.getStages().stream()
@@ -441,6 +449,7 @@ public class StepGuide
 		}
 		boolean changed = advance(tile);
 		changed |= refreshFight();
+		changed |= refreshOnActTile(tile);
 		changed |= refreshBox();
 		changed |= obelisk.takeChanged();
 		changed |= keyFromCharterList();
@@ -806,8 +815,11 @@ public class StepGuide
 		{
 			return false;
 		}
-		pickUpTiles = sceneObjects.groundItemTiles(current.getGroundItem());
-		return replaceCurrent(current.toBuilder().waypoint(nearest(tile)).build());
+		WorldPoint only = current.getGroundItemTile();
+		pickUpTiles = sceneObjects.groundItemTiles(current.getGroundItem()).stream().filter(at -> only == null || only.equals(at))
+			.collect(Collectors.toUnmodifiableList());
+		WorldPoint nearest = nearest(tile);
+		return replaceCurrent(current.toBuilder().waypoint(nearest != null ? nearest : only).build());
 	}
 
 	/** The pick-up tile nearest the player; null with no tile or none to pick up. */
@@ -872,7 +884,7 @@ public class StepGuide
 			WorldView view = client.getTopLevelWorldView();
 			taskStartedAt = view == null ? null : WorldPoint.fromScene(view, event.getParam0(), event.getParam1(), view.getPlane());
 		}
-		else if (isTaskCastItem(event.getItemId()))
+		else if (isTaskCastItem(event.getItemId()) || usesTaskItem(current, event.getItemId()))
 		{
 			taskStartedKey = routeStep.getKey();
 			taskStartedAt = player.getPosition().getTile();
@@ -973,19 +985,23 @@ public class StepGuide
 		notifyListeners();
 	}
 
+	/**
+	 * While an enemy fights the player, the step's fighting act is shown whatever line is current: gear swapped to fight
+	 * makes a new plan, whose lines start again at putting the step's gear on, which waits until the enemy is dead.
+	 */
 	private boolean refreshFight()
 	{
-		SubStep act = listedAt(index);
+		NPC enemy = actWatcher.getEnemy();
+		SubStep act = enemy == null ? listedAt(index)
+			: steps.stream().skip(index).filter(SubStep::isFights).findFirst().orElse(listedAt(index));
 		SubStep view = null;
 		SubStep again = null;
 		if (act != null && act.isFights())
 		{
-			NPC enemy = actWatcher.getEnemy();
 			if (enemy != null)
 			{
-				boolean emote = act.getDone() == SubStep.Done.URI_HERE;
 				view = SubStep.of(Kind.ACT, "Kill the " + (enemy.getName() == null ? "enemy" : enemy.getName()))
-					.detail(emote ? "Stay equipped" : null).build();
+					.npcIds(Set.of(enemy.getId())).option(ATTACK).build();
 				again = act.toBuilder().text(act.getAgain()).build();
 			}
 			else if (actWatcher.foughtSince(stepSince))
@@ -996,6 +1012,16 @@ public class StepGuide
 		Fight next = view == null ? null : new Fight(view, again);
 		boolean changed = !Objects.equals(next, fight);
 		fight = next;
+		return changed;
+	}
+
+	/** An act used only on its own tile (a drop, a feel) has its items highlighted the tick the player steps onto it. */
+	private boolean refreshOnActTile(WorldPoint tile)
+	{
+		SubStep current = getCurrent();
+		boolean on = current != null && current.getWaypoint() != null && current.getWaypoint().equals(tile);
+		boolean changed = on != onActTile;
+		onActTile = on;
 		return changed;
 	}
 

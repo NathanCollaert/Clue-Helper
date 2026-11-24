@@ -142,7 +142,7 @@ public class WaypointOverlay extends Overlay
 		if (goal.isMarkTile())
 		{
 			drawTile(graphics, view, goal.getWalk().getSouthWest());
-			drawDeviceToFeelWith(graphics, view, goal.getWalk().getSouthWest());
+			drawItemUsedOn(graphics, view, goal.getWalk().getSouthWest());
 		}
 		return null;
 	}
@@ -199,8 +199,17 @@ public class WaypointOverlay extends Overlay
 		{
 			return null;
 		}
-		boolean markTile = !outlined() && !awaitsNpc() && waypoint.getPlane() == view.getPlane();
+		boolean markTile = !outlined() && !awaitsNpc() && waypoint.getPlane() == view.getPlane() && !guide.getPickUpTiles().contains(waypoint)
+			&& !coreMarksDigSpot(waypoint);
 		return object == null ? path(view, WalkGoal.tile(waypoint), markTile) : pathTo(view, targets.planWalk(), object, markTile);
+	}
+
+	/** Core marks a hot/cold clue's dig spots itself; a feel's tile is ours to mark. */
+	private boolean coreMarksDigSpot(WorldPoint tile)
+	{
+		Step travel = routes.travelStep();
+		return travel != null && ClueTypes.HOT_COLD.equals(travel.getType()) && travel.getWaypointAct() != null
+			&& travel.getActItems().isEmpty() && travel.getTargets().contains(tile);
 	}
 
 	private Goal path(WorldView view, WalkGoal walk, boolean markTile)
@@ -213,11 +222,30 @@ public class WaypointOverlay extends Overlay
 		return new Goal(here, LineTargets.objectGoal(view, object), endIn(view, object), markTile);
 	}
 
-	/** Core marks the clue itself; only the way there is ours. */
+	/** Core marks the clue itself; only the way there is ours, and the tile of an act core doesn't mark. */
 	private Goal pathToClue(WorldView view, SubStep current)
 	{
+		WorldPoint actTile = unmarkedActTileAhead();
+		if (actTile != null)
+		{
+			return path(view, WalkGoal.tile(actTile), true);
+		}
 		WorldPoint goal = wandererOr(view, current.getGoal());
 		return goal == null ? null : path(view, WalkGoal.tile(goal), false);
+	}
+
+	/**
+	 * A three-step's drop or a hot/cold feel: core marks neither, so the line leads to the act's tile and marks it from the
+	 * walk on, past the walk node the route ends at.
+	 */
+	private WorldPoint unmarkedActTileAhead()
+	{
+		Step travel = routes.travelStep();
+		SubStep next = guide.getNext();
+		boolean coreMarksNoTile = travel != null && (ClueTypes.THREE_STEP.equals(travel.getType()) || ClueTypes.HOT_COLD.equals(travel.getType()));
+		boolean unmarked = coreMarksNoTile && next != null && next.getKind() == SubStep.Kind.ACT && next.getWaypoint() != null
+			&& next.getGroundItem() < 0 && !coreMarksDigSpot(next.getWaypoint());
+		return unmarked ? next.getWaypoint() : null;
 	}
 
 	/**
@@ -256,14 +284,28 @@ public class WaypointOverlay extends Overlay
 		}
 	}
 
-	private void drawDeviceToFeelWith(Graphics2D graphics, WorldView view, WorldPoint tile)
+	private void drawItemUsedOn(Graphics2D graphics, WorldView view, WorldPoint tile)
 	{
-		HotColdTier tier = probeTarget.feltOn(tile);
-		LocalPoint local = tier == null ? null : LocalPoint.fromWorld(view, tile);
+		int itemId = itemUsedOn(tile);
+		LocalPoint local = itemId < 0 ? null : LocalPoint.fromWorld(view, tile);
 		if (local != null)
 		{
-			OverlayUtil.renderImageLocation(client, graphics, local, itemManager.getImage(tier.getDeviceItemId()), 0);
+			OverlayUtil.renderImageLocation(client, graphics, local, itemManager.getImage(itemId), 0);
 		}
+	}
+
+	/** The device to feel with on the tile, or the item its act uses there by an option (the master clue to drop); else -1. */
+	private int itemUsedOn(WorldPoint tile)
+	{
+		HotColdTier tier = probeTarget.feltOn(tile);
+		if (tier != null)
+		{
+			return tier.getDeviceItemId();
+		}
+		SubStep act = Stream.of(guide.getCurrent(), guide.getNext())
+			.filter(sub -> sub != null && sub.getKind() == SubStep.Kind.ACT && sub.getActOption() != null && tile.equals(sub.getWaypoint()))
+			.findFirst().orElse(null);
+		return act == null || act.getActItems().size() != 1 ? -1 : act.getActItems().iterator().next();
 	}
 
 	/**

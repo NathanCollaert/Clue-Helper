@@ -34,6 +34,7 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 | 🖱️ **Guidance** | Every click highlighted, with a path line to where to go next, in the scene and on the minimap. |
 | 📜 **Every type** | Emotes, STASH units, Charlie, Falo, Sherlock, keys and the ways in, all guided. |
 | 🔥 **Hot/cold** | Where to feel the strange device next, then the route to the dig. |
+| 🧩 **Three-steps** | Keeps your quickest master three-step aside and guides combining its pieces onto slower ones. |
 
 
 ## Report a slow route or a bug
@@ -68,6 +69,8 @@ Something else wrong? [Open an issue](https://github.com/NathanCollaert/Clue-Hel
 | Path | Draw the path line to where to go next, in the scene and on the minimap | On |
 | Overlay | None, Separate (its own overlay under Clue Scroll's), Combined (one overlay with Clue Scroll's text on top) or Helper only (Clue Scroll's overlay hidden) | Combined |
 | Show the next step | Show the action after the current one in the box | On |
+| Three-step swaps | Keep your quickest master three-step and guide combining its pieces onto slower ones | On |
+| Three-step to keep | Score three-steps by the teleports you have now, or as a maxed account would | Quickest now |
 
 
 ## Good to know

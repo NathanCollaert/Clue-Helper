@@ -215,6 +215,13 @@ public final class CoreClueReader
 		return clue instanceof CrypticClue ? ((CrypticClue) clue).getSolution(plugin) : null;
 	}
 
+	/** A three-step's parts' texts in core's order; empty for any other clue. */
+	public static List<String> threeStepParts(ClueScroll clue)
+	{
+		return clue instanceof ThreeStepCrypticClue ? List.copyOf(((ThreeStepCrypticClue) clue).getClueSteps()).stream()
+			.map(part -> part.getKey().getText()).collect(toUnmodifiableList()) : List.of();
+	}
+
 	/** The three-step's parts core hasn't marked solved, in core's order. */
 	static List<CrypticClue> unsolvedParts(ThreeStepCrypticClue clue)
 	{

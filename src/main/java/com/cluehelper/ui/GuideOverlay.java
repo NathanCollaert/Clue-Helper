@@ -134,6 +134,7 @@ public class GuideOverlay extends OverlayPanel
 		}
 		int title = panelComponent.getChildren().size();
 		panelComponent.getChildren().add(TitleComponent.builder().text(TITLE).color(TEXT).build());
+		line(shown.getHeadline(), Highlighter.COLOUR);
 		line(shown.title(), TEXT);
 		line(shown.detail(), MUTED);
 		line(shown.getNow(), TEXT);

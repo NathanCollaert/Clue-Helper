@@ -2,7 +2,7 @@ package com.cluehelper;
 
 import com.cluehelper.guide.*;
 import com.cluehelper.hotcold.HotColdService;
-import com.cluehelper.link.ClueLink;
+import com.cluehelper.link.*;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.poh.PohService;
@@ -41,6 +41,9 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	ClueLink clueLink;
+
+	@Inject
+	ThreeStepSwap threeStepSwap;
 
 	@Inject
 	MemoryStore memory;
@@ -151,6 +154,7 @@ public class ClueHelperPlugin extends Plugin
 
 	final List<Runnable> unregister = new ArrayList<>();
 	boolean shownWorking;
+	List<Object> shownSwapLines = List.of();
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -235,9 +239,11 @@ public class ClueHelperPlugin extends Plugin
 		hotCold.onGameTick();
 		guide.onGameTick();
 		withdrawTab.refresh();
-		if (planner.isWorking() != shownWorking)
+		List<Object> swapLines = Arrays.asList(threeStepSwap.headline(), threeStepSwap.notes());
+		if (planner.isWorking() != shownWorking || !swapLines.equals(shownSwapLines))
 		{
 			shownWorking = planner.isWorking();
+			shownSwapLines = swapLines;
 			box.refresh();
 		}
 	}
@@ -277,6 +283,19 @@ public class ClueHelperPlugin extends Plugin
 	public void onPostMenuSort(PostMenuSort event)
 	{
 		guide.onPostMenuSort();
+		threeStepSwap.onPostMenuSort();
+	}
+
+	@Subscribe
+	public void onItemSpawned(ItemSpawned event)
+	{
+		threeStepSwap.onItemSpawned(event);
+	}
+
+	@Subscribe
+	public void onItemDespawned(ItemDespawned event)
+	{
+		threeStepSwap.onItemDespawned(event);
 	}
 
 	/** Runs after other plugins build the menu; only colours our option, never adds, removes or reorders entries. */
@@ -340,6 +359,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.onGameStateChanged(event);
 		unlocks.onGameStateChanged(event);
 		guide.onGameStateChanged(event);
+		threeStepSwap.onGameStateChanged(event);
 	}
 
 	@Subscribe

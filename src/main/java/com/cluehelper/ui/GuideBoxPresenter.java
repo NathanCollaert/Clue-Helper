@@ -3,13 +3,14 @@ package com.cluehelper.ui;
 import com.cluehelper.ClueHelperConfig;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.hotcold.*;
-import com.cluehelper.link.ClueLink;
+import com.cluehelper.link.*;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.poh.PohService;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.AvailabilityService;
+import java.util.*;
 import javax.inject.*;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 
@@ -19,6 +20,8 @@ public class GuideBoxPresenter
 {
 	@Inject
 	ClueLink clueLink;
+	@Inject
+	ThreeStepSwap threeStepSwap;
 	@Inject
 	PlayerModel playerModel;
 	@Inject
@@ -45,7 +48,9 @@ public class GuideBoxPresenter
 		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
 			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
-		GuideBox.GuideBoxBuilder shown = atStep.toBuilder();
+		List<String> notes = new ArrayList<>(atStep.getNotes());
+		notes.addAll(threeStepSwap.notes());
+		GuideBox.GuideBoxBuilder shown = atStep.toBuilder().headline(threeStepSwap.headline()).notes(List.copyOf(notes));
 		if (repeatsCoreSolution(atStep.getNowDetail()))
 		{
 			shown.nowDetail(null);

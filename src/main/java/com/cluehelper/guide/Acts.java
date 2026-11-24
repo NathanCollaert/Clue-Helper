@@ -41,13 +41,15 @@ final class Acts
 		return List.copyOf(equipped);
 	}
 
-	/** The step's one act: its marker's act, or the data's. */
+	/** The step's one act: its marker's act, fought over like the data's dig (a hot/cold spot's mage), or the data's. */
 	static SubStep act(Step step)
 	{
 		if (step.getWaypointAct() != null)
 		{
+			SubStep fought = step.getData().getActs().stream().filter(SubStep::isFights).findFirst().orElse(null);
 			return SubStep.of(Kind.ACT, step.getWaypointAct())
-				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
+				.waypoint(step.getTargets().get(0))
+				.fights(fought != null).again(fought == null ? null : fought.getAgain())
 				.actItems(step.getActItems()).build();
 		}
 		SubStep main = step.getData().getMainAct();
