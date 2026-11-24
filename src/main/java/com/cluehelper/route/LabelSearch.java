@@ -47,7 +47,11 @@ final class LabelSearch
 	final Label[] slots;
 	final LowerBound[] bounds;
 	final boolean[][] targets;
-	final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : a.half - b.half);
+	/**
+	 * At an equal rank the label with more real time carries fewer ranking-only penalties (teleport ties, bank margins), so
+	 * it goes first: an exact tie goes the way those penalties prefer, a walk over two teleports a tick each faster.
+	 */
+	final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : b.half - a.half);
 
 	@PackagePrivate
 	Label goal;

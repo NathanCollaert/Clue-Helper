@@ -59,7 +59,14 @@ public final class PlanReplay
 	private static final long NANOS_PER_MILLI = 1_000_000;
 	private static final String REPORT = ".txt";
 
-	private PlanReplay()
+	private final WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
+	private final WorldMap map = WorldMap.load();
+	private final Catalog catalog = Catalog.read(RuneLiteAPI.GSON);
+	private final NoTeleportAreas noTeleport = NoTeleportAreas.load();
+	private final Map<String, Step> steps = DriftSteps.read();
+	private final AvailabilityEngine engine = new AvailabilityEngine(Loadouts.runeModel(), id -> "item " + id);
+
+	PlanReplay() throws IOException
 	{
 	}
 
@@ -73,38 +80,46 @@ public final class PlanReplay
 			return;
 		}
 		Arrays.sort(files);
-		WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
-		WorldMap map = WorldMap.load();
-		Catalog catalog = Catalog.read(RuneLiteAPI.GSON);
-		NoTeleportAreas noTeleport = NoTeleportAreas.load();
-		Map<String, Step> steps = DriftSteps.read();
-		AvailabilityEngine engine = new AvailabilityEngine(Loadouts.runeModel(), id -> "item " + id);
+		PlanReplay replay = new PlanReplay();
 		Gson gson = new Gson();
 		for (File file : files)
 		{
 			PlanRecording recording = gson.fromJson(recordingJson(file), PlanRecording.class);
-			PlanInput input = PlanInput.builder()
-				.step(steps.getOrDefault(recording.getStepKey(), stepOf(recording)))
-				.player(recording.getPlayer())
-				.banked(recording.getBanked())
-				.pinPending(recording.isPinPending())
-				.atOpenBank(recording.isAtOpenBank())
-				.required(required(recording))
-				.engine(engine)
-				.nowMinutes(recording.getNowMinutes())
-				.catalog(catalog)
-				.table(table)
-				.noTeleport(noTeleport)
-				.start(start(recording, folder, table, map, engine))
-				.settings(recording.getSettings())
-				.revertTicksLeft(recording.getRevertTicksLeft())
-				.refusedChanges(recording.getRefusedChanges())
-				.foreignHouseStart(recording.isForeignHouseStart())
-				.followedFirstTransport(recording.getFollowedFirstTransport())
-				.followedIdentity(recording.getFollowedIdentity())
-				.build();
-			report(file.getName(), recording, input);
+			report(file.getName(), recording, replay.input(recording, folder));
 		}
+	}
+
+	/** What the recording was planned from; its scene, if any, is in {@code folder}. */
+	PlanInput input(PlanRecording recording, File folder) throws IOException
+	{
+		return PlanInput.builder()
+			.step(step(recording))
+			.player(recording.getPlayer())
+			.banked(recording.getBanked())
+			.pinPending(recording.isPinPending())
+			.atOpenBank(recording.isAtOpenBank())
+			.required(required(recording))
+			.engine(engine)
+			.nowMinutes(recording.getNowMinutes())
+			.catalog(catalog)
+			.table(table)
+			.noTeleport(noTeleport)
+			.start(start(recording, folder))
+			.settings(recording.getSettings())
+			.revertTicksLeft(recording.getRevertTicksLeft())
+			.refusedChanges(recording.getRefusedChanges())
+			.foreignHouseStart(recording.isForeignHouseStart())
+			.followedFirstTransport(recording.getFollowedFirstTransport())
+			.followedIdentity(recording.getFollowedIdentity())
+			.build();
+	}
+
+	/** The step data's step on the recorded kind and targets, which the client narrows live (a hot/cold dig spot). */
+	private Step step(PlanRecording recording)
+	{
+		Step known = steps.get(recording.getStepKey());
+		return known == null ? stepOf(recording)
+			: known.toBuilder().kind(TargetKind.valueOf(recording.getKind())).targets(targets(recording)).build();
 	}
 
 	private static String recordingJson(File file) throws IOException
@@ -149,10 +164,15 @@ public final class PlanReplay
 	/** A three-step or other key the step data lacks: its targets are enough to plan. */
 	private static Step stepOf(PlanRecording recording)
 	{
-		List<WorldPoint> targets = recording.getTargets().stream().map(PlanReplay::point).collect(Collectors.toList());
+		List<WorldPoint> targets = targets(recording);
 		List<Stage> stages = recording.getStages() == null ? List.of() : recording.getStages().stream().map(PlanReplay::stage).collect(Collectors.toList());
 		return Step.builder().key(recording.getStepKey()).type(recording.getStepType()).tier(recording.getTier()).kind(TargetKind.valueOf(recording.getKind()))
 			.targets(targets).stages(stages).regions(List.of()).build();
+	}
+
+	private static List<WorldPoint> targets(PlanRecording recording)
+	{
+		return recording.getTargets().stream().map(PlanReplay::point).collect(Collectors.toList());
 	}
 
 	private static Stage stage(PlanRecording.RecordedStage recorded)
@@ -179,8 +199,7 @@ public final class PlanReplay
 		return new GearRequirement(need.getName(), need.getGearAtLeast(), pieces);
 	}
 
-	private static PlanStart start(PlanRecording recording, File folder, WalkTable table, WorldMap map, AvailabilityEngine engine)
-		throws IOException
+	private PlanStart start(PlanRecording recording, File folder) throws IOException
 	{
 		WorldPoint tile = point(recording.getStartTile());
 		boolean[] rowOpen = new WalkGates(table, recording.getPlayer(), engine, recording.getNowMinutes()).rowOpen();
