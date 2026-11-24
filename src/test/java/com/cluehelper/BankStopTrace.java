@@ -15,6 +15,7 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.MenuAction;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.events.WidgetLoaded;
@@ -27,7 +28,9 @@ import net.runelite.client.util.Text;
  * Times every bank stop, for the costs the planner gives one (PlanContext's bank stop, per-item withdraw, PIN and
  * deposit-first half-ticks): one {@link Stopped} line each in {@link #LOG}, summed up by item stacks and PIN in
  * {@link #SUMMARY}. A stop runs from the player standing at the bank to the first click that is neither bank work nor
- * wearing an item: the next transport's first click, or a walk.
+ * wearing an item: the next transport's first click, or a walk. Its game ticks are the bank opening (standing to open,
+ * less the PIN) and each item click to the inventory or worn items changing; the rest, the PIN included, is the
+ * player's.
  *
  * <p>Ticks: as in {@link CrossingTrace}, the player stands at the bank from boundary S + 1, S the GameTick count they
  * were first seen there, or from the bank click's own period when already there; a click in period c is c - start ticks
@@ -45,6 +48,7 @@ final class BankStopTrace
 	private static final Set<Integer> BANK_GROUPS = Set.of(InterfaceID.BANKMAIN, InterfaceID.BANKSIDE, InterfaceID.BANKPIN_KEYPAD);
 	private static final int GIVE_UP_TICKS = 50;
 	private static final int ABANDON_TICKS = 300;
+	private static final int NONE = Integer.MIN_VALUE;
 
 	private enum Phase
 	{
@@ -63,6 +67,8 @@ final class BankStopTrace
 	private WorldPoint tileAtClick;
 	private final Map<WorldPoint, Integer> firstSeen = new HashMap<>();
 	private Map<Integer, Integer> carriedAtClick = Map.of();
+	/** The first item click the game hasn't answered yet, or {@link #NONE}. */
+	private int unansweredClickTick = NONE;
 
 	BankStopTrace(Client client, Gson gson, TimingLog timingLog)
 	{
@@ -82,6 +88,10 @@ final class BankStopTrace
 		else if (phase == Phase.BANKING)
 		{
 			stopped.clicks++;
+			if (unansweredClickTick == NONE && event.getParam1() >>> 16 != InterfaceID.BANKPIN_KEYPAD)
+			{
+				unansweredClickTick = client.getTickCount();
+			}
 		}
 		else if (isBankClick(event, option, Text.removeTags(event.getMenuTarget())))
 		{
@@ -108,6 +118,17 @@ final class BankStopTrace
 		if (phase != Phase.IDLE && event.getGroupId() == InterfaceID.BANKPIN_KEYPAD && stopped.pinOpenTick != 0)
 		{
 			stopped.pinTicks = client.getTickCount() - stopped.pinOpenTick;
+		}
+	}
+
+	@Subscribe(priority = -3)
+	public void onItemContainerChanged(ItemContainerChanged event)
+	{
+		boolean carried = event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN;
+		if (phase == Phase.BANKING && carried && unansweredClickTick != NONE)
+		{
+			stopped.itemGameTicks += client.getTickCount() + 1 - unansweredClickTick;
+			unansweredClickTick = NONE;
 		}
 	}
 
@@ -148,6 +169,7 @@ final class BankStopTrace
 		tileAtClick = PlayerTiles.tile(client);
 		firstSeen.clear();
 		carriedAtClick = carried();
+		unansweredClickTick = NONE;
 		phase = Phase.GOING;
 	}
 
@@ -166,6 +188,8 @@ final class BankStopTrace
 		stopped.endTick = client.getTickCount();
 		stopped.stopTicks = stopped.endTick - stopped.startTick;
 		stopped.itemStacks = changedItems(carriedAtClick, carried());
+		stopped.gameTicks = stopped.standToOpen - stopped.pinTicks + stopped.itemGameTicks;
+		stopped.playerTicks = stopped.stopTicks - stopped.gameTicks;
 		String line = gson.toJson(stopped);
 		log.info("{} {}", TAG, line);
 		timingLog.append(LOG, line, SUMMARY, lines -> BankStopTimings.tsv(lines.stream()
@@ -231,5 +255,11 @@ final class BankStopTrace
 		int endTick;
 		/** Standing at the bank to the click that ended the stop. */
 		int stopTicks;
+		/** Each item click to the inventory or worn items changing. */
+		int itemGameTicks;
+		/** The bank opening, less the PIN, and {@link #itemGameTicks}. */
+		int gameTicks;
+		/** The rest of the stop: the PIN, reading the bank, clicking. */
+		int playerTicks;
 	}
 }

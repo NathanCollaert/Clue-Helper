@@ -86,6 +86,7 @@ import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -111,6 +112,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File ROUTE_FRAMES = new File("build/routes");
 	private static final File SCENES = new File("build/scenes");
 	private static final File GUIDE_FRAMES = new File("build/guide");
+	/** Only its name counts: frames go to the session's folder, under marks/. */
+	private static final File MARK_FRAMES = new File("build/marks");
 	/** About 10 s, to see highlights between sub-step changes. */
 	private static final int LIVE_FRAME_TICKS = 16;
 	private static final int OBJECT_DUMP_TILES = 30;
@@ -136,6 +139,9 @@ public class ClueHelperDevPlugin extends Plugin
 	private EventBus eventBus;
 
 	@Inject
+	private ConfigManager configManager;
+
+	@Inject
 	private DrawManager drawManager;
 
 	@Inject
@@ -153,6 +159,10 @@ public class ClueHelperDevPlugin extends Plugin
 	private ClueHelperPlugin clueHelper;
 	/** Built in Clue Helper's own injector, so it shares the plugin's services. */
 	private DevHarness harness;
+	/** The session's timeline; its folder also holds the session's frames. */
+	private TimelineRecorder timeline;
+	/** A dev panel mock is the current clue: the game never answers its acts. */
+	private volatile boolean mockedClue;
 	private final List<Runnable> unregister = new ArrayList<>();
 	private int stepFrameCount;
 	private int playerFrameCount;
@@ -188,13 +198,15 @@ public class ClueHelperDevPlugin extends Plugin
 			thread.setPriority(Thread.MIN_PRIORITY);
 			return thread;
 		});
-		clearOldPngs(STEP_FRAMES);
-		clearOldPngs(PLAYER_FRAMES);
-		clearOldPngs(LANDING_FRAMES);
-		clearOldPngs(ROUTE_FRAMES);
-		clearOldPngs(GUIDE_FRAMES);
-		clearOldPngs(PohTrace.FRAMES);
-		clearOldPngs(HotColdTrace.FRAMES);
+		Gson gson = clueHelper.getInjector().getInstance(Gson.class);
+		timeline = new TimelineRecorder(client, service(StepGuide.class), service(ClueLink.class),
+			service(RoutePlanner.class), service(WaypointOverlay.class), service(GuideOverlay.class), configManager, gson);
+		eventBus.register(timeline);
+		unregister.add(() ->
+		{
+			eventBus.unregister(timeline);
+			timeline.stop();
+		});
 		SCENES.mkdirs();
 		unregister.add(service(ClueLink.class).addListener(this::saveStepFrame));
 		unregister.add(service(ClueLink.class).addListener((change, step) -> forgetFakeKey(change)));
@@ -217,21 +229,15 @@ public class ClueHelperDevPlugin extends Plugin
 		NetworkTrace networkTrace = new NetworkTrace(client, file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(networkTrace);
 		unregister.add(() -> eventBus.unregister(networkTrace));
-		Gson gson = clueHelper.getInjector().getInstance(Gson.class);
 		TimingLog timingLog = new TimingLog();
 		AnimationTrace animationTrace = new AnimationTrace(client, gson, timingLog);
-		TimelineRecorder timeline = new TimelineRecorder(client, service(StepGuide.class), service(ClueLink.class),
-			service(RoutePlanner.class), service(WaypointOverlay.class), service(GuideOverlay.class), gson);
-		eventBus.register(timeline);
-		unregister.add(() ->
-		{
-			eventBus.unregister(timeline);
-			timeline.stop();
-		});
-		ActTrace actTrace = new ActTrace(client, service(StepGuide.class), service(ClueLink.class), gson, timingLog);
-		WaitWindows windows = new WaitWindows(gson, timingLog);
-		List<Object> timingTraces = List.of(animationTrace, new LegTimingTrace(client, service(StepGuide.class), gson, timingLog, windows),
-			new CrossingTrace(client, gson, timingLog, windows), new BankStopTrace(client, gson, timingLog), actTrace,
+		ActTrace actTrace = new ActTrace(client, service(StepGuide.class), service(ClueLink.class), gson, timingLog,
+			() -> mockedClue);
+		WaitWindows windows = new WaitWindows(client, gson, timingLog, timeline.session());
+		LockWatch lockWatch = new LockWatch(client);
+		List<Object> timingTraces = List.of(lockWatch, animationTrace,
+			new LegTimingTrace(client, service(StepGuide.class), gson, timingLog, windows, lockWatch),
+			new CrossingTrace(client, gson, timingLog, windows, lockWatch), new BankStopTrace(client, gson, timingLog), actTrace,
 			new StashTrace(client, gson, timingLog, windows), new BookScrollTrace(client, gson, timingLog),
 			new WindowTrace(client, service(PohService.class), service(StepGuide.class), windows), new WalkTrace(client, service(StepGuide.class), gson, timingLog));
 		timingTraces.forEach(eventBus::register);
@@ -274,7 +280,12 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		DevPanel[] panel = new DevPanel[1];
 		mockClues = new MockClues(client, service(ClueLink.class)::getCore, stepResolver,
-			description -> SwingUtilities.invokeLater(() -> panel[0].showMock(description)));
+			description ->
+			{
+				mockedClue = description != null;
+				timeline.mocked(description);
+				SwingUtilities.invokeLater(() -> panel[0].showMock(description));
+			});
 		campaign = campaign(text -> SwingUtilities.invokeLater(() -> panel[0].showCampaign(text)));
 		unregister.add(service(RoutePlanner.class).addInputListener(campaign::onPlan));
 		DevPanel.CampaignControls campaignControls = new DevPanel.CampaignControls()
@@ -336,6 +347,7 @@ public class ClueHelperDevPlugin extends Plugin
 			}
 		};
 		List<DevPanel.Action> tools = List.of(
+			new DevPanel.Action("Mark this moment", () -> clientThread.invokeLater(this::markMoment)),
 			new DevPanel.Action("Objects near the step", () -> clientThread.invokeLater(this::dumpObjectsNearStep)));
 		panel[0] = new DevPanel(campaignControls, controls, tools);
 		NavigationButton button = NavigationButton.builder()
@@ -414,7 +426,7 @@ public class ClueHelperDevPlugin extends Plugin
 		drawManager.requestNextFrameListener(frame -> frameWriter.execute(() ->
 		{
 			file.toFile().getParentFile().mkdirs();
-			writeFrame(frame, file.toFile());
+			writePng(frame, file.toFile());
 			then.run();
 		}));
 	}
@@ -762,16 +774,15 @@ public class ClueHelperDevPlugin extends Plugin
 		return clueHelper.getInjector().getInstance(type);
 	}
 
-	private static void clearOldPngs(File dir)
+	/** Client thread. Flags this tick in the timeline, with a frame, for the review before a commit to look at first. */
+	private void markMoment()
 	{
-		dir.mkdirs();
-		File[] old = dir.listFiles((parent, name) -> name.endsWith(".png"));
-		if (old != null)
+		int tick = client.getTickCount();
+		timeline.mark();
+		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(MARK_FRAMES, "mark.png"))));
+		if (client.getGameState() == GameState.LOGGED_IN)
 		{
-			for (File f : old)
-			{
-				f.delete();
-			}
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Marked tick " + tick + " for review", null);
 		}
 	}
 
@@ -889,7 +900,18 @@ public class ClueHelperDevPlugin extends Plugin
 		requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(PLAYER_FRAMES, name))));
 	}
 
-	private static void writeFrame(Image frame, File file)
+	/**
+	 * Into the session's folder beside its timeline, not where the trace named it, so frames of every session are kept:
+	 * {@code build/guide/003-act.png} becomes {@code <session>/frames/guide/t1234-003-act.png}.
+	 */
+	private void writeFrame(Image frame, File named)
+	{
+		File file = timeline.frameFile(named.getParentFile().getName(), named.getName(), client.getTickCount());
+		file.getParentFile().mkdirs();
+		writePng(frame, file);
+	}
+
+	private static void writePng(Image frame, File file)
 	{
 		BufferedImage image = new BufferedImage(frame.getWidth(null), frame.getHeight(null), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = image.createGraphics();

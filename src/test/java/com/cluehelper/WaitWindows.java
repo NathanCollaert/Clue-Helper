@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 
 /**
  * How long the events the guide waits for really take, against the window it waits: one {@link Sample} line each in
  * {@link #LOG}, summed up per window in {@link #SUMMARY}. Samples are raw tick-count differences, as the guide itself
  * subtracts them, so they compare straight with its constant. Each window's value is read from its own constant, so it
- * is never restated here.
+ * is never restated here. All of it is the game's time: what the guide waits for is the game answering.
  */
 @Slf4j
 final class WaitWindows
@@ -82,17 +83,21 @@ final class WaitWindows
 		}
 	}
 
+	private final Client client;
 	private final Gson gson;
 	private final TimingLog timingLog;
+	private final String session;
 	private final Map<Window, Integer> windowTicks = new EnumMap<>(Window.class);
 
-	WaitWindows(Gson gson, TimingLog timingLog)
+	WaitWindows(Client client, Gson gson, TimingLog timingLog, String session)
 	{
+		this.client = client;
 		this.gson = gson;
 		this.timingLog = timingLog;
+		this.session = session;
 		for (Window window : Window.values())
 		{
-			windowTicks.put(window, read(window));
+			windowTicks.put(window, constant(window.owner, window.constant));
 		}
 	}
 
@@ -102,6 +107,8 @@ final class WaitWindows
 		sample.window = window;
 		sample.ticks = ticks;
 		sample.detail = detail;
+		sample.session = session;
+		sample.tick = client.getTickCount();
 		String line = gson.toJson(sample);
 		log.info("{} {}", TAG, line);
 		timingLog.append(LOG, line, SUMMARY, lines -> tsv(lines.stream()
@@ -109,25 +116,28 @@ final class WaitWindows
 			.collect(Collectors.toList())));
 	}
 
-	/** The guide's constant, or {@link #UNREAD} (and a warning) when it was renamed or moved. */
-	private static int read(Window window)
+	/**
+	 * A private constant of the plugin, read so the dev harness never restates its value; {@link #UNREAD} (and a warning)
+	 * when it was renamed or moved.
+	 */
+	static int constant(String owner, String name)
 	{
 		try
 		{
-			Field field = Class.forName(window.owner).getDeclaredField(window.constant);
+			Field field = Class.forName(owner).getDeclaredField(name);
 			field.setAccessible(true);
 			return field.getInt(null);
 		}
 		catch (ReflectiveOperationException e)
 		{
-			log.warn("{} can't read {}.{}: update WaitWindows", TAG, window.owner, window.constant, e);
+			log.warn("{} can't read {}.{}: update the dev harness", TAG, owner, name, e);
 			return UNREAD;
 		}
 	}
 
 	private String tsv(List<Sample> all)
 	{
-		StringBuilder out = new StringBuilder("window\tconstant\tguide_waits\tbound\tsamples\tticks\toutside\n");
+		StringBuilder out = new StringBuilder("window\tconstant\tguide_waits\tbound\tsamples\tticks\toutside\tverdict\n");
 		Map<Window, List<Sample>> byWindow = all.stream()
 			.collect(Collectors.groupingBy(sample -> sample.window, () -> new EnumMap<>(Window.class), Collectors.toList()));
 		byWindow.forEach((window, samples) ->
@@ -136,9 +146,19 @@ final class WaitWindows
 			long outside = samples.stream().filter(sample -> !window.fits(sample.ticks, waits)).count();
 			out.append(String.join("\t", window.name(), window.owner + "." + window.constant, String.valueOf(waits),
 				window.bound.name(), String.valueOf(samples.size()), TimingLog.range(samples.stream().mapToLong(sample -> sample.ticks)),
-				String.valueOf(outside))).append('\n');
+				String.valueOf(outside), verdict(samples.size(), outside))).append('\n');
 		});
 		return out.toString();
+	}
+
+	/** Judged only on a batch: a window too short in a few samples may be the samples. */
+	private static String verdict(int samples, long outside)
+	{
+		if (samples < TimingLog.Batch.ENOUGH)
+		{
+			return TimingLog.Batch.needs(samples);
+		}
+		return outside == 0 ? "fits" : outside + " of " + samples + " outside";
 	}
 
 	/** One line of the log. */
@@ -149,5 +169,8 @@ final class WaitWindows
 		int ticks;
 		/** What was clicked or crossed, for a sample outside its window. */
 		String detail;
+		/** The timeline session and the tick the sample ended on, to find it there. */
+		String session;
+		int tick;
 	}
 }

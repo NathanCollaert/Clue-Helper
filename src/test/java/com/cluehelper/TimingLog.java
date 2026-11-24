@@ -70,4 +70,46 @@ final class TimingLog
 		long max = sorted[sorted.length - 1];
 		return min == max ? String.valueOf(min) : min + "-" + max;
 	}
+
+	/** The middle value (the upper one of an even count), or empty when there are no values. */
+	static String median(LongStream values)
+	{
+		long[] sorted = values.sorted().toArray();
+		return sorted.length == 0 ? "" : String.valueOf(sorted[sorted.length / 2]);
+	}
+
+	/**
+	 * Whether a measurement disagrees with what the plugin uses, judged only on a batch: below {@link Batch#ENOUGH}
+	 * samples it says how many more are needed, so a few odd samples never pass for a finding. Then the median against
+	 * the planned value: "fits", "slower by 2" or "faster by 1".
+	 */
+	static String verdict(LongStream measured, long planned)
+	{
+		long[] sorted = measured.sorted().toArray();
+		if (sorted.length < Batch.ENOUGH)
+		{
+			return Batch.needs(sorted.length);
+		}
+		long median = sorted[sorted.length / 2];
+		if (median == planned)
+		{
+			return "fits";
+		}
+		return (median > planned ? "slower by " : "faster by ") + Math.abs(median - planned);
+	}
+
+	/** How many samples a timing needs before it may be doubted. */
+	static final class Batch
+	{
+		static final int ENOUGH = 10;
+
+		private Batch()
+		{
+		}
+
+		static String needs(int samples)
+		{
+			return "needs " + (ENOUGH - samples) + " more";
+		}
+	}
 }

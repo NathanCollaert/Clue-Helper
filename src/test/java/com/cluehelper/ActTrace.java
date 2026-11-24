@@ -6,11 +6,10 @@ import com.cluehelper.link.ClueLink;
 import com.google.gson.Gson;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -19,21 +18,25 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.util.Text;
 
 /**
- * Times each act the guide points at (a dig, search, talk, emote, equip, STASH withdrawal, hand-in): one {@link Acted}
- * line each in {@link #LOG}, summed up per act in {@link #SUMMARY}. An act runs from the player standing where they do
- * it to its first animation, dialogue and game message, to the guide moving on, and to the clue changing.
+ * Times each act the guide points at (a dig, search, talk, emote, equip, drop, STASH withdrawal, hand-in): one
+ * {@link Acted} line each in {@link #LOG}, summed up per act in {@link #SUMMARY}. An act runs from the player standing
+ * where they do it to its first animation, dialogue, game message and change to the inventory or worn items (the
+ * game's share), to the guide moving on, and to the clue changing. The player's share is their reaction: the guide
+ * showing the act to the player's first click on it.
  *
- * <p>Ticks: as in {@link CrossingTrace}, the player stands there from boundary S + 1, S the GameTick count they were
- * first seen on the tile, or from the click's own period when already there; a server effect seen with count E
- * happened at boundary E + 1, so stand to effect = E + 1 - start. The guide and the clue move on in the client, on the
- * count of the tick they do it in.
+ * <p>Ticks: the player last stepped on GameTick S, so stands from boundary S + 1, or from the click's own period when
+ * they never stepped after it. The start is fixed at the act's first sign (an effect, the guide or the clue moving on),
+ * so walking off afterwards doesn't move it. An effect, the guide or the clue seen with count E answers boundary E + 1,
+ * so stand to effect = E + 1 - start.
  */
 @Slf4j
 final class ActTrace
@@ -53,14 +56,19 @@ final class ActTrace
 	private final StepGuide guide;
 	private final Gson gson;
 	private final TimingLog timingLog;
+	private final BooleanSupplier mockedClue;
 	private final List<Runnable> unregister = new ArrayList<>();
 	private SubStep acting;
 	private Acted acted;
-	private WorldPoint tileAtClick;
-	private final Map<WorldPoint, Integer> firstSeen = new HashMap<>();
+	private WorldPoint lastTile;
+	private int lastStepTick = NOT_SEEN;
+	/** The sub-step the guide showed last, and since when. */
+	private SubStep shown;
+	private int shownTick = NOT_SEEN;
 
-	ActTrace(Client client, StepGuide guide, ClueLink clueLink, Gson gson, TimingLog timingLog)
+	ActTrace(Client client, StepGuide guide, ClueLink clueLink, Gson gson, TimingLog timingLog, BooleanSupplier mockedClue)
 	{
+		this.mockedClue = mockedClue;
 		this.client = client;
 		this.guide = guide;
 		this.gson = gson;
@@ -96,9 +104,9 @@ final class ActTrace
 		if (acted != null && acted.animationTick == NOT_SEEN && event.getActor() == client.getLocalPlayer()
 			&& event.getActor().getAnimation() != -1)
 		{
+			fixStart();
 			acted.animationTick = client.getTickCount();
 			acted.animation = event.getActor().getAnimation();
-			markStanding();
 		}
 	}
 
@@ -107,8 +115,8 @@ final class ActTrace
 	{
 		if (acted != null && acted.dialogueTick == NOT_SEEN && DIALOGUES.contains(event.getGroupId()))
 		{
+			fixStart();
 			acted.dialogueTick = client.getTickCount();
-			markStanding();
 		}
 	}
 
@@ -117,21 +125,33 @@ final class ActTrace
 	{
 		if (acted != null && acted.messageTick == NOT_SEEN && GAME_LINES.contains(event.getType()))
 		{
+			fixStart();
 			acted.messageTick = client.getTickCount();
 			acted.message = Text.removeTags(event.getMessage());
-			markStanding();
+		}
+	}
+
+	@Subscribe(priority = -3)
+	public void onItemContainerChanged(ItemContainerChanged event)
+	{
+		boolean carried = event.getContainerId() == InventoryID.INV || event.getContainerId() == InventoryID.WORN;
+		if (acted != null && acted.itemsChangedTick == NOT_SEEN && carried)
+		{
+			fixStart();
+			acted.itemsChangedTick = client.getTickCount();
 		}
 	}
 
 	@Subscribe(priority = -3)
 	public void onGameTick(GameTick tick)
 	{
-		if (acted == null)
+		WorldPoint tile = PlayerTiles.tile(client);
+		if (acted != null && tile != null && lastTile != null && !tile.equals(lastTile))
 		{
-			return;
+			lastStepTick = client.getTickCount();
 		}
-		firstSeen.putIfAbsent(PlayerTiles.tile(client), client.getTickCount());
-		if (client.getTickCount() - acted.clickTick > GIVE_UP_TICKS)
+		lastTile = tile;
+		if (acted != null && client.getTickCount() - acted.clickTick > GIVE_UP_TICKS)
 		{
 			finish();
 		}
@@ -139,8 +159,15 @@ final class ActTrace
 
 	private void onGuideChanged()
 	{
+		SubStep current = guide.getCurrent();
+		if (!Objects.equals(current, shown))
+		{
+			shown = current;
+			shownTick = client.getTickCount();
+		}
 		if (acted != null && acted.guideMovedOnTick == NOT_SEEN && !Objects.equals(guide.getCurrent(), acting))
 		{
+			fixStart();
 			acted.guideMovedOnTick = client.getTickCount();
 			finishOnceBothMoved();
 		}
@@ -150,6 +177,7 @@ final class ActTrace
 	{
 		if (acted != null && acted.clueChangedTick == NOT_SEEN)
 		{
+			fixStart();
 			acted.clueChangedTick = client.getTickCount();
 			finishOnceBothMoved();
 		}
@@ -173,24 +201,25 @@ final class ActTrace
 		acted.done = current.getDone();
 		acted.click = click;
 		acted.clickTick = client.getTickCount();
-		tileAtClick = PlayerTiles.tile(client);
-		firstSeen.clear();
+		acted.shownTick = current.equals(shown) ? shownTick : NOT_SEEN;
+		acted.mocked = mockedClue.getAsBoolean();
+		lastStepTick = NOT_SEEN;
 	}
 
-	/** Where the player did the act is where they stood at its first effect. */
-	private void markStanding()
+	/** Where and from when the player did the act: where they stood at its first sign. */
+	private void fixStart()
 	{
 		if (acted.startTick != NOT_SEEN)
 		{
 			return;
 		}
-		WorldPoint tile = PlayerTiles.tile(client);
-		acted.at = PlayerTiles.text(tile);
-		acted.startTick = Objects.equals(tile, tileAtClick) ? acted.clickTick : firstSeen.getOrDefault(tile, client.getTickCount()) + 1;
+		acted.at = PlayerTiles.text(PlayerTiles.tile(client));
+		acted.startTick = lastStepTick == NOT_SEEN ? acted.clickTick : lastStepTick + 1;
 	}
 
 	private void finish()
 	{
+		fixStart();
 		String line = gson.toJson(acted);
 		log.info("{} {}", TAG, line);
 		timingLog.append(LOG, line, SUMMARY, lines -> ActTimings.tsv(lines.stream()
@@ -200,7 +229,7 @@ final class ActTrace
 		acting = null;
 	}
 
-	/** One line of the log. A tick stays 0 when its effect never came. */
+	/** One line of the log. A tick stays 0 when its sign never came. */
 	static final class Acted
 	{
 		/** The guide's line. */
@@ -217,8 +246,17 @@ final class ActTrace
 		int animation;
 		int dialogueTick;
 		int messageTick;
+		/** The inventory or worn items first changed: an item put on, used, handed in or taken out. */
+		int itemsChangedTick;
+		/** The guide first showed this act; 0 when it showed before this trace saw it. */
+		int shownTick;
 		String message;
 		int guideMovedOnTick;
 		int clueChangedTick;
+		/**
+		 * The clue was the dev panel's mock: the game never answers its acts (no challenge scroll, no reward), so the
+		 * guide and the clue move on only when the next one is mocked.
+		 */
+		boolean mocked;
 	}
 }

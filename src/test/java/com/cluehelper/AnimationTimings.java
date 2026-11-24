@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 final class AnimationTimings
 {
 	private static final String NO_CLICK = "-";
-	private static final String HEADER = String.join("\t", "animation", "click", "seen", "full_runs", "cache_ms", "loops",
+	private static final String HEADER = String.join("\t", "animation", "click", "seen", "batch", "full_runs", "cache_ms", "loops",
 		"played_ms_min", "played_ms_median", "played_ms_max", "click_to_start_ticks", "graphics");
 
 	private AnimationTimings()
@@ -40,7 +40,9 @@ final class AnimationTimings
 		Played any = runs.get(0);
 		TreeSet<Integer> graphics = new TreeSet<>();
 		runs.forEach(played -> graphics.addAll(played.graphics));
-		return String.join("\t", animationAndClick, String.valueOf(runs.size()), String.valueOf(fullRuns.size()),
+		return String.join("\t", animationAndClick, String.valueOf(runs.size()),
+			fullRuns.size() < TimingLog.Batch.ENOUGH ? TimingLog.Batch.needs(fullRuns.size()) + " full runs" : "enough",
+			String.valueOf(fullRuns.size()),
 			String.valueOf(any.cacheMs), String.valueOf(any.loops),
 			fullRuns.isEmpty() ? "" : String.valueOf(fullRuns.get(0)),
 			fullRuns.isEmpty() ? "" : String.valueOf(fullRuns.get(fullRuns.size() / 2)),

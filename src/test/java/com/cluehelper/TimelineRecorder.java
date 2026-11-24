@@ -1,5 +1,10 @@
 package com.cluehelper;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.core.AppenderBase;
 import com.cluehelper.guide.StepGuide;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.link.ClueLink;
@@ -20,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,15 +55,21 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.events.ConfigChanged;
+import org.slf4j.LoggerFactory;
 
 /**
- * Everything the plugin shows and does, and what the player does, as one timeline per session in {@link #DIR}, for
+ * Everything the plugin shows and does, and what the player does, as one timeline per session in its own folder under
+ * {@link #DIR} (with the session's frames beside it, named by tick), for
  * reading back afterwards to find what went wrong: a line per event (click, menu, game message, interface, animation,
  * clue change, plan) as it happens, and on every game tick a {@code state} line with each part of the plugin's output
  * that changed since the tick before (the guide's sub-step and list, the box, highlights, outlined objects and NPCs,
  * the path line, the plan, the clue step, the player). The session's first state line has every part, so the state at
- * any tick is the last value of each part before it.
+ * any tick is the last value of each part before it. Also every warning and error a Clue Helper class logs, the
+ * plugin's settings at the start and each change to them, and the moments the tester marked from the dev panel.
  *
  * <p>Nothing is kept from the bank PIN keypad but that it was clicked, and of chat only the game's own lines.
  */
@@ -68,6 +80,7 @@ final class TimelineRecorder
 	private static final Set<ChatMessageType> GAME_LINES = Set.of(ChatMessageType.GAMEMESSAGE, ChatMessageType.SPAM,
 		ChatMessageType.MESBOX, ChatMessageType.ENGINE, ChatMessageType.DIALOG, ChatMessageType.CONSOLE);
 	private static final String BOX_FIELD = "box";
+	private static final String PLUGIN_LOGGERS = "com.cluehelper";
 
 	private final Client client;
 	private final StepGuide guide;
@@ -86,12 +99,26 @@ final class TimelineRecorder
 		thread.setDaemon(true);
 		return thread;
 	});
+	private final ConfigManager configManager;
+	private final Logger pluginLogger = (Logger) LoggerFactory.getLogger(PLUGIN_LOGGERS);
+	private final AppenderBase<ILoggingEvent> warnings = new AppenderBase<ILoggingEvent>()
+	{
+		@Override
+		protected void append(ILoggingEvent event)
+		{
+			recordWarning(event);
+		}
+	};
+	/** The path line as last recorded; a line that only shortened along it since is the same route. */
+	private List<WorldPoint> recordedLine = List.of();
+	private final File sessionDir;
 	private final File file;
 	private Writer out;
 
 	TimelineRecorder(Client client, StepGuide guide, ClueLink clueLink, RoutePlanner planner, WaypointOverlay waypoints,
-		GuideOverlay guideOverlay, Gson gson)
+		GuideOverlay guideOverlay, ConfigManager configManager, Gson gson)
 	{
+		this.configManager = configManager;
 		this.client = client;
 		this.guide = guide;
 		this.clueLink = clueLink;
@@ -100,16 +127,41 @@ final class TimelineRecorder
 		this.guideOverlay = guideOverlay;
 		this.gson = gson;
 		this.guideBox = boxField();
-		this.file = new File(DIR, new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".jsonl");
+		this.sessionDir = new File(DIR, new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()));
+		this.file = new File(sessionDir, "timeline.jsonl");
 		definePartsOfTheState();
 		files.execute(this::open);
+		event("settings", "values", settings());
+		warnings.setContext(pluginLogger.getLoggerContext());
+		warnings.start();
+		pluginLogger.addAppender(warnings);
 		unregister.add(clueLink.addListener((change, step) -> event("clue", "change", String.valueOf(change), "step", stepOf(step))));
 		unregister.add(planner.addListener(plan -> event("plan", "plan", planOf(plan))));
 		log.info("[CH-TIMELINE] recording to {}", file.getAbsolutePath());
 	}
 
+	/** The session's folder name, which other dev logs carry to point into this timeline. */
+	String session()
+	{
+		return sessionDir.getName();
+	}
+
+	/** Where a frame of this session goes: {@code frames/<kind>/t<tick>-<name>}, so it lines up with the timeline. */
+	File frameFile(String kind, String name, int tick)
+	{
+		return new File(sessionDir, "frames/" + kind + "/t" + tick + "-" + name);
+	}
+
+	/** A moment the tester flagged as looking wrong. Client thread. */
+	void mark()
+	{
+		event("mark", "tile", PlayerTiles.text(PlayerTiles.tile(client)));
+	}
+
 	void stop()
 	{
+		pluginLogger.detachAppender(warnings);
+		warnings.stop();
 		unregister.forEach(Runnable::run);
 		unregister.clear();
 		files.execute(this::close);
@@ -124,7 +176,7 @@ final class TimelineRecorder
 		parts.put("box", this::shownBox);
 		parts.put("highlights", guide::getHighlights);
 		parts.put("outlined", this::outlined);
-		parts.put("line", waypoints::getLine);
+		parts.put("line", this::lineRoute);
 		parts.put("plan", () -> planOf(planner.getPlan()));
 		parts.put("committed", () -> routeOf(planner.getCommitted()));
 		parts.put("player", this::player);
@@ -209,6 +261,17 @@ final class TimelineRecorder
 	}
 
 	@Subscribe(priority = -5)
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (ClueHelperConfig.GROUP.equals(event.getGroup()))
+		{
+			boolean profileMemory = event.getProfile() != null;
+			event(profileMemory ? "memory" : "setting", "key", event.getKey(), "from", profileMemory ? size(event.getOldValue()) : event.getOldValue(),
+				"to", profileMemory ? size(event.getNewValue()) : event.getNewValue(), "profile", event.getProfile());
+		}
+	}
+
+	@Subscribe(priority = -5)
 	public void onGameStateChanged(GameStateChanged event)
 	{
 		event("gameState", "state", String.valueOf(event.getGameState()));
@@ -247,6 +310,82 @@ final class TimelineRecorder
 		return sub;
 	}
 
+	/**
+	 * The path line, recorded again only when its route changes: another end, or a tile it didn't pass before. While the
+	 * player walks along it, it only loses the tiles behind them, which says nothing new.
+	 */
+	private List<WorldPoint> lineRoute()
+	{
+		List<WorldPoint> line = waypoints.getLine();
+		boolean sameEnd = !line.isEmpty() && !recordedLine.isEmpty()
+			&& line.get(line.size() - 1).equals(recordedLine.get(recordedLine.size() - 1));
+		boolean shortenedOnly = sameEnd && new HashSet<>(recordedLine).containsAll(line);
+		if (!shortenedOnly)
+		{
+			recordedLine = List.copyOf(line);
+		}
+		return recordedLine;
+	}
+
+	/** What a profile memory save is recorded as: its length, not its contents, which run to hundreds of kilobytes. */
+	private static String size(String value)
+	{
+		return value == null ? null : value.length() + " chars";
+	}
+
+	/** Every setting of the plugin's group, by key. */
+	private Map<String, String> settings()
+	{
+		Map<String, String> values = new LinkedHashMap<>();
+		String prefix = ClueHelperConfig.GROUP + ".";
+		for (String key : configManager.getConfigurationKeys(prefix))
+		{
+			String name = key.startsWith(prefix) ? key.substring(prefix.length()) : key;
+			values.put(name, configManager.getConfiguration(ClueHelperConfig.GROUP, name));
+		}
+		return values;
+	}
+
+	/** Any thread. The recorder's own trouble is left out: recording it could fail the same way again. */
+	private void recordWarning(ILoggingEvent event)
+	{
+		if (!event.getLevel().isGreaterOrEqual(Level.WARN) || event.getLoggerName().equals(TimelineRecorder.class.getName()))
+		{
+			return;
+		}
+		IThrowableProxy thrown = event.getThrowableProxy();
+		event("log", "level", String.valueOf(event.getLevel()), "logger", event.getLoggerName(), "thread", event.getThreadName(),
+			"message", event.getFormattedMessage(), "thrown", thrown == null ? null : thrown.getClassName() + ": " + thrown.getMessage());
+	}
+
+	/** The outlined NPCs the clue names: the overlay leaves those to core's own outline. */
+	private List<String> leftToCore()
+	{
+		Step step = clueLink.getCurrentStep();
+		if (step == null)
+		{
+			return List.of();
+		}
+		return guide.getHighlightNpcs().stream()
+			.filter(npc -> npc.getName() != null && step.getNpcs().stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName())))
+			.map(TimelineRecorder::npcAt)
+			.collect(Collectors.toList());
+	}
+
+	/** The NPCs core's Clue Scroll plugin marks itself. */
+	private List<String> coreMarks()
+	{
+		ClueScrollPlugin core = clueLink.getCore();
+		List<NPC> marked = core == null ? null : core.getNpcsToMark();
+		return marked == null ? List.of() : marked.stream().map(TimelineRecorder::npcAt).collect(Collectors.toList());
+	}
+
+	/** The dev panel's mocked clue, as it describes it, or null once cleared. */
+	void mocked(String description)
+	{
+		event("mock", "clue", description);
+	}
+
 	/** Each outlined or filled object and NPC, as id@tile. */
 	private Map<String, Object> outlined()
 	{
@@ -256,6 +395,8 @@ final class TimelineRecorder
 		shown.put("npcs", guide.getHighlightNpcs().stream().map(TimelineRecorder::npcAt).collect(Collectors.toList()));
 		shown.put("fillNpcs", guide.getFillNpcs().stream().map(TimelineRecorder::npcAt).collect(Collectors.toList()));
 		shown.put("pickUp", guide.getPickUpTiles().stream().map(PlayerTiles::text).collect(Collectors.toList()));
+		shown.put("leftToCore", leftToCore());
+		shown.put("coreMarks", coreMarks());
 		return shown;
 	}
 
@@ -417,7 +558,7 @@ final class TimelineRecorder
 	{
 		try
 		{
-			Files.createDirectories(DIR.toPath());
+			Files.createDirectories(sessionDir.toPath());
 			out = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
 		}
 		catch (IOException e)

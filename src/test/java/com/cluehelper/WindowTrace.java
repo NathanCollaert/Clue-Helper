@@ -49,7 +49,10 @@ final class WindowTrace
 	private static final int RIDE_WATCH_TICKS = 60;
 	/** The waypoint line's own idle test starts this many ticks after the way-in click. */
 	private static final int IDLE_FROM_TICKS = 2;
-	/** Longer than the guide's refresh: a target not outlined by then is one the guide passes over on purpose. */
+	/**
+	 * Longer than the guide's refresh: a target not outlined by then is sampled as never outlined, which may be one the
+	 * guide passes over on purpose (a second NPC of the name, farther away).
+	 */
 	private static final int OUTLINE_WATCH_TICKS = 15;
 	private static final int NEVER = Integer.MIN_VALUE / 2;
 
@@ -115,7 +118,7 @@ final class WindowTrace
 	@Subscribe(priority = -3)
 	public void onGameObjectSpawned(GameObjectSpawned event)
 	{
-		if (within(houseEnteredTick))
+		if (within(houseEnteredTick) && isInHouse())
 		{
 			lastHouseSpawnTick = client.getTickCount();
 		}
@@ -165,11 +168,13 @@ final class WindowTrace
 		appeared.entrySet().removeIf(entry ->
 		{
 			boolean outlined = guide.getHighlightObjects().contains(entry.getKey()) || guide.getHighlightNpcs().contains(entry.getKey());
-			if (outlined)
+			boolean givenUp = now - entry.getValue() > OUTLINE_WATCH_TICKS;
+			if (outlined || givenUp)
 			{
-				windows.sample(WaitWindows.Window.OBJECT_REFRESH, now - entry.getValue(), describe(entry.getKey()));
+				windows.sample(WaitWindows.Window.OBJECT_REFRESH, now - entry.getValue(),
+					describe(entry.getKey()) + (outlined ? "" : ", never outlined"));
 			}
-			return outlined || now - entry.getValue() > OUTLINE_WATCH_TICKS;
+			return outlined || givenUp;
 		});
 	}
 
@@ -203,19 +208,29 @@ final class WindowTrace
 	public void onGameTick(GameTick tick)
 	{
 		int now = client.getTickCount();
-		boolean nowInHouse = poh.isInHouse();
+		boolean nowInHouse = isInHouse();
 		if (nowInHouse && !inHouse)
 		{
 			houseEnteredTick = now;
 			lastHouseSpawnTick = now;
 		}
 		inHouse = nowInHouse;
-		if (houseEnteredTick != NEVER && now - houseEnteredTick == WATCH_TICKS)
+		if (houseEnteredTick != NEVER && (!nowInHouse || now - houseEnteredTick == WATCH_TICKS))
 		{
-			windows.sample(WaitWindows.Window.HOUSE_SCAN, lastHouseSpawnTick - houseEnteredTick, PlayerTiles.text(PlayerTiles.tile(client)));
+			String detail = nowInHouse ? PlayerTiles.text(PlayerTiles.tile(client)) : "left the house after " + (now - houseEnteredTick);
+			windows.sample(WaitWindows.Window.HOUSE_SCAN, lastHouseSpawnTick - houseEnteredTick, detail);
 			houseEnteredTick = NEVER;
 		}
 		watchRide(now);
+	}
+
+	/**
+	 * In the house's scene: the plugin's house flag still reads true on the tick of landing outside, when that scene's
+	 * objects spawn, but the scene is no longer an instance by then.
+	 */
+	private boolean isInHouse()
+	{
+		return poh.isInHouse() && client.getTopLevelWorldView().isInstance();
 	}
 
 	/** As the waypoint line tells a way in taken: a click on the ENTER step's object. */

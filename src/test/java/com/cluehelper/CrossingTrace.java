@@ -60,35 +60,29 @@ final class CrossingTrace
 	private static final int GIVE_UP_TICKS = 50;
 	private static final int LOCK_WATCH_TICKS = 15;
 
-	private enum Phase
-	{
-		IDLE,
-		/** Clicked; walking to it or crossing it. */
-		CROSSING,
-		/** Across, or the door open; waiting for a walk click that moves the player. */
-		ACROSS
-	}
-
 	private final Client client;
 	private final Gson gson;
 	private final TimingLog timingLog;
 	private final WaitWindows windows;
 	private final Map<Integer, List<WalkRow>> rowsByObject;
-	private final LockWatch lock = new LockWatch();
-	private Phase phase = Phase.IDLE;
+	private final LockWatch lock;
+	/** The crossing clicked and not across yet, or null. */
 	private Crossed crossed;
+	/** Crossings done, waiting for their lock to settle. */
+	private final List<Crossed> settling = new ArrayList<>();
 	private List<WalkRow> candidates = List.of();
 	private int clickedSceneX;
 	private int clickedSceneY;
 	private WorldPoint tileAtClick;
 	private final Map<WorldPoint, Integer> firstSeen = new HashMap<>();
 
-	CrossingTrace(Client client, Gson gson, TimingLog timingLog, WaitWindows windows)
+	CrossingTrace(Client client, Gson gson, TimingLog timingLog, WaitWindows windows, LockWatch lock)
 	{
 		this.client = client;
 		this.gson = gson;
 		this.timingLog = timingLog;
 		this.windows = windows;
+		this.lock = lock;
 		this.rowsByObject = WalkRow.load(WALK_ROWS);
 	}
 
@@ -100,16 +94,7 @@ final class CrossingTrace
 			return;
 		}
 		String option = Text.removeTags(event.getMenuOption());
-		if (phase == Phase.ACROSS && option.equals(PlayerTiles.WALK))
-		{
-			lock.onWalkClick(client.getTickCount());
-			return;
-		}
-		if (phase == Phase.ACROSS)
-		{
-			finish(lock.settle(PlayerTiles.tile(client)));
-		}
-		phase = Phase.IDLE;
+		crossed = null;
 		if (OBJECT_OPTIONS.contains(event.getMenuAction()))
 		{
 			beginIfCrossing(event, option, Text.removeTags(event.getMenuTarget()));
@@ -119,7 +104,7 @@ final class CrossingTrace
 	@Subscribe(priority = -3)
 	public void onAnimationChanged(AnimationChanged event)
 	{
-		if (phase != Phase.IDLE && event.getActor() == client.getLocalPlayer() && event.getActor().getAnimation() != -1)
+		if (crossed != null && event.getActor() == client.getLocalPlayer() && event.getActor().getAnimation() != -1)
 		{
 			crossed.animations.add("t" + client.getTickCount() + " " + event.getActor().getAnimation());
 		}
@@ -140,10 +125,9 @@ final class CrossingTrace
 	@Subscribe(priority = -3)
 	public void onGameTick(GameTick tick)
 	{
-		lock.onGameTick();
 		WorldPoint tile = PlayerTiles.tile(client);
 		int now = client.getTickCount();
-		if (phase == Phase.CROSSING)
+		if (crossed != null)
 		{
 			firstSeen.putIfAbsent(tile, now);
 			noteActive(tile, now);
@@ -156,13 +140,19 @@ final class CrossingTrace
 			{
 				crossed.outcome = Crossed.Outcome.NOT_ACROSS;
 				crossed.endedAt = PlayerTiles.text(tile);
-				finish(LockWatch.Lock.NONE);
+				finish(crossed, LockWatch.Lock.NONE);
+				crossed = null;
 			}
 		}
-		else if (phase == Phase.ACROSS && (lock.hasMoved(tile) || now - crossed.acrossTick > LOCK_WATCH_TICKS))
+		settling.removeIf(done ->
 		{
-			finish(lock.settle(tile));
-		}
+			boolean settled = lock.isSettled(done.acrossTick) || now - done.acrossTick > LOCK_WATCH_TICKS;
+			if (settled)
+			{
+				finish(done, lock.settle(done.acrossTick));
+			}
+			return settled;
+		});
 	}
 
 	/** As the waypoint line sees a crossing under way: the player has stepped or animates. */
@@ -196,12 +186,11 @@ final class CrossingTrace
 		crossed.objectId = event.getId();
 		crossed.clickTick = client.getTickCount();
 		crossed.walkRow = !rows.isEmpty();
-		phase = Phase.CROSSING;
 	}
 
 	private void onObjectGone(TileObject object)
 	{
-		if (phase == Phase.CROSSING && !crossed.walkRow && object.getId() == crossed.objectId
+		if (crossed != null && !crossed.walkRow && object.getId() == crossed.objectId
 			&& object.getLocalLocation().getSceneX() == clickedSceneX && object.getLocalLocation().getSceneY() == clickedSceneY)
 		{
 			across(PlayerTiles.tile(client), null);
@@ -226,14 +215,14 @@ final class CrossingTrace
 			crossed.duration = row.duration;
 			crossed.plannedHalfTicks = row.pricedHalfTicks();
 		}
-		lock.arrived(now, tile);
-		phase = Phase.ACROSS;
 		String detail = crossed.walkRow ? crossed.label : crossed.click;
 		if (crossed.activeTick != 0)
 		{
 			windows.sample(WaitWindows.Window.CROSSING_START, crossed.activeTick - crossed.clickTick, detail);
 		}
 		windows.sample(WaitWindows.Window.CROSSING, now - crossed.clickTick, detail);
+		settling.add(crossed);
+		crossed = null;
 	}
 
 	private boolean wasAt(WorldPoint tile)
@@ -254,17 +243,16 @@ final class CrossingTrace
 		return wall != null && wall.getId() == objectId;
 	}
 
-	private void finish(LockWatch.Lock settled)
+	private void finish(Crossed done, LockWatch.Lock settled)
 	{
-		crossed.lockAtLeast = settled.atLeast;
-		crossed.lockAtMost = settled.atMost;
-		String line = gson.toJson(crossed);
+		done.lockAtLeast = settled.atLeast;
+		done.lockAtMost = settled.atMost;
+		done.lockTakenBy = settled.takenBy;
+		String line = gson.toJson(done);
 		log.info("{} {}", TAG, line);
 		timingLog.append(LOG, line, SUMMARY, lines -> CrossingTimings.tsv(lines.stream()
 			.map(logged -> gson.fromJson(logged, Crossed.class))
 			.collect(Collectors.toList())));
-		crossed = null;
-		phase = Phase.IDLE;
 	}
 
 	/** A row of {@code w0_rows.tsv}: Shortest Path's doors, stairs and shortcuts as the walk table was baked from. */
@@ -349,8 +337,10 @@ final class CrossingTrace
 		/** The first game tick the player had stepped or animated since the click; 0 when never. */
 		int activeTick;
 		int lockAtLeast;
-		/** {@link LockWatch#UNKNOWN} when no accepted walk click told it. */
+		/** {@link LockWatch#UNKNOWN} when no click after crossing was seen taken. */
 		int lockAtMost = LockWatch.UNKNOWN;
+		/** The click after crossing that was taken, and the effect that showed it. */
+		String lockTakenBy;
 		String origin;
 		String endedAt;
 		List<String> animations = new ArrayList<>();
