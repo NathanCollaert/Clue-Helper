@@ -240,18 +240,18 @@ minigame	Sorceress's Garden Minigame Teleport		3319 3140 0						3329>0	4560&128;
 minigame	Sorceress's Garden Minigame Teleport		3319 3140 0						3329>0	4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varbit:3329=OSMAN_WANT_POMES varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
 minigame	Sorceress's Garden Minigame Teleport		3319 3140 0						3329>0	4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varbit:3329=OSMAN_WANT_POMES varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
 minigame	Sorceress's Garden Minigame Teleport		3319 3140 0						3329>0	4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varbit:3329=OSMAN_WANT_POMES varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
-minigame	Soul Wars Minigame Teleport		2018 5929 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&4;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&8;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&16;888@20	0	24	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&32;888@20	0	25	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&64;888@20	0	20	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&128;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&256;888@20	0	21	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&512;888@20	0	19	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
+minigame	Soul Wars Minigame Teleport		2210 2856 0							4560&1024;888@20	0	23	2	F	cooldown:888	any	Y				varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
 minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560=0;888@20	0	24	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
 minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&1;888@20	0	24	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID
 minigame	Tithe Farm Minigame Teleport		1792 3501 0				34 Farming		4909=1	4560&2;888@20	0	21	2	F	cooldown:888	any	Y				varbit:4909=ZEAH_TITHE_MINIGAME_UNLOCKED varp:4560=HOME_TELEPORT_ANIM_TOGGLES varp:888=SLUG2_REGIONUID

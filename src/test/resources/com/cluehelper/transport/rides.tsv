@@ -985,3 +985,7 @@ wilderness obelisk	Obelisk: Level 19 Wilderness	3306 3915 0	3227 3667 0		Set Des
 wilderness obelisk	Obelisk: Level 27 Wilderness	3306 3915 0	3035 3732 0		Set Destination Obelisk 14831				4468=1		-1	10	3	F	none	any	Y		op Set Destination > 3: Level 27 Wilderness		varbit:4468=WILDERNESS_DIARY_HARD_COMPLETE object:14831=WILDERNESS_PORTAL_STONE_5
 wilderness obelisk	Obelisk: Level 35 Wilderness	3306 3915 0	3106 3794 0		Set Destination Obelisk 14831				4468=1		-1	10	3	F	none	any	Y		op Set Destination > 4: Level 35 Wilderness		varbit:4468=WILDERNESS_DIARY_HARD_COMPLETE object:14831=WILDERNESS_PORTAL_STONE_5
 wilderness obelisk	Obelisk: Level 44 Wilderness	3306 3915 0	2980 3866 0		Set Destination Obelisk 14831				4468=1		-1	10	3	F	none	any	Y		op Set Destination > 5: Level 44 Wilderness		varbit:4468=WILDERNESS_DIARY_HARD_COMPLETE object:14831=WILDERNESS_PORTAL_STONE_5
+portal	Portal: Ferox Enclave	2206 2858 0	3158 10027 0		Ferox Enclave Portal 40476						-1	0	0	F	none	any	Y		op Ferox Enclave		object:40476=SOUL_WARS_LEAVE_SOULWARS_PORTAL
+portal	Portal: Edgeville	2206 2858 0	3081 3475 0		Edgeville Portal 40476						-1	0	0	F	none	any	Y		op Edgeville		object:40476=SOUL_WARS_LEAVE_SOULWARS_PORTAL
+portal	Portal: Soul Wars	3084 3476 0	2206 2858 0		Enter Soul Wars Portal 40474						-1	0	0	F	none	any	Y		op Enter		object:40474=SOUL_WARS_EDGEVILLE_PORTAL
+portal	Portal: Soul Wars	3158 10028 0	2206 2858 0		Enter Soul Wars Portal 40475						-1	0	0	F	none	any	Y		op Enter		object:40475=SOUL_WARS_ENCLAVE_PORTAL

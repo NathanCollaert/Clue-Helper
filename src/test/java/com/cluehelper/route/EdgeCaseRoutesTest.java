@@ -439,6 +439,8 @@ public class EdgeCaseRoutesTest
 			TEAR_OF_THE_SOUL_DOCK, VarbitID.SAILING_BOAT_1_TELEPORT_FOCUS, GREATER_TELEPORT_FOCUS, VarbitID.AMENITY_ROWBOAT_SOUL_TEAR, 0));
 		lines.add(line("sailing: boat 1 moored at the Tear of the Soul with a greater teleport focus, maxed, the Tear's beach",
 			checked(input(boatAtTheTear, tear, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("Isle of Souls: maxed, the Isle of Souls mine spot, onto the island through Soul Wars",
+			checked(input(maxed, step("spot:ISLE_OF_SOULS_MINE"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		lines.add(line("sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium",
 			checked(input(alsoCarrying(maxed, ItemID.SAILORS_AMULET), step("emote:31268"), PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		PlayerSnapshot bridgeUnbuilt = withVarbits(maxed, Map.of(VarbitID.FENK_BUILT_BRIDGE_NORTH, 1, VarbitID.FENK_BUILT_BRIDGE_SOUTH, 1));
