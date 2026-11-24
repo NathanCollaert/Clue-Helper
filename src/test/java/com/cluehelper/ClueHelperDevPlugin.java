@@ -3,6 +3,7 @@ package com.cluehelper;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.cluehelper.campaign.Campaign;
+import com.google.gson.Gson;
 import com.cluehelper.campaign.CampaignRecorder;
 import com.cluehelper.campaign.Outcome;
 import com.cluehelper.dev.DevHarness;
@@ -19,6 +20,7 @@ import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.PlayerModel;
+import com.cluehelper.poh.PohService;
 import com.cluehelper.player.Position;
 import com.cluehelper.player.PositionRules;
 import com.cluehelper.route.GearPieces;
@@ -36,6 +38,7 @@ import com.cluehelper.step.StepResolver;
 import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogRow;
+import com.cluehelper.ui.GuideOverlay;
 import com.cluehelper.ui.WaypointOverlay;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -214,6 +217,32 @@ public class ClueHelperDevPlugin extends Plugin
 		NetworkTrace networkTrace = new NetworkTrace(client, file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(networkTrace);
 		unregister.add(() -> eventBus.unregister(networkTrace));
+		Gson gson = clueHelper.getInjector().getInstance(Gson.class);
+		TimingLog timingLog = new TimingLog();
+		AnimationTrace animationTrace = new AnimationTrace(client, gson, timingLog);
+		TimelineRecorder timeline = new TimelineRecorder(client, service(StepGuide.class), service(ClueLink.class),
+			service(RoutePlanner.class), service(WaypointOverlay.class), service(GuideOverlay.class), gson);
+		eventBus.register(timeline);
+		unregister.add(() ->
+		{
+			eventBus.unregister(timeline);
+			timeline.stop();
+		});
+		ActTrace actTrace = new ActTrace(client, service(StepGuide.class), service(ClueLink.class), gson, timingLog);
+		WaitWindows windows = new WaitWindows(gson, timingLog);
+		List<Object> timingTraces = List.of(animationTrace, new LegTimingTrace(client, service(StepGuide.class), gson, timingLog, windows),
+			new CrossingTrace(client, gson, timingLog, windows), new BankStopTrace(client, gson, timingLog), actTrace,
+			new StashTrace(client, gson, timingLog, windows), new BookScrollTrace(client, gson, timingLog),
+			new WindowTrace(client, service(PohService.class), service(StepGuide.class), windows), new WalkTrace(client, service(StepGuide.class), gson, timingLog));
+		timingTraces.forEach(eventBus::register);
+		unregister.add(() ->
+		{
+			timingTraces.forEach(eventBus::unregister);
+			animationTrace.stop();
+			actTrace.stop();
+			timingLog.stop();
+		});
+		log.info("{} timings go to {}", TAG, TimingLog.DIR.getAbsolutePath());
 		FairyDialTrace dialTrace = new FairyDialTrace(client, service(MenuLines.class), fairyDials,
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(dialTrace);
