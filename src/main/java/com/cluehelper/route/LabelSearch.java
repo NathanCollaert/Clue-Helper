@@ -217,7 +217,7 @@ final class LabelSearch
 		int[] withdrawn = from.b == PlanContext.BANKED ? sortedUnion(staged, ctx.requiredWithdraw) : staged;
 		int area = areaHalfTicks + withdrawHalfTicks(from, withdrawn);
 		Book end = endBook(k);
-		int strand = ctx.strandHalfTicks(end, from.b, capeUses(from.spent));
+		int strand = ctx.strandHalfTicks(end, from.node, from.b, capeUses(from.spent));
 		if (probes)
 		{
 			Label current = probeBest.get(from.node);

@@ -98,7 +98,7 @@ house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      74t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 58
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)
-  best      79t (rank 110): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
+  best      79t (rank 92): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
   best      77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62

@@ -31,8 +31,8 @@ final class PlanContext
 	private static final Map<Category, Integer> USE_UP_FEES = Tables.byKey("use-up fees", Category::valueOf, row -> row.id(0));
 	/** Ranking only, on Scarcity: an item's or charge's last use; the second last weighs half of it, and so on. */
 	static final int LAST_USE_HALF_TICKS = 60;
-	/** Ranking only: the route leaves you on another book with no way back left today. */
-	private static final int STRAND_PENALTY_HALF_TICKS = 60;
+	/** Ranking only: the route leaves you on another book with no way back left today; also caps an estimated way back. */
+	private static final int STRAND_PENALTY_HALF_TICKS = 120;
 	/** One more click when the withdraw list needs more slots than are free. */
 	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
 	private static final OriginClass[] ABSTRACT_CLASSES = {OriginClass.WILD0, OriginClass.WILD20, OriginClass.WILD30, OriginClass.POH};
@@ -47,6 +47,8 @@ final class PlanContext
 	private final Map<WorldPoint, Integer> extraNodes = new HashMap<>();
 	private OriginClass[] classes;
 	private final Map<String, LowerBound> lowerBounds = new HashMap<>();
+	/** By book and bank state: from each node, the half-ticks back to the home book through located changes. */
+	private final Map<String, int[]> waysBack = new HashMap<>();
 
 	final PlanResources resources = new PlanResources();
 	final TransportOptions[] options = new TransportOptions[2];
@@ -446,20 +448,59 @@ final class PlanContext
 		return in.getBanked() != null ? in.getBanked() : in.getPlayer();
 	}
 
-	int strandHalfTicks(Book book, int bankState, int capeUsesSpent)
+	/** Ranking only: the cheapest way back to the home book from where the route ends, by a cape change left today or a located change. */
+	int strandHalfTicks(Book book, int node, int bankState, int capeUsesSpent)
 	{
 		if (book == homeBook)
 		{
 			return 0;
 		}
+		int back = Math.min(STRAND_PENALTY_HALF_TICKS, wayBack(book, bankState)[node]);
 		TransportOptions.Change cape = options[bankState].cape;
 		SpellbookState state = in.getPlayer().getSpellbook();
 		int usesLeft = state == null ? 0 : state.getCapeChangesLeft();
 		if (cape != null && capeUsesSpent + 1 <= usesLeft)
 		{
-			return cape.halfTicks + cape.priceHalfTicks;
+			back = Math.min(back, cape.halfTicks + cape.priceHalfTicks);
 		}
-		return STRAND_PENALTY_HALF_TICKS;
+		return back;
+	}
+
+	/**
+	 * From each node on the book: the cheapest walk, or teleport castable on it and walk, to a change that lands on the home
+	 * book, or on Standard where a second change goes home; with each change's time and fee.
+	 */
+	private int[] wayBack(Book book, int bankState)
+	{
+		String key = book + "|" + bankState;
+		int[] known = waysBack.get(key);
+		if (known != null)
+		{
+			return known;
+		}
+		TransportOptions o = options[bankState];
+		int[] seed = new int[nodeCount()];
+		Arrays.fill(seed, LowerBound.UNREACHABLE);
+		for (List<TransportOptions.Change> here : o.changes.values())
+		{
+			for (TransportOptions.Change c : here)
+			{
+				Book toggles = c.change.getToggles();
+				Book lands = toggles == null ? homeBook : toggles == book ? Book.STANDARD : toggles;
+				int onward = lands == homeBook ? 0
+					: lands == Book.STANDARD && book != Book.STANDARD ? wayBack(Book.STANDARD, bankState)[c.node] : LowerBound.UNREACHABLE;
+				seed[c.node] = Math.min(seed[c.node], c.halfTicks + c.priceHalfTicks + onward);
+			}
+		}
+		int[] walk = LowerBound.walkTo(this, seed);
+		int teleport = o.teleports.stream().filter(tele -> tele.book == null || tele.book == book)
+			.mapToInt(tele -> tele.halfTicks + tele.priceHalfTicks + walk[tele.node]).min().orElse(LowerBound.UNREACHABLE);
+		for (int n = 0; n < walk.length; n++)
+		{
+			walk[n] = Math.min(walk[n], teleport);
+		}
+		waysBack.put(key, walk);
+		return walk;
 	}
 
 	private void expandBooks()
