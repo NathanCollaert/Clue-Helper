@@ -35,6 +35,12 @@ final class TimingLog
 		files.execute(() -> appendAndSummarise(logFile, line, summary, summarise));
 	}
 
+	/** A second summary of the same log, rewritten after the lines appended before this call. */
+	void summarise(File logFile, File summary, Function<List<String>, String> summarise)
+	{
+		files.execute(() -> writeSummary(logFile, summary, summarise));
+	}
+
 	void stop()
 	{
 		files.shutdown();
@@ -46,6 +52,19 @@ final class TimingLog
 		{
 			Files.createDirectories(DIR.toPath());
 			Files.write(logFile.toPath(), List.of(line), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+		}
+		catch (IOException e)
+		{
+			log.warn("could not write {}", logFile.getAbsolutePath(), e);
+			return;
+		}
+		writeSummary(logFile, summary, summarise);
+	}
+
+	private static void writeSummary(File logFile, File summary, Function<List<String>, String> summarise)
+	{
+		try
+		{
 			List<String> all = Files.readAllLines(logFile.toPath(), StandardCharsets.UTF_8);
 			try (Writer out = Files.newBufferedWriter(summary.toPath(), StandardCharsets.UTF_8))
 			{
@@ -54,7 +73,7 @@ final class TimingLog
 		}
 		catch (IOException e)
 		{
-			log.warn("could not write {} or {}", logFile.getAbsolutePath(), summary.getAbsolutePath(), e);
+			log.warn("could not summarise {} into {}", logFile.getAbsolutePath(), summary.getAbsolutePath(), e);
 		}
 	}
 

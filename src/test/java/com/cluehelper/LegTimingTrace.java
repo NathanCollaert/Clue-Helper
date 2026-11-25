@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,9 @@ import net.runelite.client.util.Text;
  * <p>Ticks: a click carries the tick count of the period it happens in, a landing seen on GameTick (or a spellbook var)
  * the count L of the period before its boundary, so commit to landing = L + 1 - commit tick. The guide's travel-start,
  * refusal and landing windows are sampled into {@link WaitWindows} as it counts them: raw tick-count differences.
+ *
+ * <p>The lead-in is the player's time before the first click: from the later of the guide showing the leg's line and the
+ * player last moving or animating, to that click. Summed up per category in {@link #LEAD_IN_SUMMARY}.
  */
 @Slf4j
 final class LegTimingTrace
@@ -48,6 +52,7 @@ final class LegTimingTrace
 	static final String TAG = "[CH-LEG]";
 	static final File LOG = new File(TimingLog.DIR, "legs.jsonl");
 	static final File SUMMARY = new File(TimingLog.DIR, "legs.tsv");
+	static final File LEAD_IN_SUMMARY = new File(TimingLog.DIR, "lead-ins.tsv");
 	private static final Set<SubStep.Kind> TIMED = EnumSet.of(SubStep.Kind.TELEPORT, SubStep.Kind.FAIRY_RING,
 		SubStep.Kind.SPELLBOOK_SWAP, SubStep.Kind.CHANGE_BOOK);
 	private static final Set<SubStep.Kind> CHANGES_BOOK = EnumSet.of(SubStep.Kind.SPELLBOOK_SWAP, SubStep.Kind.CHANGE_BOOK);
@@ -80,6 +85,12 @@ final class LegTimingTrace
 	/** The tick an interface opened after the last menu click, or {@link #NONE}. */
 	private int openedAfterLastClick = NONE;
 	private WorldPoint lastTile;
+	/** The guide's line as last seen on a game tick, the tick it was first seen, and its predecessor's kind. */
+	private SubStep shown;
+	private int shownTick = NONE;
+	private SubStep.Kind shownAfter;
+	/** The last game tick the player moved or animated. */
+	private int busyTick = NONE;
 
 	LegTimingTrace(Client client, StepGuide guide, Gson gson, TimingLog timingLog, WaitWindows windows, LockWatch lock)
 	{
@@ -163,6 +174,8 @@ final class LegTimingTrace
 		{
 			noteAnimating(now);
 		}
+		noteShownLine(now);
+		noteBusy(now, tile);
 		if (taken != null && !taken.changesBook && PlayerTiles.isJump(lastTile, tile))
 		{
 			land();
@@ -200,6 +213,40 @@ final class LegTimingTrace
 		}
 	}
 
+	private void noteShownLine(int now)
+	{
+		SubStep current = guide.getCurrent();
+		if (!Objects.equals(current, shown))
+		{
+			shownAfter = shown == null ? null : shown.getKind();
+			shown = current;
+			shownTick = now;
+		}
+	}
+
+	private void noteBusy(int now, WorldPoint tile)
+	{
+		Player local = client.getLocalPlayer();
+		if (local != null && local.getAnimation() != -1 || lastTile != null && !lastTile.equals(tile))
+		{
+			busyTick = now;
+		}
+	}
+
+	/**
+	 * Ticks from the period the player was free to click the shown line to the first click; 0 for a line that changed
+	 * since the last game tick, which the player can only have clicked at once.
+	 */
+	private int leadInTicks(SubStep current, int firstTick)
+	{
+		if (!current.equals(shown) || shownTick == NONE)
+		{
+			return 0;
+		}
+		int freeFrom = Math.max(shownTick, busyTick) + 1;
+		return Math.max(0, firstTick - freeFrom);
+	}
+
 	private void beginIfGuided(String option, String click)
 	{
 		SubStep current = guide.getCurrent();
@@ -218,6 +265,8 @@ final class LegTimingTrace
 		taken.commitTick = taken.firstTick;
 		taken.clicks.add(click);
 		taken.from = PlayerTiles.text(PlayerTiles.tile(client));
+		taken.leadInTicks = leadInTicks(current, taken.firstTick);
+		taken.leadInAfter = current.equals(shown) ? shownAfter : shown == null ? null : shown.getKind();
 		openedAfterLastClick = NONE;
 		describePlanned(current);
 	}
@@ -332,9 +381,13 @@ final class LegTimingTrace
 		done.lockTakenBy = settled.takenBy;
 		String line = gson.toJson(done);
 		log.info("{} {}", TAG, line);
-		timingLog.append(LOG, line, SUMMARY, lines -> LegTimings.tsv(lines.stream()
-			.map(logged -> gson.fromJson(logged, Taken.class))
-			.collect(Collectors.toList())));
+		timingLog.append(LOG, line, SUMMARY, lines -> LegTimings.tsv(parse(lines)));
+		timingLog.summarise(LOG, LEAD_IN_SUMMARY, lines -> LeadInTimings.tsv(parse(lines)));
+	}
+
+	private List<Taken> parse(List<String> lines)
+	{
+		return lines.stream().map(logged -> gson.fromJson(logged, Taken.class)).collect(Collectors.toList());
 	}
 
 	/** One line of the log. */
@@ -364,6 +417,10 @@ final class LegTimingTrace
 		Outcome outcome;
 		List<String> clicks = new ArrayList<>();
 		int firstTick;
+		/** The player's time before {@link #firstTick}; {@link LockWatch#UNKNOWN} in lines logged before it was measured. */
+		int leadInTicks = LockWatch.UNKNOWN;
+		/** The kind of the guide line shown before this leg's, or null for the first line seen. */
+		SubStep.Kind leadInAfter;
 		int commitTick;
 		/** First click to the commit click: the menu ticks, unless the player walked in between. */
 		int menuTicks;
