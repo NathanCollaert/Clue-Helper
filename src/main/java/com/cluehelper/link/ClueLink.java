@@ -102,30 +102,15 @@ public class ClueLink
 	}
 
 	/**
-	 * Client thread. Core marks its clue's NPC only while one of the clue's own tiles is in the loaded scene on the
-	 * player's floor: not inside a cave reached from that tile (Fycie in Rantz's cave), nor up the ladder from it
-	 * (Bolkoy on his platform).
+	 * Client thread. Core outlines this NPC itself. It marks its clue's NPC only some of the time: not after a map load
+	 * until the NPC spawns again, not inside a cave reached from the clue's tile (Fycie in Rantz's cave), nor where it
+	 * has the NPC on another floor.
 	 */
-	public boolean coreMarksNpcs()
+	public boolean coreMarks(NPC npc)
 	{
-		WorldPoint[] locations = coreLocations();
-		return locations == null || Arrays.stream(locations).anyMatch(location -> location != null && location.isInScene(client));
-	}
-
-	/** The tiles core marks its clue's NPC from, or null where core doesn't tie the marking to a tile. */
-	private WorldPoint[] coreLocations()
-	{
-		ClueScroll clue = coreClue();
 		ClueScrollPlugin plugin = core;
-		if (plugin == null)
-		{
-			return null;
-		}
-		if (clue instanceof LocationClueScroll)
-		{
-			return ((LocationClueScroll) clue).getLocations(plugin);
-		}
-		return clue instanceof AnagramClue ? new WorldPoint[]{((AnagramClue) clue).getLocation(plugin)} : null;
+		List<NPC> marked = plugin == null ? null : plugin.getNpcsToMark();
+		return marked != null && marked.contains(npc);
 	}
 
 	public Runnable addListener(StepListener listener)

@@ -1,6 +1,6 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.memory.BankMemory;
+import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
@@ -23,19 +23,14 @@ import com.cluehelper.guide.StepGuide.Tab;
 @Singleton
 final class TaskActs
 {
-	/** A farming patch's varbit: below this it still has weeds, above it a crop (as RuneLite's time tracking reads it). */
-	private static final int PATCH_WEEDED = 3;
 	private static final String RAKE = "Rake";
 	private static final String SPADE = "Spade";
+	/** The tools a planting task's seed is listed beside. */
+	private static final Set<String> PATCH_TOOLS = Set.of(RAKE, SPADE, "Seed dibber");
+	/** What a patch to plant in takes before the seed goes in, one line at a time. */
+	private static final Map<Allotment, String> CLEARING_LINES = Map.of(Allotment.WEEDS, "Rake the weeds off the patch",
+		Allotment.CROP, "Harvest the crop", Allotment.DEAD, "Clear the dead crop");
 	private static final int[] PRODUCT_SCREENS = {InterfaceID.CraftingGold.UNIVERSE, InterfaceID.Smithing.UNIVERSE};
-
-	/** In the order a patch is picked to plant in: the least clearing first. */
-	private enum Patch
-	{
-		EMPTY,
-		WEEDS,
-		CROP
-	}
 
 	@Inject
 	Client client;
@@ -117,37 +112,53 @@ final class TaskActs
 		{
 			return "Wield the " + client.getItemDefinition(staff).getName() + " first";
 		}
-		Patch patch = nearestPatch(step);
-		if (patch != null)
-		{
-			return patch == Patch.WEEDS ? "Rake the weeds off the patch first"
-				: patch == Patch.CROP ? "Dig the crop out with the spade first" : "Use the seed on the patch";
-		}
 		StepIndex.Making making = makingNow(step, player.carriedIds());
 		return making == null ? null : making.getText();
 	}
 
-	/** What the nearest patch takes next, as carried: the rake on weeds, the spade on a crop, else the seed and dibber. */
+	/** What the nearest patch takes next, as carried: the seed and dibber once clear, none while its option clears it. */
 	private Set<Integer> patchItems(Step step, Set<Integer> carried)
 	{
-		Patch patch = nearestPatch(step);
+		return itemsFor(step, nearestPatch(step), carried);
+	}
+
+	private Set<Integer> itemsFor(Step step, Allotment patch, Set<Integer> carried)
+	{
 		if (patch == null)
 		{
 			return null;
 		}
-		if (patch == Patch.CROP)
+		if (patch != Allotment.EMPTY)
 		{
-			return step.getData().getRequires().stream().filter(need -> need.getName().equals(SPADE))
-				.flatMap(need -> need.getIds().stream()).filter(carried::contains).collect(toUnmodifiableSet());
+			return Set.of();
 		}
-		boolean rake = patch == Patch.WEEDS;
 		return carried.stream().filter(id -> step.getRequirements().getItems().stream()
-				.anyMatch(need -> need.fulfilledBy(id) && RAKE.equals(need.getCollectiveName(client)) == rake))
+				.anyMatch(need -> need.fulfilledBy(id) && !RAKE.equals(need.getCollectiveName(client))))
 			.collect(toUnmodifiableSet());
 	}
 
+	/**
+	 * The carried item the patch to plant in takes next: the seed (not the dibber beside it) once empty; -1 for none, as
+	 * while the patch's own option clears it.
+	 */
+	int itemForPatch(Step step, TileObject patch)
+	{
+		if (step == null || !step.getData().isPlants())
+		{
+			return -1;
+		}
+		Set<Integer> items = itemsFor(step, stateOf(patch), player.carriedIds());
+		return items == null ? -1 : items.stream().min(Comparator.comparing(id -> isPatchTool(step, id))).orElse(-1);
+	}
+
+	private boolean isPatchTool(Step step, int itemId)
+	{
+		return step.getRequirements().getItems().stream()
+			.anyMatch(need -> need.fulfilledBy(itemId) && PATCH_TOOLS.contains(need.getCollectiveName(client)));
+	}
+
 	/** The state of the patch to plant in; null for other tasks or with none in the scene. */
-	private Patch nearestPatch(Step step)
+	private Allotment nearestPatch(Step step)
 	{
 		if (step == null || !step.getData().isPlants())
 		{
@@ -159,8 +170,8 @@ final class TaskActs
 	}
 
 	/**
-	 * Of a planting task's patches in sight, the one to plant in: an empty one before a weedy one before one with a crop,
-	 * as clearing takes a while, then the nearest. Null for other tasks or none read.
+	 * Of a planting task's patches in sight, the one to plant in: an empty one before a weedy one before one with a grown
+	 * or dead crop, as clearing takes a while, then the nearest. Null for other tasks or none that can be cleared now.
 	 */
 	TileObject patchToUse(Step step, List<TileObject> patches)
 	{
@@ -175,22 +186,18 @@ final class TaskActs
 			.orElse(null);
 	}
 
-	/** Read from the patch's varbit; null for an object that has none. */
-	private Patch stateOf(TileObject patch)
+	/** Read from the form the patch shows now; null for a growing crop or an object that is no patch. */
+	private Allotment stateOf(TileObject patch)
 	{
-		int varbit = client.getObjectDefinition(patch.getId()).getVarbitId();
-		if (varbit < 0)
-		{
-			return null;
-		}
-		int state = client.getVarbitValue(varbit);
-		return state < PATCH_WEEDED ? Patch.WEEDS : state == PATCH_WEEDED ? Patch.EMPTY : Patch.CROP;
+		ObjectComposition patchObject = client.getObjectDefinition(patch.getId());
+		ObjectComposition shown = patchObject.getImpostorIds() == null ? null : patchObject.getImpostor();
+		return shown == null || patchObject.getVarbitId() < 0 ? null : Allotment.of(client.getVarbitValue(patchObject.getVarbitId()), shown);
 	}
 
 	/** An interface option the task picks and its confirm button, outlined while the interface is open. */
 	List<Widget> choice(SubStep current, Step step)
 	{
-		Widget product = makeOption(step);
+		Widget product = makeOption(products(current, step));
 		if (product != null)
 		{
 			return List.of(product);
@@ -215,14 +222,24 @@ final class TaskActs
 		return List.copyOf(widgets);
 	}
 
-	/**
-	 * The making step's product in the "How many do you wish to make?" box (its option, A to R), or in a screen that
-	 * shows each product as its item: the furnace's jewellery, the anvil's smithing.
-	 */
-	private Widget makeOption(Step step)
+	/** The making step's product, else what the act makes: the item it is done once held (a black d'hide body). */
+	private Set<Integer> products(SubStep current, Step step)
 	{
 		StepIndex.Making making = step == null ? null : makingNow(step, player.carriedIds());
-		if (making == null || making.getMake() < 0)
+		if (making != null && making.getMake() >= 0)
+		{
+			return Set.of(making.getMake());
+		}
+		return current != null && current.getDone() == SubStep.Done.ITEM_HELD ? current.getHeldWhenDone() : Set.of();
+	}
+
+	/**
+	 * The product in the "How many do you wish to make?" box (its option, A to R), or in a screen that shows each product
+	 * as its item: the furnace's jewellery, the anvil's smithing.
+	 */
+	private Widget makeOption(Set<Integer> products)
+	{
+		if (products.isEmpty())
 		{
 			return null;
 		}
@@ -231,7 +248,7 @@ final class TaskActs
 			if (Widgets.shown(client, screen))
 			{
 				return Widgets.descendants(client.getWidget(screen)).stream()
-					.filter(shown -> Widgets.visible(shown) && shown.getItemId() == making.getMake()).findFirst().orElse(null);
+					.filter(shown -> Widgets.visible(shown) && products.contains(shown.getItemId())).findFirst().orElse(null);
 			}
 		}
 		if (!Widgets.shown(client, InterfaceID.Skillmulti.UNIVERSE))
@@ -242,7 +259,7 @@ final class TaskActs
 		{
 			Widget option = client.getWidget(id);
 			if (option != null && !option.isHidden()
-				&& Widgets.descendants(option).stream().anyMatch(shown -> shown.getItemId() == making.getMake()))
+				&& Widgets.descendants(option).stream().anyMatch(shown -> products.contains(shown.getItemId())))
 			{
 				return option;
 			}
@@ -281,9 +298,21 @@ final class TaskActs
 		return null;
 	}
 
-	/** A task act read as its phase: the first whose items are carried, else the task's own line. */
+	/**
+	 * A task act, or the walk to it, read as its phase: a planting task's patch cleared first, else the first phase whose
+	 * items are carried, else the task's own line.
+	 */
 	SubStep phased(SubStep act, Step step)
 	{
+		Stage planting = step == null || !step.getData().isPlants() ? null : act.isTask() ? act.getStage() : taskWalkedTo(act, step);
+		if (planting != null)
+		{
+			Allotment patch = nearestPatch(step);
+			boolean clearing = patch != null && CLEARING_LINES.containsKey(patch);
+			String text = clearing ? CLEARING_LINES.get(patch) : planting.getAct();
+			String option = !act.isTask() ? act.getOption() : clearing ? patch.getOption() : planting.getOption();
+			return text.equals(act.getText()) && Objects.equals(option, act.getOption()) ? act : act.toBuilder().text(text).option(option).build();
+		}
 		Stage task = step == null || step.getData().getPhases().isEmpty() ? null : act.isTask() ? act.getStage() : taskWalkedTo(act, step);
 		if (task == null)
 		{
@@ -306,7 +335,8 @@ final class TaskActs
 		}
 		Stage task = step.getStages().stream().filter(stage -> stage.getKind() == Stage.Kind.TASK).findFirst().orElse(null);
 		boolean taskLine = task != null && (walk.getText().equals(task.getAct())
-			|| step.getData().getPhases().stream().anyMatch(phase -> phase.getText().equals(walk.getText())));
+			|| step.getData().getPhases().stream().anyMatch(phase -> phase.getText().equals(walk.getText()))
+			|| step.getData().isPlants() && CLEARING_LINES.containsValue(walk.getText()));
 		return taskLine ? task : null;
 	}
 

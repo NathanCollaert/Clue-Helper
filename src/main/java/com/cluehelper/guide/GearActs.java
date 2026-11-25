@@ -206,7 +206,45 @@ final class GearActs
 		List<Integer> fitting = inventory.stream().filter(requirement::fulfilledBy).filter(id -> leftClicks.wearOption(id) != null)
 			.sorted().collect(toList());
 		boolean outfit = requirement instanceof AllRequirementsCollection;
-		return outfit || fitting.isEmpty() ? fitting : List.of(fitting.get(0));
+		return outfit || fitting.isEmpty() ? fitting : fewestCompleting(requirement, worn, fitting);
+	}
+
+	/**
+	 * The fewest of {@code pieces} that meet the need along with {@code worn}: one item for a choice of items, every
+	 * missing piece for a choice of sets (any full Barrows set). The lowest id is kept where any one would do; the first
+	 * piece alone when even all of them fall short.
+	 */
+	static List<Integer> fewestCompleting(ItemRequirement requirement, Set<Integer> worn, List<Integer> pieces)
+	{
+		List<Integer> chosen = new ArrayList<>(pieces);
+		if (!meets(requirement, worn, chosen))
+		{
+			return List.of(pieces.get(0));
+		}
+		for (int i = pieces.size() - 1; i >= 0; i--)
+		{
+			List<Integer> without = new ArrayList<>(chosen);
+			without.remove(pieces.get(i));
+			if (meets(requirement, worn, without))
+			{
+				chosen = without;
+			}
+		}
+		return List.copyOf(chosen);
+	}
+
+	/** The carried items that meet one need: one item, or a whole set for a choice of sets. */
+	static List<Integer> meetingNeed(ItemRequirement need, Set<Integer> carried)
+	{
+		List<Integer> fitting = carried.stream().filter(need::fulfilledBy).sorted().collect(toList());
+		return fitting.isEmpty() ? List.of() : fewestCompleting(need, Set.of(), fitting);
+	}
+
+	private static boolean meets(ItemRequirement requirement, Set<Integer> worn, List<Integer> pieces)
+	{
+		Set<Integer> all = new HashSet<>(worn);
+		all.addAll(pieces);
+		return requirement.fulfilledBy(PlayerSnapshot.oneOfEach(all));
 	}
 
 	private Item[] wornBySlot()

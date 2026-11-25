@@ -104,6 +104,7 @@ public class PlayerModel
 			varbits.add(POUCH_QUANTITIES[i]);
 		}
 		varbits.addAll(ChargeReader.chargeVarbits());
+		varbits.addAll(GrownPatches.allotmentVarbits());
 		watch(varbits, OWN_VARPS);
 		dirty = true;
 		questsDirty = true;
@@ -418,6 +419,7 @@ public class PlayerModel
 			.freeInventorySlots(Math.max(0, INVENTORY_SLOTS - usedSlots))
 			.house(house)
 			.plantedTrees(grownPatches.grown())
+			.growingAllotments(grownPatches.growingAllotments())
 			.unlocks(unlockMemory.unlocks())
 			.lastFairyRing(lastFairyRing())
 			.build();
@@ -489,6 +491,18 @@ public class PlayerModel
 	public boolean holdsOrWearsItemNamed(String nameStart)
 	{
 		return now().holdsOrWearsItemNamed(nameStart, id -> client.getItemDefinition(id).getName());
+	}
+
+	/** The planting places whose every allotment still grows a crop. */
+	public Set<WorldPoint> growingAllotments()
+	{
+		return now().getGrowingAllotments();
+	}
+
+	/** How many the inventory and worn hold together; 0 while logged out. */
+	public int carried(int itemId)
+	{
+		return now().carried(itemId);
 	}
 
 	/** Inventory and worn; empty while logged out. */

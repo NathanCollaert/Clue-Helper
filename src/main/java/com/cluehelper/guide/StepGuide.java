@@ -164,6 +164,7 @@ public class StepGuide
 	public void start()
 	{
 		unregister = routes.addListener(this::onPlan);
+		routes.holdWhile(() -> isTravelling() || isTravelJustClicked());
 		obelisk.start();
 	}
 
@@ -236,6 +237,39 @@ public class StepGuide
 	private SubStep listedAt(int at)
 	{
 		return at < steps.size() ? steps.get(at) : null;
+	}
+
+	/**
+	 * The carried item used on the outlined objects: a way in's (a rope on the crevice), or what a planting task's patch
+	 * takes next (rake, spade or seed); -1 for none.
+	 */
+	public int getItemUsedOnObjects()
+	{
+		if (highlights.getUsedItem() >= 0)
+		{
+			return highlights.getUsedItem();
+		}
+		List<TileObject> patch = scene.getObjects();
+		return isAtOrToTask(getCurrent()) && !patch.isEmpty() ? taskActs.itemForPatch(routeStep, patch.get(0)) : -1;
+	}
+
+	/** A planting task's patches, or the walk to them: outlined as ground, as the objects an item is used on are. */
+	public boolean isPlantingPatch()
+	{
+		return isAtOrToTask(getCurrent()) && routeStep != null && routeStep.getData().isPlants();
+	}
+
+	/** How many of the item one use takes: a patch is planted with three seeds. */
+	public int getItemUsedOnObjectsQuantity(int itemId)
+	{
+		return routeStep == null ? 1 : routeStep.getData().getAmounts().getOrDefault(itemId, 1);
+	}
+
+	/** A task's act, or the walk to it: the patch is outlined from the walk on, as at the task. */
+	private boolean isAtOrToTask(SubStep current)
+	{
+		SubStep next = listedAt(index + 1);
+		return current != null && (current.isTask() || current.getKind() == Kind.WALK && next != null && next.isTask());
 	}
 
 	/**
@@ -361,11 +395,12 @@ public class StepGuide
 
 	/**
 	 * Once the task is under way, only the object it was begun on: a net trap's tree is no young tree any more, and the
-	 * next young tree is not where the catch comes.
+	 * next young tree is not where the catch comes. A patch to plant in is already the one patch, and nearby keeps only
+	 * part of an L-shaped one.
 	 */
 	private List<TileObject> whereTaskBegan(List<TileObject> objects)
 	{
-		if (!isTaskUnderway() || taskStartedAt == null)
+		if (!isTaskUnderway() || taskStartedAt == null || routeStep.getData().isPlants())
 		{
 			return objects;
 		}
@@ -452,7 +487,7 @@ public class StepGuide
 		changed |= refreshOnActTile(tile);
 		changed |= refreshBox();
 		changed |= obelisk.takeChanged();
-		changed |= keyFromCharterList();
+		changed |= keyFromOpenList();
 		changed |= partWayIn(tile);
 		changed |= dropToPickUp();
 		changed |= pickUpForAct(tile);
@@ -488,18 +523,21 @@ public class StepGuide
 
 	private void refreshObjects()
 	{
-		SubStep current = getCurrent();
+		SubStep current = withClueTileObject(getCurrent());
 		boolean bank = current != null && current.getKind() == Kind.BANK;
 		SubStep ahead = objectActAhead(current);
-		SubStep optionOf = ahead != null ? ahead : current;
-		List<String> option = optionOf == null || optionOf.getOption() == null ? List.of() : List.of(optionOf.getOption());
+		SubStep coresAhead = ahead == null ? coresObjectActAhead(current) : null;
+		SubStep optionOf = ahead != null ? ahead : coresAhead != null ? coresAhead : current;
+		List<String> option = optionPath(optionOf);
 		if (ahead != null)
 		{
 			highlights = highlights.toBuilder().objectOption(ahead.getOption()).build();
 		}
 		MenuTarget target = outlineTarget(current, option);
+		MenuTarget optionTarget = coresAhead == null ? target
+			: MenuTarget.builder().path(option).objectIds(coresAhead.getObjectIds()).build();
 		boolean ownOption = !option.isEmpty() && highlights.getMenuTarget() == MenuTarget.NONE;
-		highlights = highlights.toBuilder().optionTarget(ownOption ? target : MenuTarget.NONE).build();
+		highlights = highlights.toBuilder().optionTarget(ownOption ? optionTarget : MenuTarget.NONE).build();
 		boolean nothingToOutline = target.getObjectIds().isEmpty() && target.getNpcIds().isEmpty() && target.getNpcNames().isEmpty();
 		if (nothingToOutline && !bank || isCoresOwnObject(current))
 		{
@@ -520,10 +558,62 @@ public class StepGuide
 	 */
 	private SubStep objectActAhead(SubStep current)
 	{
-		SubStep next = getNext();
-		boolean ahead = current != null && current.getKind() == Kind.WALK_TO_CLUE && next != null
-			&& next.getKind() == Kind.ACT && !next.getObjectIds().isEmpty() && !isCoresOwnObject(next);
-		return ahead ? next : null;
+		SubStep next = objectActAfterWalk(current);
+		return next != null && !isCoresOwnObject(next) ? next : null;
+	}
+
+	/** The act after the walk to the clue when it is on core's own object (a crate searched): its option is coloured from afar. */
+	private SubStep coresObjectActAhead(SubStep current)
+	{
+		SubStep next = objectActAfterWalk(current);
+		return next != null && next.getOption() != null && isCoresOwnObject(next) ? next : null;
+	}
+
+	/** Listed right after the walk, not {@link #getNext}: that skips an act reading as the walk does ("Search the crate"). */
+	private SubStep objectActAfterWalk(SubStep current)
+	{
+		SubStep next = withClueTileObject(listedAt(index + 1));
+		boolean act = current != null && current.getKind() == Kind.WALK_TO_CLUE && next != null && next.getKind() == Kind.ACT
+			&& !next.getObjectIds().isEmpty();
+		return act ? next : null;
+	}
+
+	/**
+	 * A search act on what stands on the clue's tile now, when that is another form than core marks (a wardrobe opened)
+	 * or core knows the place alone (Ardougne's drawers): outlined by us then. Core's own form keeps core's ids.
+	 */
+	private SubStep withClueTileObject(SubStep act)
+	{
+		if (!isSearchAct(act) || routeStep == null)
+		{
+			return act;
+		}
+		Set<Integer> onTile = clueTileObjects().stream().map(TileObject::getId).collect(Collectors.toUnmodifiableSet());
+		boolean coresForm = onTile.stream().anyMatch(routeStep.getObjectIds()::contains);
+		return onTile.isEmpty() || coresForm ? act : act.toBuilder().objectIds(onTile).build();
+	}
+
+	/** The objects on the clue's tiles that are searched, or opened to be searched. */
+	private List<TileObject> clueTileObjects()
+	{
+		return routeStep.getTargets().stream().flatMap(tile -> sceneObjects.on(tile).stream())
+			.filter(object -> leftClicks.offers(object, StepHighlights.SEARCH_OPTION) || leftClicks.offers(object, StepHighlights.OPEN_OPTION))
+			.collect(Collectors.toUnmodifiableList());
+	}
+
+	private static boolean isSearchAct(SubStep act)
+	{
+		return act != null && act.getKind() == Kind.ACT && StepHighlights.SEARCH_OPTION.equals(act.getOption());
+	}
+
+	/** A closed wardrobe or chest is opened before it is searched: its Open is marked until it shows Search. */
+	private static List<String> optionPath(SubStep act)
+	{
+		if (act == null || act.getOption() == null)
+		{
+			return List.of();
+		}
+		return isSearchAct(act) ? List.of(StepHighlights.OPEN_OPTION, act.getOption()) : List.of(act.getOption());
 	}
 
 	/** An act on the clue's own object (the spirit tree), which core marks already: only its option is coloured. */
@@ -548,6 +638,10 @@ public class StepGuide
 		{
 			return withOption.objectIds(current.getObjectIds()).build();
 		}
+		if (current != null && current.getWayIn() != null && !current.getWayIn().getUse().isEmpty())
+		{
+			return withOption.objectIds(Set.of(current.getWayIn().getObject())).build();
+		}
 		if (current != null && !current.getNpcNames().isEmpty())
 		{
 			return withOption.npcNames(current.getNpcNames()).build();
@@ -570,7 +664,7 @@ public class StepGuide
 	{
 		List<TileObject> objects = bank ? sceneObjects.banksNear(current.getWaypoint(), BANK_TILES)
 			: target.getObjectIds().stream().anyMatch(AbyssObstacles::isObstacle) ? abyssObstacle()
-			: whereTaskBegan(onlyPatchToUse(current, atExit(current, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption()))));
+			: whereTaskBegan(onlyPatchToUse(current, atExit(current, onClueTiles(target, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption())))));
 		List<NPC> npcs = bank ? sceneObjects.bankersNear(current.getWaypoint(), BANK_TILES) : npcsFor(target);
 		if (!bank)
 		{
@@ -580,6 +674,18 @@ public class StepGuide
 		return withFills(SceneHighlights.builder().foundTick(tick)
 			.emptySearches(scene.getFoundTick() == ActWatcher.NEVER ? 0 : scene.getEmptySearches() + 1)
 			.objects(objects).npcs(npcs).bank(bank).npcOption(npcOption).build());
+	}
+
+	/** A search outlines the object on the clue's tile, not every drawers of its id in town. */
+	private List<TileObject> onClueTiles(MenuTarget target, List<TileObject> objects)
+	{
+		if (routeStep == null || !target.getPath().contains(StepHighlights.SEARCH_OPTION))
+		{
+			return objects;
+		}
+		List<TileObject> there = objects.stream().filter(object -> routeStep.getTargets().contains(object.getWorldLocation()))
+			.collect(Collectors.toUnmodifiableList());
+		return there.isEmpty() ? objects : there;
 	}
 
 	/** The found objects and NPCs whose left click does what the step needs: at a bank stop, opens the bank. */
@@ -613,11 +719,12 @@ public class StepGuide
 		return near.isEmpty() ? objects : near;
 	}
 
-	/** A planting task outlines the one patch to plant in, not every patch at the farm. */
+	/** A planting task outlines the one patch to plant in, all its pieces (an L-shaped patch is two), not every patch. */
 	private List<TileObject> onlyPatchToUse(SubStep current, List<TileObject> objects)
 	{
-		TileObject patch = current != null && current.isTask() ? taskActs.patchToUse(routeStep, objects) : null;
-		return patch == null ? objects : List.of(patch);
+		TileObject patch = isAtOrToTask(current) ? taskActs.patchToUse(routeStep, objects) : null;
+		return patch == null ? objects
+			: objects.stream().filter(piece -> piece.getId() == patch.getId()).collect(Collectors.toUnmodifiableList());
 	}
 
 	private List<TileObject> offeringOption(List<TileObject> objects, String option)
@@ -627,16 +734,16 @@ public class StepGuide
 	}
 
 	/**
-	 * An act's NPC given by name (Fycie) is outlined only where core can't mark it. Shortest Path names one NPC per ride
-	 * (a charter's Trader Crewmember), but a port's crew have several ids: when the named
-	 * one isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC there
-	 * with that option (a boat's ride may be another NPC's than the one the row names).
+	 * An act's NPC given by name (Fycie) is found by name; the overlay leaves it to core while core marks it. Shortest
+	 * Path names one NPC per ride (a charter's Trader Crewmember), but a port's crew have several ids: when the named one
+	 * isn't there, an NPC of the same name near the boarding tile with the ride's option is it, else any NPC there with
+	 * that option (a boat's ride may be another NPC's than the one the row names).
 	 */
 	private List<NPC> npcsFor(MenuTarget target)
 	{
 		if (target.getNpcIds().isEmpty() && !target.getNpcNames().isEmpty())
 		{
-			return clueLink.coreMarksNpcs() ? List.of() : sceneObjects.npcsNamed(target.getNpcNames());
+			return sceneObjects.npcsNamed(target.getNpcNames());
 		}
 		List<NPC> named = sceneObjects.npcs(target.getNpcIds());
 		WorldPoint boarding = isApproach() ? getNext().getWaypoint() : getCurrent().getWaypoint();
@@ -834,11 +941,19 @@ public class StepGuide
 		return snapshot == null ? 0 : snapshot.count(Container.INVENTORY, itemId);
 	}
 
-	/** The charter list's key for the port is known only once it is open: the step's text names it from then on. */
-	private boolean keyFromCharterList()
+	/**
+	 * The charter list's key for the port, or a destination list's for a row with no key of its own (a minecart's
+	 * station), is known only once the list is open: the step's text names it from then on.
+	 */
+	private boolean keyFromOpenList()
 	{
-		char key = menuLines.charterKey(highlights.getMenuTarget());
 		SubStep current = getCurrent();
+		char key = menuLines.charterKey(highlights.getMenuTarget());
+		if (key == 0 && current != null && current.getRow() != null && current.getRow().getKey() == null && current.getRow().getPick() != null)
+		{
+			int line = menuLines.listIndex(current.getRow().getPick());
+			key = line >= 0 && line < MenuLines.HOTKEYS.length() ? MenuLines.HOTKEYS.charAt(line) : 0;
+		}
 		if (key == 0 || current == null || current.getRow() == null || current.getText().contains(MenuLines.keyText(String.valueOf(key))))
 		{
 			return false;
@@ -867,7 +982,7 @@ public class StepGuide
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (isTravelStep() && mayStartTravel(event))
+		if (isTravelStep() && mayStartTravel(event) && !opensItsList(event))
 		{
 			travelClickTick = client.getTickCount();
 		}
@@ -894,10 +1009,12 @@ public class StepGuide
 			return;
 		}
 		MenuTarget menuTarget = highlights.getMenuTarget();
-		boolean onItem = menuTarget.getItemIds().contains(event.getItemId())
-			|| menuTarget.getItemNames().contains(MenuLabels.normalise(event.getMenuTarget()));
+		boolean onItem = (menuTarget.getItemIds().contains(event.getItemId())
+			|| menuTarget.getItemNames().contains(MenuLabels.normalise(event.getMenuTarget())))
+			&& menuLines.isTeleportClick(menuTarget, event.getMenuOption());
 		boolean onObject = menuTarget.getObjectIds().contains(event.getId());
-		if ((onItem || onObject) && !current.getRow().isOpensMenu())
+		boolean onMapButton = menuLines.isMapButton(menuTarget, event.getWidget());
+		if ((onItem || onObject || onMapButton) && !current.getRow().isOpensMenu())
 		{
 			teleportRefusal.clicked(client.getTickCount(), player.getPosition().getTile());
 		}
@@ -1047,7 +1164,7 @@ public class StepGuide
 	{
 		Set<Integer> carried = player.carriedIds();
 		return ended.getRequirements().getItems().stream()
-			.flatMap(need -> carried.stream().filter(need::fulfilledBy).findFirst().stream())
+			.flatMap(need -> GearActs.meetingNeed(need, carried).stream())
 			.map(id -> client.getItemDefinition(id).getName())
 			.collect(Collectors.toUnmodifiableList());
 	}
@@ -1131,8 +1248,14 @@ public class StepGuide
 
 	private boolean stillAtAct(Step step, WorldPoint tile)
 	{
-		return actKey(step).equals(actReachedStepKey) && tile != null
-			&& step.getTargets().stream().anyMatch(target -> target.distanceTo2D(tile) <= STAY_AT_ACT_TILES);
+		return actKey(step).equals(actReachedStepKey) && tile != null && step.getTargets().stream()
+			.anyMatch(target -> target.distanceTo2D(tile) <= STAY_AT_ACT_TILES && !isAllGrowing(step, target));
+	}
+
+	/** A planting place whose every patch still grows a crop: the plan has left it for another, and so does the guide. */
+	private boolean isAllGrowing(Step step, WorldPoint place)
+	{
+		return step.getData().isPlants() && player.growingAllotments().contains(place);
 	}
 
 	/**
@@ -1284,6 +1407,17 @@ public class StepGuide
 			&& !ATTACK.equalsIgnoreCase(Text.removeTags(event.getMenuOption()));
 	}
 
+	/**
+	 * A click on the teleport's own item that only opens its list (the scroll book's Open): the hit or block animation that
+	 * follows one while fighting isn't travel either, and would hide the book's outlined scroll.
+	 */
+	private boolean opensItsList(MenuOptionClicked event)
+	{
+		MenuTarget target = highlights.getMenuTarget();
+		boolean onItem = target.getItemIds().contains(event.getItemId());
+		return onItem && !menuLines.isTeleportClick(target, event.getMenuOption());
+	}
+
 	private int travelStartTicks()
 	{
 		SubStep current = getCurrent();
@@ -1379,7 +1513,9 @@ public class StepGuide
 			case BANK:
 				return bankMemory.isBankOpen();
 			case WITHDRAW:
-				return !bankMemory.isBankOpen();
+				// Closed without all its items, the bank is the step until the plan sends the player back to it
+				return !bankMemory.isBankOpen() && player.carriedIds().containsAll(step.getBankItems())
+					&& step.getCarriedAfterBank().entrySet().stream().allMatch(item -> player.carried(item.getKey()) >= item.getValue());
 			case ACT:
 				return isActDone(step);
 			default:

@@ -1,8 +1,8 @@
 package com.cluehelper.ui;
 
+import com.cluehelper.BackgroundThread;
 import com.cluehelper.route.*;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
@@ -34,7 +34,7 @@ final class WalkLine
 	WorldPoint searchedFrom;
 
 	@Inject
-	void init(ScheduledExecutorService executor, ClientThread clientThread)
+	void init(BackgroundThread executor, ClientThread clientThread)
 	{
 		runner = new PlannerRunner(executor, clientThread);
 	}

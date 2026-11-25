@@ -95,7 +95,7 @@ public final class StepLoader
 		StepIndex staged = SOURCE_GSON.fromJson(index, StepIndex.class);
 		StepResolver resolver = new StepResolver(() -> staged);
 		clues.forEach((key, clue) -> addActs(entryOf(index, key), resolver.resolve(clue, plugin())));
-		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(amounts(clue))));
+		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(withHandAmounts(amounts(clue), entryOf(index, key)))));
 		return SOURCE_GSON.fromJson(index, StepIndex.class);
 	}
 
@@ -175,6 +175,17 @@ public final class StepLoader
 		{
 			throw new IllegalStateException(step.getKey() + "'s act holds what only the game has: " + act);
 		}
+	}
+
+	/** The hand data's own amounts win: the parts an item is made from (6 black dragon leather for a d'hide set). */
+	private static Map<Integer, Integer> withHandAmounts(Map<Integer, Integer> core, JsonObject entry)
+	{
+		Map<Integer, Integer> amounts = new TreeMap<>(core);
+		if (entry.has("amounts"))
+		{
+			entry.getAsJsonObject("amounts").entrySet().forEach(hand -> amounts.put(Integer.parseInt(hand.getKey()), hand.getValue().getAsInt()));
+		}
+		return amounts;
 	}
 
 	/** The item ids core asks for more than one of, and how many: a MultipleOfItemRequirement, alone or as one of a choice. */

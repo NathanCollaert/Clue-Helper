@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.IntFunction;
 import lombok.*;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 
 /**
  * Immutable, so any thread can read it: its maps and sets are handed over fresh and never changed. Walking alone doesn't
@@ -70,6 +71,9 @@ public class PlayerSnapshot
 	/** Patch names known to be grown: spirit trees, and the grown patches read from Time Tracking. */
 	@Builder.Default
 	Set<String> plantedTrees = Set.of();
+	/** A planting task's places where every allotment has a crop still growing. */
+	@Builder.Default
+	Set<WorldPoint> growingAllotments = Set.of();
 	/** Account unlocks seen in play, named as the catalog's {@code UNLOCK_} tokens name them (without the prefix). */
 	@Builder.Default
 	Set<String> unlocks = Set.of();

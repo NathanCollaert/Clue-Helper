@@ -25,7 +25,7 @@ final class StepHighlights
 	private static final String TAKE_OPTION = "Take";
 	static final String SEARCH_OPTION = "Search";
 	private static final String REMOVE_OPTION = "Remove";
-	private static final String OPEN_OPTION = "Open";
+	static final String OPEN_OPTION = "Open";
 	private static final String USE_OPTION = "Use";
 	private static final String BANK_OPTION = "Bank";
 	private static final String CAST_OPTION = "Cast";
@@ -323,6 +323,7 @@ final class StepHighlights
 	private Highlights useOnWayIn(Highlights.HighlightsBuilder shown, StepIndex.WayIn way)
 	{
 		Set<Integer> items = player.inventoryIds().stream().filter(way.getUse()::contains).collect(toUnmodifiableSet());
+		shown.usedItem(items.stream().findFirst().orElse(-1));
 		return useOn(shown, MenuTarget.builder().objectIds(Set.of(way.getObject())), items, Set.of());
 	}
 
@@ -442,9 +443,20 @@ final class StepHighlights
 		else
 		{
 			Set<Integer> held = withHeld(shown, rowTargets.heldUses(row));
-			shown.scroll(ScrollBook.scroll(row)).scrollLeftClick(row.getOptions().size() == 1)
-				.menuTarget(rowTargets.heldTeleport(current, held));
+			ScrollBook.Scroll scroll = ScrollBook.scroll(row);
+			shown.scroll(scroll).scrollLeftClick(row.getOptions().size() == 1)
+				.menuTarget(scroll != null && !isBookDefault(held, row) ? rowTargets.items(held, OPEN_OPTION) : rowTargets.heldTeleport(current, held));
 		}
+	}
+
+	/**
+	 * The book's first option is its default teleport, named after that place or plainly "Teleport": either way it is no
+	 * list opener, so any other scroll is reached through Open.
+	 */
+	private boolean isBookDefault(Set<Integer> book, CatalogRow row)
+	{
+		String label = row.getOptions().get(row.getOptions().size() - 1);
+		return book.stream().anyMatch(id -> teleportsTo(leftClicks.item(id), label));
 	}
 
 	/**

@@ -17,6 +17,8 @@ import static java.util.stream.Collectors.*;
  */
 public final class Stages
 {
+	/** The bake's act for an object it knows only by id. */
+	public static final String SEARCH_IT = "Search it";
 	private static final String ANYWHERE = "Anywhere, with what it needs";
 	private static final Pattern ACTIVATE_PRAYER = Pattern.compile("activate the (\\w+) prayer\\.?");
 
@@ -30,7 +32,8 @@ public final class Stages
 		return stages.stream().flatMap(stage -> stage.getTiles().stream()).collect(toUnmodifiableList());
 	}
 
-	static List<Stage> parts(List<CrypticClue> parts, ClueScrollPlugin plugin, Function<CrypticClue, List<String>> wornFor)
+	static List<Stage> parts(List<CrypticClue> parts, ClueScrollPlugin plugin, Function<CrypticClue, List<String>> wornFor,
+		Function<Collection<Integer>, List<String>> objectNames)
 	{
 		List<Stage> stages = new ArrayList<>();
 		for (CrypticClue part : parts)
@@ -38,7 +41,7 @@ public final class Stages
 			WorldPoint at = part.getLocation(plugin);
 			if (at != null)
 			{
-				stages.add(Stage.builder().kind(Stage.Kind.PART).act(partAct(part, plugin)).tiles(List.of(at)).worn(wornFor.apply(part))
+				stages.add(Stage.builder().kind(Stage.Kind.PART).act(partAct(part, plugin, objectNames)).tiles(List.of(at)).worn(wornFor.apply(part))
 					.build());
 			}
 		}
@@ -46,18 +49,19 @@ public final class Stages
 	}
 
 	/** A part known by its text alone, from the step data: its act at its first target, which is outlined. */
-	static Stage part(StepIndex.Entry entry, IntFunction<String> npcName)
+	static Stage part(StepIndex.Entry entry, IntFunction<String> npcName, Function<Collection<Integer>, List<String>> objectNames)
 	{
 		StepIndex.Target target = entry.getTargets().get(0);
 		String name = target.getNpcs().isEmpty() ? target.getTalkTo() : npcName.apply(target.getNpcs().get(0));
 		Step named = Step.builder().npcs(name == null ? List.of() : List.of(NpcAliases.either(name))).build();
 		SubStep act = entry.getMainAct();
-		return Stage.builder().kind(Stage.Kind.PART).act(act == null ? "Search it" : named.namingNpc(act.getText()))
+		boolean search = act == null || SEARCH_IT.equals(act.getText());
+		return Stage.builder().kind(Stage.Kind.PART).act(search ? search(objectNames.apply(target.getLocs())) : named.namingNpc(act.getText()))
 			.option(act == null ? null : act.getOption()).tiles(List.of(entry.getStand() != null ? entry.getStand() : target.getTile()))
 			.worn(entry.getWornNeeds()).npcIds(Set.copyOf(target.getNpcs())).objectIds(target.getLocs()).build();
 	}
 
-	private static String partAct(CrypticClue part, ClueScrollPlugin plugin)
+	private static String partAct(CrypticClue part, ClueScrollPlugin plugin, Function<Collection<Integer>, List<String>> objectNames)
 	{
 		if (part.isRequiresSpade())
 		{
@@ -68,7 +72,13 @@ public final class Stages
 		{
 			return "Talk to " + NpcAliases.either(npc);
 		}
-		return "Search it";
+		return search(objectNames.apply(CoreClueReader.objectIds(part)));
+	}
+
+	/** "Search the boxes", by the object's name; "Search it" where no name is known. */
+	public static String search(List<String> objectNames)
+	{
+		return objectNames.isEmpty() ? SEARCH_IT : "Search the " + objectNames.get(0).toLowerCase(Locale.ROOT);
 	}
 
 	/** The key a kill-for-key stage gets: a clue's own key, which no key ring holds. */

@@ -25,6 +25,9 @@ public class Route
 	Map<String, Integer> spent;
 	@Builder.Default
 	List<ItemUse> withdraw = List.of();
+	/** How many of each withdrawn item the player carries once the withdraw is done: what was carried, and the withdraw. */
+	@Builder.Default
+	Map<Integer, Integer> carriedAfterBank = Map.of();
 	/** The withdraw list needs more slots than are free; the extra click is counted in the ticks. */
 	boolean depositFirst;
 	/** Banked, but with no bank leg: the route starts with the withdraw list. */

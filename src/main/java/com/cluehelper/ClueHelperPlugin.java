@@ -80,6 +80,8 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	PlannerRunner planner;
+	@Inject
+	BackgroundThread backgroundThread;
 
 	@Inject
 	RoutePlanner routes;
@@ -165,6 +167,7 @@ public class ClueHelperPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
+		backgroundThread.start();
 		carryOverHiddenBox();
 		guideOverlay.show(GuideBox.EMPTY);
 		clueLink.start();
@@ -204,6 +207,7 @@ public class ClueHelperPlugin extends Plugin
 		guide.stop();
 		routes.stop();
 		planner.cancelAll();
+		backgroundThread.stop();
 		availability.stop();
 		poh.stop();
 		playerModel.stop();
@@ -213,6 +217,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onPluginChanged(PluginChanged event)
 	{
+		easyTeleportsNames.onPluginChanged();
 		if (clueLink.onPluginChanged(event))
 		{
 			clientThread.invokeLater(box::refresh);
@@ -298,10 +303,11 @@ public class ClueHelperPlugin extends Plugin
 		threeStepSwap.onItemDespawned(event);
 	}
 
-	/** Runs after other plugins build the menu; only colours our option, never adds, removes or reorders entries. */
+	/** Runs after other plugins build the menu; only marks our option, never adds, removes or reorders entries. */
 	@Subscribe(priority = -1)
 	public void onMenuOpened(MenuOpened event)
 	{
+		menuLines.forgetMenu();
 		menuLines.colourMenu(guide.getHighlights().getMenuTarget(), config.highlightMenus());
 		menuLines.colourMenu(guide.getHighlights().getOptionTarget(), config.highlightMenus());
 		for (MenuTarget pathObject : waypointOverlay.pathObjectTargets())

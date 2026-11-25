@@ -269,7 +269,7 @@ public final class ActParts
 	{
 		StepIndex.Music music = step.getData().getMusic();
 		String track = music != null && music.getTrack() != null ? music.getTrack() : step.getText();
-		return List.of(SubSteps.playTrack(track), act("Talk to Cecilia", null));
+		return List.of(SubSteps.playTrack(track), talkTo(act("Talk to Cecilia", null).toBuilder(), "Cecilia").build());
 	}
 
 	private static SubStep.SubStepBuilder useOnFalo(List<String> handInItems)

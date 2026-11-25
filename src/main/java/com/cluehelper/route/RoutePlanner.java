@@ -92,9 +92,11 @@ public class RoutePlanner
 	/** The committed walk was kept once although the last plan didn't offer it. */
 	boolean walkHeld;
 	final Set<String> refusedChanges = new HashSet<>();
+	/** A teleport under way: its item or runes are already spent, so a plan now would fetch them again. */
+	BooleanSupplier travelling = () -> false;
 
 	@Inject
-	void init(ScheduledExecutorService executor, ClientThread clientThread)
+	void init(BackgroundThread executor, ClientThread clientThread)
 	{
 		startRunner = new PlannerRunner(executor, clientThread);
 	}
@@ -148,6 +150,12 @@ public class RoutePlanner
 	public Route getCommitted()
 	{
 		return ahead ? null : committed;
+	}
+
+	/** Client thread. No plan is made while {@code travelling} holds; the next tick after it plans as usual. */
+	public void holdWhile(BooleanSupplier travelling)
+	{
+		this.travelling = travelling;
 	}
 
 	/** Listeners run on the client thread with each new plan. */
@@ -224,7 +232,7 @@ public class RoutePlanner
 		{
 			dropPlan();
 		}
-		if (client.getGameState() != GameState.LOGGED_IN)
+		if (client.getGameState() != GameState.LOGGED_IN || travelling.getAsBoolean())
 		{
 			return;
 		}

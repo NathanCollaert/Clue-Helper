@@ -4,7 +4,6 @@ import com.cluehelper.*;
 import com.cluehelper.step.*;
 import com.cluehelper.transport.*;
 import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import javax.inject.*;
 import net.runelite.client.callback.ClientThread;
@@ -30,7 +29,7 @@ public class ThreeStepScorer
 	PlannerRunner runner;
 
 	@Inject
-	void init(ScheduledExecutorService executor, ClientThread clientThread)
+	void init(BackgroundThread executor, ClientThread clientThread)
 	{
 		runner = new PlannerRunner(executor, clientThread);
 	}

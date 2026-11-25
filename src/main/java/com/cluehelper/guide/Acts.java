@@ -77,9 +77,17 @@ final class Acts
 		}
 	}
 
-	/** The baked act with core's name for the step's NPC, which can change with a quest or come from the client. */
+	/**
+	 * The baked act with core's name for the step's NPC, which can change with a quest or come from the client, or the
+	 * game's name for an object the bake knows only by id, with its Search option to colour.
+	 */
 	private static SubStep named(Step step, SubStep act)
 	{
+		if (Stages.SEARCH_IT.equals(act.getText()))
+		{
+			return act.toBuilder().text(Stages.search(step.getObjectNames())).objectIds(Set.copyOf(step.getObjectIds()))
+				.option(StepHighlights.SEARCH_OPTION).build();
+		}
 		if (step.getNpcs().isEmpty())
 		{
 			return act;
@@ -90,19 +98,25 @@ final class Acts
 			.build();
 	}
 
-	/** Core's items off and the step's on, from the STASH unit when they wait there, then the emotes. */
+	/**
+	 * Core's items off, the step's taken from the STASH unit when they wait there, the walk from it to the spot, the items
+	 * made there (black d'hide crafted on Entrana) when not, then the step's items on and the emotes. The items go on at
+	 * the spot, as a plan made once they are carried puts them.
+	 */
 	private static List<SubStep> emote(Step step, boolean takeFromStash, List<SubStep> baked)
 	{
 		List<SubStep> acts = new ArrayList<>();
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
 		boolean items = !step.getRequirements().getItems().isEmpty();
 		acts.addAll(items ? SubSteps.remove(EmptySlots.of(step.getRequirements().getItems())) : List.of());
-		acts.addAll(takeFromStash ? fromStash(step) : items ? List.of(equip(step.getRequirements().getItems())) : List.of());
+		acts.addAll(takeFromStash ? List.of(takeOutOfStash()) : List.of());
 		WorldPoint spot = step.getTargets().isEmpty() ? null : step.getTargets().get(0);
 		if (stash != null && spot != null)
 		{
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES, step.getData()));
 		}
+		acts.addAll(takeFromStash ? List.of() : step.getData().getBefore().stream().map(SubSteps::beforeAct).collect(toList()));
+		acts.addAll(items ? List.of(equip(takeFromStash ? itemsToPutOn(step) : step.getRequirements().getItems())) : List.of());
 		acts.addAll(items ? withItemsBackOnForUri(step, baked) : baked);
 		return List.copyOf(acts);
 	}
@@ -131,15 +145,19 @@ final class Acts
 		return acts;
 	}
 
-	/** Take the items out of the STASH unit and put them on. */
+	/** Take the items out of the STASH unit and put them on there: a unit outside the step's way in. */
 	static List<SubStep> fromStash(Step step)
 	{
-		SubStep take = SubStep.of(Kind.ACT, "Search the STASH unit: take the items").done(SubStep.Done.STASH_WITHDRAWN).build();
 		boolean items = !step.getRequirements().getItems().isEmpty();
-		return items ? List.of(take, equip(itemsToPutOn(step))) : List.of(take);
+		return items ? List.of(takeOutOfStash(), equip(itemsToPutOn(step))) : List.of(takeOutOfStash());
 	}
 
-	/** At the STASH unit only the items go on: what must come off is taken off at the clue (inside the axe hut). */
+	private static SubStep takeOutOfStash()
+	{
+		return SubStep.of(Kind.ACT, "Search the STASH unit: take the items").done(SubStep.Done.STASH_WITHDRAWN).build();
+	}
+
+	/** Only the items go on: what must come off is taken off at the clue (inside the axe hut) by its own act. */
 	private static List<ItemRequirement> itemsToPutOn(Step step)
 	{
 		return step.getRequirements().getItems().stream().filter(item -> !EmptySlots.metByEmptySlots(item)).collect(toList());

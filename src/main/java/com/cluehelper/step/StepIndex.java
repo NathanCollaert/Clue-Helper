@@ -383,6 +383,13 @@ public final class StepIndex
 		/** What the replacement is called where it is listed as missing; null for an alternative to core's item. */
 		String name;
 		List<List<Integer>> all = List.of();
+		/** Core's item can't be brought (Entrana turns away armour): only the parts are withdrawn, and it is made there. */
+		boolean madeThere;
+		/**
+		 * How many of a part's item it takes, where more than one: the leather for this piece and the pieces made after it, so
+		 * what is left still counts once a piece is made.
+		 */
+		Map<Integer, Integer> counts = Map.of();
 	}
 
 	/** Worn gear adding up to at least {@code atLeast} of its bonus (Ghommal's +100 melee strength). */

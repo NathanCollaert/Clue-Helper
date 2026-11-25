@@ -10,7 +10,9 @@ import lombok.Value;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 
 /**
@@ -51,6 +53,12 @@ public class UnlockMemory
 	MemorySlot<Seen> legacyDragontooth;
 	WorldPoint lastTile;
 	Map<Integer, Integer> lastFares = Map.of();
+	/**
+	 * A flight's log leaves the inventory on the click in the balloon's map, ticks before the landing, so a flight is
+	 * judged by what was carried when the map opened.
+	 */
+	Map<Integer, Integer> faresAtBalloonMap = Map.of();
+	boolean balloonMapShown;
 
 	@Inject
 	void init(MemoryStore memory)
@@ -60,9 +68,30 @@ public class UnlockMemory
 		legacyDragontooth = memory.slot(DRAGONTOOTH_KEY, Seen.class, Seen::new);
 	}
 
+	/** Before version 1 every flight paid with a carried log was taken for one paid from storage, so those are forgotten. */
+	private Set<String> migratedUnlocks()
+	{
+		Learned saved = learned.get();
+		if (saved.version < Learned.VERSION)
+		{
+			saved = learnedAs(saved.unlocks.stream().filter(unlock -> LANDING_UNLOCKS.stream()
+				.noneMatch(landing -> landing.fromBalloon && landing.name.equals(unlock))).collect(Collectors.toSet()));
+		}
+		return saved.unlocks;
+	}
+
+	private Learned learnedAs(Set<String> unlocks)
+	{
+		Learned next = new Learned();
+		next.unlocks = unlocks;
+		next.version = Learned.VERSION;
+		learned.set(next);
+		return next;
+	}
+
 	public Set<String> unlocks()
 	{
-		Set<String> unlocks = new HashSet<>(learned.get().unlocks);
+		Set<String> unlocks = new HashSet<>(migratedUnlocks());
 		if (legacyXericsHonour.get().learnedAt > 0)
 		{
 			unlocks.add(XERICS_HONOUR);
@@ -80,6 +109,13 @@ public class UnlockMemory
 		Player local = client.getLocalPlayer();
 		WorldPoint tile = local == null ? null : WorldPoint.fromLocalInstance(client, local.getLocalLocation());
 		Map<Integer, Integer> fares = carriedFares();
+		Widget balloonMap = client.getWidget(InterfaceID.ZepBalloonMap.ROOT_RECT0);
+		boolean mapShown = balloonMap != null && !balloonMap.isHidden();
+		if (mapShown && !balloonMapShown)
+		{
+			faresAtBalloonMap = fares;
+		}
+		balloonMapShown = mapShown;
 		if (PositionRules.teleported(lastTile, tile))
 		{
 			learnFromLanding(lastTile, tile, fares);
@@ -110,7 +146,8 @@ public class UnlockMemory
 		boolean fromBalloon = LANDING_UNLOCKS.stream().anyMatch(unlock -> unlock.fromBalloon && PositionRules.near(from, unlock.landing, BALLOON_TILES));
 		for (LandingUnlock unlock : LANDING_UNLOCKS)
 		{
-			boolean farePaidElsewhere = fares.getOrDefault(unlock.fare, 0) >= lastFares.getOrDefault(unlock.fare, 0);
+			Map<Integer, Integer> before = unlock.fromBalloon ? faresAtBalloonMap : lastFares;
+			boolean farePaidElsewhere = before.containsKey(unlock.fare) && fares.get(unlock.fare) >= before.get(unlock.fare);
 			if ((fromBalloon || !unlock.fromBalloon) && PositionRules.near(to, unlock.landing, LANDING_TILES) && farePaidElsewhere)
 			{
 				setLearned(unlock.name, true);
@@ -132,12 +169,10 @@ public class UnlockMemory
 
 	private void setLearned(String unlock, boolean known)
 	{
-		Set<String> unlocks = new HashSet<>(learned.get().unlocks);
+		Set<String> unlocks = new HashSet<>(migratedUnlocks());
 		if (known ? unlocks.add(unlock) : unlocks.remove(unlock))
 		{
-			Learned next = new Learned();
-			next.unlocks = unlocks;
-			learned.set(next);
+			learnedAs(unlocks);
 		}
 	}
 
@@ -170,7 +205,10 @@ public class UnlockMemory
 
 	static final class Learned
 	{
+		static final int VERSION = 1;
+
 		Set<String> unlocks = new HashSet<>();
+		int version;
 	}
 
 	/** Xeric's Honour's and Dragontooth's own keys before {@link #UNLOCKS_KEY} held every unlock. */

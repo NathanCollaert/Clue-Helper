@@ -84,7 +84,8 @@ Something else wrong? [Open an issue](https://github.com/NathanCollaert/Clue-Hel
 
 Clue Helper makes no network calls. What it remembers (your bank, house, STASH units, grown spirit trees, unlocks such as Xeric's Honour and similar)
 is saved in your RuneLite profile like any other plugin setting. It reads, without changing anything, the Clue Scroll
-plugin's current clue, Menu Entry Swapper's swaps and Time Tracking's farming patches. A route report only leaves
+plugin's current clue, Menu Entry Swapper's swaps, Time Tracking's farming patches and the names Easy Teleports
+gives teleport places. A route report only leaves
 your computer when you paste it somewhere yourself.
 
 

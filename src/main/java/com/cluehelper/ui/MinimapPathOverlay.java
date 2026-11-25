@@ -20,6 +20,8 @@ import net.runelite.client.ui.overlay.*;
 /** The scene's path line again on the minimap, kept inside the round map so it never runs over the orbs. */
 public class MinimapPathOverlay extends Overlay
 {
+	/** A jump this long (a cave entrance into another region) lands far off: the line isn't drawn across it. */
+	private static final int LONG_JUMP_TILES = 20;
 	/** Fixed, resizable classic and resizable modern: whichever layout is showing has its map. */
 	private static final int[] MINIMAPS = {InterfaceID.Toplevel.MINIMAP, InterfaceID.ToplevelOsrsStretch.MINIMAP,
 		InterfaceID.ToplevelPreEoc.MINIMAP};
@@ -68,7 +70,7 @@ public class MinimapPathOverlay extends Overlay
 		for (WorldPoint tile : line)
 		{
 			if (previous != null && (previous.getPlane() != tile.getPlane()
-				|| previous.distanceTo2D(tile) > WaypointOverlay.CROSSING_JUMP_TILES))
+				|| previous.distanceTo2D(tile) > LONG_JUMP_TILES))
 			{
 				points.add(null);
 			}

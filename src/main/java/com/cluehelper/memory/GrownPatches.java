@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.*;
 import javax.inject.*;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.events.ConfigChanged;
@@ -13,9 +15,10 @@ import static java.util.stream.Collectors.*;
 
 /**
  * Client thread. Grown patches a route or a Sherlock task needs, named as the catalog and the step data name them: the
- * planted spirit trees and the Farming Guild redwood. The Time Tracking plugin remembers each patch for this account as
- * core reads it, "region.varbit" to "value:seconds" in its group. The spirit tree menu greys a planted tree that can't
- * be used, so a tree counts as grown by whichever of the two saw it last.
+ * planted spirit trees and the Farming Guild redwood, and the allotments a planting task can't use while a crop grows.
+ * The Time Tracking plugin remembers each patch for this account as core reads it, "region.varbit" to "value:seconds"
+ * in its group. The spirit tree menu greys a planted tree that can't be used, in the label the game passes its list
+ * script, so a tree counts as grown by whichever of the two saw it last.
  */
 @Slf4j
 @Singleton
@@ -32,13 +35,22 @@ public class GrownPatches
 	private static final String MENU_TITLE = "Spirit Tree Locations";
 	/** As core's farming tracker reads a spirit tree patch: 8-19 is growing, 21 and up diseased or dead. */
 	private static final int GROWN_TREE = 20;
-	private static final String GREYED = "5f5f5f";
+	/** The tag the game wraps a planted tree that can't be used in, in the label it passes the list script. */
+	private static final String GREYED = "<col=5f5f5f>";
 	private static final Seen UNTRACKED = new Seen();
 	/** Spirit tree patch name → its Time Tracking key. */
 	private static final Map<String, String> SPIRIT_TREE_PATCHES = Tables.byKey("spirit tree patches", row -> row.ids()[0] + "." + row.ids()[1]);
+	/** A planting task's place to its allotments' varbits. */
+	private static final Map<WorldPoint, int[]> ALLOTMENTS = Tables.rows("allotment patches").stream().collect(toUnmodifiableMap(
+		row -> new WorldPoint(row.id(0), row.id(1), row.id(2)), row -> Arrays.copyOfRange(row.ids(), 3, row.getCells().size())));
+	private static final int ALLOTMENT_FORMS = Tables.ids("allotment form")[0];
+	/** How long an allotment crop takes to grow one stage. */
+	private static final long ALLOTMENT_STAGE_SECONDS = 10 * 60;
 
 	@Inject
 	ConfigManager configManager;
+	@Inject
+	Client client;
 	MemorySlot<Patches> menuSeen;
 
 	@Inject
@@ -59,7 +71,61 @@ public class GrownPatches
 
 	public boolean isOurs(ConfigChanged event)
 	{
-		return TIME_TRACKING.equals(event.getGroup()) && (REDWOOD_KEY.equals(event.getKey()) || SPIRIT_TREE_PATCHES.containsValue(event.getKey()));
+		return TIME_TRACKING.equals(event.getGroup()) && (REDWOOD_KEY.equals(event.getKey()) || SPIRIT_TREE_PATCHES.containsValue(event.getKey())
+			|| ALLOTMENTS.entrySet().stream().anyMatch(place -> Arrays.stream(place.getValue()).anyMatch(varbit -> allotmentKey(place.getKey(), varbit).equals(event.getKey()))));
+	}
+
+	/** Every varbit of the planting places' allotments: a change to one can free a place. */
+	public static Set<Integer> allotmentVarbits()
+	{
+		return ALLOTMENTS.values().stream().flatMapToInt(Arrays::stream).boxed().collect(toUnmodifiableSet());
+	}
+
+	/**
+	 * The planting places whose every allotment has a crop still growing, read live where the place is loaded and else as
+	 * Time Tracking last saw it, while the crop can't have grown since: none of them can be cleared or planted.
+	 */
+	public Set<WorldPoint> growingAllotments()
+	{
+		return ALLOTMENTS.entrySet().stream()
+			.filter(place -> Arrays.stream(place.getValue()).allMatch(varbit -> isGrowing(place.getKey(), varbit)))
+			.map(Map.Entry::getKey).collect(toUnmodifiableSet());
+	}
+
+	private boolean isGrowing(WorldPoint place, int varbit)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		boolean loaded = view != null && Arrays.stream(view.getMapRegions()).anyMatch(region -> region == place.getRegionID());
+		Seen seen = loaded ? null : tracked(allotmentKey(place, varbit));
+		int value = loaded ? client.getVarbitValue(varbit) : seen.value;
+		int[] forms = client.getObjectDefinition(ALLOTMENT_FORMS).getImpostorIds();
+		if (!isGrowingStage(forms, value))
+		{
+			return false;
+		}
+		return loaded || seen.seconds + stagesLeft(forms, value) * ALLOTMENT_STAGE_SECONDS > Instant.now().getEpochSecond();
+	}
+
+	private boolean isGrowingStage(int[] forms, int value)
+	{
+		return forms != null && value >= 0 && value < forms.length && forms[value] >= 0
+			&& Allotment.of(value, client.getObjectDefinition(forms[value])) == null;
+	}
+
+	/** The growing stages after this one: a crop's stages are forms with ids in a row, ended by the grown one. */
+	private int stagesLeft(int[] forms, int value)
+	{
+		int last = value;
+		while (last + 1 < forms.length && forms[last + 1] == forms[last] + 1 && isGrowingStage(forms, last + 1))
+		{
+			last++;
+		}
+		return last - value;
+	}
+
+	private static String allotmentKey(WorldPoint place, int varbit)
+	{
+		return place.getRegionID() + "." + varbit;
 	}
 
 	/** Patches the menu doesn't list keep what was known: the menu only speaks for its own lines. */

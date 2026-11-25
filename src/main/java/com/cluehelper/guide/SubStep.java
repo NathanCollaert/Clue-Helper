@@ -94,6 +94,9 @@ public class SubStep
 	String again;
 	@Builder.Default
 	Set<Integer> bankItems = Set.of();
+	/** How many of each the player carries once the withdraw is done; from the live plan, so never baked. */
+	@Builder.Default
+	transient Map<Integer, Integer> carriedAfterBank = Map.of();
 	/** Shown one per line under the text: the items to withdraw. */
 	@Builder.Default
 	List<String> items = List.of();

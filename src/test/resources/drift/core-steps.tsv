@@ -54,7 +54,7 @@ anagram:23133	*	anagram	medium	ANY_OF	2553,2868,0	Madame Caldarium				none	1518	
 anagram:24493	*	anagram	hard	ANY_OF	3821,9780,2	Daer Krand				none	1558	DARN DRAKE
 anagram:25784	*	anagram	medium	ANY_OF	1551,3565,0	Drunken soldier				none	1551	UESNKRL NRIEDDO
 anagram:2843	*	anagram	medium	ANY_OF	3207,3214,0	Cook				none	1540	OK CO
-anagram:2845	*	anagram	medium	ANY_OF	2613,3269,0	Zoo keeper				none	1521	EEK ZERO OP
+anagram:2845	*	anagram	medium	ANY_OF	2613,3269,0|2614,3281,0|2603,3285,0	Zoo keeper				none	1521	EEK ZERO OP
 anagram:2847	*	anagram	medium	ANY_OF	3233,3423,0	Lowe				none	1522	EL OW
 anagram:2849	*	anagram	medium	ANY_OF	3273,3181,0	Karim				none	1545	R AK MI
 anagram:2851	*	anagram	medium	ANY_OF	3013,3501,0	Oracle				none	1515	ARE COL

@@ -124,7 +124,8 @@ public final class Planner
 		for (Stage stage : step.getStages())
 		{
 			anyOrder &= stage.getKind() == Stage.Kind.PART;
-			int[] places = stage.getTiles().stream().filter(tile -> isThere(ctx, stage, tile)).mapToInt(ctx::nodeAt).toArray();
+			int[] places = notGrowing(ctx, stage.getTiles().stream().filter(tile -> isThere(ctx, stage, tile)).collect(toList()))
+				.stream().mapToInt(ctx::nodeAt).toArray();
 			if (places.length > 0)
 			{
 				legs.add(places);
@@ -143,6 +144,14 @@ public final class Planner
 		boolean inHouse = PositionRules.POH_NODE.equals(tile);
 		return (patch == null || ctx.in.getPlayer().getPlantedTrees().contains(patch))
 			&& (!inHouse || ctx.in.getPlayer().getHouse().hasAny(stage.getHouseObjects())) && !ctx.lacksItems(tile);
+	}
+
+	/** Places whose every allotment still grows a crop can't be planted in now: left out, unless every place is such. */
+	private static List<WorldPoint> notGrowing(PlanContext ctx, List<WorldPoint> places)
+	{
+		Set<WorldPoint> growing = ctx.in.getPlayer().getGrowingAllotments();
+		List<WorldPoint> free = places.stream().filter(place -> !growing.contains(place)).collect(toList());
+		return free.isEmpty() ? places : free;
 	}
 
 	private static List<List<int[]>> permutations(List<int[]> items)
@@ -554,6 +563,8 @@ public final class Planner
 				.rankHalfTicks(goal.rank - goal.choicePenalty + extra)
 				.banked(banked)
 				.withdraw(withdraw)
+				.carriedAfterBank(withdraw.stream().collect(toUnmodifiableMap(ItemUse::getItemId,
+					use -> ctx.in.getPlayer().carried(use.getItemId()) + use.getQuantity(), Integer::sum)))
 				.depositFirst(depositFirst)
 				.openBankStart(banked && !bankLeg)
 				.startBook(ctx.homeBook)

@@ -77,7 +77,8 @@ final class LegSteps
 		List<String> items = route.getWithdraw().stream().map(use -> itemLine(use, itemLines)).collect(toList());
 		String text = route.isDepositFirst() ? "Deposit to free slots, then withdraw:" : "Withdraw from the bank:";
 		return SubStep.of(Kind.WITHDRAW, text).items(List.copyOf(items))
-			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(toUnmodifiableSet())).build();
+			.bankItems(route.getWithdraw().stream().map(ItemUse::getItemId).collect(toUnmodifiableSet()))
+			.carriedAfterBank(route.getCarriedAfterBank()).build();
 	}
 
 	static SubStep walk(Leg leg, Leg next, Step step, boolean takeFromStash)

@@ -3,7 +3,6 @@ package com.cluehelper.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -42,7 +41,9 @@ public class Highlighter
 	private static final int RIPPLES = 2;
 	private static final long RIPPLE_MILLIS = 3200;
 	/** How much bigger than the tile a ring is when it has faded away. */
-	private static final double RIPPLE_GROWTH = 0.7;
+	private static final double RIPPLE_GROWTH = 0.3;
+	/** A ring spreads no further than this past a larger shape (a whole patch): about as far as past one tile up close. */
+	private static final double RIPPLE_MAX_SPREAD_PIXELS = 12;
 	private static final BasicStroke RIPPLE_STROKE = new BasicStroke(1.5f);
 	private static final int OUTLINE_WIDTH = 2;
 	private static final int FEATHER = 0;
@@ -142,22 +143,53 @@ public class Highlighter
 	/**
 	 * A scenery or ground object (God Wars' ice bridge) with no model at all, a flat click spot or flat ground (an empty
 	 * farming patch), or one whose every
-	 * face is skipped by the outline renderer (see-through) or never drawn by the client.
+	 * face is skipped by the outline renderer (see-through) or never drawn by the client. A wall or wall decoration (the
+	 * Ferox Enclave's barriers) is hidden when none of its models has a drawn face.
 	 */
 	private static boolean isHidden(TileObject object)
 	{
+		if (object instanceof WallObject || object instanceof DecorativeObject)
+		{
+			return wallRenderables(object).stream().map(Highlighter::modelOf).filter(Objects::nonNull).noneMatch(Highlighter::hasDrawnFace);
+		}
 		Renderable renderable = object instanceof GameObject ? ((GameObject) object).getRenderable()
 			: object instanceof GroundObject ? ((GroundObject) object).getRenderable() : null;
 		if (renderable == null && !(object instanceof GameObject))
 		{
 			return false;
 		}
-		Model model = renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
+		Model model = modelOf(renderable);
 		if (model == null || model.getFaceCount() <= FLAT_MARKER_FACES || model.getModelHeight() <= FLAT_MODEL_HEIGHT)
 		{
 			return true;
 		}
-		return IntStream.range(0, model.getFaceCount()).noneMatch(face -> ModelSilhouette.isDrawn(model, face));
+		return !hasDrawnFace(model);
+	}
+
+	private static List<Renderable> wallRenderables(TileObject object)
+	{
+		List<Renderable> renderables = new ArrayList<>();
+		if (object instanceof WallObject)
+		{
+			renderables.add(((WallObject) object).getRenderable1());
+			renderables.add(((WallObject) object).getRenderable2());
+		}
+		else
+		{
+			renderables.add(((DecorativeObject) object).getRenderable());
+			renderables.add(((DecorativeObject) object).getRenderable2());
+		}
+		return renderables;
+	}
+
+	private static Model modelOf(Renderable renderable)
+	{
+		return renderable instanceof Model ? (Model) renderable : renderable == null ? null : renderable.getModel();
+	}
+
+	private static boolean hasDrawnFace(Model model)
+	{
+		return IntStream.range(0, model.getFaceCount()).anyMatch(face -> ModelSilhouette.isDrawn(model, face));
 	}
 
 	public void npc(Graphics2D graphics, NPC npc, boolean leftClick)
@@ -246,7 +278,7 @@ public class Highlighter
 	}
 
 	/** A spot to walk to with nothing on it to outline: a steady outline, with rings slowly spreading from it. */
-	public void tile(Graphics2D graphics, Polygon tile)
+	public void tile(Graphics2D graphics, Shape tile)
 	{
 		graphics.setStroke(STROKE);
 		graphics.setColor(TARGET);
@@ -259,11 +291,12 @@ public class Highlighter
 	}
 
 	/** {@code phase} runs from 0, the ring on the tile's outline, to 1, the ring spread out and faded away. */
-	private static void ripple(Graphics2D graphics, Polygon tile, double phase)
+	private static void ripple(Graphics2D graphics, Shape tile, double phase)
 	{
 		Rectangle bounds = tile.getBounds();
 		double easedOut = 1 - (1 - phase) * (1 - phase);
-		double scale = 1 + RIPPLE_GROWTH * easedOut;
+		double halfSize = Math.max(1, Math.max(bounds.getWidth(), bounds.getHeight()) / 2);
+		double scale = 1 + Math.min(RIPPLE_GROWTH, RIPPLE_MAX_SPREAD_PIXELS / halfSize) * easedOut;
 		AffineTransform spread = AffineTransform.getTranslateInstance(bounds.getCenterX(), bounds.getCenterY());
 		spread.scale(scale, scale);
 		spread.translate(-bounds.getCenterX(), -bounds.getCenterY());

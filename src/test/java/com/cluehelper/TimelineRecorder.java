@@ -358,16 +358,11 @@ final class TimelineRecorder
 			"message", event.getFormattedMessage(), "thrown", thrown == null ? null : thrown.getClassName() + ": " + thrown.getMessage());
 	}
 
-	/** The outlined NPCs the clue names: the overlay leaves those to core's own outline. */
+	/** The outlined NPCs core marks itself: the overlay leaves those to core's own outline. */
 	private List<String> leftToCore()
 	{
-		Step step = clueLink.getCurrentStep();
-		if (step == null)
-		{
-			return List.of();
-		}
 		return guide.getHighlightNpcs().stream()
-			.filter(npc -> npc.getName() != null && step.getNpcs().stream().anyMatch(name -> name.equalsIgnoreCase(npc.getName())))
+			.filter(clueLink::coreMarks)
 			.map(TimelineRecorder::npcAt)
 			.collect(Collectors.toList());
 	}
