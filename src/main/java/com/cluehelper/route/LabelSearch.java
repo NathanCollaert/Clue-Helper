@@ -21,8 +21,6 @@ final class LabelSearch
 	 * than 2 ticks: near-ties stay on fewer steps.
 	 */
 	static final int MARGIN_HALF_TICKS = 5;
-	/** A carried spellbook change is taken only when strictly faster: on a tie the route stays on its book. */
-	private static final int CHANGE_TIE_HALF_TICKS = 1;
 	private static final int BOOKS = 7;
 	private static final int FIRST_PENDING = 4;
 	private static final int LUNAR = Book.LUNAR.ordinal();
@@ -48,11 +46,14 @@ final class LabelSearch
 	final LowerBound[] bounds;
 	final boolean[][] targets;
 	/**
-	 * An exact tie goes to the route that uses nothing up, then to the one without a bank stop; both only grow along a
-	 * route, so a partial route that would win the tie is expanded first. After that the label with more real time carries
-	 * fewer ranking-only penalties (teleport ties, bank margins): a walk over two teleports a tick each faster.
+	 * An exact tie goes to the route that uses nothing up, then to the one that stays on its book, then to the one without
+	 * a bank stop; all three only grow along a route, so a partial route that would win the tie is expanded first, and a
+	 * label never prunes one with fewer of them. After that the label with more real time carries fewer ranking-only
+	 * penalties (teleport ties, bank margins): a walk over two teleports a tick each faster.
 	 */
-	static final Comparator<Label> TIE_ORDER = Comparator.<Label>comparingInt(label -> label.fee).thenComparingInt(label -> label.b);
+	static final Comparator<Label> TIE_ORDER = Comparator.<Label>comparingInt(label -> label.fee).thenComparingInt(label -> label.changes)
+		.thenComparingInt(label -> label.b);
+	private static final Comparator<Label> RANK_ORDER = Comparator.<Label>comparingInt(label -> label.rank).thenComparing(TIE_ORDER);
 	final PriorityQueue<Label> queue = new PriorityQueue<>(Comparator.<Label>comparingInt(label -> label.f).thenComparing(TIE_ORDER)
 		.thenComparing(Comparator.<Label>comparingInt(label -> label.half).reversed()));
 
@@ -246,6 +247,7 @@ final class LabelSearch
 		goal.rank = from.rank + area + strand;
 		goal.choicePenalty = from.choicePenalty;
 		goal.fee = from.fee;
+		goal.changes = from.changes;
 		goal.spent = from.spent;
 		goal.withdrawn = withdrawn;
 		goal.endBook = end;
@@ -379,7 +381,7 @@ final class LabelSearch
 		{
 			if (k >= FIRST_PENDING || book.ordinal() != k)
 			{
-				change(from, from.node, book.ordinal(), cape, CHANGE_TIE_HALF_TICKS);
+				change(from, from.node, book.ordinal(), cape, 0);
 			}
 		}
 	}
@@ -487,24 +489,10 @@ final class LabelSearch
 
 	private void bankStop(Label from, int k, int half, int[] withdrawn)
 	{
-		penalise(offer(from, from.node, PlanContext.BANKED, k, from.t, from.leg, half, half + MARGIN_HALF_TICKS, Leg.Kind.BANK, null, null,
-			from.spent, withdrawn), MARGIN_HALF_TICKS);
-	}
-
-	private static void penalise(Label label, int choiceHalfTicks)
-	{
-		if (label != null)
-		{
-			label.choicePenalty += choiceHalfTicks;
-		}
-	}
-
-	private static void charge(Label label, int priceHalfTicks)
-	{
-		if (label != null)
-		{
-			label.fee += priceHalfTicks;
-		}
+		Label label = label(from, from.node, PlanContext.BANKED, k, from.t, from.leg, half, half + MARGIN_HALF_TICKS, Leg.Kind.BANK, null,
+			null, from.spent, withdrawn);
+		label.choicePenalty += MARGIN_HALF_TICKS;
+		offer(label);
 	}
 
 	private void transport(Label from, int node, int k, int half, Leg.Kind kind, TransportOptions.Teleport tele,
@@ -531,12 +519,15 @@ final class LabelSearch
 		if (spent != null && (!pointlessAfterBank(from, withdrawn) || ctx.usesBankItems(node)))
 		{
 			int total = half + withdrawHalfTicks(from, withdrawn);
-			int choice = kind == Leg.Kind.SWAP_TELEPORT ? CHANGE_TIE_HALF_TICKS : 0;
 			int price = tele.priceHalfTicks + (second == null ? 0 : second.priceHalfTicks);
-			Label label = offer(from, node, from.b, k, t, from.leg, total, total + PlanContext.TELEPORT_TIE_HALF_TICKS + choice + price, kind,
+			Label label = label(from, node, from.b, k, t, from.leg, total, total + PlanContext.TELEPORT_TIE_HALF_TICKS + price, kind,
 				tele, second, spent, withdrawn);
-			penalise(label, choice);
-			charge(label, price);
+			label.fee += price;
+			if (kind == Leg.Kind.SWAP_TELEPORT)
+			{
+				label.changes++;
+			}
+			offer(label);
 		}
 	}
 
@@ -548,10 +539,12 @@ final class LabelSearch
 		{
 			int total = change.halfTicks + withdrawHalfTicks(from, withdrawn);
 			int penalty = change.priceHalfTicks + choiceHalfTicks;
-			Label label = offer(from, node, from.b, k, from.t, from.leg, total, total + penalty, Leg.Kind.SPELLBOOK_CHANGE,
+			Label label = label(from, node, from.b, k, from.t, from.leg, total, total + penalty, Leg.Kind.SPELLBOOK_CHANGE,
 				change, null, spent, withdrawn);
-			penalise(label, choiceHalfTicks);
-			charge(label, change.priceHalfTicks);
+			label.choicePenalty += choiceHalfTicks;
+			label.fee += change.priceHalfTicks;
+			label.changes++;
+			offer(label);
 		}
 	}
 
@@ -600,15 +593,15 @@ final class LabelSearch
 	 * Withdrawing later costs the same as now, except after a bank stop that took nothing: that one only walks to
 	 * bank-item uses, so it can't stand in for a stop that took something.
 	 */
-	private boolean dominates(int bankState, int aRank, int aHalf, int[] aSpent, int[] aWithdrawn, int bRank, int bHalf, int[] bSpent,
-		int[] bWithdrawn)
+	private boolean dominates(Label a, Label b)
 	{
-		if (bankState == PlanContext.BANKED && aWithdrawn.length == 0 && bWithdrawn.length > 0 && bankStopsArePruned())
+		if (b.b == PlanContext.BANKED && a.withdrawn.length == 0 && b.withdrawn.length > 0 && bankStopsArePruned())
 		{
 			return false;
 		}
-		int withdrawLater = PlanContext.WITHDRAW_HALF_TICKS * countMissing(aWithdrawn, bWithdrawn);
-		return aRank + withdrawLater <= bRank && aHalf + withdrawLater <= bHalf && spendsNoMore(aSpent, bSpent);
+		int withdrawLater = PlanContext.WITHDRAW_HALF_TICKS * countMissing(a.withdrawn, b.withdrawn);
+		return a.rank + withdrawLater <= b.rank && a.half + withdrawLater <= b.half && a.fee <= b.fee && a.changes <= b.changes
+			&& spendsNoMore(a.spent, b.spent);
 	}
 
 	private static int countMissing(int[] sortedHave, int[] sortedWanted)
@@ -644,19 +637,48 @@ final class LabelSearch
 	private Label offer(Label from, int node, int b, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
 		TransportOptions.Edge ref, TransportOptions.Edge ref2, int[] spent, int[] withdrawn)
 	{
-		int half = (from == null ? 0 : from.half) + addHalf;
-		int rank = (from == null ? 0 : from.rank) + addRank;
-		int bound = bounds[leg] == null ? 0 : bounds[leg].of(node);
+		return offer(label(from, node, b, k, t, leg, addHalf, addRank, kind, ref, ref2, spent, withdrawn));
+	}
+
+	/** A label not yet offered, so an edge can add its fee or spellbook change before it is weighed against the others. */
+	private static Label label(Label from, int node, int b, int k, int t, int leg, int addHalf, int addRank, Leg.Kind kind,
+		TransportOptions.Edge ref, TransportOptions.Edge ref2, int[] spent, int[] withdrawn)
+	{
+		Label label = new Label();
+		label.leg = leg;
+		label.node = node;
+		label.b = b;
+		label.k = k;
+		label.t = t;
+		label.half = (from == null ? 0 : from.half) + addHalf;
+		label.rank = (from == null ? 0 : from.rank) + addRank;
+		label.spent = spent;
+		label.withdrawn = withdrawn;
+		label.parent = from;
+		label.choicePenalty = from == null ? 0 : from.choicePenalty;
+		label.fee = from == null ? 0 : from.fee;
+		label.changes = from == null ? 0 : from.changes;
+		label.kind = kind;
+		label.ref = ref;
+		label.ref2 = ref2;
+		label.edgeHalf = addHalf;
+		return label;
+	}
+
+	/** Returns null when dominated, or when its state is full of labels that rank or tie better. */
+	private Label offer(Label label)
+	{
+		int bound = bounds[label.leg] == null ? 0 : bounds[label.leg].of(label.node);
 		if (bound >= LowerBound.UNREACHABLE)
 		{
 			return null;
 		}
-		int base = firstSlot(leg, node, b, k, t);
-		if (dominatedAt(base, b, rank, half, spent, withdrawn))
+		int base = firstSlot(label.leg, label.node, label.b, label.k, label.t);
+		if (dominatedAt(base, label))
 		{
 			return null;
 		}
-		killDominated(base, b, rank, half, spent, withdrawn);
+		killDominated(base, label);
 		int free = -1;
 		int worst = -1;
 		for (int i = base; i < base + MAX_LABELS; i++)
@@ -666,50 +688,33 @@ final class LabelSearch
 			{
 				free = free < 0 ? i : free;
 			}
-			else if (worst < 0 || old.rank > slots[worst].rank)
+			else if (worst < 0 || RANK_ORDER.compare(old, slots[worst]) > 0)
 			{
 				worst = i;
 			}
 		}
 		if (free < 0)
 		{
-			if (slots[worst].rank <= rank)
+			if (RANK_ORDER.compare(slots[worst], label) <= 0)
 			{
 				return null;
 			}
 			slots[worst].dead = true;
 			free = worst;
 		}
-		Label label = new Label();
-		label.leg = leg;
-		label.node = node;
-		label.b = b;
-		label.k = k;
-		label.t = t;
-		label.half = half;
-		label.rank = rank;
-		label.f = rank + bound;
-		label.spent = spent;
-		label.withdrawn = withdrawn;
-		label.parent = from;
-		label.choicePenalty = from == null ? 0 : from.choicePenalty;
-		label.fee = from == null ? 0 : from.fee;
-		label.kind = kind;
-		label.ref = ref;
-		label.ref2 = ref2;
-		label.edgeHalf = addHalf;
+		label.f = label.rank + bound;
 		slots[free] = label;
 		queue.add(label);
 		labels++;
 		return label;
 	}
 
-	private boolean dominatedAt(int base, int b, int rank, int half, int[] spent, int[] withdrawn)
+	private boolean dominatedAt(int base, Label label)
 	{
 		for (int i = base; i < base + MAX_LABELS; i++)
 		{
 			Label old = slots[i];
-			if (old != null && !old.dead && dominates(b, old.rank, old.half, old.spent, old.withdrawn, rank, half, spent, withdrawn))
+			if (old != null && !old.dead && dominates(old, label))
 			{
 				return true;
 			}
@@ -717,12 +722,12 @@ final class LabelSearch
 		return false;
 	}
 
-	private void killDominated(int base, int b, int rank, int half, int[] spent, int[] withdrawn)
+	private void killDominated(int base, Label label)
 	{
 		for (int i = base; i < base + MAX_LABELS; i++)
 		{
 			Label old = slots[i];
-			if (old != null && !old.dead && dominates(b, rank, half, spent, withdrawn, old.rank, old.half, old.spent, old.withdrawn))
+			if (old != null && !old.dead && dominates(label, old))
 			{
 				old.dead = true;
 				slots[i] = null;
@@ -857,10 +862,12 @@ final class LabelSearch
 		int half;
 		int rank;
 		int f;
-		/** The rank so far that only chooses between routes: margins on bank stops and walked changes, change tie-breaks. */
+		/** The rank so far that only chooses between routes: margins on bank stops and walked changes. */
 		int choicePenalty;
 		/** The rank so far for what the route uses up: the Save consumables setting's fees. */
 		int fee;
+		/** Spellbook changes so far, a Spellbook Swap teleport included. */
+		int changes;
 		int[] spent;
 		/** Sorted; each id is charged its withdraw ticks once. */
 		int[] withdrawn = NOTHING;

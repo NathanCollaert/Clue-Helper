@@ -25,9 +25,9 @@ Lunar, swap runes only in the bank (bank on)
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
   best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
 Wilderness start at level 26 (3100,3720), to Varrock
-  best      37t (rank 40): Slayer ring: Dark Beasts → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      37t (rank 40): Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 Wilderness start at level 36 (3100,3800), to Varrock
-  best      60t (rank 63): walk south 23 → Slayer ring: Dark Beasts → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      60t (rank 63): walk south 23 → Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 member on an F2P world on Ancient: Edgeville Home Teleport
   best      33t (rank 35): Edgeville Home Teleport → walk 9 {cooldown:892=1}
 avoidWilderness with a Wilderness target
@@ -173,7 +173,7 @@ Isle of Souls: maxed, the Isle of Souls mine spot, onto the island through Soul 
 sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium
   best      9t: Max cape: Other Teleports: The Pandemonium → walk 4
 gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave
-  best      98t: Construction cape: Tele to POH → Portal nexus: Fenken' Castle → walk 83
+  best      89t (rank 98): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
 quest gate: maxed without Song of the Elves, to Prifddinas: no route, the quest named
   best      none
   note      Quests not finished:

@@ -493,7 +493,7 @@ public final class Planner
 			return best;
 		}
 
-		/** A lower rank, or at the same rank the better tie: nothing used up, then no bank stop. */
+		/** A lower rank, or at the same rank the better tie: nothing used up, then no spellbook change, then no bank stop. */
 		private static boolean beats(LabelSearch search, LabelSearch best)
 		{
 			if (search.goal == null || best == null || best.goal == null || search.goal.rank != best.goal.rank)
