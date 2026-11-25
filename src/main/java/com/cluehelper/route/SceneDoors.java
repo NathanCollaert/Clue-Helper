@@ -141,6 +141,17 @@ public final class SceneDoors
 		return null;
 	}
 
+	/**
+	 * Client thread only. A door or web the player opens and walks on from where they stand; not one that carries them
+	 * through (squeezed through, or a row's door that shuts behind them).
+	 */
+	public boolean opensInPlace(WalkTable table, TileObject door)
+	{
+		String option = openOption(door.getId());
+		boolean opened = OPEN.equals(option) || SLASH.equals(option);
+		return opened && (table == null || !table.isRowObjectAt(door.getId(), door.getWorldLocation()));
+	}
+
 	private static boolean passedByRow(WalkTable table, int id, WorldView view, int sceneX, int sceneY, int plane)
 	{
 		return table != null && table.isRowObjectAt(id, new WorldPoint(view.getBaseX() + sceneX, view.getBaseY() + sceneY, plane));

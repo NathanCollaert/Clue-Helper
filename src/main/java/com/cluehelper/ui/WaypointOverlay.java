@@ -64,6 +64,8 @@ public class WaypointOverlay extends Overlay
 	@Inject
 	PathObjects paths;
 	@Inject
+	SceneDoors doors;
+	@Inject
 	WalkLine walkLine;
 	@Inject
 	LineTargets targets;
@@ -701,7 +703,7 @@ public class WaypointOverlay extends Overlay
 		boolean wayIn = isWayInClicked(event);
 		TileObject clicked = Stream.concat(pathObjects.keySet().stream(), wayIn ? guide.getHighlightObjects().stream() : Stream.empty())
 			.filter(object -> object.getId() == event.getId()).findFirst().orElse(null);
-		if (clicked == null || view == null)
+		if (clicked == null || view == null || !wayIn && opensInPlace(view, clicked))
 		{
 			return;
 		}
@@ -716,8 +718,18 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/**
-	 * Clicked from afar, the object is run to first, the line still leading there (an Abyss obstacle's own spot, a door
-	 * across the room); the crossing starts on arriving beside it. Given up after a while.
+	 * A door opened leaves the player where they stand, so it is no crossing: the line keeps following its goal (an NPC
+	 * walking about behind the door).
+	 */
+	private boolean opensInPlace(WorldView view, TileObject clicked)
+	{
+		WalkData data = routes.getWalk();
+		return doors.opensInPlace(data == null || view.isInstance() ? null : data.getTable(), clicked);
+	}
+
+	/**
+	 * Clicked from afar, the object is run to first, the line still leading there (an Abyss obstacle's own spot, a
+	 * shortcut across the room); the crossing starts on arriving beside it. Given up after a while.
 	 */
 	private void startCrossingOnArrival(WorldView view)
 	{
