@@ -27,10 +27,12 @@ import net.runelite.client.callback.ClientThread;
 @Singleton
 public class RoutePlanner
 {
-	static final int COMMIT_MARGIN_TICKS = 5;
+	/** Once acted on, the followed route gives way only to one that saves a quarter of its time left, and at least this. */
+	private static final int MIN_SWITCH_TICKS = 2;
+	private static final int SWITCH_SHARE = 4;
 	/** A Spellbook Swap's free cast stays pending this long after varbit 3617 turns 1. */
 	private static final int SWAP_WINDOW_TICKS = 200;
-	private static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
+	private static final int TARGET_WALK_BUCKET_TILES = 10;
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
 	private static final int POCKET_TILES = 3;
@@ -89,6 +91,14 @@ public class RoutePlanner
 	String committedStep;
 	/** The step's targets when it was committed: a hot/cold step keeps its key while its target moves. */
 	List<WorldPoint> committedTargets = List.of();
+	/**
+	 * The player walked along the committed route, took its first teleport or withdrew its items: from then on it is kept
+	 * until it breaks or a route saves enough of its time. Until then a better route replaces it freely.
+	 */
+	boolean acted;
+	/** Where the committed route was planned from and what the player carried then, to tell when they act on it. */
+	WorldPoint committedFrom;
+	PlayerSnapshot committedWith;
 	/** The committed walk was kept once although the last plan didn't offer it. */
 	boolean walkHeld;
 	final Set<String> refusedChanges = new HashSet<>();
@@ -135,6 +145,9 @@ public class RoutePlanner
 		committed = null;
 		committedStep = null;
 		committedTargets = List.of();
+		acted = false;
+		committedFrom = null;
+		committedWith = null;
 		walkHeld = false;
 		lastTrigger = null;
 		lastTile = null;
@@ -259,6 +272,8 @@ public class RoutePlanner
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, required);
 		Route followed = followed(step);
+		acted = acted || followed != null && isActedOn(followed, snapshot);
+		followed = acted ? followed : null;
 		PlanInput followingInput = followed == null ? input
 			: input.toBuilder().followedFirstTransport(followed.getFirstTransportKey()).followedIdentity(followed.getIdentity()).build();
 		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
@@ -501,6 +516,11 @@ public class RoutePlanner
 	{
 		plan = planned;
 		committed = commit(planned, input.getStep().getTargets());
+		if (!acted)
+		{
+			committedFrom = input.getStart().getTile();
+			committedWith = input.getPlayer();
+		}
 		committedStep = planned.getStepKey();
 		committedTargets = input.getStep().getTargets();
 		if (!ahead)
@@ -518,6 +538,11 @@ public class RoutePlanner
 		if (best == null || current == null || !sameGoal)
 		{
 			walkHeld = false;
+			acted = acted && sameGoal;
+			return best;
+		}
+		if (!acted)
+		{
 			return best;
 		}
 		Route same = offered(planned, current.getIdentity());
@@ -526,11 +551,48 @@ public class RoutePlanner
 			return holdBlockedWalk(current, best);
 		}
 		walkHeld = false;
-		if (best.getTicks() <= same.getTicks() - COMMIT_MARGIN_TICKS || landsWhereItStarts(same))
+		if (savesEnough(same.getTicks(), best.getTicks()) || landsWhereItStarts(same))
 		{
 			return best;
 		}
 		return same;
+	}
+
+	static boolean savesEnough(int followedTicks, int bestTicks)
+	{
+		int saved = followedTicks - bestTicks;
+		return saved >= MIN_SWITCH_TICKS && saved * SWITCH_SHARE >= followedTicks;
+	}
+
+	/** The search limit for the followed route: past it, the best route saves enough of its time to replace it. */
+	static int keptUpToHalfTicks(int bestHalfTicks)
+	{
+		return Math.max(bestHalfTicks + 2 * MIN_SWITCH_TICKS, bestHalfTicks * SWITCH_SHARE / (SWITCH_SHARE - 1));
+	}
+
+	/**
+	 * The player walked off where the route was planned from toward the end of its first leg, landed from its first
+	 * teleport, or carries more of an item its bank stop withdraws.
+	 */
+	private boolean isActedOn(Route route, PlayerSnapshot now)
+	{
+		PlanStart from = start;
+		WorldPoint at = from == null ? null : from.getTile();
+		return at != null && (walkedAlong(route, at) || landsWhereItStarts(route)) || withdrewFor(route, now);
+	}
+
+	private boolean walkedAlong(Route route, WorldPoint at)
+	{
+		Leg first = route.getLegs().isEmpty() ? null : route.getLegs().get(0);
+		WorldPoint end = first == null || first.getKind() != Leg.Kind.WALK ? null : first.getTo();
+		return end != null && committedFrom != null && !at.equals(committedFrom)
+			&& at.distanceTo2D(end) < committedFrom.distanceTo2D(end);
+	}
+
+	private boolean withdrewFor(Route route, PlayerSnapshot now)
+	{
+		PlayerSnapshot before = committedWith;
+		return before != null && route.getWithdraw().stream().anyMatch(use -> now.carried(use.getItemId()) > before.carried(use.getItemId()));
 	}
 
 	/**

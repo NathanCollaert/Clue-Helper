@@ -205,7 +205,7 @@ public final class Planner
 		{
 			return null;
 		}
-		int limit = bestGoal.rank + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
+		int limit = RoutePlanner.keptUpToHalfTicks(bestGoal.rank);
 		LabelSearch search = searches.followed(orders, in.getFollowedFirstTransport(), identity, limit);
 		return search == null ? null : RouteBuilder.build(searches.ctx, search.goal);
 	}
