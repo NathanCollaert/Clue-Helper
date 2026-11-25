@@ -349,33 +349,33 @@ public class MenuLines
 		if (row >= 0)
 		{
 			colour(entries[row]);
-		}
-		String destination = target.destination();
-		for (MenuEntry entry : entries)
-		{
-			Menu sub = entry.getSubMenu();
-			if (sub == null || destination == null || !isOptionOnTarget(entry, target))
-			{
-				continue;
-			}
-			MenuEntry[] options = sub.getMenuEntries();
-			boolean exact = Arrays.stream(options).anyMatch(option -> namesExactly(option.getOption(), destination));
-			boolean named = false;
-			for (MenuEntry option : options)
-			{
-				if (exact ? namesExactly(option.getOption(), destination) : shows(option.getOption(), destination))
-				{
-					colour(option);
-					named = true;
-				}
-			}
-			int line = MenuLabels.hotkeyIndex(destination);
-			if (!named && line >= 0 && line < options.length)
-			{
-				colour(options[options.length - 1 - line]);
-			}
+			colourSubMenuLine(entries[row].getSubMenu(), target.destination());
 		}
 		target.getAlternatives().forEach(alternative -> colourMenu(alternative, true));
+	}
+
+	/** Only the topmost line naming the destination, else the one its hotkey picks. */
+	private void colourSubMenuLine(Menu sub, String destination)
+	{
+		if (sub == null || destination == null)
+		{
+			return;
+		}
+		MenuEntry[] options = sub.getMenuEntries();
+		boolean exact = Arrays.stream(options).anyMatch(option -> namesExactly(option.getOption(), destination));
+		for (int i = options.length - 1; i >= 0; i--)
+		{
+			if (exact ? namesExactly(options[i].getOption(), destination) : shows(options[i].getOption(), destination))
+			{
+				colour(options[i]);
+				return;
+			}
+		}
+		int line = MenuLabels.hotkeyIndex(destination);
+		if (line >= 0 && line < options.length)
+		{
+			colour(options[options.length - 1 - line]);
+		}
 	}
 
 	/** Coloured, unless it carries its own colour: then it is boxed. */
@@ -867,7 +867,7 @@ public class MenuLines
 			return true;
 		}
 		Widget widget = entry.getWidget();
-		if (widget != null && (target.getItemIds().contains(widget.getItemId()) || target.getWidgetIds().contains(widget.getId())))
+		if (widget != null && (target.getItemIds().contains(LeftClicks.itemOn(widget)) || target.getWidgetIds().contains(widget.getId())))
 		{
 			return true;
 		}

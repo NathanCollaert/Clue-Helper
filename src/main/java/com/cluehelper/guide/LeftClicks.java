@@ -261,6 +261,12 @@ public final class LeftClicks
 		return OBJECT_OPTIONS.contains(entry.getType()) ? OBJECT + shown(entry.getIdentifier()).getId() : null;
 	}
 
+	/** The item a menu entry's widget shows; a worn slot holds it on a child. */
+	static int itemOn(Widget widget)
+	{
+		return WidgetUtil.componentToInterface(widget.getId()) == InterfaceID.WORNITEMS ? slotItem(widget) : widget.getItemId();
+	}
+
 	private static int slotItem(Widget slot)
 	{
 		if (slot.getItemId() > 0)
