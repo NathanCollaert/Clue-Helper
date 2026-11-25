@@ -50,7 +50,7 @@ public class ConventionsTest
 		"avoidWilderness", "stopWildernessClues", "scrollBookOutOfWilderness",
 		"highlightItems", "withdrawTab", "highlightSpells", "highlightMenus",
 		"pathLine", "guideBox", "showNextStep",
-		"spellbookChanges", "useBank", "threeStepSwaps", "threeStepKeep"));
+		"spellbookChanges", "useBank", "saveConsumables", "threeStepSwaps", "threeStepKeep"));
 
 	private static final Set<String> PLAIN_CONFIG_TYPES = new TreeSet<>(Arrays.asList("int", "boolean", "String", "double", "long"));
 
@@ -138,7 +138,7 @@ public class ConventionsTest
 			assertTrue(type + " is declared 'public enum'", Files.readString(source).contains("public enum " + type));
 			enums++;
 		}
-		assertEquals("avoidWilderness, spellbookChanges, guideBox and threeStepKeep", 4, enums);
+		assertEquals("avoidWilderness, saveConsumables, spellbookChanges, guideBox and threeStepKeep", 5, enums);
 	}
 
 	@Test

@@ -19,6 +19,9 @@ public class Outcome
 	/** The tick counts in a route line: {@code 20t}, {@code (rank 21)}, {@code walk 14}, {@code walk south 3}. */
 	private static final Pattern TICKS = Pattern.compile("\\b\\d+t\\b|(?<=\\(rank )\\d+(?=\\))|(?<=walk )\\d+|(?<=walk south )\\d+");
 
+	/** A route line's ranking note, which only says how rank and ticks differ, so its showing up is no route change. */
+	private static final Pattern RANK_NOTE = Pattern.compile(" \\(rank \\d+\\)");
+
 	List<String> route;
 	List<String> guide;
 	/** Per guide line, what it outlines and clicks; null in a recording made before these were kept. */
@@ -126,6 +129,6 @@ public class Outcome
 
 	private static List<String> withoutTicks(List<String> lines)
 	{
-		return lines.stream().map(line -> TICKS.matcher(line).replaceAll("#")).collect(Collectors.toList());
+		return lines.stream().map(line -> TICKS.matcher(RANK_NOTE.matcher(line).replaceAll("")).replaceAll("#")).collect(Collectors.toList());
 	}
 }

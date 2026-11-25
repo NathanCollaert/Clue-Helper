@@ -1,10 +1,12 @@
 package com.cluehelper.route;
 
 import com.cluehelper.player.*;
+import com.cluehelper.route.PlanContext.PlanResources;
 import com.cluehelper.transport.*;
 import java.util.*;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import net.runelite.api.gameval.ItemID;
 
 /** The teleports and spellbook changes available on one side of the bank stop, placed by where each is used from. */
 @FieldDefaults(level = AccessLevel.PACKAGE)
@@ -27,6 +29,8 @@ final class TransportOptions
 		int[] amounts;
 		int[] withdraw;
 		List<ItemUse> withdrawUses;
+		/** Ranking only: what the edge uses up, weighed by the Save consumables setting. */
+		int priceHalfTicks;
 	}
 
 	@FieldDefaults(level = AccessLevel.PACKAGE)
@@ -42,7 +46,6 @@ final class TransportOptions
 	static final class Change extends Edge
 	{
 		SpellbookChange change;
-		boolean capeUse;
 	}
 
 	final List<Teleport> teleports = new ArrayList<>();
@@ -202,7 +205,7 @@ final class TransportOptions
 		tele.book = row.getRequirements().getBook();
 		tele.minigame = row.getCategory() == Category.MINIGAME;
 		tele.maxWilderness = row.getRequirements().getMaxWildernessLevel();
-		spending(tele, row.getSpends(), judged, player, bankState);
+		spending(tele, row.getSpends(), judged, row.getCategory(), player, bankState);
 		return tele;
 	}
 
@@ -211,15 +214,18 @@ final class TransportOptions
 		Change c = new Change();
 		c.change = change;
 		c.halfTicks = change.isTemporary() ? 2 * (SWAP_DURATION_TICKS + SWAP_MENU_TICKS) : 2 * (change.getDuration() + change.getMenuTicks());
-		c.capeUse = change.getSpends().stream().anyMatch(s -> s.getKind() == Spend.Kind.CAPE_USE);
-		spending(c, change.getSpends(), judged, player, bankState);
+		boolean capeUse = change.getSpends().stream().anyMatch(s -> s.getKind() == Spend.Kind.CAPE_USE);
+		spending(c, change.getSpends(), judged, capeUse ? Category.CAPE : Category.SPELL, player, bankState);
 		return c;
 	}
 
-	private void spending(Edge edge, List<Spend> spends, RowAvailability judged, PlayerSnapshot player, int bankState)
+	private void spending(Edge edge, List<Spend> spends, RowAvailability judged, Category category, PlayerSnapshot player, int bankState)
 	{
 		List<ItemUse> witness = judged.getWitness();
 		Map<Integer, Integer> units = new LinkedHashMap<>();
+		PlayerSnapshot owner = ctx.owner();
+		List<Integer> usesLeft = new ArrayList<>();
+		boolean usesUp = false;
 		for (Spend spend : spends)
 		{
 			switch (spend.getKind())
@@ -232,6 +238,10 @@ final class TransportOptions
 						{
 							int r = ctx.resources.item(use.getItemId(), player, bankState);
 							units.merge(r, use.getQuantity(), Integer::sum);
+							if (use.getItemId() != ItemID.COINS)
+							{
+								usesLeft.add(PlanResources.owned(owner, use.getItemId()) / use.getQuantity());
+							}
 						}
 					}
 					break;
@@ -239,27 +249,46 @@ final class TransportOptions
 					for (ItemUse use : witness)
 					{
 						units.merge(ctx.resources.charge(use.getItemId(), player, bankState), 1, Integer::sum);
+						usesLeft.add(familyChargesLeft(owner, judged.getRow().getRequirements(), use.getItemId()));
 					}
 					break;
 				case COOLDOWN:
 					units.merge(ctx.resources.once("cooldown:" + spend.getVar(), bankState), 1, Integer::sum);
+					usesUp = true;
 					break;
 				case DAILY:
 					units.merge(ctx.resources.once("daily:" + spend.getVar(), bankState), 1, Integer::sum);
+					usesUp = true;
 					break;
 				case CAPE_USE:
 					SpellbookState state = player.getSpellbook();
-					units.merge(ctx.resources.capeUses(state == null ? 0 : state.getCapeChangesLeft(), bankState), 1, Integer::sum);
+					int changesLeft = state == null ? 0 : state.getCapeChangesLeft();
+					units.merge(ctx.resources.capeUses(changesLeft, bankState), 1, Integer::sum);
+					usesLeft.add(changesLeft);
 					break;
 				default:
 					throw new IllegalArgumentException("unhandled spend " + spend.getKind());
 			}
 		}
 		units.forEach(ctx.resources::used);
+		edge.priceHalfTicks = ctx.priceHalfTicks(category, usesUp, usesLeft);
 		edge.res = units.keySet().stream().mapToInt(Integer::intValue).toArray();
 		edge.amounts = units.values().stream().mapToInt(Integer::intValue).toArray();
 		edge.withdrawUses = withdrawUses(witness);
 		edge.withdraw = ids(edge.withdrawUses);
+	}
+
+	/** Charges left over the items the row takes in each other's place, so a part-used one isn't saved for last. */
+	private static int familyChargesLeft(PlayerSnapshot owner, Requirements requirements, int itemId)
+	{
+		return requirements.getItems().stream()
+			.filter(clause -> clause.ids().anyMatch(id -> id == itemId))
+			.findFirst()
+			.map(clause -> clause.ids().distinct()
+				.filter(id -> owner.carried(id) + owner.stored(id) > 0)
+				.mapToInt(id -> PlanResources.chargesLeft(owner, id))
+				.sum())
+			.orElseGet(() -> PlanResources.chargesLeft(owner, itemId));
 	}
 
 	private static int houseWalkHalfTicks(Requirements requirements, PlayerSnapshot player)

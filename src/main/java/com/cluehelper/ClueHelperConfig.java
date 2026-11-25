@@ -84,6 +84,18 @@ public interface ClueHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "saveConsumables",
+		name = "Save consumables",
+		description = "Weigh what a teleport uses up against its speed",
+		section = routesSection,
+		position = 4
+	)
+	default SaveConsumables saveConsumables()
+	{
+		return SaveConsumables.FLAT_FEE;
+	}
+
+	@ConfigItem(
 		keyName = "spellbookChanges",
 		name = "Spellbook changes",
 		description = "Spellbook Swap only never leaves you on another book",

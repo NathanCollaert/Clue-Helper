@@ -4,6 +4,7 @@ import com.cluehelper.memory.StashMemory;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import com.cluehelper.SaveConsumables;
 import com.cluehelper.SpellbookChanges;
 import com.cluehelper.player.Book;
 import com.cluehelper.player.Charge;
@@ -155,7 +156,7 @@ public class EdgeCaseRoutesTest
 	@Test
 	public void followedRouteWithoutTheBankIsKeptWithinTheMargin()
 	{
-		PlannerSettings bankOn = PlannerSettings.builder().bankEdge(true).build();
+		PlannerSettings bankOn = PlannerSettings.builder().bankEdge(true).saveConsumables(SaveConsumables.OFF).build();
 		PlayerSnapshot mid = ready(Loadouts.load("mid-ironman").getCarried());
 		Step digsite = step("cryptic:search the bush at the digsite centre.");
 		Route plain = Planner.plan(input(mid, digsite, PlanStart.teleportOnly(ANYWHERE), bankOn).build()).getBest();
@@ -184,6 +185,15 @@ public class EdgeCaseRoutesTest
 			itemId("AMULET_OF_GLORY_1"), new Charge(1))).build();
 		lines.add(line("consumption: glory(1) carried, bank on with glory(1), to Draynor",
 			checked(input(glory1, draynor, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(glory1).build())));
+		Map<Integer, Integer> lastGlory = new HashMap<>(maxed.getInventory());
+		lastGlory.remove(Loadouts.itemId("Amulet of glory"));
+		lastGlory.put(itemId("AMULET_OF_GLORY_1"), 1);
+		PlayerSnapshot maxedLastGlory = maxed.toBuilder().inventory(lastGlory).charges(Map.of(itemId("AMULET_OF_GLORY_1"), new Charge(1))).build();
+		for (SaveConsumables save : List.of(SaveConsumables.FLAT_FEE, SaveConsumables.SCARCITY))
+		{
+			lines.add(line(save + ": maxed with a glory's last charge, to Edgeville",
+				checked(input(maxedLastGlory, edgeville, PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().saveConsumables(save).build()).build())));
+		}
 		PlayerSnapshot minigames = mid.toBuilder().inventory(Map.of()).build();
 		lines.add(line("consumption: minigame teleports only, bank on, to Varrock bank crates",
 			checked(input(minigames, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn).banked(withBank(minigames, Map.of(
@@ -203,6 +213,9 @@ public class EdgeCaseRoutesTest
 			checked(input(pending, senntisten, PlanStart.teleportOnly(ANYWHERE), plain).revertTicksLeft(150).build())));
 		lines.add(line("99 Magic, no cape uses left today, Ancient target",
 			checked(input(capeUsesLeft(maxed, 0), senntisten, PlanStart.teleportOnly(ANYWHERE), plain).build())));
+		lines.add(line("flat fee, Max cape and house runes carried: the cape's free Tele to POH, not the spell",
+			checked(input(capeUsesLeft(maxed, 0), senntisten, PlanStart.teleportOnly(ANYWHERE),
+				plain.toBuilder().saveConsumables(SaveConsumables.FLAT_FEE).build()).build())));
 		PlayerSnapshot noSwapRunes = withoutSwapRunes(lunarMaxed);
 		lines.add(line("Lunar, swap runes only in the bank (bank on)",
 			checked(input(noSwapRunes, varrock, PlanStart.teleportOnly(ANYWHERE), bankOn)
@@ -395,6 +408,10 @@ public class EdgeCaseRoutesTest
 		PlayerSnapshot twoPassages = noPassage.toBuilder().charges(passageCharges).build();
 		lines.add(line("partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
 			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE), plain.toBuilder().bankEdge(true).build())
+				.banked(withBank(twoPassages, Map.of(ItemID.NECKLACE_OF_PASSAGE_5, 1, ItemID.NECKLACE_OF_PASSAGE_2, 1))).build())));
+		lines.add(line("partial charges first on Scarcity too: passage(5) and passage(2) banked, coordinate 2807 by the Outpost",
+			checked(input(twoPassages, step("coordinate:2807"), PlanStart.teleportOnly(ANYWHERE),
+				plain.toBuilder().bankEdge(true).saveConsumables(SaveConsumables.SCARCITY).build())
 				.banked(withBank(twoPassages, Map.of(ItemID.NECKLACE_OF_PASSAGE_5, 1, ItemID.NECKLACE_OF_PASSAGE_2, 1))).build())));
 		lines.add(line("pharaoh's sceptre: carried, maxed, yawn in the 7th room of Pyramid Plunder",
 			checked(input(alsoCarrying(maxed, ItemID.PHARAOHS_SCEPTRE_CHARGED), step("emote:yawn in the 7th room of pyramid plunder. "

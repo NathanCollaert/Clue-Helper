@@ -63,6 +63,7 @@ Something else wrong? [Open an issue](https://github.com/NathanCollaert/Clue-Hel
 | Stop Wilderness clues | Show a red warning instead of guiding into the Wilderness | Off |
 | Bank the scroll book | Bank the master scroll book before a teleport into the Wilderness | On |
 | Use the bank | Count banked teleports and items, and GIM group storage | On |
+| Save consumables | Weigh what a teleport uses up against its speed | Flat fee |
 | Spellbook changes | Which spellbook changes routes may use | All |
 | Highlight items / spells / menu lines | What gets highlighted for the current action | On |
 | Withdraw tab | Open a bank tab with only the items to withdraw (uses Bank Tags) | On |

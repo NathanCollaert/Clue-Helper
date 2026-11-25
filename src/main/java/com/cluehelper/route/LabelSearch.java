@@ -48,10 +48,13 @@ final class LabelSearch
 	final LowerBound[] bounds;
 	final boolean[][] targets;
 	/**
-	 * At an equal rank the label with more real time carries fewer ranking-only penalties (teleport ties, bank margins), so
-	 * it goes first: an exact tie goes the way those penalties prefer, a walk over two teleports a tick each faster.
+	 * An exact tie goes to the route that uses nothing up, then to the one without a bank stop; both only grow along a
+	 * route, so a partial route that would win the tie is expanded first. After that the label with more real time carries
+	 * fewer ranking-only penalties (teleport ties, bank margins): a walk over two teleports a tick each faster.
 	 */
-	final PriorityQueue<Label> queue = new PriorityQueue<>((a, b) -> a.f != b.f ? a.f - b.f : b.half - a.half);
+	static final Comparator<Label> TIE_ORDER = Comparator.<Label>comparingInt(label -> label.fee).thenComparingInt(label -> label.b);
+	final PriorityQueue<Label> queue = new PriorityQueue<>(Comparator.<Label>comparingInt(label -> label.f).thenComparing(TIE_ORDER)
+		.thenComparing(Comparator.<Label>comparingInt(label -> label.half).reversed()));
 
 	@PackagePrivate
 	Label goal;
@@ -242,6 +245,7 @@ final class LabelSearch
 		goal.half = from.half + area;
 		goal.rank = from.rank + area + strand;
 		goal.choicePenalty = from.choicePenalty;
+		goal.fee = from.fee;
 		goal.spent = from.spent;
 		goal.withdrawn = withdrawn;
 		goal.endBook = end;
@@ -495,6 +499,14 @@ final class LabelSearch
 		}
 	}
 
+	private static void charge(Label label, int priceHalfTicks)
+	{
+		if (label != null)
+		{
+			label.fee += priceHalfTicks;
+		}
+	}
+
 	private void transport(Label from, int node, int k, int half, Leg.Kind kind, TransportOptions.Teleport tele,
 		TransportOptions.Edge second)
 	{
@@ -520,8 +532,11 @@ final class LabelSearch
 		{
 			int total = half + withdrawHalfTicks(from, withdrawn);
 			int choice = kind == Leg.Kind.SWAP_TELEPORT ? CHANGE_TIE_HALF_TICKS : 0;
-			penalise(offer(from, node, from.b, k, t, from.leg, total, total + PlanContext.TELEPORT_TIE_HALF_TICKS + choice, kind, tele, second,
-				spent, withdrawn), choice);
+			int price = tele.priceHalfTicks + (second == null ? 0 : second.priceHalfTicks);
+			Label label = offer(from, node, from.b, k, t, from.leg, total, total + PlanContext.TELEPORT_TIE_HALF_TICKS + choice + price, kind,
+				tele, second, spent, withdrawn);
+			penalise(label, choice);
+			charge(label, price);
 		}
 	}
 
@@ -532,9 +547,11 @@ final class LabelSearch
 		if (spent != null && !pointlessAfterBank(from, withdrawn))
 		{
 			int total = change.halfTicks + withdrawHalfTicks(from, withdrawn);
-			int penalty = (change.capeUse ? PlanContext.CAPE_USE_PENALTY_HALF_TICKS : 0) + choiceHalfTicks;
-			penalise(offer(from, node, from.b, k, from.t, from.leg, total, total + penalty, Leg.Kind.SPELLBOOK_CHANGE,
-				change, null, spent, withdrawn), choiceHalfTicks);
+			int penalty = change.priceHalfTicks + choiceHalfTicks;
+			Label label = offer(from, node, from.b, k, from.t, from.leg, total, total + penalty, Leg.Kind.SPELLBOOK_CHANGE,
+				change, null, spent, withdrawn);
+			penalise(label, choiceHalfTicks);
+			charge(label, change.priceHalfTicks);
 		}
 	}
 
@@ -676,6 +693,7 @@ final class LabelSearch
 		label.withdrawn = withdrawn;
 		label.parent = from;
 		label.choicePenalty = from == null ? 0 : from.choicePenalty;
+		label.fee = from == null ? 0 : from.fee;
 		label.kind = kind;
 		label.ref = ref;
 		label.ref2 = ref2;
@@ -841,6 +859,8 @@ final class LabelSearch
 		int f;
 		/** The rank so far that only chooses between routes: margins on bank stops and walked changes, change tie-breaks. */
 		int choicePenalty;
+		/** The rank so far for what the route uses up: the Save consumables setting's fees. */
+		int fee;
 		int[] spent;
 		/** Sorted; each id is charged its withdraw ticks once. */
 		int[] withdrawn = NOTHING;

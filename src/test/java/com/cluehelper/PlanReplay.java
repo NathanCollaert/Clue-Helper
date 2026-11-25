@@ -12,6 +12,7 @@ import com.cluehelper.route.NoTeleportAreas;
 import com.cluehelper.route.Plan;
 import com.cluehelper.route.PlanInput;
 import com.cluehelper.route.PlanRecording;
+import com.cluehelper.route.PlannerSettings;
 import com.cluehelper.route.PlanStart;
 import com.cluehelper.route.Planner;
 import com.cluehelper.route.RequiredItems;
@@ -105,7 +106,7 @@ public final class PlanReplay
 			.table(table)
 			.noTeleport(noTeleport)
 			.start(start(recording, folder))
-			.settings(recording.getSettings())
+			.settings(recorded(recording.getSettings()))
 			.revertTicksLeft(recording.getRevertTicksLeft())
 			.refusedChanges(recording.getRefusedChanges())
 			.foreignHouseStart(recording.isForeignHouseStart())
@@ -227,6 +228,12 @@ public final class PlanReplay
 	private static WorldPoint point(int[] xyz)
 	{
 		return new WorldPoint(xyz[0], xyz[1], xyz[2]);
+	}
+
+	/** Recordings made before the Save consumables setting replay on its default, Flat fee. */
+	public static PlannerSettings recorded(PlannerSettings settings)
+	{
+		return settings.getSaveConsumables() != null ? settings : settings.toBuilder().saveConsumables(SaveConsumables.FLAT_FEE).build();
 	}
 
 	/** A recorded need: any one of the owned items that counted for it. */

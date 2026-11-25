@@ -250,3 +250,32 @@ allotment patches	Prifddinas	3291	6100	0	VarbitID.FARMING_TRANSMIT_A=4771	Varbit
 allotment patches	Civitas illa Fortis	1586	3099	0	VarbitID.FARMING_TRANSMIT_A=4771	VarbitID.FARMING_TRANSMIT_B=4772
 # allotment form: an allotment patch; every allotment shows the same form for a varbit value.
 allotment form	any	ObjectID.FARMING_VEG_PATCH_3=8552
+# use-up fees: half-ticks a route's ranking adds for a transport of the category that uses up anything (runes, an item, a
+# charge, a daily or cooldown use; coins paid as a fare are free). Every category has a row.
+use-up fees	SPELL	3
+use-up fees	HOME	3
+use-up fees	MINIGAME	3
+use-up fees	FAIRY_RING	0
+use-up fees	TABLET	6
+use-up fees	SCROLL	12
+use-up fees	JEWELLERY	3
+use-up fees	DIARY	6
+use-up fees	CAPE	6
+use-up fees	ITEM	6
+use-up fees	NEXUS	0
+use-up fees	JEWELLERY_BOX	0
+use-up fees	MOUNTED	0
+use-up fees	PORTAL	0
+use-up fees	OBELISK	0
+use-up fees	SPIRIT_TREE	0
+use-up fees	QUETZAL	0
+use-up fees	BOAT	3
+use-up fees	CHARTER	3
+use-up fees	CANOE	0
+use-up fees	CARPET	3
+use-up fees	MINECART	3
+use-up fees	LEVER	0
+use-up fees	GLIDER	0
+use-up fees	BALLOON	3
+use-up fees	MUSHTREE	0
+use-up fees	WILDERNESS_OBELISK	0

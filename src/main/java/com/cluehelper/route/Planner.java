@@ -469,7 +469,7 @@ public final class Planner
 			for (List<int[]> order : orders)
 			{
 				LabelSearch search = run(order, Math.min(rankLimit, rankOf(best)));
-				if (best == null || rankOf(search) < rankOf(best))
+				if (best == null || beats(search, best))
 				{
 					best = search;
 				}
@@ -485,12 +485,22 @@ public final class Planner
 			{
 				LabelSearch search = run(new LabelSearch(ctx, order, area, first,
 					goal -> identity.equals(RouteBuilder.build(ctx, goal).getIdentity()), rankLimit));
-				if (search.goal != null && rankOf(search) < rankOf(best))
+				if (search.goal != null && beats(search, best))
 				{
 					best = search;
 				}
 			}
 			return best;
+		}
+
+		/** A lower rank, or at the same rank the better tie: nothing used up, then no bank stop. */
+		private static boolean beats(LabelSearch search, LabelSearch best)
+		{
+			if (search.goal == null || best == null || best.goal == null || search.goal.rank != best.goal.rank)
+			{
+				return rankOf(search) < rankOf(best);
+			}
+			return LabelSearch.TIE_ORDER.compare(search.goal, best.goal) < 0;
 		}
 
 		private static int rankOf(LabelSearch search)

@@ -1,6 +1,6 @@
 package com.cluehelper.route;
 
-import com.cluehelper.SpellbookChanges;
+import com.cluehelper.*;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
@@ -22,13 +22,15 @@ final class PlanContext
 	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
 	private static final int PIN_HALF_TICKS = 8;
-	/** Ranking only: Magic and Max cape changes are limited per day. */
-	static final int CAPE_USE_PENALTY_HALF_TICKS = 6;
 	/**
 	 * Ranking only, per teleport or fairy ring: routes about a tick apart go the way with fewer teleports, the same way each
 	 * time.
 	 */
 	static final int TELEPORT_TIE_HALF_TICKS = 2;
+	/** Ranking only, in half-ticks: what using something up on a transport of each category weighs. */
+	private static final Map<Category, Integer> USE_UP_FEES = Tables.byKey("use-up fees", Category::valueOf, row -> row.id(0));
+	/** Ranking only, on Scarcity: an item's or charge's last use; the second last weighs half of it, and so on. */
+	static final int LAST_USE_HALF_TICKS = 60;
 	/** Ranking only: the route leaves you on another book with no way back left today. */
 	private static final int STRAND_PENALTY_HALF_TICKS = 60;
 	/** One more click when the withdraw list needs more slots than are free. */
@@ -422,6 +424,28 @@ final class PlanContext
 		return last != null && landing.getCode() != null && last.equals(landing.getCode().replace("-", ""));
 	}
 
+	/**
+	 * Ranking only: its category's fee for a transport that uses anything up, so a free one about as fast wins; on Scarcity
+	 * also more the fewer uses of an item or charge are left, so a last tablet only goes where it saves real time.
+	 */
+	int priceHalfTicks(Category category, boolean usesUp, List<Integer> usesLeft)
+	{
+		SaveConsumables save = in.getSettings().getSaveConsumables();
+		if (save == SaveConsumables.OFF || !usesUp && usesLeft.isEmpty())
+		{
+			return 0;
+		}
+		int scarcity = save != SaveConsumables.SCARCITY ? 0
+			: usesLeft.stream().mapToInt(left -> LAST_USE_HALF_TICKS / Math.max(1, left)).sum();
+		return USE_UP_FEES.get(category) + scarcity;
+	}
+
+	/** What the player owns, carried and, when the bank counts, banked. */
+	PlayerSnapshot owner()
+	{
+		return in.getBanked() != null ? in.getBanked() : in.getPlayer();
+	}
+
 	int strandHalfTicks(Book book, int bankState, int capeUsesSpent)
 	{
 		if (book == homeBook)
@@ -433,7 +457,7 @@ final class PlanContext
 		int usesLeft = state == null ? 0 : state.getCapeChangesLeft();
 		if (cape != null && capeUsesSpent + 1 <= usesLeft)
 		{
-			return cape.halfTicks + CAPE_USE_PENALTY_HALF_TICKS;
+			return cape.halfTicks + cape.priceHalfTicks;
 		}
 		return STRAND_PENALTY_HALF_TICKS;
 	}
@@ -522,20 +546,30 @@ final class PlanContext
 
 		int item(int itemId, PlayerSnapshot player, int bankState)
 		{
+			return set("item:" + itemId, bankState, owned(player, itemId));
+		}
+
+		int charge(int itemId, PlayerSnapshot player, int bankState)
+		{
+			return set("charge:" + itemId, bankState, chargesLeft(player, itemId));
+		}
+
+		static int owned(PlayerSnapshot player, int itemId)
+		{
 			int have = 0;
 			for (Container container : Container.values())
 			{
 				have += player.count(container, itemId);
 			}
-			return set("item:" + itemId, bankState, have);
+			return have;
 		}
 
-		int charge(int itemId, PlayerSnapshot player, int bankState)
+		static int chargesLeft(PlayerSnapshot player, int itemId)
 		{
 			Charge charge = player.getCharges().get(itemId);
 			int perItem = charge == null ? 1 : Math.max(0, charge.getCharges());
 			int held = player.carried(itemId) + player.stored(itemId);
-			return set("charge:" + itemId, bankState, Math.max(1, held) * perItem);
+			return Math.max(1, held) * perItem;
 		}
 
 		int once(String key, int bankState)
