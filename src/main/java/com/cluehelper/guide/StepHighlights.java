@@ -27,7 +27,7 @@ final class StepHighlights
 	private static final String REMOVE_OPTION = "Remove";
 	static final String OPEN_OPTION = "Open";
 	private static final String USE_OPTION = "Use";
-	private static final String BANK_OPTION = "Bank";
+	static final String BANK_OPTION = "Bank";
 	private static final String CAST_OPTION = "Cast";
 	private static final String CLOSE_OPTION = "Close";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Tables.idSet("fairy ring objects");

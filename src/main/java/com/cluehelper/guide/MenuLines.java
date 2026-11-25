@@ -222,7 +222,7 @@ public class MenuLines
 		Found found = lineWidgets(target);
 		for (Widget widget : found.widgets)
 		{
-			boolean boxed = found.mapButtons.contains(widget) || !Widgets.hasTextInside(widget) || hasOwnColourInside(widget);
+			boolean boxed = found.mapButtons.contains(widget) || !Widgets.hasTextInside(widget) || isColouredByEasyTeleports(widget);
 			Rectangle shown = boxed ? Widgets.clipped(widget) : null;
 			if (shown != null && !shown.isEmpty())
 			{
@@ -243,7 +243,7 @@ public class MenuLines
 		if (enabled)
 		{
 			Found found = lineWidgets(target);
-			found.widgets.stream().filter(line -> !found.mapButtons.contains(line) && !hasOwnColourInside(line))
+			found.widgets.stream().filter(line -> !found.mapButtons.contains(line) && !isColouredByEasyTeleports(line))
 				.flatMap(line -> Widgets.descendants(line).stream()).filter(Widgets::hasText).forEach(wanted::add);
 			if (scroll != null)
 			{
@@ -276,9 +276,18 @@ public class MenuLines
 		}
 	}
 
-	private static boolean hasOwnColourInside(Widget line)
+	private boolean isColouredByEasyTeleports(Widget line)
 	{
-		return Widgets.descendants(line).stream().anyMatch(text -> hasOwnColour(text.getText()));
+		return Widgets.descendants(line).stream().anyMatch(text -> isColouredByEasyTeleports(text.getText()));
+	}
+
+	/**
+	 * Easy Teleports colours the names it shows again on every frame, so the guide boxes such a line instead of
+	 * recolouring it. A colour tag on any other line, the game's own included, is recoloured.
+	 */
+	private boolean isColouredByEasyTeleports(String text)
+	{
+		return hasOwnColour(text) && easyTeleportsNames.renamed(text);
 	}
 
 	/** A colour tag other than ours: another plugin's or the game's. */
@@ -301,7 +310,7 @@ public class MenuLines
 		markedOptions.clear();
 	}
 
-	/** The marked options that carry their own colour, boxed where the open menu draws them. */
+	/** The marked options that Easy Teleports colours, boxed where the open menu draws them. */
 	public List<Rectangle> boxedOptions()
 	{
 		if (!client.isMenuOpen())
@@ -314,7 +323,7 @@ public class MenuLines
 		List<Rectangle> out = new ArrayList<>();
 		for (MenuEntry option : markedOptions)
 		{
-			if (!hasOwnColour(option.getOption()))
+			if (!isColouredByEasyTeleports(option.getOption()))
 			{
 				continue;
 			}
@@ -378,11 +387,11 @@ public class MenuLines
 		}
 	}
 
-	/** Coloured, unless it carries its own colour: then it is boxed. */
+	/** Coloured, unless Easy Teleports colours it: then it is boxed. */
 	private void colour(MenuEntry entry)
 	{
 		markedOptions.add(entry);
-		if (hasOwnColour(entry.getOption()))
+		if (isColouredByEasyTeleports(entry.getOption()))
 		{
 			return;
 		}

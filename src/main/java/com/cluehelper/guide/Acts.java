@@ -180,10 +180,18 @@ final class Acts
 			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 
-	/** The box the talk handed over is opened (core solves it), then the NPC is talked to again; {@code act} is the talk, or a new act. */
-	static SubStep openBoxThenTalk(SubStep.SubStepBuilder act, String box, String npc)
+	/**
+	 * The talk that handed over a box while the box is carried: the box to open, nothing to click while it is open (core
+	 * solves it), then the talk again once it is solved.
+	 */
+	static SubStep boxView(SubStep talk, String box, boolean open, boolean solved)
 	{
-		return act.text("Open the " + box + ", then talk to " + npc + " again").actItemNamed(box).build();
+		if (solved)
+		{
+			return talk.toBuilder().text(talk.getText() + " again").build();
+		}
+		return open ? SubStep.of(Kind.ACT, "Solve the " + box).build()
+			: talk.toBuilder().text("Open the " + box).actItemNamed(box).option(null).npcNames(Set.of()).npcIds(Set.of()).build();
 	}
 
 	private static SubStep act(String text, String detail)

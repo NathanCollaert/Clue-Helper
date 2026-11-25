@@ -92,6 +92,13 @@ public final class SceneObjects
 		return view == null ? List.of() : view.npcs().stream().filter(wanted).collect(toList());
 	}
 
+	/** Whether the scene still holds this NPC: one that despawned, or came back into view as a new NPC, is gone. */
+	boolean isLoaded(NPC npc)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		return view != null && view.npcs().byIndex(npc.getIndex()) == npc;
+	}
+
 	private static boolean offers(NPC npc, String option)
 	{
 		NPCComposition composition = npc.getTransformedComposition();

@@ -295,16 +295,10 @@ public final class ActParts
 			.done(SubStep.Done.CHALLENGE_ITEM), npc).build();
 		if (challenge.getBox() != null)
 		{
-			String box = challenge.getBox().toLowerCase().contains("light") ? "light box" : "puzzle box";
-			return List.of(talk, openBoxThenTalk(SubStep.builder().kind(Kind.ACT), box, npc));
+			String box = challenge.getBox().toLowerCase().contains("light") ? "puzzle box or light box" : "puzzle box";
+			return List.of(talk, act("Open the " + box, null));
 		}
 		return List.of(talk, talkTo(act("Talk to " + npc + " again: answer the challenge", null).toBuilder(), npc).build());
-	}
-
-	/** The box the talk handed over is opened (core solves it), then the NPC is talked to again; {@code act} is the talk, or a new act. */
-	static SubStep openBoxThenTalk(SubStep.SubStepBuilder act, String box, String npc)
-	{
-		return act.text("Open the " + box + ", then talk to " + npc + " again").actItemNamed(box).build();
 	}
 
 	private static SubStep.SubStepBuilder talkTo(SubStep.SubStepBuilder act, String npc)

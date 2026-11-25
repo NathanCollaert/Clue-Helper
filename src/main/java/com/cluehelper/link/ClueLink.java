@@ -110,7 +110,22 @@ public class ClueLink
 	{
 		ClueScrollPlugin plugin = core;
 		List<NPC> marked = plugin == null ? null : plugin.getNpcsToMark();
-		return marked != null && marked.contains(npc);
+		return marked != null && marked.contains(npc) && drawsItsNpcsHere(plugin);
+	}
+
+	/**
+	 * An anagram, cipher or music clue draws its NPCs only while its own tile is in the scene: Prospector Percy, whom core
+	 * places on Falador's surface, stands in the Motherlode Mine.
+	 */
+	private boolean drawsItsNpcsHere(ClueScrollPlugin plugin)
+	{
+		ClueScroll clue = coreClue();
+		if (!(clue instanceof AnagramClue || clue instanceof CipherClue || clue instanceof MusicClue))
+		{
+			return true;
+		}
+		WorldPoint tile = ((LocationClueScroll) clue).getLocation(plugin);
+		return tile != null && tile.isInScene(client);
 	}
 
 	public Runnable addListener(StepListener listener)

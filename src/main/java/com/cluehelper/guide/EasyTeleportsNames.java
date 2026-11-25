@@ -51,6 +51,13 @@ public class EasyTeleportsNames
 		return readings(shown, renames());
 	}
 
+	/** Whether the text shows a name from its settings, while it runs with that item turned on. */
+	public boolean renamed(String shown)
+	{
+		String plain = shown == null ? "" : Text.removeTags(shown);
+		return renames().stream().anyMatch(rename -> plain.contains(rename.shown));
+	}
+
 	/** The teleport line with its place as Easy Teleports shows it: "Amulet of glory: Edge". */
 	public SubStep named(SubStep step)
 	{

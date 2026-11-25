@@ -107,7 +107,6 @@ public class StepGuide
 	ClueLink clueLink;
 	final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private static final String TALK_TO = "Talk to ";
-	private static final List<String> BOXES = List.of("puzzle box", "light box");
 	@Inject
 	LeftClicks leftClicks;
 	@Inject
@@ -152,7 +151,7 @@ public class StepGuide
 	Fight fight;
 	boolean onActTile;
 	RingChain ringChain;
-	/** After a talk that hands over a puzzle or light box: open it (core solves it), then talk again. */
+	/** After a talk that hands over a puzzle or light box: open it, solve it, then talk again. */
 	SubStep boxView;
 	/** Ground items to pick up now, by tile. */
 	@Getter
@@ -546,10 +545,27 @@ public class StepGuide
 		}
 		int tick = client.getTickCount();
 		boolean nothingYet = scene.isEmpty() && scene.getEmptySearches() < OBJECT_REFRESH_TICKS;
-		if (scene.getFoundTick() == ActWatcher.NEVER || nothingYet || tick - scene.getFoundTick() >= OBJECT_REFRESH_TICKS)
+		boolean npcGone = scene.getNpcs().stream().anyMatch(npc -> !sceneObjects.isLoaded(npc));
+		if (scene.getFoundTick() == ActWatcher.NEVER || nothingYet || npcGone || tick - scene.getFoundTick() >= OBJECT_REFRESH_TICKS)
 		{
 			scene = searchScene(current, target, bank, tick);
 		}
+		if (bank)
+		{
+			highlights = highlights.toBuilder().optionTarget(bankOptions()).build();
+		}
+	}
+
+	/** The found booths' and bankers' "Bank", and "Use" on a bank chest that has no "Bank". */
+	private MenuTarget bankOptions()
+	{
+		Set<Integer> chests = scene.getObjects().stream().filter(object -> !leftClicks.offers(object, StepHighlights.BANK_OPTION))
+			.map(TileObject::getId).collect(Collectors.toUnmodifiableSet());
+		MenuTarget useOnChests = MenuTarget.builder().path(List.of(Acts.USE_OPTION)).objectIds(chests).build();
+		return MenuTarget.builder().path(List.of(StepHighlights.BANK_OPTION))
+			.objectIds(scene.getObjects().stream().map(TileObject::getId).collect(Collectors.toUnmodifiableSet()))
+			.npcIds(scene.getNpcs().stream().map(NPC::getId).collect(Collectors.toUnmodifiableSet()))
+			.alternatives(List.of(useOnChests)).build();
 	}
 
 	/**
@@ -1594,21 +1610,24 @@ public class StepGuide
 
 	private boolean refreshBox()
 	{
-		SubStep act = listedAt(index);
-		boolean talk = act != null && act.getKind() == Kind.ACT && act.getActItemNamed() == null && routeStep != null
-			&& act.getText().startsWith(TALK_TO)
-			&& routeStep.getNpcs().contains(act.getText().substring(TALK_TO.length()));
-		String box = talk ? carriedBox() : null;
-		String npc = box == null ? null : act.getText().substring(TALK_TO.length());
-		SubStep view = box == null ? null : Acts.openBoxThenTalk(act.toBuilder(), box, npc);
+		SubStep talk = boxTalk();
+		String box = talk == null ? null : actWatcher.getBox();
+		SubStep view = box == null ? null : Acts.boxView(talk, box, actWatcher.isBoxOpen(), actWatcher.isBoxSolved());
 		boolean changed = !Objects.equals(view, boxView);
 		boxView = view;
 		return changed;
 	}
 
-	private String carriedBox()
+	/** The talk to the step's NPC that hands over a box: the act now, or the talk before the act for the box it handed over. */
+	private SubStep boxTalk()
 	{
-		return BOXES.stream().filter(player::carriesItemNamed).findFirst().orElse(null);
+		SubStep act = listedAt(index);
+		SubStep before = index > 0 ? listedAt(index - 1) : null;
+		SubStep talk = before != null && before.getDone() == SubStep.Done.CHALLENGE_ITEM ? before : act;
+		boolean isTalk = talk != null && talk.getKind() == Kind.ACT && talk.getActItemNamed() == null && routeStep != null
+			&& talk.getText().startsWith(TALK_TO)
+			&& routeStep.getNpcs().contains(talk.getText().substring(TALK_TO.length()));
+		return isTalk ? talk : null;
 	}
 
 	/** A gear act listing what to put on or take off now. */
