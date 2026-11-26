@@ -25,7 +25,8 @@ public class ActWatcher
 	/** Uri and the double agents appear beside the player who called them. */
 	private static final int SPAWN_TILES = 5;
 	private static final List<String> BOXES = List.of("puzzle box", "light box");
-	private static final Set<String> CHALLENGE_ITEMS = Set.of("challenge scroll", BOXES.get(0), BOXES.get(1));
+	/** Name starts, since the scroll and the puzzle box carry their tier: "Challenge scroll (hard)". */
+	private static final List<String> CHALLENGE_ITEMS = List.of("challenge scroll", BOXES.get(0), BOXES.get(1));
 	/** A solved puzzle box holds its tiles in this many slots, in item id order, and leaves the last slot empty. */
 	private static final int PUZZLE_TILES = 24;
 
@@ -82,7 +83,7 @@ public class ActWatcher
 		if (inventoryChanged)
 		{
 			inventoryChanged = false;
-			boolean carried = carriesChallengeItem();
+			boolean carried = CHALLENGE_ITEMS.stream().anyMatch(player::carriesItemNamed);
 			if (carried && !challengeCarried)
 			{
 				challengeTick = tick;
@@ -206,12 +207,5 @@ public class ActWatcher
 		Set<Integer> ids = new HashSet<>();
 		data.getCombat().forEach(combat -> ids.addAll(combat.getNpcs()));
 		return ids;
-	}
-
-	private boolean carriesChallengeItem()
-	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot != null && snapshot.getInventory().keySet().stream()
-			.anyMatch(id -> CHALLENGE_ITEMS.contains(client.getItemDefinition(id).getName().toLowerCase()));
 	}
 }
