@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import com.cluehelper.transport.MenuLine;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -18,7 +19,7 @@ import net.runelite.client.callback.ClientThread;
 @Singleton
 public class FairyLogFilter
 {
-	private static final int BUILD_LOG_SCRIPT = 8080;
+	public static final int BUILD_LOG_SCRIPT = 8080;
 	private static final int NONE = -1;
 
 	@Inject
@@ -50,12 +51,12 @@ public class FairyLogFilter
 		}
 	}
 
-	/** Narrowing runs the scrollbar script, which can't run inside another script. */
+	/** Narrows before the frame is drawn: the game can build the list again every frame, which would flicker. */
 	public void onScriptPostFired(ScriptPostFired event)
 	{
 		if (event.getScriptId() == BUILD_LOG_SCRIPT)
 		{
-			clientThread.invokeLater(() -> narrow(wantedRow()));
+			narrow(wantedRow());
 		}
 	}
 
@@ -105,9 +106,10 @@ public class FairyLogFilter
 			return;
 		}
 		int rowY = row.getOriginalY();
+		List<Widget> code = codeBeside(row);
 		for (Widget child : children(contents))
 		{
-			boolean keep = child == row || child.getId() == rowId + 1 || child.getIndex() >= 0 && child.getOriginalY() == rowY;
+			boolean keep = child == row || child.getId() == rowId + 1 || code.contains(child);
 			if (keep)
 			{
 				moveUp(child, rowY);
@@ -119,6 +121,15 @@ public class FairyLogFilter
 		}
 		scrollToTop(contents);
 		narrowedRow = rowId;
+	}
+
+	/** The game draws a row's code as dynamic children of the list at the row's height. */
+	static List<Widget> codeBeside(Widget row)
+	{
+		Widget[] drawn = row.getParent() == null ? null : row.getParent().getDynamicChildren();
+		return drawn == null ? List.of() : Arrays.stream(drawn)
+			.filter(child -> child.getOriginalY() == row.getOriginalY())
+			.collect(Collectors.toList());
 	}
 
 	private static List<Widget> children(Widget parent)
@@ -144,14 +155,21 @@ public class FairyLogFilter
 		undo.add(() -> widget.setHidden(false));
 	}
 
-	/** A list no taller than its box has no scroll height, as the game leaves it. */
+	/**
+	 * A list no taller than its box has no scroll height and no scrollbar. The bar is hidden rather than redrawn: its
+	 * script can't run inside the build, and run a frame later it flickers against the game's own redraw.
+	 */
 	private void scrollToTop(Widget contents)
 	{
 		int oldHeight = contents.getScrollHeight();
 		int oldY = contents.getScrollY();
 		contents.setScrollHeight(0);
 		contents.setScrollY(0);
-		client.runScript(ScriptID.UPDATE_SCROLLBAR, InterfaceID.FairyringsLog.SCROLLBAR, contents.getId(), 0);
+		Widget scrollbar = client.getWidget(InterfaceID.FairyringsLog.SCROLLBAR);
+		if (scrollbar != null && !scrollbar.isSelfHidden())
+		{
+			hide(scrollbar);
+		}
 		undo.add(() ->
 		{
 			contents.setScrollHeight(oldHeight);

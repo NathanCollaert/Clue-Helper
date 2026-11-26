@@ -285,6 +285,11 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
+		colourMenuLines();
+	}
+
+	private void colourMenuLines()
+	{
 		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getScroll(), config.highlightMenus());
 	}
 
@@ -335,6 +340,11 @@ public class ClueHelperPlugin extends Plugin
 	{
 		withdrawTab.onScriptPostFired(event);
 		fairyLogFilter.onScriptPostFired(event);
+		if (event.getScriptId() == FairyLogFilter.BUILD_LOG_SCRIPT)
+		{
+			// The game can build the travel log again every frame, putting back its own colours before the frame is drawn.
+			colourMenuLines();
+		}
 	}
 
 	@Subscribe

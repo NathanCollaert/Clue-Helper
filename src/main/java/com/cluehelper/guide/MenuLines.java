@@ -580,7 +580,12 @@ public class MenuLines
 		{
 			return;
 		}
-		out.add(client.getWidget(FairyDials.logRow(letters)));
+		Widget row = client.getWidget(FairyDials.logRow(letters));
+		out.add(row);
+		if (row != null)
+		{
+			FairyLogFilter.codeBeside(row).forEach(out::add);
+		}
 		if (fairyDials.isDialled(letters))
 		{
 			out.add(client.getWidget(InterfaceID.Fairyrings.CONFIRM));
