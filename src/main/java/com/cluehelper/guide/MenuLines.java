@@ -43,11 +43,8 @@ public class MenuLines
 	private static final String LINE_BREAK = "<br>";
 	private static final int NEXUS_GROUP = 17;
 	private static final int BOX_GROUP = 590;
-	private static final int LOG_FIRST_CODE = 12;
 	/** The Pendant of Ates' and the balloon's maps have one button per place, by the place its catalog line names. */
 	private static final Map<String, Integer> MAP_BUTTONS = Tables.byKey("map buttons", row -> row.id(0));
-	/** Each code in the travel log is followed by its favourite star. */
-	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String MAP_TELEPORT = "Teleport";
 	private static final String MAP_REGION = "Select";
 	private static final String OPEN_OPTION = "Open";
@@ -583,8 +580,7 @@ public class MenuLines
 		{
 			return;
 		}
-		int logComponent = LOG_FIRST_CODE + LOG_COMPONENTS_PER_CODE * FairyDials.logIndex(letters);
-		out.add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | logComponent));
+		out.add(client.getWidget(FairyDials.logRow(letters)));
 		if (fairyDials.isDialled(letters))
 		{
 			out.add(client.getWidget(InterfaceID.Fairyrings.CONFIRM));

@@ -151,6 +151,9 @@ public class ClueHelperPlugin extends Plugin
 	WithdrawTab withdrawTab;
 
 	@Inject
+	FairyLogFilter fairyLogFilter;
+
+	@Inject
 	RouteReport routeReport;
 
 
@@ -203,6 +206,7 @@ public class ClueHelperPlugin extends Plugin
 		unregister.clear();
 		routeReport.stop();
 		withdrawTab.stop();
+		fairyLogFilter.stop();
 		hotCold.stop();
 		guide.stop();
 		routes.stop();
@@ -244,6 +248,7 @@ public class ClueHelperPlugin extends Plugin
 		hotCold.onGameTick();
 		guide.onGameTick();
 		withdrawTab.refresh();
+		fairyLogFilter.refresh();
 		List<Object> swapLines = Arrays.asList(threeStepSwap.headline(), threeStepSwap.notes());
 		if (planner.isWorking() != shownWorking || !swapLines.equals(shownSwapLines))
 		{
@@ -322,12 +327,14 @@ public class ClueHelperPlugin extends Plugin
 	{
 		menuLines.onScriptPreFired(event);
 		poh.onScriptPreFired(event);
+		fairyLogFilter.onScriptPreFired(event);
 	}
 
 	@Subscribe
 	public void onScriptPostFired(ScriptPostFired event)
 	{
 		withdrawTab.onScriptPostFired(event);
+		fairyLogFilter.onScriptPostFired(event);
 	}
 
 	@Subscribe

@@ -16,6 +16,7 @@ public class FairyDials
 {
 	private static final int COUNT = 3;
 	private static final int LETTERS_PER_DIAL = 4;
+	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String LETTERS = "ABCDIJKLPQRS";
 	private static final int[] VARBITS = {VarbitID.FAIRYRING_1, VarbitID.FAIRYRING_2, VarbitID.FAIRYRING_3};
 	/**
@@ -90,15 +91,15 @@ public class FairyDials
 		return code.toString();
 	}
 
-	/** The travel log lists every code alphabetically, starting at AIP. */
-	static int logIndex(String letters)
+	/** The travel log row of a code: every code in alphabetical order from AIP, each followed by its favourite star. */
+	static int logRow(String letters)
 	{
 		int index = 0;
 		for (int dial = 0; dial < COUNT; dial++)
 		{
 			index = index * LETTERS_PER_DIAL + LETTERS.indexOf(letters.charAt(dial)) - dial * LETTERS_PER_DIAL;
 		}
-		return index;
+		return InterfaceID.FairyringsLog.AIP + LOG_COMPONENTS_PER_CODE * index;
 	}
 
 	/**
