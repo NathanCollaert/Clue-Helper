@@ -11,6 +11,7 @@ import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
+import java.util.stream.IntStream;
 import javax.inject.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,12 @@ import net.runelite.client.callback.ClientThread;
 @Singleton
 public class RoutePlanner
 {
-	static final int COMMIT_MARGIN_TICKS = 5;
+	/** Once acted on, the followed route gives way only to one that saves a quarter of its time left, and at least this. */
+	private static final int MIN_SWITCH_TICKS = 2;
+	private static final int SWITCH_SHARE = 4;
 	/** A Spellbook Swap's free cast stays pending this long after varbit 3617 turns 1. */
 	private static final int SWAP_WINDOW_TICKS = 200;
-	private static final int TARGET_WALK_BUCKET_TILES = 2 * COMMIT_MARGIN_TICKS;
+	private static final int TARGET_WALK_BUCKET_TILES = 10;
 	/** The guide's landing radius: some teleports land anywhere in a small area. */
 	private static final int LANDED_TILES = 10;
 	private static final int POCKET_TILES = 3;
@@ -82,19 +85,29 @@ public class RoutePlanner
 	volatile int nearestNode = WalkTable.NO_NODE;
 	int targetWalkBucket = NO_TARGET_NEAR;
 	Trigger lastTrigger;
-	@Getter
 	volatile Plan plan = Plan.NONE;
-	@Getter
 	volatile Route committed;
+	/** The plan is for {@link ClueLink#getAheadStep()}: listeners and getters see none until core shows that step. */
+	volatile boolean ahead;
 	String committedStep;
 	/** The step's targets when it was committed: a hot/cold step keeps its key while its target moves. */
 	List<WorldPoint> committedTargets = List.of();
+	/**
+	 * The player walked along the committed route, took its first teleport or withdrew its items: from then on it is kept
+	 * until it breaks or a route saves enough of its time. Until then a better route replaces it freely.
+	 */
+	boolean acted;
+	/** Where the committed route was planned from and what the player carried then, to tell when they act on it. */
+	WorldPoint committedFrom;
+	PlayerSnapshot committedWith;
 	/** The committed walk was kept once although the last plan didn't offer it. */
 	boolean walkHeld;
 	final Set<String> refusedChanges = new HashSet<>();
+	/** A teleport under way: its item or runes are already spent, so a plan now would fetch them again. */
+	BooleanSupplier travelling = () -> false;
 
 	@Inject
-	void init(ScheduledExecutorService executor, ClientThread clientThread)
+	void init(BackgroundThread executor, ClientThread clientThread)
 	{
 		startRunner = new PlannerRunner(executor, clientThread);
 	}
@@ -133,10 +146,30 @@ public class RoutePlanner
 		committed = null;
 		committedStep = null;
 		committedTargets = List.of();
+		acted = false;
+		committedFrom = null;
+		committedWith = null;
 		walkHeld = false;
 		lastTrigger = null;
 		lastTile = null;
 		start = null;
+		ahead = false;
+	}
+
+	public Plan getPlan()
+	{
+		return ahead ? Plan.NONE : plan;
+	}
+
+	public Route getCommitted()
+	{
+		return ahead ? null : committed;
+	}
+
+	/** Client thread. No plan is made while {@code travelling} holds; the next tick after it plans as usual. */
+	public void holdWhile(BooleanSupplier travelling)
+	{
+		this.travelling = travelling;
 	}
 
 	/** Listeners run on the client thread with each new plan. */
@@ -146,17 +179,25 @@ public class RoutePlanner
 		return () -> listeners.remove(listener);
 	}
 
-	/** Like {@link #addListener}, with what each plan was planned from. */
+	/** Like {@link #addListener}, with what each plan was planned from, and told of the plans made ahead too. */
 	public Runnable addInputListener(BiConsumer<Plan, PlanInput> listener)
 	{
 		inputListeners.add(listener);
 		return () -> inputListeners.remove(listener);
 	}
 
-	/** The step to travel to now: the clue's step, with a hot/cold probe as its target and the stages already done dropped. */
+	/**
+	 * The step to travel to now: the clue's step, with a hot/cold probe as its target and the stages already done dropped;
+	 * null while core shows no clue.
+	 */
 	public Step travelStep()
 	{
-		return stageTarget.travelStep(probeTarget.travelStep(clueLink.getCurrentStep()));
+		return travelStep(clueLink.getCurrentStep());
+	}
+
+	private Step travelStep(Step step)
+	{
+		return stageTarget.travelStep(probeTarget.travelStep(step));
 	}
 
 	/** Call after the player model's and availability's GameTick handlers. */
@@ -187,7 +228,8 @@ public class RoutePlanner
 	/** The start walk from a new tile first, then a plan once any of its inputs changed. */
 	private void refresh()
 	{
-		Step step = travelStep();
+		Step shown = travelStep();
+		Step step = shown != null ? shown : travelStep(clueLink.getAheadStep());
 		PlayerSnapshot snapshot = player.getSnapshot();
 		RuneModel runes = player.getRuneModel();
 		WalkData data = walk;
@@ -196,12 +238,15 @@ public class RoutePlanner
 		{
 			if ((step == null || dormant) && plan != Plan.NONE)
 			{
-				stop();
-				listeners.forEach(listener -> listener.accept(Plan.NONE));
+				dropPlan();
 			}
 			return;
 		}
-		if (client.getGameState() != GameState.LOGGED_IN)
+		if (shown == null && !ahead && (plan != Plan.NONE || runner.isWorking()))
+		{
+			dropPlan();
+		}
+		if (client.getGameState() != GameState.LOGGED_IN || travelling.getAsBoolean())
 		{
 			return;
 		}
@@ -215,6 +260,12 @@ public class RoutePlanner
 		Trigger trigger = new Trigger(step, snapshot.getVersion(), carried.getSnapshotVersion(), carried.getValidUntilMinute(),
 			nearestNode, targetWalkBucket, start.getKind(), snapshot.getSpellbook(), PlannerSettings.from(config, snapshot.getAccountType()),
 			Set.copyOf(refusedChanges), bankMemory.getVersion(), bankMemory.isBankOpen(), required, isForeignHouse());
+		boolean wasAhead = ahead;
+		ahead = shown == null;
+		if (wasAhead && shown != null)
+		{
+			reveal(shown);
+		}
 		if (trigger.equals(lastTrigger))
 		{
 			return;
@@ -222,9 +273,38 @@ public class RoutePlanner
 		lastTrigger = trigger;
 		PlanInput input = input(step, snapshot, runes, required);
 		Route followed = followed(step);
+		acted = acted || followed != null && isActedOn(followed, snapshot);
+		followed = acted ? followed : null;
 		PlanInput followingInput = followed == null ? input
 			: input.toBuilder().followedFirstTransport(followed.getFirstTransportKey()).followedIdentity(followed.getIdentity()).build();
 		runner.submit(() -> Planner.plan(followingInput), planned -> onPlanned(planned, followingInput));
+	}
+
+	/**
+	 * Core now shows a step: the plan made ahead for it is the guide's at once. Whatever the read changed for the planner
+	 * still starts a new plan, which replaces it when it comes in.
+	 */
+	private void reveal(Step shown)
+	{
+		if (shown.getKey().equals(plan.getStepKey()))
+		{
+			listeners.forEach(listener -> listener.accept(plan));
+		}
+		else
+		{
+			plan = Plan.NONE;
+		}
+	}
+
+	/** Listeners hear of it only if they were shown the plan. */
+	private void dropPlan()
+	{
+		boolean shown = !ahead;
+		stop();
+		if (shown)
+		{
+			listeners.forEach(listener -> listener.accept(Plan.NONE));
+		}
 	}
 
 	/**
@@ -352,7 +432,7 @@ public class RoutePlanner
 		int nearestHere = nearest(table, walk);
 		int targetWalk = targets.stream().mapToInt(walk::cost).min().orElse(WalkCosts.UNREACHED);
 		boolean targetNear = targetWalk != WalkCosts.UNREACHED;
-		if (isInPocket(nearestHere, targetNear, tile))
+		if (isInPocket(table, nearestHere, targetNear, tile))
 		{
 			retryNextTick();
 			return;
@@ -391,11 +471,26 @@ public class RoutePlanner
 		return walk.reachedTiles() <= 1;
 	}
 
-	/** Mid-obstacle in a pocket with no node, a few tiles from a start that had nodes. */
-	private boolean isInPocket(int nearestHere, boolean targetInScene, WorldPoint tile)
+	/**
+	 * Mid-obstacle in a pocket with no node, a few tiles from a start that had nodes, or anywhere along a crossing that
+	 * starts beside it: a rope pulls the player across the water tile by tile.
+	 */
+	private boolean isInPocket(WalkTable table, int nearestHere, boolean targetInScene, WorldPoint tile)
 	{
-		return nearestHere == WalkTable.NO_NODE && !targetInScene && start != null && start.getKind() == PlanStart.Kind.SCENE
-			&& start.getTile() != null && start.getTile().distanceTo2D(tile) <= POCKET_TILES;
+		if (nearestHere != WalkTable.NO_NODE || targetInScene || start == null || start.getKind() != PlanStart.Kind.SCENE
+			|| start.getTile() == null)
+		{
+			return false;
+		}
+		WorldPoint from = start.getTile();
+		return from.distanceTo2D(tile) <= POCKET_TILES || IntStream.range(0, table.rowCount())
+			.anyMatch(row -> isAlongCrossing(table.rowOrigin(row), table.rowDest(row), from, tile));
+	}
+
+	private static boolean isAlongCrossing(WorldPoint origin, WorldPoint dest, WorldPoint from, WorldPoint tile)
+	{
+		return origin.getPlane() == tile.getPlane() && dest.getPlane() == tile.getPlane() && origin.distanceTo2D(from) <= POCKET_TILES
+			&& origin.distanceTo2D(tile) + tile.distanceTo2D(dest) <= origin.distanceTo2D(dest) + 1;
 	}
 
 	/** The last start stands until the next tick looks again. */
@@ -437,9 +532,17 @@ public class RoutePlanner
 	{
 		plan = planned;
 		committed = commit(planned, input.getStep().getTargets());
+		if (!acted)
+		{
+			committedFrom = input.getStart().getTile();
+			committedWith = input.getPlayer();
+		}
 		committedStep = planned.getStepKey();
 		committedTargets = input.getStep().getTargets();
-		listeners.forEach(listener -> listener.accept(planned));
+		if (!ahead)
+		{
+			listeners.forEach(listener -> listener.accept(planned));
+		}
 		inputListeners.forEach(listener -> listener.accept(planned, input));
 	}
 
@@ -451,6 +554,11 @@ public class RoutePlanner
 		if (best == null || current == null || !sameGoal)
 		{
 			walkHeld = false;
+			acted = acted && sameGoal;
+			return best;
+		}
+		if (!acted)
+		{
 			return best;
 		}
 		Route same = offered(planned, current.getIdentity());
@@ -459,11 +567,48 @@ public class RoutePlanner
 			return holdBlockedWalk(current, best);
 		}
 		walkHeld = false;
-		if (best.getTicks() <= same.getTicks() - COMMIT_MARGIN_TICKS || landsWhereItStarts(same))
+		if (savesEnough(same.getTicks(), best.getTicks()) || landsWhereItStarts(same))
 		{
 			return best;
 		}
 		return same;
+	}
+
+	static boolean savesEnough(int followedTicks, int bestTicks)
+	{
+		int saved = followedTicks - bestTicks;
+		return saved >= MIN_SWITCH_TICKS && saved * SWITCH_SHARE >= followedTicks;
+	}
+
+	/** The search limit for the followed route: past it, the best route saves enough of its time to replace it. */
+	static int keptUpToHalfTicks(int bestHalfTicks)
+	{
+		return Math.max(bestHalfTicks + 2 * MIN_SWITCH_TICKS, bestHalfTicks * SWITCH_SHARE / (SWITCH_SHARE - 1));
+	}
+
+	/**
+	 * The player walked off where the route was planned from toward the end of its first leg, landed from its first
+	 * teleport, or carries more of an item its bank stop withdraws.
+	 */
+	private boolean isActedOn(Route route, PlayerSnapshot now)
+	{
+		PlanStart from = start;
+		WorldPoint at = from == null ? null : from.getTile();
+		return at != null && (walkedAlong(route, at) || landsWhereItStarts(route)) || withdrewFor(route, now);
+	}
+
+	private boolean walkedAlong(Route route, WorldPoint at)
+	{
+		Leg first = route.getLegs().isEmpty() ? null : route.getLegs().get(0);
+		WorldPoint end = first == null || first.getKind() != Leg.Kind.WALK ? null : first.getTo();
+		return end != null && committedFrom != null && !at.equals(committedFrom)
+			&& at.distanceTo2D(end) < committedFrom.distanceTo2D(end);
+	}
+
+	private boolean withdrewFor(Route route, PlayerSnapshot now)
+	{
+		PlayerSnapshot before = committedWith;
+		return before != null && route.getWithdraw().stream().anyMatch(use -> now.carried(use.getItemId()) > before.carried(use.getItemId()));
 	}
 
 	/**

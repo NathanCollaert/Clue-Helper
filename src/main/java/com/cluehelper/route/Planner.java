@@ -124,7 +124,8 @@ public final class Planner
 		for (Stage stage : step.getStages())
 		{
 			anyOrder &= stage.getKind() == Stage.Kind.PART;
-			int[] places = stage.getTiles().stream().filter(tile -> isThere(ctx, stage, tile)).mapToInt(ctx::nodeAt).toArray();
+			int[] places = notGrowing(ctx, stage.getTiles().stream().filter(tile -> isThere(ctx, stage, tile)).collect(toList()))
+				.stream().mapToInt(ctx::nodeAt).toArray();
 			if (places.length > 0)
 			{
 				legs.add(places);
@@ -143,6 +144,14 @@ public final class Planner
 		boolean inHouse = PositionRules.POH_NODE.equals(tile);
 		return (patch == null || ctx.in.getPlayer().getPlantedTrees().contains(patch))
 			&& (!inHouse || ctx.in.getPlayer().getHouse().hasAny(stage.getHouseObjects())) && !ctx.lacksItems(tile);
+	}
+
+	/** Places whose every allotment still grows a crop can't be planted in now: left out, unless every place is such. */
+	private static List<WorldPoint> notGrowing(PlanContext ctx, List<WorldPoint> places)
+	{
+		Set<WorldPoint> growing = ctx.in.getPlayer().getGrowingAllotments();
+		List<WorldPoint> free = places.stream().filter(place -> !growing.contains(place)).collect(toList());
+		return free.isEmpty() ? places : free;
 	}
 
 	private static List<List<int[]>> permutations(List<int[]> items)
@@ -196,7 +205,7 @@ public final class Planner
 		{
 			return null;
 		}
-		int limit = bestGoal.rank + 2 * RoutePlanner.COMMIT_MARGIN_TICKS;
+		int limit = RoutePlanner.keptUpToHalfTicks(bestGoal.rank);
 		LabelSearch search = searches.followed(orders, in.getFollowedFirstTransport(), identity, limit);
 		return search == null ? null : RouteBuilder.build(searches.ctx, search.goal);
 	}
@@ -460,7 +469,7 @@ public final class Planner
 			for (List<int[]> order : orders)
 			{
 				LabelSearch search = run(order, Math.min(rankLimit, rankOf(best)));
-				if (best == null || rankOf(search) < rankOf(best))
+				if (best == null || beats(search, best))
 				{
 					best = search;
 				}
@@ -476,12 +485,22 @@ public final class Planner
 			{
 				LabelSearch search = run(new LabelSearch(ctx, order, area, first,
 					goal -> identity.equals(RouteBuilder.build(ctx, goal).getIdentity()), rankLimit));
-				if (search.goal != null && rankOf(search) < rankOf(best))
+				if (search.goal != null && beats(search, best))
 				{
 					best = search;
 				}
 			}
 			return best;
+		}
+
+		/** A lower rank, or at the same rank the better tie: nothing used up, then no spellbook change, then no bank stop. */
+		private static boolean beats(LabelSearch search, LabelSearch best)
+		{
+			if (search.goal == null || best == null || best.goal == null || search.goal.rank != best.goal.rank)
+			{
+				return rankOf(search) < rankOf(best);
+			}
+			return LabelSearch.TIE_ORDER.compare(search.goal, best.goal) < 0;
 		}
 
 		private static int rankOf(LabelSearch search)
@@ -554,6 +573,8 @@ public final class Planner
 				.rankHalfTicks(goal.rank - goal.choicePenalty + extra)
 				.banked(banked)
 				.withdraw(withdraw)
+				.carriedAfterBank(withdraw.stream().collect(toUnmodifiableMap(ItemUse::getItemId,
+					use -> ctx.in.getPlayer().carried(use.getItemId()) + use.getQuantity(), Integer::sum)))
 				.depositFirst(depositFirst)
 				.openBankStart(banked && !bankLeg)
 				.startBook(ctx.homeBook)

@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import com.cluehelper.BackgroundThread;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.*;
@@ -24,7 +25,7 @@ public class PlannerRunner
 	volatile long finishedGeneration;
 
 	@Inject
-	public PlannerRunner(ScheduledExecutorService executor, ClientThread clientThread)
+	public PlannerRunner(BackgroundThread executor, ClientThread clientThread)
 	{
 		this(executor, clientThread::invoke);
 	}

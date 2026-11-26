@@ -1,136 +1,144 @@
 consumption: glory(1) carried, bank on with glory(1), to Draynor
-  best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1706=1}
+  best      22t (rank 23): Amulet of glory: Draynor Village → walk 17 {charge:1706=1}
+Flat fee: maxed with a glory's last charge, to Edgeville
+  best      15t (rank 16): Amulet of glory: Edgeville → walk 10 {charge:1706=1}
+Scarcity: maxed with a glory's last charge, to Edgeville
+  best      24t: Construction cape: Tele to POH → Mounted glory: Edgeville → walk 10
 consumption: minigame teleports only, bank on, to Varrock bank crates
-  best      66t: Soul Wars Minigame Teleport → walk 2 → bank → Varrock tablet → walk 28 {cooldown:888=1, item:8007=1} withdraw [8007]
+  best      66t (rank 71): Soul Wars Minigame Teleport → walk 2 → bank → Varrock tablet → walk 28 {cooldown:888=1, item:8007=1} withdraw [8007]
 Lunar, swap runes and Max cape carried, to Varrock: Spellbook Swap, not the cape
-  best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  best      37t (rank 40): Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
 Lunar, swap runes and Max cape, Spellbook Swap only
-  best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  best      37t (rank 40): Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
 pending revert to Lunar on Standard, 150 ticks left: Standard teleport at +0
-  best      32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  best      32t (rank 33): Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
 pending revert, window unknown: plans from Lunar
-  best      37t: Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
+  best      37t (rank 40): Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
 pending revert on Standard, Ancient target: the cape from a pending revert
-  best      44t: Teleport to House → Portal nexus: Senntisten → walk 30 {item:556=1, item:557=1, item:563=1}
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 99 Magic, no cape uses left today, Ancient target
-  best      44t: Teleport to House → Portal nexus: Senntisten → walk 30 {item:556=1, item:557=1, item:563=1}
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
+flat fee, Max cape and house runes carried: the cape's free Tele to POH, not the spell
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 Lunar, swap runes only in the bank (bank on)
-  best      40t: Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
+  best      40t (rank 41): Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
-  best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 Wilderness start at level 26 (3100,3720), to Varrock
-  best      37t: Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      37t (rank 40): Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 Wilderness start at level 36 (3100,3800), to Varrock
-  best      60t: walk south 23 → Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
+  best      60t (rank 63): walk south 23 → Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 member on an F2P world on Ancient: Edgeville Home Teleport
-  best      33t: Edgeville Home Teleport → walk 9 {cooldown:892=1}
+  best      33t (rank 35): Edgeville Home Teleport → walk 9 {cooldown:892=1}
 avoidWilderness with a Wilderness target
-  best      71t: Games necklace: Corporeal Beast → walk 66 {charge:3853=1}
+  best      71t (rank 72): Games necklace: Corporeal Beast → walk 66 {charge:3853=1}
   note      Wilderness target
 avoidWilderness, targets in and out of it: to the one outside
-  best      4t: Varrock Teleport {item:556=3, item:554=1, item:563=1}
+  best      4t (rank 6): Varrock Teleport {item:556=3, item:554=1, item:563=1}
 avoidWilderness, target outside: no Wilderness landing
-  best      57t: Necklace of passage: Wizards' Tower → walk 52 {charge:21146=1}
+  best      57t (rank 59): Necklace of passage: Wizards' Tower → walk 52 {charge:21146=1}
 avoidWilderness, King Black Dragon's lair: outside it, but only reachable through it
-  best      46t: Teleport to House → House obelisk: Level 44 Wilderness → walk 26 → Lever: King Black Dragon Lair {item:556=1, item:557=1, item:563=1}
+  best      47t: Construction cape: Tele to POH → House obelisk: Level 44 Wilderness → walk 26 → Lever: King Black Dragon Lair
   note      only reachable through the Wilderness
 avoidWilderness, start at the level 50 obelisk (3306,3915), to Varrock: out by the obelisk
-  best      45t: Obelisk: Level 13 Wilderness → Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  best      45t (rank 46): Obelisk: Level 13 Wilderness → Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
 stopWildernessClues with a Wilderness target: stopped
   best      none
   danger    No guide: this clue step is in the Wilderness
 stopWildernessClues, targets in and out of it: to the one outside
-  best      4t: Varrock Teleport {item:556=3, item:554=1, item:563=1}
+  best      4t (rank 6): Varrock Teleport {item:556=3, item:554=1, item:563=1}
 stopWildernessClues, King Black Dragon's lair: only reachable through it, stopped
   best      none
   danger    No guide: this clue step is only reachable through the Wilderness
 bank tipping point: mid-ironman, bank on, to Varrock bank crates
-  best      32t: Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
+  best      32t (rank 33): Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1}
 Fountain of Rune case: elite coordinate 12101, no cape uses left, Wilderness sword 4 banked
-  best      27t: Camelot Teleport: Seers' → walk 4 → bank → Wilderness sword 4: Teleport → walk 6 {item:556=5, item:563=1} withdraw [13111] deposit first
+  best      27t: Crafting cape: Teleport → walk 4 → bank → Wilderness sword 4: Teleport → walk 6 withdraw [13111] deposit first
   note      Wilderness target
 bank tipping point: mid-ironman, coordinate:3556
-  best      64t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
+  best      64t (rank 67): Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 bank tipping point with the PIN still to come: mid-ironman, coordinate:3556
-  best      68t: Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
+  best      68t (rank 71): Ring of dueling: Castle Wars → walk 4 → bank → Burning amulet: Lava Maze → walk 44 {charge:2552=1, charge:21166=1} withdraw [21166]
   note      Wilderness target
 bank tipping point: mid-ironman, map:3599
-  best      69t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011]
+  best      69t (rank 74): Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011]
 bank tipping point with the PIN still to come: mid-ironman, map:3599
-  best      73t: Ring of dueling: Castle Wars → walk 4 → bank → Ardougne tablet → walk 49 {charge:2552=1, item:8011=1} withdraw [8011]
+  best      80t (rank 81): Fishing Trawler Minigame Teleport → walk 54 {cooldown:888=1}
 bank tipping point: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
-  best      42t: Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
+  best      42t (rank 44): Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
 bank tipping point with the PIN still to come: mid-ironman, spot:MISTHALIN_VARROCK_STONE_CIRCLE
-  best      42t: Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
+  best      42t (rank 44): Varrock Teleport → walk 38 {item:556=3, item:554=1, item:563=1}
 required spade: glory(1) carried, a spade in the bank, to Draynor (dig)
-  best      37t: Amulet of glory: Draynor Village → walk 9 → bank → walk 17 {charge:1706=1} withdraw [952]
+  best      37t (rank 39): Amulet of glory: Draynor Village → walk 9 → bank → walk 17 {charge:1706=1} withdraw [952]
 required spade: carried, to Draynor (dig)
-  best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
+  best      22t (rank 23): Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
 required spade: nowhere, at a tool leprechaun
-  best      22t: Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
+  best      22t (rank 23): Amulet of glory: Draynor Village → walk 17 {charge:1712=1}
   needs     Required but not found:
   needs     - Spade
   needs     Your spade is with a tool leprechaun
 emote item in the bank, STASH filled
-  best      57t: Necklace of passage: Wizards' Tower → walk 52 {charge:21146=1}
+  best      57t (rank 59): Necklace of passage: Wizards' Tower → walk 52 {charge:21146=1}
 Max cape and Construction cape banked, at the Crafting Guild bank, to Taverley shop boxes
   best      22t: (at the open bank) Max cape: POH Portals: Taverley → walk 14 withdraw [13280] deposit first
 scroll book kept out of the Wilderness: carried, to the Lava Maze
-  best      90t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport: Northern entrance → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw []
+  best      91t (rank 97): Crafting cape: Teleport → walk 4 → bank → Master scroll book: Revenant cave teleport: Northern entrance → walk 66 {charge:21389=1} withdraw []
   note      Wilderness target
 scroll book kept out of the Wilderness: banked, to the Lava Maze
-  best      93t: Camelot Teleport: Seers' → walk 4 → bank → Master scroll book: Revenant cave teleport: Northern entrance → walk 66 {item:556=5, item:563=1, charge:21389=1} withdraw [21389] deposit first
+  best      94t (rank 100): Crafting cape: Teleport → walk 4 → bank → Master scroll book: Revenant cave teleport: Northern entrance → walk 66 {charge:21389=1} withdraw [21389] deposit first
   note      Wilderness target
 at the open Grand Exchange bank: mid-ironman, to Varrock bank crates, spade required
-  best      34t: (at the open bank) Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1} withdraw [952]
+  best      34t (rank 35): (at the open bank) Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=1} withdraw [952]
 house: Burthorpe castle steps (Eohric), no games necklace, a fully built house
-  best      27t: Teleport to House → Jewellery box: 5. Burthorpe → walk 13 {item:556=1, item:557=1, item:563=1}
+  best      28t: Construction cape: Tele to POH → Jewellery box: 5. Burthorpe → walk 13
 house: Burthorpe castle steps (Eohric), no games necklace, no house
-  best      39t: Burthorpe Games Room Minigame Teleport → walk 13 {cooldown:888=1}
+  best      39t: Max cape: Warriors' Guild → walk 34
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, a fully built house
   best      74t: Construction cape: Tele to POH → House obelisk: Level 50 Wilderness → walk 58
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, no cape uses left, occult altar but no nexus, no hard Wilderness diary (obelisks)
-  best      79t (rank 109): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
+  best      79t (rank 92): Construction cape: Tele to POH → Occult altar → ANCIENT → Annakarl Teleport → walk 62 {item:563=2, item:565=2} leaves you on ANCIENT
   note      Wilderness target
 house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)
   best      77t: Construction cape: Tele to POH → Portal nexus: Annakarl → walk 62
   note      Wilderness target
 house: standing in the own house, Burthorpe castle steps
-  best      18t: Games necklace: Burthorpe → walk 13 {charge:3853=1}
+  best      18t (rank 19): Games necklace: Burthorpe → walk 13 {charge:3853=1}
 house: standing in a stranger's house, Burthorpe castle steps
-  best      18t: Games necklace: Burthorpe → walk 13 {charge:3853=1}
+  best      18t (rank 19): Games necklace: Burthorpe → walk 13 {charge:3853=1}
 house: Fountain of Rune 12101, an Annakarl portal chamber but no nexus or obelisk
-  best      72t: Teleport to House → Portal chamber: Annakarl → walk 62 {item:556=1, item:557=1, item:563=1}
+  best      73t: Construction cape: Tele to POH → Portal chamber: Annakarl → walk 62
   note      Wilderness target
 house: Yanille upstairs house, the Yanille twin of the Watchtower slot, no law runes
   best      30t: Construction cape: Tele to POH → Portal nexus: Yanille → walk 8 → walk 7
 house: standing at the house portal in Hosidius with house tabs only, Burthorpe castle steps
   best      26t: House portal: Home → Jewellery box: 5. Burthorpe → walk 13
 house: cipher 19904 with BIQ as the ring's last destination (no dials: 0 menu ticks)
-  best      37t: Teleport to House → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 25 {item:556=1, item:557=1, item:563=1}
+  best      38t: Construction cape: Tele to POH → Fairy ring BIQ: Kharidian Desert: Near the Kalphite Hive → walk 25
 house: map w356 without a house (the overworld fairy rings)
-  best      23t: Necklace of passage: Wizards' Tower → walk 18 {charge:21146=1}
+  best      23t (rank 24): Necklace of passage: Wizards' Tower → walk 18 {charge:21146=1}
 spirit tree: anagram 23133 (Madame Caldarium), maxed
-  best      40t: Max cape: Other Teleports: Feldip Hills → walk 35 {daily:4819=1}
+  best      40t (rank 43): Max cape: Other Teleports: Feldip Hills → walk 35 {daily:4819=1}
 spirit tree: anagram 23133 (Madame Caldarium), maxed with 1 Agility
-  best      55t: Teleport to House → Spirit tree: Feldip Hills → walk 39 {item:556=1, item:557=1, item:563=1}
+  best      56t: Construction cape: Tele to POH → Spirit tree: Feldip Hills → walk 39
 planted: Etceteria castle, mid-ironman, the Etceteria tree never seen
-  best      210t: Camelot Teleport → walk 145 → Ship: Miscellania → walk 54 {item:556=5, item:563=1}
+  best      210t (rank 212): Camelot Teleport → walk 145 → Ship: Miscellania → walk 54 {item:556=5, item:563=1}
 planted: Etceteria castle, mid-ironman, the Etceteria tree seen grown
-  best      60t: Skills necklace: Cooking Guild → walk 41 → Spirit tree: Etceteria → walk 5 {charge:11968=1}
+  best      60t (rank 61): Skills necklace: Cooking Guild → walk 41 → Spirit tree: Etceteria → walk 5 {charge:11968=1}
 spirit tree to the house: at the Grand Exchange tree, mid-ironman with a fully built house, Fountain of Rune 12101
   best      78t: Spirit tree: Your house → House obelisk: Level 50 Wilderness → walk 58
   note      Wilderness target
 quetzal: at Renu in Civitas illa Fortis, maxed, dig outside the bank on Aldarin
   best      27t: Quetzal: Aldarin → walk 19
 partial charges first: passage(5) and passage(2) banked, coordinate 2807 by the Outpost
-  best      52t: Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 32 {charge:2552=1, charge:21153=1} withdraw [21153]
+  best      52t (rank 55): Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 32 {charge:2552=1, charge:21153=1} withdraw [21153]
+partial charges first on Scarcity too: passage(5) and passage(2) banked, coordinate 2807 by the Outpost
+  best      52t (rank 62): Ring of dueling: Castle Wars → walk 4 → bank → Necklace of passage: The Outpost → walk 32 {charge:2552=1, charge:21153=1} withdraw [21153]
 pharaoh's sceptre: carried, maxed, yawn in the 7th room of Pyramid Plunder
-  best      104t: Pharaoh's sceptre: Jalsavrah → walk 99 {charge:26948=1}
+  best      104t (rank 107): Pharaoh's sceptre: Jalsavrah → walk 99 {charge:26948=1}
 quetzal whistle: carried, maxed, emote outside the gates of Cam Torum
-  best      19t: Quetzal whistle: Cam Torum → walk 6 {charge:29275=1}
+  best      19t (rank 22): Quetzal whistle: Cam Torum → walk 6 {charge:29275=1}
 ride: boat, boarding at 2720,3301,0 with coins, an axe and logs only, cryptic:try not to step on any aquatic nasties while searching this crate.
   best      21t: Boat: Fishing Platform → walk 11
 ride: charter, boarding at 2792,3414,0 with coins, an axe and logs only, cryptic:talk to charles at port piscarilius.
@@ -149,7 +157,7 @@ ride: lever, then the keep's web, boarding at 3090,3475,0 with coins, an axe and
 ride: glider, boarding at 2465,3501,3 with coins, an axe and logs only, cryptic:search the crates in the most north-western house in al kharid.
   best      10t: Gnome glider: Kar-Hewo → walk 4
 ride: balloon, boarding at 2461,3111,0 with coins, an axe and logs only, spot:MISTHALIN_LUMBER_YARD
-  best      8t: Balloon: Varrock → walk 1 {item:1519=1}
+  best      8t (rank 10): Balloon: Varrock → walk 1 {item:1519=1}
 ride: mushtree, boarding at 3764,3879,1 with coins, an axe and logs only, anagram:21524
   best      28t: walk 17 → Boat: north Fossil Island → Boat: Fossil Island → walk 3
 ride: wilderness obelisk, boarding at 2979,3865,0 with coins, an axe and logs only, spot:WILDERNESS_20
@@ -159,11 +167,13 @@ ride: lever, then the keep's web, boarding at 3090,3475,0 with the axe and a Wil
   best      84t: walk 12 → bank → walk 12 → Lever: Deserted Keep → walk 48 withdraw [13108] deposit first
   note      Wilderness target
 sailing: boat 1 moored at the Tear of the Soul with a greater teleport focus, maxed, the Tear's beach
-  best      9t: Teleport to Boat → walk 4 {item:563=2, item:557=2, item:555=2}
+  best      9t (rank 10): Teleport to Boat → walk 4 {item:563=2, item:557=2, item:555=2}
+Isle of Souls: maxed, the Isle of Souls mine spot, onto the island through Soul Wars
+  best      57t (rank 58): Amulet of glory: Edgeville → walk 12 → Portal: Soul Wars → walk 40 {charge:1712=1}
 sailing: Sailors' amulet carried, maxed, emote 31268 at the Pandemonium
   best      9t: Max cape: Other Teleports: The Pandemonium → walk 4
 gated alternative: Mausoleum bridge unbuilt, maxed, emote 10256: through Fenkenstrain's experiment cave
-  best      89t (rank 97): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
+  best      89t (rank 98): Max cape: Spellbook → ARCEUUS → Fenkenstrain's Castle Teleport → walk 83 {cape=1, item:557=1, item:563=1, item:566=1} leaves you on ARCEUUS
 quest gate: maxed without Song of the Elves, to Prifddinas: no route, the quest named
   best      none
   note      Quests not finished:
@@ -177,9 +187,9 @@ start on a node: standing at the Varrock Teleport landing, to Varrock bank crate
 Dramen staff in the inventory, not worn, at the Tower of Life ring: dials AIQ there
   best      16t: Fairy ring AIQ: Asgarnia: Mudskipper Point → walk 3
 AREA: cryptic:a demon's best friend holds the next step of this clue.
-  best      28t: Master scroll book: Key master teleport → walk 23 {charge:21389=1}
+  best      29t (rank 30): Kourend Castle Teleport → walk 25 {item:554=1, item:555=1, item:563=2}
 SEQUENCE skill: cryptic:a graceful man of many colours, his crates must be full of many delights.
-  best      84t: Teleport to House → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 28 → Book of the dead: History and Hearsay → walk 33 {item:556=1, item:557=1, item:563=1, charge:25818=1}
+  best      85t (rank 88): Construction cape: Tele to POH → Fairy ring DJR: Great Kourend: Chasm of Fire → walk 28 → Book of the dead: History and Hearsay → walk 33 {charge:25818=1}
 SEQUENCE three-step (6 orders)
-  best      103t: Skills necklace: Mining Guild → walk 35 → Lumbridge Teleport → walk 28 → Varrock Teleport → walk 28 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
+  best      103t (rank 107): Skills necklace: Mining Guild → walk 35 → Lumbridge Teleport → walk 28 → Varrock Teleport → walk 28 {charge:11968=1, item:556=6, item:557=1, item:563=2, item:554=1}
 PROBES (hot/cold spots): {2860,3562,0=30, 2915,3425,0=66, 2917,3295,0=14, 2972,3486,0=65, 2975,3238,0=43, 3030,3364,0=34, 3031,3304,0=66, 3033,3438,0=57}

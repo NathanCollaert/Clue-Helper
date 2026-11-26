@@ -94,6 +94,9 @@ public class SubStep
 	String again;
 	@Builder.Default
 	Set<Integer> bankItems = Set.of();
+	/** How many of each the player carries once the withdraw is done; from the live plan, so never baked. */
+	@Builder.Default
+	transient Map<Integer, Integer> carriedAfterBank = Map.of();
 	/** Shown one per line under the text: the items to withdraw. */
 	@Builder.Default
 	List<String> items = List.of();
@@ -134,6 +137,8 @@ public class SubStep
 	/** A ground item to pick up, outlined where it lies, the nearest as the waypoint; -1 for none. */
 	@Builder.Default
 	int groundItem = -1;
+	/** Where the one {@link #groundItem} to pick up lies, of several (two master clues); null for any of them. */
+	WorldPoint groundItemTile;
 	/** For {@link Done#ITEM_CARRIED}: the start of the item's name, lower case. */
 	String carriedWhenDone;
 	/** The side tab the act is done in: Emotes for an emote, Music for a track. */

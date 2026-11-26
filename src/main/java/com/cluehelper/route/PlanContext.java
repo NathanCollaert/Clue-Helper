@@ -1,6 +1,6 @@
 package com.cluehelper.route;
 
-import com.cluehelper.SpellbookChanges;
+import com.cluehelper.*;
 import com.cluehelper.memory.StashMemory;
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
@@ -22,15 +22,17 @@ final class PlanContext
 	/** Per item stack withdrawn, worn or deposited at the bank. */
 	static final int WITHDRAW_HALF_TICKS = 4;
 	private static final int PIN_HALF_TICKS = 8;
-	/** Ranking only: Magic and Max cape changes are limited per day. */
-	static final int CAPE_USE_PENALTY_HALF_TICKS = 6;
 	/**
 	 * Ranking only, per teleport or fairy ring: routes about a tick apart go the way with fewer teleports, the same way each
 	 * time.
 	 */
 	static final int TELEPORT_TIE_HALF_TICKS = 2;
-	/** Ranking only: the route leaves you on another book with no way back left today. */
-	private static final int STRAND_PENALTY_HALF_TICKS = 60;
+	/** Ranking only, in half-ticks: what using something up on a transport of each category weighs. */
+	private static final Map<Category, Integer> USE_UP_FEES = Tables.byKey("use-up fees", Category::valueOf, row -> row.id(0));
+	/** Ranking only, on Scarcity: an item's or charge's last use; the second last weighs half of it, and so on. */
+	static final int LAST_USE_HALF_TICKS = 60;
+	/** Ranking only: the route leaves you on another book with no way back left today; also caps an estimated way back. */
+	private static final int STRAND_PENALTY_HALF_TICKS = 120;
 	/** One more click when the withdraw list needs more slots than are free. */
 	static final int DEPOSIT_FIRST_HALF_TICKS = 2;
 	private static final OriginClass[] ABSTRACT_CLASSES = {OriginClass.WILD0, OriginClass.WILD20, OriginClass.WILD30, OriginClass.POH};
@@ -45,6 +47,8 @@ final class PlanContext
 	private final Map<WorldPoint, Integer> extraNodes = new HashMap<>();
 	private OriginClass[] classes;
 	private final Map<String, LowerBound> lowerBounds = new HashMap<>();
+	/** By book and bank state: from each node, the half-ticks back to the home book through located changes. */
+	private final Map<String, int[]> waysBack = new HashMap<>();
 
 	final PlanResources resources = new PlanResources();
 	final TransportOptions[] options = new TransportOptions[2];
@@ -422,20 +426,81 @@ final class PlanContext
 		return last != null && landing.getCode() != null && last.equals(landing.getCode().replace("-", ""));
 	}
 
-	int strandHalfTicks(Book book, int bankState, int capeUsesSpent)
+	/**
+	 * Ranking only: its category's fee for a transport that uses anything up, so a free one about as fast wins; on Scarcity
+	 * also more the fewer uses of an item or charge are left, so a last tablet only goes where it saves real time.
+	 */
+	int priceHalfTicks(Category category, boolean usesUp, List<Integer> usesLeft)
+	{
+		SaveConsumables save = in.getSettings().getSaveConsumables();
+		if (save == SaveConsumables.OFF || !usesUp && usesLeft.isEmpty())
+		{
+			return 0;
+		}
+		int scarcity = save != SaveConsumables.SCARCITY ? 0
+			: usesLeft.stream().mapToInt(left -> LAST_USE_HALF_TICKS / Math.max(1, left)).sum();
+		return USE_UP_FEES.get(category) + scarcity;
+	}
+
+	/** What the player owns, carried and, when the bank counts, banked. */
+	PlayerSnapshot owner()
+	{
+		return in.getBanked() != null ? in.getBanked() : in.getPlayer();
+	}
+
+	/** Ranking only: the cheapest way back to the home book from where the route ends, by a cape change left today or a located change. */
+	int strandHalfTicks(Book book, int node, int bankState, int capeUsesSpent)
 	{
 		if (book == homeBook)
 		{
 			return 0;
 		}
+		int back = Math.min(STRAND_PENALTY_HALF_TICKS, wayBack(book, bankState)[node]);
 		TransportOptions.Change cape = options[bankState].cape;
 		SpellbookState state = in.getPlayer().getSpellbook();
 		int usesLeft = state == null ? 0 : state.getCapeChangesLeft();
 		if (cape != null && capeUsesSpent + 1 <= usesLeft)
 		{
-			return cape.halfTicks + CAPE_USE_PENALTY_HALF_TICKS;
+			back = Math.min(back, cape.halfTicks + cape.priceHalfTicks);
 		}
-		return STRAND_PENALTY_HALF_TICKS;
+		return back;
+	}
+
+	/**
+	 * From each node on the book: the cheapest walk, or teleport castable on it and walk, to a change that lands on the home
+	 * book, or on Standard where a second change goes home; with each change's time and fee.
+	 */
+	private int[] wayBack(Book book, int bankState)
+	{
+		String key = book + "|" + bankState;
+		int[] known = waysBack.get(key);
+		if (known != null)
+		{
+			return known;
+		}
+		TransportOptions o = options[bankState];
+		int[] seed = new int[nodeCount()];
+		Arrays.fill(seed, LowerBound.UNREACHABLE);
+		for (List<TransportOptions.Change> here : o.changes.values())
+		{
+			for (TransportOptions.Change c : here)
+			{
+				Book toggles = c.change.getToggles();
+				Book lands = toggles == null ? homeBook : toggles == book ? Book.STANDARD : toggles;
+				int onward = lands == homeBook ? 0
+					: lands == Book.STANDARD && book != Book.STANDARD ? wayBack(Book.STANDARD, bankState)[c.node] : LowerBound.UNREACHABLE;
+				seed[c.node] = Math.min(seed[c.node], c.halfTicks + c.priceHalfTicks + onward);
+			}
+		}
+		int[] walk = LowerBound.walkTo(this, seed);
+		int teleport = o.teleports.stream().filter(tele -> tele.book == null || tele.book == book)
+			.mapToInt(tele -> tele.halfTicks + tele.priceHalfTicks + walk[tele.node]).min().orElse(LowerBound.UNREACHABLE);
+		for (int n = 0; n < walk.length; n++)
+		{
+			walk[n] = Math.min(walk[n], teleport);
+		}
+		waysBack.put(key, walk);
+		return walk;
 	}
 
 	private void expandBooks()
@@ -522,20 +587,30 @@ final class PlanContext
 
 		int item(int itemId, PlayerSnapshot player, int bankState)
 		{
+			return set("item:" + itemId, bankState, owned(player, itemId));
+		}
+
+		int charge(int itemId, PlayerSnapshot player, int bankState)
+		{
+			return set("charge:" + itemId, bankState, chargesLeft(player, itemId));
+		}
+
+		static int owned(PlayerSnapshot player, int itemId)
+		{
 			int have = 0;
 			for (Container container : Container.values())
 			{
 				have += player.count(container, itemId);
 			}
-			return set("item:" + itemId, bankState, have);
+			return have;
 		}
 
-		int charge(int itemId, PlayerSnapshot player, int bankState)
+		static int chargesLeft(PlayerSnapshot player, int itemId)
 		{
 			Charge charge = player.getCharges().get(itemId);
 			int perItem = charge == null ? 1 : Math.max(0, charge.getCharges());
 			int held = player.carried(itemId) + player.stored(itemId);
-			return set("charge:" + itemId, bankState, Math.max(1, held) * perItem);
+			return Math.max(1, held) * perItem;
 		}
 
 		int once(String key, int bankState)

@@ -5,7 +5,7 @@ import com.cluehelper.transport.MenuLine;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 import java.util.function.*;
 import javax.inject.*;
 import net.runelite.api.*;
@@ -17,7 +17,8 @@ import static java.util.stream.Collectors.*;
 
 /**
  * Teleport interfaces are read from their scripts' arguments, before better-teleport-menu rewrites them. Lines and menu
- * options are only recoloured, never rewritten or hidden. Client thread only.
+ * options are recoloured, never rewritten or hidden. One that carries its own colour (Easy Teleports colours its names,
+ * every line alike) is boxed instead, as its colour would win over ours. Client thread only.
  */
 @Singleton
 public class MenuLines
@@ -33,16 +34,17 @@ public class MenuLines
 	private static final int BOX_LINE = 1688;
 	public static final String HOTKEYS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int LIST_GROUP = 187;
+	private static final Pattern COLOUR_TAG = Pattern.compile("<col=([0-9a-fA-F]+)>");
+	/** Each right-click menu row's height; the menu's height is its title, its rows and this padding under them. */
+	private static final int MENU_ROW_HEIGHT = 15;
+	private static final int MENU_BOTTOM_PADDING = 3;
 	private static final Pattern MINIGAME_PLACE_NUMBER = Pattern.compile("^\\d+\\. ");
 	/** A minigame card's text is its name, a break, then its places. */
 	private static final String LINE_BREAK = "<br>";
 	private static final int NEXUS_GROUP = 17;
 	private static final int BOX_GROUP = 590;
-	private static final int LOG_FIRST_CODE = 12;
-	/** The Pendant of Ates' map has one button per place, by the place its catalog line names. */
-	private static final Map<String, Integer> ATES_BUTTONS = Tables.byKey("ates buttons", row -> row.id(0));
-	/** Each code in the travel log is followed by its favourite star. */
-	private static final int LOG_COMPONENTS_PER_CODE = 2;
+	/** The Pendant of Ates' and the balloon's maps have one button per place, by the place its catalog line names. */
+	private static final Map<String, Integer> MAP_BUTTONS = Tables.byKey("map buttons", row -> row.id(0));
 	private static final String MAP_TELEPORT = "Teleport";
 	private static final String MAP_REGION = "Select";
 	private static final String OPEN_OPTION = "Open";
@@ -87,11 +89,14 @@ public class MenuLines
 	EasyTeleportsNames easyTeleportsNames;
 	final Map<String, int[]> listLines = new HashMap<>();
 	String listTitle;
-	final List<int[]> rawListLines = new ArrayList<>();
+	/** The open list's labels as the game passed them, tags and all, before any plugin rewrites the lines. */
+	final List<String> listLabels = new ArrayList<>();
 	boolean listFresh;
 	final Map<Integer, int[]> nexusLines = new HashMap<>();
 	final Map<Integer, int[]> boxLines = new HashMap<>();
 	final Map<Widget, Integer> originalTextColours = new IdentityHashMap<>();
+	/** The open menu's options the guide marks, coloured or boxed. */
+	final List<MenuEntry> markedOptions = new ArrayList<>();
 
 	/** Call from a handler at priority 2, ahead of better-teleport-menu's at 1. */
 	public void onScriptPreFired(ScriptPreFired event)
@@ -101,7 +106,7 @@ public class MenuLines
 			case LIST_TITLE:
 			case LIST_TITLE_ALT:
 				listLines.clear();
-				rawListLines.clear();
+				listLabels.clear();
 				listTitle = objectTail();
 				break;
 			case LIST_LINE:
@@ -113,7 +118,7 @@ public class MenuLines
 				{
 					int[] line = {ints[0], ints[3]};
 					listLines.put(MenuLabels.normalise(label), line);
-					rawListLines.add(line);
+					listLabels.add(label);
 					listFresh = true;
 				}
 				break;
@@ -142,8 +147,8 @@ public class MenuLines
 	}
 
 	/**
-	 * Once per list, a tick after its lines are drawn. Hands over the widget texts rather than the script's labels: only
-	 * they carry the grey of a planted spirit tree that can't be used.
+	 * Once per list, a tick after its lines are drawn. Hands over the labels as the game passed them: it greys a planted
+	 * spirit tree that can't be used in the label itself, which another plugin may recolour once drawn.
 	 */
 	public void takeFreshList(BiConsumer<String, List<String>> reader)
 	{
@@ -152,9 +157,7 @@ public class MenuLines
 			return;
 		}
 		listFresh = false;
-		List<String> texts = rawListLines.stream().map(this::child).filter(line -> line != null && line.getText() != null)
-			.map(Widget::getText).collect(toList());
-		reader.accept(listTitle, texts);
+		reader.accept(listTitle, List.copyOf(listLabels));
 	}
 
 	public boolean isListOpen(String title)
@@ -192,6 +195,23 @@ public class MenuLines
 		return !lineWidgets(target).widgets.isEmpty();
 	}
 
+	/**
+	 * The teleport's own click on its item: the option the target marks, or any while it marks none (an item with one
+	 * teleport). Another option (the scroll book's default while Open is marked) or one that only opens a list (the book's
+	 * Open) is no click of the teleport's, so the game's answer to it is no refusal.
+	 */
+	boolean isTeleportClick(MenuTarget target, String option)
+	{
+		String destination = target.destination();
+		return destination == null || shows(option, destination) && !MenuLabels.isOpener(destination);
+	}
+
+	/** A click on one of the target's map buttons (a balloon's destination) is its teleport's click. */
+	boolean isMapButton(MenuTarget target, Widget clicked)
+	{
+		return clicked != null && lineWidgets(target).mapButtons.stream().anyMatch(button -> button.getId() == clicked.getId());
+	}
+
 	/** Only the target's lines without text (map icons, region shields, travel log codes); text lines are coloured. */
 	public List<Rectangle> lines(MenuTarget target)
 	{
@@ -199,7 +219,7 @@ public class MenuLines
 		Found found = lineWidgets(target);
 		for (Widget widget : found.widgets)
 		{
-			boolean boxed = found.mapButtons.contains(widget) || !Widgets.hasTextInside(widget);
+			boolean boxed = found.mapButtons.contains(widget) || !Widgets.hasTextInside(widget) || isColouredByEasyTeleports(widget);
 			Rectangle shown = boxed ? Widgets.clipped(widget) : null;
 			if (shown != null && !shown.isEmpty())
 			{
@@ -220,8 +240,8 @@ public class MenuLines
 		if (enabled)
 		{
 			Found found = lineWidgets(target);
-			found.widgets.stream().filter(line -> !found.mapButtons.contains(line)).flatMap(line -> Widgets.descendants(line).stream())
-				.filter(Widgets::hasText).forEach(wanted::add);
+			found.widgets.stream().filter(line -> !found.mapButtons.contains(line) && !isColouredByEasyTeleports(line))
+				.flatMap(line -> Widgets.descendants(line).stream()).filter(Widgets::hasText).forEach(wanted::add);
 			if (scroll != null)
 			{
 				for (int text : new int[]{scroll.getCharges(), scroll.getTitle()})
@@ -253,7 +273,77 @@ public class MenuLines
 		}
 	}
 
-	/** Call on {@code MenuOpened}. Each alternative target colours its own option, on its own item. */
+	private boolean isColouredByEasyTeleports(Widget line)
+	{
+		return Widgets.descendants(line).stream().anyMatch(text -> isColouredByEasyTeleports(text.getText()));
+	}
+
+	/**
+	 * Easy Teleports colours the names it shows again on every frame, so the guide boxes such a line instead of
+	 * recolouring it. A colour tag on any other line, the game's own included, is recoloured.
+	 */
+	private boolean isColouredByEasyTeleports(String text)
+	{
+		return hasOwnColour(text) && easyTeleportsNames.renamed(text);
+	}
+
+	/** A colour tag other than ours: another plugin's or the game's. */
+	private static boolean hasOwnColour(String text)
+	{
+		Matcher tag = text == null ? null : COLOUR_TAG.matcher(text);
+		while (tag != null && tag.find())
+		{
+			if (Integer.parseInt(tag.group(1), 16) != TEXT_COLOUR)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Call on {@code MenuOpened}, before {@link #colourMenu}: the options marked in the last menu are dropped. */
+	public void forgetMenu()
+	{
+		markedOptions.clear();
+	}
+
+	/** The marked options that Easy Teleports colours, boxed where the open menu draws them. */
+	public List<Rectangle> boxedOptions()
+	{
+		if (!client.isMenuOpen())
+		{
+			return List.of();
+		}
+		Menu top = client.getMenu();
+		List<Menu> menus = new ArrayList<>(List.of(top));
+		Arrays.stream(top.getMenuEntries()).map(MenuEntry::getSubMenu).filter(Objects::nonNull).forEach(menus::add);
+		List<Rectangle> out = new ArrayList<>();
+		for (MenuEntry option : markedOptions)
+		{
+			if (!isColouredByEasyTeleports(option.getOption()))
+			{
+				continue;
+			}
+			menus.stream().map(menu -> rowOf(menu, option)).filter(Objects::nonNull).findFirst().ifPresent(out::add);
+		}
+		return out;
+	}
+
+	/** The rows are drawn last entry first, under the menu's title. */
+	private static Rectangle rowOf(Menu menu, MenuEntry option)
+	{
+		MenuEntry[] entries = menu.getMenuEntries();
+		int index = Arrays.asList(entries).indexOf(option);
+		if (index < 0)
+		{
+			return null;
+		}
+		int title = menu.getMenuHeight() - entries.length * MENU_ROW_HEIGHT - MENU_BOTTOM_PADDING;
+		int row = entries.length - 1 - index;
+		return new Rectangle(menu.getMenuX(), menu.getMenuY() + title + row * MENU_ROW_HEIGHT, menu.getMenuWidth(), MENU_ROW_HEIGHT);
+	}
+
+	/** Call on {@code MenuOpened}. Each alternative target marks its own option, on its own item. */
 	public void colourMenu(MenuTarget target, boolean enabled)
 	{
 		if (!enabled || target == null || target == MenuTarget.NONE)
@@ -265,36 +355,43 @@ public class MenuLines
 		if (row >= 0)
 		{
 			colour(entries[row]);
-		}
-		String destination = target.destination();
-		for (MenuEntry entry : entries)
-		{
-			Menu sub = entry.getSubMenu();
-			if (sub == null || destination == null || !isOptionOnTarget(entry, target))
-			{
-				continue;
-			}
-			MenuEntry[] options = sub.getMenuEntries();
-			boolean named = false;
-			for (MenuEntry option : options)
-			{
-				if (shows(option.getOption(), destination))
-				{
-					colour(option);
-					named = true;
-				}
-			}
-			int line = MenuLabels.hotkeyIndex(destination);
-			if (!named && line >= 0 && line < options.length)
-			{
-				colour(options[options.length - 1 - line]);
-			}
+			colourSubMenuLine(entries[row].getSubMenu(), target.destination());
 		}
 		target.getAlternatives().forEach(alternative -> colourMenu(alternative, true));
 	}
 
-	private static void colour(MenuEntry entry)
+	/** Only the topmost line naming the destination, else the one its hotkey picks. */
+	private void colourSubMenuLine(Menu sub, String destination)
 	{
+		if (sub == null || destination == null)
+		{
+			return;
+		}
+		MenuEntry[] options = sub.getMenuEntries();
+		boolean exact = Arrays.stream(options).anyMatch(option -> namesExactly(option.getOption(), destination));
+		for (int i = options.length - 1; i >= 0; i--)
+		{
+			if (exact ? namesExactly(options[i].getOption(), destination) : shows(options[i].getOption(), destination))
+			{
+				colour(options[i]);
+				return;
+			}
+		}
+		int line = MenuLabels.hotkeyIndex(destination);
+		if (line >= 0 && line < options.length)
+		{
+			colour(options[options.length - 1 - line]);
+		}
+	}
+
+	/** Coloured, unless Easy Teleports colours it: then it is boxed. */
+	private void colour(MenuEntry entry)
+	{
+		markedOptions.add(entry);
+		if (isColouredByEasyTeleports(entry.getOption()))
+		{
+			return;
+		}
 		entry.setOption(ColorUtil.wrapWithColorTag(Text.removeTags(entry.getOption()), new Color(TEXT_COLOUR)));
 	}
 
@@ -374,9 +471,9 @@ public class MenuLines
 		return found;
 	}
 
-	private boolean atesMap(String destination, Found out)
+	private boolean placeButton(String destination, Found out)
 	{
-		for (Map.Entry<String, Integer> place : ATES_BUTTONS.entrySet())
+		for (Map.Entry<String, Integer> place : MAP_BUTTONS.entrySet())
 		{
 			Widget button = client.getWidget(place.getValue());
 			if (MenuLabels.matches(place.getKey(), destination) && Widgets.visible(button))
@@ -483,8 +580,12 @@ public class MenuLines
 		{
 			return;
 		}
-		int logComponent = LOG_FIRST_CODE + LOG_COMPONENTS_PER_CODE * FairyDials.logIndex(letters);
-		out.add(client.getWidget(InterfaceID.FairyringsLog.UNIVERSE | logComponent));
+		Widget row = client.getWidget(FairyDials.logRow(letters));
+		out.add(row);
+		if (row != null)
+		{
+			FairyLogFilter.codeBeside(row).forEach(out::add);
+		}
 		if (fairyDials.isDialled(letters))
 		{
 			out.add(client.getWidget(InterfaceID.Fairyrings.CONFIRM));
@@ -663,18 +764,17 @@ public class MenuLines
 	{
 		String destination = target.destination();
 		if (destination == null || charter(destination, out) || glider(destination, out) || mushtree(destination, out)
-			|| atesMap(destination, out))
+			|| placeButton(destination, out))
 		{
 			return;
 		}
-		for (Map.Entry<String, int[]> line : listLines.entrySet())
+		Map.Entry<String, int[]> listed = listLines.entrySet().stream().filter(line -> namesExactly(line.getKey(), destination)).findFirst()
+			.or(() -> listLines.entrySet().stream().filter(line -> MenuLabels.matches(line.getKey(), destination)).findFirst()).orElse(null);
+		if (listed != null)
 		{
-			if (MenuLabels.matches(line.getKey(), destination))
-			{
-				Widget listLine = child(line.getValue());
-				out.add(Widgets.visible(listLine) ? listLine : drawnOverList(line.getValue(), destination));
-				return;
-			}
+			Widget listLine = child(listed.getValue());
+			out.add(Widgets.visible(listLine) ? listLine : drawnOverList(listed.getValue(), destination));
+			return;
 		}
 		int index = MenuLabels.hotkeyIndex(destination);
 		for (int[] line : listLines.values())
@@ -685,19 +785,29 @@ public class MenuLines
 				return;
 			}
 		}
-		Widget[] lines = dynamicChildren(InterfaceID.Chatmenu.OPTIONS);
+		List<Widget> options = Arrays.stream(dynamicChildren(InterfaceID.Chatmenu.OPTIONS)).filter(Widgets::visible).collect(toList());
 		List<String> labels = target.getPath();
 		for (int i = labels.size() - 1; i >= 0; i--)
 		{
-			for (Widget option : lines)
+			String label = labels.get(i);
+			Optional<Widget> option = options.stream().filter(line -> namesExactly(line.getText(), label)).findFirst()
+				.or(() -> options.stream().filter(line -> shows(line.getText(), label)).findFirst());
+			if (option.isPresent())
 			{
-				if (Widgets.visible(option) && shows(option.getText(), labels.get(i)))
-				{
-					out.add(option);
-					return;
-				}
+				out.add(option.get());
+				return;
 			}
 		}
+	}
+
+	/**
+	 * A line that is the label itself, also under its Easy Teleports name, wins over one that only starts the same: the
+	 * camulet's "Enakhra's Temple Entrance." over its "Enakhra's Temple.".
+	 */
+	private boolean namesExactly(String line, String label)
+	{
+		String wanted = MenuLabels.normalise(label);
+		return line != null && easyTeleportsNames.readings(line).stream().anyMatch(reading -> MenuLabels.normalise(reading).equals(wanted));
 	}
 
 	/**
@@ -767,7 +877,7 @@ public class MenuLines
 			return true;
 		}
 		Widget widget = entry.getWidget();
-		if (widget != null && (target.getItemIds().contains(widget.getItemId()) || target.getWidgetIds().contains(widget.getId())))
+		if (widget != null && (target.getItemIds().contains(LeftClicks.itemOn(widget)) || target.getWidgetIds().contains(widget.getId())))
 		{
 			return true;
 		}

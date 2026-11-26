@@ -29,6 +29,8 @@ public class StepNeeds
 	private static final ItemRequirement LIGHT = anyOf("Light source", IntStream.of(Tables.ids("light sources")).boxed().collect(toList()));
 	private static final int NO_FIRE_PIT = -1;
 	private static final int LIT = 1;
+	/** Entrana's chapel to its landings; its nearest balloon, at Taverley, is farther. */
+	private static final int MADE_THERE_TILES = 64;
 
 	/** Names, real levels and varbits. */
 	final Client client;
@@ -74,7 +76,7 @@ public class StepNeeds
 			boolean optional = isOptional(item.getCollectiveName(client), step.getData());
 			if (!EmptySlots.metByEmptySlots(item) && !optional)
 			{
-				needs.add(new RequiredItems.Need(item.getCollectiveName(client), withAlternatives(item, step.getData()), true, true));
+				needs.add(new RequiredItems.Need(item.getCollectiveName(client), withAlternatives(item, step), true, true));
 			}
 		}
 		for (ItemRequirement item : requirements.getOwnItems())
@@ -132,8 +134,9 @@ public class StepNeeds
 	}
 
 	/** Core's item, or the hand data's other way to the same thing; core's bank tag then lacks the other items. */
-	private ItemRequirement withAlternatives(ItemRequirement item, StepIndex.Entry data)
+	private ItemRequirement withAlternatives(ItemRequirement item, Step step)
 	{
+		StepIndex.Entry data = step.getData();
 		StepIndex.Alternative other = data == null ? null
 			: data.getAlternatives().stream().filter(alternative -> item.fulfilledBy(alternative.getInstead())).findFirst().orElse(null);
 		if (other == null)
@@ -141,14 +144,23 @@ public class StepNeeds
 			return item;
 		}
 		return widened.computeIfAbsent(other, alternative -> new AlternativeRequirement(item, alternative.getAll().stream()
-			.map(this::part).collect(toList())));
+			.map(ids -> part(ids, alternative.getCounts())).collect(toList()), alternative.isMadeThere(), () -> isAtThePlace(step)));
 	}
 
-	/** Any of these ids, named by them: "Grimy cadantine or Cadantine". */
-	private AlternativeRequirement.Part part(List<Integer> ids)
+	/** On the step's island or in its area: a made-there item carried here was made here. */
+	private boolean isAtThePlace(Step step)
+	{
+		WorldPoint tile = playerTile.get();
+		return step.getTargets().stream().anyMatch(place -> PositionRules.near(tile, place, MADE_THERE_TILES));
+	}
+
+	/** Any of these ids, as many as {@code counts} says or one, named by them: "Grimy cadantine or Cadantine". */
+	private AlternativeRequirement.Part part(List<Integer> ids, Map<Integer, Integer> counts)
 	{
 		String name = ids.stream().map(id -> client.getItemDefinition(id).getName()).distinct().collect(joining(" or "));
-		return new AlternativeRequirement.Part(name, anyOf(name, ids));
+		ItemRequirement[] each = ids.stream().map(id -> counts.containsKey(id) ? ItemRequirements.xOfItem(id, counts.get(id)) : ItemRequirements.item(id))
+			.toArray(ItemRequirement[]::new);
+		return new AlternativeRequirement.Part(name, ItemRequirements.any(name, each));
 	}
 
 	/** A skill challenge whose task core marked done: the way to the task's place (a talisman for its ruins) isn't needed. */

@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import java.util.stream.*;
 import javax.inject.*;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.coords.*;
 import static java.util.stream.Collectors.*;
 
 /** Client thread only. */
@@ -92,6 +92,13 @@ public final class SceneObjects
 		return view == null ? List.of() : view.npcs().stream().filter(wanted).collect(toList());
 	}
 
+	/** Whether the scene still holds this NPC: one that despawned, or came back into view as a new NPC, is gone. */
+	boolean isLoaded(NPC npc)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		return view != null && view.npcs().byIndex(npc.getIndex()) == npc;
+	}
+
 	private static boolean offers(NPC npc, String option)
 	{
 		NPCComposition composition = npc.getTransformedComposition();
@@ -120,6 +127,15 @@ public final class SceneObjects
 		}
 		return Arrays.stream(view.getScene().getTiles()).flatMap(SceneObjects::loaded).flatMap(tile -> objectsOn(tile).stream())
 			.filter(object -> isFormOf(object.getId(), ids)).distinct().collect(toList());
+	}
+
+	/** The objects on one tile of the loaded scene; none outside it. */
+	List<TileObject> on(WorldPoint at)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		LocalPoint local = view == null ? null : LocalPoint.fromWorld(view, at);
+		Tile tile = local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
+		return tile == null ? List.of() : objectsOn(tile);
 	}
 
 	/** The tile's game objects, then its wall, ground and decorative object: a large object is on each tile it covers. */

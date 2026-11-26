@@ -2,6 +2,7 @@ package com.cluehelper.guide;
 
 import static org.junit.Assert.assertEquals;
 
+import net.runelite.api.gameval.InterfaceID;
 import org.junit.Test;
 
 public class FairyDialsTest
@@ -16,5 +17,14 @@ public class FairyDialsTest
 		assertEquals("CLR", FairyDials.code(38));
 		assertEquals("BKS", FairyDials.code(57));
 		assertEquals("BJQ", FairyDials.code(63));
+	}
+
+	@Test
+	public void findsEachCodesRowInTheTravelLog()
+	{
+		assertEquals(InterfaceID.FairyringsLog.AIP, FairyDials.logRow("AIP"));
+		assertEquals(InterfaceID.FairyringsLog.BKR, FairyDials.logRow("BKR"));
+		assertEquals(InterfaceID.FairyringsLog.CKS, FairyDials.logRow("CKS"));
+		assertEquals(InterfaceID.FairyringsLog.DLS, FairyDials.logRow("DLS"));
 	}
 }

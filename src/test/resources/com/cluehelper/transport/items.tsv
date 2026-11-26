@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 497a5f5 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 9c83c97 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 diary	Ardougne cloak: Kandarin Monastery		2607 3221 0			13121=1|13122=1|13123=1|13124=1|20760=1			4458=1		20	4	1	F	none	any	Y				item:13121=ARDY_CAPE_EASY item:13122=ARDY_CAPE_MEDIUM item:13123=ARDY_CAPE_HARD item:13124=ARDY_CAPE_ELITE item:20760=SKILLCAPE_MAX_ARDY varbit:4458=ARDOUGNE_DIARY_EASY_COMPLETE
 diary	Ardougne cloak: Ardougne Farm		2665 3374 0			13122=1			4459=1;6069<3		20	4	1	T	daily:6069	any	Y				item:13122=ARDY_CAPE_MEDIUM varbit:4459=ARDOUGNE_DIARY_MEDIUM_COMPLETE varbit:6069=ARDOUGNE_CLOAK_LOWBITS
@@ -276,6 +276,7 @@ jewellery	Teleport crystal: Lletya		2330 3171 0			6099=1|6100=1|6101=1|6102=1|13
 jewellery	Teleport crystal: Prifddinas		3264 6066 0			6099=1|6100=1|6101=1|6102=1|13102=1		Song of the Elves			20	4	1	T	charge	any	Y				item:6099=MOURNING_TELEPORT_CRYSTAL_4 item:6100=MOURNING_TELEPORT_CRYSTAL_3 item:6101=MOURNING_TELEPORT_CRYSTAL_2 item:6102=MOURNING_TELEPORT_CRYSTAL_1 item:13102=MOURNING_TELEPORT_CRYSTAL_5
 jewellery	Eternal teleport crystal: Lletya		2330 3171 0			23946=1					20	4	1	F	none	any	Y				item:23946=PRIF_TELEPORT_CRYSTAL
 jewellery	Eternal teleport crystal: Prifddinas		3264 6066 0			23946=1		Song of the Elves			20	4	1	F	none	any	Y				item:23946=PRIF_TELEPORT_CRYSTAL
+item	Seed of growth		1249 3724 0			34813=1	45 Farming				20	4	1	T	item	any	Y				item:34813=ANL_SEED_OF_GROWTH
 item	Royal seed pod: Grand Tree		2465 3495 0			19564=1					30	10	1	F	none	any	Y				item:19564=MM2_ROYAL_SEED_POD
 item	Grand seed pod: Grand Tree		2465 3495 0			9469=1					30	13	1	T	item	any	Y				item:9469=ALUFT_SEED_POD
 jewellery	Enchanted lyre: Rellekka		2662 3644 0			3691=1|6125=1|6126=1|6127=1|13079=1					20	4	1	T	charge	any	Y				item:3691=MAGIC_STRUNG_LYRE item:6125=MAGIC_STRUNG_LYRE_2 item:6126=MAGIC_STRUNG_LYRE_3 item:6127=MAGIC_STRUNG_LYRE_4 item:13079=MAGIC_STRUNG_LYRE_5
@@ -287,7 +288,7 @@ jewellery	Enchanted lyre (i): Waterbirth Island		2551 3755 0			23458=1			4493=1	
 jewellery	Enchanted lyre (i): Jatizso		2409 3809 0			23458=1			4494=1		20	4	1	F	none	any	Y				item:23458=MAGIC_STRUNG_LYRE_INFINITE varbit:4494=FREMENNIK_DIARY_ELITE_COMPLETE
 jewellery	Enchanted lyre (i): Neitiznot		2336 3802 0			23458=1			4494=1		20	4	1	F	none	any	Y				item:23458=MAGIC_STRUNG_LYRE_INFINITE varbit:4494=FREMENNIK_DIARY_ELITE_COMPLETE
 item	Camulet: Enakhra's Temple		3105 9315 2			6707=1					20	4	1	T	charge	any	Y				item:6707=CAMULET
-item	Camulet: Bandit Camp Quarry		3191 2924 0			6707=1			4485=1		20	4	1	T	charge	any	Y				item:6707=CAMULET varbit:4485=DESERT_DIARY_HARD_COMPLETE
+item	Camulet: Enakhra's Temple Entrance		3191 2924 0			6707=1			4485=1		20	4	1	T	charge	any	Y				item:6707=CAMULET varbit:4485=DESERT_DIARY_HARD_COMPLETE
 item	Kharedst's memoirs: Lunch by the Lancalliums		1714 3611 0			21760=1			6028=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:6028=HOSIDIUSQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Kharedst's memoirs: The Fisher's Flute		1803 3748 0			21760=1			6038=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:6038=PISCQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES
 item	Kharedst's memoirs: History and Hearsay		1478 3576 0			21760=1			6359=1;6035>0		20	4	1	T	charge	any	Y				item:21760=VEOS_KHAREDSTS_MEMOIRS varbit:6359=SHAYZIENQUEST_REWARD varbit:6035=VEOS_MEMOIR_CHARGES

@@ -1,133 +1,135 @@
-Tile	Name	Members	Skills	Quests	Varbits	VarPlayers	GroupStorage
-1243 3121 0	Tal Teklan	Y		Children of the Sun			Y
-1248 3758 0	Farming Guild	Y	85 Farming				Y
-1253 3741 0	Farming Guild	Y					Y
-1254 3571 0	Mount Quidamortem	Y					Y
-1324 3824 0	Mount Karuulm	Y					Y
-1380 2866 0	Mistrock	Y		Children of the Sun			Y
-1387 3309 0	Nemus Retreat	Y		Children of the Sun			Y
-1399 2925 0	Aldarin	Y		Children of the Sun			Y
-1416 3350 0	Auburnvale	Y		Children of the Sun			Y
-1438 3828 0	Lovakengj	Y					Y
-1452 9567 1	Cam Torum	Y		Perilous Moons			Y
-1454 3858 0	Sulphur Mine	Y					Y
-1477 3874 0	Sulphur Mine	Y					Y
-1478 3856 0	Sulphur Mine	Y					Y
-1478 3873 0	Blast Mine	Y					Y
-1479 3857 0	Blast Mine	Y					Y
-1483 3646 0	Shayzien Encampment	Y					Y
-1488 3592 0	Shayzien	Y					Y
-1499 3857 0	Blast Mine	Y					Y
-1499 3857 0	Sulphur Mine	Y					Y
-1501 3871 0	Blast Mine	Y					Y
-1501 3871 0	Sulphur Mine	Y					Y
-1512 3421 0	Land's End	Y					Y
-1519 3228 0	Quetzacalli Gorge	Y		Children of the Sun			Y
-1524 3740 0	Lovakengj	Y					Y
-1525 3293 0	The Darkfrost	Y		Children of the Sun			Y
-1542 3040 0	Hunter Guild	Y		Children of the Sun			Y
-1551 9873 0	Woodcutting Guild	Y					Y
-1592 3476 0	Woodcutting Guild	Y					Y
-1611 3681 2	Kourend Castle	Y					Y
-1624 3744 0	Arceuus	Y					Y
-1640 3944 0	Wintertodt Camp	Y					Y
-1647 3118 0	Fortis west bank	Y		Children of the Sun			Y
-1674 3615 0	Hosidius Kitchen	Y					Y
-1719 3465 0	Hosidius Sand Crabs	Y					Y
-1746 5476 0	Clan Hall	N					Y
-1748 3599 0	Hosidius	Y					Y
-1779 3094 0	Fortis east bank	Y		Children of the Sun			Y
-1800 3790 0	Port Piscarilius	Y					Y
-1804 9501 0	Fortis Colosseum	Y				4130>1999	Y
-1809 3566 0	Hosidius Vinery	Y					Y
-1882 3315 1	Port Roberts	Y					Y
-1936 2755 0	Deepfin Point	Y					Y
-1948 4957 0	Blast Furnace	Y		The Giant Dwarf			Y
-2011 9186 0	Deepfin Mine	Y			18361=1		Y
-2020 5931 0	Soul Wars	Y					Y
-2093 9198 0	Deepfin Mine	Y			18362=1		Y
-2096 3687 0	Buccaneers' Haven	Y			18369=1		Y
-2098 3919 0	Lunar Isle	Y		Lunar Diplomacy			Y
-2195 2314 0	Sunbleak Island	Y			18358=1		Y
-2212 2859 0	Soul Wars	Y					Y
-2280 2544 0	Bank Boat	Y					Y
-2330 3690 0	Piscatoris	Y		Swan Song			Y
-2335 3807 0	Neitiznot	Y		The Fremennik Isles			Y
-2352 3162 0	Lletya	Y		Mourning's End Part I			Y
-2381 4458 0	Zanaris	Y		Lost City			Y
-2396 5985 0	Hallowed Sepulchre	Y		Sins of the Father			Y
-2417 3801 0	Jatizso	Y		The Fremennik Isles			Y
-2443 3083 0	Castle Wars	Y					Y
-2445 3425 1	Tree Gnome Stronghold	Y					Y
-2445 5180 0	Mor Ul Rek	Y					Y
-2448 3482 1	Tree Gnome Stronghold	Y					Y
-2465 2848 1	Myths' Guild	Y		Dragon Slayer II			Y
-2534 4712 0	Mage Arena	Y		Mage Arena I			Y
-2536 3573 0	Barbarian Outpost	Y					Y
-2543 5141 0	Mor Ul Rek	Y					Y
-2569 2864 0	Corsair Cove	Y		The Corsair Curse			Y
-2586 3419 0	Fishing Guild	Y					Y
-2613 3092 0	Yanille	Y					Y
-2618 3332 0	Ardougne	Y					Y
-2620 3895 0	Etceteria	Y		Throne of Miscellania			Y
-2654 2387 0	Charred Island	Y			18353=1		Y
-2655 3283 0	Ardougne	Y					Y
-2661 3162 0	Port Khazard	Y					Y
-2666 2653 0	Void Knights' Outpost	Y					Y
-2701 5349 0	Dorgesh-Kaan	Y		Death to the Dorgeshuun			Y
-2724 3493 0	Seers' Village	Y					Y
-2732 3379 2	Legends' Guild	Y		Legends' Quest			Y
-2780 2783 0	Ape Atoll	Y		Monkey Madness II			Y
-2799 5169 0	Sophanem	Y		Contact!			Y
-2809 3441 0	Catherby	Y					Y
-2836 10207 0	Keldagrim	Y		The Giant Dwarf			Y
-2843 3543 0	Warriors' Guild	Y					Y
-2852 2954 0	Shilo Village	Y		Shilo Village			Y
-2904 5205 0	Ancient Prison	Y		The Frozen Door			Y
-2935 3280 0	Crafting Guild	Y	99 Crafting				Y
-2935 3280 0	Crafting Guild	Y			4464=1		Y
-2947 3368 0	Falador	N					Y
-2978 5798 0	Ruins of Camdozaal	Y		Below Ice Mountain			Y
-2984 2268 0	Onyx Crest	Y			18363=1		Y
-3012 3355 0	Falador	N					Y
-3013 5625 0	Ourania	Y					Y
-3013 9718 0	Mining Guild	Y					Y
-3038 3000 0	The Pandemonium	Y					Y
-3040 4969 1	Rogues' Den	Y					Y
-3092 3243 0	Draynor Village	N					Y
-3094 3491 0	Edgeville	N					Y
-3130 3631 0	Ferox Enclave	Y					Y
-3147 3450 0	Cooks' Guild	Y					Y
-3156 2835 0	Ruins of Unkah	Y					Y
-3162 3489 0	Grand Exchange	N					Y
-3182 2418 0	Great Conch	Y		Troubled Tortugans			Y
-3185 3440 0	Varrock	N					Y
-3195 4569 0	Tarn's Lair	Y		Haunted Mine			Y
-3208 3220 2	Lumbridge Castle	N					Y
-3218 9623 0	Culinaromancer's Chest	Y		Recipe for Disaster			Y
-3253 3420 0	Varrock	N					Y
-3256 6105 0	Prifddinas	Y		Song of the Elves			Y
-3269 3167 0	Al Kharid	N					Y
-3279 5200 0	Chambers of Xeric	Y					Y
-3295 6059 0	Prifddinas	Y		Song of the Elves			Y
-3304 5199 0	Chambers of Xeric	Y					Y
-3308 3120 0	Shantay Pass	Y					Y
-3333 5194 0	Chambers of Xeric	Y					Y
-3353 9118 0	Tombs of Amascut	Y		Beneath Cursed Sands			Y
-3365 3318 1	Mage Training Arena	Y					Y
-3374 11493 0	Giants' Foundry	Y		Sleeping Giants			Y
-3382 3269 0	Emir's Arena	Y					Y
-3420 4058 0	Daimon's Crater	Y					Y
-3427 2891 0	Nardah	Y					Y
-3495 3211 0	Burgh de Rott	Y		In Aid of the Myreque			Y
-3512 3480 0	Canifis	Y		Priest in Peril			Y
-3604 3367 0	Darkmeyer	Y		Sins of the Father			Y
-3618 9473 0	Temple of the Eye	Y		Temple of the Eye			Y
-3651 3208 0	Ver Sinhaza	Y		Priest in Peril			Y
-3680 2982 0	Mos Le'Harmless	Y		Cabin Fever			Y
-3688 3466 0	Port Phasmatys	Y		Ghosts Ahoy			Y
-3741 3805 0	Fossil Island Museum Camp	Y		Bone Voyage			Y
-3768 3899 0	Fossil Island Shipwreck	Y		Bone Voyage			Y
-3810 3021 0	Trouble Brewing	Y		Cabin Fever			Y
-3819 3809 0	Fossil Island Volcano	Y		Bone Voyage			Y
-4133 5553 0	The Fractured Archive	Y		While Guthix Sleeps			Y
+Tile	Name	Members	Skills	Quests	Varbits	VarPlayers	Items	GroupStorage
+1243 3121 0	Tal Teklan	Y		Children of the Sun				Y
+1248 3758 0	Farming Guild	Y	85 Farming					Y
+1253 3741 0	Farming Guild	Y						Y
+1254 3571 0	Mount Quidamortem	Y						Y
+1324 3824 0	Mount Karuulm	Y						Y
+1380 2866 0	Mistrock	Y		Children of the Sun				Y
+1387 3309 0	Nemus Retreat	Y		Children of the Sun				Y
+1399 2925 0	Aldarin	Y		Children of the Sun				Y
+1416 3350 0	Auburnvale	Y		Children of the Sun				Y
+1438 3828 0	Lovakengj	Y						Y
+1452 9567 1	Cam Torum	Y		Perilous Moons				Y
+1454 3858 0	Sulphur Mine	Y						Y
+1477 3874 0	Sulphur Mine	Y						Y
+1478 3856 0	Sulphur Mine	Y						Y
+1478 3873 0	Blast Mine	Y						Y
+1479 3857 0	Blast Mine	Y						Y
+1483 3646 0	Shayzien Encampment	Y						Y
+1488 3592 0	Shayzien	Y						Y
+1499 3857 0	Blast Mine	Y						Y
+1499 3857 0	Sulphur Mine	Y						Y
+1501 3871 0	Blast Mine	Y						Y
+1501 3871 0	Sulphur Mine	Y						Y
+1512 3421 0	Land's End	Y						Y
+1519 3228 0	Quetzacalli Gorge	Y		Children of the Sun				Y
+1524 3740 0	Lovakengj	Y						Y
+1525 3293 0	The Darkfrost	Y		Children of the Sun				Y
+1542 3040 0	Hunter Guild	Y		Children of the Sun				Y
+1551 9873 0	Woodcutting Guild	Y						Y
+1592 3476 0	Woodcutting Guild	Y						Y
+1611 3681 2	Kourend Castle	Y						Y
+1624 3744 0	Arceuus	Y						Y
+1640 3944 0	Wintertodt Camp	Y						Y
+1647 3118 0	Fortis west bank	Y		Children of the Sun				Y
+1674 3615 0	Hosidius Kitchen	Y						Y
+1719 3465 0	Hosidius Sand Crabs	Y						Y
+1746 5476 0	Clan Hall	N						Y
+1748 3599 0	Hosidius	Y						Y
+1779 3094 0	Fortis east bank	Y		Children of the Sun				Y
+1800 3790 0	Port Piscarilius	Y						Y
+1804 9501 0	Fortis Colosseum	Y				4130>1999		Y
+1809 3566 0	Hosidius Vinery	Y						Y
+1882 3315 1	Port Roberts	Y						Y
+1936 2755 0	Deepfin Point	Y						Y
+1948 4957 0	Blast Furnace	Y		The Giant Dwarf				Y
+2011 9186 0	Deepfin Mine	Y			18361=1			Y
+2020 5931 0	Soul Wars	Y						Y
+2093 9198 0	Deepfin Mine	Y			18362=1			Y
+2096 3687 0	Buccaneers' Haven	Y			18369=1			Y
+2098 3919 0	Lunar Isle	Y		Lunar Diplomacy			9083=1|QUEST_DREAM_MENTOR=1|VARBIT_4494=1	Y
+2195 2314 0	Sunbleak Island	Y			18358=1			Y
+2212 2859 0	Soul Wars	Y						Y
+2280 2544 0	Bank Boat	Y						Y
+2330 3690 0	Piscatoris	Y		Swan Song				Y
+2335 3807 0	Neitiznot	Y		The Fremennik Isles				Y
+2352 3162 0	Lletya	Y		Mourning's End Part I				Y
+2381 4458 0	Zanaris	Y		Lost City				Y
+2396 5985 0	Hallowed Sepulchre	Y		Sins of the Father				Y
+2417 3801 0	Jatizso	Y		The Fremennik Isles				Y
+2443 3083 0	Castle Wars	Y						Y
+2445 3425 1	Tree Gnome Stronghold	Y						Y
+2445 5180 0	Mor Ul Rek	Y						Y
+2448 3482 1	Tree Gnome Stronghold	Y						Y
+2465 2848 1	Myths' Guild	Y		Dragon Slayer II				Y
+2534 4712 0	Mage Arena	Y		Mage Arena I				Y
+2536 3573 0	Barbarian Outpost	Y						Y
+2543 5141 0	Mor Ul Rek	Y						Y
+2569 2864 0	Corsair Cove	Y		The Corsair Curse				Y
+2586 3419 0	Fishing Guild	Y						Y
+2613 3092 0	Yanille	Y						Y
+2618 3332 0	Ardougne	Y						Y
+2620 3895 0	Etceteria	Y		Throne of Miscellania				Y
+2654 2387 0	Charred Island	Y			18353=1			Y
+2655 3283 0	Ardougne	Y						Y
+2661 3162 0	Port Khazard	Y						Y
+2666 2653 0	Void Knights' Outpost	Y						Y
+2701 5349 0	Dorgesh-Kaan	Y		Death to the Dorgeshuun				Y
+2724 3493 0	Seers' Village	Y						Y
+2732 3379 2	Legends' Guild	Y		Legends' Quest				Y
+2780 2783 0	Ape Atoll	Y		Monkey Madness II				Y
+2799 5169 0	Sophanem	Y		Contact!				Y
+2809 3441 0	Catherby	Y						Y
+2836 10207 0	Keldagrim	Y		The Giant Dwarf				Y
+2843 3543 0	Warriors' Guild	Y						Y
+2852 2954 0	Shilo Village	Y		Shilo Village				Y
+2904 5205 0	Ancient Prison	Y		The Frozen Door				Y
+2935 3280 0	Crafting Guild	Y	99 Crafting					Y
+2935 3280 0	Crafting Guild	Y			4464=1			Y
+2947 3368 0	Falador	N						Y
+2978 5798 0	Ruins of Camdozaal	Y		Below Ice Mountain				Y
+2984 2268 0	Onyx Crest	Y			18363=1			Y
+3012 3355 0	Falador	N						Y
+3013 5625 0	Ourania	Y						Y
+3013 9718 0	Mining Guild	Y						Y
+3038 3000 0	The Pandemonium	Y						Y
+3040 4969 1	Rogues' Den	Y						Y
+3092 3243 0	Draynor Village	N						Y
+3094 3491 0	Edgeville	N						Y
+3130 3631 0	Ferox Enclave	Y						Y
+3147 3450 0	Cooks' Guild	Y	99 Cooking					Y
+3147 3450 0	Cooks' Guild	Y			4481=1			Y
+3156 2835 0	Ruins of Unkah	Y						Y
+3162 3489 0	Grand Exchange	N						Y
+3182 2418 0	Great Conch	Y		Troubled Tortugans				Y
+3185 3440 0	Varrock	N						Y
+3195 4569 0	Tarn's Lair	Y		Haunted Mine				Y
+3208 3220 2	Lumbridge Castle	N						Y
+3218 9623 0	Culinaromancer's Chest	Y		Recipe for Disaster				Y
+3253 3420 0	Varrock	N						Y
+3256 6105 0	Prifddinas	Y		Song of the Elves				Y
+3269 3167 0	Al Kharid	N						Y
+3279 5200 0	Chambers of Xeric	Y						Y
+3295 6059 0	Prifddinas	Y		Song of the Elves				Y
+3304 5199 0	Chambers of Xeric	Y						Y
+3308 3120 0	Shantay Pass	Y						Y
+3333 5194 0	Chambers of Xeric	Y						Y
+3353 9118 0	Tombs of Amascut	Y		Beneath Cursed Sands				Y
+3365 3318 1	Mage Training Arena	Y						Y
+3374 11493 0	Giants' Foundry	Y		Sleeping Giants				Y
+3382 3269 0	Emir's Arena	Y						Y
+3420 4058 0	Daimon's Crater	Y						Y
+3427 2891 0	Nardah	Y						Y
+3495 3211 0	Burgh de Rott	Y		In Aid of the Myreque				Y
+3512 3480 0	Canifis	Y		Priest in Peril				Y
+3604 3367 0	Darkmeyer	Y		Sins of the Father				Y
+3618 9473 0	Temple of the Eye	Y		Temple of the Eye				Y
+3651 3208 0	Ver Sinhaza	Y		Priest in Peril				Y
+3680 2982 0	Mos Le'Harmless	Y		Cabin Fever				Y
+3688 3466 0	Port Phasmatys	Y		Ghosts Ahoy				Y
+3741 3805 0	Fossil Island Museum Camp	Y		Bone Voyage				Y
+3760 5666 0	Motherlode Mine	Y						Y
+3768 3899 0	Fossil Island Shipwreck	Y		Bone Voyage				Y
+3810 3021 0	Trouble Brewing	Y		Cabin Fever				Y
+3819 3809 0	Fossil Island Volcano	Y		Bone Voyage				Y
+4133 5553 0	The Fractured Archive	Y		While Guthix Sleeps				Y

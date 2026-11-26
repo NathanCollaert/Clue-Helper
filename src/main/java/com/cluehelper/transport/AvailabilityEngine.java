@@ -33,6 +33,15 @@ public final class AvailabilityEngine
 	final RuneModel runes;
 	/** Called from any thread. */
 	final IntFunction<String> itemNames;
+	/** Every row passes with nothing spent: an account with every unlock, each teleport priced as the catalog has it. */
+	boolean meetsAll;
+
+	public static AvailabilityEngine meetingAll(RuneModel runes, IntFunction<String> itemNames)
+	{
+		AvailabilityEngine engine = new AvailabilityEngine(runes, itemNames);
+		engine.meetsAll = true;
+		return engine;
+	}
 
 
 	/** Also judges a banked snapshot ({@link PlayerSnapshot#getBank()} filled), whose witnesses name what to withdraw. */
@@ -46,6 +55,10 @@ public final class AvailabilityEngine
 	public RowAvailability judge(CatalogRow row, PlayerSnapshot player, long nowMinutes)
 	{
 		Verdict v = new Verdict();
+		if (meetsAll)
+		{
+			return v.result(row);
+		}
 		Requirements req = row.getRequirements();
 		req.getErrors().forEach(error -> v.no("catalog row unreadable: " + error));
 		if (req.isMembers() && !player.isMembersWorld())

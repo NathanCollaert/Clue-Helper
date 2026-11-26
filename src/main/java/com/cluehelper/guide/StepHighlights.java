@@ -25,9 +25,9 @@ final class StepHighlights
 	private static final String TAKE_OPTION = "Take";
 	static final String SEARCH_OPTION = "Search";
 	private static final String REMOVE_OPTION = "Remove";
-	private static final String OPEN_OPTION = "Open";
+	static final String OPEN_OPTION = "Open";
 	private static final String USE_OPTION = "Use";
-	private static final String BANK_OPTION = "Bank";
+	static final String BANK_OPTION = "Bank";
 	private static final String CAST_OPTION = "Cast";
 	private static final String CLOSE_OPTION = "Close";
 	private static final Set<Integer> FAIRY_RING_OBJECTS = Tables.idSet("fairy ring objects");
@@ -165,9 +165,16 @@ final class StepHighlights
 		return !leftClicks.isLearned(object) && !NOT_FILLED_UNHOVERED.contains(object.getId());
 	}
 
-	/** The act's items whose left click does the act: put on, taken off (a Max cape left-clicking "Home" isn't), else all. */
+	/**
+	 * The act's items whose left click does the act: put on, taken off (a Max cape left-clicking "Home" isn't), the act's
+	 * own option (Drop), else all.
+	 */
 	private Set<Integer> actItemFill(SubStep act)
 	{
+		if (act.getActOption() != null)
+		{
+			return act.getActItems().stream().filter(id -> act.getActOption().equalsIgnoreCase(leftClicks.item(id))).collect(toUnmodifiableSet());
+		}
 		if (takesOff(act))
 		{
 			return act.getActItems().stream().filter(leftClicks::removes).collect(toUnmodifiableSet());
@@ -214,16 +221,16 @@ final class StepHighlights
 		{
 			return shown.menuTarget(MenuTarget.builder().objectIds(Set.of(stash)).build()).objectOption(SEARCH_OPTION).build();
 		}
-		if (!current.getActItems().isEmpty() && !waitsForDepositBox(current))
+		if (!current.getActItems().isEmpty() && !waitsForDepositBox(current) && isAtWaypoint(current))
 		{
 			boolean takesOff = takesOff(current);
 			// Deposited items are clicked in the deposit box, which shows the inventory and worn items itself
 			boolean deposits = current.getDone() == SubStep.Done.ITEMS_GONE;
 			shown.items(current.getActItems()).fillItems(actItemFill(current))
 				.tab(takesOff ? Tab.EQUIPMENT : deposits ? Tab.NONE : Tab.INVENTORY);
-			if (takesOff)
+			if (takesOff || current.getActOption() != null)
 			{
-				return shown.menuTarget(rowTargets.items(current.getActItems(), REMOVE_OPTION)).build();
+				return shown.menuTarget(rowTargets.items(current.getActItems(), takesOff ? REMOVE_OPTION : current.getActOption())).build();
 			}
 			return (current.getDone() == SubStep.Done.WORN ? shown.menuTarget(wearTargets(current.getActItems())) : shown).build();
 		}
@@ -236,6 +243,12 @@ final class StepHighlights
 			shown.menuTarget(withStageDialogue(current));
 		}
 		return withOneClick(shown.build(), current);
+	}
+
+	/** An act at a marked tile (a feel, a drop) uses its item only once the player stands on that tile. */
+	private boolean isAtWaypoint(SubStep act)
+	{
+		return act.getKind() != SubStep.Kind.ACT || act.getWaypoint() == null || act.getWaypoint().equals(player.getPosition().getTile());
 	}
 
 	/** A gear act whose pieces are all worn takes them off: they count against its bonus. */
@@ -310,6 +323,7 @@ final class StepHighlights
 	private Highlights useOnWayIn(Highlights.HighlightsBuilder shown, StepIndex.WayIn way)
 	{
 		Set<Integer> items = player.inventoryIds().stream().filter(way.getUse()::contains).collect(toUnmodifiableSet());
+		shown.usedItem(items.stream().findFirst().orElse(-1));
 		return useOn(shown, MenuTarget.builder().objectIds(Set.of(way.getObject())), items, Set.of());
 	}
 
@@ -429,9 +443,20 @@ final class StepHighlights
 		else
 		{
 			Set<Integer> held = withHeld(shown, rowTargets.heldUses(row));
-			shown.scroll(ScrollBook.scroll(row)).scrollLeftClick(row.getOptions().size() == 1)
-				.menuTarget(rowTargets.heldTeleport(current, held));
+			ScrollBook.Scroll scroll = ScrollBook.scroll(row);
+			shown.scroll(scroll).scrollLeftClick(row.getOptions().size() == 1)
+				.menuTarget(scroll != null && !isBookDefault(held, row) ? rowTargets.items(held, OPEN_OPTION) : rowTargets.heldTeleport(current, held));
 		}
+	}
+
+	/**
+	 * The book's first option is its default teleport, named after that place or plainly "Teleport": either way it is no
+	 * list opener, so any other scroll is reached through Open.
+	 */
+	private boolean isBookDefault(Set<Integer> book, CatalogRow row)
+	{
+		String label = row.getOptions().get(row.getOptions().size() - 1);
+		return book.stream().anyMatch(id -> teleportsTo(leftClicks.item(id), label));
 	}
 
 	/**

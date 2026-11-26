@@ -23,7 +23,7 @@ public class BundledData
 	final CompletableFuture<WalkData> walk;
 
 	@Inject
-	BundledData(ScheduledExecutorService executor, Gson gson)
+	BundledData(BackgroundThread executor, Gson gson)
 	{
 		catalog = CompletableFuture.supplyAsync(() -> catalogOrEmpty(gson), executor);
 		steps = CompletableFuture.supplyAsync(() -> stepsOrEmpty(gson), executor);

@@ -1,5 +1,6 @@
 package com.cluehelper.campaign;
 
+import com.cluehelper.PlanReplay;
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.guide.SubSteps;
 import com.cluehelper.memory.StashMemory;
@@ -158,7 +159,7 @@ public final class CampaignReplay
 			.table(table)
 			.noTeleport(noTeleport)
 			.start(start)
-			.settings(recording.settings)
+			.settings(PlanReplay.recorded(recording.settings))
 			.revertTicksLeft(recording.revertTicksLeft)
 			.refusedChanges(recording.refusedChanges)
 			.foreignHouseStart(recording.foreignHouseStart)

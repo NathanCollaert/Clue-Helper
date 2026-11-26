@@ -55,14 +55,27 @@ final class LowerBound
 
 	private static int[] walkToTargets(PlanContext ctx, int[] targets)
 	{
-		WalkTable table = ctx.table;
-		int[] walk = new int[ctx.nodeCount()];
-		Arrays.fill(walk, UNREACHABLE);
-		PriorityQueue<int[]> queue = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+		int[] seed = new int[ctx.nodeCount()];
+		Arrays.fill(seed, UNREACHABLE);
 		for (int target : targets)
 		{
-			walk[target] = 0;
-			queue.add(new int[]{target, 0});
+			seed[target] = 0;
+		}
+		return walkTo(ctx, seed);
+	}
+
+	/** From every node, the cheapest walk to a seeded node plus that node's seed; the seed array becomes the result. */
+	static int[] walkTo(PlanContext ctx, int[] seed)
+	{
+		WalkTable table = ctx.table;
+		int[] walk = seed;
+		PriorityQueue<int[]> queue = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+		for (int node = 0; node < walk.length; node++)
+		{
+			if (walk[node] < UNREACHABLE)
+			{
+				queue.add(new int[]{node, walk[node]});
+			}
 		}
 		while (!queue.isEmpty())
 		{

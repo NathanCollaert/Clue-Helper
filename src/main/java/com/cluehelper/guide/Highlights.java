@@ -42,4 +42,7 @@ public class Highlights
 	String oneClickLabel;
 	/** An outlined object is filled when its left click is this option (a STASH unit's "Search"); null for teleports. */
 	String objectOption;
+	/** The carried item used on the outlined objects (a rope on the crevice), shown on them; -1 for none. */
+	@Builder.Default
+	int usedItem = -1;
 }

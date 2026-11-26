@@ -31,8 +31,13 @@ public class MenuLineOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		if (!config.highlightMenus())
+		{
+			return null;
+		}
+		lines.boxedOptions().forEach(option -> highlighter.box(graphics, option));
 		MenuTarget target = guide.getHighlights().getMenuTarget();
-		if (!config.highlightMenus() || target.isEmpty())
+		if (target.isEmpty())
 		{
 			return null;
 		}

@@ -33,7 +33,7 @@ public class ProbeTarget
 	public HotColdTier feltOn(WorldPoint tile)
 	{
 		Target chosen = target;
-		boolean feel = chosen != null && chosen.getAct() != null && !chosen.isDig() && !chosen.isHere();
+		boolean feel = chosen != null && chosen.getAct() != null && !chosen.isDig();
 		return feel && tile.equals(chosen.getTile()) ? chosen.getTier() : null;
 	}
 

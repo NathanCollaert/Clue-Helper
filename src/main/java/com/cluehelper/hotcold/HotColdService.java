@@ -85,7 +85,7 @@ public class HotColdService
 	}
 
 	@Inject
-	void init(MemoryStore memory, ScheduledExecutorService executor, ClientThread clientThread)
+	void init(MemoryStore memory, BackgroundThread executor, ClientThread clientThread)
 	{
 		runner = new PlannerRunner(executor, clientThread);
 		logs = memory.slot(KEY, FeelLogs.class, FeelLogs::new);

@@ -85,6 +85,7 @@ public final class StepLoader
 				source.getAsJsonObject("hotColdSpots").entrySet().forEach(spot -> spots.add(spot.getKey(), spot.getValue()));
 			}
 		}
+		addSpotEnemies(steps, spots);
 		JsonObject index = new JsonObject();
 		index.add("steps", sorted(steps));
 		index.add("hotColdSpots", GSON.toJsonTree(SpotParts.of(cacheSpots(spots))));
@@ -94,8 +95,26 @@ public final class StepLoader
 		StepIndex staged = SOURCE_GSON.fromJson(index, StepIndex.class);
 		StepResolver resolver = new StepResolver(() -> staged);
 		clues.forEach((key, clue) -> addActs(entryOf(index, key), resolver.resolve(clue, plugin())));
-		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(amounts(clue))));
+		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(withHandAmounts(amounts(clue), entryOf(index, key)))));
 		return SOURCE_GSON.fromJson(index, StepIndex.class);
+	}
+
+	/**
+	 * A master hot/cold step fights whatever its dig spot holds, and which spot is only known once dug: every spot's enemy is
+	 * the step's.
+	 */
+	private static void addSpotEnemies(JsonObject steps, JsonObject spots)
+	{
+		JsonArray enemies = new JsonArray();
+		spots.entrySet().stream().map(spot -> spot.getValue().getAsJsonObject().getAsJsonArray("combat")).filter(Objects::nonNull)
+			.forEach(combat -> combat.forEach(enemy -> {
+				if (!enemies.contains(enemy))
+				{
+					enemies.add(enemy);
+				}
+			}));
+		steps.entrySet().stream().filter(step -> step.getKey().startsWith("hotcold:master:"))
+			.forEach(step -> step.getValue().getAsJsonObject().add("combat", enemies));
 	}
 
 	/** The cache's hot/cold spots by core's name, as the hot/cold step file holds them. */
@@ -156,6 +175,17 @@ public final class StepLoader
 		{
 			throw new IllegalStateException(step.getKey() + "'s act holds what only the game has: " + act);
 		}
+	}
+
+	/** The hand data's own amounts win: the parts an item is made from (6 black dragon leather for a d'hide set). */
+	private static Map<Integer, Integer> withHandAmounts(Map<Integer, Integer> core, JsonObject entry)
+	{
+		Map<Integer, Integer> amounts = new TreeMap<>(core);
+		if (entry.has("amounts"))
+		{
+			entry.getAsJsonObject("amounts").entrySet().forEach(hand -> amounts.put(Integer.parseInt(hand.getKey()), hand.getValue().getAsInt()));
+		}
+		return amounts;
 	}
 
 	/** The item ids core asks for more than one of, and how many: a MultipleOfItemRequirement, alone or as one of a choice. */

@@ -34,6 +34,7 @@ A small **Clue Helper** box appears under Clue Scroll's: what to do now, the ite
 | 🖱️ **Guidance** | Every click highlighted, with a path line to where to go next, in the scene and on the minimap. |
 | 📜 **Every type** | Emotes, STASH units, Charlie, Falo, Sherlock, keys and the ways in, all guided. |
 | 🔥 **Hot/cold** | Where to feel the strange device next, then the route to the dig. |
+| 🧩 **Three-steps** | Keeps your quickest master three-step aside and guides combining its pieces onto slower ones. |
 
 
 ## Report a slow route or a bug
@@ -62,12 +63,15 @@ Something else wrong? [Open an issue](https://github.com/NathanCollaert/Clue-Hel
 | Stop Wilderness clues | Show a red warning instead of guiding into the Wilderness | Off |
 | Bank the scroll book | Bank the master scroll book before a teleport into the Wilderness | On |
 | Use the bank | Count banked teleports and items, and GIM group storage | On |
+| Save consumables | Weigh what a teleport uses up against its speed | Flat fee |
 | Spellbook changes | Which spellbook changes routes may use | All |
 | Highlight items / spells / menu lines | What gets highlighted for the current action | On |
 | Withdraw tab | Open a bank tab with only the items to withdraw (uses Bank Tags) | On |
 | Path | Draw the path line to where to go next, in the scene and on the minimap | On |
 | Overlay | None, Separate (its own overlay under Clue Scroll's), Combined (one overlay with Clue Scroll's text on top) or Helper only (Clue Scroll's overlay hidden) | Combined |
 | Show the next step | Show the action after the current one in the box | On |
+| Three-step swaps | Keep your quickest master three-step and guide combining its pieces onto slower ones | On |
+| Three-step to keep | Score three-steps by the teleports you have now, or as a maxed account would | Quickest now |
 
 
 ## Good to know
@@ -81,7 +85,8 @@ Something else wrong? [Open an issue](https://github.com/NathanCollaert/Clue-Hel
 
 Clue Helper makes no network calls. What it remembers (your bank, house, STASH units, grown spirit trees, unlocks such as Xeric's Honour and similar)
 is saved in your RuneLite profile like any other plugin setting. It reads, without changing anything, the Clue Scroll
-plugin's current clue, Menu Entry Swapper's swaps and Time Tracking's farming patches. A route report only leaves
+plugin's current clue, Menu Entry Swapper's swaps, Time Tracking's farming patches and the names Easy Teleports
+gives teleport places. A route report only leaves
 your computer when you paste it somewhere yourself.
 
 

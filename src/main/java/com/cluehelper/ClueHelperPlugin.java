@@ -2,7 +2,7 @@ package com.cluehelper;
 
 import com.cluehelper.guide.*;
 import com.cluehelper.hotcold.HotColdService;
-import com.cluehelper.link.ClueLink;
+import com.cluehelper.link.*;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.poh.PohService;
@@ -43,6 +43,9 @@ public class ClueHelperPlugin extends Plugin
 	ClueLink clueLink;
 
 	@Inject
+	ThreeStepSwap threeStepSwap;
+
+	@Inject
 	MemoryStore memory;
 
 	@Inject
@@ -77,6 +80,8 @@ public class ClueHelperPlugin extends Plugin
 
 	@Inject
 	PlannerRunner planner;
+	@Inject
+	BackgroundThread backgroundThread;
 
 	@Inject
 	RoutePlanner routes;
@@ -146,11 +151,15 @@ public class ClueHelperPlugin extends Plugin
 	WithdrawTab withdrawTab;
 
 	@Inject
+	FairyLogFilter fairyLogFilter;
+
+	@Inject
 	RouteReport routeReport;
 
 
 	final List<Runnable> unregister = new ArrayList<>();
 	boolean shownWorking;
+	List<Object> shownSwapLines = List.of();
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -161,6 +170,7 @@ public class ClueHelperPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
+		backgroundThread.start();
 		carryOverHiddenBox();
 		guideOverlay.show(GuideBox.EMPTY);
 		clueLink.start();
@@ -196,10 +206,12 @@ public class ClueHelperPlugin extends Plugin
 		unregister.clear();
 		routeReport.stop();
 		withdrawTab.stop();
+		fairyLogFilter.stop();
 		hotCold.stop();
 		guide.stop();
 		routes.stop();
 		planner.cancelAll();
+		backgroundThread.stop();
 		availability.stop();
 		poh.stop();
 		playerModel.stop();
@@ -209,6 +221,7 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onPluginChanged(PluginChanged event)
 	{
+		easyTeleportsNames.onPluginChanged();
 		if (clueLink.onPluginChanged(event))
 		{
 			clientThread.invokeLater(box::refresh);
@@ -235,9 +248,12 @@ public class ClueHelperPlugin extends Plugin
 		hotCold.onGameTick();
 		guide.onGameTick();
 		withdrawTab.refresh();
-		if (planner.isWorking() != shownWorking)
+		fairyLogFilter.refresh();
+		List<Object> swapLines = Arrays.asList(threeStepSwap.headline(), threeStepSwap.notes());
+		if (planner.isWorking() != shownWorking || !swapLines.equals(shownSwapLines))
 		{
 			shownWorking = planner.isWorking();
+			shownSwapLines = swapLines;
 			box.refresh();
 		}
 	}
@@ -269,6 +285,11 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
+		colourMenuLines();
+	}
+
+	private void colourMenuLines()
+	{
 		menuLines.colourLines(guide.getHighlights().getMenuTarget(), guide.getHighlights().getScroll(), config.highlightMenus());
 	}
 
@@ -277,12 +298,26 @@ public class ClueHelperPlugin extends Plugin
 	public void onPostMenuSort(PostMenuSort event)
 	{
 		guide.onPostMenuSort();
+		threeStepSwap.onPostMenuSort();
 	}
 
-	/** Runs after other plugins build the menu; only colours our option, never adds, removes or reorders entries. */
+	@Subscribe
+	public void onItemSpawned(ItemSpawned event)
+	{
+		threeStepSwap.onItemSpawned(event);
+	}
+
+	@Subscribe
+	public void onItemDespawned(ItemDespawned event)
+	{
+		threeStepSwap.onItemDespawned(event);
+	}
+
+	/** Runs after other plugins build the menu; only marks our option, never adds, removes or reorders entries. */
 	@Subscribe(priority = -1)
 	public void onMenuOpened(MenuOpened event)
 	{
+		menuLines.forgetMenu();
 		menuLines.colourMenu(guide.getHighlights().getMenuTarget(), config.highlightMenus());
 		menuLines.colourMenu(guide.getHighlights().getOptionTarget(), config.highlightMenus());
 		for (MenuTarget pathObject : waypointOverlay.pathObjectTargets())
@@ -297,12 +332,19 @@ public class ClueHelperPlugin extends Plugin
 	{
 		menuLines.onScriptPreFired(event);
 		poh.onScriptPreFired(event);
+		fairyLogFilter.onScriptPreFired(event);
 	}
 
 	@Subscribe
 	public void onScriptPostFired(ScriptPostFired event)
 	{
 		withdrawTab.onScriptPostFired(event);
+		fairyLogFilter.onScriptPostFired(event);
+		if (event.getScriptId() == FairyLogFilter.BUILD_LOG_SCRIPT)
+		{
+			// The game can build the travel log again every frame, putting back its own colours before the frame is drawn.
+			colourMenuLines();
+		}
 	}
 
 	@Subscribe
@@ -340,6 +382,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.onGameStateChanged(event);
 		unlocks.onGameStateChanged(event);
 		guide.onGameStateChanged(event);
+		threeStepSwap.onGameStateChanged(event);
 	}
 
 	@Subscribe

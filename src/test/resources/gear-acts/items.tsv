@@ -201,6 +201,7 @@
 1949	Chef's hat	0	|Wear|||Drop
 2162	King worm	-1	Eat||||Drop
 2357	Gold bar	-1	||||Drop
+2359	Mithril bar	-1	||||Drop
 2363	Runite bar	-1	||||Drop
 2412	Saradomin cape	1	|Wear|||Drop
 2414	Zamorak cape	1	|Wear|||Drop
@@ -927,6 +928,7 @@
 21169	Burning amulet(4)	2	|Wear||Rub|Drop
 21171	Burning amulet(3)	2	|Wear||Rub|Drop
 21173	Burning amulet(2)	2	|Wear||Rub|Drop
+21175	Burning amulet(1)	2	|Wear||Rub|Drop
 21177	Expeditious bracelet	9	|Wear|Check|Break|Drop
 21183	Bracelet of slaughter	9	|Wear|Check|Break|Drop
 21198	Lava battlestaff	3	|Wield|||Revert

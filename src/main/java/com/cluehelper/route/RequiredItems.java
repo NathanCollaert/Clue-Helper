@@ -90,7 +90,8 @@ public class RequiredItems
 		{
 			return Verdict.MET;
 		}
-		Map<Integer, Integer> all = banked == null ? carried : everything(carried, banked);
+		Set<Integer> leftBehind = banked == null ? Set.of() : leftBehind(open, banked);
+		Map<Integer, Integer> all = banked == null ? carried : everything(carried, banked, leftBehind);
 		if (banked == null || !allMet(open, all))
 		{
 			Item[] owned = PlayerSnapshot.items(all);
@@ -99,25 +100,33 @@ public class RequiredItems
 				.collect(toMap(need -> need, need -> ((AlternativeRequirement) need.requirement).missingParts(owned)));
 			return Verdict.missing(missing, parts);
 		}
-		return Verdict.fromBank(withOneStaff(open, player, carried, banked));
+		return Verdict.fromBank(withOneStaff(open, player, carried, banked, leftBehind));
+	}
+
+	/** The banked items no need may take: core's item where it is made there (black d'hide, which Entrana turns away). */
+	private static Set<Integer> leftBehind(List<Need> open, PlayerSnapshot banked)
+	{
+		return banked.storedIds().stream().filter(id -> open.stream().anyMatch(need -> need.requirement instanceof AlternativeRequirement
+			&& ((AlternativeRequirement) need.requirement).leftBehind(id))).collect(toSet());
 	}
 
 	/**
 	 * The fewest items to withdraw with at most one staff among them and the carried ones, when there is such a set; else
 	 * the fewest at all. A staff already carried (taken a moment ago) is the one: no other is added.
 	 */
-	private List<ItemUse> withOneStaff(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried, PlayerSnapshot banked)
+	private List<ItemUse> withOneStaff(List<Need> open, PlayerSnapshot player, Map<Integer, Integer> carried, PlayerSnapshot banked,
+		Set<Integer> leftBehind)
 	{
 		Set<Integer> held = carried.keySet().stream().filter(staves::contains).collect(toSet());
 		if (!held.isEmpty())
 		{
-			List<ItemUse> withHeld = minimalWithdraw(open, player, carried, banked, stavesBut(held));
+			List<ItemUse> withHeld = minimalWithdraw(open, player, carried, banked, stavesBut(held, leftBehind));
 			if (allMet(open, with(carried, withHeld)))
 			{
 				return withHeld;
 			}
 		}
-		List<ItemUse> fewest = minimalWithdraw(open, player, carried, banked, Set.of());
+		List<ItemUse> fewest = minimalWithdraw(open, player, carried, banked, leftBehind);
 		List<Integer> picked = fewest.stream().map(ItemUse::getItemId).filter(staves::contains).collect(toList());
 		if (picked.size() <= 1)
 		{
@@ -126,7 +135,7 @@ public class RequiredItems
 		List<ItemUse> best = null;
 		for (int kept : picked)
 		{
-			List<ItemUse> withdraw = minimalWithdraw(open, player, carried, banked, stavesBut(Set.of(kept)));
+			List<ItemUse> withdraw = minimalWithdraw(open, player, carried, banked, stavesBut(Set.of(kept), leftBehind));
 			if (allMet(open, with(carried, withdraw)) && (best == null || withdraw.size() < best.size()))
 			{
 				best = withdraw;
@@ -135,9 +144,11 @@ public class RequiredItems
 		return best != null ? best : fewest;
 	}
 
-	private Set<Integer> stavesBut(Set<Integer> kept)
+	private Set<Integer> stavesBut(Set<Integer> kept, Set<Integer> leftBehind)
 	{
-		return staves.stream().filter(staff -> !kept.contains(staff)).collect(toSet());
+		Set<Integer> left = staves.stream().filter(staff -> !kept.contains(staff)).collect(toSet());
+		left.addAll(leftBehind);
+		return left;
 	}
 
 	/**
@@ -208,10 +219,11 @@ public class RequiredItems
 		return open.stream().allMatch(need -> need.requirement.fulfilledBy(array));
 	}
 
-	private static Map<Integer, Integer> everything(Map<Integer, Integer> carried, PlayerSnapshot banked)
+	private static Map<Integer, Integer> everything(Map<Integer, Integer> carried, PlayerSnapshot banked, Set<Integer> leftBehind)
 	{
 		Map<Integer, Integer> items = new LinkedHashMap<>(carried);
-		banked.storedItems().forEach((id, qty) -> items.merge(id, qty, Integer::sum));
+		banked.storedItems().entrySet().stream().filter(stored -> !leftBehind.contains(stored.getKey()))
+			.forEach(stored -> items.merge(stored.getKey(), stored.getValue(), Integer::sum));
 		return items;
 	}
 

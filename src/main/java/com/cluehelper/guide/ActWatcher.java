@@ -4,10 +4,14 @@ import com.cluehelper.player.*;
 import com.cluehelper.step.*;
 import java.util.*;
 import javax.inject.*;
+import lombok.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 
 /** Client thread only. The events that end an act, each kept with the tick it was last seen. */
@@ -20,7 +24,11 @@ public class ActWatcher
 	private static final String URI = "Uri";
 	/** Uri and the double agents appear beside the player who called them. */
 	private static final int SPAWN_TILES = 5;
-	private static final Set<String> CHALLENGE_ITEMS = Set.of("challenge scroll", "puzzle box", "light box");
+	private static final List<String> BOXES = List.of("puzzle box", "light box");
+	/** Name starts, since the scroll and the puzzle box carry their tier: "Challenge scroll (hard)". */
+	private static final List<String> CHALLENGE_ITEMS = List.of("challenge scroll", BOXES.get(0), BOXES.get(1));
+	/** A solved puzzle box holds its tiles in this many slots, in item id order, and leaves the last slot empty. */
+	private static final int PUZZLE_TILES = 24;
 
 	@Inject
 	Client client;
@@ -34,6 +42,14 @@ public class ActWatcher
 	NPC enemy;
 	boolean inventoryChanged = true;
 	boolean challengeCarried;
+	/** The puzzle or light box carried, by name; null for none. */
+	@Getter(AccessLevel.PACKAGE)
+	String box;
+	@Getter(AccessLevel.PACKAGE)
+	boolean boxOpen;
+	/** The carried box was seen solved while open; a solved box opens solved again. */
+	@Getter(AccessLevel.PACKAGE)
+	boolean boxSolved;
 
 	public void onChatMessage(ChatMessage message)
 	{
@@ -67,13 +83,15 @@ public class ActWatcher
 		if (inventoryChanged)
 		{
 			inventoryChanged = false;
-			boolean carried = carriesChallengeItem();
+			boolean carried = CHALLENGE_ITEMS.stream().anyMatch(player::carriesItemNamed);
 			if (carried && !challengeCarried)
 			{
 				challengeTick = tick;
 			}
 			challengeCarried = carried;
+			box = BOXES.stream().filter(player::carriesItemNamed).findFirst().orElse(null);
 		}
+		watchBox();
 		Player local = client.getLocalPlayer();
 		WorldPoint at = local == null ? null : local.getWorldLocation();
 		if (at == null || client.getTopLevelWorldView() == null)
@@ -99,6 +117,40 @@ public class ActWatcher
 		{
 			enemyTick = tick;
 		}
+	}
+
+	private void watchBox()
+	{
+		Widget puzzle = client.getWidget(InterfaceID.TRAIL_SLIDEPUZZLE, 0);
+		Widget lights = client.getWidget(InterfaceID.LightPuzzle.LIGHTS);
+		boxOpen = puzzle != null || lights != null;
+		boolean solvedNow = puzzle != null ? isPuzzleSolved() : lights != null && areAllLit(lights);
+		boxSolved = box != null && (boxSolved || solvedNow);
+	}
+
+	private boolean isPuzzleSolved()
+	{
+		ItemContainer tiles = client.getItemContainer(InventoryID.TRAIL_PUZZLEINV);
+		Item[] items = tiles == null ? new Item[0] : tiles.getItems();
+		if (items.length < PUZZLE_TILES)
+		{
+			return false;
+		}
+		for (int slot = 1; slot < PUZZLE_TILES; slot++)
+		{
+			if (items[slot].getId() != items[0].getId() + slot)
+			{
+				return false;
+			}
+		}
+		return items.length == PUZZLE_TILES || items[PUZZLE_TILES].getId() == -1;
+	}
+
+	private static boolean areAllLit(Widget lights)
+	{
+		Widget[] bulbs = lights.getDynamicChildren();
+		return Arrays.stream(bulbs).anyMatch(bulb -> bulb.getItemId() == ItemID.TRAIL_LIGHT_LIT)
+			&& Arrays.stream(bulbs).noneMatch(bulb -> bulb.getItemId() == ItemID.TRAIL_LIGHT_UNLIT);
 	}
 
 	/** Items came out of a STASH unit since {@code since} and none went back in after. */
@@ -155,12 +207,5 @@ public class ActWatcher
 		Set<Integer> ids = new HashSet<>();
 		data.getCombat().forEach(combat -> ids.addAll(combat.getNpcs()));
 		return ids;
-	}
-
-	private boolean carriesChallengeItem()
-	{
-		PlayerSnapshot snapshot = player.getSnapshot();
-		return snapshot != null && snapshot.getInventory().keySet().stream()
-			.anyMatch(id -> CHALLENGE_ITEMS.contains(client.getItemDefinition(id).getName().toLowerCase()));
 	}
 }

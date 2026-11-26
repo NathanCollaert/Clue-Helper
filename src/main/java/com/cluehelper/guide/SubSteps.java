@@ -42,9 +42,9 @@ public final class SubSteps
 	static final int AREA_ARRIVE_TILES = 15;
 
 	private static final String ENTRANA_SHIP = "Ship: Entrana";
+	private static final String ENTRANA = "Entrana";
 	private static final String DIG = "Dig";
 	private static final String WALK_TO_DIG = "Walk to the dig spot";
-	private static final String ENTRANA_RULE = "Entrana allows no weapons or armour: the deposit box by the monks";
 	private static final String DEPOSIT = "Deposit";
 
 	/** For item names. */
@@ -194,14 +194,15 @@ public final class SubSteps
 	}
 
 	/**
-	 * Before the ship to Entrana, every weapon and piece of armour carried or worn goes in the deposit box by its monks,
-	 * which turn away anyone with one.
+	 * Before the ship or the balloon to Entrana, every weapon and piece of armour carried or worn is left behind: in the bank
+	 * at the route's last bank stop before it, else in the deposit box by the monks for the ship, or at a bank first for the
+	 * balloon. Both turn away anyone with one.
 	 */
 	private List<SubStep> withEntranaDeposits(List<SubStep> steps)
 	{
-		int ship = IntStream.range(0, steps.size()).filter(i -> isEntranaShip(steps.get(i))).findFirst().orElse(-1);
+		int crossing = IntStream.range(0, steps.size()).filter(i -> isEntranaCrossing(steps.get(i))).findFirst().orElse(-1);
 		PlayerSnapshot carrier = snapshot.get();
-		if (ship < 0 || carrier == null)
+		if (crossing < 0 || carrier == null)
 		{
 			return steps;
 		}
@@ -211,7 +212,20 @@ public final class SubSteps
 			return steps;
 		}
 		List<SubStep> out = new ArrayList<>(steps);
-		out.add(ship, entranaDeposit(banned));
+		int bank = IntStream.range(0, crossing).filter(i -> steps.get(i).getKind() == Kind.BANK).reduce((first, last) -> last).orElse(-1);
+		if (bank >= 0)
+		{
+			out.add(bank + 1, bankDeposit(banned));
+		}
+		else if (ENTRANA_SHIP.equals(steps.get(crossing).getRow().getName()))
+		{
+			out.add(crossing, entranaDeposit(banned));
+		}
+		else
+		{
+			out.addAll(0, List.of(SubStep.of(Kind.BANK, "Open the bank").build(), bankDeposit(banned),
+				SubStep.of(Kind.WITHDRAW, "Close the bank").build()));
+		}
 		return List.copyOf(out);
 	}
 
@@ -284,17 +298,28 @@ public final class SubSteps
 			.worn(List.of(anyOf(client.getItemDefinition(piece).getName(), gear))).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build();
 	}
 
-	private static boolean isEntranaShip(SubStep step)
+	/** The ship or a balloon: every row landing on Entrana. */
+	private static boolean isEntranaCrossing(SubStep step)
 	{
-		return step.getKind() == Kind.TELEPORT && step.getRow() != null && ENTRANA_SHIP.equals(step.getRow().getName());
+		return step.getKind() == Kind.TELEPORT && step.getRow() != null && ENTRANA.equals(step.getRow().getPick());
 	}
 
 	private SubStep entranaDeposit(Set<Integer> banned)
 	{
-		List<String> names = banned.stream().map(id -> client.getItemDefinition(id).getName()).sorted().collect(toList());
-		return SubStep.of(Kind.ACT, "Deposit in the deposit box:").items(List.copyOf(names))
-			.detail(ENTRANA_RULE).actItems(banned).objectIds(Set.of(ObjectID.SARIM_DEPOSIT_BOX)).option(DEPOSIT)
+		return SubStep.of(Kind.ACT, "Deposit in the deposit box:").items(itemNames(banned))
+			.actItems(banned).objectIds(Set.of(ObjectID.SARIM_DEPOSIT_BOX)).option(DEPOSIT)
 			.done(SubStep.Done.ITEMS_GONE).build();
+	}
+
+	private SubStep bankDeposit(Set<Integer> banned)
+	{
+		return SubStep.of(Kind.ACT, "Deposit in the bank:").items(itemNames(banned)).actItems(banned)
+			.tab(Tab.INVENTORY).done(SubStep.Done.ITEMS_GONE).build();
+	}
+
+	private List<String> itemNames(Set<Integer> ids)
+	{
+		return ids.stream().map(id -> client.getItemDefinition(id).getName()).sorted().collect(toUnmodifiableList());
 	}
 
 	/** What to do at the step once there, its STASH items taken out first when they wait there. */

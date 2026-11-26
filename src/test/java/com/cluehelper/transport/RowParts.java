@@ -32,6 +32,7 @@ final class RowParts
 	private static final Pattern LIST_HOTKEY = Pattern.compile("^([0-9A-Z])[.:] ");
 	/** The mushtree map's places in its hotkey order, 1 to 4: its buttons carry no number. */
 	private static final List<String> MUSHTREE_PLACES = Tables.keys("mushtree places");
+	private static final List<String> MINECART_PLACES = Tables.keys("minecart places");
 	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
 	private static final Map<String, String> CHANGE_WARNINGS = Tables.byKey("spellbook change warnings", Tables.Row::text);
 	private static final String TRAVEL_OPTION = "Travel";
@@ -326,6 +327,11 @@ final class RowParts
 		{
 			int place = MUSHTREE_PLACES.indexOf(lastOption(row));
 			return place < 0 ? 0 : MenuLines.HOTKEYS.charAt(place);
+		}
+		int station = row.getCategory() == Category.MINECART ? MINECART_PLACES.indexOf(lastOption(row)) : -1;
+		if (station >= 0)
+		{
+			return MenuLines.HOTKEYS.charAt(station);
 		}
 		if (menu != null && menu.startsWith("nexus "))
 		{

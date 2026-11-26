@@ -1,4 +1,4 @@
-== emote:blow a raspberry at aris in her tent. equip a gold ring and a gold necklace. #3 Equip the items
+== emote:blow a raspberry at aris in her tent. equip a gold ring and a gold necklace. #4 Equip the items
 -- recorded
   worn [13342] inv [952, 1127, 1523, 13069, 13111, 13222, 21795, 25932]
    -> Equip: [Gold ring, Gold necklace]
@@ -34,7 +34,7 @@
   worn [1635, 1654] inv [] done
 -- worn
   worn [1635, 1654] inv [] done
-== emote:cheer at iffie nitter. equip a chef hat and a red cape. #2 Equip the items
+== emote:cheer at iffie nitter. equip a chef hat and a red cape. #3 Equip the items
 -- recorded
   worn [13342] inv [952, 995]
    -> Equip: [Chef's hat, Red cape]
@@ -70,7 +70,7 @@
   worn [1007, 1949] inv [] done
 -- worn
   worn [1007, 1949] inv [] done
-== emote:clap at bob's brilliant axes. equip a bronze axe and leather boots. #4 Equip the items
+== emote:clap at bob's brilliant axes. equip a bronze axe and leather boots. #5 Equip the items
 -- recorded
   worn [13342] inv [952]
    -> Equip: [Bronze axe, Leather boots]
@@ -106,7 +106,7 @@
   worn [1061, 1351] inv [] done
 -- worn
   worn [1061, 1351] inv [] done
-== emote:10180 #3 Equip the items
+== emote:10180 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21155, 26818]
    -> Equip: [Bronze dagger, Iron full helm, Gold ring]
@@ -142,7 +142,7 @@
   worn [1153, 1205, 1635] inv [] done
 -- worn
   worn [1153, 1205, 1635] inv [] done
-== emote:10182 #3 Equip the items
+== emote:10182 #4 Equip the items
 -- recorded
   worn [13342] inv [952, 1127, 1523, 13069, 13111, 13222, 21795, 25932]
    -> Equip: [Iron med helm, Emerald ring, White apron]
@@ -178,7 +178,7 @@
   worn [1005, 1137, 1639] inv [] done
 -- worn
   worn [1005, 1137, 1639] inv [] done
-== emote:10184 #3 Equip the items
+== emote:10184 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Studded chaps, Iron kiteshield, Steel longsword]
@@ -214,7 +214,7 @@
   worn [1097, 1191, 1295] inv [] done
 -- worn
   worn [1097, 1191, 1295] inv [] done
-== emote:10186 #2 Equip the items
+== emote:10186 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21155, 26818]
    -> Equip: [Bronze platelegs, Steel pickaxe, Steel med helm]
@@ -250,7 +250,7 @@
   worn [1075, 1141, 1269] inv [] done
 -- worn
   worn [1075, 1141, 1269] inv [] done
-== emote:10188 #5 Equip the items
+== emote:10188 #6 Equip the items
 -- recorded
   worn [] inv [995, 13280, 34723]
    -> Equip: [Iron platelegs, Oak longbow, Emerald amulet]
@@ -286,7 +286,7 @@
   worn [845, 1067, 1696] inv [] done
 -- worn
   worn [845, 1067, 1696] inv [] done
-== emote:10190 #4 Equip the items
+== emote:10190 #5 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21276, 26818]
    -> Equip: [Black cape, Leather chaps, Steel mace]
@@ -322,7 +322,7 @@
   worn [1019, 1095, 1424] inv [] done
 -- worn
   worn [1019, 1095, 1424] inv [] done
-== emote:10192 #4 Equip the items
+== emote:10192 #5 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Coif, Steel plateskirt, Sapphire necklace]
@@ -358,7 +358,7 @@
   worn [1083, 1169, 1656] inv [] done
 -- worn
   worn [1083, 1169, 1656] inv [] done
-== emote:10194 #2 Equip the items
+== emote:10194 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 13069, 21153, 26818]
    -> Equip: [Desert shirt, Leather gloves, Leather boots]
@@ -394,7 +394,7 @@
   worn [1059, 1061, 1833] inv [] done
 -- worn
   worn [1059, 1061, 1833] inv [] done
-== emote:10196 #2 Equip the items
+== emote:10196 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Iron platebody, Studded chaps, Bronze full helm]
@@ -430,7 +430,7 @@
   worn [1097, 1115, 1155] inv [] done
 -- worn
   worn [1097, 1115, 1155] inv [] done
-== emote:10198 #2 Equip the items
+== emote:10198 #3 Equip the items
 -- recorded
   worn [] inv [952, 995, 13069, 13280, 21276, 25818, 26818, 30638]
    -> Equip: [Blue robe top, Turquoise robe bottoms, Oak shortbow]
@@ -466,7 +466,7 @@
   worn [640, 654, 843] inv [] done
 -- worn
   worn [640, 654, 843] inv [] done
-== emote:10202 #3 Equip the items
+== emote:10202 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Gold necklace, Gold ring, Bronze spear]
@@ -502,7 +502,7 @@
   worn [1237, 1635, 1654] inv [] done
 -- worn
   worn [1237, 1635, 1654] inv [] done
-== emote:10204 #3 Equip the items
+== emote:10204 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 13069, 21153, 26818]
    -> Equip: [Green robe top, Ham robe, Iron warhammer]
@@ -538,7 +538,7 @@
   worn [638, 1335, 4300] inv [] done
 -- worn
   worn [638, 1335, 4300] inv [] done
-== emote:10206 #3 Equip the items
+== emote:10206 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21276, 25818, 26818, 30638]
    -> Equip: [Blue robe top, Ham robe, Tiara]
@@ -574,7 +574,7 @@
   worn [640, 4300, 5525] inv [] done
 -- worn
   worn [640, 4300, 5525] inv [] done
-== emote:10208 #2 Equip the items
+== emote:10208 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21276, 26818]
    -> Equip: [Steel full helm, Steel platebody, Iron plateskirt]
@@ -610,7 +610,7 @@
   worn [1081, 1119, 1157] inv [] done
 -- worn
   worn [1081, 1119, 1157] inv [] done
-== emote:10210 #3 Equip the items
+== emote:10210 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Blue wizard hat, Bronze 2h sword, Ham boots]
@@ -694,7 +694,7 @@
   worn [] inv [] done
 -- worn
   worn [] inv [] done
-== emote:10214 #3 Equip the items
+== emote:10214 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Desert shirt, Green robe bottoms, Steel axe]
@@ -730,7 +730,7 @@
   worn [648, 1353, 1833] inv [] done
 -- worn
   worn [648, 1353, 1833] inv [] done
-== emote:10216 #2 Equip the items
+== emote:10216 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Studded body, Bronze platelegs, Staff]
@@ -766,7 +766,7 @@
   worn [1075, 1133, 1379] inv [] done
 -- worn
   worn [1075, 1133, 1379] inv [] done
-== emote:10218 #2 Equip the items
+== emote:10218 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21276, 25818, 26818, 30638]
    -> Equip: [Green hat, Cream robe top, Leather chaps]
@@ -802,7 +802,7 @@
   worn [642, 658, 1095] inv [] done
 -- worn
   worn [642, 658, 1095] inv [] done
-== emote:10220 #3 Equip the items
+== emote:10220 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Emerald ring, Sapphire amulet, Bronze chainbody]
@@ -838,7 +838,7 @@
   worn [1103, 1639, 1694] inv [] done
 -- worn
   worn [1103, 1639, 1694] inv [] done
-== emote:10222 #2 Equip the items
+== emote:10222 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Coif, Iron platebody, Leather gloves]
@@ -922,7 +922,7 @@
   worn [] inv [] done
 -- worn
   worn [] inv [] done
-== emote:10226 #4 Equip the items
+== emote:10226 #5 Equip the items
 -- recorded
   worn [13342] inv [335, 345, 440, 952, 995, 13069, 13103, 13111, 13124, 21153, 21276, 26818]
    -> Equip: [Leather cowl, Blue wizard robe, Iron scimitar]
@@ -958,7 +958,7 @@
   worn [577, 1167, 1323] inv [] done
 -- worn
   worn [577, 1167, 1323] inv [] done
-== emote:10228 #4 Equip the items
+== emote:10228 #5 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21155, 26818]
    -> Equip: [White apron, Green boots, Leather gloves]
@@ -994,7 +994,7 @@
   worn [628, 1005, 1059] inv [] done
 -- worn
   worn [628, 1005, 1059] inv [] done
-== emote:10230 #3 Equip the items
+== emote:10230 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21155, 26818]
    -> Equip: [Hardleather body, Leather chaps, Bronze axe]
@@ -1030,7 +1030,7 @@
   worn [1095, 1131, 1351] inv [] done
 -- worn
   worn [1095, 1131, 1351] inv [] done
-== emote:10232 #4 Equip the items
+== emote:10232 #5 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1059, 1061, 1129, 1833, 13069, 21153, 26818]
    -> Equip: [Iron chainbody, Leather chaps, Coif]
@@ -1066,7 +1066,7 @@
   worn [1095, 1101, 1169] inv [] done
 -- worn
   worn [1095, 1101, 1169] inv [] done
-== emote:12162 #2 Equip the items
+== emote:12162 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 21155, 26818]
    -> Equip: [Black axe, Coif, Ruby ring]
@@ -1102,7 +1102,7 @@
   worn [1169, 1361, 1641] inv [] done
 -- worn
   worn [1169, 1361, 1641] inv [] done
-== emote:12164 #2 Equip the items
+== emote:12164 #3 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 1203, 13069, 26818]
    -> Equip: [Mithril pickaxe, Black platebody, Iron kiteshield]
@@ -1138,7 +1138,7 @@
   worn [1125, 1191, 1273] inv [] done
 -- worn
   worn [1125, 1191, 1273] inv [] done
-== emote:19831 #4 Equip the items
+== emote:19831 #5 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 13069, 21153, 26818]
    -> Equip: [Pink skirt, Pink robe top, Body tiara]
@@ -1174,7 +1174,7 @@
   worn [636, 1013, 5533] inv [] done
 -- worn
   worn [636, 1013, 5533] inv [] done
-== emote:19833 #3 Equip the items
+== emote:19833 #4 Equip the items
 -- recorded
   worn [13342] inv [345, 440, 952, 995, 1129, 13069, 21153, 26818]
    -> Equip: [Air tiara, Staff of water]
@@ -1210,7 +1210,7 @@
   worn [1383, 5527] inv [] done
 -- worn
   worn [1383, 5527] inv [] done
-== emote:28914 #4 Equip the items
+== emote:28914 #5 Equip the items
 -- recorded
   worn [13342] inv [335, 345, 440, 952, 995, 13068, 13069, 13103, 13111, 13124, 21153, 21276, 25818, 26818]
    -> Equip: [Emerald necklace, Blue skirt, Turquoise robe top]
@@ -1333,7 +1333,7 @@
   worn [4168] inv [11864, 11865, 19639, 19641, 19643, 19645, 19647, 19649, 21264, 21266, 21888, 21890, 23073, 23075, 24370, 24444, 25898, 25900, 25904, 25906, 25910, 25912, 29816, 29818, 33066, 33068] done
 -- worn
   worn [33068] inv [4168, 11864, 11865, 19639, 19641, 19643, 19645, 19647, 19649, 21264, 21266, 21888, 21890, 23073, 23075, 24370, 24444, 25898, 25900, 25904, 25906, 25910, 25912, 29816, 29818, 33066] done
-== emote:12073 #4 Equip the items
+== emote:12073 #5 Equip the items
 -- recorded
   worn [13342, 28329, 32386, 33066] inv [952, 5321, 13069, 13111, 13124, 13140, 19525, 21268, 21389, 23946, 25818, 26948, 28939, 29893, 33120]
    -> Equip: [Dragon spear, Red d'hide chaps]
@@ -1369,7 +1369,7 @@
   worn [1249, 2495] inv [] done
 -- worn
   worn [1249, 2495] inv [] done
-== emote:12074 #3 Equip the items
+== emote:12074 #4 Equip the items
 -- recorded
   worn [13342, 21268] inv [952, 1515, 13069, 13140, 13241, 21389, 23458]
    -> Equip: [Rune boots, Proselyte hauberk, Dragonstone ring]
@@ -1405,9 +1405,9 @@
   worn [1645, 4131, 9674] inv [] done
 -- worn
   worn [1645, 4131, 9674] inv [] done
-== emote:12075 #7 Equip the items
+== emote:12075 #9 Equip the items
 -- recorded
-  worn [13342] inv [952, 3469, 13140, 21389, 31719, 33120, 34631]
+  worn [13342] inv [952, 995, 2359, 6707, 13136, 13140, 21268, 21389, 22947, 23458, 25644, 26818]
    -> Equip: [Black d'hide chaps, Spotted cape, Rolling pin]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -1423,9 +1423,9 @@
   worn [2497, 7445, 10069] inv [10073] done
 -- worn
   worn [2497, 7445, 10073] inv [10069] done
-== emote:12075 #10 Equip the items
+== emote:12075 #11 Equip the items
 -- recorded
-  worn [13342] inv [952, 3469, 13140, 21389, 31719, 33120, 34631]
+  worn [13342] inv [952, 995, 2359, 6707, 13136, 13140, 21268, 21389, 22947, 23458, 25644, 26818]
    -> Equip: [Black d'hide chaps, Spotted cape, Rolling pin]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -1459,7 +1459,7 @@
   worn [4657] inv [3105, 9185, 10452, 10454, 10456, 12203, 12259, 12271, 23413, 26486, 28327, 28329] done
 -- worn
   worn [12271, 23413, 26486, 28329] inv [3105, 4657, 9185, 10452, 10454, 10456, 12203, 12259, 28327] done
-== emote:12076 #9 Equip the items
+== emote:12076 #10 Equip the items
 -- recorded
   worn [4587, 11283, 22326, 22327, 22328, 22981, 24133, 29804, 31097] inv [590, 855, 946, 952, 954, 995, 1523, 3695, 4156, 6317, 12629, 13069, 13111, 13115, 13124, 13140, 13241, 13280, 21268, 23680, 23946, 24855, 28682, 29893, 32399, 33066]
    -> Equip: [Any mitre, Rune crossbow, Climbing boots, Ring of visibility or ring of shadows]
@@ -1507,7 +1507,7 @@
   worn [] inv [10148] done
 -- worn
   worn [10148] inv [] done
-== emote:12077 #5 Equip the items
+== emote:12077 #6 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 13111]
    -> Equip: [Black salamander]
@@ -1555,7 +1555,7 @@
   worn [10148] inv [] done
 -- worn
   worn [10148] inv [] done
-== emote:12078 #5 Equip the items
+== emote:12078 #6 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 13111, 23458, 26948]
    -> Equip: [Any god book]
@@ -1591,7 +1591,7 @@
   worn [3840] inv [3842, 3844, 12608, 12610, 12612, 26488, 26490, 26492, 26494, 26496, 26498] done
 -- worn
   worn [26498] inv [3840, 3842, 3844, 12608, 12610, 12612, 26488, 26490, 26492, 26494, 26496] done
-== emote:12079 #5 Equip the items
+== emote:12079 #6 Equip the items
 -- recorded
   worn [13342] inv [952]
    -> Equip: [Any amulet of glory, Barrows gloves, Dragon med helm]
@@ -1627,7 +1627,7 @@
   worn [1149, 1704, 7462] inv [1706, 1708, 1710, 1712, 11976, 11978] done
 -- worn
   worn [1149, 7462, 11978] inv [1704, 1706, 1708, 1710, 1712, 11976] done
-== emote:12080 #3 Equip the items
+== emote:12080 #4 Equip the items
 -- recorded
   worn [13342, 21268, 32386] inv [373, 552, 952, 995, 1745, 2574, 3054, 4084, 4251, 7936, 13069, 13140, 21389, 23680, 24855, 25932, 26818, 26948, 29920, 32399]
    -> Equip: [Seercull, Combat bracelet, Helm of Neitiznot]
@@ -1663,7 +1663,7 @@
   worn [6724, 10828, 11118] inv [11119, 11120, 11121, 11122, 11123, 11124, 11125, 11126, 11972, 11974] done
 -- worn
   worn [6724, 10828, 11974] inv [11118, 11119, 11120, 11121, 11122, 11123, 11124, 11125, 11126, 11972] done
-== emote:12081 #4 Equip the items
+== emote:12081 #5 Equip the items
 -- recorded
   worn [13342, 21268] inv [952, 3054, 11115, 13069, 13140, 13354, 21006, 21389, 23946, 25644, 25818, 30638, 30843]
    -> Equip: [Lava battlestaff, Black d'hide vambraces, Mind shield]
@@ -1699,7 +1699,7 @@
   worn [2491, 3053, 9731] inv [21198] done
 -- worn
   worn [2491, 9731, 21198] inv [3053] done
-== emote:12082 #3 Equip the items
+== emote:12082 #4 Equip the items
 -- recorded
   worn [4156, 13342, 32386] inv [952, 5321, 5982, 13069, 13111, 13124, 13140, 21268, 26948]
    -> Equip: [Splitbark legs, Dragon boots, Rune longsword]
@@ -1735,7 +1735,7 @@
   worn [1303, 3389, 11840] inv [13239, 22234] done
 -- worn
   worn [1303, 3389, 22234] inv [11840, 13239] done
-== emote:12083 #3 Equip the items
+== emote:12083 #4 Equip the items
 -- recorded
   worn [4156, 6465, 22326, 22327, 22328, 22981, 24133, 29804, 31097] inv [590, 855, 946, 952, 954, 995, 1523, 3695, 4587, 6317, 12629, 13069, 13111, 13115, 13124, 13140, 13241, 13280, 21268, 23680, 23946, 24855, 28682, 29893, 32399]
    -> Equip: [Granite shield, Splitbark body, Any rune heraldic helm]
@@ -1771,7 +1771,7 @@
   worn [3122, 3387, 10286] inv [10287, 10288, 10289, 10290, 10291, 10292, 10293, 10294] done
 -- worn
   worn [3122, 3387, 10294] inv [10286, 10287, 10288, 10289, 10290, 10291, 10292, 10293] done
-== emote:19787 #2 Equip the items
+== emote:19787 #3 Equip the items
 -- recorded
   worn [552, 4084, 13342, 21268] inv [383, 449, 564, 952, 1623, 13069, 13140, 25932, 32399]
    -> Equip: [Blue d'hide vambraces, Dragon spear, Rune plateskirt]
@@ -1845,7 +1845,7 @@
   worn [1093, 1249, 2487] inv [4084]
    -> Equip: [Sled]
    outline [4084] fill [4084] tab INVENTORY menu [[Ride]@[4084]]
-== emote:19788 #3 Equip the items
+== emote:19788 #4 Equip the items
 -- recorded
   worn [13342, 28329, 32386, 33066] inv [952, 5321, 13069, 13111, 13124, 13140, 19525, 21268, 23946, 25818, 26948, 28939, 29893, 33120]
    -> Equip: [Mystic robe bottom, Rune kiteshield, Any bob shirt]
@@ -1881,7 +1881,7 @@
   worn [1201, 4093, 10316] inv [10317, 10318, 10319, 10320, 10321, 10322, 10323, 10324] done
 -- worn
   worn [1201, 4093, 10324] inv [10316, 10317, 10318, 10319, 10320, 10321, 10322, 10323] done
-== emote:19789 #4 Equip the items
+== emote:19789 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 21802, 33120]
    -> Equip: [Cape of Legends, Dragon battleaxe, Any amulet of glory]
@@ -1917,7 +1917,7 @@
   worn [1052, 1377, 1704] inv [1706, 1708, 1710, 1712, 11976, 11978, 28037] done
 -- worn
   worn [1052, 11978, 28037] inv [1377, 1704, 1706, 1708, 1710, 1712, 11976] done
-== emote:19790 #4 Equip the items
+== emote:19790 #5 Equip the items
 -- recorded
   worn [13342, 21268] inv [952, 13069, 13140, 13354, 21389, 23946, 25644, 25818]
    -> Equip: [Castle wars bracelet, Dragonstone amulet, Ring of forging]
@@ -1953,9 +1953,9 @@
   worn [1702, 2568, 11079] inv [11080, 11081, 11082, 11083] done
 -- worn
   worn [1702, 2568, 11083] inv [11079, 11080, 11081, 11082] done
-== emote:19791 #5 Equip the items
+== emote:19791 #4 Equip the items
 -- recorded
-  worn [13342] inv [303, 952, 954, 5300, 10006, 10008, 10010, 10012, 10029, 10150, 11260, 13111, 13140, 26948, 29263, 29265, 29267, 29269, 29309]
+  worn [13342] inv [952, 995, 13128, 13140, 13354, 22947, 23680, 25644, 32399]
    -> Equip: [Any pirate bandana, Dragon necklace, Magic longbow]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -1971,9 +1971,9 @@
   worn [859, 1664, 7112] inv [7124, 7130, 7136] done
 -- worn
   worn [859, 1664, 7136] inv [7112, 7124, 7130] done
-== emote:19791 #8 Equip the items
+== emote:19791 #6 Equip the items
 -- recorded
-  worn [13342] inv [303, 952, 954, 5300, 10006, 10008, 10010, 10012, 10029, 10150, 11260, 13111, 13140, 26948, 29263, 29265, 29267, 29269, 29309]
+  worn [13342] inv [952, 995, 13128, 13140, 13354, 22947, 23680, 25644, 32399]
    -> Equip: [Any pirate bandana, Dragon necklace, Magic longbow]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -1989,7 +1989,7 @@
   worn [859, 1664, 7112] inv [7124, 7130, 7136] done
 -- worn
   worn [859, 1664, 7136] inv [7112, 7124, 7130] done
-== emote:25786 #3 Equip the items
+== emote:25786 #4 Equip the items
 -- recorded
   worn [13342, 21268, 32386] inv [373, 552, 952, 995, 1745, 2574, 3054, 4084, 4251, 7936, 13069, 13140, 21389, 23680, 24855, 25932, 26818, 26948, 29920, 32399]
    -> Equip: [Farmer's strawhat, Shayzien body (5), Pyromancer robe]
@@ -2166,7 +2166,7 @@
   worn [1949] inv [9801, 9802, 13106, 13107, 13280, 13342, 20205] done
 -- worn
   worn [13107, 13342, 20205] inv [1949, 9801, 9802, 13106, 13280] done
-== emote:10234 #4 Equip the items
+== emote:10234 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 13069]
    -> Equip: [Rune platelegs, Iron platebody, Blue d'hide vambraces]
@@ -2202,7 +2202,7 @@
   worn [1079, 1115, 2487] inv [] done
 -- worn
   worn [1079, 1115, 2487] inv [] done
-== emote:10236 #3 Equip the items
+== emote:10236 #4 Equip the items
 -- recorded
   worn [13342] inv [952, 1359, 4251, 6317, 13069, 13103, 13115, 13124, 13144, 21173, 23458, 25932, 29893]
    -> Equip: [Elemental shield, Blue d'hide chaps, Rune warhammer]
@@ -2247,7 +2247,7 @@
   worn [] inv [2487, 2499] done
 -- worn
   worn [2487, 2499] inv [] done
-== emote:10238 #5 Equip the items
+== emote:10238 #6 Equip the items
 -- recorded
   worn [13342] inv [952, 13069]
    -> Equip: [Blue d'hide body, Blue d'hide vambraces]
@@ -2340,7 +2340,7 @@
   worn [] inv [] done
 -- worn
   worn [] inv [] done
-== emote:10242 #6 Equip the items
+== emote:10242 #7 Equip the items
 -- recorded
   worn [13342] inv [952, 6707, 13068, 13069, 13111]
    -> Equip: [Ring of life, Amulet of glory, Adamant 2h sword]
@@ -2376,7 +2376,7 @@
   worn [1317, 1704, 2570] inv [] done
 -- worn
   worn [1317, 1704, 2570] inv [] done
-== emote:10244 #6 Equip the items
+== emote:10244 #7 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 26948]
    -> Equip: [Adamant sq shield, Blue d'hide vambraces, Rune pickaxe]
@@ -2421,7 +2421,7 @@
   worn [] inv [1643, 1731] done
 -- worn
   worn [1643, 1731] inv [] done
-== emote:10246 #5 Equip the items
+== emote:10246 #6 Equip the items
 -- recorded
   worn [13342] inv [952, 21389]
    -> Equip: [Diamond ring, Amulet of power]
@@ -2466,7 +2466,7 @@
   worn [1643, 1731] inv [] done
 -- worn
   worn [1643, 1731] inv [] done
-== emote:10248 #4 Equip the items
+== emote:10248 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 1359, 4251, 6317, 13069, 13103, 13115, 13124, 13144, 21173, 25932, 29893]
    -> Equip: [Rune full helm, Blue d'hide chaps, Fire battlestaff]
@@ -2502,7 +2502,7 @@
   worn [1163, 1393, 2493] inv [] done
 -- worn
   worn [1163, 1393, 2493] inv [] done
-== emote:10250 #5 Equip the items
+== emote:10250 #6 Equip the items
 -- recorded
   worn [13342] inv [946, 952, 4446, 13124, 13132, 21149, 21169]
    -> Equip: [Mithril platelegs, Ring of life, Rune axe]
@@ -2538,7 +2538,7 @@
   worn [1071, 1359, 2570] inv [] done
 -- worn
   worn [1071, 1359, 2570] inv [] done
-== emote:10252 #3 Equip the items
+== emote:10252 #4 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 13103, 13111, 13124, 21389]
    -> Equip: [Mystic hat, Bone spear, Rune platebody]
@@ -2574,7 +2574,7 @@
   worn [1127, 4089, 5016] inv [] done
 -- worn
   worn [1127, 4089, 5016] inv [] done
-== emote:12542 #4 Equip the items
+== emote:12542 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 6707, 13068, 13069, 13111]
    -> Equip: [Mystic fire staff, Diamond bracelet, Rune boots]
@@ -2610,7 +2610,7 @@
   worn [1401, 4131, 11092] inv [] done
 -- worn
   worn [1401, 4131, 11092] inv [] done
-== emote:12544 #3 Equip the items
+== emote:12544 #4 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 21389, 22400, 25818]
    -> Equip: [Any stole, Any heraldic rune shield]
@@ -2646,7 +2646,7 @@
   worn [7336, 10470] inv [7342, 7348, 7354, 7360, 10472, 10474, 12201, 12257, 12269] done
 -- worn
   worn [7360, 12269] inv [7336, 7342, 7348, 7354, 10470, 10472, 10474, 12201, 12257] done
-== emote:12546 #8 Equip the items
+== emote:12546 #9 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 13103, 13111, 13124, 21153, 21389]
    -> Equip: [Any headband, Any crozier]
@@ -2682,7 +2682,7 @@
   worn [2645, 10440] inv [2646, 2647, 2648, 2649, 10441, 10442, 10443, 10444, 12199, 12263, 12275, 12299, 12300, 12301, 12302, 12303, 12304, 12305, 12306, 12307] done
 -- worn
   worn [12275, 12307] inv [2645, 2646, 2647, 2648, 2649, 10440, 10441, 10442, 10443, 10444, 12199, 12263, 12299, 12300, 12301, 12302, 12303, 12304, 12305, 12306] done
-== emote:12548 #4 Equip the items
+== emote:12548 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 13103, 13111, 13124, 21389]
    -> Equip: [Any rune heraldic helm, Rune spear, Rune platelegs]
@@ -2772,7 +2772,7 @@
   worn [4091, 7336] inv [7342, 7348, 7354, 7360] done
 -- worn
   worn [4091, 7360] inv [7336, 7342, 7348, 7354] done
-== emote:12552 #5 Equip the items
+== emote:12552 #6 Equip the items
 -- recorded
   worn [13342] inv [952, 13103]
    -> Equip: [Rune halberd, Rune platebody, Amulet of strength]
@@ -2808,7 +2808,7 @@
   worn [1127, 1725, 3202] inv [] done
 -- worn
   worn [1127, 1725, 3202] inv [] done
-== emote:29859 #6 Equip the items
+== emote:29859 #7 Equip the items
 -- recorded
   worn [13342] inv [952, 1359, 4251, 6317, 13069, 13103, 21171, 25932]
    -> Equip: [Rune longsword, Rune platebody, Rune plateskirt]
@@ -2879,7 +2879,7 @@
    stuck
 == cryptic:a chisel and hammer reside in his home, strange for one of magic. impress him with your magical equipment. #4 Equip:
 -- recorded
-  worn [13342, 25549, 25551, 25553, 25555] inv [565, 952, 1616, 4151, 13069, 13140, 21268]
+  worn [13342, 24745, 24751, 24754, 24757, 24760] inv [952, 995, 13128, 13132, 13140, 13354, 22947, 23680, 25644, 32399]
    -> Equip: [+100 magic attack]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -2889,12 +2889,12 @@
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
 -- carried
-  worn [] inv [1203, 1213, 1215, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1704, 2414, 3053, 3054, 3844, 4091, 4170, 7409, 7462, 11126, 12257, 12273, 13103, 13124, 13132, 13333, 19720, 20714, 21006, 21024, 21276, 21776, 21793, 21795, 22323, 22557, 22986, 24133, 24423, 24664, 24666, 24780, 25404, 25410, 25413, 25416, 25818, 25900, 25981, 25985, 26948, 27275, 27287, 27291, 27665, 27690, 28260, 28262, 28313, 28327, 28329, 29594, 29806, 31097, 31106, 33718, 34428]
+  worn [] inv [1203, 1213, 1215, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1704, 2414, 3053, 3054, 3844, 4091, 4170, 7409, 7462, 12273, 13103, 13124, 13132, 13333, 19720, 20714, 21006, 21024, 21276, 21776, 21793, 21795, 22323, 22557, 22986, 24133, 24423, 24664, 24666, 24780, 25404, 25410, 25413, 25416, 25818, 25900, 25981, 25985, 26948, 27275, 27287, 27291, 27665, 27690, 28260, 28262, 28313, 28327, 28329, 29594, 29806, 31097, 31106, 33718, 34428]
    -> Equip: [Purging staff, Twisted ancestral robe top, Ancestral robe bottom, Confliction gauntlets]
    outline [21024, 24666, 29594, 31106] fill [21024, 24666, 29594, 31106] tab INVENTORY menu [[Wear]@[21024], [Wear]@[24666], [Wield]@[29594], [Wear]@[31106]]
-  worn [21024, 24666, 29594, 31106] inv [1203, 1213, 1215, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1704, 2414, 3053, 3054, 3844, 4091, 4170, 7409, 7462, 11126, 12257, 12273, 13103, 13124, 13132, 13333, 19720, 20714, 21006, 21276, 21776, 21793, 21795, 22323, 22557, 22986, 24133, 24423, 24664, 24780, 25404, 25410, 25413, 25416, 25818, 25900, 25981, 25985, 26948, 27275, 27287, 27291, 27665, 27690, 28260, 28262, 28313, 28327, 28329, 29806, 31097, 33718, 34428] done
+  worn [21024, 24666, 29594, 31106] inv [1203, 1213, 1215, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1704, 2414, 3053, 3054, 3844, 4091, 4170, 7409, 7462, 12273, 13103, 13124, 13132, 13333, 19720, 20714, 21006, 21276, 21776, 21793, 21795, 22323, 22557, 22986, 24133, 24423, 24664, 24780, 25404, 25410, 25413, 25416, 25818, 25900, 25981, 25985, 26948, 27275, 27287, 27291, 27665, 27690, 28260, 28262, 28313, 28327, 28329, 29806, 31097, 33718, 34428] done
 -- worn
-  worn [24133, 25404, 25416, 25900, 25985, 28329, 31097, 31106, 33718, 34428] inv [1203, 1213, 1215, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1704, 2414, 3053, 3054, 3844, 4091, 4170, 7409, 7462, 11126, 12257, 12273, 13103, 13124, 13132, 13333, 19720, 20714, 21006, 21024, 21276, 21776, 21793, 21795, 22323, 22557, 22986, 24423, 24664, 24666, 24780, 25410, 25413, 25818, 25981, 26948, 27275, 27287, 27291, 27665, 27690, 28260, 28262, 28313, 28327, 29594, 29806] done
+  worn [24133, 25404, 25416, 25900, 25985, 28329, 31097, 31106, 33718, 34428] inv [1203, 1213, 1215, 1391, 1393, 1395, 1397, 1399, 1405, 1407, 1704, 2414, 3053, 3054, 3844, 4091, 4170, 7409, 7462, 12273, 13103, 13124, 13132, 13333, 19720, 20714, 21006, 21024, 21276, 21776, 21793, 21795, 22323, 22557, 22986, 24423, 24664, 24666, 24780, 25410, 25413, 25818, 25981, 26948, 27275, 27287, 27291, 27665, 27690, 28260, 28262, 28313, 28327, 29594, 29806] done
 == cryptic:anger abbot langley. #5 Equip:
 -- recorded
   worn [10394] inv [552, 1523, 13111, 33066]
@@ -3060,7 +3060,7 @@
   worn [2414, 11808, 19936] inv [13333, 21795] done
 -- worn
   worn [11808, 19936, 21795] inv [2414, 13333] done
-== emote:beckon by a collection of crystalline maple trees. beware of double agents! equip bryophyta's staff and a nature tiara. #4 Equip the items
+== emote:beckon by a collection of crystalline maple trees. beware of double agents! equip bryophyta's staff and a nature tiara. #5 Equip the items
 -- recorded
   worn [13342] inv [303, 556, 563, 952, 954, 5300, 10006, 10008, 10010, 10012, 10029, 10150, 10887, 11260, 13111, 13140, 13241, 26948, 29263, 29265, 29267, 29269, 29309]
    -> Equip: [Bryophyta's staff, Nature tiara]
@@ -3114,7 +3114,7 @@
   worn [2414] inv [2657, 10858, 11808, 13333, 19936, 21795] done
 -- worn
   worn [2657, 11808, 19936, 21795] inv [2414, 10858, 13333] done
-== emote:blow a kiss outside k'ril tsutsaroth's chamber. beware of double agents! equip a zamorak full helm and the shadow sword. #4 Equip the items
+== emote:blow a kiss outside k'ril tsutsaroth's chamber. beware of double agents! equip a zamorak full helm and the shadow sword. #5 Equip the items
 -- recorded
   worn [10933, 10939, 10940, 10941, 13342, 28260] inv [556, 563, 952, 1127, 1523, 10595, 11849, 13069, 13111, 13140, 13222, 13241, 21795, 25932]
    -> Equip: [Zamorak full helm, Shadow sword]
@@ -3156,7 +3156,7 @@
    -> Equip: [Shadow sword]
    outline [10858] fill [10858] tab INVENTORY menu [[Wield]@[10858]]
   worn [2657, 10858, 19936, 21795] inv [2414, 11808, 13333] done
-== emote:blow a raspberry in the bank of the warriors' guild. beware of double agents! equip a dragon battleaxe, a slayer helm of any kind and a dragon defender or avernic defender. #3 Equip the items
+== emote:blow a raspberry in the bank of the warriors' guild. beware of double agents! equip a dragon battleaxe, a slayer helm of any kind and a dragon defender or avernic defender. #4 Equip the items
 -- recorded
   worn [13342] inv [556, 952, 1623, 4587, 13069, 13140, 22322, 24855]
    -> Equip: [Dragon battleaxe, Avernic defender, Any slayer helmet]
@@ -3198,7 +3198,7 @@
   worn [1377, 11864, 12954] inv [11865, 19639, 19641, 19643, 19645, 19647, 19649, 19722, 21264, 21266, 21888, 21890, 22322, 23073, 23075, 24143, 24186, 24370, 24444, 25177, 25179, 25181, 25183, 25185, 25187, 25189, 25191, 25898, 25900, 25902, 25904, 25906, 25908, 25910, 25912, 25914, 26674, 26675, 26676, 26677, 26678, 26679, 26680, 26681, 26682, 26683, 26684, 27550, 27551, 27552, 27553, 28037, 29816, 29818, 29820, 29822, 33066, 33068, 33070, 33072, 33338, 33340, 33439, 33441, 33443, 33445, 33447, 33449] done
 -- worn
   worn [27553, 28037, 33449] inv [1377, 11864, 11865, 12954, 19639, 19641, 19643, 19645, 19647, 19649, 19722, 21264, 21266, 21888, 21890, 22322, 23073, 23075, 24143, 24186, 24370, 24444, 25177, 25179, 25181, 25183, 25185, 25187, 25189, 25191, 25898, 25900, 25902, 25904, 25906, 25908, 25910, 25912, 25914, 26674, 26675, 26676, 26677, 26678, 26679, 26680, 26681, 26682, 26683, 26684, 27550, 27551, 27552, 29816, 29818, 29820, 29822, 33066, 33068, 33070, 33072, 33338, 33340, 33439, 33441, 33443, 33445, 33447] done
-== emote:bow in front of the cave on brittle isle. beware of double agents! equip a medallion of the deep and a rosewood blowpipe. #6 Equip the items
+== emote:bow in front of the cave on brittle isle. beware of double agents! equip a medallion of the deep and a rosewood blowpipe. #7 Equip the items
 -- recorded
   worn [13342] inv [6528, 11849, 13068, 13222, 24175]
    -> Equip: [Medallion of the Deep, Rosewood blowpipe]
@@ -3234,9 +3234,9 @@
   worn [31583, 32386] inv [] done
 -- worn
   worn [31583, 32386] inv [] done
-== emote:bow in the iorwerth camp. beware of double agents! equip a charged crystal bow. #3 Equip the items
+== emote:bow in the iorwerth camp. beware of double agents! equip a charged crystal bow. #4 Equip the items
 -- recorded
-  worn [28260] inv [229, 307, 552, 590, 946, 952, 1523, 12934, 13111, 13140, 13280, 21389, 26948, 33066]
+  worn [] inv [229, 307, 590, 946, 952, 954, 2363, 3469, 4587, 5321, 6707, 11943, 12934, 13115, 13124, 13140, 13280, 21175, 21389, 23946, 25644, 30638, 32017, 33718]
    -> Equip: [Crystal Bow or Bow of Faerdhinen]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3254,7 +3254,25 @@
   worn [33021] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187] done
 == emote:bow in the iorwerth camp. beware of double agents! equip a charged crystal bow. #6 Equip the items
 -- recorded
-  worn [28260] inv [229, 307, 552, 590, 946, 952, 1523, 12934, 13111, 13140, 13280, 21389, 26948, 33066]
+  worn [] inv [229, 307, 590, 946, 952, 954, 2363, 3469, 4587, 5321, 6707, 11943, 12934, 13115, 13124, 13140, 13280, 21175, 21389, 23946, 25644, 30638, 32017, 33718]
+   -> Equip: [Crystal Bow or Bow of Faerdhinen]
+   outline [] fill [] tab INVENTORY menu [[]@[]]
+   stuck
+-- bare
+  worn [] inv []
+   -> Equip: [Crystal Bow or Bow of Faerdhinen]
+   outline [] fill [] tab INVENTORY menu [[]@[]]
+   stuck
+-- carried
+  worn [] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187, 33021]
+   -> Equip: [Crystal bow]
+   outline [23983] fill [23983] tab INVENTORY menu [[Wield]@[23983]]
+  worn [23983] inv [24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187, 33021] done
+-- worn
+  worn [33021] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187] done
+== emote:bow near lord iorwerth. beware of double agents! equip a charged crystal bow. #4 Equip the items
+-- recorded
+  worn [13342] inv [229, 307, 590, 946, 952, 954, 3469, 5321, 6707, 12934, 13115, 13124, 13140, 21175, 21389, 23946, 30638]
    -> Equip: [Crystal Bow or Bow of Faerdhinen]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3272,7 +3290,7 @@
   worn [33021] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187] done
 == emote:bow near lord iorwerth. beware of double agents! equip a charged crystal bow. #6 Equip the items
 -- recorded
-  worn [4151, 13342] inv [952, 4251, 8851, 13140, 23946, 25818]
+  worn [13342] inv [229, 307, 590, 946, 952, 954, 3469, 5321, 6707, 12934, 13115, 13124, 13140, 21175, 21389, 23946, 30638]
    -> Equip: [Crystal Bow or Bow of Faerdhinen]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3288,27 +3306,9 @@
   worn [23983] inv [24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187, 33021] done
 -- worn
   worn [33021] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187] done
-== emote:bow near lord iorwerth. beware of double agents! equip a charged crystal bow. #9 Equip the items
+== emote:cheer in the entrana church. beware of double agents! equip a full set of black dragonhide armour. #6 Equip the items
 -- recorded
-  worn [4151, 13342] inv [952, 4251, 8851, 13140, 23946, 25818]
-   -> Equip: [Crystal Bow or Bow of Faerdhinen]
-   outline [] fill [] tab INVENTORY menu [[]@[]]
-   stuck
--- bare
-  worn [] inv []
-   -> Equip: [Crystal Bow or Bow of Faerdhinen]
-   outline [] fill [] tab INVENTORY menu [[]@[]]
-   stuck
--- carried
-  worn [] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187, 33021]
-   -> Equip: [Crystal bow]
-   outline [23983] fill [23983] tab INVENTORY menu [[Wield]@[23983]]
-  worn [23983] inv [24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187, 33021] done
--- worn
-  worn [33021] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187] done
-== emote:cheer in the entrana church. beware of double agents! equip a full set of black dragonhide armour. #5 Equip the items
--- recorded
-  worn [4156, 10933, 10939, 10940, 10941, 28262] inv [952, 10595, 13069, 13140, 13241, 13280, 19525, 21268, 33066]
+  worn [13342] inv [952, 954, 13115, 21175, 21389, 23946]
    -> Equip: [Black d'hide vambraces, Black d'hide chaps, Black d'hide body]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3326,7 +3326,7 @@
   worn [2491, 2497, 2503] inv [] done
 == emote:cheer in the entrana church. beware of double agents! equip a full set of black dragonhide armour. #8 Equip the items
 -- recorded
-  worn [4156, 10933, 10939, 10940, 10941, 28262] inv [952, 10595, 13069, 13140, 13241, 13280, 19525, 21268, 33066]
+  worn [13342] inv [952, 954, 13115, 21175, 21389, 23946]
    -> Equip: [Black d'hide vambraces, Black d'hide chaps, Black d'hide body]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3420,7 +3420,7 @@
   worn [10394] inv [1523] done
 -- worn
   worn [10394] inv [1523] done
-== emote:cry in the tzhaar gem store. beware of double agents! equip a fire cape and toktz-xil-ul. #3 Equip the items
+== emote:cry in the tzhaar gem store. beware of double agents! equip a fire cape and toktz-xil-ul. #4 Equip the items
 -- recorded
   worn [13342] inv [952, 13069, 22322, 24855]
    -> Equip: [Fire cape, Toktz-xil-ul]
@@ -3456,7 +3456,7 @@
   worn [6522, 6570] inv [13329, 21285, 21295, 24133, 24134, 24223, 24224] done
 -- worn
   worn [6522, 24224] inv [6570, 13329, 21285, 21295, 24133, 24134, 24223] done
-== emote:dance in iban's temple. beware of double agents! equip iban's staff, a black mystic top and a black mystic bottom. #3 Equip the items
+== emote:dance in iban's temple. beware of double agents! equip iban's staff, a black mystic top and a black mystic bottom. #4 Equip the items
 -- recorded
   worn [13342] inv [952, 5743, 13111, 13222, 32017]
    -> Equip: [Any iban's staff, Mystic robe top (dark), Mystic robe bottom (dark)]
@@ -3492,7 +3492,7 @@
   worn [1409, 4101, 4103] inv [12658] done
 -- worn
   worn [4101, 4103, 12658] inv [1409] done
-== emote:dance in the king black dragon's lair. beware of double agents! equip a black dragonhide body, black dragonhide vambraces and a black dragon mask. #3 Equip the items
+== emote:dance in the king black dragon's lair. beware of double agents! equip a black dragonhide body, black dragonhide vambraces and a black dragon mask. #4 Equip the items
 -- recorded
   worn [13342] inv [952, 5743, 13111, 13222]
    -> Equip: [Black d'hide body, Black d'hide vambraces, Black dragon mask]
@@ -3528,7 +3528,7 @@
   worn [2491, 2503, 12524] inv [] done
 -- worn
   worn [2491, 2503, 12524] inv [] done
-== emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #5 Equip the items
+== emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #6 Equip the items
 -- recorded
   worn [13342, 28329, 29796, 32386, 33066] inv [307, 552, 561, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13241, 19476, 19669, 21268, 21389, 24738, 26948, 28260]
    -> Equip: [Any full barrows set]
@@ -3541,17 +3541,9 @@
    stuck
 -- carried
   worn [] inv [4708, 4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's hood]
-   outline [4708] fill [4708] tab INVENTORY menu [[Wear]@[4708]]
-  worn [4708] inv [4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's staff]
-   outline [4710] fill [4710] tab INVENTORY menu [[Wield]@[4710]]
-  worn [4708, 4710] inv [4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's robetop]
-   outline [4712] fill [4712] tab INVENTORY menu [[Wear]@[4712]]
-  worn [4708, 4710, 4712] inv [4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's robeskirt]
-   outline [4714] fill [4714] tab INVENTORY menu [[Wear]@[4714]]
+   -> Equip: [Ahrim's hood, Ahrim's staff, Ahrim's robetop, Ahrim's robeskirt]
+   outline [4708, 4710, 4712, 4714] fill [4708, 4710, 4712, 4714] tab INVENTORY menu [[Wear]@[4708], [Wield]@[4710], [Wear]@[4712], [Wear]@[4714]]
+  worn [4708, 4710, 4712, 4714] inv [4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574] done
 -- worn
   worn [30543, 30545, 30547, 30574] inv [4708, 4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30568, 30570, 30571, 30572, 30573] done
 == emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #8 Equip the items
@@ -3567,20 +3559,12 @@
    stuck
 -- carried
   worn [] inv [4708, 4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's hood]
-   outline [4708] fill [4708] tab INVENTORY menu [[Wear]@[4708]]
-  worn [4708] inv [4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's staff]
-   outline [4710] fill [4710] tab INVENTORY menu [[Wield]@[4710]]
-  worn [4708, 4710] inv [4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's robetop]
-   outline [4712] fill [4712] tab INVENTORY menu [[Wear]@[4712]]
-  worn [4708, 4710, 4712] inv [4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574]
-   -> Equip: [Ahrim's robeskirt]
-   outline [4714] fill [4714] tab INVENTORY menu [[Wear]@[4714]]
+   -> Equip: [Ahrim's hood, Ahrim's staff, Ahrim's robetop, Ahrim's robeskirt]
+   outline [4708, 4710, 4712, 4714] fill [4708, 4710, 4712, 4714] tab INVENTORY menu [[Wear]@[4708], [Wield]@[4710], [Wear]@[4712], [Wear]@[4714]]
+  worn [4708, 4710, 4712, 4714] inv [4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30543, 30545, 30547, 30568, 30570, 30571, 30572, 30573, 30574] done
 -- worn
   worn [30543, 30545, 30547, 30574] inv [4708, 4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30568, 30570, 30571, 30572, 30573] done
-== emote:flap at the death altar. beware of double agents! equip a death tiara, a legend's cape and any ring of wealth. #6 Equip the items
+== emote:flap at the death altar. beware of double agents! equip a death tiara, a legend's cape and any ring of wealth. #7 Equip the items
 -- recorded
   worn [13342, 24757] inv [952, 22400]
    -> Equip: [Any ring of wealth, Death tiara, Cape of Legends]
@@ -3652,9 +3636,27 @@
   worn [11804, 12273, 12480] inv [20370] done
 -- worn
   worn [12273, 12480, 20370] inv [11804] done
+== emote:jump for joy in the centre of zul-andra. beware of double agents! equip a dragon 2h sword, bandos boots and an obsidian cape. #4 Equip the items
+-- recorded
+  worn [1187, 3387, 7325, 13342] inv [229, 307, 590, 946, 952, 954, 3469, 5321, 6707, 12934, 13115, 13124, 13140, 21175, 21389, 23946, 30638]
+   -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
+   outline [] fill [] tab INVENTORY menu [[]@[]]
+   stuck
+-- bare
+  worn [] inv []
+   -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
+   outline [] fill [] tab INVENTORY menu [[]@[]]
+   stuck
+-- carried
+  worn [] inv [6568, 7158, 11836, 21733, 28945]
+   -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
+   outline [6568, 7158, 11836] fill [6568, 7158, 11836] tab INVENTORY menu [[Wear]@[6568], [Wield]@[7158], [Wear]@[11836]]
+  worn [6568, 7158, 11836] inv [21733, 28945] done
+-- worn
+  worn [6568, 7158, 28945] inv [11836, 21733] done
 == emote:jump for joy in the centre of zul-andra. beware of double agents! equip a dragon 2h sword, bandos boots and an obsidian cape. #6 Equip the items
 -- recorded
-  worn [4151, 13342] inv [952, 28329]
+  worn [1187, 3387, 7325, 13342] inv [229, 307, 590, 946, 952, 954, 3469, 5321, 6707, 12934, 13115, 13124, 13140, 21175, 21389, 23946, 30638]
    -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3670,25 +3672,7 @@
   worn [6568, 7158, 11836] inv [21733, 28945] done
 -- worn
   worn [6568, 7158, 28945] inv [11836, 21733] done
-== emote:jump for joy in the centre of zul-andra. beware of double agents! equip a dragon 2h sword, bandos boots and an obsidian cape. #9 Equip the items
--- recorded
-  worn [4151, 13342] inv [952, 28329]
-   -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
-   outline [] fill [] tab INVENTORY menu [[]@[]]
-   stuck
--- bare
-  worn [] inv []
-   -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
-   outline [] fill [] tab INVENTORY menu [[]@[]]
-   stuck
--- carried
-  worn [] inv [6568, 7158, 11836, 21733, 28945]
-   -> Equip: [Dragon 2h sword, Bandos boots, Obsidian cape]
-   outline [6568, 7158, 11836] fill [6568, 7158, 11836] tab INVENTORY menu [[Wear]@[6568], [Wield]@[7158], [Wear]@[11836]]
-  worn [6568, 7158, 11836] inv [21733, 28945] done
--- worn
-  worn [6568, 7158, 28945] inv [11836, 21733] done
-== emote:panic by the big egg where no one dare goes and the ground is burnt. beware of double agents! equip a dragon med helm, a toktz-ket-xil, a brine sabre, rune platebody and an uncharged amulet of glory. #7 Equip the items
+== emote:panic by the big egg where no one dare goes and the ground is burnt. beware of double agents! equip a dragon med helm, a toktz-ket-xil, a brine sabre, rune platebody and an uncharged amulet of glory. #8 Equip the items
 -- recorded
   worn [13342] inv [229, 590, 952, 995, 5743, 13111, 13140, 13222, 21389, 32017, 33718]
    -> Equip: [Dragon med helm, Toktz-ket-xil, Brine sabre, Rune platebody, Uncharged Amulet of glory]
@@ -3724,7 +3708,7 @@
   worn [1127, 1149, 1704, 6524, 11037] inv [] done
 -- worn
   worn [1127, 1149, 1704, 6524, 11037] inv [] done
-== emote:salute outside the gates of cam torum. beware of double agents! equip a full set of blue moon equipment. #4 Equip the items
+== emote:salute outside the gates of cam torum. beware of double agents! equip a full set of blue moon equipment. #5 Equip the items
 -- recorded
   worn [13258, 13259, 13260, 13261, 13342] inv [307, 952, 13140, 23946, 25818, 30773]
    -> Equip: [Blue moon helm, Blue moon chestplate, Blue moon tassets, Blue Moon spear]
@@ -3760,7 +3744,7 @@
   worn [28988, 29013, 29016, 29019] inv [29037, 29039, 29041] done
 -- worn
   worn [28988, 29037, 29039, 29041] inv [29013, 29016, 29019] done
-== emote:show your anger at the wise old man. beware of double agents! equip an abyssal whip, a legend's cape and some spined chaps. #4 Equip the items
+== emote:show your anger at the wise old man. beware of double agents! equip an abyssal whip, a legend's cape and some spined chaps. #5 Equip the items
 -- recorded
   worn [13258, 13259, 13260, 13261, 13342] inv [307, 563, 565, 952, 1127, 13103, 13115, 13140, 13446, 23946, 25818, 30773, 30843]
    -> Equip: [Abyssal whip, Cape of Legends, Spined chaps]
@@ -3832,7 +3816,7 @@
   worn [11808] inv [20374] done
 -- worn
   worn [20374] inv [11808] done
-== emote:slap your head in the centre of the kourend catacombs. beware of double agents! equip arclight or emberlight along with the amulet of the damned. #4 Equip the items
+== emote:slap your head in the centre of the kourend catacombs. beware of double agents! equip arclight or emberlight along with the amulet of the damned. #5 Equip the items
 -- recorded
   worn [13258, 13259, 13260, 13261, 13342] inv [307, 563, 565, 590, 952, 1127, 13103, 13115, 13140, 13446, 21268, 23946, 24175, 25818, 30773, 30843]
    -> Equip: [Arclight or Emberlight, Amulet of the damned]
@@ -3868,7 +3852,7 @@
   worn [12851, 19675] inv [12853, 29589, 30305] done
 -- worn
   worn [12853, 30305] inv [12851, 19675, 29589] done
-== emote:spin in front of the soul altar. beware of double agents! equip a dragon pickaxe, helm of neitiznot and a pair of rune boots. #6 Equip the items
+== emote:spin in front of the soul altar. beware of double agents! equip a dragon pickaxe, helm of neitiznot and a pair of rune boots. #7 Equip the items
 -- recorded
   worn [13342, 26219] inv [952, 13111]
    -> Equip: [Dragon or Crystal pickaxe, Helm of Neitiznot, Rune boots]
@@ -3904,7 +3888,7 @@
   worn [4131, 10828, 11920] inv [12797, 13243, 13244, 23677, 23680, 23682, 25063, 25369, 25376, 30345, 30346, 30351] done
 -- worn
   worn [4131, 10828, 30351] inv [11920, 12797, 13243, 13244, 23677, 23680, 23682, 25063, 25369, 25376, 30345, 30346] done
-== emote:stamp in the enchanted valley west of the waterfall. beware of double agents! equip a dragon axe. #4 Equip the items
+== emote:stamp in the enchanted valley west of the waterfall. beware of double agents! equip a dragon axe. #5 Equip the items
 -- recorded
   worn [13342, 26219] inv [952, 13069, 13111]
    -> Equip: [Dragon or Crystal axe]
@@ -3940,7 +3924,7 @@
   worn [6739] inv [13241, 13242, 23673, 23675, 25066, 25371, 25378, 28217, 28220, 28223, 30347, 30348] done
 -- worn
   worn [30348] inv [6739, 13241, 13242, 23673, 23675, 25066, 25371, 25378, 28217, 28220, 28223, 30347] done
-== emote:swing a bullroarer at the top of the watchtower. beware of double agents! equip a dragon plateskirt, climbing boots and a dragon chainbody. #4 Equip the items
+== emote:swing a bullroarer at the top of the watchtower. beware of double agents! equip a dragon plateskirt, climbing boots and a dragon chainbody. #5 Equip the items
 -- recorded
   worn [13342, 26219] inv [952, 13069, 13111]
    -> Equip: [Dragon plateskirt, Climbing boots, Dragon chainbody, Bullroarer]
@@ -3976,7 +3960,7 @@
   worn [3105, 3140, 4585] inv [716, 12414, 12416, 23413] done
 -- worn
   worn [12414, 12416, 23413] inv [716, 3105, 3140, 4585] done
-== emote:think on the western coast of salvager overlook. beware of double agents! equip a hueycoatl hide coif and some hueycoatl hide vambraces. #4 Equip the items
+== emote:think on the western coast of salvager overlook. beware of double agents! equip a hueycoatl hide coif and some hueycoatl hide vambraces. #5 Equip the items
 -- recorded
   worn [13258, 13259, 13260, 13261, 13342] inv [307, 563, 565, 590, 952, 1127, 6528, 13103, 13115, 13140, 13446, 21268, 23946, 24175, 25818, 30773, 30843]
    -> Equip: [Hueycoatl hide coif, Hueycoatl hide vambraces]
@@ -4012,9 +3996,9 @@
   worn [30073, 30082] inv [] done
 -- worn
   worn [30073, 30082] inv [] done
-== emote:wave on the northern wall of castle drakan. beware of double agents! wear a dragon sq shield, splitbark body and any boater. #3 Equip the items
+== emote:wave on the northern wall of castle drakan. beware of double agents! wear a dragon sq shield, splitbark body and any boater. #4 Equip the items
 -- recorded
-  worn [13342] inv [952, 3469, 13140, 21389, 33120]
+  worn [13342, 23983] inv [229, 307, 590, 946, 952, 954, 3469, 5321, 6707, 12934, 13115, 13124, 13140, 21175, 21389, 23946, 30638]
    -> Equip: [Dragon sq shield, Splitbark body, Any boater]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4032,7 +4016,7 @@
   worn [3387, 12313, 12418] inv [1187, 7319, 7321, 7323, 7325, 7327, 12309, 12311] done
 == emote:wave on the northern wall of castle drakan. beware of double agents! wear a dragon sq shield, splitbark body and any boater. #6 Equip the items
 -- recorded
-  worn [13342] inv [952, 3469, 13140, 21389, 33120]
+  worn [13342, 23983] inv [229, 307, 590, 946, 952, 954, 3469, 5321, 6707, 12934, 13115, 13124, 13140, 21175, 21389, 23946, 30638]
    -> Equip: [Dragon sq shield, Splitbark body, Any boater]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4048,7 +4032,7 @@
   worn [1187, 3387, 7319] inv [7321, 7323, 7325, 7327, 12309, 12311, 12313, 12418] done
 -- worn
   worn [3387, 12313, 12418] inv [1187, 7319, 7321, 7323, 7325, 7327, 12309, 12311] done
-== emote:yawn in the 7th room of pyramid plunder. beware of double agents! equip a pharaoh sceptre and a full set of menaphite robes. #7 Equip the items
+== emote:yawn in the 7th room of pyramid plunder. beware of double agents! equip a pharaoh sceptre and a full set of menaphite robes. #8 Equip the items
 -- recorded
   worn [28260] inv [229, 307, 552, 590, 946, 952, 1523, 12934, 13111, 13140, 13280, 21389, 33066]
    -> Equip: [Pharaoh's sceptre, Full set of menaphite robes]
@@ -4061,14 +4045,8 @@
    stuck
 -- carried
   worn [] inv [6392, 6394, 6396, 6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26945, 26948, 26950]
-   -> Equip: [Pharaoh's sceptre (uncharged), Menaphite purple hat]
-   outline [6392, 26945] fill [6392, 26945] tab INVENTORY menu [[Wear]@[6392], [Wield]@[26945]]
-  worn [6392, 26945] inv [6394, 6396, 6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26948, 26950]
-   -> Equip: [Menaphite purple top]
-   outline [6394] fill [6394] tab INVENTORY menu [[Wear]@[6394]]
-  worn [6392, 6394, 26945] inv [6396, 6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26948, 26950]
-   -> Equip: [Menaphite purple robe]
-   outline [6396] fill [6396] tab INVENTORY menu [[Wear]@[6396]]
+   -> Equip: [Pharaoh's sceptre (uncharged), Menaphite purple hat, Menaphite purple top, Menaphite purple robe]
+   outline [6392, 6394, 6396, 26945] fill [6392, 6394, 6396, 26945] tab INVENTORY menu [[Wear]@[6392], [Wear]@[6394], [Wear]@[6396], [Wield]@[26945]]
   worn [6392, 6394, 6396, 26945] inv [6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26948, 26950] done
 -- worn
   worn [6400, 6402, 6406, 26950] inv [6392, 6394, 6396, 6397, 6398, 6404, 6405, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26945, 26948] done
@@ -4085,14 +4063,8 @@
    stuck
 -- carried
   worn [] inv [6392, 6394, 6396, 6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26945, 26948, 26950]
-   -> Equip: [Pharaoh's sceptre (uncharged), Menaphite purple hat]
-   outline [6392, 26945] fill [6392, 26945] tab INVENTORY menu [[Wear]@[6392], [Wield]@[26945]]
-  worn [6392, 26945] inv [6394, 6396, 6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26948, 26950]
-   -> Equip: [Menaphite purple top]
-   outline [6394] fill [6394] tab INVENTORY menu [[Wear]@[6394]]
-  worn [6392, 6394, 26945] inv [6396, 6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26948, 26950]
-   -> Equip: [Menaphite purple robe]
-   outline [6396] fill [6396] tab INVENTORY menu [[Wear]@[6396]]
+   -> Equip: [Pharaoh's sceptre (uncharged), Menaphite purple hat, Menaphite purple top, Menaphite purple robe]
+   outline [6392, 6394, 6396, 26945] fill [6392, 6394, 6396, 26945] tab INVENTORY menu [[Wear]@[6392], [Wear]@[6394], [Wear]@[6396], [Wield]@[26945]]
   worn [6392, 6394, 6396, 26945] inv [6397, 6398, 6400, 6402, 6404, 6405, 6406, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26948, 26950] done
 -- worn
   worn [6400, 6402, 6406, 26950] inv [6392, 6394, 6396, 6397, 6398, 6404, 6405, 9044, 9045, 9046, 9047, 9048, 9049, 9050, 9051, 13074, 13075, 13076, 13077, 13078, 16176, 21445, 21446, 26945, 26948] done
@@ -4131,7 +4103,7 @@
   worn [28169, 28171, 28173, 28175, 30352] inv [1349, 1351, 1353, 1355, 1357, 1359, 1361, 6739, 10933, 10939, 10940, 10941, 13241, 13242, 20011, 23279, 23673, 23675, 25066, 25110, 25371, 25378, 28196, 28199, 28202, 28205, 28208, 28211, 28214, 28217, 28220, 28223, 28226, 30347, 30348] done
 == skill:SHERLOCK:complete a lap of the rellekka rooftop agility course whilst sporting the finest amount of grace. #4 Equip:
 -- recorded
-  worn [10933, 10939, 10940, 10941] inv [952, 10595, 19525, 21268]
+  worn [859, 1664, 7136, 13342] inv [952, 995, 13128, 13140, 13354, 22947, 23680, 25644, 32399]
    -> Equip: [A full Graceful set]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4183,7 +4155,7 @@
   worn [25549, 25551, 25553, 25555] inv [1265, 1267, 1269, 1271, 1273, 1275, 11920, 12013, 12014, 12015, 12016, 12297, 12797, 13107, 13243, 13244, 20014, 23276, 23677, 23680, 23682, 25063, 25112, 25369, 25376, 30345, 30346, 30351] done
 -- worn
   worn [25549, 25551, 25553, 25555, 30351] inv [1265, 1267, 1269, 1271, 1273, 1275, 11920, 12013, 12014, 12015, 12016, 12297, 12797, 13107, 13243, 13244, 20014, 23276, 23677, 23680, 23682, 25063, 25112, 25369, 25376, 30345, 30346] done
-== emote:10254 #3 Equip the items
+== emote:10254 #4 Equip the items
 -- recorded
   worn [13342, 21268, 21276] inv [952, 13069, 13124, 13132, 13222, 21151, 21389, 25818, 26818, 29893]
    -> Equip: [Green robe top, Mithril platelegs, Iron 2h sword]
@@ -4228,7 +4200,7 @@
   worn [] inv [851, 1085] done
 -- worn
   worn [851, 1085] inv [] done
-== emote:10256 #5 Equip the items
+== emote:10256 #6 Equip the items
 -- recorded
   worn [13342, 21268, 21276] inv [952, 995, 4446, 4822, 8780, 8794, 13069, 13124, 13132, 13222, 21151, 21389, 22947, 25818, 26818, 29775, 29893]
    -> Equip: [Mithril plateskirt, Maple longbow]
@@ -4273,7 +4245,7 @@
   worn [851, 1085] inv [] done
 -- worn
   worn [851, 1085] inv [] done
-== emote:10258 #3 Equip the items
+== emote:10258 #4 Equip the items
 -- recorded
   worn [13342] inv [952, 995, 13069, 21276, 25818, 26818, 30638]
    -> Equip: [Purple gloves, Steel kiteshield, Mithril full helm]
@@ -4309,9 +4281,9 @@
   worn [1159, 1193, 2942] inv [] done
 -- worn
   worn [1159, 1193, 2942] inv [] done
-== emote:10260 #6 Equip the items
+== emote:10260 #7 Equip the items
 -- recorded
-  worn [13342] inv [952, 995, 13068, 13069, 13103, 13111, 13124, 13660, 21155, 21276, 25818, 26818, 29893, 30638]
+  worn [13342] inv [952, 995, 22947, 26818]
    -> Equip: [Green d'hide chaps, Ring of dueling, Mithril med helm]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4329,7 +4301,7 @@
   worn [1099, 1143, 2566] inv [2552, 2554, 2556, 2558, 2560, 2562, 2564] done
 == emote:10260 #9 Equip the items
 -- recorded
-  worn [13342] inv [952, 995, 13068, 13069, 13103, 13111, 13124, 13660, 21155, 21276, 25818, 26818, 29893, 30638]
+  worn [13342] inv [952, 995, 22947, 26818]
    -> Equip: [Green d'hide chaps, Ring of dueling, Mithril med helm]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4345,7 +4317,7 @@
   worn [1099, 1143, 2552] inv [2554, 2556, 2558, 2560, 2562, 2564, 2566] done
 -- worn
   worn [1099, 1143, 2566] inv [2552, 2554, 2556, 2558, 2560, 2562, 2564] done
-== emote:10262 #4 Equip the items
+== emote:10262 #5 Equip the items
 -- recorded
   worn [13342, 21268] inv [952, 13069, 13124, 21151, 21276, 21389, 25818, 26818, 29893]
    -> Equip: [Ruby amulet, Mithril scimitar, Any team cape]
@@ -4381,7 +4353,7 @@
   worn [1329, 1698, 4315] inv [4317, 4319, 4321, 4323, 4325, 4327, 4329, 4331, 4333, 4335, 4337, 4339, 4341, 4343, 4345, 4347, 4349, 4351, 4353, 4355, 4357, 4359, 4361, 4363, 4365, 4367, 4369, 4371, 4373, 4375, 4377, 4379, 4381, 4383, 4385, 4387, 4389, 4391, 4393, 4395, 4397, 4399, 4401, 4403, 4405, 4407, 4409, 4411, 4413, 20211, 20214, 20217] done
 -- worn
   worn [1329, 1698, 20217] inv [4315, 4317, 4319, 4321, 4323, 4325, 4327, 4329, 4331, 4333, 4335, 4337, 4339, 4341, 4343, 4345, 4347, 4349, 4351, 4353, 4355, 4357, 4359, 4361, 4363, 4365, 4367, 4369, 4371, 4373, 4375, 4377, 4379, 4381, 4383, 4385, 4387, 4389, 4391, 4393, 4395, 4397, 4399, 4401, 4403, 4405, 4407, 4409, 4411, 4413, 20211, 20214] done
-== emote:10264 #4 Equip the items
+== emote:10264 #5 Equip the items
 -- recorded
   worn [13342, 21276] inv [566, 952, 995, 13069, 21268, 21389, 24362, 25818, 26818, 29893]
    -> Equip: [Steel platebody, Maple shortbow, Any team cape]
@@ -4417,7 +4389,7 @@
   worn [853, 1119, 4315] inv [4317, 4319, 4321, 4323, 4325, 4327, 4329, 4331, 4333, 4335, 4337, 4339, 4341, 4343, 4345, 4347, 4349, 4351, 4353, 4355, 4357, 4359, 4361, 4363, 4365, 4367, 4369, 4371, 4373, 4375, 4377, 4379, 4381, 4383, 4385, 4387, 4389, 4391, 4393, 4395, 4397, 4399, 4401, 4403, 4405, 4407, 4409, 4411, 4413, 20211, 20214, 20217] done
 -- worn
   worn [853, 1119, 20217] inv [4315, 4317, 4319, 4321, 4323, 4325, 4327, 4329, 4331, 4333, 4335, 4337, 4339, 4341, 4343, 4345, 4347, 4349, 4351, 4353, 4355, 4357, 4359, 4361, 4363, 4365, 4367, 4369, 4371, 4373, 4375, 4377, 4379, 4381, 4383, 4385, 4387, 4389, 4391, 4393, 4395, 4397, 4399, 4401, 4403, 4405, 4407, 4409, 4411, 4413, 20211, 20214] done
-== emote:10266 #3 Equip the items
+== emote:10266 #4 Equip the items
 -- recorded
   worn [13342, 21276] inv [566, 952, 995, 13069, 21268, 24362, 25818, 26818]
    -> Equip: [Steel kiteshield, Ring of forging, Green d'hide chaps]
@@ -4453,7 +4425,7 @@
   worn [1099, 1193, 2568] inv [] done
 -- worn
   worn [1099, 1193, 2568] inv [] done
-== emote:10268 #4 Equip the items
+== emote:10268 #5 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818]
    -> Equip: [Brown apron, Adamant med helm, Snakeskin chaps]
@@ -4489,7 +4461,7 @@
   worn [1145, 1757, 6324] inv [] done
 -- worn
   worn [1145, 1757, 6324] inv [] done
-== emote:10270 #4 Equip the items
+== emote:10270 #5 Equip the items
 -- recorded
   worn [13342, 21276] inv [566, 952, 995, 13069, 21268, 21389, 24362, 25818, 26818, 29893]
    -> Equip: [Mithril chainbody, Green d'hide chaps, Ruby amulet]
@@ -4525,7 +4497,7 @@
   worn [1099, 1109, 1698] inv [] done
 -- worn
   worn [1099, 1109, 1698] inv [] done
-== emote:10272 #3 Equip the items
+== emote:10272 #4 Equip the items
 -- recorded
   worn [13342, 21276] inv [566, 952, 995, 13069, 21268, 21389, 24362, 25818, 26818, 29893]
    -> Equip: [Green d'hide body, Green d'hide chaps, Steel sq shield]
@@ -4561,9 +4533,9 @@
   worn [1099, 1135, 1177] inv [] done
 -- worn
   worn [1099, 1135, 1177] inv [] done
-== emote:10274 #3 Equip the items
+== emote:10274 #4 Equip the items
 -- recorded
-  worn [13342, 21276] inv [566, 952, 995, 13069, 21268, 21389, 24362, 25818, 26818, 29893]
+  worn [13342] inv [952, 995, 21389, 22947, 26818]
    -> Equip: [Green hat, Snakeskin boots, Iron pickaxe]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4581,7 +4553,7 @@
   worn [658, 1267, 6328] inv [] done
 == emote:10274 #6 Equip the items
 -- recorded
-  worn [13342, 21276] inv [566, 952, 995, 13069, 21268, 21389, 24362, 25818, 26818, 29893]
+  worn [13342] inv [952, 995, 21389, 22947, 26818]
    -> Equip: [Green hat, Snakeskin boots, Iron pickaxe]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -4597,7 +4569,7 @@
   worn [658, 1267, 6328] inv [] done
 -- worn
   worn [658, 1267, 6328] inv [] done
-== emote:10276 #4 Equip the items
+== emote:10276 #5 Equip the items
 -- recorded
   worn [13342, 21276] inv [952]
    -> Equip: [Blue boots, Hardleather body, Silver sickle]
@@ -4633,7 +4605,7 @@
   worn [630, 1131, 2961] inv [] done
 -- worn
   worn [630, 1131, 2961] inv [] done
-== emote:10278 #6 Equip the items
+== emote:10278 #7 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818, 26818]
    -> Equip: [Pointed bruise blue snelm, Staff of air, Bronze sq shield]
@@ -4669,7 +4641,7 @@
   worn [1173, 1381, 3343] inv [] done
 -- worn
   worn [1173, 1381, 3343] inv [] done
-== emote:12021 #6 Equip the items
+== emote:12021 #7 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818]
    -> Equip: [Staff of air, Bronze full helm, Amulet of power]
@@ -4705,7 +4677,7 @@
   worn [1155, 1381, 1731] inv [] done
 -- worn
   worn [1155, 1381, 1731] inv [] done
-== emote:12023 #4 Equip the items
+== emote:12023 #5 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818, 26818]
    -> Equip: [Maple longbow, Green d'hide chaps, Iron med helm]
@@ -4741,7 +4713,7 @@
   worn [851, 1099, 1137] inv [] done
 -- worn
   worn [851, 1099, 1137] inv [] done
-== emote:12025 #4 Equip the items
+== emote:12025 #5 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818, 26818]
    -> Equip: [Adamant halberd, Mystic robe bottom, Diamond ring]
@@ -4777,7 +4749,7 @@
   worn [1643, 3200, 4093] inv [] done
 -- worn
   worn [1643, 3200, 4093] inv [] done
-== emote:12027 #4 Equip the items
+== emote:12027 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 995, 13068, 13069, 13103, 13111, 13124, 13222, 13660, 21151, 21268, 21276, 21389, 22947, 25818, 26818, 29893, 30638]
    -> Equip: [Adamant sq shield, Bone dagger, Mithril platebody]
@@ -4813,7 +4785,7 @@
   worn [1121, 1183, 8872] inv [] done
 -- worn
   worn [1121, 1183, 8872] inv [] done
-== emote:12029 #3 Equip the items
+== emote:12029 #4 Equip the items
 -- recorded
   worn [13342, 21276] inv [952, 13069, 13124, 21151, 25818, 29893]
    -> Equip: [Steel longsword, Blue d'hide body, Mystic gloves]
@@ -4849,7 +4821,7 @@
   worn [1295, 2499, 4095] inv [] done
 -- worn
   worn [1295, 2499, 4095] inv [] done
-== emote:12031 #4 Equip the items
+== emote:12031 #5 Equip the items
 -- recorded
   worn [13342] inv [952, 995, 13068, 13069, 13103, 13111, 13124, 13660, 21155, 21276, 25818, 26818, 29893]
    -> Equip: [Brown apron, Leather boots, Leather gloves]
@@ -4885,7 +4857,7 @@
   worn [1059, 1061, 1757] inv [] done
 -- worn
   worn [1059, 1061, 1757] inv [] done
-== emote:19776 #2 Equip the items
+== emote:19776 #3 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818]
    -> Equip: [Adamant platelegs, Adamant platebody, Adamant full helm]
@@ -4921,7 +4893,7 @@
   worn [1073, 1123, 1161] inv [] done
 -- worn
   worn [1073, 1123, 1161] inv [] done
-== emote:19778 #4 Equip the items
+== emote:19778 #5 Equip the items
 -- recorded
   worn [13342] inv [566, 952, 995, 21268, 21276, 24362, 25818]
    -> Equip: [Blue d'hide vambraces, Adamant boots, Adamant dagger]
@@ -4957,7 +4929,7 @@
   worn [1211, 2487, 4129] inv [] done
 -- worn
   worn [1211, 2487, 4129] inv [] done
-== emote:19780 #3 Equip the items
+== emote:19780 #4 Equip the items
 -- recorded
   worn [13342, 21276] inv [952, 13069, 13124, 21151, 25818, 29893]
    -> Equip: [Adamant shortsword, Sapphire amulet, Adamant plateskirt]
@@ -4993,7 +4965,7 @@
   worn [1091, 1287, 1694] inv [] done
 -- worn
   worn [1091, 1287, 1694] inv [] done
-== emote:23046 #3 Equip the items
+== emote:23046 #4 Equip the items
 -- recorded
   worn [13342, 28329, 29796, 32386, 33066] inv [554, 555, 556, 557, 560, 561, 562, 563, 564, 565, 566, 4697, 9075, 21880, 22947, 30843]
    -> Equip: [Adamant warhammer, Ring of life, Mithril boots]
@@ -5029,9 +5001,9 @@
   worn [1345, 2570, 4127] inv [] done
 -- worn
   worn [1345, 2570, 4127] inv [] done
-== emote:29857 #6 Equip the items
+== emote:29857 #5 Equip the items
 -- recorded
-  worn [13342] inv [335, 345, 440, 952, 995, 13068, 13069, 13103, 13111, 13124, 13660, 21155, 21276, 25818, 26818]
+  worn [13342] inv [952, 995, 13128, 22947]
    -> Equip: [Maple longbow, Ruby amulet, Steel platelegs]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -5047,9 +5019,9 @@
   worn [851, 1069, 1698] inv [] done
 -- worn
   worn [851, 1069, 1698] inv [] done
-== emote:29857 #9 Equip the items
+== emote:29857 #7 Equip the items
 -- recorded
-  worn [13342] inv [335, 345, 440, 952, 995, 13068, 13069, 13103, 13111, 13124, 13660, 21155, 21276, 25818, 26818]
+  worn [13342] inv [952, 995, 13128, 22947]
    -> Equip: [Maple longbow, Ruby amulet, Steel platelegs]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -5074,7 +5046,7 @@
   worn [] inv [577, 579] done
 -- worn
   worn [577, 579] inv [] done
-== emote:29858 #4 Equip the items
+== emote:29858 #5 Equip the items
 -- recorded
   worn [13342, 21268, 21276] inv [952, 995, 4446, 8794, 13069, 13124, 13132, 13222, 21151, 21389, 22947, 25818, 26818, 29775, 29893]
    -> Equip: [Blue wizard hat, Blue wizard robe]

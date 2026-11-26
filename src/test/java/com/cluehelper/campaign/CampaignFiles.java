@@ -1,5 +1,6 @@
 package com.cluehelper.campaign;
 
+import com.cluehelper.player.PlayerSnapshot;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -63,8 +65,17 @@ public final class CampaignFiles
 	{
 		try (Reader in = new InputStreamReader(new GZIPInputStream(Files.newInputStream(file)), StandardCharsets.UTF_8))
 		{
-			return GSON.fromJson(in, CampaignRecording.class);
+			CampaignRecording recording = GSON.fromJson(in, CampaignRecording.class);
+			recording.player = withNewFields(recording.player);
+			recording.banked = withNewFields(recording.banked);
+			return recording;
 		}
+	}
+
+	/** Gson leaves a field the recording predates null: it gets the builder's default. */
+	private static PlayerSnapshot withNewFields(PlayerSnapshot snapshot)
+	{
+		return snapshot == null || snapshot.getGrowingAllotments() != null ? snapshot : snapshot.toBuilder().growingAllotments(Set.of()).build();
 	}
 
 	static void write(Path file, CampaignRecording recording) throws IOException

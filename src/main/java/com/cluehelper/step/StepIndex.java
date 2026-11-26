@@ -144,6 +144,14 @@ public final class StepIndex
 			return entry;
 		}
 
+		/** A step of the plugin's own, done by these acts alone (a master clue dropped where another is picked up). */
+		public static Entry ofActs(List<SubStep> acts)
+		{
+			Entry entry = new Entry();
+			entry.acts = List.copyOf(acts);
+			return entry;
+		}
+
 		/** A three-step: every part's rows, and what its unsolved parts need. */
 		static Entry ofParts(String tier, List<CacheRow> rows, List<Entry> unsolved)
 		{
@@ -375,6 +383,13 @@ public final class StepIndex
 		/** What the replacement is called where it is listed as missing; null for an alternative to core's item. */
 		String name;
 		List<List<Integer>> all = List.of();
+		/** Core's item can't be brought (Entrana turns away armour): only the parts are withdrawn, and it is made there. */
+		boolean madeThere;
+		/**
+		 * How many of a part's item it takes, where more than one: the leather for this piece and the pieces made after it, so
+		 * what is left still counts once a piece is made.
+		 */
+		Map<Integer, Integer> counts = Map.of();
 	}
 
 	/** Worn gear adding up to at least {@code atLeast} of its bonus (Ghommal's +100 melee strength). */

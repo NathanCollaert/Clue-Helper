@@ -2,7 +2,6 @@ package com.cluehelper.ui;
 
 import com.cluehelper.guide.*;
 import com.cluehelper.route.*;
-import java.awt.Rectangle;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -16,7 +15,7 @@ import net.runelite.api.coords.*;
 final class PathObjects
 {
 	/** A large staircase stands a few tiles from the row's origin tile. */
-	private static final int ROW_OBJECT_TILES = 3;
+	static final int ROW_OBJECT_TILES = 3;
 	/** Outweighs any squared distance within reach, so the distance to the row's origin only breaks ties. */
 	private static final int TIE_BREAK = 100;
 	/** Row objects that open only after another is used each time, by id: Meiyerditch's barricade after its rocky surface. */
@@ -89,6 +88,12 @@ final class PathObjects
 		return from.getPlane() != to.getPlane() || Math.max(Math.abs(from.getX() - to.getX()), Math.abs(from.getY() - to.getY())) > 1;
 	}
 
+	/** A step a row takes other than a door opened and walked through: a wall searched, stepping stones, a ladder. */
+	static boolean isCrossing(WalkTable table, WorldPoint from, WorldPoint to)
+	{
+		return isJump(from, to) || rows(table, from, to).stream().anyMatch(row -> !OPEN.equals(row.getOption()));
+	}
+
 	/** Of the rows joining the same tiles, the object nearest the origin is the one clicked (the rope below the rocks). */
 	private void addRowObject(Map<TileObject, String> objects, WorldView view, List<Exit> rows, WorldPoint origin)
 	{
@@ -154,75 +159,11 @@ final class PathObjects
 		return squaredDistance(object.getWorldLocation(), origin);
 	}
 
-	static int squaredDistance(WorldPoint a, WorldPoint b)
+	private static int squaredDistance(WorldPoint a, WorldPoint b)
 	{
 		int dx = a.getX() - b.getX();
 		int dy = a.getY() - b.getY();
 		return dx * dx + dy * dy;
-	}
-
-	/**
-	 * Client thread only. The objects named as {@code crossed} is on the tiles {@code around} a jump: every stepping stone
-	 * of a crossing, both ends of a pipe, where the walk data names only one.
-	 */
-	List<TileObject> sameNamed(WorldView view, TileObject crossed, Rectangle around)
-	{
-		String name = nameOf(crossed);
-		return objectsIn(view, around, crossed.getPlane()).stream().filter(object -> name != null && name.equals(nameOf(object)))
-			.collect(Collectors.toList());
-	}
-
-	/** The objects on the rectangle's tiles, west to east, south to north. */
-	private static List<TileObject> objectsIn(WorldView view, Rectangle around, int plane)
-	{
-		List<TileObject> found = new ArrayList<>();
-		for (int x = around.x; x < around.x + around.width; x++)
-		{
-			for (int y = around.y; y < around.y + around.height; y++)
-			{
-				Tile tile = tile(view, new WorldPoint(x, y, plane));
-				if (tile != null)
-				{
-					found.addAll(SceneObjects.objectsOn(tile));
-				}
-			}
-		}
-		return found;
-	}
-
-	/**
-	 * Client thread only. The object of every row from {@code from} to {@code to} on the tiles {@code around}: a climb's
-	 * rope at its foot and its rocks at the top, which the walk data names as two rows. Each row is one object, the one
-	 * nearest both its ends on one floor, else nearest {@code from}: Marim's two staircases share their ids and stand
-	 * within reach of each other's rows, as the Kharazi Jungle's bushes do.
-	 */
-	List<TileObject> rowObjectsAround(WorldView view, WalkTable table, WorldPoint from, WorldPoint to, Rectangle around)
-	{
-		List<Exit> rows = rows(table, from, to);
-		Map<Integer, TileObject> nearestByRow = new LinkedHashMap<>();
-		for (TileObject object : rows.isEmpty() ? List.<TileObject>of() : objectsIn(view, around, from.getPlane()))
-		{
-			for (Exit row : rows)
-			{
-				if (row.getObjectId() >= 0 && isObject(object, row.getObjectId()))
-				{
-					nearestByRow.merge(row.getObjectId(), object, (kept, other) -> nearer(from, to, kept, other));
-				}
-			}
-		}
-		return List.copyOf(nearestByRow.values());
-	}
-
-	private static TileObject nearer(WorldPoint from, WorldPoint to, TileObject a, TileObject b)
-	{
-		return closeness(b, from, to) < closeness(a, from, to) ? b : a;
-	}
-
-	/** Nearness to both ends of a hop on one floor, else to its start alone. */
-	private static int closeness(TileObject object, WorldPoint from, WorldPoint to)
-	{
-		boolean hop = to.getPlane() == from.getPlane() && to.distanceTo2D(from) <= ROW_OBJECT_TILES;
-		return squaredDistance(object, from) + (hop ? squaredDistance(object, to) : 0);
 	}
 
 	private String nameOf(TileObject object)

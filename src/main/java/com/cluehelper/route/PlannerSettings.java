@@ -17,6 +17,8 @@ public class PlannerSettings
 	@Builder.Default
 	boolean bankEdge = true;
 	boolean scrollBookOutOfWilderness;
+	@Builder.Default
+	SaveConsumables saveConsumables = SaveConsumables.FLAT_FEE;
 
 	public static PlannerSettings from(ClueHelperConfig config, AccountType accountType)
 	{
@@ -29,6 +31,7 @@ public class PlannerSettings
 			.stopWildernessClues(stop)
 			.bankEdge(config.useBank())
 			.scrollBookOutOfWilderness(config.scrollBookOutOfWilderness())
+			.saveConsumables(config.saveConsumables())
 			.build();
 	}
 }
