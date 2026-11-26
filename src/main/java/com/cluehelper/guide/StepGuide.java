@@ -998,7 +998,7 @@ public class StepGuide
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (isTravelStep() && mayStartTravel(event) && !opensItsList(event))
+		if (isTravelStep() && mayStartTravel(event) && !opensItsList(event) && !isOtherObject(event))
 		{
 			travelClickTick = client.getTickCount();
 		}
@@ -1432,6 +1432,18 @@ public class StepGuide
 		MenuTarget target = highlights.getMenuTarget();
 		boolean onItem = target.getItemIds().contains(event.getItemId());
 		return onItem && !menuLines.isTeleportClick(target, event.getMenuOption());
+	}
+
+	/**
+	 * A click on a scene object that isn't the teleport's own: drinking from a house's pool next to its jewellery box
+	 * animates like the box's teleport would.
+	 */
+	private boolean isOtherObject(MenuOptionClicked event)
+	{
+		MenuTarget target = highlights.getMenuTarget();
+		return event.getMenuAction().name().startsWith("GAME_OBJECT")
+			&& Stream.concat(Stream.of(target), target.getAlternatives().stream())
+				.noneMatch(teleport -> sceneObjects.isFormOf(event.getId(), teleport.getObjectIds()));
 	}
 
 	private int travelStartTicks()
