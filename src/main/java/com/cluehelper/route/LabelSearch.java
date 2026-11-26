@@ -315,15 +315,31 @@ final class LabelSearch
 
 	private void expandExits(Label from, int k)
 	{
-		WorldPoint tile = ctx.tile(from.node);
-		OriginClass origin = ctx.originClass(from.node);
-		if (tile == null || !origin.isWilderness() || tile.getY() > SURFACE_WILDERNESS_MAX_Y)
+		if (!canExit(from.node) || isWalkedFromExitingStart(from))
 		{
 			return;
 		}
+		WorldPoint tile = ctx.tile(from.node);
+		OriginClass origin = ctx.originClass(from.node);
 		exit(from, k, tile, origin, OriginClass.WILD30);
 		exit(from, k, tile, origin, OriginClass.WILD20);
 		exit(from, k, tile, origin, OriginClass.WILD0);
+	}
+
+	private boolean canExit(int node)
+	{
+		WorldPoint tile = ctx.tile(node);
+		return tile != null && ctx.originClass(node).isWilderness() && tile.getY() <= SURFACE_WILDERNESS_MAX_Y;
+	}
+
+	/**
+	 * Walking from the start to a node and south from there ties with walking south from the start, which the start's
+	 * own exit already offers: the plan would flip between the two with every step south.
+	 */
+	private boolean isWalkedFromExitingStart(Label from)
+	{
+		Label walkedFrom = from.kind == Leg.Kind.WALK ? from.parent : null;
+		return walkedFrom != null && walkedFrom.node == ctx.start && canExit(ctx.start);
 	}
 
 	private void exit(Label from, int k, WorldPoint tile, OriginClass origin, OriginClass to)

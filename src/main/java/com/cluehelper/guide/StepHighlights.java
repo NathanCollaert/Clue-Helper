@@ -415,7 +415,7 @@ final class StepHighlights
 		CatalogRow row = current.getRow();
 		if (isSpell(row))
 		{
-			int spell = rowTargets.spellWidget(row);
+			int spell = row.getSpellWidget();
 			shown.spellWidget(spell).tab(Tab.MAGIC);
 			if (row.getLine() == MenuLine.BOAT)
 			{
@@ -429,7 +429,7 @@ final class StepHighlights
 		else if (row.getCategory() == Category.MINIGAME)
 		{
 			shown.spellWidget(rowTargets.minigameSpellWidget(player.currentBook())).tab(Tab.MAGIC)
-				.menuTarget(RowTargets.line(row).build());
+				.menuTarget(RowTargets.line(row).path(row.getOptions()).build());
 		}
 		else if (row.isLocated())
 		{

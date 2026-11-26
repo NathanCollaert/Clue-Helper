@@ -610,12 +610,17 @@ public class RoutePlanner
 
 	/**
 	 * A walk the loaded scene suddenly blocks is kept for one plan: a gate's collision lags a tick behind it swinging
-	 * open (King Lathas' camp). Only a walk the next plan still doesn't offer gives way.
+	 * open (King Lathas' camp). Only a walk the next plan still doesn't offer gives way, so the next tick plans again even
+	 * when nothing the plan reads has changed: a player standing still would keep the held walk for good.
 	 */
 	private Route holdBlockedWalk(Route walk, Route best)
 	{
 		boolean hold = !walkHeld && walk.getFirstTransport() == null && !walk.isBanked() && isAlong(walk);
 		walkHeld = hold;
+		if (hold)
+		{
+			lastTrigger = null;
+		}
 		return hold ? walk : best;
 	}
 

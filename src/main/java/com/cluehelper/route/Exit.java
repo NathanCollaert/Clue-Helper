@@ -17,6 +17,8 @@ public class Exit
 	String option;
 	/** The object or NPC name, e.g. "Staircase"; empty when unknown. */
 	String target;
+	/** The guide's line for taking it, e.g. "Climb up the staircase". */
+	String text;
 	/** -1 when unknown. */
 	int objectId;
 	/** The other objects a row between the same tiles goes through (the Viyeldi winch before its rope is tied). */

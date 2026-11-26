@@ -7,7 +7,6 @@ import java.util.*;
 import javax.inject.*;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.DBTableID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import static java.util.stream.Collectors.*;
@@ -20,7 +19,6 @@ final class RowTargets
 
 	private static final String LAST_DESTINATION_OPTION = "Last-destination";
 	private static final String SPELLBOOK_OPTION = "Spellbook";
-	private static final int PARAM_SPELL_WIDGET = 596;
 	/** Catalog landings spread 0–2 tiles, so another menu's line within this lands at the same place. */
 	private static final int SAME_LANDING_TILES = 3;
 	/** Minigame Teleport is a spell on every book, so it is cast rather than picked from the Grouping tab. */
@@ -76,28 +74,10 @@ final class RowTargets
 		return MenuTarget.builder().path(List.of(LAST_DESTINATION_OPTION));
 	}
 
-	/** The game keeps the quetzals' last site by its id in the quetzal table, whose map icon is where the row's is. */
+	/** The game keeps the quetzals' last site by its id in the quetzal table, which the row carries as its line id. */
 	private boolean isLastQuetzalSite(CatalogRow row)
 	{
-		if (row.getLine() != MenuLine.QUETZAL || row.getIcon() == null)
-		{
-			return false;
-		}
-		int lastId = client.getVarbitValue(VarbitID.QUETZAL_LAST_DESTINATION);
-		List<Integer> sites = client.getDBRowsByValue(DBTableID.Quetzal.ID, DBTableID.Quetzal.COL_ID, 0, lastId);
-		if (sites.isEmpty())
-		{
-			return false;
-		}
-		int site = sites.get(0);
-		int[] icon = row.getIcon();
-		return icon[0] == quetzalField(site, DBTableID.Quetzal.COL_IF_X_POS) && icon[1] == quetzalField(site, DBTableID.Quetzal.COL_IF_Y_POS);
-	}
-
-	private int quetzalField(int site, int column)
-	{
-		Object[] values = client.getDBTableField(site, column, 0);
-		return values.length == 0 ? -1 : (int) values[0];
+		return row.getLine() == MenuLine.QUETZAL && row.getLineId() == client.getVarbitValue(VarbitID.QUETZAL_LAST_DESTINATION);
 	}
 
 	/**
@@ -153,13 +133,6 @@ final class RowTargets
 	List<ItemUse> heldUses(SpellbookChange change)
 	{
 		return heldUses(CatalogRow.builder().name(change.getName()).requirements(change.getRequirements()).build());
-	}
-
-	/** -1 when none is known. */
-	int spellWidget(CatalogRow row)
-	{
-		int widget = row.getSpellObj() < 0 ? -1 : client.getItemDefinition(row.getSpellObj()).getIntValue(PARAM_SPELL_WIDGET);
-		return widget > 0 ? widget : -1;
 	}
 
 	int minigameSpellWidget(Book book)

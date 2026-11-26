@@ -4,6 +4,7 @@ import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
 import com.cluehelper.step.*;
+import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.transport.Category;
 import com.cluehelper.transport.MenuLine;
 import java.util.*;
@@ -954,23 +955,20 @@ public class StepGuide
 	}
 
 	/**
-	 * The charter list's key for the port, or a destination list's for a row with no key of its own (a minecart's
-	 * station), is known only once the list is open: the step's text names it from then on.
+	 * A destination list's key for a row with no key of its own (a minecart's station) is known only once the list is
+	 * open: the step's text names it from then on.
 	 */
 	private boolean keyFromOpenList()
 	{
 		SubStep current = getCurrent();
-		char key = menuLines.charterKey(highlights.getMenuTarget());
-		if (key == 0 && current != null && current.getRow() != null && current.getRow().getKey() == null && current.getRow().getPick() != null)
-		{
-			int line = menuLines.listIndex(current.getRow().getPick());
-			key = line >= 0 && line < MenuLines.HOTKEYS.length() ? MenuLines.HOTKEYS.charAt(line) : 0;
-		}
-		if (key == 0 || current == null || current.getRow() == null || current.getText().contains(MenuLines.keyText(String.valueOf(key))))
+		CatalogRow row = current == null ? null : current.getRow();
+		int line = row == null || row.getKey() != null || row.getPick() == null ? -1 : menuLines.listIndex(row.getPick());
+		if (line < 0 || line >= MenuLines.HOTKEYS.length())
 		{
 			return false;
 		}
-		return replaceCurrent(current.toBuilder().text(LegSteps.travelLine(current.getRow(), String.valueOf(key))).build());
+		String key = String.valueOf(MenuLines.HOTKEYS.charAt(line));
+		return !current.getText().contains(MenuLines.keyText(key)) && replaceCurrent(current.toBuilder().text(LegSteps.travelLine(row, key)).build());
 	}
 
 	/** The current step's obelisk is lit: what is left is the wait on its platform. */

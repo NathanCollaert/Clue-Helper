@@ -1246,9 +1246,9 @@
   worn [644, 1011, 1658] inv [] done
 -- worn
   worn [644, 1011, 1658] inv [] done
-== coordinate:12085 #5 Equip the Ghostspeak amulet
+== coordinate:12085 #4 Equip the Ghostspeak amulet
 -- recorded
-  worn [13342, 29796, 32386, 33066] inv [536, 590, 952, 1359, 1753, 7936, 13140, 19476, 21171, 22325, 24855, 25932, 26219]
+  worn [13342] inv [23458]
    -> Equip: [Ghostspeak amulet]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck

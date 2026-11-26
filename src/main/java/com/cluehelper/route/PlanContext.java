@@ -78,7 +78,6 @@ final class PlanContext
 	private byte[] bankUsable;
 	private boolean[] bankItemUses;
 	private List<TransportOptions.Teleport> storedItemRides;
-	private Map<Integer, Integer> rowsPerItem;
 
 	PlanContext(PlanInput in)
 	{
@@ -556,21 +555,8 @@ final class PlanContext
 	/** How many catalog teleports use the items. */
 	int versatility(int[] itemIds)
 	{
-		if (rowsPerItem == null)
-		{
-			rowsPerItem = new HashMap<>();
-			for (CatalogRow row : in.getCatalog().getTeleports())
-			{
-				row.getRequirements().getItems().forEach(clause -> clause.getBranches().forEach(branch ->
-					branch.getIds().forEach(id -> rowsPerItem.merge(id, 1, Integer::sum))));
-			}
-		}
-		int rows = 0;
-		for (int id : itemIds)
-		{
-			rows += rowsPerItem.getOrDefault(id, 0);
-		}
-		return rows;
+		Map<Integer, Integer> rowsPerItem = in.getCatalog().getRowsPerItem();
+		return Arrays.stream(itemIds).map(id -> rowsPerItem.getOrDefault(id, 0)).sum();
 	}
 
 	/** What a route spends: items, charges, cooldowns and cape uses, each with the units available before and after a bank stop. */

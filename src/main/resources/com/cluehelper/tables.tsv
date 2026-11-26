@@ -171,6 +171,29 @@ mushtree places	House on the Hill
 mushtree places	Verdant Valley
 mushtree places	Sticky Swamp
 mushtree places	Mushroom Meadow
+# charter keys: a port and its key in the charter destination list, the same at every dock (seen live at
+# Port Sarim and Catherby): a dock leaves itself and the ports not open to it out. Read by the bake only.
+charter keys	Port Sarim	0
+charter keys	Brimhaven	1
+charter keys	Catherby	2
+charter keys	Mos Le'Harmless	3
+charter keys	Musa Point	4
+charter keys	Port Khazard	5
+charter keys	Port Phasmatys	6
+charter keys	Karamja Shipyard	7
+charter keys	Port Tyras	8
+charter keys	Corsair Cove	9
+charter keys	Prifddinas	A
+charter keys	Port Piscarilius	B
+charter keys	Land's End	C
+charter keys	Civitas illa Fortis	D
+charter keys	Aldarin	E
+charter keys	Sunset Coast	F
+charter keys	The Pandemonium	I
+charter keys	The Summer Shore	J
+charter keys	Red Rock	K
+charter keys	Deepfin Point	M
+charter keys	Port Roberts	N
 # minecart places: the Lovakengj minecart list, in the order the game lists every station from each of them (seen live).
 minecart places	Arceuus
 minecart places	Farming Guild
@@ -248,8 +271,129 @@ allotment patches	Hosidius	1735	3555	0	VarbitID.FARMING_TRANSMIT_A=4771	VarbitID
 allotment patches	Farming Guild	1266	3730	0	VarbitID.FARMING_TRANSMIT_C=4773	VarbitID.FARMING_TRANSMIT_D=4774
 allotment patches	Prifddinas	3291	6100	0	VarbitID.FARMING_TRANSMIT_A=4771	VarbitID.FARMING_TRANSMIT_B=4772
 allotment patches	Civitas illa Fortis	1586	3099	0	VarbitID.FARMING_TRANSMIT_A=4771	VarbitID.FARMING_TRANSMIT_B=4772
-# allotment form: an allotment patch; every allotment shows the same form for a varbit value.
-allotment form	any	ObjectID.FARMING_VEG_PATCH_3=8552
+# allotment stages left: an allotment's varbit value while its crop grows, then the growing stages still to come.
+# Written by gradlew bakeData from core's farming tracker (AllotmentStages); don't edit.
+allotment stages left	6	3
+allotment stages left	7	2
+allotment stages left	8	1
+allotment stages left	9	0
+allotment stages left	13	3
+allotment stages left	14	2
+allotment stages left	15	1
+allotment stages left	16	0
+allotment stages left	20	3
+allotment stages left	21	2
+allotment stages left	22	1
+allotment stages left	23	0
+allotment stages left	27	3
+allotment stages left	28	2
+allotment stages left	29	1
+allotment stages left	30	0
+allotment stages left	34	5
+allotment stages left	35	4
+allotment stages left	36	3
+allotment stages left	37	2
+allotment stages left	38	1
+allotment stages left	39	0
+allotment stages left	43	5
+allotment stages left	44	4
+allotment stages left	45	3
+allotment stages left	46	2
+allotment stages left	47	1
+allotment stages left	48	0
+allotment stages left	52	7
+allotment stages left	53	6
+allotment stages left	54	5
+allotment stages left	55	4
+allotment stages left	56	3
+allotment stages left	57	2
+allotment stages left	58	1
+allotment stages left	59	0
+allotment stages left	63	6
+allotment stages left	64	5
+allotment stages left	65	4
+allotment stages left	66	3
+allotment stages left	67	2
+allotment stages left	68	1
+allotment stages left	69	0
+allotment stages left	70	3
+allotment stages left	71	2
+allotment stages left	72	1
+allotment stages left	73	0
+allotment stages left	77	3
+allotment stages left	78	2
+allotment stages left	79	1
+allotment stages left	80	0
+allotment stages left	84	3
+allotment stages left	85	2
+allotment stages left	86	1
+allotment stages left	87	0
+allotment stages left	91	3
+allotment stages left	92	2
+allotment stages left	93	1
+allotment stages left	94	0
+allotment stages left	98	5
+allotment stages left	99	4
+allotment stages left	100	3
+allotment stages left	101	2
+allotment stages left	102	1
+allotment stages left	103	0
+allotment stages left	107	5
+allotment stages left	108	4
+allotment stages left	109	3
+allotment stages left	110	2
+allotment stages left	111	1
+allotment stages left	112	0
+allotment stages left	116	7
+allotment stages left	117	6
+allotment stages left	118	5
+allotment stages left	119	4
+allotment stages left	120	3
+allotment stages left	121	2
+allotment stages left	122	1
+allotment stages left	123	0
+allotment stages left	128	6
+allotment stages left	129	5
+allotment stages left	130	4
+allotment stages left	131	3
+allotment stages left	132	2
+allotment stages left	133	1
+allotment stages left	134	0
+allotment stages left	135	2
+allotment stages left	136	1
+allotment stages left	137	0
+allotment stages left	142	2
+allotment stages left	143	1
+allotment stages left	144	0
+allotment stages left	149	2
+allotment stages left	150	1
+allotment stages left	151	0
+allotment stages left	156	2
+allotment stages left	157	1
+allotment stages left	158	0
+allotment stages left	163	4
+allotment stages left	164	3
+allotment stages left	165	2
+allotment stages left	166	1
+allotment stages left	167	0
+allotment stages left	172	4
+allotment stages left	173	3
+allotment stages left	174	2
+allotment stages left	175	1
+allotment stages left	176	0
+allotment stages left	181	6
+allotment stages left	182	5
+allotment stages left	183	4
+allotment stages left	184	3
+allotment stages left	185	2
+allotment stages left	186	1
+allotment stages left	187	0
+allotment stages left	196	2
+allotment stages left	197	1
+allotment stages left	198	0
+allotment stages left	202	2
+allotment stages left	203	1
+allotment stages left	204	0
 # use-up fees: half-ticks a route's ranking adds for a transport of the category that uses up anything (runes, an item, a
 # charge, a daily or cooldown use; coins paid as a fare are free). Every category has a row.
 use-up fees	SPELL	3
@@ -279,3 +423,15 @@ use-up fees	GLIDER	0
 use-up fees	BALLOON	3
 use-up fees	MUSHTREE	0
 use-up fees	WILDERNESS_OBELISK	0
+wilderness	surface	2944	3525	448	448	3520
+wilderness	underground	2944	9918	518	458	9912
+not wilderness	Ferox Enclave	3123	3622	2	10
+not wilderness	Ferox Enclave	3125	3617	16	23
+not wilderness	Ferox Enclave	3138	3636	18	10
+not wilderness	Ferox Enclave	3141	3625	14	11
+not wilderness	Ferox Enclave	3141	3619	7	6
+not wilderness	south edge	2997	3525	34	9
+not wilderness	south edge	3005	3534	21	10
+not wilderness	south edge	3000	3534	5	5
+not wilderness	south edge	3031	3525	2	2
+not wilderness	Slayer Tower basement	3392	9920	64	64

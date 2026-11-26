@@ -9,13 +9,13 @@ import lombok.Value;
 @Value
 public class Catalog
 {
-	public static final Catalog EMPTY = new Catalog(List.of(), List.of(), Set.of(), Map.of(), Set.of(), Set.of(), Set.of());
+	public static final Catalog EMPTY = new Catalog(List.of(), List.of(), Set.of(), Map.of(), Set.of(), Set.of(), Set.of(), Map.of());
 	/** Baked by the test source set's DataBake from the tables Clue-Helper-Tools/tools/catalog/seed.py writes. */
 	private static final String FILE = "catalog.json";
 
 	List<CatalogRow> teleports;
 	List<SpellbookChange> spellbookChanges;
-	/** The items the rows ask for: which banked ones count. */
+	/** The items the rows, the spellbook changes and the walk gates ask for: which banked ones count. */
 	Set<Integer> items;
 	/** The rows' and the walk gates' items by name, for the no-route notes. */
 	Map<Integer, String> itemNames;
@@ -24,6 +24,8 @@ public class Catalog
 	Set<Integer> watchedVarps;
 	/** The house's objects the rows use (a nexus, an altar, a jewellery box), looked for in the house. */
 	Set<Integer> housePieces;
+	/** By item, how often a row's item branches name it: the versatility tie-break between routes. */
+	Map<Integer, Integer> rowsPerItem;
 
 	public static Catalog read(Gson gson)
 	{

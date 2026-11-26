@@ -1,5 +1,6 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.memory.AllotmentStages;
 import com.cluehelper.player.RuneLoader;
 import com.cluehelper.route.WalkLoader;
 import com.cluehelper.step.StepLoader;
@@ -18,8 +19,8 @@ import net.runelite.http.api.RuneLiteAPI;
  * Turns the source tables into the data the plugin loads, so the parsing never ships: the teleport catalog
  * ({@code catalog.json}), the walk data ({@code walk/walk.json} and {@code walk/columns.bin}, see {@link WalkLoader}),
  * the step data ({@code step/steps.json}, see {@link StepLoader}), the rune model ({@code player/runes.json}, see
- * {@link RuneLoader}) and the gameval values in {@code tables.tsv}, each
- * written after its constant's name. Run with {@code gradlew bakeData} after Clue-Helper-Tools regenerates the catalog,
+ * {@link RuneLoader}), and in {@code tables.tsv} the gameval values, each written after its constant's name, and the
+ * allotment growth table (see {@link AllotmentStages}). Run with {@code gradlew bakeData} after Clue-Helper-Tools regenerates the catalog,
  * the walk data or the step data; {@code BakedDataTest}
  * fails while the baked files are out of date.
  */
@@ -62,13 +63,25 @@ public final class DataBake
 		return StepLoader.json(StepLoader.load());
 	}
 
-	/** The tables file with every gameval cell's value written after its name. */
+	/** The tables file with every gameval cell's value written after its name, and the allotment table from core. */
 	static List<String> tablesWithValues() throws IOException
 	{
-		return Files.readAllLines(TABLES, StandardCharsets.UTF_8).stream()
-			.map(line -> line.startsWith("#") ? line : Arrays.stream(line.split("\t", -1)).map(DataBake::withValue)
-				.collect(Collectors.joining("\t")))
-			.collect(Collectors.toList());
+		List<String> allotmentRows = AllotmentStages.rows();
+		List<String> lines = new ArrayList<>();
+		for (String line : Files.readAllLines(TABLES, StandardCharsets.UTF_8))
+		{
+			if (!line.startsWith(AllotmentStages.TABLE + "\t"))
+			{
+				lines.add(line.startsWith("#") ? line : Arrays.stream(line.split("\t", -1)).map(DataBake::withValue)
+					.collect(Collectors.joining("\t")));
+			}
+			else
+			{
+				lines.addAll(allotmentRows);
+				allotmentRows = List.of();
+			}
+		}
+		return lines;
 	}
 
 	private static String withValue(String cell)

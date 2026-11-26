@@ -43,7 +43,11 @@ public class GrownPatches
 	/** A planting task's place to its allotments' varbits. */
 	private static final Map<WorldPoint, int[]> ALLOTMENTS = Tables.rows("allotment patches").stream().collect(toUnmodifiableMap(
 		row -> new WorldPoint(row.id(0), row.id(1), row.id(2)), row -> Arrays.copyOfRange(row.ids(), 3, row.getCells().size())));
-	private static final int ALLOTMENT_FORMS = Tables.ids("allotment form")[0];
+	/**
+	 * By an allotment's varbit value while its crop grows, the growing stages still to come; a diseased crop counts as
+	 * growing. Baked from core's farming tracker.
+	 */
+	private static final Map<Integer, Integer> STAGES_LEFT = Tables.byKey("allotment stages left", Integer::valueOf, row -> row.id(0));
 	/** How long an allotment crop takes to grow one stage. */
 	private static final long ALLOTMENT_STAGE_SECONDS = 10 * 60;
 
@@ -98,29 +102,8 @@ public class GrownPatches
 		boolean loaded = view != null && Arrays.stream(view.getMapRegions()).anyMatch(region -> region == place.getRegionID());
 		Seen seen = loaded ? null : tracked(allotmentKey(place, varbit));
 		int value = loaded ? client.getVarbitValue(varbit) : seen.value;
-		int[] forms = client.getObjectDefinition(ALLOTMENT_FORMS).getImpostorIds();
-		if (!isGrowingStage(forms, value))
-		{
-			return false;
-		}
-		return loaded || seen.seconds + stagesLeft(forms, value) * ALLOTMENT_STAGE_SECONDS > Instant.now().getEpochSecond();
-	}
-
-	private boolean isGrowingStage(int[] forms, int value)
-	{
-		return forms != null && value >= 0 && value < forms.length && forms[value] >= 0
-			&& Allotment.of(value, client.getObjectDefinition(forms[value])) == null;
-	}
-
-	/** The growing stages after this one: a crop's stages are forms with ids in a row, ended by the grown one. */
-	private int stagesLeft(int[] forms, int value)
-	{
-		int last = value;
-		while (last + 1 < forms.length && forms[last + 1] == forms[last] + 1 && isGrowingStage(forms, last + 1))
-		{
-			last++;
-		}
-		return last - value;
+		Integer stagesLeft = STAGES_LEFT.get(value);
+		return stagesLeft != null && (loaded || seen.seconds + stagesLeft * ALLOTMENT_STAGE_SECONDS > Instant.now().getEpochSecond());
 	}
 
 	private static String allotmentKey(WorldPoint place, int varbit)

@@ -18,6 +18,7 @@ public final class RuneLoader
 	public static final Path JSON = Paths.get("src/main/resources/com/cluehelper/player/runes.json");
 	private static final String SLICE = "/runes/cache-runes.json";
 	private static final int PARAM_NAME = 601;
+	private static final int PARAM_SPELL_WIDGET = 596;
 
 	/** {element rune, enum of its staves (OBJ → BOOLEAN), enum of the pouch types that hold it}. */
 	private static final int[][] ELEMENTS = {
@@ -117,7 +118,8 @@ public final class RuneLoader
 	private static Spell spell(CacheView cache, Book book, int obj)
 	{
 		String name = cache.itemStringParam(obj, PARAM_NAME);
-		return new Spell(book, name == null ? "spell " + obj : name, obj);
+		int widget = cache.itemIntParam(obj, PARAM_SPELL_WIDGET, -1);
+		return new Spell(book, name == null ? "spell " + obj : name, obj, widget > 0 ? widget : -1);
 	}
 
 	private static Map<Integer, Integer> enumMap(CacheView cache, int enumId)

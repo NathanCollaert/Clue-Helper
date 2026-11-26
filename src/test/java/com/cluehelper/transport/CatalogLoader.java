@@ -79,11 +79,23 @@ public final class CatalogLoader
 			req.getItems().stream().filter(clause -> clause.getWaivedBy() != null)
 				.forEach(clause -> varbits.add(clause.getWaivedBy().getId()));
 		}
-		Set<Integer> items = itemIds(teleports.stream().map(CatalogRow::getRequirements).collect(Collectors.toList()));
-		Set<Integer> named = new TreeSet<>(items);
+		Set<Integer> named = itemIds(teleports.stream().map(CatalogRow::getRequirements).collect(Collectors.toList()));
 		named.addAll(itemIds(gates()));
+		Set<Integer> items = new TreeSet<>(named);
+		items.addAll(itemIds(changes.stream().map(SpellbookChange::getRequirements).collect(Collectors.toList())));
 		return new Catalog(RowParts.withSingleLandings(teleports), List.copyOf(changes), items, itemNames(named), varbits, varps,
-			housePieces(teleports, changes));
+			housePieces(teleports, changes), rowsPerItem(teleports));
+	}
+
+	private static Map<Integer, Integer> rowsPerItem(List<CatalogRow> teleports)
+	{
+		Map<Integer, Integer> rows = new TreeMap<>();
+		for (CatalogRow row : teleports)
+		{
+			row.getRequirements().getItems().forEach(clause -> clause.getBranches().forEach(branch ->
+				branch.getIds().forEach(id -> rows.merge(id, 1, Integer::sum))));
+		}
+		return rows;
 	}
 
 	/** The nexus, every piece of furniture a row needs, and the in-house spellbook altars. */

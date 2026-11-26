@@ -38,7 +38,6 @@ public class MenuLines
 	/** Each right-click menu row's height; the menu's height is its title, its rows and this padding under them. */
 	private static final int MENU_ROW_HEIGHT = 15;
 	private static final int MENU_BOTTOM_PADDING = 3;
-	private static final Pattern MINIGAME_PLACE_NUMBER = Pattern.compile("^\\d+\\. ");
 	/** A minigame card's text is its name, a break, then its places. */
 	private static final String LINE_BREAK = "<br>";
 	private static final int NEXUS_GROUP = 17;
@@ -58,7 +57,6 @@ public class MenuLines
 	private static final String CLOSE_OPTION = "Close";
 	/** Same cyan as {@code Highlighter.COLOUR}, the colour of every Clue Helper highlight. */
 	private static final int TEXT_COLOUR = 0x40D0FF;
-	private static final int MOST_ICON_PIXELS_OFF = 24;
 	/** The grey of the info box's item lines. */
 	private static final int PICK_COLOUR = 0xBEBEBE;
 
@@ -402,22 +400,6 @@ public class MenuLines
 		return found;
 	}
 
-	/** The key the charter's destination list gives the target's port, or 0 while the list isn't open. */
-	public char charterKey(MenuTarget target)
-	{
-		String destination = target == null ? null : target.destination();
-		Widget[] rows = dynamicChildren(InterfaceID.CharteringMenuSide.LIST_CONTENT);
-		for (int i = 0; destination != null && i + 1 < rows.length; i++)
-		{
-			String text = rows[i + 1] == null ? null : Text.removeTags(rows[i + 1].getText()).trim();
-			if (Widgets.visible(rows[i]) && namesPlace(rows[i], destination) && text != null && !text.isEmpty())
-			{
-				return text.charAt(0);
-			}
-		}
-		return 0;
-	}
-
 	/** The charter map's marker and the destination list's line both carry the port's name as their action. */
 	private boolean charter(String destination, Found out)
 	{
@@ -516,7 +498,7 @@ public class MenuLines
 				fairyCode(target.getLineKey(), out);
 				break;
 			case MINIGAME:
-				minigame(target.getLineName(), out);
+				minigame(target, out);
 				break;
 			case QUETZAL:
 				quetzal(target.getIcon(), out);
@@ -592,14 +574,15 @@ public class MenuLines
 		}
 	}
 
-	private void minigame(String name, Found out)
+	/** After the card, a game with several places asks which one next: the row's place is its path's option. */
+	private void minigame(MenuTarget target, Found out)
 	{
 		if (Widgets.visible(client.getWidget(InterfaceID.Minigames.MINIGAMES)))
 		{
-			minigameCard(name, out);
+			minigameCard(target.getLineName(), out);
 			return;
 		}
-		minigamePlace(name, out);
+		labelled(target, out);
 	}
 
 	/**
@@ -616,27 +599,6 @@ public class MenuLines
 			if (Widgets.visible(widget) && hasTextMatching(widget, game))
 			{
 				out.addMapButton(widget);
-				return;
-			}
-		}
-	}
-
-	/** A game with several places asks which one next. */
-	private void minigamePlace(String name, Found out)
-	{
-		String[] parts = name.split(": ", 2);
-		Widget options = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
-		Widget[] lines = parts.length < 2 || !Widgets.visible(options) ? null : options.getDynamicChildren();
-		if (lines == null)
-		{
-			return;
-		}
-		String place = MenuLabels.normalise(MINIGAME_PLACE_NUMBER.matcher(parts[1]).replaceFirst(""));
-		for (Widget line : lines)
-		{
-			if (Widgets.visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
-			{
-				out.add(line);
 				return;
 			}
 		}
@@ -659,34 +621,15 @@ public class MenuLines
 		{
 			return;
 		}
-		out.add(nearestIcon(icons.getDynamicChildren(), at));
+		out.add(iconAt(icons.getDynamicChildren(), at));
 	}
 
-	private static Widget nearestIcon(Widget[] icons, int[] at)
+	/** The icon placed where the quetzal table puts the site; y counts from the map's top, as the table does. */
+	private static Widget iconAt(Widget[] icons, int[] at)
 	{
-		Widget best = null;
-		int bestOff = MOST_ICON_PIXELS_OFF + 1;
-		for (Widget icon : icons == null ? new Widget[0] : icons)
-		{
-			if (icon == null || icon.isHidden())
-			{
-				continue;
-			}
-			int x = icon.getOriginalX();
-			int y = icon.getOriginalY();
-			int off = Math.min(off(x, y, at), off(x + icon.getWidth() / 2, y + icon.getHeight() / 2, at));
-			if (off < bestOff)
-			{
-				best = icon;
-				bestOff = off;
-			}
-		}
-		return best;
-	}
-
-	private static int off(int x, int y, int[] at)
-	{
-		return Math.max(Math.abs(x - at[0]), Math.abs(y - at[1]));
+		return icons == null ? null : Arrays.stream(icons)
+			.filter(icon -> icon != null && !icon.isHidden() && icon.getOriginalX() == at[0] && icon.getOriginalY() == at[1])
+			.findFirst().orElse(null);
 	}
 
 	/**

@@ -52,7 +52,7 @@ public class CatalogRow
 	List<String> clicks = List.of();
 	@Builder.Default
 	MenuLine line = MenuLine.LABEL;
-	/** A nexus line's struct id or a jewellery box line's index. */
+	/** A nexus line's struct id, a jewellery box line's index or a Quetzal site's id in the game's quetzal table. */
 	int lineId;
 	/** A nexus line's map region shield. */
 	String lineKey;
@@ -62,9 +62,9 @@ public class CatalogRow
 	int[] icon;
 	/** The spell's name, without its option; null when it isn't a spell. */
 	String spell;
-	/** The cache object of the spell, whose params name its spellbook button; -1 when it isn't a spell the cache lists. */
+	/** The spell's button in the spellbook; -1 when it isn't a spell the cache lists. */
 	@Builder.Default
-	int spellObj = -1;
+	int spellWidget = -1;
 	/** The master scroll book's scroll it reads, as the loose scroll is named; null when it isn't a book teleport. */
 	String scroll;
 	/** Its first click opens a list or map the place is picked from (the portal nexus), so that click teleports nowhere yet. */

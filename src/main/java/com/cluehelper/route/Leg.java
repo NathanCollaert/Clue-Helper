@@ -9,6 +9,8 @@ import net.runelite.api.coords.WorldPoint;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Leg
 {
+	private static final int EXIT_COLUMNS = 8;
+
 	public enum Kind
 	{
 		WALK,
@@ -41,10 +43,14 @@ public class Leg
 		return new Leg(Kind.WALK, from, to, halfTicks, null, null, null, book);
 	}
 
-	/** Due south until out of the Wilderness, a tile per half-tick. */
+	/**
+	 * Due south until out of the Wilderness, a tile per half-tick. It ends on the last column of its group of
+	 * {@link #EXIT_COLUMNS}: a few tiles aside cost no time, and a step aside between plans doesn't move the end.
+	 */
 	public static Leg wildernessExit(WorldPoint from, int exitY, int halfTicks, Book book)
 	{
-		return new Leg(Kind.WILDERNESS_EXIT, from, new WorldPoint(from.getX(), exitY, from.getPlane()), halfTicks, null, null, null, book);
+		WorldPoint end = new WorldPoint(from.getX() | EXIT_COLUMNS - 1, exitY, from.getPlane());
+		return new Leg(Kind.WILDERNESS_EXIT, from, end, halfTicks, null, null, null, book);
 	}
 
 	public static Leg teleport(WorldPoint from, CatalogRow row, int halfTicks, Book book)

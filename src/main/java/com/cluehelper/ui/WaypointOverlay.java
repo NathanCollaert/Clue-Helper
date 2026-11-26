@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.*;
@@ -44,6 +45,7 @@ public class WaypointOverlay extends Overlay
 	/** An obelisk row's origin is the south-west corner of its 3 by 3 platform, which teleports whole. */
 	private static final int TO_PLATFORM_MIDDLE = 1;
 	private static final BasicStroke PATH_STROKE = new BasicStroke(2f);
+	private static final int START_DOT_PIXELS = 5;
 	private static final int COVER_STEP_PIXELS = 3;
 	private static final int[] CONVERSATION = {InterfaceID.ChatLeft.UNIVERSE, InterfaceID.ChatRight.UNIVERSE, InterfaceID.Chatmenu.UNIVERSE};
 	private static final String NO_STEP = "";
@@ -155,7 +157,7 @@ public class WaypointOverlay extends Overlay
 	/** Where the line leads for the current sub-step; null when nothing is drawn. */
 	private Goal goal(WorldView view, SubStep current)
 	{
-		if (current != null && current.getKind() == SubStep.Kind.ACT && isFighting(view, actNpc(current)))
+		if (current != null && current.getKind() == SubStep.Kind.ACT && isFighting(actNpc(current)))
 		{
 			return null;
 		}
@@ -669,19 +671,15 @@ public class WaypointOverlay extends Overlay
 	}
 
 	/**
-	 * Attacking one of the {@code wanted} NPCs, its health bar up, or attacked by one: the fight is where the player is,
-	 * so no line. Running to an NPC clicked from afar targets it too, before any hit, and keeps the line.
+	 * Attacking one of the {@code wanted} NPCs, its health bar up: the fight is where the player is, so no line. Being
+	 * attacked by one keeps it (aggressive naguas hit on arrival). Running to an NPC clicked from afar targets it too,
+	 * before any hit, and keeps the line.
 	 */
-	private boolean isFighting(WorldView view, Predicate<NPC> wanted)
+	private boolean isFighting(Predicate<NPC> wanted)
 	{
 		Player local = client.getLocalPlayer();
-		if (local == null)
-		{
-			return false;
-		}
-		Actor opponent = local.getInteracting();
-		boolean hitting = opponent instanceof NPC && wanted.test((NPC) opponent) && opponent.getHealthRatio() != NO_HEALTH_BAR;
-		return hitting || view.npcs().stream().anyMatch(npc -> npc.getInteracting() == local && wanted.test(npc));
+		Actor opponent = local == null ? null : local.getInteracting();
+		return opponent instanceof NPC && wanted.test((NPC) opponent) && opponent.getHealthRatio() != NO_HEALTH_BAR;
 	}
 
 	private WorldPoint playerTile()
@@ -802,7 +800,7 @@ public class WaypointOverlay extends Overlay
 
 	/**
 	 * Over a crossing (a wall searched, stepping stones, a ladder) the line breaks: it runs into the outlined object and
-	 * goes on from where the crossing lands, so it never reads as a walk through the wall or over the water.
+	 * goes on from a dot where the crossing lands, so it never reads as a walk through the wall or over the water.
 	 */
 	private void drawLine(Graphics2D graphics, WorldView view, List<WorldPoint> ahead)
 	{
@@ -814,6 +812,7 @@ public class WaypointOverlay extends Overlay
 		WalkTable table = data == null || view.isInstance() ? null : data.getTable();
 		Point previous = null;
 		WorldPoint previousTile = null;
+		boolean crossed = false;
 		for (WorldPoint tile : ahead)
 		{
 			if (SKIPPED_TILES.contains(tile))
@@ -824,9 +823,16 @@ public class WaypointOverlay extends Overlay
 			{
 				drawIntoCrossed(graphics, view, previous, previousTile);
 				previous = null;
+				crossed = true;
 			}
 			LocalPoint local = onFloor(view, tile);
 			Point at = local == null ? null : Perspective.localToCanvas(client, local, view.getPlane());
+			if (crossed && at != null)
+			{
+				double radius = START_DOT_PIXELS / 2.0;
+				graphics.fill(new Ellipse2D.Double(at.getX() - radius, at.getY() - radius, START_DOT_PIXELS, START_DOT_PIXELS));
+				crossed = false;
+			}
 			previous = drawTo(graphics, previous, at);
 			previousTile = tile;
 		}

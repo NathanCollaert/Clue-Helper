@@ -17,7 +17,6 @@ final class LegSteps
 	private static final int PROBE_ARRIVE_TILES = 0;
 	private static final String CODE_SEPARATOR = "-";
 	private static final int CODE_LENGTH = 3;
-	private static final String TALK_TO = "Talk to";
 	/** Teleports that land anywhere in a place, by name: how far from the catalog's landing tile a landing still counts. */
 	private static final Map<String, Integer> SCATTERED_LANDING_TILES = Map.of("Dorgesh-kaan sphere", 120);
 
@@ -98,14 +97,14 @@ final class LegSteps
 
 	static SubStep exit(Leg leg, Exit exit)
 	{
-		return SubStep.of(Kind.EXIT, exitText(exit))
+		return SubStep.of(Kind.EXIT, exit.getText())
 			.waypoint(exit.getOrigin()).goal(leg.getTo()).radius(SubSteps.LANDING_TILES).exit(exit).build();
 	}
 
 	/** Through an exit whose far side isn't loaded yet: done on landing. */
 	static SubStep jump(Exit exit)
 	{
-		return SubStep.of(Kind.EXIT, exitText(exit))
+		return SubStep.of(Kind.EXIT, exit.getText())
 			.waypoint(exit.getOrigin()).goal(exit.getDestination()).radius(SubSteps.LANDING_TILES).exit(exit).build();
 	}
 
@@ -185,17 +184,6 @@ final class LegSteps
 	{
 		String storage = use.getContainer() == Container.GROUP_STORAGE ? " (group storage)" : "";
 		return itemLines.apply(use) + storage;
-	}
-
-	private static String exitText(Exit exit)
-	{
-		String target = exit.getTarget().isEmpty() ? "exit" : exit.getTarget().toLowerCase();
-		String option = exit.getOption().replace('-', ' ');
-		if (option.equals(TALK_TO) && !exit.getTarget().isEmpty())
-		{
-			return TALK_TO + " " + exit.getTarget();
-		}
-		return option.isEmpty() ? "Take the " + target : option + (option.equals("Travel") ? " with the " : " the ") + target;
 	}
 
 	private static String walkGoal(Leg next)

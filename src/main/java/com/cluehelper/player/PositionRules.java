@@ -1,7 +1,9 @@
 package com.cluehelper.player;
 
-import java.util.Arrays;
+import com.cluehelper.Tables;
+import java.util.List;
 import net.runelite.api.coords.WorldPoint;
+import static java.util.stream.Collectors.*;
 
 public final class PositionRules
 {
@@ -14,22 +16,11 @@ public final class PositionRules
 	private static final int POH_MIN_Y = 7040;
 	private static final int POH_MAX_Y = 7111;
 
-	private static final int WILDERNESS_MIN_X = 2944;
-	private static final int WILDERNESS_MAX_X_SURFACE = 3391;
-	private static final int WILDERNESS_MAX_X_UNDERGROUND = 3461;
-	private static final int SURFACE_MIN_Y = 3525;
-	private static final int SURFACE_MAX_Y = 3972;
-	private static final int SURFACE_LEVEL_BASE_Y = 3520;
-	private static final int UNDERGROUND_MIN_Y = 9918;
-	private static final int UNDERGROUND_MAX_Y = 10375;
-	private static final int UNDERGROUND_LEVEL_BASE_Y = 9912;
 	private static final int TILES_PER_LEVEL = 8;
-	/** Inside the surface area but not Wilderness: Ferox Enclave and the south edge (Shortest Path's boxes: x, y, width, height). */
-	private static final int[][] NOT_WILDERNESS = {{3123, 3622, 2, 10}, {3125, 3617, 16, 23}, {3138, 3636, 18, 10},
-		{3141, 3625, 14, 11}, {3141, 3619, 7, 6}, {2997, 3525, 34, 9}, {3005, 3534, 21, 10}, {3000, 3534, 5, 5},
-		{3031, 3525, 2, 2}};
-	/** Inside the underground box but Morytania: the Slayer Tower basement (its map region). */
-	private static final int[] SLAYER_TOWER_BASEMENT = {3392, 9920, 64, 64};
+	/** The surface and the underground Wilderness: x, y, width, height, then the y its levels count from. */
+	private static final List<int[]> WILDERNESS = boxes("wilderness");
+	/** Inside those but safe (Ferox Enclave, the south edge, the Slayer Tower basement): x, y, width, height. */
+	private static final List<int[]> NOT_WILDERNESS = boxes("not wilderness");
 
 	private PositionRules()
 	{
@@ -85,35 +76,22 @@ public final class PositionRules
 	/** Must match the areas of Shortest Path's {@code WildernessChecker}. */
 	public static int wildernessLevel(WorldPoint tile)
 	{
-		if (tile == null || tile.getX() < WILDERNESS_MIN_X)
+		if (tile == null || NOT_WILDERNESS.stream().anyMatch(box -> isIn(box, tile)))
 		{
 			return 0;
 		}
-		int x = tile.getX();
-		int y = tile.getY();
-		if (isSafeInsideSurfaceArea(x, y))
-		{
-			return 0;
-		}
-		if (y >= SURFACE_MIN_Y && y <= SURFACE_MAX_Y && x <= WILDERNESS_MAX_X_SURFACE)
-		{
-			return (y - SURFACE_LEVEL_BASE_Y) / TILES_PER_LEVEL + 1;
-		}
-		if (y >= UNDERGROUND_MIN_Y && y <= UNDERGROUND_MAX_Y && x <= WILDERNESS_MAX_X_UNDERGROUND && !isIn(SLAYER_TOWER_BASEMENT, x, y))
-		{
-			return (y - UNDERGROUND_LEVEL_BASE_Y) / TILES_PER_LEVEL + 1;
-		}
-		return 0;
-	}
-
-	private static boolean isSafeInsideSurfaceArea(int x, int y)
-	{
-		return Arrays.stream(NOT_WILDERNESS).anyMatch(box -> isIn(box, x, y));
+		return WILDERNESS.stream().filter(area -> isIn(area, tile)).mapToInt(area -> (tile.getY() - area[4]) / TILES_PER_LEVEL + 1)
+			.findFirst().orElse(0);
 	}
 
 	/** {@code box} is x, y, width, height. */
-	private static boolean isIn(int[] box, int x, int y)
+	private static boolean isIn(int[] box, WorldPoint tile)
 	{
-		return x >= box[0] && x < box[0] + box[2] && y >= box[1] && y < box[1] + box[3];
+		return tile.getX() >= box[0] && tile.getX() < box[0] + box[2] && tile.getY() >= box[1] && tile.getY() < box[1] + box[3];
+	}
+
+	private static List<int[]> boxes(String table)
+	{
+		return Tables.rows(table).stream().map(Tables.Row::ids).collect(toUnmodifiableList());
 	}
 }

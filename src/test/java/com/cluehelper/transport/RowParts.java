@@ -33,6 +33,7 @@ final class RowParts
 	/** The mushtree map's places in its hotkey order, 1 to 4: its buttons carry no number. */
 	private static final List<String> MUSHTREE_PLACES = Tables.keys("mushtree places");
 	private static final List<String> MINECART_PLACES = Tables.keys("minecart places");
+	private static final Map<String, String> CHARTER_KEYS = Tables.byKey("charter keys", Tables.Row::text);
 	private static final Pattern CLICK_NOTE = Pattern.compile(" \\((left|right)-click\\)$");
 	private static final Map<String, String> CHANGE_WARNINGS = Tables.byKey("spellbook change warnings", Tables.Row::text);
 	private static final String TRAVEL_OPTION = "Travel";
@@ -72,7 +73,7 @@ final class RowParts
 			.approach(approach(row, menu))
 			.options(optionPath(row))
 			.spell(isSpell(row) ? spellName(row.getName()) : null)
-			.spellObj(isSpell(row) ? spellObj(spellName(row.getName()), row.getRequirements().getBook()) : -1)
+			.spellWidget(isSpell(row) ? spellWidget(spellName(row.getName()), row.getRequirements().getBook()) : -1)
 			.scroll(row.getName().startsWith(BOOK_ROW_PREFIX) ? row.getName().substring(BOOK_ROW_PREFIX.length()).split(": ", 2)[0] : null)
 			.opensMenu(menu != null && (OPENS_MENU.matcher(menu).find() || menu.contains(MENU_STEP)));
 		line(parts, row, menu);
@@ -83,11 +84,11 @@ final class RowParts
 		return text(parts, row, menu).build();
 	}
 
-	/** The cache's object for the spell on the row's book, or on any book when the row names none; -1 when none matches. */
-	private static int spellObj(String name, Book book)
+	/** The spellbook button of the spell on the row's book, or on any book when the row names none; -1 when none matches. */
+	private static int spellWidget(String name, Book book)
 	{
 		return SPELLS.stream().filter(spell -> spell.getName().equalsIgnoreCase(name) && (book == null || spell.getBook() == book))
-			.mapToInt(Spell::getObj).findFirst().orElse(-1);
+			.mapToInt(Spell::getWidget).findFirst().orElse(-1);
 	}
 
 	/** Spellbook changes: the line before the book, its detail, and the place a walk heads for. */
@@ -135,7 +136,7 @@ final class RowParts
 			case "quetzal":
 			{
 				String[] site = cell[1].split(" ");
-				parts.line(MenuLine.QUETZAL).icon(new int[]{Integer.parseInt(site[1]), Integer.parseInt(site[2])});
+				parts.line(MenuLine.QUETZAL).lineId(Integer.parseInt(site[0])).icon(new int[]{Integer.parseInt(site[1]), Integer.parseInt(site[2])});
 				break;
 			}
 			case "nexus":
@@ -224,7 +225,7 @@ final class RowParts
 			return parts.label(FAIRY_RING_PREFIX).pick(row.getCode() == null ? fairyRingPlace(row) : destination(row));
 		}
 		String text = teleportText(row, menu);
-		boolean gameKnowsKey = menu != null && menu.startsWith("nexus ") || row.getCategory() == Category.CHARTER;
+		boolean gameKnowsKey = menu != null && menu.startsWith("nexus ");
 		char key = gameKnowsKey ? 0 : hotkey(row, menu);
 		String shown = travelText(withKey(text, key), destination(row));
 		String keySuffix = key == 0 ? null : HOTKEY_DASH + keyText(key);
@@ -240,6 +241,17 @@ final class RowParts
 			check(travelText(withKey(text, SAMPLE_KEY), destination(row)), join(label, pick, String.valueOf(SAMPLE_KEY)), row);
 		}
 		return parts.label(label).pick(row.getCategory() == Category.CAPE ? withoutSubmenu(pick) : pick).key(partKey);
+	}
+
+	/** The charter list keys a port the same at every dock; a dock leaves itself and the ports not open to it out. */
+	private static char charterKey(String port)
+	{
+		String key = CHARTER_KEYS.get(port);
+		if (key == null)
+		{
+			throw new IllegalStateException("tables.tsv has no charter list key for " + port);
+		}
+		return key.charAt(0);
 	}
 
 	/** A cape's place without the submenu it sits in ("Other Teleports: Farming Guild" shows as "Farming Guild"). */
@@ -345,6 +357,10 @@ final class RowParts
 		String label = menu != null && menu.startsWith("list ") ? menu.substring("list ".length())
 			: menu != null && menu.contains(MENU_STEP) ? menu.substring(menu.lastIndexOf(MENU_STEP) + MENU_STEP.length())
 			: lastOption(row);
+		if (row.getCategory() == Category.CHARTER)
+		{
+			return charterKey(label);
+		}
 		Matcher key = LIST_HOTKEY.matcher(label);
 		return key.find() ? key.group(1).charAt(0) : 0;
 	}

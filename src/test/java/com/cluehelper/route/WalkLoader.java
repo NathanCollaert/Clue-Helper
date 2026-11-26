@@ -27,6 +27,7 @@ public final class WalkLoader
 	private static final int FIRST_BANK_COLUMN = 2;
 	/** The option of the webs' rows: their gate is the one {@link SceneDoors} opens webs by. */
 	private static final String SLASH = "Slash";
+	private static final String TALK_TO = "Talk to";
 
 	private final RequirementParser parser = new RequirementParser();
 	private WorldPoint[] tiles;
@@ -285,7 +286,7 @@ public final class WalkLoader
 				}
 				Set<Integer> forms = new TreeSet<>(first.getOtherForms());
 				forms.add(later.getObjectId());
-				return new Exit(first.getOrigin(), first.getDestination(), first.getOption(), first.getTarget(),
+				return new Exit(first.getOrigin(), first.getDestination(), first.getOption(), first.getTarget(), first.getText(),
 					first.getObjectId(), forms, first.getChat());
 			});
 		}
@@ -356,7 +357,19 @@ public final class WalkLoader
 	private static Exit rowAction(String[] c, Set<Integer> otherForms)
 	{
 		int objectId = c[4].isEmpty() ? -1 : Integer.parseInt(c[4]);
-		return new Exit(parseTile(c[0]), parseTile(c[1]), c[2], c[3], objectId, otherForms, c.length > 5 ? c[5] : "");
+		return new Exit(parseTile(c[0]), parseTile(c[1]), c[2], c[3], exitText(c[2], c[3]), objectId, otherForms, c.length > 5 ? c[5] : "");
+	}
+
+	/** The guide's line for a row's option and its object or NPC name, which is empty when unknown. */
+	private static String exitText(String menuOption, String targetName)
+	{
+		String target = targetName.isEmpty() ? "exit" : targetName.toLowerCase();
+		String option = menuOption.replace('-', ' ');
+		if (option.equals(TALK_TO) && !targetName.isEmpty())
+		{
+			return TALK_TO + " " + targetName;
+		}
+		return option.isEmpty() ? "Take the " + target : option + (option.equals("Travel") ? " with the " : " the ") + target;
 	}
 
 	private static WorldPoint parseTile(String cell)

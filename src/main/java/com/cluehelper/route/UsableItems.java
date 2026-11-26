@@ -2,7 +2,6 @@ package com.cluehelper.route;
 
 import com.cluehelper.player.*;
 import com.cluehelper.step.*;
-import com.cluehelper.transport.*;
 import java.util.*;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
@@ -19,15 +18,13 @@ public final class UsableItems
 	}
 
 	/**
-	 * Any item a teleport, a spellbook change or a walk gate asks for, runes and what stands in for them, and stored items
-	 * that meet one of the step's needs or stages.
+	 * Any item the catalog counts, runes and what stands in for them, and stored items that meet one of the step's needs or
+	 * stages.
 	 */
 	public static Set<Integer> of(PlanInput input, RuneModel runes, RequiredItems required, Step travel)
 	{
 		Set<Integer> usable = new HashSet<>(runes.sourceItemIds());
-		input.getCatalog().getTeleports().forEach(row -> addItems(row.getRequirements(), usable));
-		input.getCatalog().getSpellbookChanges().forEach(change -> addItems(change.getRequirements(), usable));
-		input.getTable().getGates().forEach(gate -> addItems(gate, usable));
+		usable.addAll(input.getCatalog().getItems());
 		usable.add(ItemID.HUNTSMANS_KIT);
 		if (input.getBanked() != null)
 		{
@@ -78,18 +75,6 @@ public final class UsableItems
 	{
 		return stage.getUses().values().stream().flatMap(List::stream).flatMap(use -> use.getAll().stream())
 			.anyMatch(group -> group.contains(itemId));
-	}
-
-	private static void addItems(Requirements requirements, Set<Integer> ids)
-	{
-		if (requirements == null)
-		{
-			return;
-		}
-		for (ItemClause clause : requirements.getItems())
-		{
-			clause.getBranches().forEach(branch -> ids.addAll(branch.getIds()));
-		}
 	}
 
 	private static <V> Map<Integer, V> only(Map<Integer, V> items, Set<Integer> ids)
