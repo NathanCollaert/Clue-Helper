@@ -9,8 +9,10 @@ import java.nio.file.*;
 import java.util.*;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.NpcID;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
+import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 import net.runelite.http.api.RuneLiteAPI;
 import static java.util.stream.Collectors.*;
@@ -19,7 +21,8 @@ import static java.util.stream.Collectors.*;
  * Reads the step files Clue-Helper-Tools/tools/steps/generate.py writes ({@code src/test/resources/com/cluehelper/step/steps},
  * one per clue type, tiles as {@code [x, y, plane]}, boxes as {@code [west, south, east, north, plane]}) into the one
  * {@code steps.json} {@link StepIndex#read} takes as it is, each core clue's entry with the stages ({@link StageParts}) and
- * acts ({@link ActParts}) the plugin built from it at play before. {@code DataBake} writes it; {@code BakedDataTest}
+ * acts ({@link ActParts}) the plugin built from it at play before, and the other facts it derived from the entry or core's
+ * clue. The fields only these read ({@link StepSource}) stay out of it. {@code DataBake} writes it; {@code BakedDataTest}
  * fails while it is stale.
  */
 public final class StepLoader
@@ -29,6 +32,10 @@ public final class StepLoader
 	private static final List<String> FILES = List.of("anagram", "cipher", "coordinate", "cryptic", "emote", "fairyring", "falo",
 		"hotcold", "map", "music", "skill");
 	private static final int BOX_SIDES = 5;
+	/** The tools a planting task's seed is listed beside: the seed goes in first. */
+	private static final Set<Integer> PATCH_TOOLS = Set.of(ItemID.RAKE, ItemID.SPADE, ItemID.DIBBER);
+	/** NPCs whose name changes with a quest (the doorman is Ghommal, then Laidee Gnonock): named at play. */
+	private static final Set<Integer> NAMED_BY_QUEST = Set.of(NpcID.WARGUILD_GHOMMAL);
 	/** Reads the source files' arrays, and the objects the baked parts are written as. */
 	private static final Gson SOURCE_GSON = new GsonBuilder()
 		.registerTypeAdapter(WorldPoint.class, (JsonDeserializer<WorldPoint>) (json, type, context) -> point(json))
@@ -86,17 +93,82 @@ public final class StepLoader
 			}
 		}
 		addSpotEnemies(steps, spots);
+		Map<String, StepSource.Entry> sources = new TreeMap<>();
+		steps.entrySet().forEach(step -> sources.put(step.getKey(), SOURCE_GSON.fromJson(step.getValue(), StepSource.Entry.class)));
 		JsonObject index = new JsonObject();
 		index.add("steps", sorted(steps));
 		index.add("hotColdSpots", GSON.toJsonTree(SpotParts.of(cacheSpots(spots))));
 		Map<String, ClueScroll> clues = coreClues();
 		StepIndex shaped = SOURCE_GSON.fromJson(index, StepIndex.class);
-		clues.forEach((key, clue) -> entryOf(index, key).add("stages", GSON.toJsonTree(StageParts.of(shaped.entry(key), clue))));
+		clues.forEach((key, clue) -> entryOf(index, key).add("stages", GSON.toJsonTree(StageParts.of(shaped.entry(key), sources.get(key), clue))));
 		StepIndex staged = SOURCE_GSON.fromJson(index, StepIndex.class);
 		StepResolver resolver = new StepResolver(() -> staged);
-		clues.forEach((key, clue) -> addActs(entryOf(index, key), resolver.resolve(clue, plugin())));
+		clues.forEach((key, clue) -> addActs(entryOf(index, key), resolver.resolve(clue, plugin()), sources.get(key)));
 		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(withHandAmounts(amounts(clue), entryOf(index, key)))));
+		StepIndex acted = SOURCE_GSON.fromJson(index, StepIndex.class);
+		clues.forEach((key, clue) -> addPart(entryOf(index, key), acted.entry(key), clue));
+		sources.forEach((key, source) -> addEntryFacts(entryOf(index, key), shaped.entry(key), source));
+		clues.forEach((key, clue) -> entryOf(index, key).add("plantItems", GSON.toJsonTree(plantItems(shaped.entry(key), clue))));
 		return SOURCE_GSON.fromJson(index, StepIndex.class);
+	}
+
+	/** A master cryptic's stage as one part of a three-step, its NPC named as core names it unless a quest renames it. */
+	private static void addPart(JsonObject json, StepIndex.Entry entry, ClueScroll clue)
+	{
+		if (clue instanceof CrypticClue && "master".equals(entry.getTier()) && !entry.getTargets().isEmpty())
+		{
+			List<Integer> npcs = entry.getTargets().get(0).getNpcs();
+			boolean nameIsLive = !npcs.isEmpty() && NAMED_BY_QUEST.contains(npcs.get(0));
+			json.add("part", GSON.toJsonTree(StageParts.part(entry, ((CrypticClue) clue).getNpc(plugin()), nameIsLive)));
+		}
+	}
+
+	/** What the entry's own fields give: the acts before the task, the monsters met and the way in's one cover item. */
+	private static void addEntryFacts(JsonObject json, StepIndex.Entry entry, StepSource.Entry source)
+	{
+		json.add("beforeActs", GSON.toJsonTree(source.getBefore().stream().map(ActParts::beforeAct).collect(toList())));
+		json.add("enemies", GSON.toJsonTree(source.getCombat().stream().flatMap(combat -> combat.getNpcs().stream()).collect(toSet())));
+		json.addProperty("cover", cover(entry));
+	}
+
+	/**
+	 * The one item that is every worn need of the way in at once (the Medallion of the Deep for the diving helmet and
+	 * apparatus), worn by its own Wear; -1 for none. The plugin offers it only while two or more needs are left.
+	 */
+	private static int cover(StepIndex.Entry entry)
+	{
+		List<StepIndex.Requires> worn = entry.wornRequires();
+		if (worn.size() < 2)
+		{
+			return -1;
+		}
+		List<Integer> covers = worn.get(0).getIds().stream().filter(id -> worn.stream().allMatch(need -> need.getIds().contains(id)))
+			.collect(toList());
+		if (covers.size() > 1 || !covers.isEmpty() && worn.stream().anyMatch(need -> need.getPutOn() != null))
+		{
+			throw new IllegalStateException("the plugin offers one cover item worn by its own Wear: " + covers);
+		}
+		return covers.isEmpty() ? -1 : covers.get(0);
+	}
+
+	/** A planting task's items but the rake, which only clears the patch: the seed first, then the tools it goes in with. */
+	private static List<Integer> plantItems(StepIndex.Entry entry, ClueScroll clue)
+	{
+		if (!entry.isPlants())
+		{
+			return List.of();
+		}
+		return CoreClueReader.itemRequirements(clue).stream().map(StepLoader::itemId).filter(id -> id != ItemID.RAKE)
+			.sorted(Comparator.comparing((Integer id) -> PATCH_TOOLS.contains(id)).thenComparing(Comparator.naturalOrder())).collect(toList());
+	}
+
+	private static int itemId(ItemRequirement requirement)
+	{
+		if (!(requirement instanceof SingleItemRequirement || requirement instanceof MultipleOfItemRequirement))
+		{
+			throw new IllegalStateException("a planting task's item is one item: " + requirement);
+		}
+		return field(requirement, "itemId");
 	}
 
 	/**
@@ -172,16 +244,18 @@ public final class StepLoader
 		return index.getAsJsonObject("steps").getAsJsonObject(key);
 	}
 
-	private static void addActs(JsonObject entry, Step step)
+	private static void addActs(JsonObject entry, Step step, StepSource.Entry source)
 	{
-		List<SubStep> acts = ActParts.baked(step);
-		SubStep main = ActParts.bakedMain(step);
+		List<SubStep> acts = ActParts.baked(step, source);
+		SubStep main = ActParts.bakedMain(step, source);
 		List<SubStep> all = new ArrayList<>(acts);
 		all.add(main);
 		all.forEach(act -> requireBakeable(step, act));
 		entry.add("acts", GSON.toJsonTree(acts));
 		entry.add("mainAct", GSON.toJsonTree(main));
-		entry.add("arriveNpcs", GSON.toJsonTree(ActParts.arriveNpcs(step)));
+		entry.add("arriveNpcs", GSON.toJsonTree(ActParts.arriveNpcs(step, source)));
+		entry.addProperty("keyFromNpc", ActParts.isKeyFromNpc(step));
+		entry.add("prayer", GSON.toJsonTree(ActParts.prayerToActivate(step)));
 	}
 
 	/** An act holding a part of the game Gson can't write (core's item requirements, a teleport) must stay built at play. */

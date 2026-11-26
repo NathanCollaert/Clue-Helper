@@ -28,8 +28,6 @@ public class Step
 	@Builder.Default
 	List<Integer> objectIds = List.of();
 	@Builder.Default
-	List<String> objectNames = List.of();
-	@Builder.Default
 	StepRequirements requirements = StepRequirements.none();
 	/**
 	 * Set on a hot/cold step rewritten to one probe tile of our own: what to do there. The target is then our waypoint,
@@ -51,16 +49,6 @@ public class Step
 	@Builder.Default
 	List<WorldPoint> otherTiles = List.of();
 
-	/**
-	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to
-	 * the guardian".
-	 */
-	public boolean isKeyFromNpc()
-	{
-		boolean talk = text != null && text.toLowerCase().contains("speak");
-		return ClueTypes.CRYPTIC.equals(type) && !talk && !npcs.isEmpty() && (!objectNames.isEmpty() || !objectIds.isEmpty());
-	}
-
 	/** The text with the step's NPC named; "the NPC" for a step core names none for. */
 	public String namingNpc(String text)
 	{
@@ -70,6 +58,6 @@ public class Step
 	/** The NPCs the step is done with: none when its NPC only drops the key for its object. */
 	public List<String> getNpcsAtStep()
 	{
-		return isKeyFromNpc() ? List.of() : npcs;
+		return data.isKeyFromNpc() ? List.of() : npcs;
 	}
 }

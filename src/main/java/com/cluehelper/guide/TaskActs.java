@@ -23,10 +23,6 @@ import com.cluehelper.guide.StepGuide.Tab;
 @Singleton
 final class TaskActs
 {
-	private static final String RAKE = "Rake";
-	private static final String SPADE = "Spade";
-	/** The tools a planting task's seed is listed beside. */
-	private static final Set<String> PATCH_TOOLS = Set.of(RAKE, SPADE, "Seed dibber");
 	/** What a patch to plant in takes before the seed goes in, one line at a time. */
 	private static final Map<Allotment, String> CLEARING_LINES = Map.of(Allotment.WEEDS, "Rake the weeds off the patch",
 		Allotment.CROP, "Harvest the crop", Allotment.DEAD, "Clear the dead crop");
@@ -132,9 +128,7 @@ final class TaskActs
 		{
 			return Set.of();
 		}
-		return carried.stream().filter(id -> step.getRequirements().getItems().stream()
-				.anyMatch(need -> need.fulfilledBy(id) && !RAKE.equals(need.getCollectiveName(client))))
-			.collect(toUnmodifiableSet());
+		return carried.stream().filter(step.getData().getPlantItems()::contains).collect(toUnmodifiableSet());
 	}
 
 	/**
@@ -148,13 +142,7 @@ final class TaskActs
 			return -1;
 		}
 		Set<Integer> items = itemsFor(step, stateOf(patch), player.carriedIds());
-		return items == null ? -1 : items.stream().min(Comparator.comparing(id -> isPatchTool(step, id))).orElse(-1);
-	}
-
-	private boolean isPatchTool(Step step, int itemId)
-	{
-		return step.getRequirements().getItems().stream()
-			.anyMatch(need -> need.fulfilledBy(itemId) && PATCH_TOOLS.contains(need.getCollectiveName(client)));
+		return items == null ? -1 : step.getData().getPlantItems().stream().filter(items::contains).findFirst().orElse(-1);
 	}
 
 	/** The state of the patch to plant in; null for other tasks or with none in the scene. */

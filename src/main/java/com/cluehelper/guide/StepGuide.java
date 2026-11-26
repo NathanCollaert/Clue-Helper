@@ -214,7 +214,8 @@ public class StepGuide
 	private void noteItemsSpent(SubStep done)
 	{
 		boolean spent = done.getKind() == Kind.ACT && done.getDone() == SubStep.Done.ITEMS_GONE && routeStep != null
-			&& routeStep.getData().getBefore().stream().anyMatch(before -> !before.getGone().isEmpty() && before.getText().equals(done.getText()));
+			&& routeStep.getData().getBeforeActs().stream().anyMatch(before -> before.getDone() == SubStep.Done.ITEMS_GONE
+				&& before.getText().equals(done.getText()));
 		if (spent)
 		{
 			spentStepKey = routeStep.getKey();

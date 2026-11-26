@@ -76,8 +76,8 @@ public final class DriftSteps
 			return List.of();
 		}
 		List<WorldPoint> places = targets.subList(0, targets.size() - 1);
-		Map<WorldPoint, String> grownOnly = entry == null ? Map.of() : entry.getPlaces().stream().filter(place -> place.getGrown() != null)
-			.collect(Collectors.toMap(StepIndex.Place::getTile, StepIndex.Place::getGrown));
+		Map<WorldPoint, String> grownOnly = entry == null ? Map.of() : entry.getStages().stream()
+			.filter(stage -> stage.getKind() == Stage.Kind.TASK).map(Stage::getGrownOnly).findFirst().orElse(Map.of());
 		Book book = entry == null || entry.getBook() == null ? null : Book.valueOf(entry.getBook());
 		return List.of(Stage.builder().kind(Stage.Kind.TASK).tiles(List.copyOf(places)).grownOnly(grownOnly).takesStepItems(true)
 				.book(book).build(),

@@ -1,5 +1,6 @@
 package com.cluehelper.step;
 
+import com.cluehelper.guide.SubStep;
 import com.cluehelper.player.Book;
 import java.util.*;
 import lombok.*;
@@ -69,17 +70,20 @@ public class Stage
 	/** Places that span an area: outlined, and anywhere in one is arriving. */
 	@Builder.Default
 	List<StepIndex.Place> spans = List.of();
+	/** Done before the walk to the place, being done anywhere, in order. */
+	@Builder.Default
+	List<SubStep> beforeAnywhere = List.of();
 	/** Done at the place before the act (Alry's bird, king worms), in order. */
 	@Builder.Default
-	List<StepIndex.Before> before = List.of();
+	List<SubStep> beforeThere = List.of();
 	/** Objects the stage is done on (an anvil): outlined, and the walk ends beside them. */
 	@Builder.Default
 	Set<Integer> objectIds = Set.of();
 	/** NPCs the stage is done with: outlined, and the walk ends on them. */
 	@Builder.Default
 	Set<Integer> npcIds = Set.of();
-	/** What the objects or NPCs are called in the game ("anvil"), for the walk there; null when they go by several names. */
-	String targetName;
+	/** The line of the walk to our marker ("Walk to the nearest anvil"); null for a stage core marks. */
+	String walk;
 	/** Per tile, core's items that place takes others in place of (the True Blood Altar takes pure essence). */
 	@Builder.Default
 	Map<WorldPoint, List<StepIndex.Alternative>> uses = Map.of();

@@ -4,6 +4,7 @@ import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
 import com.cluehelper.step.CacheRow;
 import com.cluehelper.step.CoreClueReader;
+import com.cluehelper.step.ObjectNames;
 import com.cluehelper.step.RequirementsText;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
@@ -93,9 +94,10 @@ final class StepDump
 		{
 			lines.add("NPCs: " + String.join(", ", step.getNpcs()) + (step.getRegions().isEmpty() ? "" : " in regions " + step.getRegions()));
 		}
-		if (!step.getObjectIds().isEmpty() || !step.getObjectNames().isEmpty())
+		List<String> objectNames = ObjectNames.core(step.getKey());
+		if (!step.getObjectIds().isEmpty() || !objectNames.isEmpty())
 		{
-			lines.add("Objects: " + step.getObjectIds() + " " + step.getObjectNames());
+			lines.add("Objects: " + step.getObjectIds() + " " + objectNames);
 		}
 		lines.add("Needs: " + (step.getRequirements() == null ? "unknown" : RequirementsText.describe(step.getRequirements())));
 		String text = step.getText() == null ? "" : step.getText();

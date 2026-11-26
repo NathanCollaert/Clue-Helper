@@ -61,17 +61,10 @@ public final class StepIndex
 		public static final Entry NONE = new Entry();
 
 		String tier;
-		/** The task as the box says it, when the clue's own wording is too long; null to use the clue's. */
-		String act;
-		/** The option the step's NPC is clicked with when it isn't Talk-to (the Monk of Entrana's Take-boat); null for a talk. */
-		String npcOption;
 		/** Which quest places the step's NPC for each player (Viggora); null for an NPC always at its targets. */
 		LearnPlace learnPlace;
 		List<WorldPoint> tiles = List.of();
 		List<Target> targets = List.of();
-		List<Combat> combat = List.of();
-		Challenge challenge;
-		Music music;
 		Stash stash;
 		/** Hand data: where a step with no tile (a kill task) is done. */
 		Area area;
@@ -86,18 +79,12 @@ public final class StepIndex
 		/** Hand data: how to get to a target no route reaches (a Sailing island); null for the rest. */
 		String reach;
 		List<Place> places;
-		/** Sherlock's items worn for the task (the lumberjack outfit), by core's names for them. */
-		List<String> wear = List.of();
 		/** Core's items the task can do without (a rake for a weeded patch), by core's names for them. */
 		List<String> optional = List.of();
 		/** Core's items the task does without from these skill levels on (a harpoon, fishing barehanded), by core's names. */
 		Map<String, List<Level>> optionalFrom = Map.of();
 		/** Core's items the task does without once one of these varbits is set (a rake after buying auto-weed), by core's names. */
 		Map<String, List<Integer>> optionalWith = Map.of();
-		/** What is done at the place before the task, in order: Alry's bird, then king worms for aerial fishing. */
-		List<Before> before = List.of();
-		/** Other places the key's NPCs are killed, beside the cache's key tile: any chicken drops the Seers' key. */
-		List<WorldPoint> keyAlso = List.of();
 		/** The task's line while something is carried, the first that matches: reanimate the head, then kill what rises. */
 		List<Phase> phases = List.of();
 		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
@@ -118,8 +105,6 @@ public final class StepIndex
 		String book;
 		/** The option the task picks in an interface, or null. */
 		Choose choose;
-		String floor;
-		String note;
 		/** Quest steps: never guided. */
 		boolean hidden;
 		/** The skill levels the task itself needs; boosts count. */
@@ -134,6 +119,23 @@ public final class StepIndex
 		Set<Integer> arriveNpcs = Set.of();
 		/** Baked: how many of an item core's requirements ask for, by item id, where it is more than one (3 mithril bars). */
 		Map<Integer, Integer> amounts = Map.of();
+		/** Baked: the step's NPC only drops the key for its object, so the step is done at the object. */
+		boolean keyFromNpc;
+		/** Baked: the prayer a Sherlock task turns on, or null. */
+		Prayer prayer;
+		/**
+		 * Baked for a master cryptic: the stage it is as one part of a three-step. {@link Step#NPC_NAME} stands for an NPC
+		 * whose name changes with a quest (the Warriors' Guild doorman).
+		 */
+		Stage part;
+		/** Baked: what is done at the place before the task, in order (Alry's bird, then king worms for aerial fishing). */
+		List<SubStep> beforeActs = List.of();
+		/** Baked: the monsters that attack at the step (a double agent, a hot/cold spot's mage). */
+		Set<Integer> enemies = Set.of();
+		/** Baked: the one item that is every worn need of the way in at once (the Medallion of the Deep); -1 for none. */
+		int cover = -1;
+		/** Baked: the items a planting task plants with, the seed first, then the dibber. */
+		List<Integer> plantItems = List.of();
 
 		/** A step of the plugin's own, done by these acts alone (a master clue dropped where another is picked up). */
 		public static Entry ofActs(List<SubStep> acts)
@@ -188,12 +190,6 @@ public final class StepIndex
 		{
 			return places == null ? List.of() : places;
 		}
-
-		/** True when hand data says where the task is done; an empty list then means anywhere. */
-		public boolean hasPlaces()
-		{
-			return places != null;
-		}
 	}
 
 	/** A cache target: a tile, an NPC, an object, an NPC killed for a key before a search, or a kill. */
@@ -222,7 +218,6 @@ public final class StepIndex
 		int key = -1;
 		/** Where the key's NPCs are killed. */
 		WorldPoint keyTile;
-		String text;
 		/** An object's name when talking is all it does (the spirit tree); null otherwise. */
 		String talkTo;
 		/** A loc target's object ids: its own and the cache's fallback form. */
@@ -230,39 +225,14 @@ public final class StepIndex
 	}
 
 	@Getter
-	public static final class Combat
-	{
-		String text;
-		List<Integer> npcs = List.of();
-	}
-
-	/** The puzzle or light box a challenge hands over; {@code box} is null for a question, whose answer core shows. */
-	@Getter
-	public static final class Challenge
-	{
-		String box;
-	}
-
-	@Getter
-	public static final class Music
-	{
-		String track;
-		/** Where the track unlocks. */
-		String unlock;
-	}
-
-	@Getter
 	public static final class Stash
 	{
-		int object;
 		WorldPoint tile;
 	}
 
 	@Getter
 	public static final class Area
 	{
-		int radius;
-		String text;
 		/** The main spawn first, then the others the route may go to instead. */
 		List<WorldPoint> tiles = List.of();
 	}
@@ -302,25 +272,6 @@ public final class StepIndex
 			return box != null && at != null && at.getPlane() == box.plane && at.getX() >= box.west && at.getY() >= box.south
 				&& at.getX() <= box.east && at.getY() <= box.north;
 		}
-	}
-
-	/** An NPC's option or a ground item to pick up before the task, done once one of {@code held} is carried or worn. */
-	@Getter
-	public static final class Before
-	{
-		String text;
-		List<Integer> npcs = List.of();
-		String option;
-		int groundItem = -1;
-		List<Integer> held = List.of();
-		/** Items it is done with in the inventory (sacred oil on the logs), highlighted there. */
-		List<Integer> items = List.of();
-		/** Done anywhere, so before the walk to the place rather than at it. */
-		boolean anywhere;
-		/** Objects it is done on with {@code option} (the pyre site's Construct). */
-		List<Integer> objects = List.of();
-		/** Done once none of these is carried any more (the mangled bones, built into the pyre ship); else by {@code held}. */
-		List<Integer> gone = List.of();
 	}
 
 	/** The task's line while any of {@code whileCarried} is carried. */
@@ -539,46 +490,20 @@ public final class StepIndex
 	@Getter
 	public static final class Place
 	{
-		WorldPoint tile;
-		String text;
 		/** What the task is done on there (an anvil), outlined; empty for a place with nothing to click. */
 		List<Integer> objects = List.of();
-		/** Who the task is done on there (a dust devil, a fishing spot), outlined. */
-		List<Integer> npcs = List.of();
-		@Getter(AccessLevel.NONE)
-		List<String> click;
-		/** Core's items this place takes others in place of (pure essence for fragments at the True Blood Altar). */
-		List<Alternative> uses = List.of();
-		/** A patch that must be grown for this place to count; null for a place always there. */
-		String grown;
 		/** The area the task works anywhere in (the Dark Altar's reanimation ground); null for a place that is a tile. */
 		Box span;
-		/** The chat options to pick, in order, after the click. */
-		List<String> dialogue = List.of();
 
 		public boolean spans(WorldPoint at)
 		{
 			return Box.within(span, at);
 		}
-
-		/** The menu option that does the task on the place's objects or NPCs ("Chop down"), or null. */
-		public String getOption()
-		{
-			return click == null || click.size() < 2 ? null : click.get(0);
-		}
 	}
 
-	/** An NPC killed for a way in's item: where it stands and what the stage says. */
-	@Getter
+	/** An NPC killed for a way in's item: the bake turns it into the step's kill stage. */
 	public static final class From
 	{
-		List<Integer> npcs = List.of();
-		/** An object the item is had from (the Elemental Workshop's bookcase), instead of an NPC that drops it. */
-		List<Integer> objects = List.of();
-		/** The object's option; an NPC is attacked. */
-		String option;
-		WorldPoint tile;
-		String text;
 	}
 
 }

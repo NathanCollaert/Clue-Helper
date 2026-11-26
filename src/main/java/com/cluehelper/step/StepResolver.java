@@ -24,8 +24,6 @@ public class StepResolver
 	final Supplier<StepIndex> index;
 	/** Whether an NPC id shows for the player: a multiloc NPC is hidden in the form its quest state doesn't use. */
 	final IntPredicate npcShown;
-	/** The game's name for an object id, or null: core names few of its clues' objects. */
-	final IntFunction<String> objectName;
 	final Set<String> loggedUnknown = ConcurrentHashMap.newKeySet();
 	/** One requirement per key or tool entry, so a re-read step equals the last one. */
 	final Map<Integer, ItemRequirement> keyRequirements = new ConcurrentHashMap<>();
@@ -33,7 +31,7 @@ public class StepResolver
 	@Inject
 	StepResolver(BundledData data, Client client)
 	{
-		this(data::stepIndex, id -> isShown(client, id), id -> client.getObjectDefinition(id).getName());
+		this(data::stepIndex, id -> isShown(client, id));
 	}
 
 	public StepResolver(Supplier<StepIndex> index)
@@ -44,14 +42,8 @@ public class StepResolver
 	/** @param npcShown whether an NPC id shows for this player now (a recording's tape answers it) */
 	public StepResolver(Supplier<StepIndex> index, IntPredicate npcShown)
 	{
-		this(index, npcShown, id -> null);
-	}
-
-	private StepResolver(Supplier<StepIndex> index, IntPredicate npcShown, IntFunction<String> objectName)
-	{
 		this.index = index;
 		this.npcShown = npcShown;
-		this.objectName = objectName;
 	}
 
 	/** Client thread. */
@@ -88,25 +80,11 @@ public class StepResolver
 			.npcs(npcs)
 			.regions(CoreClueReader.regions(clue))
 			.objectIds(CoreClueReader.objectIds(clue))
-			.objectNames(objectNames(clue))
 			.requirements(requirements(clue))
 			.stages(stages)
 			.data(entry)
 			.otherTiles(otherTiles(entry, targets))
 			.build();
-	}
-
-	/** Core's names for the clue's objects, else the game's: the Al Kharid tent's boxes are only an id to core. */
-	private List<String> objectNames(ClueScroll clue)
-	{
-		List<String> named = CoreClueReader.objectNames(clue);
-		return named.isEmpty() ? namesOf(CoreClueReader.objectIds(clue)) : named;
-	}
-
-	private List<String> namesOf(Collection<Integer> objectIds)
-	{
-		return objectIds.stream().map(objectName::apply).filter(name -> name != null && !"null".equals(name)).distinct()
-			.collect(toUnmodifiableList());
 	}
 
 	/** The entry's baked stages, given what only the game knows: core's targets, NPC name and empty-slot needs, and the items. */
@@ -115,7 +93,7 @@ public class StepResolver
 	{
 		if (clue instanceof ThreeStepCrypticClue)
 		{
-			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::wornFor, this::namesOf);
+			return Stages.parts(CoreClueReader.unsolvedParts((ThreeStepCrypticClue) clue), plugin, this::partEntry);
 		}
 		if (CoreClueReader.challengeCompleted(clue))
 		{
@@ -193,7 +171,7 @@ public class StepResolver
 	public Step threeStep(List<String> parts, Set<Integer> done, IntFunction<String> npcName)
 	{
 		List<StepIndex.Entry> entries = parts.stream().map(this::crypticEntry).collect(toList());
-		if (entries.stream().anyMatch(entry -> entry == null || entry.getTargets().isEmpty()))
+		if (entries.stream().anyMatch(entry -> entry == null || entry.getPart() == null))
 		{
 			return null;
 		}
@@ -205,7 +183,7 @@ public class StepResolver
 				unsolved.add(entries.get(part));
 			}
 		}
-		List<Stage> stages = unsolved.stream().map(entry -> Stages.part(entry, npcName, this::namesOf)).collect(toUnmodifiableList());
+		List<Stage> stages = unsolved.stream().map(entry -> Stages.part(entry, npcName)).collect(toUnmodifiableList());
 		String text = String.join(" ", parts);
 		return Step.builder()
 			.key(CoreClueReader.byText(ClueTypes.THREE_STEP, text).getKey())
@@ -227,12 +205,6 @@ public class StepResolver
 	private StepIndex.Entry partEntry(CrypticClue part)
 	{
 		return crypticEntry(part.getText());
-	}
-
-	private List<String> wornFor(CrypticClue part)
-	{
-		StepIndex.Entry entry = partEntry(part);
-		return entry == null ? List.of() : entry.getWornNeeds();
 	}
 
 	private static TargetKind kind(ClueScroll clue, StepIndex.Entry entry)

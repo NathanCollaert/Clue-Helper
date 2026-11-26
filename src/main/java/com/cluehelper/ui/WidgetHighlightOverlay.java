@@ -82,7 +82,7 @@ public class WidgetHighlightOverlay extends Overlay
 	private void outlinePrayer(Graphics2D graphics)
 	{
 		Step step = clueLink.getCurrentStep();
-		Prayer prayer = Stages.prayerToActivate(step);
+		Prayer prayer = step == null ? null : step.getData().getPrayer();
 		if (prayer == null)
 		{
 			return;

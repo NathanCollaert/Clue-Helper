@@ -117,9 +117,9 @@ final class GearActs
 		{
 			return null;
 		}
-		List<StepIndex.Requires> needs = step.getData().wornRequiresFor(player::finished, player.carriedIds());
-		return needs.size() < 2 ? null : needs.get(0).getIds().stream().sorted()
-			.filter(id -> needs.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
+		int cover = step.getData().getCover();
+		boolean severalNeeds = step.getData().wornRequiresFor(player::finished, player.carriedIds()).size() > 1;
+		return severalNeeds && cover >= 0 ? cover : null;
 	}
 
 	/** The worn items an act wants off, refreshed as each comes off. */

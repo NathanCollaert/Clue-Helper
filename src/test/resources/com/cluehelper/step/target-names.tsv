@@ -488,18 +488,50 @@ npc	15083	Fishing spot
 npc	15087	Fishing spot
 npc	16821	Captain Harlan
 object	114	Cooking range
+object	300	Haystack
+object	348	Drawers
+object	350	Drawers
+object	352	Drawers
+object	354	Crate
+object	355	Crate
+object	356	Crate
+object	357	Crate
+object	358	Crate
+object	359	Boxes
+object	360	Boxes
+object	361	Boxes
+object	366	Crate
+object	375	Closed chest
+object	380	Bookcase
+object	394	Bookcase
+object	398	Coffin
 object	1293	null
 object	1294	null
 object	1295	null
 object	2030	Furnace
 object	2031	Anvil
 object	2097	Anvil
+object	2357	Bush
+object	2620	Crate
+object	3686	Boxes
 object	4093	Funeral Pyre
 object	4099	Magic Pyre
 object	4105	Magic Pyre
 object	4304	Furnace
 object	4306	Anvil
+object	4771	Awowogei
+object	5106	Crate
+object	5107	Crate
+object	5108	Closed chest
+object	5111	Boxes
+object	5113	Crate
+object	5618	Drawers
+object	5622	Wardrobe
+object	6045	Mine cart
 object	6150	Anvil
+object	6176	Boxes
+object	6616	Crate
+object	7194	Drawers
 object	8550	null
 object	8551	null
 object	8552	null
@@ -508,6 +540,11 @@ object	8554	null
 object	8555	null
 object	8556	null
 object	8557	null
+object	9523	Bookcase
+object	9533	Crate
+object	9534	Crate
+object	9568	Bucket
+object	9625	Wheelbarrow
 object	10377	Clay Oven
 object	10822	Yew tree
 object	10823	null
@@ -515,16 +552,24 @@ object	11372	Mithril rocks
 object	11373	Mithril rocks
 object	11376	Runite rocks
 object	11377	Runite rocks
+object	11485	Crate
+object	11600	Crates
 object	11731	Gem stall
 object	11739	Chest
 object	12100	Furnace
 object	12460	Underwater Cavern Entrance
 object	12461	Underwater Cavern Entrance
+object	12539	Bookcase
 object	12655	Small furnace
 object	12805	null
+object	12963	Crate
+object	14934	Crate
 object	14946	Rough wall
 object	15412	Stepping stone
 object	16469	Furnace
+object	18204	Crate
+object	18506	Crate
+object	18889	Crate
 object	21302	Clay oven
 object	21303	Clay forge
 object	22725	Anvil
@@ -592,18 +637,132 @@ object	23038	null
 object	23039	null
 object	23040	null
 object	23041	null
+object	23690	Food pot
 object	24009	Furnace
+object	24088	Crates
+object	24344	Crate
 object	25286	Pyre site
+object	25592	Closed chest
+object	25766	Drawers
+object	25775	Crate
 object	26113	Bookcase
+object	26633	Stones
 object	27097	Spiritual Fairy Tree
 object	27113	null
 object	27114	null
+object	27522	Apple basket
+object	27532	Crate
+object	27533	Crates
 object	27978	Blood Altar
 object	28563	Anvil
 object	28565	Furnace
 object	28802	Lectern
 object	28865	Redwood Pyre
 object	28866	Redwood Pyre
+object	28928	<col=ffff00>Juna</col>
+object	28958	null
+object	28959	null
+object	28960	null
+object	28961	null
+object	28962	null
+object	28963	null
+object	28964	null
+object	28965	null
+object	28966	null
+object	28967	null
+object	28968	null
+object	28969	null
+object	28970	null
+object	28971	null
+object	28972	null
+object	28973	null
+object	28974	null
+object	28975	null
+object	28976	null
+object	28977	null
+object	28978	null
+object	28979	null
+object	28980	null
+object	28981	null
+object	28982	null
+object	28983	null
+object	28984	null
+object	28985	null
+object	28986	null
+object	28987	null
+object	28988	null
+object	28989	null
+object	28990	null
+object	28991	null
+object	28992	null
+object	28993	null
+object	28994	null
+object	28995	null
+object	28996	null
+object	28997	null
+object	28998	null
+object	28999	null
+object	29000	null
+object	29001	null
+object	29002	null
+object	29003	null
+object	29004	null
+object	29005	null
+object	29006	null
+object	29007	null
+object	29008	null
+object	29009	null
+object	29010	null
+object	29011	null
+object	29012	null
+object	29013	null
+object	29014	null
+object	29015	null
+object	29016	null
+object	29017	null
+object	29018	null
+object	29019	null
+object	29020	null
+object	29021	null
+object	29022	null
+object	29023	null
+object	29024	null
+object	29025	null
+object	29026	null
+object	29027	null
+object	29028	null
+object	29029	null
+object	29030	null
+object	29031	null
+object	29032	null
+object	29033	null
+object	29034	null
+object	29035	null
+object	29036	null
+object	29037	null
+object	29038	null
+object	29039	null
+object	29040	null
+object	29041	null
+object	29042	null
+object	29043	null
+object	29044	null
+object	29045	null
+object	29046	null
+object	29047	null
+object	29048	null
+object	29049	null
+object	29050	null
+object	29051	null
+object	29052	null
+object	29053	null
+object	29054	null
+object	29055	null
+object	29056	null
+object	29057	null
+object	29058	null
+object	29059	null
+object	29060	null
 object	29227	Spirit Tree
 object	29229	Spiritual Fairy Tree
 object	29662	null
@@ -619,10 +778,15 @@ object	34633	null
 object	34635	null
 object	34637	null
 object	34639	null
+object	34647	null
+object	34736	null
+object	34737	null
+object	34738	null
 object	34766	Altar
 object	34768	Altar
 object	34921	null
 object	34922	null
+object	34953	null
 object	36209	Runite rocks
 object	36555	Furnace
 object	36683	Yew tree
@@ -633,6 +797,8 @@ object	40725	Anvil
 object	40756	Yew tree
 object	40778	Christmas-Spirit Tree
 object	40779	Spiritual Fairy Tree
+object	41758	null
+object	42067	Crate
 object	42391	Yew tree
 object	43475	Fire
 object	43479	Altar
@@ -643,10 +809,21 @@ object	50695	null
 object	50696	null
 object	50698	Furnace
 object	50721	Young tree
+object	50738	null
+object	50739	null
+object	50740	null
 object	51496	Forge
 object	51501	Anvil
+object	54275	null
+object	55403	null
+object	55404	null
+object	55405	null
 object	56368	Anvil
+object	57589	Crate
 object	57790	Yew tree
+object	58130	null
+object	58131	null
+object	58132	null
 object	58657	Anvil
 object	58923	Nickel rocks
 object	60145	Furnace

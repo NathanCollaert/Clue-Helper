@@ -6,8 +6,11 @@ import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import com.cluehelper.guide.StepGuide.Tab;
 import java.util.*;
+import java.util.regex.*;
 import java.util.stream.Stream;
+import net.runelite.api.Prayer;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.SubStep.Kind;
@@ -15,27 +18,31 @@ import com.cluehelper.guide.SubStep.Kind;
 /**
  * The acts {@code StepLoader} bakes into each entry of {@code steps.json}, built as {@link Acts} built them at play before
  * the bake: {@code acts} is what {@link #actsOf} gives with nothing from the STASH and no hand-in names, {@code mainAct}
- * what {@link #act} gives with no marker. Acts keeps the parts that depend on the player.
+ * what {@link #act} gives with no marker, a search of an object the clue doesn't name named by the cache. Acts keeps the
+ * parts that depend on the player.
  */
 public final class ActParts
 {
 	private static final String TALK_OPTION = "Talk-to";
 	private static final String ATTACK_OPTION = "Attack";
 	static final String USE_OPTION = "Use";
+	/** A search of an object the clue doesn't name. */
+	private static final String SEARCH_IT = "Search it";
 	/** By ids: core doesn't mark Uri, and a target by name is left to core while the clue's tile is in view. */
 	private static final Set<Integer> URI_IDS = Tables.idSet("uri");
 	private static final Set<String> TYPES_WITH_OWN_ACT = Set.of(ClueTypes.EMOTE, ClueTypes.MUSIC, ClueTypes.HOT_COLD, ClueTypes.SKILL);
 	/** Core's emotes of each emote step in order, by key: the plugin has them only in these baked acts. */
 	private static final Map<String, List<String>> EMOTES = emotesByKey();
+	private static final Pattern ACTIVATE_PRAYER = Pattern.compile("activate the (\\w+) prayer\\.?");
 
 	private ActParts()
 	{
 	}
 
 	/** The acts as the entry holds them: an emote's after its prefix, none for a skill challenge's hand-in. */
-	public static List<SubStep> baked(Step step)
+	public static List<SubStep> baked(Step step, StepSource.Entry source)
 	{
-		List<SubStep> acts = actsOf(step, false, List.of());
+		List<SubStep> acts = actsOf(step, source, false);
 		if (ClueTypes.SKILL.equals(step.getType()))
 		{
 			return List.of();
@@ -44,22 +51,63 @@ public final class ActParts
 		{
 			acts = acts.subList(acts.size() - 2, acts.size());
 		}
-		return acts.stream().map(act -> withNpcNameOut(step, act)).collect(toUnmodifiableList());
+		return acts.stream().map(act -> withNpcNameOut(step, searchNamed(step, act))).collect(toUnmodifiableList());
 	}
 
-	public static SubStep bakedMain(Step step)
+	public static SubStep bakedMain(Step step, StepSource.Entry source)
 	{
-		return withNpcNameOut(step, act(step));
+		return withNpcNameOut(step, searchNamed(step, act(step, source)));
 	}
 
 	/** Who a walk to an area step's targets ends on: the first act's NPCs. */
-	public static Set<Integer> arriveNpcs(Step step)
+	public static Set<Integer> arriveNpcs(Step step, StepSource.Entry source)
 	{
-		return step.getData().getArea() == null ? Set.of() : actsOf(step, false, List.of()).stream()
+		return step.getData().getArea() == null ? Set.of() : actsOf(step, source, false).stream()
 			.filter(sub -> sub.getKind() == Kind.ACT && !sub.getNpcIds().isEmpty()).map(SubStep::getNpcIds).findFirst().orElse(Set.of());
 	}
 
+	/**
+	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to
+	 * the guardian".
+	 */
+	public static boolean isKeyFromNpc(Step step)
+	{
+		boolean talk = step.getText() != null && step.getText().toLowerCase().contains("speak");
+		return ClueTypes.CRYPTIC.equals(step.getType()) && !talk && !step.getNpcs().isEmpty()
+			&& (!ObjectNames.core(step.getKey()).isEmpty() || !step.getObjectIds().isEmpty());
+	}
+
+	/** The prayer a Sherlock task turns on ("activate the chivalry prayer."), or null. */
+	public static Prayer prayerToActivate(Step step)
+	{
+		Matcher task = !ClueTypes.SKILL.equals(step.getType()) || step.getText() == null ? null
+			: ACTIVATE_PRAYER.matcher(step.getText().toLowerCase());
+		if (task == null || !task.matches())
+		{
+			return null;
+		}
+		return Arrays.stream(Prayer.values()).filter(prayer -> prayer.name().equalsIgnoreCase(task.group(1))).findFirst().orElse(null);
+	}
+
+	/** What is done before the task, as a sub-step: done once an item is held, or once the items are gone. */
+	public static SubStep beforeAct(StepSource.Before before)
+	{
+		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, before.getText()).npcIds(Set.copyOf(before.getNpcs()))
+			.objectIds(Set.copyOf(before.getObjects())).option(before.getOption()).groundItem(before.getGroundItem());
+		return before.getGone().isEmpty()
+			? act.actItems(Set.copyOf(before.getItems())).tab(before.getItems().isEmpty() ? Tab.NONE : Tab.INVENTORY)
+				.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()
+			: act.actItems(Set.copyOf(before.getGone())).done(SubStep.Done.ITEMS_GONE).build();
+	}
+
 	/** Core's name for the step's NPC as {@link Step#NPC_NAME}, which {@link Acts} names again at play. */
+	/** A search of an object the clue doesn't name, by the cache's name for it, with its objects and Search option to colour. */
+	private static SubStep searchNamed(Step step, SubStep act)
+	{
+		return !SEARCH_IT.equals(act.getText()) ? act : act.toBuilder().text(ObjectNames.search(step.getObjectIds()))
+			.objectIds(Set.copyOf(step.getObjectIds())).option(StepHighlights.SEARCH_OPTION).build();
+	}
+
 	private static SubStep withNpcNameOut(Step step, SubStep act)
 	{
 		if (step.getNpcs().isEmpty())
@@ -74,27 +122,8 @@ public final class ActParts
 			.build();
 	}
 
-	/**
-	 * Gear the act wants worn (Robin's +180 ranged attack) goes on first; a step of several places wears it per stage.
-	 *
-	 * @param takeFromStash the step's items are in its STASH unit and not on the player
-	 * @param handInItems the items Charlie or Falo the Bard asks for, by name
-	 */
-	static List<SubStep> of(Step step, boolean takeFromStash, List<String> handInItems)
-	{
-		List<String> worn = !step.getStages().isEmpty() ? List.of() : step.getData().getWornNeeds();
-		List<SubStep> acts = actsOf(step, takeFromStash, handInItems);
-		if (worn.isEmpty())
-		{
-			return acts;
-		}
-		List<SubStep> equipped = new ArrayList<>(SubSteps.equip(worn));
-		equipped.addAll(acts);
-		return List.copyOf(equipped);
-	}
-
 	/** The step's one act: its marker's act, a key search, or what its type does. */
-	static SubStep act(Step step)
+	static SubStep act(Step step, StepSource.Entry source)
 	{
 		if (step.getWaypointAct() != null)
 		{
@@ -102,14 +131,15 @@ public final class ActParts
 				.waypoint(step.isActAnywhere() ? null : step.getTargets().get(0))
 				.actItems(step.getActItems()).build();
 		}
-		if (step.isKeyFromNpc())
+		List<String> objectNames = ObjectNames.core(step.getKey());
+		if (isKeyFromNpc(step))
 		{
-			String what = hasAny(step.getObjectNames()) ? "the " + step.getObjectNames().get(0).toLowerCase() : "it";
+			String what = hasAny(objectNames) ? "the " + objectNames.get(0).toLowerCase() : "it";
 			return SubStep.of(Kind.ACT, "Search " + what).build();
 		}
 		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, actText(step));
 		String npc = talkedTo(step);
-		String option = npc == null ? null : step.getData().getNpcOption();
+		String option = npc == null ? null : source.getNpcOption();
 		if (option != null)
 		{
 			return act.text(option + " with " + npc).option(option).npcNames(Set.of(MenuLabels.normalise(npc)))
@@ -177,20 +207,21 @@ public final class ActParts
 		{
 			return "Talk to " + step.getNpcs().get(0);
 		}
-		if (hasAny(step.getObjectNames()))
+		List<String> objectNames = ObjectNames.core(step.getKey());
+		if (hasAny(objectNames))
 		{
-			return "Search the " + step.getObjectNames().get(0).toLowerCase();
+			return "Search the " + objectNames.get(0).toLowerCase();
 		}
 		if (hasAny(step.getObjectIds()))
 		{
-			return "Search it";
+			return SEARCH_IT;
 		}
 		return "Do the clue step";
 	}
 
-	static List<SubStep> actsOf(Step step, boolean takeFromStash, List<String> handInItems)
+	static List<SubStep> actsOf(Step step, StepSource.Entry source, boolean takeFromStash)
 	{
-		SubStep main = act(step);
+		SubStep main = act(step, source);
 		if (step.getWaypointAct() != null)
 		{
 			return List.of(main);
@@ -199,38 +230,43 @@ public final class ActParts
 		switch (type)
 		{
 			case ClueTypes.EMOTE:
-				return emote(step, takeFromStash);
+				return emote(step, source, takeFromStash);
 			case ClueTypes.MUSIC:
-				return music(step);
+				return music(step, source);
 			case ClueTypes.FALO:
-				return List.of(useOnFalo(handInItems).option(USE_OPTION).npcIds(targetNpcs(step)).build());
+				return List.of(useOnFalo(List.of()).option(USE_OPTION).npcIds(targetNpcs(step)).build());
 			case ClueTypes.SKILL:
-				return List.of(handIn(step, handInItems));
+				return List.of(handIn(step, List.of()));
 			default:
 				break;
 		}
-		StepIndex.Entry data = step.getData();
-		StepIndex.Target kill = data == null ? null : data.getTargets().stream()
-			.filter(target -> target.getKind() == StepIndex.Target.Kind.KILL).findFirst().orElse(null);
-		if (kill != null)
+		List<StepIndex.Target> targets = step.getData().getTargets();
+		int kill = 0;
+		while (kill < targets.size() && targets.get(kill).getKind() != StepIndex.Target.Kind.KILL)
 		{
-			String text = data.getAct() != null ? data.getAct() : kill.getText() != null ? kill.getText().replaceAll("\\.$", "") : "Kill the monster";
-			List<SubStep> acts = data.getBefore().stream().map(SubSteps::beforeAct).collect(toList());
-			acts.add(SubStep.of(Kind.ACT, text).option(ATTACK_OPTION).npcIds(Set.copyOf(kill.getNpcs())).build());
+			kill++;
+		}
+		if (kill < targets.size())
+		{
+			String howTo = source.getTargets().get(kill).getText();
+			String text = source.getAct() != null ? source.getAct() : howTo != null ? howTo.replaceAll("\\.$", "") : "Kill the monster";
+			List<SubStep> acts = source.getBefore().stream().map(ActParts::beforeAct).collect(toList());
+			acts.add(SubStep.of(Kind.ACT, text).option(ATTACK_OPTION).npcIds(Set.copyOf(targets.get(kill).getNpcs())).build());
 			return List.copyOf(acts);
 		}
 		if (isDig(step))
 		{
-			return List.of(main.toBuilder().text("Dig").detail(withFloor(step, note(step))).fights(fightsFor(step)).again("Dig again").build());
+			return List.of(main.toBuilder().text("Dig").detail(withFloor(step, source, source.getNote())).fights(fights(source))
+				.again("Dig again").build());
 		}
-		if (data != null && data.getChallenge() != null && !step.getNpcs().isEmpty())
+		if (source.getChallenge() != null && !step.getNpcs().isEmpty())
 		{
-			return talkThenChallenge(step, data.getChallenge());
+			return talkThenChallenge(step, source);
 		}
-		return List.of(main.toBuilder().detail(withFloor(step, main.getDetail())).build());
+		return List.of(main.toBuilder().detail(withFloor(step, source, main.getDetail())).build());
 	}
 
-	private static List<SubStep> emote(Step step, boolean takeFromStash)
+	private static List<SubStep> emote(Step step, StepSource.Entry source, boolean takeFromStash)
 	{
 		List<SubStep> acts = new ArrayList<>();
 		WorldPoint stash = takeFromStash ? SubSteps.stashTile(step) : null;
@@ -245,7 +281,7 @@ public final class ActParts
 		List<String> stepEmotes = EMOTES.getOrDefault(step.getKey(), List.of());
 		String emotes = stepEmotes.isEmpty() ? "the emote" : String.join(", then ", stepEmotes);
 		acts.add(SubStep.of(Kind.ACT, "Perform " + emotes)
-			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
+			.done(SubStep.Done.URI_HERE).fights(fights(source)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
 		acts.add(SubStep.of(Kind.ACT, "Talk to Uri")
 			.option(TALK_OPTION).npcIds(URI_IDS).build());
 		return List.copyOf(acts);
@@ -292,9 +328,9 @@ public final class ActParts
 	}
 
 	/** The track goes on first, on the way there; Cecilia ends the step only while it plays. */
-	private static List<SubStep> music(Step step)
+	private static List<SubStep> music(Step step, StepSource.Entry source)
 	{
-		StepIndex.Music music = step.getData().getMusic();
+		StepSource.Music music = source.getMusic();
 		String track = music != null && music.getTrack() != null ? music.getTrack() : step.getText();
 		return List.of(playTrack(track), talkTo(act("Talk to Cecilia", null).toBuilder(), "Cecilia").build());
 	}
@@ -321,10 +357,11 @@ public final class ActParts
 			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 
-	private static List<SubStep> talkThenChallenge(Step step, StepIndex.Challenge challenge)
+	private static List<SubStep> talkThenChallenge(Step step, StepSource.Entry source)
 	{
+		StepSource.Challenge challenge = source.getChallenge();
 		String npc = step.getNpcs().get(0);
-		SubStep talk = talkTo(SubStep.of(Kind.ACT, "Talk to " + npc).detail(withFloor(step, null))
+		SubStep talk = talkTo(SubStep.of(Kind.ACT, "Talk to " + npc).detail(withFloor(step, source, null))
 			.done(SubStep.Done.CHALLENGE_ITEM), npc).build();
 		if (challenge.getBox() != null)
 		{
@@ -349,23 +386,18 @@ public final class ActParts
 		return step.getRequirements().getSpade() != SpadeNeed.NONE;
 	}
 
-	private static boolean fightsFor(Step step)
+	private static boolean fights(StepSource.Entry source)
 	{
-		return !step.getData().getCombat().isEmpty();
-	}
-
-	private static String note(Step step)
-	{
-		return step.getData().getNote();
+		return !source.getCombat().isEmpty();
 	}
 
 	/**
 	 * Core's tile can be on another floor than the NPC (Donovan upstairs, the cache's tile on floor 1): hand data says
 	 * so, else the cache's plane does.
 	 */
-	private static String withFloor(Step step, String detail)
+	private static String withFloor(Step step, StepSource.Entry source, String detail)
 	{
-		String floor = step.getData().getFloor();
+		String floor = source.getFloor();
 		if (floor == null && !step.getTargets().isEmpty())
 		{
 			int corePlane = step.getTargets().get(0).getPlane();

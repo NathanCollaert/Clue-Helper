@@ -679,7 +679,7 @@ public final class SubSteps
 		{
 			walk--;
 		}
-		steps.addAll(walk, stage.getBefore().stream().filter(StepIndex.Before::isAnywhere).map(SubSteps::beforeAct).collect(toList()));
+		steps.addAll(walk, stage.getBeforeAnywhere());
 		steps.addAll(stageActs(stage));
 	}
 
@@ -687,20 +687,10 @@ public final class SubSteps
 	static List<SubStep> stageActs(Stage stage)
 	{
 		List<SubStep> acts = new ArrayList<>(remove(stage.getEmptied()));
-		stage.getBefore().stream().filter(before -> !before.isAnywhere()).forEach(before -> acts.add(beforeAct(before)));
+		acts.addAll(stage.getBeforeThere());
 		acts.addAll(stage.getWorn().isEmpty() ? List.of() : equip(stage.getWorn()));
 		acts.add(stageAct(stage));
 		return List.copyOf(acts);
-	}
-
-	static SubStep beforeAct(StepIndex.Before before)
-	{
-		SubStep.SubStepBuilder act = SubStep.of(Kind.ACT, before.getText()).npcIds(Set.copyOf(before.getNpcs()))
-			.objectIds(Set.copyOf(before.getObjects())).option(before.getOption()).groundItem(before.getGroundItem());
-		return before.getGone().isEmpty()
-			? act.actItems(Set.copyOf(before.getItems())).tab(before.getItems().isEmpty() ? Tab.NONE : Tab.INVENTORY)
-				.heldWhenDone(Set.copyOf(before.getHeld())).done(SubStep.Done.ITEM_HELD).build()
-			: act.actItems(Set.copyOf(before.getGone())).done(SubStep.Done.ITEMS_GONE).build();
 	}
 
 	/** Take off what core's empty-slot requirements forbid; none when there are none. */
@@ -761,9 +751,8 @@ public final class SubSteps
 		List<StepIndex.Requires> ownWear = worn.stream().filter(need -> need.getPutOn() == null).collect(toList());
 		if (!ownWear.isEmpty())
 		{
-			Integer cover = ownWear.size() < 2 ? null : ownWear.get(0).getIds().stream().filter(onHand::contains)
-				.filter(id -> ownWear.stream().allMatch(need -> need.getIds().contains(id))).findFirst().orElse(null);
-			String names = cover != null ? itemName.apply(cover) : ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and "));
+			boolean coverOnHand = ownWear.size() > 1 && onHand.contains(data.getCover());
+			String names = coverOnHand ? itemName.apply(data.getCover()) : ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and "));
 			equip.add(SubStep.of(Kind.ACT, "Equip the " + names)
 				.actItems(ownWear.stream().flatMap(need -> need.getIds().stream()).collect(toUnmodifiableSet()))
 				.wornWayIn(true).wayIn(data.getEntry()).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());

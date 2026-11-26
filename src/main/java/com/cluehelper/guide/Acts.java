@@ -77,17 +77,9 @@ final class Acts
 		}
 	}
 
-	/**
-	 * The baked act with core's name for the step's NPC, which can change with a quest or come from the client, or the
-	 * game's name for an object the bake knows only by id, with its Search option to colour.
-	 */
+	/** The baked act with core's name for the step's NPC, which can change with a quest or come from the client. */
 	private static SubStep named(Step step, SubStep act)
 	{
-		if (Stages.SEARCH_IT.equals(act.getText()))
-		{
-			return act.toBuilder().text(Stages.search(step.getObjectNames())).objectIds(Set.copyOf(step.getObjectIds()))
-				.option(StepHighlights.SEARCH_OPTION).build();
-		}
 		if (step.getNpcs().isEmpty())
 		{
 			return act;
@@ -115,7 +107,7 @@ final class Acts
 		{
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES, step.getData()));
 		}
-		acts.addAll(takeFromStash ? List.of() : step.getData().getBefore().stream().map(SubSteps::beforeAct).collect(toList()));
+		acts.addAll(takeFromStash ? List.of() : step.getData().getBeforeActs());
 		acts.addAll(items ? List.of(equip(takeFromStash ? itemsToPutOn(step) : step.getRequirements().getItems())) : List.of());
 		acts.addAll(items ? withItemsBackOnForUri(step, baked) : baked);
 		return List.copyOf(acts);

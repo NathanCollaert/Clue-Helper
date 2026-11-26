@@ -179,16 +179,6 @@ public final class CoreClueReader
 			: Arrays.stream(objectIds).filter(id -> id > 0).distinct().boxed().collect(toUnmodifiableList());
 	}
 
-	static List<String> objectNames(ClueScroll clue)
-	{
-		if (!(clue instanceof NamedObjectClueScroll))
-		{
-			return List.of();
-		}
-		String[] names = ((NamedObjectClueScroll) clue).getObjectNames();
-		return names == null ? List.of() : distinct(Arrays.asList(names));
-	}
-
 	static List<ItemRequirement> itemRequirements(ClueScroll clue)
 	{
 		ItemRequirement[] requirements = null;

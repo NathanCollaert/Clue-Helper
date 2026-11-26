@@ -1,10 +1,7 @@
 package com.cluehelper.step;
 
-import com.cluehelper.guide.SubStep;
 import java.util.*;
 import java.util.function.*;
-import java.util.regex.*;
-import net.runelite.api.Prayer;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.CrypticClue;
@@ -17,10 +14,7 @@ import static java.util.stream.Collectors.*;
  */
 public final class Stages
 {
-	/** The bake's act for an object it knows only by id. */
-	public static final String SEARCH_IT = "Search it";
 	private static final String ANYWHERE = "Anywhere, with what it needs";
-	private static final Pattern ACTIVATE_PRAYER = Pattern.compile("activate the (\\w+) prayer\\.?");
 
 	private Stages()
 	{
@@ -32,8 +26,8 @@ public final class Stages
 		return stages.stream().flatMap(stage -> stage.getTiles().stream()).collect(toUnmodifiableList());
 	}
 
-	static List<Stage> parts(List<CrypticClue> parts, ClueScrollPlugin plugin, Function<CrypticClue, List<String>> wornFor,
-		Function<Collection<Integer>, List<String>> objectNames)
+	/** Core's unsolved parts, each with its step data entry ({@code entryOf}), null for a part the data lacks. */
+	static List<Stage> parts(List<CrypticClue> parts, ClueScrollPlugin plugin, Function<CrypticClue, StepIndex.Entry> entryOf)
 	{
 		List<Stage> stages = new ArrayList<>();
 		for (CrypticClue part : parts)
@@ -41,27 +35,29 @@ public final class Stages
 			WorldPoint at = part.getLocation(plugin);
 			if (at != null)
 			{
-				stages.add(Stage.builder().kind(Stage.Kind.PART).act(partAct(part, plugin, objectNames)).tiles(List.of(at)).worn(wornFor.apply(part))
-					.build());
+				StepIndex.Entry entry = entryOf.apply(part);
+				stages.add(Stage.builder().kind(Stage.Kind.PART).act(partAct(part, plugin, entry)).tiles(List.of(at))
+					.worn(entry == null ? List.of() : entry.getWornNeeds()).build());
 			}
 		}
 		return List.copyOf(stages);
 	}
 
-	/** A part known by its text alone, from the step data: its act at its first target, which is outlined. */
-	static Stage part(StepIndex.Entry entry, IntFunction<String> npcName, Function<Collection<Integer>, List<String>> objectNames)
+	/** A part known by its text alone: its baked stage, naming the NPC as it shows where a quest renames it (the doorman). */
+	static Stage part(StepIndex.Entry entry, IntFunction<String> npcName)
 	{
-		StepIndex.Target target = entry.getTargets().get(0);
-		String name = target.getNpcs().isEmpty() ? target.getTalkTo() : npcName.apply(target.getNpcs().get(0));
+		Stage part = entry.getPart();
+		if (!part.getAct().contains(Step.NPC_NAME))
+		{
+			return part;
+		}
+		String name = npcName.apply(entry.getTargets().get(0).getNpcs().get(0));
 		Step named = Step.builder().npcs(name == null ? List.of() : List.of(NpcAliases.either(name))).build();
-		SubStep act = entry.getMainAct();
-		boolean search = act == null || SEARCH_IT.equals(act.getText());
-		return Stage.builder().kind(Stage.Kind.PART).act(search ? search(objectNames.apply(target.getLocs())) : named.namingNpc(act.getText()))
-			.option(act == null ? null : act.getOption()).tiles(List.of(entry.getStand() != null ? entry.getStand() : target.getTile()))
-			.worn(entry.getWornNeeds()).npcIds(Set.copyOf(target.getNpcs())).objectIds(target.getLocs()).build();
+		return part.toBuilder().act(named.namingNpc(part.getAct())).build();
 	}
 
-	private static String partAct(CrypticClue part, ClueScrollPlugin plugin, Function<Collection<Integer>, List<String>> objectNames)
+	/** A part the data lacks is searched at an object it can't name. */
+	private static String partAct(CrypticClue part, ClueScrollPlugin plugin, StepIndex.Entry entry)
 	{
 		if (part.isRequiresSpade())
 		{
@@ -72,13 +68,7 @@ public final class Stages
 		{
 			return "Talk to " + NpcAliases.either(npc);
 		}
-		return search(objectNames.apply(CoreClueReader.objectIds(part)));
-	}
-
-	/** "Search the boxes", by the object's name; "Search it" where no name is known. */
-	public static String search(List<String> objectNames)
-	{
-		return objectNames.isEmpty() ? SEARCH_IT : "Search the " + objectNames.get(0).toLowerCase(Locale.ROOT);
+		return entry == null ? "Search it" : entry.getMainAct().getText();
 	}
 
 	/** The key a kill-for-key stage gets: a clue's own key, which no key ring holds. */
@@ -152,18 +142,6 @@ public final class Stages
 		return step.toBuilder().stages(stages)
 			.targets(step.getTargets().stream().filter(tile -> !task.getTiles().contains(tile)).collect(toUnmodifiableList()))
 			.build();
-	}
-
-	/** The prayer a Sherlock task turns on ("activate the chivalry prayer."), or null. */
-	public static Prayer prayerToActivate(Step step)
-	{
-		Matcher task = step == null || !ClueTypes.SKILL.equals(step.getType()) || step.getText() == null ? null
-			: ACTIVATE_PRAYER.matcher(step.getText().toLowerCase());
-		if (task == null || !task.matches())
-		{
-			return null;
-		}
-		return Arrays.stream(Prayer.values()).filter(prayer -> prayer.name().equalsIgnoreCase(task.group(1))).findFirst().orElse(null);
 	}
 
 	/** True while the step still has its task to do, before core marks it completed. */

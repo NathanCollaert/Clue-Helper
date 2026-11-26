@@ -199,13 +199,6 @@ public class ActWatcher
 
 	private static Set<Integer> enemyIds(Step step)
 	{
-		StepIndex.Entry data = step == null ? null : step.getData();
-		if (data == null)
-		{
-			return Set.of();
-		}
-		Set<Integer> ids = new HashSet<>();
-		data.getCombat().forEach(combat -> ids.addAll(combat.getNpcs()));
-		return ids;
+		return step == null ? Set.of() : step.getData().getEnemies();
 	}
 }
