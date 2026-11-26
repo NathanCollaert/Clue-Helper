@@ -21,7 +21,7 @@ import net.runelite.api.coords.WorldPoint;
 import org.junit.Test;
 
 /**
- * The live run's plans (recorded by the dev client's HotColdTrace with every probe they weighed) planned again: the
+ * The live run's plans (recorded by the dev client's HotColdTrace with the probes they weighed, or since were given) planned again: the
  * same readings and probes must give the same action and tile.
  */
 public class HotColdDecisionReplayTest

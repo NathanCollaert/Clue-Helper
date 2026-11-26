@@ -35,7 +35,6 @@ public final class CatalogLoader
 	static final String SPENDS = "Spends";
 	private static final String KIND = "Kind";
 	static final String WHERE = "Where";
-	private static final String FROM = "From";
 	private static final String TO = "To";
 	static final String MENU = "Menu";
 	static final String OBJECT = "menuOption menuTarget objectID";
@@ -189,7 +188,6 @@ public final class CatalogLoader
 			.name(line.get(NAME))
 			.temporary(TEMPORARY.equals(line.get(KIND)))
 			.inHouse(where.startsWith(IN_HOUSE))
-			.from(book(line.get(FROM)))
 			.toggles(line.get(TO).startsWith(TOGGLE) ? book(line.get(TO).substring(TOGGLE.length())) : null)
 			.duration(Integer.parseInt(line.get(DURATION)))
 			.menuTicks(Integer.parseInt(line.get(MENU_TICKS)))

@@ -14,7 +14,6 @@ import java.util.function.*;
 import java.util.stream.IntStream;
 import javax.inject.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
@@ -24,7 +23,6 @@ import net.runelite.client.callback.ClientThread;
  * Client thread, except the plans themselves, which run on the executor through {@link PlannerRunner}. Re-plans only
  * when a {@link Trigger} input changes, never per tile.
  */
-@Slf4j
 @Singleton
 public class RoutePlanner
 {
@@ -378,7 +376,6 @@ public class RoutePlanner
 		if (refusedChanges.add(row))
 		{
 			lastTrigger = null;
-			log.debug("refused this session: {}", row);
 		}
 	}
 

@@ -599,25 +599,7 @@ public class MenuLines
 			minigameCard(name, out);
 			return;
 		}
-		if (minigamePlace(name, out))
-		{
-			return;
-		}
-		Widget current = client.getWidget(InterfaceID.Grouping.CURRENTGAME);
-		if (!Widgets.visible(current))
-		{
-			return;
-		}
-		if (MenuLabels.matches(current.getText(), name))
-		{
-			out.add(client.getWidget(InterfaceID.Grouping.TELEPORT));
-			return;
-		}
-		Widget contents = client.getWidget(InterfaceID.Grouping.DROPDOWN_CONTENTS);
-		Widget[] lines = Widgets.visible(contents) ? contents.getDynamicChildren() : null;
-		Widget line = lines == null ? null : Arrays.stream(lines)
-			.filter(shown -> Widgets.visible(shown) && MenuLabels.matches(shown.getText(), name)).findFirst().orElse(null);
-		out.add(line != null ? line : client.getWidget(InterfaceID.Grouping.DROPDOWN_TOP));
+		minigamePlace(name, out);
 	}
 
 	/**
@@ -640,14 +622,14 @@ public class MenuLines
 	}
 
 	/** A game with several places asks which one next. */
-	private boolean minigamePlace(String name, Found out)
+	private void minigamePlace(String name, Found out)
 	{
 		String[] parts = name.split(": ", 2);
 		Widget options = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
 		Widget[] lines = parts.length < 2 || !Widgets.visible(options) ? null : options.getDynamicChildren();
 		if (lines == null)
 		{
-			return false;
+			return;
 		}
 		String place = MenuLabels.normalise(MINIGAME_PLACE_NUMBER.matcher(parts[1]).replaceFirst(""));
 		for (Widget line : lines)
@@ -655,10 +637,9 @@ public class MenuLines
 			if (Widgets.visible(line) && MenuLabels.normalise(line.getText()).startsWith(place))
 			{
 				out.add(line);
-				return true;
+				return;
 			}
 		}
-		return false;
 	}
 
 	private static boolean hasTextMatching(Widget widget, String label)

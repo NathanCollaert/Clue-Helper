@@ -23,6 +23,7 @@ public class CatalogSchemaTest
 {
 	private static final Map<String, Class<?>> GAMEVAL = Map.of("item", ItemID.class, "object", ObjectID.class,
 		"varbit", VarbitID.class, "varp", VarPlayerID.class, "npc", NpcID.class);
+	private static final RequirementParser PARSER = new RequirementParser();
 	private static final Pattern NAMED_ID = Pattern.compile("(\\w+):(\\d+)=(\\w+)");
 	private static final Pattern ITEM_ID = Pattern.compile("(?<![A-Z_])(\\d+)=\\d+");
 	private static final Pattern VAR_ID = Pattern.compile("(\\d+)\\s*[=<>&@]");
@@ -50,8 +51,6 @@ public class CatalogSchemaTest
 		}
 
 		Catalog catalog = CatalogLoader.load();
-		catalog.getTeleports().forEach(row -> row.getRequirements().getErrors().forEach(e -> failures.add(row.getName() + ": " + e)));
-		catalog.getSpellbookChanges().forEach(row -> row.getRequirements().getErrors().forEach(e -> failures.add(row.getName() + ": " + e)));
 		catalog.getTeleports().forEach(row -> partRules(row, failures::add, row.getName() + ": "));
 		catalog.getSpellbookChanges().stream().filter(change -> isBlank(change.getText()) || isBlank(change.getPlace()))
 			.forEach(change -> failures.add(change.getName() + ": no guide text or place"));
@@ -127,6 +126,7 @@ public class CatalogSchemaTest
 
 	private static void sharedRules(CatalogLoader.TsvTable.Line line, Failures fail, String at)
 	{
+		PARSER.errors(line.getCells()).forEach(error -> fail.add(at + error));
 		Map<String, Integer> named = new HashMap<>();
 		Matcher m = NAMED_ID.matcher(line.get("Gameval"));
 		while (m.find())

@@ -134,7 +134,7 @@ coordinate:12049	*	coordinate	medium	ANY_OF	2585,3505,0					spade	1951	Dig at 25
 coordinate:12051	*	coordinate	medium	ANY_OF	3312,3375,0					spade	1942	Dig at 3312,3375,0
 coordinate:12053	*	coordinate	medium	ANY_OF	3429,3523,0					spade	1954	Dig at 3429,3523,0
 coordinate:12085	*	coordinate	elite	ANY_OF	3822,3562,0					spade	2031	Dig at 3822,3562,0
-coordinate:12086	*	coordinate	elite	ANY_OF	3811,3060,0					spade, light (fire pit 6534), light varbit 6534	2021	Dig at 3811,3060,0
+coordinate:12086	*	coordinate	elite	ANY_OF	3811,3060,0					spade, light (fire pit 6534)	2021	Dig at 3811,3060,0
 coordinate:12087	*	coordinate	elite	ANY_OF	2700,3808,0					spade	2039	Dig at 2700,3808,0
 coordinate:12088	*	coordinate	elite	ANY_OF	3828,2848,0					spade	2028	Dig at 3828,2848,0
 coordinate:12089	*	coordinate	elite	ANY_OF	2357,3151,0					spade	2018	Dig at 2357,3151,0
@@ -275,7 +275,7 @@ coordinate:3592	*	coordinate	medium	ANY_OF	2387,3435,0					spade	1947	Dig at 238
 coordinate:3594	*	coordinate	medium	ANY_OF	2416,3516,0					spade	1953	Dig at 2416,3516,0
 coordinate:3604,3564,0	*	coordinate	master	ANY_OF	3604,3564,0					spade	2066	Dig at 3604,3564,0
 coordinate:3622,3320,0	*	coordinate	master	ANY_OF	3622,3320,0					spade	2062	Dig at 3622,3320,0
-coordinate:3830,3060,0	*	coordinate	master	ANY_OF	3830,3060,0					spade, light (fire pit 6534), light varbit 6534	2059	Dig at 3830,3060,0
+coordinate:3830,3060,0	*	coordinate	master	ANY_OF	3830,3060,0					spade, light (fire pit 6534)	2059	Dig at 3830,3060,0
 coordinate:7256	*	coordinate	hard	ANY_OF	2339,3311,0					spade	1977	Dig at 2339,3311,0
 coordinate:7258	*	coordinate	hard	ANY_OF	3138,2969,0					spade	1980	Dig at 3138,2969,0
 coordinate:7260	*	coordinate	hard	ANY_OF	2970,3749,0					spade	1995	Dig at 2970,3749,0

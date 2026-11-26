@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import net.runelite.http.api.RuneLiteAPI;
 import org.junit.Test;
@@ -33,6 +34,16 @@ public class BakedDataTest
 		{
 			assertArrayEquals(WalkLoader.COLUMNS + STALE, walk.getColumns(), baked.readAllBytes());
 		}
+	}
+
+	/**
+	 * A gate the parser can't read would bake without the part it couldn't read; catalog rows have {@code CatalogSchemaTest}.
+	 * A quest points need below the maximum lands here too: the plugin judges only every quest point.
+	 */
+	@Test
+	public void walkGatesParseWithoutErrors() throws IOException
+	{
+		assertEquals(List.of(), WalkLoader.gateErrors());
 	}
 
 	@Test

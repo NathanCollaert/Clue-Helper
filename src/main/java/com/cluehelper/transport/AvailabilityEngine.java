@@ -60,7 +60,6 @@ public final class AvailabilityEngine
 			return v.result(row);
 		}
 		Requirements req = row.getRequirements();
-		req.getErrors().forEach(error -> v.no("catalog row unreadable: " + error));
 		if (req.isMembers() && !player.isMembersWorld())
 		{
 			v.no("members world only");

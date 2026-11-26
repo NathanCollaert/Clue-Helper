@@ -34,14 +34,8 @@ public class HouseState
 	/** By base object id, measured from the house entry. */
 	@Builder.Default
 	Map<Integer, Integer> walkTicks = Map.of();
-	/** Left-click destinations are 1-based; 0 when unknown. */
-	int xericLeftClick;
-	int digsiteLeftClick;
-	int boxLeftClick;
 	@Builder.Default
 	Source source = Source.VARBITS;
-	/** Epoch millis; 0 when never scanned. */
-	long scannedAt;
 
 	public boolean hasAny(Iterable<Integer> objectIds)
 	{

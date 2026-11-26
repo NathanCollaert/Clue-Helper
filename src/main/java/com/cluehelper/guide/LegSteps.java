@@ -220,12 +220,8 @@ final class LegSteps
 		}
 		switch (next.getKind())
 		{
-			case FAIRY_RING:
-				return "the fairy ring";
 			case SPELLBOOK_CHANGE:
 				return next.getChange().getPlace();
-			case BANK:
-				return "the bank";
 			case TELEPORT:
 				return next.getRow().getApproach();
 			default:

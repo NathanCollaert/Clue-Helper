@@ -5,7 +5,6 @@ import java.util.*;
 import lombok.*;
 import net.runelite.api.Quest;
 
-/** A row with {@link #getErrors()} stays in the catalog but is never available, so it can't silently disappear. */
 @Value
 @Builder(toBuilder = true)
 public class Requirements
@@ -32,6 +31,4 @@ public class Requirements
 	/** Patch names; each must be known grown. */
 	@Builder.Default
 	Set<String> plantedTrees = Set.of();
-	@Builder.Default
-	List<String> errors = List.of();
 }

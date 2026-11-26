@@ -1,8 +1,7 @@
 package com.cluehelper.ui;
 
 import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.guide.EasyTeleportsNames;
-import com.cluehelper.guide.StepGuide;
+import com.cluehelper.guide.*;
 import com.cluehelper.hotcold.*;
 import com.cluehelper.link.*;
 import com.cluehelper.memory.BankMemory;

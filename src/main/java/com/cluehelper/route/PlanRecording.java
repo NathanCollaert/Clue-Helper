@@ -29,8 +29,6 @@ public final class PlanRecording
 	long nowMinutes;
 	String startKind;
 	int[] startTile;
-	/** Null when no scene was saved beside the recording. */
-	String sceneFile;
 	PlannerSettings settings;
 	int revertTicksLeft;
 	Set<String> refusedChanges;
@@ -46,7 +44,7 @@ public final class PlanRecording
 	{
 	}
 
-	public static PlanRecording of(Plan plan, PlanInput input, String sceneFile)
+	public static PlanRecording of(Plan plan, PlanInput input)
 	{
 		Step step = input.getStep();
 		PlanRecording r = new PlanRecording();
@@ -63,7 +61,6 @@ public final class PlanRecording
 		r.nowMinutes = input.getNowMinutes();
 		r.startKind = input.getStart().getKind().name();
 		r.startTile = xyz(input.getStart().getTile());
-		r.sceneFile = sceneFile;
 		r.settings = input.getSettings();
 		r.revertTicksLeft = input.getRevertTicksLeft();
 		r.refusedChanges = input.getRefusedChanges();
@@ -85,7 +82,7 @@ public final class PlanRecording
 			.player(UsableItems.cutDown(input.getPlayer(), usable))
 			.banked(UsableItems.cutDown(input.getBanked(), usable))
 			.build();
-		return of(plan, cut, null);
+		return of(plan, cut);
 	}
 
 	/** A need as the owned items that count for it: its "all of" sets are kept as "any of". */

@@ -400,11 +400,9 @@ public class DevHarness
 			poh.onProfileChanged();
 		}
 		HouseState house = poh.getHouse();
-		reply("house: " + house.getSource() + (house.getScannedAt() == 0 ? ", never scanned" : ", scanned " + age(System.currentTimeMillis() - house.getScannedAt()))
-			+ "; in a house: " + poh.isInHouse() + " (" + poh.getOwnership() + ")");
+		reply("house: " + house.getSource() + "; in a house: " + poh.isInHouse() + " (" + poh.getOwnership() + ")");
 		reply("furniture " + house.getFurniture() + "; walks " + house.getWalkTicks());
-		reply(house.getNexusKeys().size() + " nexus destinations; left-click Xeric " + house.getXericLeftClick() + ", digsite "
-			+ house.getDigsiteLeftClick() + ", box line " + house.getBoxLeftClick());
+		reply(house.getNexusKeys().size() + " nexus destinations");
 	}
 
 	private void reply(String message)
@@ -418,16 +416,5 @@ public class DevHarness
 				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", message, null);
 			}
 		});
-	}
-
-	private static String age(long millis)
-	{
-		long minutes = millis / 60_000;
-		if (minutes < 60)
-		{
-			return minutes + " min ago";
-		}
-		long hours = minutes / 60;
-		return hours < 24 ? hours + " h ago" : hours / 24 + " d ago";
 	}
 }

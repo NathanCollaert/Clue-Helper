@@ -12,7 +12,6 @@ import com.cluehelper.ui.*;
 import com.google.inject.Provides;
 import java.util.*;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
@@ -24,7 +23,6 @@ import net.runelite.client.plugins.banktags.BankTagsPlugin;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.overlay.*;
 
-@Slf4j
 @PluginDescriptor(
 	name = "Clue Helper",
 	description = "A click-by-click guide to every clue step, routed from the teleports you own",

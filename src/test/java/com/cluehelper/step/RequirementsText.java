@@ -22,10 +22,6 @@ public final class RequirementsText
 				text.append(" (fire pit ").append(needs.getFirePitVarbitId()).append(')');
 			}
 		}
-		if (needs.getLightSourceVarbitId() != -1)
-		{
-			text.append(text.length() > 0 ? ", " : "").append("light varbit ").append(needs.getLightSourceVarbitId());
-		}
 		int items = needs.getItems().size();
 		if (items > 0)
 		{

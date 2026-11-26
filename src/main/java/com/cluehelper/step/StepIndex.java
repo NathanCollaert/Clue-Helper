@@ -67,7 +67,6 @@ public final class StepIndex
 		String npcOption;
 		/** Which quest places the step's NPC for each player (Viggora); null for an NPC always at its targets. */
 		LearnPlace learnPlace;
-		List<CacheRow> rows = List.of();
 		List<WorldPoint> tiles = List.of();
 		List<Target> targets = List.of();
 		List<Combat> combat = List.of();
@@ -136,14 +135,6 @@ public final class StepIndex
 		/** Baked: how many of an item core's requirements ask for, by item id, where it is more than one (3 mithril bars). */
 		Map<Integer, Integer> amounts = Map.of();
 
-		static Entry of(String tier, List<CacheRow> rows)
-		{
-			Entry entry = new Entry();
-			entry.tier = tier;
-			entry.rows = List.copyOf(rows);
-			return entry;
-		}
-
 		/** A step of the plugin's own, done by these acts alone (a master clue dropped where another is picked up). */
 		public static Entry ofActs(List<SubStep> acts)
 		{
@@ -152,10 +143,11 @@ public final class StepIndex
 			return entry;
 		}
 
-		/** A three-step: every part's rows, and what its unsolved parts need. */
-		static Entry ofParts(String tier, List<CacheRow> rows, List<Entry> unsolved)
+		/** A three-step: what its unsolved parts need. */
+		static Entry ofParts(String tier, List<Entry> unsolved)
 		{
-			Entry entry = of(tier, rows);
+			Entry entry = new Entry();
+			entry.tier = tier;
 			entry.requires = unsolved.stream().flatMap(part -> part.getRequires().stream()).collect(toUnmodifiableList());
 			entry.gear = unsolved.stream().flatMap(part -> part.getGear().stream()).collect(toUnmodifiableList());
 			return entry;

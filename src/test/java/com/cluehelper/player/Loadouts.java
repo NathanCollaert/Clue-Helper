@@ -76,7 +76,6 @@ public final class Loadouts
 		ItemID.DEATHRUNE, ItemID.ASTRALRUNE, ItemID.BLOODRUNE, ItemID.SOULRUNE, ItemID.WRATHRUNE);
 	private static final Map<String, AccountType> ACCOUNT_TYPES = Map.of("mid-ironman", AccountType.IRONMAN, "uim", AccountType.ULTIMATE_IRONMAN,
 		"hcim", AccountType.HARDCORE_IRONMAN, "gim", AccountType.GROUP_IRONMAN);
-	private static final int MAX_QUEST_POINTS = 300;
 	/** Runes are taken to sit in a rune pouch, so only the carried items fill slots. */
 	private static final int INVENTORY_SLOTS = 28;
 	private static final int BANKED_TABLETS = 5;
@@ -131,7 +130,6 @@ public final class Loadouts
 		Map<Integer, Integer> values = new HashMap<>();
 		vars.getAsJsonObject("values").entrySet().forEach(e -> values.put(Integer.parseInt(e.getKey()), e.getValue().getAsInt()));
 		boolean varsPass = vars.get("default").getAsString().equals("pass");
-		boolean allQuests = f.get("quests").isJsonPrimitive();
 		PlayerSnapshot snapshot = PlayerSnapshot.builder()
 			.version(1)
 			.membersWorld(f.get("members").getAsBoolean())
@@ -143,7 +141,6 @@ public final class Loadouts
 			.totalLevel(f.get("maxTotal").getAsBoolean() ? 99 * Skill.values().length
 				: levels.values().stream().mapToInt(Integer::intValue).sum())
 			.combatLevel(combatLevel(levels))
-			.questPoints(allQuests ? MAX_QUEST_POINTS : 0)
 			.questsRead(true)
 			.quests(quests)
 			.varbits(values)
@@ -154,8 +151,7 @@ public final class Loadouts
 			.plantedTrees(strings(f, "plantedTrees"))
 			.spellbook(new SpellbookState(Book.valueOf(f.get("book").getAsString().toUpperCase()), false,
 				SpellbookState.CAPE_CHANGES_PER_DAY, varsPass || values.getOrDefault(VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED, 0) == 1,
-				quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED, quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED,
-				quests.get(Quest.DREAM_MENTOR) == QuestState.FINISHED))
+				quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED, quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED))
 			.build();
 		return new Loadout(name, snapshot, List.copyOf(banked), bankedSnapshot(snapshot, bankedFamilies), f);
 	}
@@ -195,11 +191,7 @@ public final class Loadouts
 			.furniture(Set.of(ObjectID.POH_NEXUS_PORTAL_3, ObjectID.POH_JEWELLERY_BOX_3, ObjectID.POH_TROPHY_AMULETOFGLORY_4,
 				ObjectID.POH_AMULET_XERIC_INFERNO, ObjectID.POH_AMULET_DIG_FOSSIL, ObjectID.POH_ALTAR_OCCULT,
 				ObjectID.POH_MOUNTED_MAX_CAPE, ObjectID.POH_WILDERNESS_OBELISK, ObjectID.POH_SPIRIT_RING))
-			.xericLeftClick(3)
-			.digsiteLeftClick(2)
-			.boxLeftClick(20)
 			.source(HouseState.Source.SCAN)
-			.scannedAt(1)
 			.build();
 	}
 

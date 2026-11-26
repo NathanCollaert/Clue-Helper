@@ -5,8 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -17,8 +16,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
-import net.runelite.client.util.ColorUtil;
-import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.*;
 
 /**
  * How every Clue Helper highlight looks, so an overlay only decides what to highlight. Whatever is clicked is outlined

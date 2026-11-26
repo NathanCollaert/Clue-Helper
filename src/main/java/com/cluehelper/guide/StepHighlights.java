@@ -112,7 +112,7 @@ final class StepHighlights
 	}
 
 	/** An act's items are filled by what it asks for (equip on a left click, its own items), not by a teleport's left click. */
-	Highlights withItemFill(Highlights shown, SubStep current, Step step)
+	Highlights withItemFill(Highlights shown, SubStep current)
 	{
 		if (current != null && current.getKind() == SubStep.Kind.ACT)
 		{
@@ -365,7 +365,6 @@ final class StepHighlights
 		return step.getRequirements().getItems().stream().anyMatch(item -> item.fulfilledBy(itemId));
 	}
 
-	/** How the act's carried gear goes on ("Wear" on a Max cape, whose left click teleports); null for items not worn. */
 	/** The act's click, then its chat options in turn. */
 	private static MenuTarget withStageDialogue(SubStep current)
 	{

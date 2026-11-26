@@ -3,6 +3,7 @@ package com.cluehelper;
 import com.cluehelper.hotcold.CoreSpots;
 import com.cluehelper.hotcold.HotColdPlan;
 import com.cluehelper.hotcold.HotColdService;
+import com.cluehelper.hotcold.PlanInputs;
 import com.cluehelper.hotcold.Probe;
 import com.cluehelper.hotcold.ProbeJob;
 import com.cluehelper.hotcold.ProbePlanner;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +26,8 @@ import net.runelite.api.gameval.InterfaceID;
 
 /**
  * {@code [CH-HOTCOLD]} lines, one per plan, and each plan with what it was planned from in {@link #DECISIONS}, which
- * {@code HotColdDecisionReplayTest} replays. Nothing while the bank PIN keypad is open.
+ * {@code HotColdDecisionReplayTest} replays: every probe the plan was given, not only those it weighed. Nothing while the
+ * bank PIN keypad is open.
  */
 @Slf4j
 public final class HotColdTrace
@@ -33,6 +37,14 @@ public final class HotColdTrace
 	static final File DECISIONS = new File(FRAMES, "decisions.jsonl");
 
 	private final Client client;
+	private final HotColdService hotCold;
+	/** Plans the job's probes again for {@link #DECISIONS}, off the client thread. */
+	private final ExecutorService recorder = Executors.newSingleThreadExecutor(runnable ->
+	{
+		Thread thread = new Thread(runnable, "hotcold-trace");
+		thread.setDaemon(true);
+		return thread;
+	});
 	private final Gson gson = new Gson();
 	private final Consumer<String> saveFrames;
 	private final Runnable unregister;
@@ -42,27 +54,35 @@ public final class HotColdTrace
 	HotColdTrace(Client client, HotColdService hotCold, Consumer<String> saveFrames)
 	{
 		this.client = client;
+		this.hotCold = hotCold;
 		this.saveFrames = saveFrames;
 		FRAMES.mkdirs();
-		unregister = hotCold.addPlanListener(this::record);
+		unregister = hotCold.addListener(this::record);
 	}
 
 	void stop()
 	{
 		unregister.run();
+		recorder.shutdown();
 	}
 
-	private void record(HotColdService.Planned planned)
+	private void record()
 	{
-		if (pinOpen())
+		ProbeJob job = hotCold.getPlanJob();
+		HotColdPlan plan = hotCold.getPlan();
+		if (pinOpen() || job == null || plan == null)
 		{
 			return;
 		}
-		ProbeJob job = planned.getJob();
-		HotColdPlan plan = planned.getPlan();
 		log.info("{} t{} {} from {} readings, last {}: {}{}", TAG, client.getTickCount(), job.getStepKey(), job.getReadings().size(),
 			job.getReadings().isEmpty() ? "-" : job.getReadings().get(job.getReadings().size() - 1), describe(plan), coreComparison(plan, job.getCore()));
-		Decision decision = new Decision(job.getStepKey(), job.getTier() == HotColdTier.BEGINNER, job.getReadings(), plan.getConsidered(),
+		recorder.execute(() -> writeDecision(job, plan));
+		saveFrames.accept(String.format("%03d-%s", ++planCount, plan.getAction().name().toLowerCase()));
+	}
+
+	private void writeDecision(ProbeJob job, HotColdPlan plan)
+	{
+		Decision decision = new Decision(job.getStepKey(), job.getTier() == HotColdTier.BEGINNER, job.getReadings(), PlanInputs.probes(job),
 			job.getCosts().getWildernessPenaltyTicks(), plan.getAction().name(),
 			plan.getTile() == null ? null : new int[]{plan.getTile().getX(), plan.getTile().getY(), plan.getTile().getPlane()});
 		try (Writer out = new FileWriter(DECISIONS, StandardCharsets.UTF_8, true))
@@ -73,7 +93,6 @@ public final class HotColdTrace
 		{
 			log.warn("{} could not record a decision", TAG, e);
 		}
-		saveFrames.accept(String.format("%03d-%s", ++planCount, plan.getAction().name().toLowerCase()));
 	}
 
 	private boolean pinOpen()
@@ -91,7 +110,7 @@ public final class HotColdTrace
 			line.append(" probe ").append(choice.getProbe().getKind()).append(' ').append(choice.getProbe().getTicks()).append('t')
 				.append(String.format(" %.2f bits cost %d", choice.getBits(), choice.getCostTicks()));
 		}
-		return line.append(" probes ").append(planned.getConsidered().size()).toString();
+		return line.toString();
 	}
 
 	/** The spots the grid kept that core has dropped. */

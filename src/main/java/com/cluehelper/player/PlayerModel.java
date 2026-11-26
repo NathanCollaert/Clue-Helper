@@ -74,7 +74,6 @@ public class PlayerModel
 	HouseState house = HouseState.NONE;
 	long memoryVersion = -1;
 	long version;
-	Map<Integer, Integer> fakeCarried = Map.of();
 
 	/** Null until the first tick after login. */
 	@Getter
@@ -302,13 +301,6 @@ public class PlayerModel
 		}
 	}
 
-	/** Client thread. Dev builds only: items to see in the inventory on top of the real ones; empty for none. */
-	public void fakeCarried(Map<Integer, Integer> items)
-	{
-		fakeCarried = Map.copyOf(items);
-		dirty = true;
-	}
-
 	private void resolveWatches()
 	{
 		Integer id;
@@ -372,7 +364,6 @@ public class PlayerModel
 	private PlayerSnapshot build(Position now)
 	{
 		Map<Integer, Integer> inventory = counted(contents(InventoryID.INV));
-		fakeCarried.forEach((id, quantity) -> inventory.merge(id, quantity, Integer::sum));
 		ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INV);
 		int usedSlots = inventoryContainer == null ? 0 : (int) Arrays.stream(inventoryContainer.getItems())
 			.filter(item -> item.getId() > 0 && item.getQuantity() > 0).count();
@@ -406,7 +397,6 @@ public class PlayerModel
 			.realLevels(real)
 			.totalLevel(client.getTotalLevel())
 			.combatLevel(client.getLocalPlayer().getCombatLevel())
-			.questPoints(client.getVarpValue(VarPlayerID.QP))
 			.lockedMusicTracks(lockedMusicTracks)
 			.missingQuestPoints(missingQuestPoints)
 			.questsRead(questsRead)
@@ -471,8 +461,7 @@ public class PlayerModel
 			Math.max(0, SpellbookState.CAPE_CHANGES_PER_DAY - client.getVarbitValue(VarbitID.SB_SWAP_CHECK)),
 			client.getVarbitValue(VarbitID.ARCEUUS_SPELLBOOK_UNLOCKED) == 1,
 			quests.get(Quest.DESERT_TREASURE_I) == QuestState.FINISHED,
-			quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED,
-			quests.get(Quest.DREAM_MENTOR) == QuestState.FINISHED);
+			quests.get(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED);
 	}
 
 	private static String dormantReason(Set<WorldType> worldTypes)

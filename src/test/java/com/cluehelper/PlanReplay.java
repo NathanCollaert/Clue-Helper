@@ -59,6 +59,7 @@ public final class PlanReplay
 	private static final int TIMED = 3;
 	private static final long NANOS_PER_MILLI = 1_000_000;
 	private static final String REPORT = ".txt";
+	static final String SCENE_SUFFIX = ".scene.gz";
 
 	private final WalkTable table = WalkTable.load(RuneLiteAPI.GSON);
 	private final WorldMap map = WorldMap.load();
@@ -86,12 +87,19 @@ public final class PlanReplay
 		for (File file : files)
 		{
 			PlanRecording recording = gson.fromJson(recordingJson(file), PlanRecording.class);
-			report(file.getName(), recording, replay.input(recording, folder));
+			report(file.getName(), recording, replay.input(recording, sceneBeside(file)));
 		}
 	}
 
-	/** What the recording was planned from; its scene, if any, is in {@code folder}. */
-	PlanInput input(PlanRecording recording, File folder) throws IOException
+	/** The scene {@code PlanTrace} saved beside a recording, or null for a recording without one. */
+	private static File sceneBeside(File recording)
+	{
+		File scene = new File(recording.getParentFile(), recording.getName().replaceFirst("\\.json$", SCENE_SUFFIX));
+		return recording.getName().endsWith(".json") && scene.isFile() ? scene : null;
+	}
+
+	/** What the recording was planned from, with its scene file or null for none. */
+	PlanInput input(PlanRecording recording, File scene) throws IOException
 	{
 		return PlanInput.builder()
 			.step(step(recording))
@@ -105,7 +113,7 @@ public final class PlanReplay
 			.catalog(catalog)
 			.table(table)
 			.noTeleport(noTeleport)
-			.start(start(recording, folder))
+			.start(start(recording, scene))
 			.settings(recorded(recording.getSettings()))
 			.revertTicksLeft(recording.getRevertTicksLeft())
 			.refusedChanges(recording.getRefusedChanges())
@@ -200,11 +208,11 @@ public final class PlanReplay
 		return new GearRequirement(need.getName(), need.getGearAtLeast(), pieces);
 	}
 
-	private PlanStart start(PlanRecording recording, File folder) throws IOException
+	private PlanStart start(PlanRecording recording, File sceneFile) throws IOException
 	{
 		WorldPoint tile = point(recording.getStartTile());
 		boolean[] rowOpen = new WalkGates(table, recording.getPlayer(), engine, recording.getNowMinutes()).rowOpen();
-		LoadedScene scene = recording.getSceneFile() == null ? null : scene(new File(folder, recording.getSceneFile()));
+		LoadedScene scene = sceneFile == null ? null : scene(sceneFile);
 		WalkCosts walk = WalkCosts.from(Ground.world(map, scene, table, row -> rowOpen[row]), tile);
 		switch (PlanStart.Kind.valueOf(recording.getStartKind()))
 		{

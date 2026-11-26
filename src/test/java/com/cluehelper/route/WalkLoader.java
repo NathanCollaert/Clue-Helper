@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
 
@@ -69,6 +70,14 @@ public final class WalkLoader
 	{
 		WalkLoader loader = new WalkLoader();
 		return loader.requirements(rows("gates.tsv"), FIRST_GATE_COLUMN, GATE_COLUMNS);
+	}
+
+	/** What the gates' cells hold that can't be read. */
+	public static List<String> gateErrors() throws IOException
+	{
+		RequirementParser parser = new RequirementParser();
+		return cellsByKey(rows("gates.tsv"), FIRST_GATE_COLUMN, GATE_COLUMNS).stream()
+			.flatMap(cells -> parser.errors(cells).stream()).collect(Collectors.toList());
 	}
 
 	private Baked bake() throws IOException
@@ -359,17 +368,22 @@ public final class WalkLoader
 	/** The requirement columns from {@code first} on, one per key; a short row leaves the rest empty. */
 	private List<Requirements> requirements(List<String[]> rows, int first, List<String> keys)
 	{
-		List<Requirements> parsed = new ArrayList<>();
+		return cellsByKey(rows, first, keys).stream().map(parser::parse).collect(Collectors.toList());
+	}
+
+	private static List<Map<String, String>> cellsByKey(List<String[]> rows, int first, List<String> keys)
+	{
+		List<Map<String, String>> byKey = new ArrayList<>();
 		for (String[] cells : rows)
 		{
-			Map<String, String> byKey = new HashMap<>();
+			Map<String, String> row = new HashMap<>();
 			for (int i = 0; i < keys.size(); i++)
 			{
-				byKey.put(keys.get(i), first + i < cells.length ? cells[first + i] : "");
+				row.put(keys.get(i), first + i < cells.length ? cells[first + i] : "");
 			}
-			parsed.add(parser.parse(byKey));
+			byKey.add(row);
 		}
-		return parsed;
+		return byKey;
 	}
 
 	/** The tab-separated rows after the header; blank and # lines left out. */

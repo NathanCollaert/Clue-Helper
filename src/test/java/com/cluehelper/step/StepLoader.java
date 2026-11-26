@@ -117,6 +117,24 @@ public final class StepLoader
 			.forEach(step -> step.getValue().getAsJsonObject().add("combat", enemies));
 	}
 
+	/** Each step key's cache rows, as the step files hold them: the plugin itself never reads them. */
+	public static Map<String, List<CacheRow>> cacheRows() throws IOException
+	{
+		Map<String, List<CacheRow>> byKey = new TreeMap<>();
+		for (String file : FILES)
+		{
+			try (Reader in = Files.newBufferedReader(SOURCES.resolve(file + ".json"), StandardCharsets.UTF_8))
+			{
+				new JsonParser().parse(in).getAsJsonObject().getAsJsonObject("steps").entrySet().forEach(step ->
+				{
+					JsonElement rows = step.getValue().getAsJsonObject().get("rows");
+					byKey.put(step.getKey(), rows == null ? List.of() : List.of(SOURCE_GSON.fromJson(rows, CacheRow[].class)));
+				});
+			}
+		}
+		return byKey;
+	}
+
 	/** The cache's hot/cold spots by core's name, as the hot/cold step file holds them. */
 	public static Map<String, CacheSpot> cacheSpots() throws IOException
 	{

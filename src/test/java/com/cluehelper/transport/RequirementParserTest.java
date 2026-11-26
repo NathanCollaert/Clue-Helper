@@ -22,7 +22,8 @@ public class RequirementParserTest
 		{"Skills", "Max Total", "levels 2376 total level"},
 		{"Skills", "Max Music", "levels every music track"},
 		{"Skills", "Max Quest", "levels every quest point"},
-		{"Skills", "Max Construction;100 Combat;32 Quest", "levels 99 Construction; combat level 100; 32 quest points"},
+		{"Skills", "Max Construction;100 Combat", "levels 99 Construction; combat level 100"},
+		{"Skills", "32 Quest", "error Skills: can't read '32 Quest'"},
 		{"Skills", "70 Agilty", "error Skills: can't read '70 Agilty'"},
 		{"Skills", "high Magic", "error Skills: can't read 'high Magic'"},
 		{"Quests", "Lunar Diplomacy;Fairytale II - Cure a Queen", "quests Fairytale II - Cure a Queen; Lunar Diplomacy"},
@@ -53,7 +54,7 @@ public class RequirementParserTest
 			String column = c[0];
 			String cell = c[1];
 			String expected = c[2];
-			String actual = describe(parser.parse(Map.of(column, cell)));
+			String actual = describe(Map.of(column, cell));
 			if (!actual.equals(expected))
 			{
 				failures.add(column + " '" + cell + "': expected '" + expected + "', got '" + actual + "'");
@@ -65,8 +66,7 @@ public class RequirementParserTest
 	@Test
 	public void aBookColumnThatDisagreesWithVarbit4070IsAnError()
 	{
-		Requirements r = parser.parse(Map.of("Book", "Lunar", "Varbits", "4070=0"));
-		assertEquals(List.of("Book LUNAR disagrees with varbit 4070 = 0"), r.getErrors());
+		assertEquals(List.of("Book LUNAR disagrees with varbit 4070 = 0"), parser.errors(Map.of("Book", "Lunar", "Varbits", "4070=0")));
 	}
 
 	@Test
@@ -86,8 +86,9 @@ public class RequirementParserTest
 		assertEquals(false, new VarCheck(VarCheck.Kind.VARP, 4182, VarCheck.Op.BIT_SET, 4).test(3, 0));
 	}
 
-	private static String describe(Requirements r)
+	private String describe(Map<String, String> cells)
 	{
+		Requirements r = parser.parse(cells);
 		List<String> parts = new ArrayList<>();
 		if (!r.getItems().isEmpty())
 		{
@@ -121,7 +122,7 @@ public class RequirementParserTest
 		{
 			parts.add("spends charges");
 		}
-		r.getErrors().forEach(error -> parts.add("error " + error));
+		parser.errors(cells).forEach(error -> parts.add("error " + error));
 		return String.join("; ", parts);
 	}
 

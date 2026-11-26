@@ -38,7 +38,19 @@ public final class RequirementParser
 
 	public Requirements parse(Map<String, String> cells)
 	{
+		return parse(cells, new Parsed());
+	}
+
+	/** What the cells hold that can't be read; a row with any must not be baked. */
+	public List<String> errors(Map<String, String> cells)
+	{
 		Parsed out = new Parsed();
+		parse(cells, out);
+		return List.copyOf(out.errors);
+	}
+
+	private Requirements parse(Map<String, String> cells, Parsed out)
+	{
 		parseItems(cell(cells, ITEMS), out);
 		parseLevels(cell(cells, SKILLS), out);
 		parseQuests(cell(cells, QUESTS), out);
@@ -62,7 +74,6 @@ public final class RequirementParser
 			.spendsCharges(isTrue(cell(cells, CONSUMABLE)))
 			.house(house)
 			.plantedTrees(parsePlanted(cell(cells, PLANTED)))
-			.errors(List.copyOf(out.errors))
 			.build();
 	}
 
@@ -232,7 +243,7 @@ public final class RequirementParser
 		}
 		if (lower.startsWith("quest"))
 		{
-			return new LevelNeed(null, max ? LevelNeed.Aggregate.ALL_QUEST_POINTS : LevelNeed.Aggregate.QUEST_POINTS, max ? 0 : required);
+			return max ? new LevelNeed(null, LevelNeed.Aggregate.ALL_QUEST_POINTS, 0) : null;
 		}
 		return null;
 	}

@@ -4,7 +4,6 @@ import com.cluehelper.guide.*;
 import com.cluehelper.route.*;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import javax.inject.*;
 import lombok.Value;
 import net.runelite.api.*;

@@ -41,7 +41,6 @@ public class PlayerSnapshot
 	Map<Skill, Integer> realLevels = Map.of();
 	int totalLevel;
 	int combatLevel;
-	int questPoints;
 	/** Tracks the Music cape still needs; 0 in a snapshot that never counted them. */
 	int lockedMusicTracks;
 	/** Quest points the player lacks of all the game offers; 0 in a snapshot that never counted them. */

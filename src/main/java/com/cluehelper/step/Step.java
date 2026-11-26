@@ -50,14 +50,6 @@ public class Step
 	/** Tiles core doesn't give but the step is done at too (Brimstail inside his cave): arriving there is arriving. */
 	@Builder.Default
 	List<WorldPoint> otherTiles = List.of();
-	/** An emote step's emotes in order, by core's names. */
-	@Builder.Default
-	List<String> emotes = List.of();
-
-	public List<CacheRow> getCacheRows()
-	{
-		return List.copyOf(data.getRows());
-	}
 
 	/**
 	 * In core's cryptics naming both an NPC and an object, the NPC holds the key the object needs, except Juna's "speak to

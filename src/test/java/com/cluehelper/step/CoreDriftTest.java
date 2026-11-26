@@ -55,6 +55,7 @@ public class CoreDriftTest
 
 	private static StepIndex index;
 	private static Map<String, StepLoader.CacheSpot> cacheSpots;
+	private static Map<String, List<CacheRow>> cacheRows;
 	private static Map<String, ClueScroll> steps;
 	private static final Map<String, List<String>> SOURCES_BY_KEY = new TreeMap<>();
 	/** Step key → snapshot columns → the var states that resolve to them. */
@@ -67,6 +68,7 @@ public class CoreDriftTest
 	{
 		index = StepIndex.read(new Gson());
 		cacheSpots = StepLoader.cacheSpots();
+		cacheRows = StepLoader.cacheRows();
 		steps = CoreClues.steps();
 		ClueScrollPlugin plugin = CoreClues.plugin();
 		StepResolver resolver = new StepResolver(() -> index);
@@ -123,9 +125,9 @@ public class CoreDriftTest
 		assertEquals("hot/cold spots core no longer has", Set.of(), difference(cacheSpots.keySet(), spotNames));
 
 		Set<String> withoutRow = new TreeSet<>();
-		index.getSteps().forEach((key, entry) ->
+		index.getSteps().keySet().forEach(key ->
 		{
-			if (entry.getRows().isEmpty())
+			if (rowsOf(key).isEmpty())
 			{
 				withoutRow.add(key);
 			}
@@ -139,9 +141,8 @@ public class CoreDriftTest
 		}
 		assertEquals(EXPECTED_WITHOUT_ROW, withoutRow);
 
-		StepIndex.Entry nieveOrSteve = index.entry("anagram:12059");
 		assertEquals("I EVEN / VESTE owns one row per branch of varbit 5037", List.of("varbit 5037 = 0", "varbit 5037 != 0"),
-			nieveOrSteve.getRows().stream().map(row -> row.getWhen().toString()).collect(Collectors.toList()));
+			rowsOf("anagram:12059").stream().map(row -> row.getWhen().toString()).collect(Collectors.toList()));
 	}
 
 	/** The step files' contract with the guide: a broken row would only show as a step with no route or no stage. */
@@ -151,7 +152,7 @@ public class CoreDriftTest
 		List<String> broken = new ArrayList<>();
 		index.getSteps().forEach((key, entry) ->
 		{
-			boolean coreOnly = entry.getRows().isEmpty();
+			boolean coreOnly = rowsOf(key).isEmpty();
 			if (entry.getTier() == null && !coreOnly)
 			{
 				broken.add(key + ": no tier");
@@ -197,7 +198,7 @@ public class CoreDriftTest
 	}
 
 	@Test
-	public void threeStepTakesItsPartsRowsAndShrinksAsPartsAreSolved() throws ReflectiveOperationException
+	public void threeStepShrinksAsPartsAreSolved() throws ReflectiveOperationException
 	{
 		CoreClues.setVarState(0);
 		List<Map.Entry<CrypticClue, Boolean>> parts = new ArrayList<>();
@@ -215,7 +216,6 @@ public class CoreDriftTest
 		assertEquals("master", whole.getTier());
 		assertNotSame(StepIndex.Entry.NONE, whole.getData());
 		assertEquals(TargetKind.SEQUENCE, whole.getKind());
-		assertEquals(3, whole.getCacheRows().size());
 		assertEquals(3, whole.getTargets().size());
 
 		parts.get(0).setValue(true);
@@ -255,7 +255,7 @@ public class CoreDriftTest
 			step.getObjectIds().stream().map(String::valueOf).collect(Collectors.joining("|")),
 			String.join("|", step.getObjectNames()),
 			RequirementsText.describe(step.getRequirements()),
-			step.getCacheRows().stream().map(row -> String.valueOf(row.getId())).collect(Collectors.joining("|")),
+			rowsOf(step.getKey()).stream().map(row -> String.valueOf(row.getId())).collect(Collectors.joining("|")),
 			oneLine(step.getText()));
 	}
 
@@ -289,12 +289,17 @@ public class CoreDriftTest
 			row.put("npcs", String.join(", ", step.getNpcs()));
 			row.put("objects", step.getObjectIds() + " " + step.getObjectNames());
 			row.put("needs", RequirementsText.describe(step.getRequirements()));
-			row.put("rows", step.getCacheRows().stream().map(CacheRow::getName).collect(Collectors.joining(", ")));
+			row.put("rows", rowsOf(key).stream().map(CacheRow::getName).collect(Collectors.joining(", ")));
 			row.put("branches", SNAPSHOT.get(key).size());
 			row.put("text", oneLine(step.getText()));
 			rows.add(row);
 		});
 		Files.write(VIEW_ROWS, new GsonBuilder().disableHtmlEscaping().create().toJson(rows).getBytes(StandardCharsets.UTF_8));
+	}
+
+	private static List<CacheRow> rowsOf(String key)
+	{
+		return cacheRows.getOrDefault(key, List.of());
 	}
 
 	private static List<String> golden() throws IOException

@@ -50,28 +50,28 @@ public class BankMemory
 	BankMemory(Client client, MemoryStore memory)
 	{
 		this.client = client;
-		this.storedBank = memory.slot(BANK_KEY, Seen.class, Seen::new);
-		this.storedGroup = memory.slot(GROUP_STORAGE_KEY, Seen.class, Seen::new);
+		this.storedBank = memory.slot(BANK_KEY, Seen.class, () -> null);
+		this.storedGroup = memory.slot(GROUP_STORAGE_KEY, Seen.class, () -> null);
 		this.pin = memory.slot(PIN_KEY, Pin.class, Pin::new);
-		this.storedKit = memory.slot(KIT_KEY, Seen.class, Seen::new);
+		this.storedKit = memory.slot(KIT_KEY, Seen.class, () -> null);
 	}
 
 	/** Null when this profile has never opened it. Any thread. */
 	public Seen getBank()
 	{
-		return seenOrNull(storedBank);
+		return storedBank.get();
 	}
 
 	/** Null when never seen or not a group account. Any thread. */
 	public Seen getGroupStorage()
 	{
-		return seenOrNull(storedGroup);
+		return storedGroup.get();
 	}
 
 	/** The huntsman's kit's traps and tools, as last sent when it was opened; null when never. Any thread. */
 	public Seen getKit()
 	{
-		return seenOrNull(storedKit);
+		return storedKit.get();
 	}
 
 	/**
@@ -169,7 +169,6 @@ public class BankMemory
 			return;
 		}
 		Seen updated = new Seen();
-		updated.seenAt = bank.seenAt;
 		updated.items = new HashMap<>(bank.items);
 		deposited.forEach((id, quantity) -> updated.items.merge(id, quantity, Integer::sum));
 		storedBank.hold(updated);
@@ -229,7 +228,6 @@ public class BankMemory
 	private Seen seen(ItemContainer container)
 	{
 		Seen seen = new Seen();
-		seen.seenAt = System.currentTimeMillis();
 		if (container != null)
 		{
 			for (Item item : container.getItems())
@@ -276,16 +274,8 @@ public class BankMemory
 		return placeholders.computeIfAbsent(id, i -> client.getItemDefinition(i).getPlaceholderTemplateId() != NO_PLACEHOLDER);
 	}
 
-	private static Seen seenOrNull(MemorySlot<Seen> slot)
-	{
-		Seen seen = slot.get();
-		return seen.seenAt == 0 ? null : seen;
-	}
-
 	public static final class Seen
 	{
-		/** Epoch millis; 0 when never seen. */
-		public long seenAt;
 		public Map<Integer, Integer> items = new HashMap<>();
 	}
 

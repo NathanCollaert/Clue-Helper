@@ -23,7 +23,7 @@ public class LoadoutsTest
 		}
 		PlayerSnapshot maxed = Loadouts.load("maxed-main").getCarried();
 		assertEquals(28 + 15, maxed.getInventory().size());
-		assertTrue(maxed.finished(Quest.LUNAR_DIPLOMACY) && maxed.getSpellbook().isSwapAccess());
+		assertTrue(maxed.finished(Quest.LUNAR_DIPLOMACY) && maxed.getSpellbook().isLunarAccess());
 		assertEquals(126, maxed.getCombatLevel());
 		assertEquals(PlayerSnapshot.UnknownVars.PASS, maxed.getUnknownVars());
 

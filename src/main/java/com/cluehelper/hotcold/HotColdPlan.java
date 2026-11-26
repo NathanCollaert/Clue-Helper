@@ -1,7 +1,7 @@
 package com.cluehelper.hotcold;
 
 import com.cluehelper.step.HotColdTier;
-import java.util.*;
+import java.util.Map;
 import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -31,12 +31,4 @@ public class HotColdPlan
 	ProbePlanner.Choice choice;
 	/** Kept spot names to their share, largest first. */
 	Map<String, Double> kept;
-	/** Every probe the choice weighed, for replays. */
-	@Builder.Default
-	List<Probe> considered = List.of();
-
-	public boolean isDig()
-	{
-		return action == Action.DIG_HERE || action == Action.DIG_SPOT;
-	}
 }

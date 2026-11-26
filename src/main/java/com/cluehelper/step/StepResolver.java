@@ -93,7 +93,6 @@ public class StepResolver
 			.stages(stages)
 			.data(entry)
 			.otherTiles(otherTiles(entry, targets))
-			.emotes(CoreClueReader.emotes(clue))
 			.build();
 	}
 
@@ -171,7 +170,6 @@ public class StepResolver
 	 */
 	private StepIndex.Entry threeStepEntry(ThreeStepCrypticClue clue)
 	{
-		List<CacheRow> rows = new ArrayList<>();
 		List<StepIndex.Entry> unsolved = new ArrayList<>();
 		for (Map.Entry<CrypticClue, Boolean> part : List.copyOf(clue.getClueSteps()))
 		{
@@ -180,13 +178,12 @@ public class StepResolver
 			{
 				return null;
 			}
-			rows.addAll(partEntry.getRows());
 			if (!part.getValue())
 			{
 				unsolved.add(partEntry);
 			}
 		}
-		return StepIndex.Entry.ofParts(THREE_STEP_TIER, rows, unsolved);
+		return StepIndex.Entry.ofParts(THREE_STEP_TIER, unsolved);
 	}
 
 	/**
@@ -209,7 +206,6 @@ public class StepResolver
 			}
 		}
 		List<Stage> stages = unsolved.stream().map(entry -> Stages.part(entry, npcName, this::namesOf)).collect(toUnmodifiableList());
-		List<CacheRow> rows = entries.stream().flatMap(entry -> entry.getRows().stream()).collect(toList());
 		String text = String.join(" ", parts);
 		return Step.builder()
 			.key(CoreClueReader.byText(ClueTypes.THREE_STEP, text).getKey())
@@ -219,7 +215,7 @@ public class StepResolver
 			.kind(TargetKind.SEQUENCE)
 			.targets(Stages.tiles(stages))
 			.stages(stages)
-			.data(StepIndex.Entry.ofParts(THREE_STEP_TIER, rows, unsolved))
+			.data(StepIndex.Entry.ofParts(THREE_STEP_TIER, unsolved))
 			.build();
 	}
 
@@ -339,7 +335,7 @@ public class StepResolver
 		STASHUnit stash = clue instanceof EmoteClue ? ((EmoteClue) clue).getStashUnit() : null;
 		List<ItemRequirement> items = CoreClueReader.challengeCompleted(clue) ? List.of() : CoreClueReader.itemRequirements(clue);
 		ItemRequirement charliesItem = CoreClueReader.returnItem(clue);
-		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(), CoreClueReader.lightSourceVarbitId(clue),
+		return new StepRequirements(spade, clue.isRequiresLight(), clue.getFirePitVarbitId(),
 			items, charliesItem == null ? List.of() : List.of(charliesItem), stash == null ? StepRequirements.NO_STASH : stash.getObjectId());
 	}
 }

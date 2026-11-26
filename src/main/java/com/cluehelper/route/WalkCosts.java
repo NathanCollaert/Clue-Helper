@@ -19,15 +19,13 @@ public final class WalkCosts
 	private static final int BESIDE_TILES = 2;
 
 	final Ground ground;
-	@Getter
-	final WorldPoint start;
 	final WalkSearch search;
 
 	public static WalkCosts from(Ground ground, WorldPoint start)
 	{
 		WalkSearch search = new WalkSearch(ground, MAX_TILES, true);
 		search.run(WalkTable.pack(start), (tile, cost) -> UNREACHED);
-		return new WalkCosts(ground, start, search);
+		return new WalkCosts(ground, search);
 	}
 
 	/** The loaded scene the walk was searched over, its doors open; null when none was. */

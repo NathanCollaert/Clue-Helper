@@ -141,12 +141,6 @@ public final class SubSteps
 		return sub.getKind() == Kind.WALK || sub.getKind() == Kind.WALK_TO_CLUE;
 	}
 
-	/** Played in the music tab; done once it is the track playing. */
-	static SubStep playTrack(String track)
-	{
-		return SubStep.of(Kind.ACT, "Play " + track).track(track).done(SubStep.Done.TRACK_PLAYING).tab(Tab.MUSIC).build();
-	}
-
 	/** The walk to Cecilia asks for the track already: it can be picked while running there. */
 	private static List<SubStep> withTrackPlayedOnTheWay(List<SubStep> steps)
 	{

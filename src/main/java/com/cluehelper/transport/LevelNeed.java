@@ -15,7 +15,6 @@ public class LevelNeed
 	{
 		TOTAL("%d total level", PlayerSnapshot::getTotalLevel, null),
 		COMBAT("combat level %d", PlayerSnapshot::getCombatLevel, null),
-		QUEST_POINTS("%d quest points", PlayerSnapshot::getQuestPoints, null),
 		/** Held against 0: what is still missing counts down to it. */
 		MUSIC_TRACKS("every music track", player -> -player.getLockedMusicTracks(), "still locked"),
 		ALL_QUEST_POINTS("every quest point", player -> -player.getMissingQuestPoints(), "short");

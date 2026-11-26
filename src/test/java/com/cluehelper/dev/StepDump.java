@@ -2,15 +2,20 @@ package com.cluehelper.dev;
 
 import com.cluehelper.link.ClueLink;
 import com.cluehelper.link.StepChange;
+import com.cluehelper.step.CacheRow;
 import com.cluehelper.step.CoreClueReader;
 import com.cluehelper.step.RequirementsText;
 import com.cluehelper.step.Step;
 import com.cluehelper.step.StepIndex;
+import com.cluehelper.step.StepLoader;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
@@ -24,6 +29,7 @@ final class StepDump
 	static final String TAG = "[CH-STEP]";
 	private static final int SHOWN_TARGETS = 6;
 	private static final int SHOWN_TEXT = 140;
+	private static Map<String, List<CacheRow>> cacheRows;
 
 	private final ClueLink link;
 	private final Gson gson;
@@ -59,12 +65,29 @@ final class StepDump
 		return TAG + " fixture " + gson.toJson(event);
 	}
 
+	/** The step files' rows of a key, read once; a three-step's own key has none. */
+	private static synchronized List<CacheRow> cacheRows(String key)
+	{
+		if (cacheRows == null)
+		{
+			try
+			{
+				cacheRows = StepLoader.cacheRows();
+			}
+			catch (IOException e)
+			{
+				throw new UncheckedIOException("can't read the step files' cache rows", e);
+			}
+		}
+		return cacheRows.getOrDefault(key, List.of());
+	}
+
 	static List<String> lines(Step step)
 	{
 		List<String> lines = new ArrayList<>();
 		lines.add("Step " + step.getKey());
 		lines.add(step.getType() + ", " + step.getTier() + ", " + step.getKind()
-			+ (step.getData() != StepIndex.Entry.NONE ? ", rows " + step.getCacheRows() : ", no step data"));
+			+ (step.getData() != StepIndex.Entry.NONE ? ", rows " + cacheRows(step.getKey()) : ", no step data"));
 		lines.add("Targets (" + step.getTargets().size() + "): " + tiles(step.getTargets()));
 		if (!step.getNpcs().isEmpty())
 		{

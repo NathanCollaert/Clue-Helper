@@ -9,7 +9,6 @@ import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.route.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import java.util.stream.*;
 import javax.inject.*;
 import lombok.Getter;
@@ -62,7 +61,6 @@ public class HotColdService
 	AvailabilityService availability;
 	PlannerRunner runner;
 	MemorySlot<FeelLogs> logs;
-	final List<Consumer<Planned>> planListeners = new CopyOnWriteArrayList<>();
 	final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 
 	Runnable unregisterStep;
@@ -76,13 +74,9 @@ public class HotColdService
 	volatile Set<String> coreSpots = Set.of();
 	volatile boolean coreReset;
 
-	/** A plan with what it was planned from, for replays. */
-	@lombok.Value
-	public static class Planned
-	{
-		ProbeJob job;
-		HotColdPlan plan;
-	}
+	/** What {@link #plan} was planned from. */
+	@Getter
+	volatile ProbeJob planJob;
 
 	@Inject
 	void init(MemoryStore memory, BackgroundThread executor, ClientThread clientThread)
@@ -112,12 +106,6 @@ public class HotColdService
 	{
 		listeners.add(listener);
 		return () -> listeners.remove(listener);
-	}
-
-	public Runnable addPlanListener(Consumer<Planned> listener)
-	{
-		planListeners.add(listener);
-		return () -> planListeners.remove(listener);
 	}
 
 	public void onConfigChanged()
@@ -303,7 +291,7 @@ public class HotColdService
 		plan = planned;
 		probeTarget.set(target(planned));
 		routes.onTravelStepChanged();
-		planListeners.forEach(listener -> listener.accept(new Planned(job, planned)));
+		planJob = job;
 		listeners.forEach(Runnable::run);
 	}
 

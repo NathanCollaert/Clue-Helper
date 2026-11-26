@@ -19,6 +19,7 @@ import com.cluehelper.link.StepChange;
 import com.cluehelper.memory.BankMemory;
 import com.cluehelper.memory.GrownPatches;
 import com.cluehelper.memory.StashMemory;
+import com.cluehelper.player.FakeCarried;
 import com.cluehelper.player.PlayerModel;
 import com.cluehelper.poh.PohService;
 import com.cluehelper.player.Position;
@@ -124,6 +125,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final int FRAME_NAME_KEY_CHARS = 50;
 	private static final int AUTO_RUN_AFTER_TICKS = 5;
 	private static final int NO_KEY = -1;
+	/** The key a faked act counts as carried until the step changes; {@link #NO_KEY} for none. */
+	private int fakeKey = NO_KEY;
 	private String lastLineTrace = "";
 
 	@Inject
@@ -210,7 +213,7 @@ public class ClueHelperDevPlugin extends Plugin
 		SCENES.mkdirs();
 		unregister.add(service(ClueLink.class).addListener(this::saveStepFrame));
 		unregister.add(service(ClueLink.class).addListener((change, step) -> forgetFakeKey(change)));
-		unregister.add(() -> clientThread.invokeLater(() -> service(PlayerModel.class).fakeCarried(Map.of())));
+		unregister.add(() -> clientThread.invokeLater(() -> forgetFakeKey()));
 		unregister.add(service(RoutePlanner.class).addListener(this::onPlanned));
 		unregister.add(service(StepGuide.class).addListener(this::saveGuideFrames));
 		BankTrace bankTrace = new BankTrace(client, service(BankMemory.class), service(StepGuide.class),
@@ -591,7 +594,7 @@ public class ClueHelperDevPlugin extends Plugin
 		}
 		else if (key != NO_KEY)
 		{
-			service(PlayerModel.class).fakeCarried(Map.of(key, 1));
+			fakeKey = key;
 			log.info("{} act done faked: key {} carried until the step changes", TAG, key);
 			return;
 		}
@@ -663,6 +666,10 @@ public class ClueHelperDevPlugin extends Plugin
 	public void onGameTick(GameTick tick)
 	{
 		checkLanding();
+		if (fakeKey != NO_KEY)
+		{
+			FakeCarried.onto(service(PlayerModel.class), Map.of(fakeKey, 1));
+		}
 		harness.onGameTick();
 		savePlayerFrame(service(AvailabilityService.class).getCarried());
 		traceLine();
@@ -791,7 +798,16 @@ public class ClueHelperDevPlugin extends Plugin
 	{
 		if (change == StepChange.NEW || change == StepChange.CLEARED)
 		{
-			service(PlayerModel.class).fakeCarried(Map.of());
+			forgetFakeKey();
+		}
+	}
+
+	private void forgetFakeKey()
+	{
+		if (fakeKey != NO_KEY)
+		{
+			fakeKey = NO_KEY;
+			FakeCarried.forget(service(PlayerModel.class));
 		}
 	}
 

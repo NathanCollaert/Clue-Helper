@@ -359,7 +359,7 @@ public class EdgeCaseRoutesTest
 				.house(full.toBuilder().nexusKeys(Set.of()).furniture(Set.of(ObjectID.POH_ALTAR_OCCULT)).build()).build(),
 				fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		HouseState varbitsOnly = full.toBuilder().furniture(Set.of(ObjectID.POH_AMULET_XERIC_INFERNO, ObjectID.POH_AMULET_DIG_FOSSIL,
-			ObjectID.POH_JEWELLERY_BOX_3)).source(HouseState.Source.VARBITS).scannedAt(0).build();
+			ObjectID.POH_JEWELLERY_BOX_3)).source(HouseState.Source.VARBITS).build();
 		lines.add(line("house: Fountain of Rune 12101 on Arceuus, known from varbits only (no visit yet: no obelisk)",
 			checked(input(arceuus.toBuilder().house(varbitsOnly).build(), fountain, PlanStart.teleportOnly(ANYWHERE), plain).build())));
 		PlanStart inside = PlanStart.atNode(table, table.node(PositionRules.POH_NODE));
@@ -570,7 +570,7 @@ public class EdgeCaseRoutesTest
 		{
 			fewer.add(input.toBuilder().settings(input.getSettings().toBuilder().spellbookChanges(SpellbookChanges.OFF).build()).build());
 		}
-		if (input.getSettings().isBankEdge() && input.getBanked() != null && input.getRequired().isEmpty())
+		if (input.getSettings().isBankEdge() && input.getBanked() != null && input.getRequired().getNeeds().isEmpty())
 		{
 			fewer.add(input.toBuilder().settings(input.getSettings().toBuilder().bankEdge(false).build()).build());
 		}
@@ -665,7 +665,7 @@ public class EdgeCaseRoutesTest
 		Map<Integer, Integer> varbits = new HashMap<>(player.getVarbits());
 		varbits.put(4070, book.ordinal());
 		return player.toBuilder().varbits(varbits).spellbook(new SpellbookState(book, pending, s.getCapeChangesLeft(),
-			s.isArceuusUnlocked(), s.isAncientAccess(), s.isLunarAccess(), s.isSwapAccess())).build();
+			s.isArceuusUnlocked(), s.isAncientAccess(), s.isLunarAccess())).build();
 	}
 
 	private static PlayerSnapshot without(PlayerSnapshot player, int itemId)
@@ -681,7 +681,7 @@ public class EdgeCaseRoutesTest
 		Map<Integer, Integer> varbits = new HashMap<>(player.getVarbits());
 		varbits.put(4816, SpellbookState.CAPE_CHANGES_PER_DAY - left);
 		return player.toBuilder().varbits(varbits).spellbook(new SpellbookState(s.getBook(), s.isPendingRevert(), left,
-			s.isArceuusUnlocked(), s.isAncientAccess(), s.isLunarAccess(), s.isSwapAccess())).build();
+			s.isArceuusUnlocked(), s.isAncientAccess(), s.isLunarAccess())).build();
 	}
 
 	private static PlayerSnapshot withoutSwapRunes(PlayerSnapshot player)

@@ -2,8 +2,12 @@ package com.cluehelper.guide;
 
 import com.cluehelper.Tables;
 import com.cluehelper.step.*;
+import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
+import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import java.util.*;
+import java.util.stream.Stream;
 import net.runelite.api.coords.WorldPoint;
 import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.SubStep.Kind;
@@ -21,6 +25,8 @@ public final class ActParts
 	/** By ids: core doesn't mark Uri, and a target by name is left to core while the clue's tile is in view. */
 	private static final Set<Integer> URI_IDS = Tables.idSet("uri");
 	private static final Set<String> TYPES_WITH_OWN_ACT = Set.of(ClueTypes.EMOTE, ClueTypes.MUSIC, ClueTypes.HOT_COLD, ClueTypes.SKILL);
+	/** Core's emotes of each emote step in order, by key: the plugin has them only in these baked acts. */
+	private static final Map<String, List<String>> EMOTES = emotesByKey();
 
 	private ActParts()
 	{
@@ -236,12 +242,33 @@ public final class ActParts
 		{
 			acts.add(LegSteps.walkToClue(spot, SubSteps.ARRIVE_TILES, step.getData()));
 		}
-		String emotes = step.getEmotes().isEmpty() ? "the emote" : String.join(", then ", step.getEmotes());
+		List<String> stepEmotes = EMOTES.getOrDefault(step.getKey(), List.of());
+		String emotes = stepEmotes.isEmpty() ? "the emote" : String.join(", then ", stepEmotes);
 		acts.add(SubStep.of(Kind.ACT, "Perform " + emotes)
 			.done(SubStep.Done.URI_HERE).fights(fightsFor(step)).again("Perform " + emotes + " again").tab(StepGuide.Tab.EMOTES).build());
 		acts.add(SubStep.of(Kind.ACT, "Talk to Uri")
 			.option(TALK_OPTION).npcIds(URI_IDS).build());
 		return List.copyOf(acts);
+	}
+
+	private static Map<String, List<String>> emotesByKey()
+	{
+		try
+		{
+			ClueScrollPlugin plugin = CoreClues.plugin();
+			return CoreClues.steps().values().stream().filter(EmoteClue.class::isInstance).map(EmoteClue.class::cast)
+				.collect(toUnmodifiableMap(clue -> CoreClueReader.facts(clue, plugin).getKey(), ActParts::emotesOf));
+		}
+		catch (ReflectiveOperationException e)
+		{
+			throw new IllegalStateException("can't read core's emote clues", e);
+		}
+	}
+
+	private static List<String> emotesOf(EmoteClue clue)
+	{
+		return Stream.of(clue.getFirstEmote(), clue.getSecondEmote()).filter(Objects::nonNull).map(Emote::getName)
+			.collect(toUnmodifiableList());
 	}
 
 	/** Take the items out of the STASH unit and put them on. */
@@ -269,7 +296,13 @@ public final class ActParts
 	{
 		StepIndex.Music music = step.getData().getMusic();
 		String track = music != null && music.getTrack() != null ? music.getTrack() : step.getText();
-		return List.of(SubSteps.playTrack(track), talkTo(act("Talk to Cecilia", null).toBuilder(), "Cecilia").build());
+		return List.of(playTrack(track), talkTo(act("Talk to Cecilia", null).toBuilder(), "Cecilia").build());
+	}
+
+	/** Played in the music tab; done once it is the track playing. */
+	private static SubStep playTrack(String track)
+	{
+		return SubStep.of(Kind.ACT, "Play " + track).track(track).done(SubStep.Done.TRACK_PLAYING).tab(StepGuide.Tab.MUSIC).build();
 	}
 
 	private static SubStep.SubStepBuilder useOnFalo(List<String> handInItems)

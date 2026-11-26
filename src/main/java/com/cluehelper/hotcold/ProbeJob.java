@@ -63,8 +63,7 @@ public class ProbeJob
 		{
 			grid = Hypotheses.filter(spots, tier, List.of(last.asAnchor()));
 		}
-		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares())
-			.considered(List.copyOf(nearby));
+		HotColdPlan.HotColdPlanBuilder plan = HotColdPlan.builder().stepKey(stepKey).tier(tier).kept(grid.spotShares());
 		if (shook && core.isFelt())
 		{
 			return plan.action(HotColdPlan.Action.DIG_HERE).tile(new WorldPoint(last.getX(), last.getY(), last.getPlane())).build();
@@ -75,7 +74,6 @@ public class ProbeJob
 			return plan.action(HotColdPlan.Action.DIG_SPOT).tile(grid.digTile(kept.get(0).getName())).build();
 		}
 		List<Probe> probes = ProbePlanner.worthTrying(grid, tier, last, nearby, landingsWithin, costs);
-		plan.considered(List.copyOf(probes));
 		ProbePlanner.Choice choice = ProbePlanner.choose(grid, tier, last, probes, costs);
 		if (choice == null)
 		{
@@ -84,7 +82,7 @@ public class ProbeJob
 		return plan.action(HotColdPlan.Action.FEEL).tile(choice.getProbe().getTile()).choice(choice).build();
 	}
 
-	private List<Probe> nearby()
+	List<Probe> nearby()
 	{
 		List<Probe> probes = new ArrayList<>();
 		if (here != null && !(stopWildernessClues && wilderness(here)))
@@ -107,7 +105,7 @@ public class ProbeJob
 	}
 
 	/** The PROBES search: landing probes whose ranking ticks are at most the limit. */
-	private List<Probe> landingsWithin(int rankTicksLimit)
+	List<Probe> landingsWithin(int rankTicksLimit)
 	{
 		if (landingSearch == null)
 		{

@@ -329,8 +329,7 @@ public class PohService
 		int xeric = vars.getOrDefault(VarbitID.POH_NEXUS_XERIC, 0);
 		int digsite = vars.getOrDefault(VarbitID.POH_NEXUS_DIGSITE, 0);
 		int box = vars.getOrDefault(VarbitID.POH_JEWELLERYBOX_MULTI, 0);
-		HouseState.HouseStateBuilder state = HouseState.builder().xericLeftClick(xeric).digsiteLeftClick(digsite).boxLeftClick(box)
-			.walkTicks(Map.copyOf(profile.walkTicks)).scannedAt(profile.scannedAt);
+		HouseState.HouseStateBuilder state = HouseState.builder().walkTicks(Map.copyOf(profile.walkTicks));
 		Set<Integer> furniture;
 		if (profile.scannedAt > 0)
 		{

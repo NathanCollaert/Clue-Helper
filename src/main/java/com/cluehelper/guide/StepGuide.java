@@ -1,6 +1,5 @@
 package com.cluehelper.guide;
 
-import com.cluehelper.link.ClueLink;
 import com.cluehelper.memory.*;
 import com.cluehelper.player.*;
 import com.cluehelper.route.*;
@@ -12,7 +11,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.*;
 import javax.inject.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.*;
@@ -27,7 +25,6 @@ import com.cluehelper.guide.SubStep.Kind;
  * Client thread only. While a teleport or book change is under way, a new route waits: the cast spends runes or starts
  * a cooldown, which re-plans from the old tile before the landing.
  */
-@Slf4j
 @Singleton
 public class StepGuide
 {
@@ -103,8 +100,6 @@ public class StepGuide
 	SceneObjects sceneObjects;
 	@Inject
 	AbyssObstacles abyssObstacles;
-	@Inject
-	ClueLink clueLink;
 	final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 	private static final String TALK_TO = "Talk to ";
 	@Inject
@@ -434,7 +429,7 @@ public class StepGuide
 		MenuEntry[] entries = client.getMenu().getMenuEntries();
 		if (entries.length > 0 && leftClicks.learn(entries[entries.length - 1]))
 		{
-			highlights = stepHighlights.withItemFill(highlights, getCurrent(), routeStep);
+			highlights = stepHighlights.withItemFill(highlights, getCurrent());
 			scene = withFills(scene);
 		}
 	}
@@ -1071,7 +1066,6 @@ public class StepGuide
 		String refused = teleportRefusal.refused(client.getTickCount(), currentRow, player.getPosition().getTile(), standingStill);
 		if (refused != null)
 		{
-			log.debug("teleport refused: {}", refused);
 			routes.onRowRefused(refused);
 			if (current != null && current.getRow() != null)
 			{

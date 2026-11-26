@@ -21,21 +21,18 @@ public final class StepRequirements
 	final boolean light;
 	/** The varbit that says the step's fire pit is lit, so no light is needed; -1 for none. */
 	final int firePitVarbitId;
-	/** Core's light-source varbit of a coordinate clue; -1 for none. */
-	final int lightSourceVarbitId;
 	final List<ItemRequirement> items;
 	/** Items the step's route needs that core's *clue* bank tag doesn't list: Charlie's item. */
 	final List<ItemRequirement> ownItems;
 	/** The emote step's STASH unit object, or {@link #NO_STASH}. */
 	final int stashObjectId;
 
-	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, int lightSourceVarbitId, List<ItemRequirement> items,
+	StepRequirements(SpadeNeed spade, boolean light, int firePitVarbitId, List<ItemRequirement> items,
 		List<ItemRequirement> ownItems, int stashObjectId)
 	{
 		this.spade = spade;
 		this.light = light;
 		this.firePitVarbitId = firePitVarbitId;
-		this.lightSourceVarbitId = lightSourceVarbitId;
 		this.items = List.copyOf(items);
 		this.ownItems = List.copyOf(ownItems);
 		this.stashObjectId = stashObjectId;
@@ -43,14 +40,14 @@ public final class StepRequirements
 
 	public static StepRequirements none()
 	{
-		return new StepRequirements(SpadeNeed.NONE, false, -1, -1, List.of(), List.of(), NO_STASH);
+		return new StepRequirements(SpadeNeed.NONE, false, -1, List.of(), List.of(), NO_STASH);
 	}
 
 	public StepRequirements plus(ItemRequirement item)
 	{
 		List<ItemRequirement> more = new ArrayList<>(items);
 		more.add(item);
-		return new StepRequirements(spade, light, firePitVarbitId, lightSourceVarbitId, more, ownItems, stashObjectId);
+		return new StepRequirements(spade, light, firePitVarbitId, more, ownItems, stashObjectId);
 	}
 
 	public boolean hasStash()

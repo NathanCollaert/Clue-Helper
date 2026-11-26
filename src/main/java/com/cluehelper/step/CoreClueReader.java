@@ -2,11 +2,9 @@ package com.cluehelper.step;
 
 import java.util.*;
 import java.util.function.IntFunction;
-import java.util.stream.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.*;
-import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import static java.util.stream.Collectors.*;
 
@@ -229,17 +227,6 @@ public final class CoreClueReader
 			.collect(toList());
 	}
 
-	static List<String> emotes(ClueScroll clue)
-	{
-		if (!(clue instanceof EmoteClue))
-		{
-			return List.of();
-		}
-		EmoteClue emote = (EmoteClue) clue;
-		return Stream.of(emote.getFirstEmote(), emote.getSecondEmote()).filter(Objects::nonNull).map(Emote::getName)
-			.collect(toUnmodifiableList());
-	}
-
 	static boolean challengeCompleted(ClueScroll clue)
 	{
 		return clue instanceof SkillChallengeClue && ((SkillChallengeClue) clue).isChallengeCompleted();
@@ -249,11 +236,6 @@ public final class CoreClueReader
 	static ItemRequirement returnItem(ClueScroll clue)
 	{
 		return clue instanceof SkillChallengeClue ? ((SkillChallengeClue) clue).getReturnItem() : null;
-	}
-
-	static int lightSourceVarbitId(ClueScroll clue)
-	{
-		return clue instanceof CoordinateClue ? ((CoordinateClue) clue).getLightSourceVarbitId() : -1;
 	}
 
 	private static <T> List<T> distinct(List<T> values)

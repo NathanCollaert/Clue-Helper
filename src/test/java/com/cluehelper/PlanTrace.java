@@ -62,13 +62,11 @@ final class PlanTrace
 		}
 		String name = String.format("%03d-%s%s", ++recorded, leftShortWalk ? "left-walk-" : "", slug(input.getStep().getKey()));
 		WalkCosts walk = input.getStart().getWalk();
-		String sceneFile = null;
 		if (walk != null && walk.getScene() != null)
 		{
-			sceneFile = name + ".scene.gz";
-			SceneFiles.write(new File(PLANS, sceneFile), walk.getScene(), input.getStart().getTile());
+			SceneFiles.write(new File(PLANS, name + PlanReplay.SCENE_SUFFIX), walk.getScene(), input.getStart().getTile());
 		}
-		PlanRecording recording = PlanRecording.of(plan, input, sceneFile);
+		PlanRecording recording = PlanRecording.of(plan, input);
 		try (Writer out = new FileWriter(new File(PLANS, name + ".json"), StandardCharsets.UTF_8))
 		{
 			out.write(gson.toJson(recording));

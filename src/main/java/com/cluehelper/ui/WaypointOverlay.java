@@ -1,7 +1,6 @@
 package com.cluehelper.ui;
 
-import com.cluehelper.ClueHelperConfig;
-import com.cluehelper.Tables;
+import com.cluehelper.*;
 import com.cluehelper.guide.*;
 import com.cluehelper.hotcold.ProbeTarget;
 import com.cluehelper.link.ClueLink;

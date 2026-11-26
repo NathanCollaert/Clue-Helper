@@ -73,11 +73,6 @@ public class RequiredItems
 		}
 	}
 
-	public boolean isEmpty()
-	{
-		return needs.isEmpty();
-	}
-
 	Verdict judge(PlayerSnapshot player, PlayerSnapshot banked)
 	{
 		List<Need> open = needs.stream().filter(need -> !(need.stepItem && stash == StashMemory.State.FILLED)).collect(toList());

@@ -6,7 +6,6 @@ import com.cluehelper.route.PlanRecording;
 import com.cluehelper.route.Planner;
 import com.cluehelper.route.Route;
 import com.google.gson.Gson;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +22,7 @@ public class RecordedRoutesTest
 	public void aTieWithTwoTeleportsWalks() throws IOException
 	{
 		PlanRecording recording = recording("/com/cluehelper/route/hotcold-from-the-agility-arena-pen.json");
-		Route best = Planner.plan(new PlanReplay().input(recording, new File("."))).getBest();
+		Route best = Planner.plan(new PlanReplay().input(recording, null)).getBest();
 		assertEquals("walk 28", best.describe());
 	}
 

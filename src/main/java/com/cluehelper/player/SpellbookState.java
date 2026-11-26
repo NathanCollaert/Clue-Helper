@@ -17,7 +17,6 @@ public class SpellbookState
 	boolean arceuusUnlocked;
 	boolean ancientAccess;
 	boolean lunarAccess;
-	boolean swapAccess;
 
 	public Set<Book> usableBooks()
 	{
