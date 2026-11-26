@@ -15,15 +15,15 @@ pending revert to Lunar on Standard, 150 ticks left: Standard teleport at +0
 pending revert, window unknown: plans from Lunar
   best      37t (rank 40): Spellbook Swap · Varrock Teleport → walk 28 {item:556=3, item:554=1, item:563=2, item:9075=3, item:564=2}
 pending revert on Standard, Ancient target: the cape from a pending revert
-  best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 99 Magic, no cape uses left today, Ancient target
-  best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 flat fee, Max cape and house runes carried: the cape's free Tele to POH, not the spell
-  best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 Lunar, swap runes only in the bank (bank on)
   best      40t (rank 41): Ring of wealth: Grand Exchange → walk 35 {charge:11980=1}
 Lunar, swap runes only in the bank, Senntisten: bank + Spellbook Swap vs the next best
-  best      45t: Construction cape: Tele to POH → Portal nexus: Senntisten → walk 30
+  best      39t (rank 45): Master scroll book: Digsite teleport → walk 34 {charge:21389=1}
 Wilderness start at level 26 (3100,3720), to Varrock
   best      37t (rank 40): Slayer ring: Stronghold → Varrock Teleport → walk 28 {charge:11866=1, item:556=3, item:554=1, item:563=1}
 Wilderness start at level 36 (3100,3800), to Varrock

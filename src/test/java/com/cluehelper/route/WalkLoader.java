@@ -22,7 +22,7 @@ public final class WalkLoader
 		RequirementParser.VARBITS, RequirementParser.VARPS, RequirementParser.ITEMS);
 	private static final int FIRST_GATE_COLUMN = 1;
 	private static final List<String> BANK_COLUMNS = List.of(RequirementParser.MEMBERS, RequirementParser.SKILLS,
-		RequirementParser.QUESTS, RequirementParser.VARBITS, RequirementParser.VARPS);
+		RequirementParser.QUESTS, RequirementParser.VARBITS, RequirementParser.VARPS, RequirementParser.ITEMS);
 	private static final int FIRST_BANK_COLUMN = 2;
 	/** The option of the webs' rows: their gate is the one {@link SceneDoors} opens webs by. */
 	private static final String SLASH = "Slash";
@@ -80,20 +80,23 @@ public final class WalkLoader
 		List<Requirements> gates = requirements(rows("gates.tsv"), FIRST_GATE_COLUMN, GATE_COLUMNS);
 		Map<Long, Exit> exits = exits(rows("exits.tsv"));
 		Map<Long, List<Exit>> rowObjects = rowObjects(rows("row-objects.tsv"));
+		Map<Integer, List<Bank>> banks = banks(rows("banks.tsv"));
+		List<Requirements> watchedRequirements = new ArrayList<>(gates);
+		banks.values().forEach(atNode -> atNode.forEach(bank -> watchedRequirements.add(bank.getRequirements())));
 
 		Map<String, Object> json = new LinkedHashMap<>();
 		json.put("tiles", tiles);
 		json.put("placed", placed);
 		json.put("gateSets", gateSets);
 		json.put("gates", gates);
-		json.put("banks", banks(rows("banks.tsv")));
+		json.put("banks", banks);
 		json.put("rowsByOrigin", rowsByOrigin());
 		json.put("rowIsExit", rowIsExit(exits));
 		json.put("exits", exits);
 		json.put("rowObjects", rowObjects);
 		json.put("rowObjectsAt", rowObjectsAt(rowObjects));
 		json.put("slashGate", slashGate(rowObjects));
-		Map<VarCheck.Kind, Set<Integer>> watched = watchedVars(gates);
+		Map<VarCheck.Kind, Set<Integer>> watched = watchedVars(watchedRequirements);
 		json.put("watchedVarbits", watched.get(VarCheck.Kind.VARBIT));
 		json.put("watchedVarps", watched.get(VarCheck.Kind.VARP));
 		return new Baked(json, columns(entryStart, entryTo, entryFull, entryGateSet, entryOpen, entryAlternative,
@@ -319,14 +322,14 @@ public final class WalkLoader
 	}
 
 	/** Every var a gate reads, directly or as an item clause's var branch, by kind. */
-	private static Map<VarCheck.Kind, Set<Integer>> watchedVars(List<Requirements> gates)
+	private static Map<VarCheck.Kind, Set<Integer>> watchedVars(List<Requirements> requirements)
 	{
 		Map<VarCheck.Kind, Set<Integer>> watched = new EnumMap<>(VarCheck.Kind.class);
 		for (VarCheck.Kind kind : VarCheck.Kind.values())
 		{
 			watched.put(kind, new TreeSet<>());
 		}
-		for (Requirements gate : gates)
+		for (Requirements gate : requirements)
 		{
 			List<VarCheck> checks = new ArrayList<>(gate.getVars());
 			gate.getItems().forEach(clause -> clause.getBranches().stream().filter(ItemClause.Branch::isVar)

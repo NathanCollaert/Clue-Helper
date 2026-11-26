@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 497a5f5 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 9c83c97 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 spell	Varrock Teleport		3213 3424 0			AIR_RUNE=3&FIRE_RUNE=1&LAW_RUNE=1	25 Magic				20	4	0	F	runes	Standard	N				
 spell	Varrock Teleport: Grand Exchange		3165 3479 0			AIR_RUNE=3&FIRE_RUNE=1&LAW_RUNE=1	25 Magic		4480=1		20	4	1	F	runes	Standard	N				varbit:4480=VARROCK_DIARY_MEDIUM_COMPLETE
@@ -54,7 +54,7 @@ spell	Draynor Manor Teleport		3109 3351 0			EARTH_RUNE=1&WATER_RUNE=1&LAW_RUNE=1
 spell	Battlefront Teleport		1347 3740 0			EARTH_RUNE=1&FIRE_RUNE=1&LAW_RUNE=1	23 Magic				20	4	0	F	runes	Arceuus	Y				
 spell	Mind Altar Teleport		2979 3510 0			LAW_RUNE=1&MIND_RUNE=2	28 Magic				20	4	0	F	runes	Arceuus	Y				
 spell	Respawn Teleport		3221 3218 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		668=0;3910=0;621=0;10528=0;12310=0;9805=0		20	4	0	F	runes	Arceuus	Y				varbit:668=FALADOR_SPAWN varbit:3910=CAMELOT_SPAWN varbit:621=EDGEVILLE_SPAWN varbit:10528=WILDERNESS_SPAWN varbit:12310=KOUREND_SPAWN varbit:9805=CIVITAS_SPAWN
-spell	Respawn Teleport		2964 3378 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		668=1		20	4	0	F	runes	Arceuus	Y				varbit:668=FALADOR_SPAWN
+spell	Respawn Teleport		2971 3338 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		668=1		20	4	0	F	runes	Arceuus	Y				varbit:668=FALADOR_SPAWN
 spell	Respawn Teleport		2757 3479 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		3910=1		20	4	0	F	runes	Arceuus	Y				varbit:3910=CAMELOT_SPAWN
 spell	Respawn Teleport		3095 3469 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		621=1		20	4	0	F	runes	Arceuus	Y				varbit:621=EDGEVILLE_SPAWN
 spell	Respawn Teleport		3151 3636 0			LAW_RUNE=1&SOUL_RUNE=1	34 Magic		10528=1		20	4	0	F	runes	Arceuus	Y				varbit:10528=WILDERNESS_SPAWN

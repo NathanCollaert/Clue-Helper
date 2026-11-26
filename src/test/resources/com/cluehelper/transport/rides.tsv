@@ -1,4 +1,4 @@
-# Seeded by tools/catalog/seed.py from Shortest Path 497a5f5 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
+# Seeded by tools/catalog/seed.py from Shortest Path 9c83c97 (BSD-2, see NOTICE). Don't edit: fix in tools/catalog/fixes.tsv.
 Category	Display info	Origin	Destination	Code	menuOption menuTarget objectID	Items	Skills	Quests	Varbits	VarPlayers	Wilderness level	Duration	Menu ticks	Consumable	Spends	Book	Members	House	Menu	Planted	Gameval
 boat	Boat: Fishing Platform	2720 3301 0	2782 3273 0		Travel Holgart 7789			Sea Slug	2614=0		-1	9	1	F	none	any	Y		npc Travel		varbit:2614=SLUG2_NPC_TRACK1 npc:7789=HOLGARTLANDTRAVEL
 boat	Boat: Witchaven	2782 3273 0	2720 3301 0		Travel Holgart 5070			Sea Slug	2614=0		-1	9	1	F	none	any	Y		npc Travel		varbit:2614=SLUG2_NPC_TRACK1 npc:5070=HOLGARTPLATFORM
