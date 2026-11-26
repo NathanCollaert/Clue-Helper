@@ -11,6 +11,7 @@ import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
+import java.util.stream.IntStream;
 import javax.inject.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -431,7 +432,7 @@ public class RoutePlanner
 		int nearestHere = nearest(table, walk);
 		int targetWalk = targets.stream().mapToInt(walk::cost).min().orElse(WalkCosts.UNREACHED);
 		boolean targetNear = targetWalk != WalkCosts.UNREACHED;
-		if (isInPocket(nearestHere, targetNear, tile))
+		if (isInPocket(table, nearestHere, targetNear, tile))
 		{
 			retryNextTick();
 			return;
@@ -470,11 +471,26 @@ public class RoutePlanner
 		return walk.reachedTiles() <= 1;
 	}
 
-	/** Mid-obstacle in a pocket with no node, a few tiles from a start that had nodes. */
-	private boolean isInPocket(int nearestHere, boolean targetInScene, WorldPoint tile)
+	/**
+	 * Mid-obstacle in a pocket with no node, a few tiles from a start that had nodes, or anywhere along a crossing that
+	 * starts beside it: a rope pulls the player across the water tile by tile.
+	 */
+	private boolean isInPocket(WalkTable table, int nearestHere, boolean targetInScene, WorldPoint tile)
 	{
-		return nearestHere == WalkTable.NO_NODE && !targetInScene && start != null && start.getKind() == PlanStart.Kind.SCENE
-			&& start.getTile() != null && start.getTile().distanceTo2D(tile) <= POCKET_TILES;
+		if (nearestHere != WalkTable.NO_NODE || targetInScene || start == null || start.getKind() != PlanStart.Kind.SCENE
+			|| start.getTile() == null)
+		{
+			return false;
+		}
+		WorldPoint from = start.getTile();
+		return from.distanceTo2D(tile) <= POCKET_TILES || IntStream.range(0, table.rowCount())
+			.anyMatch(row -> isAlongCrossing(table.rowOrigin(row), table.rowDest(row), from, tile));
+	}
+
+	private static boolean isAlongCrossing(WorldPoint origin, WorldPoint dest, WorldPoint from, WorldPoint tile)
+	{
+		return origin.getPlane() == tile.getPlane() && dest.getPlane() == tile.getPlane() && origin.distanceTo2D(from) <= POCKET_TILES
+			&& origin.distanceTo2D(tile) + tile.distanceTo2D(dest) <= origin.distanceTo2D(dest) + 1;
 	}
 
 	/** The last start stands until the next tick looks again. */
