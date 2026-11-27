@@ -48,6 +48,18 @@ final class ModelSilhouette
 		{
 			addFaces(shape, object, ((GroundObject) object).getRenderable(), 0, 0, NO_ROTATION);
 		}
+		else if (object instanceof ItemLayer)
+		{
+			// A pile's bottom, middle and top items, each raised by the layer's height, as core's outline draws them
+			ItemLayer items = (ItemLayer) object;
+			for (Renderable item : new Renderable[]{items.getBottom(), items.getMiddle(), items.getTop()})
+			{
+				if (item != null)
+				{
+					addFaces(shape, items.getWorldView(), item, items.getX(), items.getY(), items.getZ() - items.getHeight(), NO_ROTATION);
+				}
+			}
+		}
 		return shape;
 	}
 

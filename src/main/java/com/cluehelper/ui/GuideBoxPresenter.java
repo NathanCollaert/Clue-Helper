@@ -50,6 +50,11 @@ public class GuideBoxPresenter
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
 		List<String> notes = new ArrayList<>(atStep.getNotes());
 		notes.addAll(threeStepSwap.notes());
+		String prayerWarning = guide.getPrayerWarning();
+		if (prayerWarning != null)
+		{
+			notes.add(prayerWarning);
+		}
 		GuideBox.GuideBoxBuilder shown = atStep.toBuilder().headline(threeStepSwap.headline()).notes(List.copyOf(notes));
 		if (repeatsCoreSolution(atStep.getNowDetail()))
 		{

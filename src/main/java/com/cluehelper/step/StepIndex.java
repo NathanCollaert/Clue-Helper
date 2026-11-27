@@ -118,7 +118,7 @@ public final class StepIndex
 		List<SubStep> beforeActs = List.of();
 		/** Baked: the monsters that attack at the step (a double agent, a hot/cold spot's mage). */
 		Set<Integer> enemies = Set.of();
-		/** Baked: the items a planting task plants with, the seed first, then the dibber. */
+		/** Baked: the seeds a planting task plants, outlined at the task. */
 		List<Integer> plantItems = List.of();
 
 		/** A step of the plugin's own, done by these acts alone (a master clue dropped where another is picked up). */
@@ -469,8 +469,8 @@ public final class StepIndex
 		String then;
 		/** Where the game counts them when they don't go to the inventory (under water); -1 for none. */
 		int varbit = -1;
-		/** Where they lie: the game shows ground items only near the player, so these lead the way until they show. */
-		List<WorldPoint> spawnTiles = List.of();
+		/** Where they lie, edged on the ground: the line leads into it, and each one in sight is outlined. */
+		Box area;
 	}
 
 	@Getter

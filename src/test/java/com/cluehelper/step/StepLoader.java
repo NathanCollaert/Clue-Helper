@@ -130,15 +130,15 @@ public final class StepLoader
 		json.add("enemies", GSON.toJsonTree(source.getCombat().stream().flatMap(combat -> combat.getNpcs().stream()).collect(toSet())));
 	}
 
-	/** A planting task's items but the rake, which only clears the patch: the seed first, then the tools it goes in with. */
+	/** A planting task's seeds: its items but the tools (rake, spade, dibber), which are never outlined. */
 	private static List<Integer> plantItems(StepIndex.Entry entry, ClueScroll clue)
 	{
 		if (!entry.isPlants())
 		{
 			return List.of();
 		}
-		return CoreClueReader.itemRequirements(clue).stream().map(StepLoader::itemId).filter(id -> id != ItemID.RAKE)
-			.sorted(Comparator.comparing((Integer id) -> PATCH_TOOLS.contains(id)).thenComparing(Comparator.naturalOrder())).collect(toList());
+		return CoreClueReader.itemRequirements(clue).stream().map(StepLoader::itemId).filter(id -> !PATCH_TOOLS.contains(id)).sorted()
+			.collect(toList());
 	}
 
 	private static int itemId(ItemRequirement requirement)
@@ -374,12 +374,6 @@ public final class StepLoader
 				}
 			}
 			object.add("locs", locs);
-		}
-		JsonObject entryWay = entry.getAsJsonObject("entry");
-		JsonObject pickUp = entryWay == null ? null : entryWay.getAsJsonObject("pickUp");
-		if (pickUp != null && pickUp.has("spawns"))
-		{
-			pickUp.add("spawnTiles", pickUp.get("spawns"));
 		}
 		return entry;
 	}

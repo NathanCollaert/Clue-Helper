@@ -13,7 +13,7 @@ import com.cluehelper.route.Route;
 import com.cluehelper.route.RoutePlanner;
 import com.cluehelper.step.Step;
 import com.cluehelper.ui.GuideOverlay;
-import com.cluehelper.ui.WaypointOverlay;
+import com.cluehelper.ui.SceneOverlay;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +86,7 @@ final class TimelineRecorder
 	private final StepGuide guide;
 	private final ClueLink clueLink;
 	private final RoutePlanner planner;
-	private final WaypointOverlay waypoints;
+	private final SceneOverlay waypoints;
 	private final Gson gson;
 	private final Field guideBox;
 	private final GuideOverlay guideOverlay;
@@ -115,7 +115,7 @@ final class TimelineRecorder
 	private final File file;
 	private Writer out;
 
-	TimelineRecorder(Client client, StepGuide guide, ClueLink clueLink, RoutePlanner planner, WaypointOverlay waypoints,
+	TimelineRecorder(Client client, StepGuide guide, ClueLink clueLink, RoutePlanner planner, SceneOverlay waypoints,
 		GuideOverlay guideOverlay, ConfigManager configManager, Gson gson)
 	{
 		this.configManager = configManager;

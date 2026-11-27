@@ -157,6 +157,9 @@ public class StepGuide
 	/** Ground items to pick up now, by tile. */
 	@Getter
 	List<WorldPoint> pickUpTiles = List.of();
+	/** Where the way in's ground items lie, while they are still to pick up; null otherwise. */
+	@Getter
+	StepIndex.Box pickUpArea;
 	@Getter
 	Highlights highlights = Highlights.NONE;
 	SceneHighlights scene = SceneHighlights.NONE;
@@ -209,8 +212,7 @@ public class StepGuide
 		{
 			at++;
 		}
-		SubStep next = listedAt(at);
-		return next == null ? null : taskActs.phased(next, routeStep);
+		return listedAt(at);
 	}
 
 	/**
@@ -241,17 +243,32 @@ public class StepGuide
 	}
 
 	/**
-	 * The carried item used on the outlined objects: a way in's (a rope on the crevice), or what a planting task's patch
-	 * takes next (rake, spade or seed); -1 for none.
+	 * The item used on the outlined objects: a way in's carried one (a rope on the crevice), or a planting task's seed
+	 * drawn on its patches; -1 for none.
 	 */
 	public int getItemUsedOnObjects()
 	{
-		if (highlights.getUsedItem() >= 0)
+		if (highlights.getUsedItem() >= 0 || !isPlantingPatch())
 		{
 			return highlights.getUsedItem();
 		}
-		List<TileObject> patch = scene.getObjects();
-		return isAtOrToTask(getCurrent()) && !patch.isEmpty() ? taskActs.itemForPatch(routeStep, patch.get(0)) : -1;
+		return routeStep.getData().getPlantItems().stream().findFirst().orElse(-1);
+	}
+
+	/**
+	 * While a prayer task is left and the prayer book's filters hide its prayer, a warning naming it; null otherwise. The
+	 * prayer's button is found by its name: the book's component order isn't the prayers' order.
+	 */
+	public String getPrayerWarning()
+	{
+		Prayer prayer = routeStep == null ? null : routeStep.getData().getPrayer();
+		if (prayer == null || !Stages.taskLeft(routeStep))
+		{
+			return null;
+		}
+		Widget button = Widgets.named(client.getWidget(InterfaceID.Prayerbook.UNIVERSE), prayer.name());
+		boolean hidden = button != null && button.isSelfHidden();
+		return hidden ? Text.removeTags(button.getName()) + " is hidden by your prayer filters" : null;
 	}
 
 	/** A planting task's patches, or the walk to them: outlined as ground, as the objects an item is used on are. */
@@ -396,8 +413,8 @@ public class StepGuide
 
 	/**
 	 * Once the task is under way, only the object it was begun on: a net trap's tree is no young tree any more, and the
-	 * next young tree is not where the catch comes. A patch to plant in is already the one patch, and nearby keeps only
-	 * part of an L-shaped one.
+	 * next young tree is not where the catch comes. A planting task keeps every patch: nearby keeps only part of an
+	 * L-shaped one.
 	 */
 	private List<TileObject> whereTaskBegan(List<TileObject> objects)
 	{
@@ -671,7 +688,7 @@ public class StepGuide
 	{
 		List<TileObject> objects = bank ? sceneObjects.banksNear(current.getWaypoint(), BANK_TILES)
 			: target.getObjectIds().stream().anyMatch(AbyssObstacles::isObstacle) ? abyssObstacle()
-			: whereTaskBegan(onlyPatchToUse(current, atExit(current, onClueTiles(target, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption())))));
+			: whereTaskBegan(atExit(current, onClueTiles(target, offeringOption(sceneObjects.find(target.getObjectIds()), current.getOption()))));
 		List<NPC> npcs = bank ? sceneObjects.bankersNear(current.getWaypoint(), BANK_TILES) : npcsFor(target);
 		if (!bank)
 		{
@@ -724,14 +741,6 @@ public class StepGuide
 		List<TileObject> near = from == null ? List.of() : objects.stream()
 			.filter(object -> object.getWorldLocation().distanceTo(from) <= EXIT_OBJECT_TILES).collect(Collectors.toUnmodifiableList());
 		return near.isEmpty() ? objects : near;
-	}
-
-	/** A planting task outlines the one patch to plant in, all its pieces (an L-shaped patch is two), not every patch. */
-	private List<TileObject> onlyPatchToUse(SubStep current, List<TileObject> objects)
-	{
-		TileObject patch = isAtOrToTask(current) ? taskActs.patchToUse(routeStep, objects) : null;
-		return patch == null ? objects
-			: objects.stream().filter(piece -> piece.getId() == patch.getId()).collect(Collectors.toUnmodifiableList());
 	}
 
 	private List<TileObject> offeringOption(List<TileObject> objects, String option)
@@ -856,6 +865,7 @@ public class StepGuide
 			? current.getWayIn() : null;
 		StepIndex.PickUp pickUp = way == null ? null : way.getPickUp();
 		pickUpTiles = pickUp != null ? sceneObjects.groundItemTiles(pickUp.getId()) : List.of();
+		pickUpArea = null;
 		if (pickUp != null)
 		{
 			return pickUpOnTheWay(current, pickUp, tile);
@@ -880,28 +890,30 @@ public class StepGuide
 	}
 
 	/**
-	 * Part way in, the ground items to pick up first (the Mogre Camp's rocks): to the one that adds least to the way on,
-	 * then on through the way.
+	 * Part way in, the ground items to pick up first (the Mogre Camp's rocks): into the area they lie in, each outlined
+	 * where it lies, then on through the way.
 	 */
 	private boolean pickUpOnTheWay(SubStep current, StepIndex.PickUp pickUp, WorldPoint tile)
 	{
 		int counted = pickUp.getVarbit() < 0 ? 0 : client.getVarbitValue(pickUp.getVarbit());
 		int carried = Math.min(pickUp.getCount(), Math.max(counted, carriedCount(pickUp.getId())));
 		boolean done = carried >= pickUp.getCount();
+		pickUpArea = done ? null : pickUp.getArea();
 		return replaceCurrent(current.toBuilder()
 			.text(done ? KEEP_GOING + pickUp.getThen() : "Pick up " + pickUp.getCount() + " " + pickUp.getName() + " (" + carried + "/" + pickUp.getCount() + ")")
-			.detail(null).waypoint(done ? current.getWayIn().getTo() : onTheWay(tile, current.getWayIn().getTo(), pickUp)).build());
+			.detail(null).groundItem(done ? -1 : pickUp.getId()).waypoint(done ? current.getWayIn().getTo() : intoArea(pickUpArea, tile)).build());
 	}
 
-	/**
-	 * The pick-up tile with the shortest walk from the player through it to {@code on}: of those in sight, else of where
-	 * they lie, as the game shows them only nearby. Null with none known.
-	 */
-	private WorldPoint onTheWay(WorldPoint tile, WorldPoint on, StepIndex.PickUp pickUp)
+	/** The area's tile nearest the player, for the line to lead in by; null inside it, or with no area or tile. */
+	private static WorldPoint intoArea(StepIndex.Box area, WorldPoint tile)
 	{
-		List<WorldPoint> tiles = pickUpTiles.isEmpty() ? pickUp.getSpawnTiles() : pickUpTiles;
-		return tile == null || on == null ? null
-			: tiles.stream().min(Comparator.comparingInt(at -> at.distanceTo2D(tile) + at.distanceTo2D(on))).orElse(null);
+		if (area == null || tile == null || tile.getPlane() != area.getPlane())
+		{
+			return null;
+		}
+		WorldPoint nearest = new WorldPoint(Math.max(area.getWest(), Math.min(area.getEast(), tile.getX())),
+			Math.max(area.getSouth(), Math.min(area.getNorth(), tile.getY())), area.getPlane());
+		return nearest.equals(tile) ? null : nearest;
 	}
 
 	/**
@@ -1339,6 +1351,7 @@ public class StepGuide
 		fight = null;
 		boxView = null;
 		pickUpTiles = List.of();
+		pickUpArea = null;
 		deposit.clear();
 		changeRefusal.clear();
 		teleportRefusal.clear();
@@ -1570,11 +1583,14 @@ public class StepGuide
 		return nowPlaying != null && Text.removeTags(nowPlaying.getText()).trim().equalsIgnoreCase(track);
 	}
 
-	/** The scene is searched again for the new sub-step's objects and NPCs. */
+	/**
+	 * The scene is searched again for the new sub-step's objects and NPCs. The task's carried items are added at once: a
+	 * plan arrives between ticks (after each item gained), and they would be missing until the next tick otherwise.
+	 */
 	private void updateHighlights()
 	{
 		scene = SceneHighlights.NONE;
-		highlights = stepHighlights.of(getCurrent(), routeStep);
+		highlights = stepHighlights.refreshed(stepHighlights.of(getCurrent(), routeStep), getCurrent(), routeStep);
 		if (stashAhead() != StepRequirements.NO_STASH)
 		{
 			highlights = highlights.toBuilder().objectOption(StepHighlights.SEARCH_OPTION).build();
@@ -1615,7 +1631,7 @@ public class StepGuide
 	private boolean refreshCurrent()
 	{
 		SubStep current = getCurrent();
-		return current != null && replaceCurrent(taskActs.phased(gearActs.refresh(current, routeStep), routeStep));
+		return current != null && replaceCurrent(gearActs.refresh(current, routeStep));
 	}
 
 	/** The current sub-step rewritten; the caller's tick updates the highlights once for every change. */

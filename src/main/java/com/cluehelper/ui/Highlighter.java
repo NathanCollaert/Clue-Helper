@@ -40,7 +40,7 @@ public class Highlighter
 	private static final long RIPPLE_MILLIS = 3200;
 	/** How much bigger than the tile a ring is when it has faded away. */
 	private static final double RIPPLE_GROWTH = 0.3;
-	/** A ring spreads no further than this past a larger shape (a whole patch): about as far as past one tile up close. */
+	/** A ring spreads no further than this past a tile seen up close. */
 	private static final double RIPPLE_MAX_SPREAD_PIXELS = 12;
 	private static final BasicStroke RIPPLE_STROKE = new BasicStroke(1.5f);
 	private static final int OUTLINE_WIDTH = 2;
@@ -211,24 +211,17 @@ public class Highlighter
 		return view != null && plane == view.getPlane();
 	}
 
+	/**
+	 * An item's outline fitted into {@code bounds}: the inventory icon's own size, or a larger picture (a scroll book
+	 * entry).
+	 */
 	public void item(Graphics2D graphics, int itemId, int quantity, Rectangle bounds, boolean leftClick)
 	{
 		if (leftClick)
 		{
-			BufferedImage image = itemManager.getImage(itemId, quantity, false);
-			graphics.drawImage(ImageUtil.fillImage(image, ONE_CLICK_FILL), bounds.x, bounds.y, null);
+			drawScaled(graphics, ImageUtil.fillImage(itemManager.getImage(itemId, quantity, false), ONE_CLICK_FILL), bounds);
 		}
-		graphics.drawImage(itemManager.getItemOutline(itemId, quantity, COLOUR), bounds.x, bounds.y, null);
-	}
-
-	/** An item's outline scaled into {@code bounds}, for a picture larger than the inventory icon (a scroll book entry). */
-	public void itemScaled(Graphics2D graphics, int itemId, Rectangle bounds, boolean leftClick)
-	{
-		if (leftClick)
-		{
-			drawScaled(graphics, ImageUtil.fillImage(itemManager.getImage(itemId, 1, false), ONE_CLICK_FILL), bounds);
-		}
-		drawScaled(graphics, itemManager.getItemOutline(itemId, 1, COLOUR), bounds);
+		drawScaled(graphics, itemManager.getItemOutline(itemId, quantity, COLOUR), bounds);
 	}
 
 	private static void drawScaled(Graphics2D graphics, BufferedImage image, Rectangle bounds)
@@ -279,14 +272,23 @@ public class Highlighter
 	/** A spot to walk to with nothing on it to outline: a steady outline, with rings slowly spreading from it. */
 	public void tile(Graphics2D graphics, Shape tile)
 	{
-		graphics.setStroke(STROKE);
-		graphics.setColor(TARGET);
-		graphics.draw(tile);
+		ground(graphics, tile);
 		double start = System.currentTimeMillis() % RIPPLE_MILLIS / (double) RIPPLE_MILLIS;
 		for (int ring = 0; ring < RIPPLES; ring++)
 		{
 			ripple(graphics, tile, (start + (double) ring / RIPPLES) % 1);
 		}
+	}
+
+	/**
+	 * Ground several tiles cover (a patch, the crevice), steady: rings spread from its middle would move a notch's sides
+	 * inward.
+	 */
+	public void ground(Graphics2D graphics, Shape outline)
+	{
+		graphics.setStroke(STROKE);
+		graphics.setColor(TARGET);
+		graphics.draw(outline);
 	}
 
 	/** {@code phase} runs from 0, the ring on the tile's outline, to 1, the ring spread out and faded away. */

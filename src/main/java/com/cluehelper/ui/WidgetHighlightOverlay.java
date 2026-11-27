@@ -11,9 +11,7 @@ import javax.inject.Inject;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.util.Text;
 import net.runelite.client.ui.overlay.*;
-import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.StepGuide.Tab;
 
 public class WidgetHighlightOverlay extends Overlay
@@ -36,8 +34,6 @@ public class WidgetHighlightOverlay extends Overlay
 	Highlighter highlighter;
 	@Inject
 	ClueLink clueLink;
-	@Inject
-	PrayerFilters prayerFilters;
 
 	WidgetHighlightOverlay()
 	{
@@ -48,7 +44,6 @@ public class WidgetHighlightOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		prayerFilters.rememberFor(clueLink.getCurrentStep());
 		if (menuLines.showing(guide.getHighlights().getMenuTarget()) || guide.isTravelling())
 		{
 			return null;
@@ -76,51 +71,14 @@ public class WidgetHighlightOverlay extends Overlay
 	}
 
 	/**
-	 * Sherlock's prayer task: the prayer to turn on while the task is left, and to turn off again while it is on; then the
-	 * filters changed to find it, set back.
+	 * Sherlock's prayer task: the prayer to turn on while the task is left, and to turn off again while it is on. A prayer
+	 * the book's filters hide gets no outline: the box warns instead.
 	 */
 	private void outlinePrayer(Graphics2D graphics)
 	{
 		Step step = clueLink.getCurrentStep();
 		Prayer prayer = step == null ? null : step.getData().getPrayer();
-		if (prayer == null)
-		{
-			return;
-		}
-		if (Stages.taskLeft(step) || client.isPrayerActive(prayer))
-		{
-			outlinePrayerButton(graphics, prayer);
-			return;
-		}
-		outlineFiltersToRestore(graphics);
-	}
-
-	private void outlinePrayerButton(Graphics2D graphics, Prayer prayer)
-	{
-		if (!Widgets.shown(client, InterfaceID.Prayerbook.UNIVERSE))
-		{
-			outline(graphics, tabStone(PRAYER_STONES));
-			return;
-		}
-		if (Widgets.shown(client, InterfaceID.Prayerbook.FILTERMENU))
-		{
-			outlineToggles(graphics, prayerFilters.hidingTiers());
-			return;
-		}
-		Widget widget = named(client.getWidget(InterfaceID.Prayerbook.UNIVERSE), prayer.name());
-		if (widget == null || widget.isHidden())
-		{
-			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
-			return;
-		}
-		highlighter.box(graphics, widget.getBounds());
-	}
-
-	private void outlineFiltersToRestore(Graphics2D graphics)
-	{
-		List<PrayerFilters.Filter> changed = prayerFilters.changed();
-		boolean menuOpen = Widgets.shown(client, InterfaceID.Prayerbook.FILTERMENU);
-		if (changed.isEmpty() && !menuOpen)
+		if (prayer == null || !Stages.taskLeft(step) && !client.isPrayerActive(prayer))
 		{
 			return;
 		}
@@ -129,40 +87,11 @@ public class WidgetHighlightOverlay extends Overlay
 			outline(graphics, tabStone(PRAYER_STONES));
 			return;
 		}
-		if (!menuOpen)
+		Widget widget = Widgets.named(client.getWidget(InterfaceID.Prayerbook.UNIVERSE), prayer.name());
+		if (widget != null && !widget.isHidden())
 		{
-			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
-			return;
+			highlighter.box(graphics, widget.getBounds());
 		}
-		outlineToggles(graphics, changed);
-	}
-
-	/** The filters' lines in the open filter menu, found by their text; with none left, the Filters button to close it. */
-	private void outlineToggles(Graphics2D graphics, List<PrayerFilters.Filter> filters)
-	{
-		List<Widget> toggles = Widgets.descendants(client.getWidget(InterfaceID.Prayerbook.FILTERMENU)).stream()
-			.filter(widget -> filters.stream().anyMatch(filter -> plainText(widget).contains(filter.getPhrase())))
-			.collect(toList());
-		if (toggles.isEmpty())
-		{
-			outline(graphics, InterfaceID.Prayerbook.FILTERBUTTON);
-			return;
-		}
-		toggles.forEach(widget -> highlighter.box(graphics, widget.getBounds()));
-	}
-
-	/** Lower case without tags; "" for a widget without text. */
-	private static String plainText(Widget widget)
-	{
-		return widget.getText() == null ? "" : Text.removeTags(widget.getText()).toLowerCase();
-	}
-
-	/** The prayer's own button, found by its name: the book's component order isn't the prayers' order. */
-	private static Widget named(Widget parent, String name)
-	{
-		return Widgets.descendants(parent).stream()
-			.filter(widget -> widget.getName() != null && Text.removeTags(widget.getName()).equalsIgnoreCase(name))
-			.findFirst().orElse(null);
 	}
 
 	private int tabStone(int[] perLayout)
@@ -186,7 +115,7 @@ public class WidgetHighlightOverlay extends Overlay
 			outline(graphics, scroll.getEntry());
 			return;
 		}
-		highlighter.itemScaled(graphics, picture.getItemId(), picture.getBounds(), leftClick);
+		highlighter.item(graphics, picture.getItemId(), 1, picture.getBounds(), leftClick);
 	}
 
 	private void outlineSpell(Graphics2D graphics, Highlights shown)

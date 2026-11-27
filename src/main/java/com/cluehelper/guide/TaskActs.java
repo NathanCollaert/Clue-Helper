@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import javax.inject.*;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
@@ -23,15 +22,10 @@ import com.cluehelper.guide.StepGuide.Tab;
 @Singleton
 final class TaskActs
 {
-	/** What a patch to plant in takes before the seed goes in, one line at a time. */
-	private static final Map<Allotment, String> CLEARING_LINES = Map.of(Allotment.WEEDS, "Rake the weeds off the patch",
-		Allotment.CROP, "Harvest the crop", Allotment.DEAD, "Clear the dead crop");
 	private static final int[] PRODUCT_SCREENS = {InterfaceID.CraftingGold.UNIVERSE, InterfaceID.Smithing.UNIVERSE};
 
 	@Inject
 	Client client;
-	@Inject
-	SceneObjects sceneObjects;
 	@Inject
 	PlayerModel player;
 	@Inject
@@ -66,10 +60,9 @@ final class TaskActs
 		}
 		// Cast already: the act's line stays the same after the cast, so nothing else drops its spell and tab
 		Highlights afterCast = cast == null ? shown : shown.toBuilder().spellWidget(Highlights.NONE.getSpellWidget()).tab(Tab.NONE).build();
-		Set<Integer> forPatch = patchItems(step, carried);
-		if (forPatch != null)
+		if (step.getData().isPlants())
 		{
-			return outlined(afterCast, forPatch, Tab.INVENTORY);
+			return outlined(afterCast, carried.stream().filter(step.getData().getPlantItems()::contains).collect(toUnmodifiableSet()), Tab.INVENTORY);
 		}
 		StepIndex.Making making = makingNow(step, carried);
 		if (current.getStage().getOption() != null && making == null)
@@ -90,7 +83,7 @@ final class TaskActs
 	}
 
 	/**
-	 * What to do first (switch book, take out of the kit, wield the staff, see to the patch), else the making step
+	 * What to do first (switch book, take out of the kit, wield the staff), else the making step
 	 * reached; null when none applies.
 	 */
 	String detail(Step step)
@@ -112,76 +105,6 @@ final class TaskActs
 		}
 		StepIndex.Making making = makingNow(step, player.carriedIds());
 		return making == null ? null : making.getText();
-	}
-
-	/** What the nearest patch takes next, as carried: the seed and dibber once clear, none while its option clears it. */
-	private Set<Integer> patchItems(Step step, Set<Integer> carried)
-	{
-		return itemsFor(step, nearestPatch(step), carried);
-	}
-
-	private Set<Integer> itemsFor(Step step, Allotment patch, Set<Integer> carried)
-	{
-		if (patch == null)
-		{
-			return null;
-		}
-		if (patch != Allotment.EMPTY)
-		{
-			return Set.of();
-		}
-		return carried.stream().filter(step.getData().getPlantItems()::contains).collect(toUnmodifiableSet());
-	}
-
-	/**
-	 * The carried item the patch to plant in takes next: the seed (not the dibber beside it) once empty; -1 for none, as
-	 * while the patch's own option clears it.
-	 */
-	int itemForPatch(Step step, TileObject patch)
-	{
-		if (step == null || !step.getData().isPlants())
-		{
-			return -1;
-		}
-		Set<Integer> items = itemsFor(step, stateOf(patch), player.carriedIds());
-		return items == null ? -1 : step.getData().getPlantItems().stream().filter(items::contains).findFirst().orElse(-1);
-	}
-
-	/** The state of the patch to plant in; null for other tasks or with none in the scene. */
-	private Allotment nearestPatch(Step step)
-	{
-		if (step == null || !step.getData().isPlants())
-		{
-			return null;
-		}
-		Set<Integer> ids = step.getData().getPlaces().stream().flatMap(place -> place.getObjects().stream()).collect(toSet());
-		TileObject patch = patchToUse(step, sceneObjects.find(ids));
-		return patch == null ? null : stateOf(patch);
-	}
-
-	/**
-	 * Of a planting task's patches in sight, the one to plant in: an empty one before a weedy one before one with a grown
-	 * or dead crop, as clearing takes a while, then the nearest. Null for other tasks or none that can be cleared now.
-	 */
-	TileObject patchToUse(Step step, List<TileObject> patches)
-	{
-		Player local = client.getLocalPlayer();
-		if (step == null || !step.getData().isPlants() || local == null)
-		{
-			return null;
-		}
-		WorldPoint at = local.getWorldLocation();
-		return patches.stream().filter(patch -> stateOf(patch) != null)
-			.min(Comparator.comparing(this::stateOf).thenComparingInt(patch -> patch.getWorldLocation().distanceTo2D(at)))
-			.orElse(null);
-	}
-
-	/** Read from the form the patch shows now; null for a growing crop or an object that is no patch. */
-	private Allotment stateOf(TileObject patch)
-	{
-		ObjectComposition patchObject = client.getObjectDefinition(patch.getId());
-		ObjectComposition shown = patchObject.getImpostorIds() == null ? null : patchObject.getImpostor();
-		return shown == null || patchObject.getVarbitId() < 0 ? null : Allotment.of(client.getVarbitValue(patchObject.getVarbitId()), shown);
 	}
 
 	/** An interface option the task picks and its confirm button, outlined while the interface is open. */
@@ -286,34 +209,6 @@ final class TaskActs
 			}
 		}
 		return null;
-	}
-
-	/** A planting task's act, or the walk to it, with the patch cleared first. */
-	SubStep phased(SubStep act, Step step)
-	{
-		Stage planting = step == null || !step.getData().isPlants() ? null : act.isTask() ? act.getStage() : taskWalkedTo(act, step);
-		if (planting == null)
-		{
-			return act;
-		}
-		Allotment patch = nearestPatch(step);
-		boolean clearing = patch != null && CLEARING_LINES.containsKey(patch);
-		String text = clearing ? CLEARING_LINES.get(patch) : planting.getAct();
-		String option = !act.isTask() ? act.getOption() : clearing ? patch.getOption() : planting.getOption();
-		return text.equals(act.getText()) && Objects.equals(option, act.getOption()) ? act : act.toBuilder().text(text).option(option).build();
-	}
-
-	/** The task a walk reads as (the walk to the patch), by its line; null for any other sub-step. */
-	private static Stage taskWalkedTo(SubStep walk, Step step)
-	{
-		if (walk.getKind() != SubStep.Kind.WALK)
-		{
-			return null;
-		}
-		Stage task = step.getStages().stream().filter(stage -> stage.getKind() == Stage.Kind.TASK).findFirst().orElse(null);
-		boolean taskLine = task != null && (walk.getText().equals(task.getAct())
-			|| step.getData().isPlants() && CLEARING_LINES.containsValue(walk.getText()));
-		return taskLine ? task : null;
 	}
 
 	/** The spell's button until it is picked (the last of its buttons shown), then the items it is cast on. */

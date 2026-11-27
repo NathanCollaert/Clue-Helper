@@ -118,19 +118,13 @@ public class ClueHelperPlugin extends Plugin
 	MenuLineOverlay menuLineOverlay;
 
 	@Inject
-	FurnitureOverlay furnitureOverlay;
-
-	@Inject
-	WanderAreaOverlay wanderAreaOverlay;
-
-	@Inject
 	MenuLines menuLines;
 
 	@Inject
 	EasyTeleportsNames easyTeleportsNames;
 
 	@Inject
-	WaypointOverlay waypointOverlay;
+	SceneOverlay sceneOverlay;
 
 	@Inject
 	MinimapPathOverlay minimapPathOverlay;
@@ -157,7 +151,7 @@ public class ClueHelperPlugin extends Plugin
 
 	final List<Runnable> unregister = new ArrayList<>();
 	boolean shownWorking;
-	List<Object> shownSwapLines = List.of();
+	List<Object> shownBoxLines = List.of();
 
 	@Provides
 	ClueHelperConfig provideConfig(ConfigManager configManager)
@@ -246,11 +240,11 @@ public class ClueHelperPlugin extends Plugin
 		guide.onGameTick();
 		withdrawTab.refresh();
 		fairyLogFilter.refresh();
-		List<Object> swapLines = Arrays.asList(threeStepSwap.headline(), threeStepSwap.notes());
-		if (planner.isWorking() != shownWorking || !swapLines.equals(shownSwapLines))
+		List<Object> boxLines = Arrays.asList(threeStepSwap.headline(), threeStepSwap.notes(), guide.getPrayerWarning());
+		if (planner.isWorking() != shownWorking || !boxLines.equals(shownBoxLines))
 		{
 			shownWorking = planner.isWorking();
-			shownSwapLines = swapLines;
+			shownBoxLines = boxLines;
 			box.refresh();
 		}
 	}
@@ -316,7 +310,7 @@ public class ClueHelperPlugin extends Plugin
 		menuLines.forgetMenu();
 		menuLines.colourMenu(guide.getHighlights().getMenuTarget(), config.highlightMenus());
 		menuLines.colourMenu(guide.getHighlights().getOptionTarget(), config.highlightMenus());
-		for (MenuTarget pathObject : waypointOverlay.pathObjectTargets())
+		for (MenuTarget pathObject : sceneOverlay.pathObjectTargets())
 		{
 			menuLines.colourMenu(pathObject, config.highlightMenus());
 		}
@@ -351,7 +345,7 @@ public class ClueHelperPlugin extends Plugin
 		poh.onMenuOptionClicked(event);
 		guide.onMenuOptionClicked(event);
 		checkLines.onMenuOptionClicked(event);
-		waypointOverlay.onMenuOptionClicked(event);
+		sceneOverlay.onMenuOptionClicked(event);
 	}
 
 	@Subscribe
@@ -454,6 +448,6 @@ public class ClueHelperPlugin extends Plugin
 
 	private Overlay[] overlays()
 	{
-		return new Overlay[]{itemOverlay, widgetOverlay, waypointOverlay, minimapPathOverlay, wanderAreaOverlay, menuLineOverlay, furnitureOverlay, guideOverlay};
+		return new Overlay[]{itemOverlay, widgetOverlay, sceneOverlay, minimapPathOverlay, menuLineOverlay, guideOverlay};
 	}
 }

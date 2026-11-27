@@ -46,11 +46,11 @@ final class WaitWindows
 		/** Spellbook change click to the book var changing. */
 		CHANGE_REFUSAL("com.cluehelper.guide.StepGuide$ChangeRefusal", "CHECK_TICKS", Bound.UP_TO),
 		/** Click on a door, gate or shortcut to the player's first step. */
-		CROSSING_START("com.cluehelper.ui.WaypointOverlay", "CROSSING_START_TICKS", Bound.UP_TO),
+		CROSSING_START("com.cluehelper.ui.SceneOverlay", "CROSSING_START_TICKS", Bound.UP_TO),
 		/** Click on a door, gate or shortcut to standing on its far side. */
-		CROSSING("com.cluehelper.ui.WaypointOverlay", "CROSSING_TICKS", Bound.UP_TO),
+		CROSSING("com.cluehelper.ui.SceneOverlay", "CROSSING_TICKS", Bound.UP_TO),
 		/** Click on the step's way in to the guide moving on from it: the ride's whole length. */
-		ENTERING("com.cluehelper.ui.WaypointOverlay", "ENTERING_TICKS", Bound.UP_TO),
+		ENTERING("com.cluehelper.ui.SceneOverlay", "ENTERING_TICKS", Bound.UP_TO),
 		/** An object or NPC the guide targets appearing to the guide outlining it. */
 		OBJECT_REFRESH("com.cluehelper.guide.StepGuide", "OBJECT_REFRESH_TICKS", Bound.UP_TO),
 		/** STASH Search click to its withdraw or deposit line. */

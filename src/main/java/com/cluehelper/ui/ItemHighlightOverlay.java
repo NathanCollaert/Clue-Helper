@@ -22,7 +22,7 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	@Inject
 	LeftClicks leftClicks;
 	@Inject
-	WaypointOverlay waypoints;
+	SceneOverlay sceneOverlay;
 
 	ItemHighlightOverlay()
 	{
@@ -35,7 +35,7 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem item)
 	{
 		boolean inBank = item.getWidget() != null && WidgetUtil.componentToInterface(item.getWidget().getId()) == InterfaceID.BANKMAIN;
-		boolean usedOnPath = !inBank && waypoints.pathItems().contains(itemId);
+		boolean usedOnPath = !inBank && sceneOverlay.pathItems().contains(itemId);
 		boolean marked = inBank ? guide.getHighlights().getBankItems().contains(itemId)
 			: guide.getHighlights().getItems().contains(itemId) || usedOnPath;
 		if (!config.highlightItems() || !marked || !inBank && (guide.isTravelling() || isUsedAfterTheBank()))

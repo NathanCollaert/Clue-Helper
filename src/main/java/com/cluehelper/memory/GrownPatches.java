@@ -103,7 +103,8 @@ public class GrownPatches
 		Seen seen = loaded ? null : tracked(allotmentKey(place, varbit));
 		int value = loaded ? client.getVarbitValue(varbit) : seen.value;
 		Integer stagesLeft = STAGES_LEFT.get(value);
-		return stagesLeft != null && (loaded || seen.seconds + stagesLeft * ALLOTMENT_STAGE_SECONDS > Instant.now().getEpochSecond());
+		// The stage the crop is in may only just have begun: one in its last (none left) still grows up to a stage more
+		return stagesLeft != null && (loaded || seen.seconds + (stagesLeft + 1) * ALLOTMENT_STAGE_SECONDS > Instant.now().getEpochSecond());
 	}
 
 	private static String allotmentKey(WorldPoint place, int varbit)

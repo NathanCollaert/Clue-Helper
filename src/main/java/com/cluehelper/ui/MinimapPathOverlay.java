@@ -31,7 +31,7 @@ public class MinimapPathOverlay extends Overlay
 	@Inject
 	Client client;
 	@Inject
-	WaypointOverlay waypoints;
+	SceneOverlay sceneOverlay;
 
 	MinimapPathOverlay()
 	{
@@ -42,22 +42,18 @@ public class MinimapPathOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		List<WorldPoint> line = waypoints.getShownLine();
+		List<WorldPoint> line = sceneOverlay.getShownLine();
 		WorldView view = client.getTopLevelWorldView();
 		Shape map = minimapArea();
 		if (line.isEmpty() || view == null || map == null)
 		{
 			return null;
 		}
-		Shape clip = graphics.getClip();
-		Object antialiasing = graphics.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
 		graphics.clip(map);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		graphics.setColor(Highlighter.COLOUR);
 		graphics.setStroke(STROKE);
 		graphics.draw(path(minimapPoints(view, line)));
-		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing);
-		graphics.setClip(clip);
 		return null;
 	}
 
@@ -73,7 +69,7 @@ public class MinimapPathOverlay extends Overlay
 			{
 				points.add(null);
 			}
-			LocalPoint local = WaypointOverlay.onFloor(view, tile);
+			LocalPoint local = SceneOverlay.onFloor(view, tile);
 			points.add(local == null ? null : Perspective.localToMinimap(client, local));
 			previous = tile;
 		}

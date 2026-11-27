@@ -2061,15 +2061,15 @@
   worn [28933] inv [28936, 28939] done
 -- worn
   worn [28933, 28936, 28939] inv [] done
-== map:19782 #3 Equip the Medallion of the Deep
+== map:19782 #3 Equip the Fishbowl helmet and Diving apparatus
 -- recorded
   worn [13342] inv [952, 995, 1359, 1511, 6317, 19476, 33120]
-   -> Equip: [Medallion of the Deep]
+   -> Equip: [Fishbowl helmet, Diving apparatus]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
 -- bare
   worn [] inv []
-   -> Equip: [Medallion of the Deep]
+   -> Equip: [Fishbowl helmet, Diving apparatus]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
 -- carried
@@ -2081,7 +2081,7 @@
   worn [7534, 21723, 32386] inv [7535] done
 == skill:SHERLOCK:catch a mottled eel with aerial fishing in lake molch. #3 Take off your weapon, shield and gloves
 -- recorded
-  worn [13342, 32386, 33066] inv [952, 5321, 13069, 13111, 13124, 13140, 21268, 23458, 23946, 26948, 28939] done
+  worn [] inv [229, 590, 952, 995, 3404, 13140, 13280, 19672, 21389, 24738] done
 -- bare
   worn [] inv [] done
 -- carried
@@ -3308,7 +3308,7 @@
   worn [33021] inv [23983, 24123, 25865, 25867, 25869, 25884, 25886, 25888, 25890, 25892, 25894, 25896, 27187] done
 == emote:cheer in the entrana church. beware of double agents! equip a full set of black dragonhide armour. #6 Equip the items
 -- recorded
-  worn [13342] inv [952, 954, 13115, 21175, 21389, 23946]
+  worn [22981, 24133, 28307, 29796, 29804, 30750, 30753, 30756, 31097] inv [590, 995, 13140, 13241, 13280]
    -> Equip: [Black d'hide vambraces, Black d'hide chaps, Black d'hide body]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3326,7 +3326,7 @@
   worn [2491, 2497, 2503] inv [] done
 == emote:cheer in the entrana church. beware of double agents! equip a full set of black dragonhide armour. #8 Equip the items
 -- recorded
-  worn [13342] inv [952, 954, 13115, 21175, 21389, 23946]
+  worn [22981, 24133, 28307, 29796, 29804, 30750, 30753, 30756, 31097] inv [590, 995, 13140, 13241, 13280]
    -> Equip: [Black d'hide vambraces, Black d'hide chaps, Black d'hide body]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3530,7 +3530,7 @@
   worn [2491, 2503, 12524] inv [] done
 == emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #6 Equip the items
 -- recorded
-  worn [13342, 28329, 29796, 32386, 33066] inv [307, 552, 561, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13241, 19476, 19669, 21268, 21389, 24738, 26948, 28260]
+  worn [13342] inv [229, 590, 952, 995, 3404, 13140, 19672, 21389, 24738]
    -> Equip: [Any full barrows set]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck
@@ -3548,7 +3548,7 @@
   worn [30543, 30545, 30547, 30574] inv [4708, 4710, 4712, 4714, 4716, 4718, 4720, 4722, 4724, 4726, 4728, 4730, 4732, 4734, 4736, 4738, 4745, 4747, 4749, 4751, 4753, 4755, 4757, 4759, 4856, 4857, 4858, 4859, 4860, 4862, 4863, 4864, 4865, 4866, 4868, 4869, 4870, 4871, 4872, 4874, 4875, 4876, 4877, 4878, 4880, 4881, 4882, 4883, 4884, 4886, 4887, 4888, 4889, 4890, 4892, 4893, 4894, 4895, 4896, 4898, 4899, 4900, 4901, 4902, 4904, 4905, 4906, 4907, 4908, 4910, 4911, 4912, 4913, 4914, 4916, 4917, 4918, 4919, 4920, 4922, 4923, 4924, 4925, 4926, 4928, 4929, 4930, 4931, 4932, 4934, 4935, 4936, 4937, 4938, 4940, 4941, 4942, 4943, 4944, 4946, 4947, 4948, 4949, 4950, 4952, 4953, 4954, 4955, 4956, 4958, 4959, 4960, 4961, 4962, 4964, 4965, 4966, 4967, 4968, 4970, 4971, 4972, 4973, 4974, 4976, 4977, 4978, 4979, 4980, 4982, 4983, 4984, 4985, 4986, 4988, 4989, 4990, 4991, 4992, 4994, 4995, 4996, 4997, 4998, 30445, 30447, 30449, 30519, 30521, 30523, 30525, 30527, 30529, 30531, 30533, 30535, 30537, 30539, 30541, 30568, 30570, 30571, 30572, 30573] done
 == emote:do a jig at the barrows chest. beware of double agents! equip any full barrows set. #8 Equip the items
 -- recorded
-  worn [13342, 28329, 29796, 32386, 33066] inv [307, 552, 561, 564, 590, 946, 952, 1523, 12934, 13111, 13140, 13241, 19476, 19669, 21268, 21389, 24738, 26948, 28260]
+  worn [13342] inv [229, 590, 952, 995, 3404, 13140, 19672, 21389, 24738]
    -> Equip: [Any full barrows set]
    outline [] fill [] tab INVENTORY menu [[]@[]]
    stuck

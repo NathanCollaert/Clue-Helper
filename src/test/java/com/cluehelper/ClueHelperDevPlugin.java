@@ -39,7 +39,7 @@ import com.cluehelper.transport.AvailabilitySet;
 import com.cluehelper.transport.AvailabilityService;
 import com.cluehelper.transport.CatalogRow;
 import com.cluehelper.ui.GuideOverlay;
-import com.cluehelper.ui.WaypointOverlay;
+import com.cluehelper.ui.SceneOverlay;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -114,6 +114,8 @@ public class ClueHelperDevPlugin extends Plugin
 	private static final File GUIDE_FRAMES = new File("build/guide");
 	/** Only its name counts: frames go to the session's folder, under marks/. */
 	private static final File MARK_FRAMES = new File("build/marks");
+	private static final String BURST_COMMAND = "ch-burst";
+	private static final int BURST_FRAMES = 40;
 	/** About 10 s, to see highlights between sub-step changes. */
 	private static final int LIVE_FRAME_TICKS = 16;
 	private static final int OBJECT_DUMP_TILES = 30;
@@ -182,6 +184,7 @@ public class ClueHelperDevPlugin extends Plugin
 	private ExecutorService campaignFiles;
 	/** PNG encoding takes seconds of CPU a minute: off RuneLite's shared executor, which other plugins' tasks wait on. */
 	private ExecutorService frameWriter;
+	private OverlayFrameTime frameTime;
 
 	@Override
 	protected void startUp()
@@ -199,7 +202,7 @@ public class ClueHelperDevPlugin extends Plugin
 		});
 		Gson gson = clueHelper.getInjector().getInstance(Gson.class);
 		timeline = new TimelineRecorder(client, service(StepGuide.class), service(ClueLink.class),
-			service(RoutePlanner.class), service(WaypointOverlay.class), service(GuideOverlay.class), configManager, gson);
+			service(RoutePlanner.class), service(SceneOverlay.class), service(GuideOverlay.class), configManager, gson);
 		eventBus.register(timeline);
 		unregister.add(() ->
 		{
@@ -257,6 +260,10 @@ public class ClueHelperDevPlugin extends Plugin
 			eventBus.unregister(dialTrace);
 			overlayManager.remove(dialTrace);
 		});
+		OverlayFrameTime frameTime = new OverlayFrameTime(client, clueHelper);
+		overlayManager.add(frameTime);
+		unregister.add(() -> overlayManager.remove(frameTime));
+		this.frameTime = frameTime;
 		HotColdTrace hotColdTrace = new HotColdTrace(client, service(HotColdService.class), name ->
 			requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, new File(HotColdTrace.FRAMES, name + "-game.png")))));
 		unregister.add(hotColdTrace::stop);
@@ -690,7 +697,7 @@ public class ClueHelperDevPlugin extends Plugin
 	/** Where the line ends and what it outlines, once per change: what a missing path or outline really was. */
 	private void traceLine()
 	{
-		WaypointOverlay overlay = service(WaypointOverlay.class);
+		SceneOverlay overlay = service(SceneOverlay.class);
 		SubStep current = service(StepGuide.class).getCurrent();
 		List<WorldPoint> line = overlay.getLine();
 		String objects = overlay.pathObjectTargets().stream().map(target -> target.getObjectIds() + " " + target.getPath())
@@ -778,6 +785,20 @@ public class ClueHelperDevPlugin extends Plugin
 	}
 
 	/** Client thread. Flags this tick in the timeline, with a frame, for the review before a commit to look at first. */
+	/** {@code ::ch-burst}: the next {@value #BURST_FRAMES} frames in a row, into the session's marks, to see a flicker. */
+	private void captureBurst(int frame)
+	{
+		if (frame < BURST_FRAMES)
+		{
+			requestFrame(image ->
+			{
+				String name = String.format("burst-%02d.png", frame);
+				frameWriter.execute(() -> writeFrame(image, new File(MARK_FRAMES, name)));
+				clientThread.invokeLater(() -> captureBurst(frame + 1));
+			});
+		}
+	}
+
 	private void markMoment()
 	{
 		int tick = client.getTickCount();
@@ -897,6 +918,14 @@ public class ClueHelperDevPlugin extends Plugin
 		{
 			// Commands arrive inside the chat script, and core's clue providers run quest scripts, which can't nest.
 			clientThread.invokeLater(() -> mockClues.run(event.getArguments()));
+		}
+		if (event.getCommand().equalsIgnoreCase(OverlayFrameTime.COMMAND))
+		{
+			clientThread.invokeLater(frameTime::start);
+		}
+		if (event.getCommand().equalsIgnoreCase(BURST_COMMAND))
+		{
+			clientThread.invokeLater(() -> captureBurst(0));
 		}
 	}
 

@@ -32,6 +32,14 @@ public final class Widgets
 		return out;
 	}
 
+	/** The widget under {@code parent} by its name, ignoring tags and case; null for none. */
+	public static Widget named(Widget parent, String name)
+	{
+		return descendants(parent).stream()
+			.filter(widget -> widget.getName() != null && Text.removeTags(widget.getName()).equalsIgnoreCase(name))
+			.findFirst().orElse(null);
+	}
+
 	/** The widget by id is loaded and not hidden. */
 	public static boolean shown(Client client, int widgetId)
 	{

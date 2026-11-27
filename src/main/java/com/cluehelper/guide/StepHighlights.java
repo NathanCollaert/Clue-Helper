@@ -214,13 +214,19 @@ final class StepHighlights
 				.collect(toUnmodifiableList());
 	}
 
+	/** The ground item the sub-step picks up: a dropped key, or the rocks part way into the Mogre Camp. */
+	private static MenuTarget takeTarget(SubStep current)
+	{
+		return MenuTarget.builder().itemIds(Set.of(current.getGroundItem())).path(List.of(TAKE_OPTION)).build();
+	}
+
 	/** An act's own items, its STASH unit or the gear to put on; else only its one-click fill. */
 	private Highlights actHighlights(Highlights.HighlightsBuilder shown, SubStep current, Step step)
 	{
 		shown.tab(current.getTab());
 		if (current.getGroundItem() >= 0)
 		{
-			return shown.menuTarget(MenuTarget.builder().itemIds(Set.of(current.getGroundItem())).path(List.of(TAKE_OPTION)).build()).build();
+			return shown.menuTarget(takeTarget(current)).build();
 		}
 		int stash = stashOf(current, step);
 		if (stash != StepRequirements.NO_STASH)
@@ -298,6 +304,10 @@ final class StepHighlights
 	private Highlights wayInHighlights(Highlights.HighlightsBuilder shown, SubStep current, Step step)
 	{
 		StepIndex.WayIn way = current.getWayIn();
+		if (current.getGroundItem() >= 0)
+		{
+			return shown.menuTarget(takeTarget(current)).build();
+		}
 		if (!current.getActItems().isEmpty())
 		{
 			// The remembered mound: the spade, once the player stands on it

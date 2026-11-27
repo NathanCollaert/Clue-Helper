@@ -251,6 +251,7 @@
 3343	Pointed bruise blue snelm	0	|Wear|||Drop
 3387	Splitbark body	4	|Wear|||Drop
 3389	Splitbark legs	7	|Wear|||Drop
+3404	Fiyr remains	-1	||||Drop
 3469	Silver key purple	-1	||||Drop
 3479	Saradomin plateskirt	7	|Wear|||Drop
 3695	Pet rock	3	Interact|Wield|||Drop
@@ -875,6 +876,7 @@
 19647	Red slayer helmet	0	|Wear|Check|Disassemble|Drop
 19649	Red slayer helmet (i)	0	|Wear|Check|Disassemble|Drop
 19669	Redwood logs	-1	||||Drop
+19672	Redwood pyre logs	-1	||||Drop
 19675	Arclight	3	|Wield|Check||Drop
 19720	Occult necklace (or)	2	|Wear|||Dismantle
 19722	Dragon defender (t)	5	|Wield|||Dismantle

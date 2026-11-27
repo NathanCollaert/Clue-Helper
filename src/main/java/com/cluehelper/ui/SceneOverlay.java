@@ -12,7 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
+import java.awt.Stroke;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.Predicate;
@@ -26,9 +27,13 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.*;
 
-/** Waypoints are never core's target, so the path ends where core's marker takes over. */
+/**
+ * What the guide draws in the game scene: the path line and the tile it leads to, the edge of a wanderer's range or a
+ * task's area, and the outlined objects and NPCs. Waypoints are never core's target, so the path ends where core's
+ * marker takes over.
+ */
 @Singleton
-public class WaypointOverlay extends Overlay
+public class SceneOverlay extends Overlay
 {
 	private static final int NOT_CROSSING = -1;
 	/** Walked through, but the line steps over them into the crossing beside them: a trap that pushes the player back. */
@@ -51,6 +56,10 @@ public class WaypointOverlay extends Overlay
 	private static final int COVER_STEP_PIXELS = 3;
 	private static final int[] CONVERSATION = {InterfaceID.ChatLeft.UNIVERSE, InterfaceID.ChatRight.UNIVERSE, InterfaceID.Chatmenu.UNIVERSE};
 	private static final String NO_STEP = "";
+	/** A tile polygon's corners run south-west, south-east, north-east, north-west: each side faces this neighbour. */
+	private static final int[] SIDE_DX = {0, 1, 0, -1};
+	private static final int[] SIDE_DY = {-1, 0, 1, 0};
+	private static final Stroke AREA_EDGE = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10, new float[]{8, 8}, 0);
 
 	@Inject
 	Client client;
@@ -101,22 +110,44 @@ public class WaypointOverlay extends Overlay
 	/** The step the open conversation began on; null with no conversation open. */
 	String conversationStepKey;
 
-	WaypointOverlay()
+	SceneOverlay()
 	{
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 	}
 
+	/**
+	 * Drawn in the order the three were separate overlays, each part behind its own setting. The areas and the outlines
+	 * still show while the line is held back: talking to the NPC they mark, crossing an obstacle or entering a way in.
+	 */
 	@Override
 	public Dimension render(Graphics2D graphics)
+	{
+		WorldView view = client.getTopLevelWorldView();
+		drawGuideLine(graphics, view);
+		if (view == null)
+		{
+			return null;
+		}
+		if (config.pathLine())
+		{
+			drawAreas(graphics, view);
+		}
+		if (config.highlightMenus())
+		{
+			drawTargets(graphics, view);
+		}
+		return null;
+	}
+
+	private void drawGuideLine(Graphics2D graphics, WorldView view)
 	{
 		shownLine = List.of();
 		noteConversationStep();
 		if (!config.pathLine() || isTalkingOnThisStep())
 		{
-			return null;
+			return;
 		}
-		WorldView view = client.getTopLevelWorldView();
 		startCrossingOnArrival(view);
 		expireCrossing();
 		if (enteringFrom != NOT_CROSSING && isOver(enteringFrom, ENTERING_TICKS))
@@ -125,7 +156,7 @@ public class WaypointOverlay extends Overlay
 		}
 		if (view == null || enteringFrom != NOT_CROSSING)
 		{
-			return null;
+			return;
 		}
 		if (isCrossing())
 		{
@@ -136,13 +167,13 @@ public class WaypointOverlay extends Overlay
 				line = walkLine.getAhead();
 			}
 			drawLine(graphics, view, line);
-			return null;
+			return;
 		}
 		guide.getPickUpTiles().stream().filter(tile -> tile.getPlane() == view.getPlane()).forEach(tile -> drawPickUp(graphics, view, tile));
 		Goal goal = goal(view, guide.getCurrent());
 		if (goal == null)
 		{
-			return null;
+			return;
 		}
 		if (goal.getHere() != null)
 		{
@@ -153,7 +184,157 @@ public class WaypointOverlay extends Overlay
 			drawTile(graphics, view, goal.getWalk().getSouthWest());
 			drawItemUsedOn(graphics, view, goal.getWalk().getSouthWest());
 		}
-		return null;
+	}
+
+	/**
+	 * The edge of a wide wanderer's range on the ground (Wingstone's desert), so the player knows where to look, of where a
+	 * way in's items lie (the Mogre Camp's rocks), and of the area a task works anywhere in (the Dark Altar's reanimation
+	 * ground) while walking there or doing it.
+	 */
+	private void drawAreas(Graphics2D graphics, WorldView view)
+	{
+		graphics.setColor(Highlighter.COLOUR);
+		graphics.setStroke(AREA_EDGE);
+		Step step = clueLink.getCurrentStep();
+		StepIndex.Wander range = step == null ? null : step.getData().getWander();
+		if (range != null)
+		{
+			drawBox(graphics, view, range.getArea());
+			drawBox(graphics, view, range.getExclude());
+		}
+		drawBox(graphics, view, guide.getPickUpArea());
+		SubStep current = guide.getCurrent();
+		for (StepIndex.Place place : current == null ? List.<StepIndex.Place>of() : current.getSpans())
+		{
+			drawBox(graphics, view, place.getSpan());
+		}
+	}
+
+	/** Around the box's tiles, when it is on the plane in view. */
+	private void drawBox(Graphics2D graphics, WorldView view, StepIndex.Box box)
+	{
+		if (box == null || box.getPlane() != view.getPlane())
+		{
+			return;
+		}
+		int west = box.getWest();
+		int south = box.getSouth();
+		int east = box.getEast() + 1;
+		int north = box.getNorth() + 1;
+		drawEdge(graphics, view, west, south, east, south);
+		drawEdge(graphics, view, east, south, east, north);
+		drawEdge(graphics, view, east, north, west, north);
+		drawEdge(graphics, view, west, north, west, south);
+	}
+
+	/** Corner to corner of the box's tiles, a tile at a time so the line follows the ground; off the scene, nothing. */
+	private void drawEdge(Graphics2D graphics, WorldView view, int fromX, int fromY, int toX, int toY)
+	{
+		int steps = Math.max(Math.abs(toX - fromX), Math.abs(toY - fromY));
+		Point previous = null;
+		for (int i = 0; i <= steps; i++)
+		{
+			Point at = corner(view, fromX + Integer.signum(toX - fromX) * i, fromY + Integer.signum(toY - fromY) * i);
+			previous = drawTo(graphics, previous, at);
+		}
+	}
+
+	/** The south-west corner of world tile x, y on the canvas. */
+	private Point corner(WorldView view, int x, int y)
+	{
+		int sceneX = x - view.getBaseX();
+		int sceneY = y - view.getBaseY();
+		if (sceneX < 1 || sceneY < 1 || sceneX >= view.getSizeX() || sceneY >= view.getSizeY())
+		{
+			return null;
+		}
+		LocalPoint local = new LocalPoint(sceneX * Perspective.LOCAL_TILE_SIZE, sceneY * Perspective.LOCAL_TILE_SIZE, view);
+		return Perspective.localToCanvas(client, local, view.getPlane());
+	}
+
+	/** The object and NPC the guide outlines; the objects an item is used on as the ground they cover. */
+	private void drawTargets(Graphics2D graphics, WorldView view)
+	{
+		TileObject object = targets.object(view);
+		int usedItem = guide.getItemUsedOnObjects();
+		if (object != null && (usedItem >= 0 || guide.isPlantingPatch()))
+		{
+			BufferedImage pile = usedItem < 0 ? null : itemManager.getImage(usedItem, guide.getItemUsedOnObjectsQuantity(usedItem), false);
+			drawItemOn(graphics, guide.getHighlightObjects(), pile);
+		}
+		else if (object != null)
+		{
+			highlighter.object(graphics, object, guide.getFillObjects().contains(object));
+		}
+		NPC npc = targets.npc();
+		if (npc != null && !clueLink.coreMarks(npc))
+		{
+			highlighter.npc(graphics, npc, guide.getFillNpcs().contains(npc));
+		}
+	}
+
+	/**
+	 * Objects an item is used on are marked as a hot/cold spot is: one outline around the ground all their one-tile pieces
+	 * cover (the crevice is nine, a patch one per tile), the item, if any, shown on each of them (a place's patches). Their
+	 * models would trace every plant on a patch.
+	 */
+	private void drawItemOn(Graphics2D graphics, List<TileObject> objects, BufferedImage icon)
+	{
+		Set<WorldPoint> tiles = objects.stream().map(TileObject::getWorldLocation).collect(Collectors.toSet());
+		Path2D outline = new Path2D.Float();
+		objects.forEach(piece -> addOuterSides(outline, piece, tiles));
+		if (outline.getCurrentPoint() == null)
+		{
+			return;
+		}
+		highlighter.ground(graphics, outline);
+		if (icon != null)
+		{
+			objects.stream().collect(Collectors.groupingBy(TileObject::getId)).values()
+				.forEach(pieces -> drawOnTile(graphics, middlePiece(pieces), icon));
+		}
+	}
+
+	/**
+	 * The piece nearest the object's middle on the ground, where the item is shown: an L-shaped patch's middle lies outside
+	 * it. Picked on the ground, not on screen, so it stays put as the camera turns.
+	 */
+	private static TileObject middlePiece(List<TileObject> pieces)
+	{
+		double x = pieces.stream().mapToInt(piece -> piece.getWorldLocation().getX()).average().orElseThrow();
+		double y = pieces.stream().mapToInt(piece -> piece.getWorldLocation().getY()).average().orElseThrow();
+		return pieces.stream().min(Comparator.comparingDouble(piece -> Point2D.distanceSq(piece.getWorldLocation().getX(),
+			piece.getWorldLocation().getY(), x, y))).orElseThrow();
+	}
+
+	private static void drawOnTile(Graphics2D graphics, TileObject piece, BufferedImage icon)
+	{
+		Polygon tile = piece.getCanvasTilePoly();
+		if (tile != null)
+		{
+			Rectangle middle = tile.getBounds();
+			graphics.drawImage(icon, (int) middle.getCenterX() - icon.getWidth() / 2, (int) middle.getCenterY() - icon.getHeight() / 2, null);
+		}
+	}
+
+	/** The sides of the piece's tile that no other piece's tile shares; drawn side by side, rather than joined each frame. */
+	private static void addOuterSides(Path2D outline, TileObject piece, Set<WorldPoint> tiles)
+	{
+		Polygon tile = piece.getCanvasTilePoly();
+		if (tile == null || tile.npoints != SIDE_DX.length)
+		{
+			return;
+		}
+		WorldPoint at = piece.getWorldLocation();
+		for (int side = 0; side < SIDE_DX.length; side++)
+		{
+			if (!tiles.contains(at.dx(SIDE_DX[side]).dy(SIDE_DY[side])))
+			{
+				int end = (side + 1) % SIDE_DX.length;
+				outline.moveTo(tile.xpoints[side], tile.ypoints[side]);
+				outline.lineTo(tile.xpoints[end], tile.ypoints[end]);
+			}
+		}
 	}
 
 	/** Where the line leads for the current sub-step; null when nothing is drawn. */
@@ -267,18 +448,17 @@ public class WaypointOverlay extends Overlay
 		return current.getKind() == SubStep.Kind.ACT && stepOrPartAct && current.getActItemNamed() == null && !outlined();
 	}
 
-	/** The items to pick up, outlined where they lie, else their tile. */
+	/**
+	 * The items to pick up, outlined and filled where they lie (Take is their left click). Nothing once they are gone,
+	 * though the tile list is only searched again next tick.
+	 */
 	private void drawPickUp(Graphics2D graphics, WorldView view, WorldPoint at)
 	{
 		Tile tile = SceneObjects.tile(view, at);
 		ItemLayer items = tile == null ? null : tile.getItemLayer();
 		if (items != null)
 		{
-			highlighter.object(graphics, items, false);
-		}
-		else
-		{
-			drawTile(graphics, view, at);
+			highlighter.object(graphics, items, true);
 		}
 	}
 
@@ -332,7 +512,7 @@ public class WaypointOverlay extends Overlay
 			return null;
 		}
 		boolean killForKey = isKillForKey(current);
-		WorldPoint target = killForKey ? nearestKeyHolder(view, step, current.getStage(), at) : nearestNamedNpc(view, step.getNpcsAtStep(), at);
+		WorldPoint target = killForKey ? nearestNpc(view, keyHolder(step, current.getStage()), at) : nearestNamedNpc(view, step.getNpcsAtStep(), at);
 		StepIndex.Wander range = step.getData().getWander();
 		if (target == null && !killForKey && range != null && range.contains(at))
 		{
@@ -372,12 +552,6 @@ public class WaypointOverlay extends Overlay
 		return looking ? null : goal;
 	}
 
-	/** The NPC dropping the key: the stage's own (the Mercenary Captain), else core's for the clue. */
-	private static WorldPoint nearestKeyHolder(WorldView view, Step step, Stage kill, WorldPoint at)
-	{
-		return nearestNpc(view, keyHolder(step, kill), at);
-	}
-
 	/** An NPC the act is done with: its own, the step's at the clue, or the one dropping the key. */
 	private Predicate<NPC> actNpc(SubStep act)
 	{
@@ -391,6 +565,7 @@ public class WaypointOverlay extends Overlay
 		return isKillForKey(act) ? atStep.or(keyHolder(step, act.getStage())) : atStep;
 	}
 
+	/** The NPC dropping the key: the stage's own (the Mercenary Captain), else core's for the clue. */
 	private static Predicate<NPC> keyHolder(Step step, Stage kill)
 	{
 		return kill.getNpcIds().isEmpty() ? npc -> isNamed(npc, step.getNpcs()) : npc -> kill.getNpcIds().contains(npc.getId());
@@ -412,7 +587,7 @@ public class WaypointOverlay extends Overlay
 
 	private static WorldPoint nearestNpc(WorldView view, Predicate<NPC> wanted, WorldPoint at)
 	{
-		return view.npcs().stream().filter(wanted).map(NPC::getWorldLocation).min(Comparator.comparingInt(tile -> tile.distanceTo2D(at)))
+		return view.npcs().stream().filter(wanted).map(npc -> shownTile(npc, 1)).min(Comparator.comparingInt(tile -> tile.distanceTo2D(at)))
 			.orElse(null);
 	}
 
@@ -481,7 +656,7 @@ public class WaypointOverlay extends Overlay
 	private Goal approach(NPC npc)
 	{
 		WorldPoint from = playerTile();
-		WorldPoint at = npc.getWorldLocation();
+		WorldPoint at = shownTile(npc, 1);
 		return from == null || from.distanceTo2D(at) <= 1 ? null : new Goal(targets.planWalk(), WalkGoal.tile(at), endIn(npc), false);
 	}
 
@@ -508,10 +683,7 @@ public class WaypointOverlay extends Overlay
 	/** On the area or one tile round it, diagonals included. */
 	private static boolean isBeside(WorldPoint at, WalkGoal area)
 	{
-		WorldPoint southWest = area.getSouthWest();
-		return at.getPlane() == southWest.getPlane()
-			&& at.getX() >= southWest.getX() - 1 && at.getX() <= southWest.getX() + area.getSizeX()
-			&& at.getY() >= southWest.getY() - 1 && at.getY() <= southWest.getY() + area.getSizeY();
+		return new WorldArea(area.getSouthWest(), area.getSizeX(), area.getSizeY()).distanceTo(at) <= 1;
 	}
 
 	/**
@@ -535,7 +707,18 @@ public class WaypointOverlay extends Overlay
 		NPCComposition composition = npc.getTransformedComposition();
 		int size = composition == null ? 1 : composition.getSize();
 		return npc.getModel() == null ? null
-			: new LineEnd(npc.getLocalLocation(), silhouette.of(npc), WalkGoal.area(npc.getWorldLocation(), size, size));
+			: new LineEnd(npc.getLocalLocation(), silhouette.of(npc), WalkGoal.area(shownTile(npc, size), size, size));
+	}
+
+	/**
+	 * The south-west tile the NPC is drawn on. Its world location is the tile it walks to, a step ahead of its model: a
+	 * line led there would pass the NPC and turn back into it.
+	 */
+	private static WorldPoint shownTile(NPC npc, int size)
+	{
+		LocalPoint middle = npc.getLocalLocation();
+		int toCorner = (size - 1) * Perspective.LOCAL_HALF_TILE_SIZE;
+		return WorldPoint.fromLocal(npc.getWorldView(), middle.getX() - toCorner, middle.getY() - toCorner, npc.getWorldLocation().getPlane());
 	}
 
 	/** @param end what the line ends in; null when it ends on a plain tile */
@@ -638,8 +821,7 @@ public class WaypointOverlay extends Overlay
 	private void followAhead(WorldView view)
 	{
 		walkLine.advance();
-		WalkData data = routes.getWalk();
-		pathObjects = paths.along(view, data == null || view.isInstance() ? null : data.getTable(), walkLine.getAhead());
+		pathObjects = paths.along(view, walkTable(view), walkLine.getAhead());
 	}
 
 	/**
@@ -722,8 +904,7 @@ public class WaypointOverlay extends Overlay
 	 */
 	private boolean opensInPlace(WorldView view, TileObject clicked)
 	{
-		WalkData data = routes.getWalk();
-		return doors.opensInPlace(data == null || view.isInstance() ? null : data.getTable(), clicked);
+		return doors.opensInPlace(walkTable(view), clicked);
 	}
 
 	/**
@@ -831,8 +1012,7 @@ public class WaypointOverlay extends Overlay
 		shownLine = ahead;
 		graphics.setColor(Highlighter.COLOUR);
 		graphics.setStroke(PATH_STROKE);
-		WalkData data = routes.getWalk();
-		WalkTable table = data == null || view.isInstance() ? null : data.getTable();
+		WalkTable table = walkTable(view);
 		Point previous = null;
 		WorldPoint previousTile = null;
 		boolean crossed = false;
@@ -880,6 +1060,13 @@ public class WaypointOverlay extends Overlay
 		{
 			drawTo(graphics, from, to);
 		}
+	}
+
+	/** The walk data's table; null before it is loaded, and in a house, whose tiles are not the table's. */
+	private WalkTable walkTable(WorldView view)
+	{
+		WalkData data = routes.getWalk();
+		return data == null || view.isInstance() ? null : data.getTable();
 	}
 
 	/** Null off the view's floor or outside its scene. */
