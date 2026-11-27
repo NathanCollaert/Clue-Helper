@@ -42,13 +42,11 @@ public class GuideBoxPresenter
 	ClueHelperConfig config;
 	@Inject
 	GuideOverlay overlay;
-	@Inject
-	EasyTeleportsNames easyTeleportsNames;
 
 	public void refresh()
 	{
-		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), easyTeleportsNames.named(guide.getCurrent()),
-			config.showNextStep() ? easyTeleportsNames.named(guide.getNext()) : null, stuckBookOnF2p(), prompts());
+		GuideBox box = GuideBox.of(boxState(), routes.getPlan(), guide.getRoute(), guide.getCurrent(),
+			config.showNextStep() ? guide.getNext() : null, stuckBookOnF2p(), prompts());
 		GuideBox atStep = guide.isAtStep() ? box.atTheStep() : box;
 		List<String> notes = new ArrayList<>(atStep.getNotes());
 		notes.addAll(threeStepSwap.notes());

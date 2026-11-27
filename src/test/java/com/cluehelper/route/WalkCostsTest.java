@@ -36,9 +36,9 @@ public class WalkCostsTest
 			}
 			WalkSearch walk = new WalkSearch(ground, WALK_LIMIT, false);
 			walk.run(WalkTable.pack(table.placed(from)), (tile, cost) -> WalkSearch.UNREACHED);
-			for (int e = table.entriesFrom(from); e < table.entriesEnd(from); e++)
+			for (int e = table.entryStart[from]; e < table.entryStart[from + 1]; e++)
 			{
-				WorldPoint to = table.placed(table.entryTo(e));
+				WorldPoint to = table.placed(table.entryTo[e]);
 				if (to == null)
 				{
 					continue;
@@ -50,9 +50,9 @@ public class WalkCostsTest
 					continue;
 				}
 				compared++;
-				if (walked != table.entryFull(e))
+				if (walked != table.entryFull[e])
 				{
-					mismatches.add("node " + from + " " + table.placed(from) + " -> " + to + ": table " + table.entryFull(e)
+					mismatches.add("node " + from + " " + table.placed(from) + " -> " + to + ": table " + table.entryFull[e]
 						+ ", walk " + (walked == WalkSearch.UNREACHED ? "unreached" : walked));
 				}
 			}

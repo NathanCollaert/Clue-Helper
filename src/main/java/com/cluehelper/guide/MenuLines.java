@@ -1,6 +1,7 @@
 package com.cluehelper.guide;
 
 import com.cluehelper.Tables;
+import com.cluehelper.poh.PohService;
 import com.cluehelper.transport.MenuLine;
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -85,6 +86,8 @@ public class MenuLines
 	SceneObjects sceneObjects;
 	@Inject
 	EasyTeleportsNames easyTeleportsNames;
+	@Inject
+	PohService poh;
 	final Map<String, int[]> listLines = new HashMap<>();
 	String listTitle;
 	/** The open list's labels as the game passed them, tags and all, before any plugin rewrites the lines. */
@@ -123,10 +126,12 @@ public class MenuLines
 			}
 			case NEXUS_LINE:
 			{
+				// [index, 10, y, struct id, line number, 1, parity, component]
 				int[] ints = intTail(8);
 				if (ints != null)
 				{
 					nexusLines.put(ints[3], new int[]{ints[7], ints[0]});
+					poh.onNexusLine(ints[3], ints[4]);
 				}
 				break;
 			}
@@ -495,7 +500,7 @@ public class MenuLines
 				out.add(child(boxLines.get(target.getLineId())));
 				break;
 			case FAIRY_CODE:
-				fairyCode(target.getLineKey(), out);
+				fairyCode(target, out);
 				break;
 			case MINIGAME:
 				minigame(target, out);
@@ -520,7 +525,8 @@ public class MenuLines
 	private int pickRow(MenuEntry[] entries, MenuTarget target)
 	{
 		String destination = target.destination();
-		List<Predicate<MenuEntry>> preferred = List.of(entry -> isExactly(entry, destination),
+		// An option named exactly so wins over one that only starts the same: a ladder's "Climb-up" over its "Climb".
+		List<Predicate<MenuEntry>> preferred = List.of(entry -> destination != null && namesExactly(entry.getOption(), destination),
 			entry -> isDestination(entry, target, destination), entry -> leadsToDestination(entry, target, destination),
 			entry -> MenuLabels.isOpener(entry.getOption()), entry -> goesThroughOpened(entry, destination));
 		return preferred.stream().mapToInt(wanted -> find(entries, target, wanted)).filter(row -> row >= 0).findFirst().orElse(-1);
@@ -555,14 +561,14 @@ public class MenuLines
 		out.add(region);
 	}
 
-	private void fairyCode(String code, Found out)
+	private void fairyCode(MenuTarget target, Found out)
 	{
-		String letters = FairyDials.letters(code);
+		String letters = FairyDials.letters(target.getLineKey());
 		if (letters == null)
 		{
 			return;
 		}
-		Widget row = client.getWidget(FairyDials.logRow(letters));
+		Widget row = client.getWidget(FairyDials.logRow(target, letters));
 		out.add(row);
 		if (row != null)
 		{
@@ -743,13 +749,6 @@ public class MenuLines
 		return Widgets.descendants(client.getWidget(listLine[0] >>> 16, 0)).stream()
 			.filter(widget -> Widgets.visible(widget) && widget.getActions() != null && MenuLabels.matches(widget.getName(), destination))
 			.findFirst().orElse(null);
-	}
-
-	/** An option named exactly so wins over one that only starts the same: a ladder's "Climb-up" over its "Climb". */
-	private boolean isExactly(MenuEntry entry, String destination)
-	{
-		return destination != null && entry.getOption() != null && easyTeleportsNames.readings(entry.getOption()).stream()
-			.anyMatch(option -> MenuLabels.normalise(option).equals(MenuLabels.normalise(destination)));
 	}
 
 	/** Whether the shown option or line names the label, also under a name Easy Teleports gave it. */

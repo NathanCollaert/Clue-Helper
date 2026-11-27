@@ -1,15 +1,9 @@
 package com.cluehelper.guide;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.util.*;
 import javax.inject.*;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.api.widgets.Widget;
 
 @Singleton
 public class FairyDials
@@ -19,32 +13,9 @@ public class FairyDials
 	private static final int LOG_COMPONENTS_PER_CODE = 2;
 	private static final String LETTERS = "ABCDIJKLPQRS";
 	private static final int[] VARBITS = {VarbitID.FAIRYRING_1, VarbitID.FAIRYRING_2, VarbitID.FAIRYRING_3};
-	/**
-	 * A dial's four letter widgets share one box on its hub and the game turns each letter's model into place, so a
-	 * mushroom is found from the hub by its clockwise turns to the front: front, right, top, left.
-	 */
-	private static final Point[] MUSHROOM_OFFSETS = {new Point(0, 48), new Point(49, -1), new Point(0, -49), new Point(-49, -1)};
-	/** The front mushroom only shows through a hole in the plank. */
-	private static final int[] MUSHROOM_RADII = {21, 31, 31, 31};
 
 	@Inject
 	Client client;
-
-	public List<Shape> shapes(String code)
-	{
-		List<Shape> out = new ArrayList<>();
-		String letters = letters(code);
-		for (int dial = 0; letters != null && dial < COUNT; dial++)
-		{
-			char letter = letters.charAt(dial);
-			Widget hub = client.getWidget(InterfaceID.Fairyrings.A + LETTERS.indexOf(letter));
-			if (Widgets.visible(hub))
-			{
-				out.add(mushroom(hub.getBounds(), turnsToFront(dial, letter)));
-			}
-		}
-		return out;
-	}
 
 	boolean isDialled(String code)
 	{
@@ -91,6 +62,15 @@ public class FairyDials
 		return code.toString();
 	}
 
+	/**
+	 * The travel log row a fairy code target is dialled from: a chain's codes from the Fairy Queen's hideout row, which
+	 * turns the dials to the chain's next code (most of them have no row of their own), else the code's own row.
+	 */
+	static int logRow(MenuTarget target, String letters)
+	{
+		return target.getLineName() != null ? InterfaceID.FairyringsLog.HIDEOUT : logRow(letters);
+	}
+
 	/** The travel log row of a code: every code in alphabetical order from AIP, each followed by its favourite star. */
 	static int logRow(String letters)
 	{
@@ -115,12 +95,5 @@ public class FairyDials
 	private int turnsToFront(int dial, char letter)
 	{
 		return Math.floorMod(varbitWithLetterAtFront(dial, letter) - client.getVarbitValue(VARBITS[dial]), LETTERS_PER_DIAL);
-	}
-
-	private static Shape mushroom(Rectangle hub, int turnsToFront)
-	{
-		Point offset = MUSHROOM_OFFSETS[turnsToFront];
-		int radius = MUSHROOM_RADII[turnsToFront];
-		return new Ellipse2D.Double(hub.getCenterX() + offset.x - radius, hub.getCenterY() + offset.y - radius, 2 * radius, 2 * radius);
 	}
 }

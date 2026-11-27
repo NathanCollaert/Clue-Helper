@@ -64,20 +64,22 @@ final class TaskActs
 		{
 			return withCast(shown, cast, carried);
 		}
+		// Cast already: the act's line stays the same after the cast, so nothing else drops its spell and tab
+		Highlights afterCast = cast == null ? shown : shown.toBuilder().spellWidget(Highlights.NONE.getSpellWidget()).tab(Tab.NONE).build();
 		Set<Integer> forPatch = patchItems(step, carried);
 		if (forPatch != null)
 		{
-			return outlined(shown, forPatch, Tab.INVENTORY);
+			return outlined(afterCast, forPatch, Tab.INVENTORY);
 		}
 		StepIndex.Making making = makingNow(step, carried);
 		if (current.getStage().getOption() != null && making == null)
 		{
-			return shown;
+			return afterCast;
 		}
 		Set<Integer> items = carried.stream().filter(id -> making != null
 				? making.getItems().stream().anyMatch(group -> group.contains(id)) : StepHighlights.isStepItem(step, id))
 			.collect(toUnmodifiableSet());
-		return outlined(shown, items, items.isEmpty() ? shown.getTab() : Tab.INVENTORY);
+		return outlined(afterCast, items, items.isEmpty() ? afterCast.getTab() : Tab.INVENTORY);
 	}
 
 	/** The items outlined, filled where their left click puts them on or uses them. */
@@ -286,35 +288,22 @@ final class TaskActs
 		return null;
 	}
 
-	/**
-	 * A task act, or the walk to it, read as its phase: a planting task's patch cleared first, else the first phase whose
-	 * items are carried, else the task's own line.
-	 */
+	/** A planting task's act, or the walk to it, with the patch cleared first. */
 	SubStep phased(SubStep act, Step step)
 	{
 		Stage planting = step == null || !step.getData().isPlants() ? null : act.isTask() ? act.getStage() : taskWalkedTo(act, step);
-		if (planting != null)
-		{
-			Allotment patch = nearestPatch(step);
-			boolean clearing = patch != null && CLEARING_LINES.containsKey(patch);
-			String text = clearing ? CLEARING_LINES.get(patch) : planting.getAct();
-			String option = !act.isTask() ? act.getOption() : clearing ? patch.getOption() : planting.getOption();
-			return text.equals(act.getText()) && Objects.equals(option, act.getOption()) ? act : act.toBuilder().text(text).option(option).build();
-		}
-		Stage task = step == null || step.getData().getPhases().isEmpty() ? null : act.isTask() ? act.getStage() : taskWalkedTo(act, step);
-		if (task == null)
+		if (planting == null)
 		{
 			return act;
 		}
-		Set<Integer> carried = player.carriedIds();
-		StepIndex.Phase phase = step.getData().getPhases().stream()
-			.filter(candidate -> candidate.getWhileCarried().stream().anyMatch(carried::contains)).findFirst().orElse(null);
-		String text = phase == null ? task.getAct() : phase.getText();
-		String option = phase == null || phase.getOption() == null ? task.getOption() : phase.getOption();
+		Allotment patch = nearestPatch(step);
+		boolean clearing = patch != null && CLEARING_LINES.containsKey(patch);
+		String text = clearing ? CLEARING_LINES.get(patch) : planting.getAct();
+		String option = !act.isTask() ? act.getOption() : clearing ? patch.getOption() : planting.getOption();
 		return text.equals(act.getText()) && Objects.equals(option, act.getOption()) ? act : act.toBuilder().text(text).option(option).build();
 	}
 
-	/** The task a walk reads as (the walk to the pyre), by its line; null for any other sub-step. */
+	/** The task a walk reads as (the walk to the patch), by its line; null for any other sub-step. */
 	private static Stage taskWalkedTo(SubStep walk, Step step)
 	{
 		if (walk.getKind() != SubStep.Kind.WALK)
@@ -323,7 +312,6 @@ final class TaskActs
 		}
 		Stage task = step.getStages().stream().filter(stage -> stage.getKind() == Stage.Kind.TASK).findFirst().orElse(null);
 		boolean taskLine = task != null && (walk.getText().equals(task.getAct())
-			|| step.getData().getPhases().stream().anyMatch(phase -> phase.getText().equals(walk.getText()))
 			|| step.getData().isPlants() && CLEARING_LINES.containsValue(walk.getText()));
 		return taskLine ? task : null;
 	}

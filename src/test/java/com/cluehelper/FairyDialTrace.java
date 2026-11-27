@@ -1,6 +1,5 @@
 package com.cluehelper;
 
-import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.MenuTarget;
 import java.awt.Color;
@@ -8,7 +7,6 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +39,16 @@ final class FairyDialTrace extends Overlay
 
 	private final Client client;
 	private final MenuLines lines;
-	private final FairyDials dials;
 	private final Consumer<File> saveFrame;
 	private String code;
 	private boolean dumpPending;
 	private boolean framePending;
 	private int frameCount;
 
-	FairyDialTrace(Client client, MenuLines lines, FairyDials dials, Consumer<File> saveFrame)
+	FairyDialTrace(Client client, MenuLines lines, Consumer<File> saveFrame)
 	{
 		this.client = client;
 		this.lines = lines;
-		this.dials = dials;
 		this.saveFrame = saveFrame;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
@@ -138,11 +134,10 @@ final class FairyDialTrace extends Overlay
 		{
 			draw(graphics, line);
 		}
-		dials.shapes(code).forEach(shape -> draw(graphics, shape));
 		return null;
 	}
 
-	private static void draw(Graphics2D graphics, Shape shape)
+	private static void draw(Graphics2D graphics, Rectangle shape)
 	{
 		graphics.setColor(FILL);
 		graphics.fill(shape);

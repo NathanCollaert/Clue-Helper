@@ -145,7 +145,7 @@ public class EdgeCaseRoutesTest
 
 	private static boolean needsNoTool(int row)
 	{
-		int gate = table.rowGate(row);
+		int gate = table.rowGate[row];
 		return gate == 0 || table.getGates().get(gate - 1).getItems().isEmpty();
 	}
 

@@ -56,7 +56,7 @@ public class CatalogRow
 	int lineId;
 	/** A nexus line's map region shield. */
 	String lineKey;
-	/** The cache's name of a nexus destination, a minigame or a boat's dock. */
+	/** The cache's name of a nexus destination, a minigame or a boat's dock; a chained fairy ring hop's whole chain. */
 	String lineName;
 	/** Where a Quetzal site's icon sits on the map, x and y; null for any other line. */
 	int[] icon;

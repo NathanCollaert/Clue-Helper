@@ -24,11 +24,6 @@ public class PohService
 	/** Every piece has loaded two ticks after entering; later scans never found more. */
 	private static final int SCAN_DELAY_TICKS = 2;
 	static final int[] NEXUS_SLOTS = Tables.ids("nexus slots");
-	private static final int NEXUS_LINE_SCRIPT = 2675;
-	/** The script's int arguments: [index, 10, y, struct id, line number, 1, parity, component]. */
-	private static final int NEXUS_LINE_ARGS = 8;
-	private static final int NEXUS_ARG_STRUCT = 3;
-	private static final int NEXUS_ARG_LINE_NUMBER = 4;
 	private static final int[] SETTINGS = Tables.ids("house settings");
 	private static final int[] HOUSE_VARBITS = IntStream.concat(Arrays.stream(NEXUS_SLOTS), Arrays.stream(SETTINGS)).toArray();
 	/** The varbits a house is read from. */
@@ -95,17 +90,9 @@ public class PohService
 		ownership.observeClick(event.getMenuOption(), event.getMenuTarget());
 	}
 
-	/** Script 2675 draws each nexus line with its struct id and line number, which is its hotkey. */
-	public void onScriptPreFired(ScriptPreFired event)
+	/** A nexus line drawn, with its struct id and line number, which is its hotkey. */
+	public void onNexusLine(int struct, int line)
 	{
-		if (event.getScriptId() != NEXUS_LINE_SCRIPT || client.getIntStackSize() < NEXUS_LINE_ARGS)
-		{
-			return;
-		}
-		int[] stack = client.getIntStack();
-		int base = client.getIntStackSize() - NEXUS_LINE_ARGS;
-		int struct = stack[base + NEXUS_ARG_STRUCT];
-		int line = stack[base + NEXUS_ARG_LINE_NUMBER];
 		Profile profile = stored.get();
 		if (!Integer.valueOf(line).equals(profile.nexusLines.get(struct)))
 		{

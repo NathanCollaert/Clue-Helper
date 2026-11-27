@@ -218,7 +218,7 @@ final class StageParts
 		String where = !source.hasPlaces() ? null : places.isEmpty() ? ANYWHERE : places.get(0).getText();
 		Stage task = Stage.builder().kind(Stage.Kind.TASK).act(source.getAct() == null ? sentence(taskText) : source.getAct()).detail(where)
 			.tiles(placeTiles(places)).ourMarker(true).objectIds(objectsOf(places)).npcIds(npcsOf(places)).takesStepItems(true)
-			.worn(source.getWear()).spans(spans(entry.getPlaces()))
+			.leftClickDoesIt(source.isLeftClickDoesIt()).worn(source.getWear()).spans(spans(entry.getPlaces()))
 			.beforeAnywhere(source.getBefore().stream().filter(StepSource.Before::isAnywhere).map(ActParts::beforeAct).collect(toUnmodifiableList()))
 			.beforeThere(source.getBefore().stream().filter(before -> !before.isAnywhere()).map(ActParts::beforeAct).collect(toUnmodifiableList()))
 			.option(places.stream().map(StepSource.Place::getOption).filter(option -> option != null).findFirst().orElse(null))

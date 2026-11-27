@@ -1,5 +1,6 @@
 package com.cluehelper.route;
 
+import com.cluehelper.*;
 import java.util.*;
 import javax.inject.*;
 import lombok.*;
@@ -49,14 +50,23 @@ public final class SceneDoors
 	/** From each new snapshot's walk gates: a web opens only to a player carrying or wielding something that slashes. */
 	@Setter
 	volatile boolean canSlash;
-	/** From each new snapshot: a strange old lockpick is carried. */
-	volatile boolean canPickBarrowsLocks;
+	/** The use-up fee of a lockpick charge, in tiles of running (half-ticks). */
+	private static final int LOCKPICK_FEE = Tables.rows("lockpick use-up fee").get(0).id(0);
+	/** What picking a locked door costs a walk on top of opening it: the lockpick's fee unless Save consumables is off. */
+	volatile int lockedDoorTiles = LOCKPICK_FEE;
+	/** From each new snapshot: the strange old lockpick carried, or -1. */
+	volatile int carriedLockpick = -1;
 	@Inject
 	Client client;
 
 	public void setCarried(Set<Integer> carriedIds)
 	{
-		canPickBarrowsLocks = carriedIds.stream().anyMatch(LOCKPICKS::contains);
+		carriedLockpick = carriedIds.stream().filter(LOCKPICKS::contains).findFirst().orElse(-1);
+	}
+
+	public void setSaveConsumables(SaveConsumables save)
+	{
+		lockedDoorTiles = save == SaveConsumables.OFF ? 0 : LOCKPICK_FEE;
 	}
 
 	public void onMenuOptionClicked(MenuOptionClicked event)
@@ -105,6 +115,7 @@ public final class SceneDoors
 					if (wall != null && opensOnClick(wall) && !passedByRow(table, wall.getId(), view, x, y, plane))
 					{
 						clearWall(flags[plane], doorSides[plane], x, y, wall.getOrientationA());
+						doorSides[plane][x][y] |= lockpickFor(wall.getId()) != -1 ? LoadedScene.LOCKED_DOOR : 0;
 					}
 					if (diagonalDoor(tile) != null)
 					{
@@ -114,13 +125,19 @@ public final class SceneDoors
 				}
 			}
 		}
-		return new LoadedScene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides);
+		return new LoadedScene(scene.getBaseX(), scene.getBaseY(), scene.getSizeX(), scene.getSizeY(), flags, doorSides, lockedDoorTiles);
 	}
 
 	/** Client thread only. A door, web, fence or doorway the path can go through with one click. */
 	public boolean opensOnClick(WallObject wall)
 	{
 		return opens(wall.getId()) && !locked.contains(new Door(wall.getId(), wall.getWorldLocation()));
+	}
+
+	/** Client thread only. The carried lockpick a locked Barrows door is opened with, used on it; -1 for any other object. */
+	public int lockpickFor(int objectId)
+	{
+		return BARROWS_LOCKED.contains(currentForm(objectId)) ? carriedLockpick : -1;
 	}
 
 	/** Client thread only. The closed door standing across {@code tile}'s diagonal, or null. */
@@ -161,7 +178,7 @@ public final class SceneDoors
 	{
 		if (BARROWS_LOCKED.contains(currentForm(id)))
 		{
-			return canPickBarrowsLocks;
+			return carriedLockpick != -1;
 		}
 		String option = openOption(id);
 		return isOpening(option) && (canSlash || !SLASH.equals(option));

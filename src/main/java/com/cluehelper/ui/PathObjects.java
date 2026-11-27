@@ -203,7 +203,7 @@ final class PathObjects
 			for (int dy = -ROW_OBJECT_TILES; dy <= ROW_OBJECT_TILES; dy++)
 			{
 				WorldPoint at = origin.dx(dx).dy(dy);
-				Tile tile = tile(view, at);
+				Tile tile = SceneObjects.tile(view, at);
 				for (TileObject object : tile == null ? List.<TileObject>of() : SceneObjects.objectsOn(tile))
 				{
 					int toObject = wanted.test(object) ? distance.applyAsInt(at, object) : Integer.MAX_VALUE;
@@ -231,7 +231,7 @@ final class PathObjects
 		int fromSides = (dx > 0 ? SceneDoors.EAST : dx < 0 ? SceneDoors.WEST : 0) | (dy > 0 ? SceneDoors.NORTH : dy < 0 ? SceneDoors.SOUTH : 0);
 		int toSides = (dx > 0 ? SceneDoors.WEST : dx < 0 ? SceneDoors.EAST : 0) | (dy > 0 ? SceneDoors.SOUTH : dy < 0 ? SceneDoors.NORTH : 0);
 		for (TileObject door : new TileObject[]{closedDoorFacing(view, from, fromSides),
-			closedDoorFacing(view, to, toSides), doors.diagonalDoor(tile(view, to))})
+			closedDoorFacing(view, to, toSides), doors.diagonalDoor(SceneObjects.tile(view, to))})
 		{
 			if (door != null)
 			{
@@ -242,14 +242,8 @@ final class PathObjects
 
 	private WallObject closedDoorFacing(WorldView view, WorldPoint at, int sides)
 	{
-		Tile tile = tile(view, at);
+		Tile tile = SceneObjects.tile(view, at);
 		WallObject wall = tile == null ? null : tile.getWallObject();
 		return wall != null && (wall.getOrientationA() & sides) != 0 && doors.opensOnClick(wall) ? wall : null;
-	}
-
-	private static Tile tile(WorldView view, WorldPoint at)
-	{
-		LocalPoint local = LocalPoint.fromWorld(view, at);
-		return local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
 	}
 }

@@ -65,7 +65,7 @@ public final class SubSteps
 	SubSteps(Client client, PlayerModel player, BankMemory bankMemory, StepNeeds stepNeeds, RoutePlanner routes, CombatGear gear,
 		AvailabilityService availability)
 	{
-		this(client, player::getSnapshot, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
+		this(client, player::now, bankMemory::onlyInBankedKit, stepNeeds, routes::getStart,
 			routes::keepsScrollBookOutOfWilderness, gear::isWeaponOrArmour, availability::getCatalog, routes::exitBetween);
 	}
 
@@ -75,12 +75,8 @@ public final class SubSteps
 	public List<SubStep> of(Route route, Step step)
 	{
 		boolean takeFromStash = takeFromStash(step);
-		List<SubStep> legs = new RouteSteps(route, step, use -> withdrawLine(step, use), house(), takeFromStash, handInItems(step))
-			.build(this::exitOf, this::jumpedBy, this::plantedTreeTeleport);
-		Set<Integer> onHand = new HashSet<>(carriedIds());
-		onHand.addAll(withdrawnIds(route));
-		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData(), this::finished, carriedIds(), onHand,
-			id -> client.getItemDefinition(id).getName()), step.getData());
+		List<SubStep> legs = new RouteSteps(route, step, takeFromStash).build();
+		List<SubStep> wayIn = withWalkToWayIn(withWayInEquipped(legs, step.getData()), step.getData());
 		List<SubStep> steps = withRideItemsWorn(route, withEntranaDeposits(withGearOnArrival(wayIn)));
 		return withWalksNamedByWhatTheyLeadTo(withTrackPlayedOnTheWay(withBankTasksShown(scrollBookOutOfWilderness.getAsBoolean()
 			? ScrollBook.withBookBanked(steps, carriesScrollBook(), intoWilderness(route, step)) : steps)));
@@ -136,7 +132,7 @@ public final class SubSteps
 		return null;
 	}
 
-	private static boolean isWalk(SubStep sub)
+	static boolean isWalk(SubStep sub)
 	{
 		return sub.getKind() == Kind.WALK || sub.getKind() == Kind.WALK_TO_CLUE;
 	}
@@ -159,24 +155,11 @@ public final class SubSteps
 	 */
 	private CatalogRow plantedTreeTeleport(WorldPoint tree)
 	{
-		PlayerSnapshot player = snapshot.get();
-		Set<String> grown = player == null ? Set.of() : player.getPlantedTrees();
+		Set<String> grown = snapshot.get().getPlantedTrees();
 		return catalog.get().stream()
 			.filter(row -> row.getCategory() == Category.SPIRIT_TREE && tree.equals(row.getOrigin()))
 			.filter(row -> row.getRequirements().getPlantedTrees().stream().anyMatch(grown::contains))
 			.min(Comparator.comparing(row -> row.getClicks().toString())).orElse(null);
-	}
-
-	private Set<Integer> carriedIds()
-	{
-		PlayerSnapshot carrier = snapshot.get();
-		return carrier == null ? Set.of() : carrier.carriedIds();
-	}
-
-	private boolean finished(Quest quest)
-	{
-		PlayerSnapshot carrier = snapshot.get();
-		return carrier != null && carrier.finished(quest);
 	}
 
 	/** Where the route goes, or with no legs yet the step's targets: a step with spawns outside it (green dragons) may not. */
@@ -195,12 +178,11 @@ public final class SubSteps
 	private List<SubStep> withEntranaDeposits(List<SubStep> steps)
 	{
 		int crossing = IntStream.range(0, steps.size()).filter(i -> isEntranaCrossing(steps.get(i))).findFirst().orElse(-1);
-		PlayerSnapshot carrier = snapshot.get();
-		if (crossing < 0 || carrier == null)
+		if (crossing < 0)
 		{
 			return steps;
 		}
-		Set<Integer> banned = carrier.carriedIds().stream().filter(weaponOrArmour::test).collect(toUnmodifiableSet());
+		Set<Integer> banned = snapshot.get().carriedIds().stream().filter(weaponOrArmour::test).collect(toUnmodifiableSet());
 		if (banned.isEmpty())
 		{
 			return steps;
@@ -253,7 +235,7 @@ public final class SubSteps
 	 */
 	private static List<Set<Integer>> toWear(CatalogRow row, PlayerSnapshot player)
 	{
-		if (row == null || player == null)
+		if (row == null)
 		{
 			return List.of();
 		}
@@ -285,8 +267,8 @@ public final class SubSteps
 	/** Named by the piece the player has on them or the route withdraws, else by the lowest id of {@code gear}. */
 	private SubStep equip(Set<Integer> gear, Set<Integer> withdrawn)
 	{
-		PlayerSnapshot carrier = snapshot.get();
-		int piece = gear.stream().filter(id -> carrier != null && carrier.carriedIds().contains(id) || withdrawn.contains(id))
+		Set<Integer> carried = snapshot.get().carriedIds();
+		int piece = gear.stream().filter(id -> carried.contains(id) || withdrawn.contains(id))
 			.findFirst().orElse(gear.stream().sorted().findFirst().orElseThrow());
 		return SubStep.of(Kind.ACT, "Equip the " + client.getItemDefinition(piece).getName()).actItems(gear)
 			.worn(List.of(anyOf(client.getItemDefinition(piece).getName(), gear))).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build();
@@ -342,25 +324,12 @@ public final class SubSteps
 			return false;
 		}
 		return stepNeeds.of(step).getStash() == StashMemory.State.FILLED
-			&& !step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(carriedItems()));
-	}
-
-	private HouseState house()
-	{
-		PlayerSnapshot player = snapshot.get();
-		return player == null ? HouseState.NONE : player.getHouse();
-	}
-
-	private Map<Integer, Integer> carriedItems()
-	{
-		PlayerSnapshot player = snapshot.get();
-		return player == null ? Map.of() : player.carriedItems();
+			&& !step.getRequirements().itemsFulfilledBy(PlayerSnapshot.items(snapshot.get().carriedItems()));
 	}
 
 	private boolean carriesScrollBook()
 	{
-		PlayerSnapshot player = snapshot.get();
-		return player != null && player.carriesItemNamed(ScrollBook.BOOK_NAME, id -> client.getItemDefinition(id).getName());
+		return snapshot.get().carriesItemNamed(ScrollBook.BOOK_NAME, id -> client.getItemDefinition(id).getName());
 	}
 
 	/** The exit a start leg leaves by, or null for any other walk. */
@@ -400,7 +369,7 @@ public final class SubSteps
 	/** What the step data says core asks for, less what is carried, while a step need it counts towards is unmet. */
 	private int stillToTake(Step step, int itemId)
 	{
-		Map<Integer, Integer> carried = carriedItems();
+		Map<Integer, Integer> carried = snapshot.get().carriedItems();
 		Item[] carriedNow = PlayerSnapshot.items(carried);
 		boolean unmet = stepNeeds.of(step).getNeeds().stream().map(RequiredItems.Need::getRequirement)
 			.anyMatch(requirement -> requirement.fulfilledBy(itemId) && !requirement.fulfilledBy(carriedNow));
@@ -409,15 +378,13 @@ public final class SubSteps
 
 	/** The sub-steps of one route, built leg by leg: each stage's walk and act in turn, then the step's own acts. */
 	@RequiredArgsConstructor
-	private static final class RouteSteps
+	private final class RouteSteps
 	{
 		final List<SubStep> steps = new ArrayList<>();
+		final HouseState house = snapshot.get().getHouse();
 		final Route route;
 		final Step step;
-		final Function<ItemUse, String> itemLines;
-		final HouseState house;
 		final boolean takeFromStash;
-		final List<String> handInItems;
 
 		/** The STASH unit stands outside the step's way in: its items come before going in. */
 		private boolean stashFirst()
@@ -425,11 +392,11 @@ public final class SubSteps
 			return takeFromStash && stashOutsideWayIn(step);
 		}
 
-		List<SubStep> build(Function<Leg, Exit> exits, Function<Leg, Exit> jumps, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
+		List<SubStep> build()
 		{
 			if (route.isOpenBankStart() && !route.getWithdraw().isEmpty())
 			{
-				steps.add(LegSteps.withdraw(route, itemLines));
+				steps.add(LegSteps.withdraw(route, use -> withdrawLine(step, use)));
 			}
 			List<Stage> stages = step.getStages().stream().filter(stage -> !stage.getTiles().isEmpty()).collect(toList());
 			List<Leg> legs = route.getLegs();
@@ -437,14 +404,14 @@ public final class SubSteps
 			WorldPoint start = legs.isEmpty() ? null : legs.get(0).getFrom();
 			if (start != null && stages.size() > 1 && stages.get(0).getTiles().contains(start))
 			{
-				addStageReached(start, stages.get(0), route.getStartBook(), plantedTreeTeleport);
+				addStageReached(start, stages.get(0), route.getStartBook());
 				stage++;
 			}
 			for (int i = 0; i < legs.size(); i++)
 			{
 				Leg leg = legs.get(i);
 				Leg next = i + 1 < legs.size() ? legs.get(i + 1) : null;
-				Exit exit = leg.getKind() == Leg.Kind.WALK ? exits.apply(leg) : null;
+				Exit exit = leg.getKind() == Leg.Kind.WALK ? exitOf(leg) : null;
 				Stage reached = stage < stages.size() - 1 && stages.get(stage).getTiles().contains(leg.getTo()) ? stages.get(stage) : null;
 				if (reached != null && leg.getKind() == Leg.Kind.WALK && exit == null)
 				{
@@ -452,7 +419,7 @@ public final class SubSteps
 					{
 						steps.add(LegSteps.enter(step.getData()));
 					}
-					Exit jump = reached.getKind() == Stage.Kind.KEY ? jumps.apply(leg) : null;
+					Exit jump = reached.getKind() == Stage.Kind.KEY ? jumpedBy(leg) : null;
 					if (jump != null)
 					{
 						steps.add(LegSteps.jump(jump));
@@ -465,7 +432,7 @@ public final class SubSteps
 				}
 				if (reached != null)
 				{
-					addStageReached(leg.getTo(), reached, leg.getBookAfter(), plantedTreeTeleport);
+					addStageReached(leg.getTo(), reached, leg.getBookAfter());
 					stage++;
 				}
 			}
@@ -478,9 +445,9 @@ public final class SubSteps
 		 * The stage's act where the route reaches it; a route can also start on it (planned again on arriving in the house
 		 * whose spirit tree is the stage).
 		 */
-		private void addStageReached(WorldPoint at, Stage reached, Book book, Function<WorldPoint, CatalogRow> plantedTreeTeleport)
+		private void addStageReached(WorldPoint at, Stage reached, Book book)
 		{
-			CatalogRow toPlanted = step.getData().isToPlantedTree() ? plantedTreeTeleport.apply(at) : null;
+			CatalogRow toPlanted = step.getData().isToPlantedTree() ? plantedTreeTeleport(at) : null;
 			if (toPlanted != null)
 			{
 				steps.add(LegSteps.teleport(Leg.teleport(at, toPlanted, toPlanted.getDuration(), book), house));
@@ -517,7 +484,7 @@ public final class SubSteps
 					break;
 				case BANK:
 					steps.add(SubStep.of(Kind.BANK, "Open the bank").waypoint(leg.getTo()).build());
-					steps.add(LegSteps.withdraw(route, itemLines));
+					steps.add(LegSteps.withdraw(route, use -> withdrawLine(step, use)));
 					break;
 				default:
 					throw new IllegalArgumentException("unhandled leg kind " + leg.getKind());
@@ -553,7 +520,7 @@ public final class SubSteps
 			}
 			else
 			{
-				steps.addAll(Acts.of(step, takeFromStash && !stashFirst(), handInItems));
+				steps.addAll(Acts.of(step, takeFromStash && !stashFirst(), handInItems(step)));
 			}
 		}
 	}
@@ -737,11 +704,10 @@ public final class SubSteps
 		return List.copyOf(out);
 	}
 
-	/** @param onHand carried or withdrawn on the route: one of them that is every need names the act (the Medallion of the Deep) */
-	static List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data, Predicate<Quest> finished,
-		Set<Integer> carried, Set<Integer> onHand, IntFunction<String> itemName)
+	List<SubStep> withWayInEquipped(List<SubStep> steps, StepIndex.Entry data)
 	{
-		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequiresFor(finished, carried);
+		PlayerSnapshot player = snapshot.get();
+		List<StepIndex.Requires> worn = data == null ? List.of() : data.wornRequiresFor(player::finished, player.carriedIds());
 		if (worn.isEmpty())
 		{
 			return steps;
@@ -751,9 +717,7 @@ public final class SubSteps
 		List<StepIndex.Requires> ownWear = worn.stream().filter(need -> need.getPutOn() == null).collect(toList());
 		if (!ownWear.isEmpty())
 		{
-			boolean coverOnHand = ownWear.size() > 1 && onHand.contains(data.getCover());
-			String names = coverOnHand ? itemName.apply(data.getCover()) : ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and "));
-			equip.add(SubStep.of(Kind.ACT, "Equip the " + names)
+			equip.add(SubStep.of(Kind.ACT, "Equip the " + ownWear.stream().map(StepIndex.Requires::getName).collect(joining(" and ")))
 				.actItems(ownWear.stream().flatMap(need -> need.getIds().stream()).collect(toUnmodifiableSet()))
 				.wornWayIn(true).wayIn(data.getEntry()).done(SubStep.Done.WORN).tab(Tab.INVENTORY).build());
 		}

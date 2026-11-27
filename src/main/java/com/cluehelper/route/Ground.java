@@ -3,6 +3,7 @@ package com.cluehelper.route;
 import java.util.Arrays;
 import java.util.function.*;
 import lombok.*;
+import lombok.experimental.PackagePrivate;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -18,6 +19,7 @@ public final class Ground
 
 	final WorldMap map;
 	final LoadedScene scene;
+	@PackagePrivate
 	final WalkTable table;
 	final IntPredicate rowOpen;
 
@@ -130,24 +132,9 @@ public final class Ground
 		return rows.length == 0 ? NO_ROWS : Arrays.stream(rows).filter(rowOpen).toArray();
 	}
 
-	int rowDestination(int row)
-	{
-		return table.rowDestTile(row);
-	}
-
-	boolean isExitRow(int row)
-	{
-		return table.isExitRow(row);
-	}
-
 	Exit exit(int row)
 	{
 		return table.exit(table.rowOrigin(row), table.rowDest(row));
-	}
-
-	int rowCost(int row)
-	{
-		return table.rowCost(row);
 	}
 
 	private boolean inScene(int x, int y, int plane)

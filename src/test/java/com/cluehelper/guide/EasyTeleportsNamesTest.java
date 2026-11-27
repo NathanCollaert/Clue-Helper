@@ -10,8 +10,8 @@ import org.junit.Test;
 public class EasyTeleportsNamesTest
 {
 	private static final List<EasyTeleportsNames.Rename> RENAMES = List.of(
-		new EasyTeleportsNames.Rename("Ring of dueling", "Castle Wars", "CW"),
-		new EasyTeleportsNames.Rename("Slayer ring", "Stronghold Slayer Cave", "Gnome Stronghold Caves"));
+		new EasyTeleportsNames.Rename("Castle Wars", "CW"),
+		new EasyTeleportsNames.Rename("Stronghold Slayer Cave", "Gnome Stronghold Caves"));
 
 	@Test
 	public void renamedLinesNameTheirTeleport()

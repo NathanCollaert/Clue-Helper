@@ -1,8 +1,7 @@
 package com.cluehelper.player;
 
+import com.cluehelper.BundledData;
 import com.google.gson.Gson;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import lombok.*;
 
@@ -25,18 +24,7 @@ public final class RuneModel
 
 	public static RuneModel read(Gson gson)
 	{
-		try (InputStream in = RuneModel.class.getResourceAsStream(FILE))
-		{
-			if (in == null)
-			{
-				throw new IllegalStateException(FILE + " is missing");
-			}
-			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), RuneModel.class);
-		}
-		catch (IOException e)
-		{
-			throw new IllegalStateException("can't read " + FILE, e);
-		}
+		return BundledData.read(gson, RuneModel.class, FILE);
 	}
 
 	/** Every item that pays for a rune or stands in for one: runes, combination runes, staves and tomes. */

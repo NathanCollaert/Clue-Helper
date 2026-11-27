@@ -10,8 +10,10 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.*;
@@ -268,8 +270,7 @@ public class WaypointOverlay extends Overlay
 	/** The items to pick up, outlined where they lie, else their tile. */
 	private void drawPickUp(Graphics2D graphics, WorldView view, WorldPoint at)
 	{
-		LocalPoint local = LocalPoint.fromWorld(view, at);
-		Tile tile = local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
+		Tile tile = SceneObjects.tile(view, at);
 		ItemLayer items = tile == null ? null : tile.getItemLayer();
 		if (items != null)
 		{
@@ -310,7 +311,8 @@ public class WaypointOverlay extends Overlay
 			return tier.getDeviceItemId();
 		}
 		SubStep act = Stream.of(guide.getCurrent(), guide.getNext())
-			.filter(sub -> sub != null && sub.getKind() == SubStep.Kind.ACT && sub.getActOption() != null && tile.equals(sub.getWaypoint()))
+			.filter(sub -> sub != null && (sub.getKind() == SubStep.Kind.ACT || sub.getKind() == SubStep.Kind.ENTER) && sub.getActOption() != null
+				&& tile.equals(sub.getWaypoint()))
 			.findFirst().orElse(null);
 		return act == null || act.getActItems().size() != 1 ? -1 : act.getActItems().iterator().next();
 	}
@@ -765,6 +767,26 @@ public class WaypointOverlay extends Overlay
 			&& guide.getHighlights().getMenuTarget().getObjectIds().contains(event.getId());
 	}
 
+	/** Client thread. The items used on objects the line leads through: a strange old lockpick on a Barrows door. */
+	public Set<Integer> pathItems()
+	{
+		return pathObjects.keySet().stream().map(object -> doors.lockpickFor(object.getId())).filter(itemId -> itemId != -1)
+			.collect(Collectors.toUnmodifiableSet());
+	}
+
+	/** The item used on a path object, drawn in the middle of it. */
+	private void drawItemUsedOn(Graphics2D graphics, TileObject object)
+	{
+		int itemId = doors.lockpickFor(object.getId());
+		Shape box = itemId == -1 ? null : object.getClickbox();
+		if (box != null)
+		{
+			BufferedImage image = itemManager.getImage(itemId);
+			Rectangle bounds = box.getBounds();
+			graphics.drawImage(image, (int) bounds.getCenterX() - image.getWidth() / 2, (int) bounds.getCenterY() - image.getHeight() / 2, null);
+		}
+	}
+
 	/** Client thread. Each object the line leads through, with its option, for the right-click menu to colour. */
 	public List<MenuTarget> pathObjectTargets()
 	{
@@ -805,6 +827,7 @@ public class WaypointOverlay extends Overlay
 	private void drawLine(Graphics2D graphics, WorldView view, List<WorldPoint> ahead)
 	{
 		pathObjects.forEach((object, option) -> highlighter.object(graphics, object, leftClicks.isLeftClick(object, option)));
+		pathObjects.keySet().forEach(object -> drawItemUsedOn(graphics, object));
 		shownLine = ahead;
 		graphics.setColor(Highlighter.COLOUR);
 		graphics.setStroke(PATH_STROKE);

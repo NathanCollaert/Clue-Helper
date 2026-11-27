@@ -22,6 +22,8 @@ public class LoadedScene
 	private static final int BORDER_HIGH = 5;
 	/** Opening a door on the way: the click and the stop it costs, in tiles of running. */
 	private static final int DOOR_TILES = 3;
+	/** A locked door's tile (the Barrows tunnels'), beside its open sides: picking it uses a lockpick charge. */
+	static final int LOCKED_DOOR = 1 << 30;
 	private static final int[] FROM_SIDES = {W, E, S, N, W | S, E | S, W | N, E | N};
 	private static final int[] TO_SIDES = {E, W, N, S, E | N, W | N, E | S, W | S};
 
@@ -33,10 +35,17 @@ public class LoadedScene
 	int[][][] flags;
 	/** [plane][x][y]: the sides (wall flags) of each tile that a closed door opens through; null when none are known. */
 	int[][][] doorSides;
+	/** What a locked door's charge costs on top of opening it, by the Save consumables setting: an unlocked door a little farther wins. */
+	int lockedDoorTiles;
 
 	public LoadedScene(int baseX, int baseY, int sizeX, int sizeY, int[][][] flags)
 	{
 		this(baseX, baseY, sizeX, sizeY, flags, null);
+	}
+
+	public LoadedScene(int baseX, int baseY, int sizeX, int sizeY, int[][][] flags, int[][][] doorSides)
+	{
+		this(baseX, baseY, sizeX, sizeY, flags, doorSides, 0);
 	}
 
 	/** Client thread only. Null for an instanced scene or one without collision data. */
@@ -128,8 +137,13 @@ public class LoadedScene
 		{
 			return 1;
 		}
-		boolean throughDoor = (sides[x][y] & FROM_SIDES[d]) != 0 || (sides[x + Directions.DX[d]][y + Directions.DY[d]] & TO_SIDES[d]) != 0;
-		return throughDoor ? 1 + DOOR_TILES : 1;
+		int to = sides[x + Directions.DX[d]][y + Directions.DY[d]];
+		boolean throughDoor = (sides[x][y] & FROM_SIDES[d]) != 0 || (to & TO_SIDES[d]) != 0;
+		if (!throughDoor)
+		{
+			return 1;
+		}
+		return 1 + DOOR_TILES + (((sides[x][y] | to) & LOCKED_DOOR) != 0 ? lockedDoorTiles : 0);
 	}
 
 	boolean isBlocked(int x, int y, int plane)

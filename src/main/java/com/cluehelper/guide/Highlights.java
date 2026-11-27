@@ -42,6 +42,8 @@ public class Highlights
 	String oneClickLabel;
 	/** An outlined object is filled when its left click is this option (a STASH unit's "Search"); null for teleports. */
 	String objectOption;
+	/** Every outlined object is filled, whatever its left click: each form's left click does the task (a funeral pyre). */
+	boolean fillAllObjects;
 	/** The carried item used on the outlined objects (a rope on the crevice), shown on them; -1 for none. */
 	@Builder.Default
 	int usedItem = -1;

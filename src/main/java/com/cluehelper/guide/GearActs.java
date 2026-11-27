@@ -86,12 +86,6 @@ final class GearActs
 		}
 		Map<ItemRequirement, List<Integer>> carried = new LinkedHashMap<>();
 		unmet.forEach(requirement -> carried.put(requirement, toEquip(requirement, worn, inventory)));
-		long notCarried = carried.values().stream().filter(List::isEmpty).count();
-		Integer cover = notCarried > 1 ? wayInCover(act, step) : null;
-		if (cover != null)
-		{
-			return equipping(act, List.of(), names(List.of(cover)));
-		}
 		List<Integer> chosen = new ArrayList<>();
 		List<String> names = new ArrayList<>();
 		carried.forEach((requirement, pieces) ->
@@ -105,21 +99,6 @@ final class GearActs
 	private static SubStep equipping(SubStep act, List<Integer> chosen, List<String> names)
 	{
 		return act.toBuilder().text(EQUIP_TEXT).items(names.stream().distinct().collect(toList())).actItems(Set.copyOf(chosen)).build();
-	}
-
-	/**
-	 * One item that is every one of the way in's needs at once (the Medallion of the Deep for the diving helmet and
-	 * apparatus); null for none. The fewest items to fetch when the player has two or more of the set to find.
-	 */
-	private Integer wayInCover(SubStep act, Step step)
-	{
-		if (!act.isWornWayIn())
-		{
-			return null;
-		}
-		int cover = step.getData().getCover();
-		boolean severalNeeds = step.getData().wornRequiresFor(player::finished, player.carriedIds()).size() > 1;
-		return severalNeeds && cover >= 0 ? cover : null;
 	}
 
 	/** The worn items an act wants off, refreshed as each comes off. */

@@ -2,10 +2,9 @@ package com.cluehelper.step;
 
 import com.cluehelper.guide.SubStep;
 import com.cluehelper.hotcold.Spot;
+import com.cluehelper.BundledData;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.*;
 import lombok.*;
@@ -30,18 +29,7 @@ public final class StepIndex
 
 	public static StepIndex read(Gson gson)
 	{
-		try (InputStream in = StepIndex.class.getResourceAsStream(FILE))
-		{
-			if (in == null)
-			{
-				throw new IllegalStateException(FILE + " is missing");
-			}
-			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), StepIndex.class);
-		}
-		catch (IOException e)
-		{
-			throw new IllegalStateException("can't read " + FILE, e);
-		}
+		return BundledData.read(gson, StepIndex.class, FILE);
 	}
 
 	public static StepIndex empty()
@@ -85,8 +73,6 @@ public final class StepIndex
 		Map<String, List<Level>> optionalFrom = Map.of();
 		/** Core's items the task does without once one of these varbits is set (a rake after buying auto-weed), by core's names. */
 		Map<String, List<Integer>> optionalWith = Map.of();
-		/** The task's line while something is carried, the first that matches: reanimate the head, then kill what rises. */
-		List<Phase> phases = List.of();
 		/** Once one of these is owned the task is done anywhere: a sacred eel needs only a knife, not Zul-Andra's spots. */
 		List<Integer> anywhereWith = List.of();
 		/** The task travels to one of the player's planted spirit trees: the route ends with the teleport to the first grown one. */
@@ -132,8 +118,6 @@ public final class StepIndex
 		List<SubStep> beforeActs = List.of();
 		/** Baked: the monsters that attack at the step (a double agent, a hot/cold spot's mage). */
 		Set<Integer> enemies = Set.of();
-		/** Baked: the one item that is every worn need of the way in at once (the Medallion of the Deep); -1 for none. */
-		int cover = -1;
 		/** Baked: the items a planting task plants with, the seed first, then the dibber. */
 		List<Integer> plantItems = List.of();
 
@@ -272,16 +256,6 @@ public final class StepIndex
 			return box != null && at != null && at.getPlane() == box.plane && at.getX() >= box.west && at.getY() >= box.south
 				&& at.getX() <= box.east && at.getY() <= box.north;
 		}
-	}
-
-	/** The task's line while any of {@code whileCarried} is carried. */
-	@Getter
-	public static final class Phase
-	{
-		String text;
-		List<Integer> whileCarried = List.of();
-		/** The option the phase clicks on the task's object (the pyre's Build); null for the task's own. */
-		String option;
 	}
 
 	@Getter
@@ -451,6 +425,8 @@ public final class StepIndex
 		String forgetOn;
 		/** For a remembered way: its line once the place is known. */
 		String rememberedAct;
+		/** For a remembered way: the line after trying a place that doesn't lead in, and the way back out of it; null for none. */
+		WrongPlace wrongPlace;
 
 		/** The line on the way's own floors. */
 		public String getPartWayLine()
@@ -468,6 +444,16 @@ public final class StepIndex
 		{
 			return partWay.stream().anyMatch(box -> Box.within(box, at));
 		}
+	}
+
+	/** The game's {@code line} on trying a wrong place (a crypt without the tunnel), then {@code option} on {@code objects} out. */
+	@Getter
+	public static final class WrongPlace
+	{
+		String line;
+		List<Integer> objects = List.of();
+		String option;
+		String act;
 	}
 
 	/** {@code count} of ground item {@code id}, then {@code option} on one of {@code objects} to go on. */

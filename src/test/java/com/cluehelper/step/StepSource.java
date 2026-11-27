@@ -42,6 +42,8 @@ public final class StepSource
 		private List<Requires> requires = List.of();
 		/** What is done at the place before the task, in order: Alry's bird, then king worms for aerial fishing. */
 		private List<Before> before = List.of();
+		/** Whatever form the task's objects are in, their left click does the task (a funeral pyre). */
+		private boolean leftClickDoesIt;
 
 		/** In the order of {@link StepIndex.Entry#getPlaces()}. */
 		public List<Place> getPlaces()

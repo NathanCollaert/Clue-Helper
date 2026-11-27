@@ -11,7 +11,7 @@ import com.cluehelper.transport.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
-import java.util.stream.IntStream;
+import java.util.stream.*;
 import javax.inject.*;
 import lombok.*;
 import net.runelite.api.*;
@@ -456,6 +456,7 @@ public class RoutePlanner
 		rowOpen = gates.rowOpen();
 		doors.setCanSlash(gates.canSlash());
 		doors.setCarried(snapshot.carriedIds());
+		doors.setSaveConsumables(config.saveConsumables());
 		gatesVersion = snapshot.getVersion();
 	}
 
@@ -652,15 +653,7 @@ public class RoutePlanner
 
 	private static Route offered(Plan planned, String identity)
 	{
-		return routesOf(planned).stream().filter(route -> route != null && route.getIdentity().equals(identity)).findFirst().orElse(null);
-	}
-
-	private static List<Route> routesOf(Plan planned)
-	{
-		List<Route> routes = new ArrayList<>();
-		routes.add(planned.getBest());
-		routes.add(planned.getFollowed());
-		return routes;
+		return Stream.of(planned.getBest(), planned.getFollowed()).filter(route -> route != null && route.getIdentity().equals(identity)).findFirst().orElse(null);
 	}
 
 	/** Walking changes it only through the nearest node or the walk to a target in the scene. */

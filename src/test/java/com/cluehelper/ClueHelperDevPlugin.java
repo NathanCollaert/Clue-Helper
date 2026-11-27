@@ -8,7 +8,6 @@ import com.cluehelper.campaign.CampaignRecorder;
 import com.cluehelper.campaign.Outcome;
 import com.cluehelper.dev.DevHarness;
 import com.cluehelper.guide.ActWatcher;
-import com.cluehelper.guide.FairyDials;
 import com.cluehelper.guide.LeftClicks;
 import com.cluehelper.guide.MenuLines;
 import com.cluehelper.guide.StepGuide;
@@ -156,9 +155,6 @@ public class ClueHelperDevPlugin extends Plugin
 	@Inject
 	private StepResolver stepResolver;
 
-	@Inject
-	private FairyDials fairyDials;
-
 	private ClueHelperPlugin clueHelper;
 	/** Built in Clue Helper's own injector, so it shares the plugin's services. */
 	private DevHarness harness;
@@ -252,7 +248,7 @@ public class ClueHelperDevPlugin extends Plugin
 			timingLog.stop();
 		});
 		log.info("{} timings go to {}", TAG, TimingLog.DIR.getAbsolutePath());
-		FairyDialTrace dialTrace = new FairyDialTrace(client, service(MenuLines.class), fairyDials,
+		FairyDialTrace dialTrace = new FairyDialTrace(client, service(MenuLines.class),
 			file -> requestFrame(frame -> frameWriter.execute(() -> writeFrame(frame, file))));
 		eventBus.register(dialTrace);
 		overlayManager.add(dialTrace);

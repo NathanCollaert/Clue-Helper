@@ -4,7 +4,8 @@ import com.cluehelper.route.WalkData;
 import com.cluehelper.step.StepIndex;
 import com.cluehelper.transport.Catalog;
 import com.google.gson.*;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import javax.inject.*;
 import lombok.Getter;
@@ -25,9 +26,12 @@ public class BundledData
 	@Inject
 	BundledData(BackgroundThread executor, Gson gson)
 	{
-		catalog = CompletableFuture.supplyAsync(() -> catalogOrEmpty(gson), executor);
-		steps = CompletableFuture.supplyAsync(() -> stepsOrEmpty(gson), executor);
-		walk = CompletableFuture.supplyAsync(() -> walkOrNull(gson), executor);
+		catalog = CompletableFuture.supplyAsync(() -> orElse(() -> Catalog.read(gson), Catalog.EMPTY,
+			"catalog is unreadable: no teleports will be offered"), executor);
+		steps = CompletableFuture.supplyAsync(() -> orElse(() -> StepIndex.read(gson), StepIndex.empty(),
+			"step data is unreadable: every step resolves as unknown"), executor);
+		walk = CompletableFuture.supplyAsync(() -> orElse(() -> WalkData.load(gson), null,
+			"walk data is unreadable: no routes will be planned"), executor);
 	}
 
 	/** Blocks while the load is still running, which only a step right after start-up can hit. */
@@ -36,42 +40,34 @@ public class BundledData
 		return steps.join();
 	}
 
-	private static Catalog catalogOrEmpty(Gson gson)
+	/** A JSON resource beside {@code type}; missing or unreadable is an {@link IllegalStateException}. */
+	public static <T> T read(Gson gson, Class<T> type, String file)
 	{
-		try
+		try (InputStream in = type.getResourceAsStream(file))
 		{
-			return Catalog.read(gson);
+			if (in == null)
+			{
+				throw new IllegalStateException(file + " is missing");
+			}
+			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), type);
 		}
-		catch (IllegalStateException | JsonParseException e)
+		catch (IOException e)
 		{
-			log.warn("the bundled catalog is unreadable: no teleports will be offered", e);
-			return Catalog.EMPTY;
+			throw new IllegalStateException("can't read " + file, e);
 		}
 	}
 
-	private static StepIndex stepsOrEmpty(Gson gson)
+	/** Runs on the load thread, so any failure falls back rather than leaving the future failed. */
+	private static <T> T orElse(Callable<T> read, T fallback, String unreadable)
 	{
 		try
 		{
-			return StepIndex.read(gson);
+			return read.call();
 		}
-		catch (IllegalStateException | JsonParseException e)
+		catch (Exception e)
 		{
-			log.warn("the bundled step data is unreadable: every step resolves as unknown", e);
-			return StepIndex.empty();
-		}
-	}
-
-	private static WalkData walkOrNull(Gson gson)
-	{
-		try
-		{
-			return WalkData.load(gson);
-		}
-		catch (IOException | RuntimeException e)
-		{
-			log.warn("the bundled walk data is unreadable: no routes will be planned", e);
-			return null;
+			log.warn("the bundled {}", unreadable, e);
+			return fallback;
 		}
 	}
 }

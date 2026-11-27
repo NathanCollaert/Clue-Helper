@@ -132,10 +132,15 @@ public final class SceneObjects
 	/** The objects on one tile of the loaded scene; none outside it. */
 	List<TileObject> on(WorldPoint at)
 	{
-		WorldView view = client.getTopLevelWorldView();
-		LocalPoint local = view == null ? null : LocalPoint.fromWorld(view, at);
-		Tile tile = local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
+		Tile tile = tile(client.getTopLevelWorldView(), at);
 		return tile == null ? List.of() : objectsOn(tile);
+	}
+
+	/** The loaded scene's tile at a world point; null outside it. */
+	public static Tile tile(WorldView view, WorldPoint at)
+	{
+		LocalPoint local = view == null ? null : LocalPoint.fromWorld(view, at);
+		return local == null ? null : view.getScene().getTiles()[at.getPlane()][local.getSceneX()][local.getSceneY()];
 	}
 
 	/** The tile's game objects, then its wall, ground and decorative object: a large object is on each tile it covers. */

@@ -85,11 +85,11 @@ final class LowerBound
 			{
 				continue;
 			}
-			for (int i = table.reverseFrom(node); i < table.reverseEnd(node); i++)
+			for (int i = table.reverseStart[node]; i < table.reverseStart[node + 1]; i++)
 			{
-				int entry = table.reverseEntry(i);
-				int from = table.entryFrom(entry);
-				int cost = head[1] + table.entryFull(entry);
+				int entry = table.reverseEntry[i];
+				int from = table.entryFrom[entry];
+				int cost = head[1] + table.entryFull[entry];
 				if (cost < walk[from])
 				{
 					walk[from] = cost;

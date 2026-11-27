@@ -26,16 +26,24 @@ final class LineTargets
 	WorldPoint instanceTile;
 	WalkCosts instanceWalk;
 
-	/** The outlined object cheapest to walk to: the game walks to the nearest side of the booth or chest clicked. */
+	/**
+	 * The outlined object cheapest to walk to: the game walks to the nearest side of the booth or chest clicked. At an equal
+	 * cost, the nearest: while a chained fairy code holds new plans, the walk is from where the chain began and reaches
+	 * neither ring.
+	 */
 	TileObject object(WorldView view)
 	{
 		WalkCosts here = walk(view);
+		Player local = client.getLocalPlayer();
+		WorldPoint at = local == null ? null : local.getWorldLocation();
 		TileObject best = null;
 		int bestCost = WalkCosts.UNREACHED;
 		for (TileObject object : guide.getHighlightObjects())
 		{
 			int cost = here == null ? WalkCosts.UNREACHED : here.cost(walkedTo(view, object));
-			if (best == null || cost < bestCost)
+			boolean nearer = cost == bestCost && at != null && best != null
+				&& object.getWorldLocation().distanceTo2D(at) < best.getWorldLocation().distanceTo2D(at);
+			if (best == null || cost < bestCost || nearer)
 			{
 				best = object;
 				bestCost = cost;

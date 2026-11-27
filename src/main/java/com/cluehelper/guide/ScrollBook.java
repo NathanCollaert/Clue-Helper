@@ -4,10 +4,8 @@ import com.cluehelper.Tables;
 import com.cluehelper.route.BookScrolls;
 import com.cluehelper.transport.CatalogRow;
 import java.util.*;
-import java.util.function.Function;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
-import static java.util.stream.Collectors.*;
 import com.cluehelper.guide.SubStep.Kind;
 
 /** The master scroll book: its interface's widget per scroll, and the bank stops that keep it out of the Wilderness. */
@@ -36,9 +34,8 @@ public final class ScrollBook
 		}
 	}
 
-	private static final List<Scroll> SCROLLS = Tables.rows("scrolls").stream()
-		.map(row -> new Scroll(row.getKey(), row.id(0), row.id(1), row.id(2), row.id(3))).collect(toUnmodifiableList());
-	private static final Map<String, Scroll> BY_NAME = SCROLLS.stream().collect(toUnmodifiableMap(Scroll::getName, Function.identity()));
+	private static final Map<String, Scroll> BY_NAME = Tables.byKey("scrolls",
+		row -> new Scroll(row.getKey(), row.id(0), row.id(1), row.id(2), row.id(3)));
 
 
 	private ScrollBook()

@@ -188,14 +188,10 @@ public class StepNeeds
 		return ids;
 	}
 
+	/** A lit fire pit lights the step, as core counts it. */
 	private boolean firePitLit(StepRequirements requirements)
 	{
-		return isFirePitLit(requirements.getFirePitVarbitId(), client);
-	}
-
-	/** A lit fire pit lights the step, as core counts it. */
-	private static boolean isFirePitLit(int firePitVarbitId, Client client)
-	{
+		int firePitVarbitId = requirements.getFirePitVarbitId();
 		return firePitVarbitId != NO_FIRE_PIT && client.getVarbitValue(firePitVarbitId) == LIT;
 	}
 

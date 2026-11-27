@@ -33,7 +33,7 @@ public class MenuTarget
 	int lineId;
 	/** A nexus line's map region shield or a fairy ring code. */
 	String lineKey;
-	/** The cache's name of a nexus destination, a minigame or a boat's dock. */
+	/** The cache's name of a nexus destination, a minigame or a boat's dock; a chained fairy ring code's whole chain. */
 	String lineName;
 	/** Where a Quetzal site's icon sits on the map, x and y. */
 	int[] icon;

@@ -8,7 +8,8 @@ import java.util.*;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
-import lombok.Getter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import net.runelite.api.coords.WorldPoint;
 
 /**
@@ -16,6 +17,7 @@ import net.runelite.api.coords.WorldPoint;
  * generator's tables by the test-side {@code WalkLoader}: {@link #JSON} holds the fields Gson reads, {@link #COLUMNS}
  * the transient int columns.
  */
+@FieldDefaults(level = AccessLevel.PACKAGE)
 public final class WalkTable
 {
 	public static final int NO_NODE = -1;
@@ -33,6 +35,7 @@ public final class WalkTable
 	List<Requirements> gates;
 	Map<Integer, List<Bank>> banks;
 	Map<Integer, int[]> rowsByOrigin;
+	/** The row is an {@link Exit}: it leaves for a far landing (a cave, a dungeon's ladder). */
 	boolean[] rowIsExit;
 	Map<Long, Exit> exits;
 	Map<Long, List<Exit>> rowObjects;
@@ -48,19 +51,33 @@ public final class WalkTable
 	List<Integer> watchedVarps;
 
 	final transient Map<WorldPoint, Integer> byTile = new HashMap<>();
+	/** Each node's entries are {@code [entryStart[node], entryStart[node + 1])}. */
 	transient int[] entryStart;
 	transient int[] entryTo;
+	/** The cost when every gate on the path passes. */
 	transient int[] entryFull;
+	/** 0 when the path uses no gated row; else an index into {@link #gateSet(int)}. */
 	transient int[] entryGateSet;
+	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
 	transient int[] entryOpen;
+	/**
+	 * The cheapest cost passing none of {@link #entryGateSet}'s gates, or {@link #NO_PATH}; kept only when it uses gates
+	 * of its own ({@link #entryAlternativeGateSet}) and beats {@link #entryOpen}. A place with two differently gated ways
+	 * in stays reachable when the cheaper way's gates fail.
+	 */
 	transient int[] entryAlternative;
+	/** 0 when the entry has no {@link #entryAlternative}; else an index into {@link #gateSet(int)}. */
 	transient int[] entryAlternativeGateSet;
+	/** Entries that walk into a node: {@code reverseEntry[i]} for i in {@code [reverseStart[node], reverseStart[node + 1])}. */
 	transient int[] reverseStart;
 	transient int[] reverseEntry;
 	transient int[] entryFrom;
+	/** Packed tiles ({@link #pack}). */
 	transient int[] rowOrigin;
+	/** The packed tile the row lands on. */
 	transient int[] rowDest;
 	transient int[] rowCost;
+	/** 0 for an always-open row, else a gate id. */
 	transient int[] rowGate;
 
 	private WalkTable()
@@ -129,55 +146,6 @@ public final class WalkTable
 		return tile == null ? NO_NODE : byTile.getOrDefault(tile, NO_NODE);
 	}
 
-	public int entriesFrom(int node)
-	{
-		return entryStart[node];
-	}
-
-	public int entriesEnd(int node)
-	{
-		return entryStart[node + 1];
-	}
-
-	public int entryTo(int entry)
-	{
-		return entryTo[entry];
-	}
-
-	/** The cost when every gate on the path passes. */
-	public int entryFull(int entry)
-	{
-		return entryFull[entry];
-	}
-
-	/** 0 when the path uses no gated row; else an index into {@link #gateSet(int)}. */
-	public int entryGateSet(int entry)
-	{
-		return entryGateSet[entry];
-	}
-
-	/** The cost using always-open rows only, or {@link #NO_PATH}; meaningful only for a gated entry. */
-	public int entryOpen(int entry)
-	{
-		return entryOpen[entry];
-	}
-
-	/**
-	 * The cheapest cost passing none of {@link #entryGateSet}'s gates, or {@link #NO_PATH}; kept only when it uses gates
-	 * of its own ({@link #entryAlternativeGateSet}) and beats {@link #entryOpen}. A place with two differently gated ways
-	 * in stays reachable when the cheaper way's gates fail.
-	 */
-	public int entryAlternative(int entry)
-	{
-		return entryAlternative[entry];
-	}
-
-	/** 0 when the entry has no {@link #entryAlternative}; else an index into {@link #gateSet(int)}. */
-	public int entryAlternativeGateSet(int entry)
-	{
-		return entryAlternativeGateSet[entry];
-	}
-
 	public int gateSetCount()
 	{
 		return gateSets.length;
@@ -215,33 +183,10 @@ public final class WalkTable
 		return unpack(rowDest[row]);
 	}
 
-	public int rowCost(int row)
-	{
-		return rowCost[row];
-	}
-
-	/** The row is an {@link Exit}: it leaves for a far landing (a cave, a dungeon's ladder). */
-	boolean isExitRow(int row)
-	{
-		return rowIsExit[row];
-	}
-
 	/** The rows that start on the packed tile ({@link #pack}). */
 	int[] rowsFrom(int tile)
 	{
 		return rowsByOrigin.getOrDefault(tile, NO_ROWS);
-	}
-
-	/** The packed tile the row lands on. */
-	int rowDestTile(int row)
-	{
-		return rowDest[row];
-	}
-
-	/** 0 for an always-open row, else a gate id. */
-	public int rowGate(int row)
-	{
-		return rowGate[row];
 	}
 
 	/**
@@ -283,27 +228,6 @@ public final class WalkTable
 			}
 		}
 		return false;
-	}
-
-	/** Entries that walk into {@code node}: {@code reverseEntry(i)} for i in [reverseFrom, reverseEnd). */
-	public int reverseFrom(int node)
-	{
-		return reverseStart[node];
-	}
-
-	public int reverseEnd(int node)
-	{
-		return reverseStart[node + 1];
-	}
-
-	public int reverseEntry(int index)
-	{
-		return reverseEntry[index];
-	}
-
-	public int entryFrom(int entry)
-	{
-		return entryFrom[entry];
 	}
 
 	private static long exitKey(WorldPoint origin, WorldPoint destination)

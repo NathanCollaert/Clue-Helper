@@ -62,7 +62,7 @@ public final class WalkCosts
 		if (search.cost(packed) != UNREACHED)
 		{
 			int via = search.via(packed);
-			return via != WalkSearch.NONE && ground.isExitRow(via) ? ground.exit(via) : null;
+			return via != WalkSearch.NONE && ground.table.rowIsExit[via] ? ground.exit(via) : null;
 		}
 		int landing = exitLandingBy(packed);
 		return landing == WalkSearch.NONE ? null : ground.exit(search.via(landing));

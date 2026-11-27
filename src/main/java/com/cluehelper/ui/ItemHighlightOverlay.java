@@ -21,6 +21,8 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	Highlighter highlighter;
 	@Inject
 	LeftClicks leftClicks;
+	@Inject
+	WaypointOverlay waypoints;
 
 	ItemHighlightOverlay()
 	{
@@ -33,12 +35,14 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem item)
 	{
 		boolean inBank = item.getWidget() != null && WidgetUtil.componentToInterface(item.getWidget().getId()) == InterfaceID.BANKMAIN;
-		if (!config.highlightItems() || !(inBank ? guide.getHighlights().getBankItems() : guide.getHighlights().getItems()).contains(itemId)
-			|| !inBank && (guide.isTravelling() || isUsedAfterTheBank()))
+		boolean usedOnPath = !inBank && waypoints.pathItems().contains(itemId);
+		boolean marked = inBank ? guide.getHighlights().getBankItems().contains(itemId)
+			: guide.getHighlights().getItems().contains(itemId) || usedOnPath;
+		if (!config.highlightItems() || !marked || !inBank && (guide.isTravelling() || isUsedAfterTheBank()))
 		{
 			return;
 		}
-		boolean leftClick = inBank ? leftClicks.withdraws(itemId) : guide.getHighlights().getFillItems().contains(itemId);
+		boolean leftClick = inBank ? leftClicks.withdraws(itemId) : usedOnPath || guide.getHighlights().getFillItems().contains(itemId);
 		highlighter.item(graphics, itemId, item.getQuantity(), item.getCanvasBounds(), leftClick);
 	}
 

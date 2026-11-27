@@ -523,7 +523,7 @@ public class PlayerModel
 	}
 
 	/** The snapshot, or an empty one while logged out. */
-	private PlayerSnapshot now()
+	public PlayerSnapshot now()
 	{
 		PlayerSnapshot snapshot = getSnapshot();
 		return snapshot == null ? EMPTY : snapshot;

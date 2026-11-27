@@ -317,7 +317,7 @@ public final class Planner
 		}
 		WalkTable table = ctx.table;
 		Set<Integer> targets = orders.get(0).stream().flatMapToInt(Arrays::stream).boxed().collect(toSet());
-		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || !ctx.isTableNode(n) || table.reverseEnd(n) == table.reverseFrom(n));
+		boolean noWalkData = targets.stream().anyMatch(n -> n == WalkTable.NO_NODE || !ctx.isTableNode(n) || table.reverseStart[n + 1] == table.reverseStart[n]);
 		if (noWalkData)
 		{
 			return List.of("No route: the plugin has no way to this spot yet");
@@ -338,7 +338,7 @@ public final class Planner
 	 */
 	private static List<List<String>> lockingItems(PlanContext ctx, Set<Integer> targets)
 	{
-		PlayerSnapshot judged = withBank(ctx);
+		PlayerSnapshot judged = ctx.owner();
 		Set<List<String>> missing = new LinkedHashSet<>();
 		shutWaysInto(ctx, ctx.gates[ctx.gates[PlanContext.BANKED] != null ? PlanContext.BANKED : PlanContext.NOT_BANKED], targets).flatMap(List::stream)
 			.map(gate -> ctx.judge("gate", gate, judged))
@@ -351,20 +351,14 @@ public final class Planner
 	private static Stream<List<Requirements>> shutWaysInto(PlanContext ctx, WalkGates gates, Set<Integer> targets)
 	{
 		WalkTable table = ctx.table;
-		return targets.stream().flatMap(target -> IntStream.range(table.reverseFrom(target), table.reverseEnd(target)).boxed()
-			.flatMap(i -> gates.shutWays(table.reverseEntry(i)).stream()));
-	}
-
-	/** The player as a missing note judges them: with the bank, where it counts. */
-	private static PlayerSnapshot withBank(PlanContext ctx)
-	{
-		return ctx.in.getBanked() != null ? ctx.in.getBanked() : ctx.in.getPlayer();
+		return targets.stream().flatMap(target -> IntStream.range(table.reverseStart[target], table.reverseStart[target + 1]).boxed()
+			.flatMap(i -> gates.shutWays(table.reverseEntry[i]).stream()));
 	}
 
 	/** The way in the player lacks, from the nearest transport landing by a target (the Dragontooth boat's fare). */
 	private static List<String> blockedRideNotes(PlanContext ctx)
 	{
-		PlayerSnapshot judged = withBank(ctx);
+		PlayerSnapshot judged = ctx.owner();
 		List<WorldPoint> targets = ctx.in.getStep().getTargets();
 		return ctx.in.getCatalog().getTeleports().stream()
 			.filter(row -> row.getDestination() != null && distanceToNearest(row.getDestination(), targets) <= BLOCKED_RIDE_TILES)
@@ -483,7 +477,7 @@ public final class Planner
 			LabelSearch best = null;
 			for (List<int[]> order : orders)
 			{
-				LabelSearch search = run(new LabelSearch(ctx, order, area, first,
+				LabelSearch search = run(new LabelSearch(ctx, order, false, area, first,
 					goal -> identity.equals(RouteBuilder.build(ctx, goal).getIdentity()), rankLimit));
 				if (search.goal != null && beats(search, best))
 				{
@@ -496,11 +490,7 @@ public final class Planner
 		/** A lower rank, or at the same rank the better tie: nothing used up, then no spellbook change, then no bank stop. */
 		private static boolean beats(LabelSearch search, LabelSearch best)
 		{
-			if (search.goal == null || best == null || best.goal == null || search.goal.rank != best.goal.rank)
-			{
-				return rankOf(search) < rankOf(best);
-			}
-			return LabelSearch.TIE_ORDER.compare(search.goal, best.goal) < 0;
+			return search.goal != null && (best == null || best.goal == null || LabelSearch.RANK_ORDER.compare(search.goal, best.goal) < 0);
 		}
 
 		private static int rankOf(LabelSearch search)
@@ -510,7 +500,7 @@ public final class Planner
 
 		private LabelSearch run(List<int[]> order, int rankLimit)
 		{
-			return run(new LabelSearch(ctx, order, probes, area, rankLimit));
+			return run(new LabelSearch(ctx, order, probes, area, null, goal -> true, rankLimit));
 		}
 
 		private LabelSearch run(LabelSearch search)
@@ -548,7 +538,7 @@ public final class Planner
 				stageReached = false;
 				if (merge)
 				{
-					legs.set(legs.size() - 1, Leg.walk(last.getFrom(), leg.getTo(), last.getHalfTicks() + leg.getHalfTicks(), leg.getBookAfter()));
+					legs.set(legs.size() - 1, last.toBuilder().to(leg.getTo()).halfTicks(last.getHalfTicks() + leg.getHalfTicks()).bookAfter(leg.getBookAfter()).build());
 				}
 				else
 				{
@@ -599,11 +589,38 @@ public final class Planner
 			}
 			Map<Integer, ItemUse> byItem = new LinkedHashMap<>(routeWithdraw(goal));
 			ctx.required.getWithdraw().forEach(use -> byItem.putIfAbsent(use.getItemId(), use));
+			Set<Integer> unused = unusedGateTools(ctx, goal);
 			for (int gateItem : goal.withdrawn)
 			{
-				byItem.putIfAbsent(gateItem, new ItemUse(Container.BANK, gateItem, 1));
+				if (!unused.contains(gateItem))
+				{
+					byItem.putIfAbsent(gateItem, new ItemUse(Container.BANK, gateItem, 1));
+				}
 			}
 			return List.copyOf(byItem.values());
+		}
+
+		/**
+		 * The gates' tools the route took at its bank stop but walks through none of their gates with (a web's sword on a
+		 * route with no web). The search lets a stop that took nothing go only straight to a bank item's use, so a teleport
+		 * used legs later (the headgear back to Sherlock) is reached by a stop that took some tool.
+		 */
+		private static Set<Integer> unusedGateTools(PlanContext ctx, LabelSearch.Label goal)
+		{
+			Set<Integer> unused = ctx.gates[PlanContext.BANKED].storedGateTools().stream().flatMapToInt(IntStream::of).boxed()
+				.collect(toCollection(HashSet::new));
+			IntStream.of(ctx.stageWithdraw()).forEach(unused::remove);
+			WalkTable table = ctx.table;
+			for (LabelSearch.Label label : goal.chain())
+			{
+				LabelSearch.Label from = label.parent;
+				if (label.kind == Leg.Kind.WALK && from != null && ctx.isTableNode(from.node) && ctx.isTableNode(label.node))
+				{
+					IntStream.range(table.entryStart[from.node], table.entryStart[from.node + 1]).filter(e -> table.entryTo[e] == label.node)
+						.flatMap(e -> IntStream.of(ctx.gates[label.b].withdraw(e))).forEach(unused::remove);
+				}
+			}
+			return unused;
 		}
 
 		private static Map<Integer, ItemUse> routeWithdraw(LabelSearch.Label goal)
@@ -639,27 +656,34 @@ public final class Planner
 
 		private static Leg leg(PlanContext ctx, LabelSearch.Label label, WorldPoint at)
 		{
-			Book book = LabelSearch.bookOf(label.k);
+			Leg.LegBuilder leg = Leg.builder().kind(label.kind).from(at).to(at).halfTicks(label.edgeHalf).bookAfter(LabelSearch.bookOf(label.k));
 			switch (label.kind)
 			{
 				case TELEPORT:
-					return Leg.teleport(at, ((TransportOptions.Teleport) label.ref).row, label.edgeHalf, book);
+					return teleport(leg, label).build();
 				case SWAP_TELEPORT:
-					return Leg.swapTeleport(at, ((TransportOptions.Teleport) label.ref).row, ((TransportOptions.Change) label.ref2).change, label.edgeHalf, book);
+					return teleport(leg, label).change(((TransportOptions.Change) label.ref2).change).build();
 				case FAIRY_RING:
-					return Leg.fairyRing(at, ((TransportOptions.Teleport) label.ref).row, ((TransportOptions.Teleport) label.ref2).row, label.edgeHalf, book);
+					CatalogRow landing = ((TransportOptions.Teleport) label.ref2).row;
+					return leg.row(((TransportOptions.Teleport) label.ref).row).landing(landing).to(landing.getDestination()).build();
 				case SPELLBOOK_CHANGE:
-					return Leg.spellbookChange(at, ((TransportOptions.Change) label.ref).change, label.edgeHalf, book);
+					return leg.change(((TransportOptions.Change) label.ref).change).build();
 				case BANK:
-					return Leg.bank(at, label.edgeHalf, book);
+					return leg.build();
 				case WILDERNESS_EXIT:
 					// The exit's node has no tile, so its origin class is WILD0's: its own class says how far south it goes.
-					return Leg.wildernessExit(at, ctx.abstractClass(label.node).getExitY(), label.edgeHalf, book);
+					return leg.to(Leg.wildernessExitEnd(at, ctx.abstractClass(label.node).getExitY())).build();
 				case WALK:
-					return Leg.walk(at, ctx.tile(label.node), label.edgeHalf, book);
+					return leg.to(ctx.tile(label.node)).build();
 				default:
 					throw new IllegalArgumentException("unhandled leg kind " + label.kind);
 			}
+		}
+
+		private static Leg.LegBuilder teleport(Leg.LegBuilder leg, LabelSearch.Label label)
+		{
+			CatalogRow row = ((TransportOptions.Teleport) label.ref).row;
+			return leg.row(row).to(row.getDestination());
 		}
 	}
 }

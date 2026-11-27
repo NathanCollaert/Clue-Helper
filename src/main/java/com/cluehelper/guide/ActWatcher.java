@@ -40,7 +40,6 @@ public class ActWatcher
 	int challengeTick = NEVER;
 	int enemyTick = NEVER;
 	NPC enemy;
-	boolean inventoryChanged = true;
 	boolean challengeCarried;
 	/** The puzzle or light box carried, by name; null for none. */
 	@Getter(AccessLevel.PACKAGE)
@@ -68,29 +67,17 @@ public class ActWatcher
 		}
 	}
 
-	public void onItemContainerChanged(ItemContainerChanged event)
-	{
-		if (event.getContainerId() == InventoryID.INV)
-		{
-			inventoryChanged = true;
-		}
-	}
-
 	/** Call once per tick with the step being guided. */
 	void onGameTick(Step step)
 	{
 		int tick = client.getTickCount();
-		if (inventoryChanged)
+		boolean carried = CHALLENGE_ITEMS.stream().anyMatch(player::carriesItemNamed);
+		if (carried && !challengeCarried)
 		{
-			inventoryChanged = false;
-			boolean carried = CHALLENGE_ITEMS.stream().anyMatch(player::carriesItemNamed);
-			if (carried && !challengeCarried)
-			{
-				challengeTick = tick;
-			}
-			challengeCarried = carried;
-			box = BOXES.stream().filter(player::carriesItemNamed).findFirst().orElse(null);
+			challengeTick = tick;
 		}
+		challengeCarried = carried;
+		box = BOXES.stream().filter(player::carriesItemNamed).findFirst().orElse(null);
 		watchBox();
 		Player local = client.getLocalPlayer();
 		WorldPoint at = local == null ? null : local.getWorldLocation();

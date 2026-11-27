@@ -85,7 +85,8 @@ public class Highlighter
 		}
 		try
 		{
-			Shape hiddenShape = isHidden(object) ? hiddenShape(object) : null;
+			// A ring's hub is only its flying butterflies, often too low or few to count as drawn: its mushrooms always are
+			Shape hiddenShape = !FAIRY_RINGS.contains(object.getId()) && isHidden(object) ? hiddenShape(object) : null;
 			if (hiddenShape != null)
 			{
 				box(graphics, hiddenShape);

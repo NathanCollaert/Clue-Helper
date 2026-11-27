@@ -61,6 +61,8 @@ public class Stage
 	Set<Integer> houseObjects = Set.of();
 	/** The step's own items are used here (Sherlock's task), so they come before this stage, not at the hand-in. */
 	boolean takesStepItems;
+	/** Whatever form its objects are in, their left click does the task (a pyre's Build, then Light): they are filled. */
+	boolean leftClickDoesIt;
 	/** Needs the act wants worn, by name (Ghommal's +100 melee strength): put on just before. */
 	@Builder.Default
 	List<String> worn = List.of();

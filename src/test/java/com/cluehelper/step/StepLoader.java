@@ -107,7 +107,7 @@ public final class StepLoader
 		clues.forEach((key, clue) -> entryOf(index, key).add("amounts", GSON.toJsonTree(withHandAmounts(amounts(clue), entryOf(index, key)))));
 		StepIndex acted = SOURCE_GSON.fromJson(index, StepIndex.class);
 		clues.forEach((key, clue) -> addPart(entryOf(index, key), acted.entry(key), clue));
-		sources.forEach((key, source) -> addEntryFacts(entryOf(index, key), shaped.entry(key), source));
+		sources.forEach((key, source) -> addEntryFacts(entryOf(index, key), source));
 		clues.forEach((key, clue) -> entryOf(index, key).add("plantItems", GSON.toJsonTree(plantItems(shaped.entry(key), clue))));
 		return SOURCE_GSON.fromJson(index, StepIndex.class);
 	}
@@ -123,32 +123,11 @@ public final class StepLoader
 		}
 	}
 
-	/** What the entry's own fields give: the acts before the task, the monsters met and the way in's one cover item. */
-	private static void addEntryFacts(JsonObject json, StepIndex.Entry entry, StepSource.Entry source)
+	/** What the entry's own fields give: the acts before the task and the monsters met. */
+	private static void addEntryFacts(JsonObject json, StepSource.Entry source)
 	{
 		json.add("beforeActs", GSON.toJsonTree(source.getBefore().stream().map(ActParts::beforeAct).collect(toList())));
 		json.add("enemies", GSON.toJsonTree(source.getCombat().stream().flatMap(combat -> combat.getNpcs().stream()).collect(toSet())));
-		json.addProperty("cover", cover(entry));
-	}
-
-	/**
-	 * The one item that is every worn need of the way in at once (the Medallion of the Deep for the diving helmet and
-	 * apparatus), worn by its own Wear; -1 for none. The plugin offers it only while two or more needs are left.
-	 */
-	private static int cover(StepIndex.Entry entry)
-	{
-		List<StepIndex.Requires> worn = entry.wornRequires();
-		if (worn.size() < 2)
-		{
-			return -1;
-		}
-		List<Integer> covers = worn.get(0).getIds().stream().filter(id -> worn.stream().allMatch(need -> need.getIds().contains(id)))
-			.collect(toList());
-		if (covers.size() > 1 || !covers.isEmpty() && worn.stream().anyMatch(need -> need.getPutOn() != null))
-		{
-			throw new IllegalStateException("the plugin offers one cover item worn by its own Wear: " + covers);
-		}
-		return covers.isEmpty() ? -1 : covers.get(0);
 	}
 
 	/** A planting task's items but the rake, which only clears the patch: the seed first, then the tools it goes in with. */

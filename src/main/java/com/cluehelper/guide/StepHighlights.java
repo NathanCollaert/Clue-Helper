@@ -58,7 +58,8 @@ final class StepHighlights
 		{
 			return Highlights.NONE;
 		}
-		Highlights.HighlightsBuilder shown = Highlights.builder().objectOption(current.getOption()).bankItems(current.getBankItems().stream()
+		Highlights.HighlightsBuilder shown = Highlights.builder().objectOption(current.getOption())
+			.fillAllObjects(fillsAllObjects(current, step)).bankItems(current.getBankItems().stream()
 			.map(id -> bankMemory.onlyInBankedKit(id) ? ItemID.HUNTSMANS_KIT : id).collect(toUnmodifiableSet()));
 		switch (current.getKind())
 		{
@@ -89,7 +90,8 @@ final class StepHighlights
 			case FAIRY_RING:
 				if (current.getRow().getCode() != null)
 				{
-					shown.menuTarget(MenuTarget.fairyCode(current.getRow().getCode()).toBuilder().objectIds(FAIRY_RING_OBJECTS).build());
+					shown.menuTarget(MenuTarget.fairyCode(current.getRow().getCode()).toBuilder().lineName(current.getRow().getLineName())
+						.objectIds(FAIRY_RING_OBJECTS).build());
 				}
 				break;
 			case CHANGE_BOOK:
@@ -134,6 +136,10 @@ final class StepHighlights
 
 	List<TileObject> fillObjects(List<TileObject> objects, Highlights shown)
 	{
+		if (shown.isFillAllObjects())
+		{
+			return objects;
+		}
 		String objectOption = shown.getObjectOption();
 		// Filled until a hover shows otherwise: most left clicks do the step, and a hover is kept for later sessions
 		if (objectOption != null)
@@ -292,6 +298,13 @@ final class StepHighlights
 	private Highlights wayInHighlights(Highlights.HighlightsBuilder shown, SubStep current, Step step)
 	{
 		StepIndex.WayIn way = current.getWayIn();
+		if (!current.getActItems().isEmpty())
+		{
+			// The remembered mound: the spade, once the player stands on it
+			boolean onIt = current.getWaypoint() == null || current.getWaypoint().equals(player.getPosition().getTile());
+			return onIt ? shown.items(current.getActItems()).fillItems(actItemFill(current)).tab(Tab.INVENTORY)
+				.menuTarget(rowTargets.items(current.getActItems(), current.getActOption())).build() : shown.build();
+		}
 		if (!way.getUse().isEmpty())
 		{
 			return useOnWayIn(shown, way);
@@ -358,6 +371,13 @@ final class StepHighlights
 	{
 		return current != null && step != null && current.getKind() == SubStep.Kind.ACT && Acts.USE_OPTION.equals(current.getOption())
 			&& !current.getNpcIds().isEmpty();
+	}
+
+	/** The act at, or the walk to, a task whose objects' every form has the task as its left click (a funeral pyre). */
+	private static boolean fillsAllObjects(SubStep current, Step step)
+	{
+		return step != null && !current.getObjectIds().isEmpty() && step.getStages().stream()
+			.anyMatch(stage -> stage.isLeftClickDoesIt() && stage.getObjectIds().containsAll(current.getObjectIds()));
 	}
 
 	static boolean isStepItem(Step step, int itemId)

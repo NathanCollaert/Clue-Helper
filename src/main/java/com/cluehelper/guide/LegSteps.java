@@ -142,7 +142,7 @@ final class LegSteps
 			steps.add(SubStep.of(Kind.FAIRY_RING, travelLine(landing, hops[i]))
 				.detail("Code " + (i + 1) + " of " + hops.length + (last ? "" : ", then dial the next where you land"))
 				.waypoint(i == 0 ? leg.getFrom() : null).goal(last ? leg.getTo() : null).radius(SubSteps.LANDING_TILES)
-				.row(landing.toBuilder().code(hops[i]).build()).build());
+				.row(landing.toBuilder().code(hops[i]).lineName(code).build()).build());
 		}
 		return List.copyOf(steps);
 	}

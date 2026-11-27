@@ -8,30 +8,33 @@ import net.runelite.api.coords.WorldPoint;
 
 /**
  * Client thread only. Where the player went into a way in entered at one of several places, learnt as they go in: the
- * Barrows crypt with the tunnel is only known once its sarcophagus is searched. Kept across sessions until the way's
+ * Barrows crypt with the tunnel is only known once the player has gone in from it. Kept across sessions until the way's
  * forget line shows in chat (the chest's count once it is looted).
  */
 @Singleton
 public class WayInMemory
 {
 	static final String KEY = "waysIn";
+	/** Anywhere on one Barrows mound digs into the same crypt. */
+	private static final int SAME_PLACE_TILES = 4;
 
-	/** Where the player stepped onto the way's part-way floors, and the object they then went in by. */
+	/**
+	 * Where the player stepped onto the way's part-way floors (the mound dug into); stored with the way's forget line, so
+	 * it is forgotten whatever step is on.
+	 */
 	@Value
 	public static class Entered
 	{
 		WorldPoint from;
-		int object;
-		String option;
+		String forgetOn;
 	}
 
 	MemorySlot<Ways> remembered;
 	WorldPoint last;
 	/** The tile the player last stepped from onto the way's part-way floors (a crypt), for the way being watched. */
 	WorldPoint partWayFrom;
-	/** The object last clicked on the part-way floors (the sarcophagus searched); -1 for none. */
-	int clicked = -1;
-	String clickedOption;
+	/** The place {@link #partWayFrom} leads to was tried and doesn't lead in (no tunnel in that crypt). */
+	boolean triedWrong;
 
 	@Inject
 	void init(MemoryStore memory)
@@ -51,78 +54,56 @@ public class WayInMemory
 		if (way.isPartWay(at) && !way.isPartWay(before) && !way.isInside(before))
 		{
 			partWayFrom = before;
-			clicked = -1;
+			triedWrong = false;
 		}
 		else if (way.isInside(at) && way.isPartWay(before) && partWayFrom != null)
 		{
 			Ways ways = remembered.get().copy();
-			ways.entered.put(way.getText(), new Place(partWayFrom, clicked, clickedOption, way.getForgetOn()));
+			ways.entered.put(way.getText(), new Entered(partWayFrom, way.getForgetOn()));
 			remembered.set(ways);
 		}
 	}
 
-	/** An object clicked while on the way's part-way floors: the last one before going in is how the player went in. */
-	public void onObjectClicked(StepIndex.WayIn way, WorldPoint at, int objectId, String option)
+	/** Whatever the step: the Barrows chest looted on any trip moves the tunnel. With the step's way, a wrong place tried. */
+	public void onGameLine(StepIndex.WayIn way, String line)
 	{
-		if (way != null && way.isRemembered() && at != null && way.isPartWay(at))
-		{
-			clicked = objectId;
-			clickedOption = option;
-		}
-	}
-
-	/** Whatever the step: the Barrows chest looted on any trip moves the tunnel. */
-	public void onGameLine(String line)
-	{
+		StepIndex.WrongPlace wrong = way == null ? null : way.getWrongPlace();
+		triedWrong |= wrong != null && partWayFrom != null && line.contains(wrong.getLine());
 		Ways ways = remembered.get().copy();
-		if (ways.entered.values().removeIf(place -> place.forgetOn != null && line.contains(place.forgetOn)))
+		if (ways.entered.values().removeIf(entered -> entered.forgetOn != null && line.contains(entered.forgetOn)))
 		{
 			remembered.set(ways);
 		}
 	}
 
-	/** How the player went in last time; null while it isn't known. */
+	/**
+	 * Part way in at a place that doesn't lead in: one tried without luck, or another than the one remembered (a crypt dug
+	 * into elsewhere on the mounds).
+	 */
+	public boolean isInWrongPlace(StepIndex.WayIn way)
+	{
+		Entered entered = enteredBy(way);
+		boolean elsewhere = entered != null && partWayFrom != null && partWayFrom.distanceTo2D(entered.from) > SAME_PLACE_TILES;
+		return partWayFrom != null && (triedWrong || elsewhere);
+	}
+
+	/** How the player went in last time; null while it isn't known, or stored before the tile was kept whole. */
 	public Entered enteredBy(StepIndex.WayIn way)
 	{
-		Place place = way == null ? null : remembered.get().entered.get(way.getText());
-		return place == null ? null : new Entered(new WorldPoint(place.x, place.y, place.plane), place.object, place.option);
+		Entered entered = way == null ? null : remembered.get().entered.get(way.getText());
+		return entered == null || entered.from == null ? null : entered;
 	}
 
-	/** Stored as plain numbers, by the way's text. */
+	/** By the way's text. */
 	static final class Ways
 	{
-		Map<String, Place> entered = new HashMap<>();
+		Map<String, Entered> entered = new HashMap<>();
 
 		Ways copy()
 		{
 			Ways copy = new Ways();
 			copy.entered.putAll(entered);
 			return copy;
-		}
-	}
-
-	static final class Place
-	{
-		int x;
-		int y;
-		int plane;
-		int object;
-		String option;
-		/** The way's forget line, kept with the place so it is forgotten whatever step is on. */
-		String forgetOn;
-
-		Place()
-		{
-		}
-
-		Place(WorldPoint tile, int object, String option, String forgetOn)
-		{
-			x = tile.getX();
-			y = tile.getY();
-			plane = tile.getPlane();
-			this.object = object;
-			this.option = option;
-			this.forgetOn = forgetOn;
 		}
 	}
 }

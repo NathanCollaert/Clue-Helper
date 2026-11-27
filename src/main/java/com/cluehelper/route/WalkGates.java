@@ -72,11 +72,11 @@ public final class WalkGates
 	public int cost(int entry)
 	{
 		int set = walkedGateSet(entry);
-		if (set == table.entryGateSet(entry))
+		if (set == table.entryGateSet[entry])
 		{
-			return table.entryFull(entry) + setExtra[set];
+			return table.entryFull[entry] + setExtra[set];
 		}
-		return set == 0 ? table.entryOpen(entry) : table.entryAlternative(entry) + setExtra[set];
+		return set == 0 ? table.entryOpen[entry] : table.entryAlternative[entry] + setExtra[set];
 	}
 
 	/** For an entry no walk takes, each of its gated ways as the gates that shut it: the full path's, then the alternative's. */
@@ -87,7 +87,7 @@ public final class WalkGates
 			return List.of();
 		}
 		List<List<Requirements>> ways = new ArrayList<>();
-		for (int set : new int[] {table.entryGateSet(entry), table.entryAlternativeGateSet(entry)})
+		for (int set : new int[] {table.entryGateSet[entry], table.entryAlternativeGateSet[entry]})
 		{
 			if (set != 0)
 			{
@@ -107,12 +107,12 @@ public final class WalkGates
 	/** The gate set of the walk {@link #cost} takes: the full path's, else the alternative's, else 0 for the open one. */
 	private int walkedGateSet(int entry)
 	{
-		int full = table.entryGateSet(entry);
+		int full = table.entryGateSet[entry];
 		if (setPass[full])
 		{
 			return full;
 		}
-		int alternative = table.entryAlternativeGateSet(entry);
+		int alternative = table.entryAlternativeGateSet[entry];
 		return alternative != 0 && setPass[alternative] ? alternative : 0;
 	}
 
@@ -141,7 +141,7 @@ public final class WalkGates
 		boolean[] open = new boolean[table.rowCount()];
 		for (int r = 0; r < open.length; r++)
 		{
-			open[r] = gatePass[table.rowGate(r)];
+			open[r] = gatePass[table.rowGate[r]];
 		}
 		return open;
 	}

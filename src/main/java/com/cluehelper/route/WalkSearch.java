@@ -95,7 +95,7 @@ final class WalkSearch
 				reached++;
 				stopAfter = Math.min(stopAfter, stop.after(tile, cost));
 				int via = vias[slot(tile)];
-				if (via != NONE && ground.isExitRow(via))
+				if (via != NONE && ground.table.rowIsExit[via])
 				{
 					exitLandings.add(tile);
 					if (exitsEnd)
@@ -164,7 +164,7 @@ final class WalkSearch
 		int pushed = 0;
 		for (int row : stepsOnly ? NO_ROWS : ground.openRowsFrom(tile))
 		{
-			pushed += push(buckets, ground.rowDestination(row), cost + ground.rowCost(row), tile, row);
+			pushed += push(buckets, ground.table.rowDest[row], cost + ground.table.rowCost[row], tile, row);
 		}
 		if (isSteppedOntoObstacle(tile, x, y, plane))
 		{

@@ -53,7 +53,7 @@ final class LabelSearch
 	 */
 	static final Comparator<Label> TIE_ORDER = Comparator.<Label>comparingInt(label -> label.fee).thenComparingInt(label -> label.changes)
 		.thenComparingInt(label -> label.b);
-	private static final Comparator<Label> RANK_ORDER = Comparator.<Label>comparingInt(label -> label.rank).thenComparing(TIE_ORDER);
+	static final Comparator<Label> RANK_ORDER = Comparator.<Label>comparingInt(label -> label.rank).thenComparing(TIE_ORDER);
 	final PriorityQueue<Label> queue = new PriorityQueue<>(Comparator.<Label>comparingInt(label -> label.f).thenComparing(TIE_ORDER)
 		.thenComparing(Comparator.<Label>comparingInt(label -> label.half).reversed()));
 
@@ -64,23 +64,13 @@ final class LabelSearch
 	@PackagePrivate
 	int labels;
 
-	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, int rankLimit)
-	{
-		this(ctx, legTargets, probes, areaHalfTicks, null, goal -> true, rankLimit);
-	}
-
 	/**
-	 * The followed route again: the best route that starts with transport {@code onlyFirst} ({@link Route#WALK} for none)
-	 * and whose goal label is {@code wantedGoal}, up to {@code rankLimit}. A bank stop is a state of its own, so the route
-	 * with it and the one without both reach the goal.
+	 * With {@code onlyFirst} and {@code wantedGoal}, the followed route again: the best route that starts with transport
+	 * {@code onlyFirst} ({@link Route#WALK} for none) and whose goal label is {@code wantedGoal}, up to {@code rankLimit};
+	 * a bank stop is a state of its own, so the route with it and the one without both reach the goal. Without them
+	 * ({@code null} and any label), every route.
 	 */
-	LabelSearch(PlanContext ctx, List<int[]> legTargets, int areaHalfTicks, String onlyFirst, Predicate<Label> wantedGoal,
-		int rankLimit)
-	{
-		this(ctx, legTargets, false, areaHalfTicks, onlyFirst, wantedGoal, rankLimit);
-	}
-
-	private LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, String onlyFirst,
+	LabelSearch(PlanContext ctx, List<int[]> legTargets, boolean probes, int areaHalfTicks, String onlyFirst,
 		Predicate<Label> wantedGoal, int rankLimit)
 	{
 		this.rankLimit = rankLimit;
@@ -223,7 +213,9 @@ final class LabelSearch
 			Label current = probeBest.get(from.node);
 			if (current == null || current.rank > from.rank + area + strand)
 			{
-				probeBest.put(from.node, goalLabel(from, end, area, strand, withdrawn));
+				Label goal = label(from, ctx.goal, from.b, 0, 0, from.leg, area, area + strand, null, null, null, from.spent, withdrawn);
+				goal.endBook = end;
+				probeBest.put(from.node, goal);
 			}
 			return;
 		}
@@ -235,23 +227,6 @@ final class LabelSearch
 				goal.endBook = end;
 			}
 		}
-	}
-
-	private Label goalLabel(Label from, Book end, int area, int strand, int[] withdrawn)
-	{
-		Label goal = new Label();
-		goal.parent = from;
-		goal.node = ctx.goal;
-		goal.b = from.b;
-		goal.half = from.half + area;
-		goal.rank = from.rank + area + strand;
-		goal.choicePenalty = from.choicePenalty;
-		goal.fee = from.fee;
-		goal.changes = from.changes;
-		goal.spent = from.spent;
-		goal.withdrawn = withdrawn;
-		goal.endBook = end;
-		return goal;
 	}
 
 	private void expandWalks(Label from, int k)
@@ -267,10 +242,10 @@ final class LabelSearch
 		}
 		WalkTable table = ctx.table;
 		WalkGates gates = ctx.gates[from.b];
-		for (int e = table.entriesFrom(from.node); e < table.entriesEnd(from.node); e++)
+		for (int e = table.entryStart[from.node]; e < table.entryStart[from.node + 1]; e++)
 		{
 			int cost = gates.cost(e);
-			int to = table.entryTo(e);
+			int to = table.entryTo[e];
 			if (cost == WalkTable.NO_PATH || ctx.forbidden(to))
 			{
 				continue;

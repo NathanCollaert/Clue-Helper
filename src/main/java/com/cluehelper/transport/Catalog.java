@@ -1,8 +1,7 @@
 package com.cluehelper.transport;
 
+import com.cluehelper.BundledData;
 import com.google.gson.Gson;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import lombok.Value;
 
@@ -29,17 +28,6 @@ public class Catalog
 
 	public static Catalog read(Gson gson)
 	{
-		try (InputStream in = Catalog.class.getResourceAsStream(FILE))
-		{
-			if (in == null)
-			{
-				throw new IllegalStateException(FILE + " is missing");
-			}
-			return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), Catalog.class);
-		}
-		catch (IOException e)
-		{
-			throw new IllegalStateException("can't read " + FILE, e);
-		}
+		return BundledData.read(gson, Catalog.class, FILE);
 	}
 }

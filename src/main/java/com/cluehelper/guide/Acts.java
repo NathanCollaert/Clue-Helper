@@ -166,9 +166,9 @@ final class Acts
 	{
 		if (!"beginner".equals(step.getTier()))
 		{
-			return act("Talk to Sherlock", null);
+			return SubStep.of(Kind.ACT, "Talk to Sherlock").build();
 		}
-		return handInItems.isEmpty() ? act("Give Charlie the item", null)
+		return handInItems.isEmpty() ? SubStep.of(Kind.ACT, "Give Charlie the item").build()
 			: SubStep.of(Kind.ACT, "Give Charlie:").items(handInItems).build();
 	}
 
@@ -184,10 +184,5 @@ final class Acts
 		}
 		return open ? SubStep.of(Kind.ACT, "Solve the " + box).build()
 			: talk.toBuilder().text("Open the " + box).actItemNamed(box).option(null).npcNames(Set.of()).npcIds(Set.of()).build();
-	}
-
-	private static SubStep act(String text, String detail)
-	{
-		return SubStep.of(Kind.ACT, text).detail(detail).build();
 	}
 }

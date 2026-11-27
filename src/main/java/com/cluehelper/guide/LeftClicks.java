@@ -11,7 +11,7 @@ import net.runelite.api.widgets.*;
 
 /**
  * What a left click on an item, object or NPC does, Menu Entry Swapper's swaps included. Learned from the hover menu's
- * top entry once the mouse has been over it; before that, read from Menu Entry Swapper's config, else the first action.
+ * top entry once the mouse has been over it; before that, the first action.
  * Client thread only.
  */
 @Singleton
@@ -40,8 +40,6 @@ public final class LeftClicks
 
 	@Inject
 	Client client;
-	@Inject
-	SwapperClicks swapperClicks;
 	/** Kept in the profile, so a hover once is enough for every later session. */
 	MemorySlot<Learned> remembered;
 
@@ -125,8 +123,7 @@ public final class LeftClicks
 		{
 			return known;
 		}
-		String swapped = swapperClicks.object(shown);
-		return swapped != null ? swapped : firstAction(objectLeftClickActions(shown.getActions()));
+		return firstAction(objectLeftClickActions(shown.getActions()));
 	}
 
 	/** An ornate jewellery box's left click becomes the place it just sent the player to. */
@@ -184,8 +181,7 @@ public final class LeftClicks
 
 	private String carried(int itemId)
 	{
-		String known = learned().get(ITEM + itemId);
-		return known != null ? known : swapperClicks.item(itemId);
+		return learned().get(ITEM + itemId);
 	}
 
 	/**
@@ -195,8 +191,7 @@ public final class LeftClicks
 	private String worn(int itemId)
 	{
 		String byName = learned().get(WORN + MenuLabels.normalise(client.getItemDefinition(itemId).getName()));
-		String known = byName != null ? byName : learned().get(WORN_ID + itemId);
-		return known != null ? known : swapperClicks.worn(itemId);
+		return byName != null ? byName : learned().get(WORN_ID + itemId);
 	}
 
 	/**

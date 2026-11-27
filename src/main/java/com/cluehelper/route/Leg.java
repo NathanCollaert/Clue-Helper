@@ -6,7 +6,7 @@ import lombok.*;
 import net.runelite.api.coords.WorldPoint;
 
 @Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
 public class Leg
 {
 	private static final int EXIT_COLUMNS = 8;
@@ -27,56 +27,32 @@ public class Leg
 		}
 	}
 
+	@NonNull
 	Kind kind;
+	@NonNull
 	WorldPoint from;
+	@NonNull
 	WorldPoint to;
 	int halfTicks;
 	/** The teleport's row, or a fairy ring's entry ring; null for walks, exits, spellbook changes and bank stops. */
 	CatalogRow row;
 	CatalogRow landing;
 	SpellbookChange change;
-	/** For a pending Spellbook Swap, the temporary book. */
+	/** The book after the leg; for a pending Spellbook Swap, the temporary book. */
 	Book bookAfter;
-
-	public static Leg walk(WorldPoint from, WorldPoint to, int halfTicks, Book book)
-	{
-		return new Leg(Kind.WALK, from, to, halfTicks, null, null, null, book);
-	}
-
-	/**
-	 * Due south until out of the Wilderness, a tile per half-tick. It ends on the last column of its group of
-	 * {@link #EXIT_COLUMNS}: a few tiles aside cost no time, and a step aside between plans doesn't move the end.
-	 */
-	public static Leg wildernessExit(WorldPoint from, int exitY, int halfTicks, Book book)
-	{
-		WorldPoint end = new WorldPoint(from.getX() | EXIT_COLUMNS - 1, exitY, from.getPlane());
-		return new Leg(Kind.WILDERNESS_EXIT, from, end, halfTicks, null, null, null, book);
-	}
 
 	public static Leg teleport(WorldPoint from, CatalogRow row, int halfTicks, Book book)
 	{
-		return new Leg(Kind.TELEPORT, from, row.getDestination(), halfTicks, row, null, null, book);
+		return builder().kind(Kind.TELEPORT).from(from).to(row.getDestination()).halfTicks(halfTicks).row(row).bookAfter(book).build();
 	}
 
-	/** A Spellbook Swap cast, then the teleport it enables. */
-	public static Leg swapTeleport(WorldPoint from, CatalogRow row, SpellbookChange swap, int halfTicks, Book book)
+	/**
+	 * Where a walk due south out of the Wilderness ends, a tile per half-tick: on the last column of its group of
+	 * {@link #EXIT_COLUMNS}, as a few tiles aside cost no time, and a step aside between plans doesn't move the end.
+	 */
+	static WorldPoint wildernessExitEnd(WorldPoint from, int exitY)
 	{
-		return new Leg(Kind.SWAP_TELEPORT, from, row.getDestination(), halfTicks, row, null, swap, book);
-	}
-
-	public static Leg fairyRing(WorldPoint from, CatalogRow entry, CatalogRow landing, int halfTicks, Book book)
-	{
-		return new Leg(Kind.FAIRY_RING, from, landing.getDestination(), halfTicks, entry, landing, null, book);
-	}
-
-	public static Leg spellbookChange(WorldPoint at, SpellbookChange change, int halfTicks, Book bookAfter)
-	{
-		return new Leg(Kind.SPELLBOOK_CHANGE, at, at, halfTicks, null, null, change, bookAfter);
-	}
-
-	public static Leg bank(WorldPoint at, int halfTicks, Book book)
-	{
-		return new Leg(Kind.BANK, at, at, halfTicks, null, null, null, book);
+		return new WorldPoint(from.getX() | EXIT_COLUMNS - 1, exitY, from.getPlane());
 	}
 
 	public int getTicks()

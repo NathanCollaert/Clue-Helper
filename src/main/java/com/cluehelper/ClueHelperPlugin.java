@@ -204,7 +204,6 @@ public class ClueHelperPlugin extends Plugin
 		unregister.clear();
 		routeReport.stop();
 		withdrawTab.stop();
-		fairyLogFilter.stop();
 		hotCold.stop();
 		guide.stop();
 		routes.stop();
@@ -259,7 +258,6 @@ public class ClueHelperPlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		actWatcher.onItemContainerChanged(event);
 		playerModel.onItemContainerChanged(event);
 		bankMemory.onItemContainerChanged(event);
 	}
@@ -329,8 +327,6 @@ public class ClueHelperPlugin extends Plugin
 	public void onScriptPreFired(ScriptPreFired event)
 	{
 		menuLines.onScriptPreFired(event);
-		poh.onScriptPreFired(event);
-		fairyLogFilter.onScriptPreFired(event);
 	}
 
 	@Subscribe
